@@ -80,6 +80,9 @@ debug/
 .nyc_output/
 jest-cache/
 
+# Storybook
+storybook-static/
+
 # Backup folders
 **/backup/
 
