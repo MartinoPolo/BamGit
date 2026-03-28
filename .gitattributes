@@ -1,0 +1,34 @@
+# Normalize all text to LF in git and working tree
+* text=auto eol=lf
+
+# Shell scripts - always LF (CRLF breaks shebangs)
+*.sh text eol=lf
+
+# Common text
+*.md text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+*.html text eol=lf
+*.py text eol=lf
+*.rs text eol=lf
+*.go text eol=lf
+
+# Binary - no conversion
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
