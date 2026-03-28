@@ -1,36 +1,39 @@
 # Project Context
 
 ## Overview
-[Brief description of what this project does]
+BamGit — Desktop Git client built with Tauri v2 + Svelte 5 + TypeScript
 
 ## Tech Stack
-- Language: [e.g., TypeScript, Python]
-- Framework: [e.g., React, FastAPI]
-- Database: [e.g., PostgreSQL, SQLite, None]
-- Package Manager: [e.g., npm, yarn, pip]
+- Frontend: Svelte 5, TypeScript, Vite
+- Backend: Rust (Tauri v2)
+- Package Manager: pnpm
+- Build: Tauri CLI
 
 ## Project Structure
 ```
-[Add key directories and their purposes]
+src/             # Svelte frontend (SvelteKit with static adapter)
+src-tauri/       # Rust backend (Tauri commands, config)
+static/          # Static assets
 ```
 
 ## Development Commands
 ```bash
 # Install dependencies
-[command]
+pnpm install
 
-# Run development server
-[command]
-
-# Run tests
-[command]
+# Run development server (frontend + native window)
+pnpm tauri dev
 
 # Build for production
-[command]
+pnpm tauri build
+
+# Type check
+pnpm check
 ```
 
 ## Key Files
-- `[file]`: [purpose]
-
-## Notes
-[Any important context for Claude to know]
+- `src-tauri/tauri.conf.json`: Tauri app config (window, permissions, bundle)
+- `src-tauri/src/lib.rs`: Rust backend entry point
+- `src/routes/+page.svelte`: Main frontend page
+- `svelte.config.js`: SvelteKit config (static adapter)
+- `vite.config.js`: Vite config

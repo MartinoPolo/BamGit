@@ -4,6 +4,7 @@
 # Environment & secrets
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 .secrets/
@@ -34,6 +35,11 @@ obj/
 .turbo/
 .svelte-kit/
 .nuxt/
+
+# Svelte / Vite
+/package
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
 
 # TypeScript
 *.tsbuildinfo
