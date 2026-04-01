@@ -2,7 +2,7 @@ mod commands;
 mod database;
 mod models;
 
-use commands::dashboard_commands;
+use commands::{dashboard_commands, issue_commands, portfolio_commands};
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,6 +27,16 @@ pub fn run() {
             dashboard_commands::get_dashboard,
             dashboard_commands::update_dashboard,
             dashboard_commands::delete_dashboard,
+            issue_commands::create_issue,
+            issue_commands::get_issues_for_dashboard,
+            issue_commands::get_issue,
+            issue_commands::update_issue,
+            issue_commands::delete_issue,
+            issue_commands::archive_issue,
+            issue_commands::unarchive_issue,
+            portfolio_commands::add_repo_to_portfolio,
+            portfolio_commands::remove_repo_from_portfolio,
+            portfolio_commands::get_portfolio_repos,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -94,16 +94,7 @@ pub fn get_dashboard(state: State<DatabaseState>, id: String) -> Result<Dashboar
         .map_err(|error| format!("Dashboard not found: {error}"))
 }
 
-/// Resolves Option<Option<T>>: None = keep existing, Some(None) = clear, Some(Some(v)) = set
-fn resolve_nullable_field(
-    update_value: Option<Option<String>>,
-    existing_value: Option<String>,
-) -> Option<String> {
-    match update_value {
-        None => existing_value,
-        Some(new_value) => new_value,
-    }
-}
+use super::shared::resolve_nullable_field;
 
 #[tauri::command]
 pub fn update_dashboard(

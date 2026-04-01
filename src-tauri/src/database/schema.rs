@@ -24,7 +24,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
 
         CREATE TABLE IF NOT EXISTS issues (
             id TEXT PRIMARY KEY,
-            dashboard_id TEXT NOT NULL REFERENCES dashboards(id),
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             priority TEXT CHECK (priority IN ('low', 'medium', 'high', 'top')),
             color TEXT,
@@ -35,13 +35,22 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             base_branch TEXT,
             worktree_folder TEXT,
             worktree_state TEXT DEFAULT 'none' CHECK (worktree_state IN ('none', 'pending', 'active', 'failed')),
-            parent_issue_id TEXT REFERENCES issues(id),
+            parent_issue_id TEXT REFERENCES issues(id) ON DELETE SET NULL,
             editor_folder TEXT,
             dev_server_command TEXT,
             dev_server_port INTEGER,
             dev_server_pid INTEGER,
             browser_url TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS portfolio_dashboard_pointers (
+            id TEXT PRIMARY KEY,
+            portfolio_dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            repo_dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            UNIQUE(portfolio_dashboard_id, repo_dashboard_id)
         );
 
         CREATE TABLE IF NOT EXISTS sessions (

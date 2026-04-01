@@ -1,70 +1,142 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { get_dashboards, create_dashboard } from '$lib/tauri/commands';
-	import type { Dashboard } from '$lib/types/dashboard';
+	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
+	import { get_issue_store } from '$lib/stores/issues.svelte';
+	import { create_issue, archive_issue, unarchive_issue, update_issue, delete_issue } from '$lib/tauri/issue_commands';
+	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
+	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
+	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
+	import DashboardToolbar from '$lib/components/DashboardToolbar.svelte';
+	import IssueCardList from '$lib/components/IssueCardList.svelte';
+	import IssueCreateDialog from '$lib/components/IssueCreateDialog.svelte';
+	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
 
-	let dashboards = $state<Dashboard[]>([]);
-	let loading = $state(true);
-	let error = $state<string | null>(null);
+	const dashboard_store = get_dashboard_store();
+	const issue_store = get_issue_store();
 
-	async function load_dashboards() {
+	let create_dialog_open = $state(false);
+	let editing_issue = $state<Issue | null>(null);
+	let all_expanded = $state(false);
+
+	// Load issues when active dashboard changes
+	let last_loaded_dashboard_id: string | null = null;
+
+	$effect(() => {
+		const dashboard_id = dashboard_store.active_dashboard_id;
+		if (dashboard_id !== null && dashboard_id !== last_loaded_dashboard_id) {
+			last_loaded_dashboard_id = dashboard_id;
+			issue_store.load_issues(dashboard_id);
+		}
+	});
+
+	async function handle_create_issue(request: CreateIssueRequest) {
 		try {
-			dashboards = await get_dashboards();
-			error = null;
+			await create_issue(request);
+			await issue_store.refresh();
 		} catch (err) {
-			error = String(err);
-		} finally {
-			loading = false;
+			console.error('Failed to create issue:', err);
 		}
 	}
 
-	async function handle_create_test_dashboard() {
+	async function handle_archive_issue(id: string) {
 		try {
-			await create_dashboard({
-				name: `Test Dashboard ${dashboards.length + 1}`,
-				type: 'repo',
-			});
-			await load_dashboards();
+			await archive_issue(id);
+			await issue_store.refresh();
 		} catch (err) {
-			error = String(err);
+			console.error('Failed to archive issue:', err);
 		}
 	}
 
-	onMount(load_dashboards);
+	async function handle_unarchive_issue(id: string) {
+		try {
+			await unarchive_issue(id);
+			await issue_store.refresh();
+		} catch (err) {
+			console.error('Failed to unarchive issue:', err);
+		}
+	}
+
+	async function handle_update_issue(request: UpdateIssueRequest) {
+		try {
+			await update_issue(request);
+			await issue_store.refresh();
+		} catch (err) {
+			console.error('Failed to update issue:', err);
+		}
+	}
+
+	async function handle_delete_issue(id: string) {
+		try {
+			await delete_issue(id);
+			await issue_store.refresh();
+		} catch (err) {
+			console.error('Failed to delete issue:', err);
+		}
+	}
 </script>
 
-<div class="space-y-4">
-	<div class="flex items-center justify-between">
-		<h1 class="text-xl font-semibold">Issue Dashboard</h1>
-		<button
-			onclick={handle_create_test_dashboard}
-			class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-blue-500"
-		>
-			Create Test Dashboard
-		</button>
+{#if dashboard_store.loading}
+	<p class="text-neutral-500">Loading...</p>
+{:else if dashboard_store.dashboards.length === 0}
+	<OnboardingCard on_create_dashboard={() => {
+		dashboard_store.show_create_dialog = true;
+	}} />
+{:else if !dashboard_store.active_dashboard}
+	<p class="text-neutral-500">Select a dashboard from the sidebar.</p>
+{:else}
+	<div class="flex flex-col gap-4">
+		<!-- Dashboard header -->
+		<div class="flex items-center gap-2">
+			<h1 class="text-xl font-semibold">{dashboard_store.active_dashboard.name}</h1>
+			<span class="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-400">
+				{dashboard_store.active_dashboard.type}
+			</span>
+		</div>
+
+		<!-- Toolbar -->
+		<DashboardToolbar
+			sort_mode={issue_store.sort_mode}
+			show_archived={issue_store.show_archived}
+			archived_count={issue_store.archived_issues.length}
+			{all_expanded}
+			on_add_issue={() => (create_dialog_open = true)}
+			on_sort_change={(mode) => issue_store.set_sort_mode(mode)}
+			on_toggle_archived={() => issue_store.toggle_show_archived()}
+			on_toggle_expand_all={() => (all_expanded = !all_expanded)}
+		/>
+
+		<!-- Issue list or empty state -->
+		{#if issue_store.loading}
+			<p class="text-neutral-500">Loading issues...</p>
+		{:else if issue_store.error}
+			<p class="text-red-400">Error: {issue_store.error}</p>
+		{:else if issue_store.active_issues.length === 0 && issue_store.archived_issues.length === 0}
+			<EmptyIssueState on_add_issue={() => (create_dialog_open = true)} />
+		{:else}
+			<IssueCardList
+				parent_issues={issue_store.parent_issues}
+				archived_issues={issue_store.archived_issues}
+				show_archived={issue_store.show_archived}
+				is_portfolio={dashboard_store.active_dashboard.type === 'portfolio'}
+				force_expanded={all_expanded ? true : undefined}
+				get_children={issue_store.get_children}
+				on_archive={handle_archive_issue}
+				on_unarchive={handle_unarchive_issue}
+				on_edit={(issue) => (editing_issue = issue)}
+				on_delete={handle_delete_issue}
+			/>
+		{/if}
 	</div>
 
-	{#if loading}
-		<p class="text-neutral-500">Loading dashboards...</p>
-	{:else if error}
-		<p class="text-red-400">Error: {error}</p>
-	{:else if dashboards.length === 0}
-		<p class="text-neutral-500">No dashboards yet. Create one to test the IPC bridge.</p>
-	{:else}
-		<div class="space-y-2">
-			{#each dashboards as dashboard (dashboard.id)}
-				<div class="rounded border border-neutral-800 bg-neutral-900 p-3">
-					<div class="flex items-center gap-2">
-						<span class="font-medium">{dashboard.name}</span>
-						<span class="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-400">
-							{dashboard.type}
-						</span>
-					</div>
-					{#if dashboard.github_repo}
-						<p class="mt-1 text-sm text-neutral-500">{dashboard.github_repo}</p>
-					{/if}
-				</div>
-			{/each}
-		</div>
-	{/if}
-</div>
+	<IssueCreateDialog
+		open={create_dialog_open}
+		dashboard_id={dashboard_store.active_dashboard.id}
+		on_close={() => (create_dialog_open = false)}
+		on_create={handle_create_issue}
+	/>
+
+	<IssueEditDialog
+		issue={editing_issue}
+		on_close={() => (editing_issue = null)}
+		on_update={handle_update_issue}
+	/>
+{/if}

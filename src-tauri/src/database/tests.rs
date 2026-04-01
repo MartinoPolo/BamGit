@@ -17,12 +17,12 @@ mod tests {
     // --- Migration tests ---
 
     #[test]
-    fn migration_sets_schema_version_to_one() {
+    fn migration_sets_schema_version_to_current() {
         let connection = Connection::open_in_memory().unwrap();
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 1);
+        assert_eq!(version, 2);
     }
 
     #[test]
@@ -32,13 +32,13 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 1);
+        assert_eq!(version, 2);
     }
 
     // --- Schema tests ---
 
     #[test]
-    fn all_seven_tables_are_created() {
+    fn all_eight_tables_are_created() {
         let connection = setup_test_database();
 
         let expected_tables = [
@@ -49,6 +49,7 @@ mod tests {
             "actions",
             "notification_config",
             "git_status_cache",
+            "portfolio_dashboard_pointers",
         ];
 
         for table_name in &expected_tables {
@@ -282,6 +283,430 @@ mod tests {
             .unwrap();
 
         assert_eq!(worktree_state, "none");
+    }
+
+    // --- Issue CRUD tests ---
+
+    fn insert_test_dashboard(connection: &Connection, id: &str, dashboard_type: &str) {
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id, format!("Dashboard {id}"), dashboard_type],
+            )
+            .unwrap();
+    }
+
+    fn insert_test_issue(connection: &Connection, id: &str, dashboard_id: &str, name: &str) {
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id, dashboard_id, name],
+            )
+            .unwrap();
+    }
+
+    #[test]
+    fn issue_crud_round_trip() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        // Create
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, priority, color) VALUES ('i1', 'd1', 'Fix bug', 'high', '#ff0000')",
+                [],
+            )
+            .unwrap();
+
+        // Read
+        let (name, priority, color, status): (String, Option<String>, Option<String>, String) =
+            connection
+                .query_row(
+                    "SELECT name, priority, color, status FROM issues WHERE id = 'i1'",
+                    [],
+                    |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+                )
+                .unwrap();
+
+        assert_eq!(name, "Fix bug");
+        assert_eq!(priority.as_deref(), Some("high"));
+        assert_eq!(color.as_deref(), Some("#ff0000"));
+        assert_eq!(status, "active");
+
+        // Update
+        connection
+            .execute(
+                "UPDATE issues SET name = 'Fix critical bug', priority = 'top' WHERE id = 'i1'",
+                [],
+            )
+            .unwrap();
+
+        let updated_name: String = connection
+            .query_row("SELECT name FROM issues WHERE id = 'i1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(updated_name, "Fix critical bug");
+
+        // Delete
+        let rows_affected = connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+        assert_eq!(rows_affected, 1);
+    }
+
+    #[test]
+    fn issue_sort_order_defaults_to_zero() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Test");
+
+        let sort_order: i64 = connection
+            .query_row("SELECT sort_order FROM issues WHERE id = 'i1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+
+        assert_eq!(sort_order, 0);
+    }
+
+    #[test]
+    fn issue_sort_order_persists_and_orders_correctly() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, sort_order) VALUES ('i1', 'd1', 'Third', 3)",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, sort_order) VALUES ('i2', 'd1', 'First', 1)",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, sort_order) VALUES ('i3', 'd1', 'Second', 2)",
+                [],
+            )
+            .unwrap();
+
+        let mut statement = connection
+            .prepare("SELECT name FROM issues WHERE dashboard_id = 'd1' ORDER BY sort_order")
+            .unwrap();
+        let names: Vec<String> = statement
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(names, vec!["First", "Second", "Third"]);
+    }
+
+    #[test]
+    fn issue_priority_constraint_accepts_all_valid_values() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        for (index, priority) in ["low", "medium", "high", "top"].iter().enumerate() {
+            let id = format!("i{index}");
+            let result = connection.execute(
+                "INSERT INTO issues (id, dashboard_id, name, priority) VALUES (?1, 'd1', 'Test', ?2)",
+                rusqlite::params![id, priority],
+            );
+            assert!(result.is_ok(), "Priority '{priority}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn issue_priority_constraint_rejects_invalid_value() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        let result = connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, priority) VALUES ('i1', 'd1', 'Test', 'urgent')",
+            [],
+        );
+
+        assert!(result.is_err(), "Invalid priority should be rejected");
+    }
+
+    #[test]
+    fn issue_archive_and_unarchive() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Test");
+
+        // Archive
+        connection
+            .execute(
+                "UPDATE issues SET status = 'archived' WHERE id = 'i1'",
+                [],
+            )
+            .unwrap();
+
+        let status: String = connection
+            .query_row("SELECT status FROM issues WHERE id = 'i1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(status, "archived");
+
+        // Unarchive
+        connection
+            .execute(
+                "UPDATE issues SET status = 'active' WHERE id = 'i1'",
+                [],
+            )
+            .unwrap();
+
+        let status: String = connection
+            .query_row("SELECT status FROM issues WHERE id = 'i1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(status, "active");
+    }
+
+    #[test]
+    fn issue_archived_filter_excludes_archived() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Active Issue");
+
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, status) VALUES ('i2', 'd1', 'Archived Issue', 'archived')",
+                [],
+            )
+            .unwrap();
+
+        // Without archived
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM issues WHERE dashboard_id = 'd1' AND status = 'active'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 1);
+
+        // With archived
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM issues WHERE dashboard_id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn issue_parent_child_foreign_key_valid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Parent");
+
+        let result = connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, parent_issue_id) VALUES ('i2', 'd1', 'Child', 'i1')",
+            [],
+        );
+
+        assert!(result.is_ok(), "Valid parent_issue_id should be accepted");
+    }
+
+    #[test]
+    fn issue_parent_child_foreign_key_invalid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        let result = connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, parent_issue_id) VALUES ('i1', 'd1', 'Orphan', 'nonexistent')",
+            [],
+        );
+
+        assert!(
+            result.is_err(),
+            "Invalid parent_issue_id should be rejected"
+        );
+    }
+
+    #[test]
+    fn delete_parent_issue_nullifies_child_parent_id() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Parent");
+
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, parent_issue_id) VALUES ('i2', 'd1', 'Child', 'i1')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+
+        let parent_id: Option<String> = connection
+            .query_row(
+                "SELECT parent_issue_id FROM issues WHERE id = 'i2'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(parent_id, None, "Deleting parent should nullify child's parent_issue_id");
+    }
+
+    #[test]
+    fn delete_dashboard_cascades_to_issues() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Issue 1");
+        insert_test_issue(&connection, "i2", "d1", "Issue 2");
+
+        connection
+            .execute("DELETE FROM dashboards WHERE id = 'd1'", [])
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM issues WHERE dashboard_id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(count, 0, "Deleting dashboard should cascade to issues");
+    }
+
+    // --- Portfolio pointer tests ---
+
+    #[test]
+    fn portfolio_pointer_crud_round_trip() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "p1", "portfolio");
+        insert_test_dashboard(&connection, "r1", "repo");
+
+        // Create
+        connection
+            .execute(
+                "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'p1', 'r1')",
+                [],
+            )
+            .unwrap();
+
+        // Read
+        let repo_id: String = connection
+            .query_row(
+                "SELECT repo_dashboard_id FROM portfolio_dashboard_pointers WHERE id = 'ptr1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(repo_id, "r1");
+
+        // Delete
+        let rows_affected = connection
+            .execute(
+                "DELETE FROM portfolio_dashboard_pointers WHERE id = 'ptr1'",
+                [],
+            )
+            .unwrap();
+        assert_eq!(rows_affected, 1);
+    }
+
+    #[test]
+    fn portfolio_pointer_rejects_invalid_dashboard_ids() {
+        let connection = setup_test_database();
+
+        let result = connection.execute(
+            "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'bad1', 'bad2')",
+            [],
+        );
+
+        assert!(result.is_err(), "Invalid dashboard IDs should be rejected");
+    }
+
+    #[test]
+    fn portfolio_pointer_unique_constraint() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "p1", "portfolio");
+        insert_test_dashboard(&connection, "r1", "repo");
+
+        connection
+            .execute(
+                "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'p1', 'r1')",
+                [],
+            )
+            .unwrap();
+
+        let result = connection.execute(
+            "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr2', 'p1', 'r1')",
+            [],
+        );
+
+        assert!(
+            result.is_err(),
+            "Duplicate portfolio-repo pair should be rejected"
+        );
+    }
+
+    #[test]
+    fn delete_dashboard_cascades_to_portfolio_pointers() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "p1", "portfolio");
+        insert_test_dashboard(&connection, "r1", "repo");
+
+        connection
+            .execute(
+                "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'p1', 'r1')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute("DELETE FROM dashboards WHERE id = 'p1'", [])
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM portfolio_dashboard_pointers",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(count, 0, "Deleting portfolio should cascade to pointers");
+    }
+
+    // --- Migration v2 tests ---
+
+    #[test]
+    fn migration_v2_adds_sort_order_and_portfolio_table() {
+        let connection = Connection::open_in_memory().unwrap();
+        connection
+            .execute_batch("PRAGMA foreign_keys = ON;")
+            .unwrap();
+        migrations::run_migrations(&connection).unwrap();
+
+        let version = migrations::get_schema_version(&connection).unwrap();
+        assert_eq!(version, 2);
+
+        // portfolio_dashboard_pointers table exists
+        let exists: bool = connection
+            .query_row(
+                "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='portfolio_dashboard_pointers')",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert!(exists, "portfolio_dashboard_pointers table should exist");
     }
 
     #[test]

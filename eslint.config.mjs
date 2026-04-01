@@ -15,6 +15,7 @@ export default [
 			'src-tauri',
 			'**/*.config.*',
 			'*.d.ts',
+			'**/*.svelte.ts',
 		],
 	},
 	...tseslint.configs.recommended,
