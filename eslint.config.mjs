@@ -2,6 +2,7 @@ import tseslint from 'typescript-eslint';
 import sveltePlugin from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
 import storybook from 'eslint-plugin-storybook';
+import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 import svelteConfig from './svelte.config.js';
 
@@ -29,7 +30,12 @@ export default [
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
+		plugins: {
+			'@stylistic': stylistic,
+		},
 		rules: {
+			// Enforce multi-line if blocks — never collapse { body; } onto the if line
+			'@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: false }],
 			// typescript-eslint recommends disabling no-undef for TS projects
 			// https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
 			'no-undef': 'off',

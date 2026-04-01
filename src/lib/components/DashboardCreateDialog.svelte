@@ -133,8 +133,9 @@
 										const next = new Set(selected_repo_ids);
 										if (next.has(repo.id)) {
 								next.delete(repo.id);
-							}
-										else { next.add(repo.id); }
+							} else {
+ next.add(repo.id); 
+}
 										selected_repo_ids = next;
 									}}
 									class="accent-blue-500"
