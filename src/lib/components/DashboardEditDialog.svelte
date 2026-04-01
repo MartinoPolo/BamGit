@@ -34,7 +34,7 @@
 
 	function handle_submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!dashboard || !name.trim()) return;
+		if (!dashboard || !name.trim()) { return; }
 
 		const request: UpdateDashboardRequest = {
 			id: dashboard.id,
@@ -53,7 +53,7 @@
 	}
 
 	function handle_delete() {
-		if (!dashboard) return;
+		if (!dashboard) { return; }
 		if (!confirm_delete) {
 			confirm_delete = true;
 			return;

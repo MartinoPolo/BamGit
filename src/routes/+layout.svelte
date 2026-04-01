@@ -5,6 +5,7 @@
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/DashboardEditDialog.svelte';
 	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
+	import { initialize_theme } from '$lib/stores/theme.svelte';
 	import { create_dashboard, update_dashboard, delete_dashboard } from '$lib/tauri/commands';
 	import { add_repo_to_portfolio } from '$lib/tauri/portfolio_commands';
 	import type { CreateDashboardRequest, Dashboard, UpdateDashboardRequest } from '$lib/types/dashboard';
@@ -12,6 +13,7 @@
 	let { children } = $props();
 
 	const dashboard_store = get_dashboard_store();
+	initialize_theme();
 
 	let editing_dashboard = $state<Dashboard | null>(null);
 
@@ -59,7 +61,7 @@
 	}
 </script>
 
-<div class="flex h-screen bg-neutral-950 text-neutral-100">
+<div class="flex h-screen bg-background text-foreground">
 	<DashboardSidebar
 		dashboards={dashboard_store.dashboards}
 		active_dashboard_id={dashboard_store.active_dashboard_id}

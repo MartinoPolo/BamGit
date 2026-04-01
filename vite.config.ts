@@ -39,6 +39,9 @@ export default defineConfig({
 			typeAware: true,
 			typeCheck: true,
 		},
+		rules: {
+			curly: 'error',
+		},
 	},
 	test: {
 		passWithNoTests: true,

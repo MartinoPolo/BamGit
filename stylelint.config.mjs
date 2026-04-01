@@ -3,5 +3,13 @@ export default {
 	rules: {
 		// @tailwindcss/vite handles imports directly — url() notation breaks SSR build
 		'import-notation': 'string',
+		// Tailwind CSS v4 at-rules
+		'at-rule-no-unknown': [
+			true,
+			{ ignoreAtRules: ['theme', 'custom-variant', 'plugin', 'apply', 'layer'] },
+		],
+		// shadcn-svelte uses OKLCH decimal lightness (0.141) and unitless hue (285.823) — both valid CSS
+		'lightness-notation': null,
+		'hue-degree-notation': null,
 	},
 };

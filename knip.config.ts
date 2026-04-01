@@ -5,9 +5,11 @@ const config: KnipConfig = {
 	project: ['src/**/*.{ts,svelte}'],
 	ignoreDependencies: [
 		'@typescript-eslint/parser',
-		'tailwindcss',
 		'vitest-browser-svelte',
 		'@tauri-apps/plugin-opener',
+		// shadcn-svelte ecosystem — used transitively by ui components
+		'bits-ui',
+		'lucide-svelte',
 	],
 	ignoreBinaries: ['vite'],
 };
