@@ -39,7 +39,9 @@
 
 	function handle_submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!name.trim()) { return; }
+		if (!name.trim()) {
+			return;
+		}
 
 		const request: CreateDashboardRequest = {
 			name: name.trim(),
@@ -47,9 +49,15 @@
 		};
 
 		if (dashboard_type === 'repo') {
-			if (github_repo.trim()) { request.github_repo = github_repo.trim(); }
-			if (local_folder.trim()) { request.local_folder = local_folder.trim(); }
-			if (default_base_branch.trim()) { request.default_base_branch = default_base_branch.trim(); }
+			if (github_repo.trim()) {
+				request.github_repo = github_repo.trim();
+			}
+			if (local_folder.trim()) {
+				request.local_folder = local_folder.trim();
+			}
+			if (default_base_branch.trim()) {
+				request.default_base_branch = default_base_branch.trim();
+			}
 			if (worktree_parent_folder.trim()) {
 				request.worktree_parent_folder = worktree_parent_folder.trim();
 			}
@@ -123,7 +131,9 @@
 									checked={selected_repo_ids.has(repo.id)}
 									onchange={() => {
 										const next = new Set(selected_repo_ids);
-										if (next.has(repo.id)) { next.delete(repo.id); }
+										if (next.has(repo.id)) {
+								next.delete(repo.id);
+							}
 										else { next.add(repo.id); }
 										selected_repo_ids = next;
 									}}

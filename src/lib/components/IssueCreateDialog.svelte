@@ -34,7 +34,9 @@
 
 	function handle_submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!name.trim()) { return; }
+		if (!name.trim()) {
+			return;
+		}
 
 		const request: CreateIssueRequest = {
 			dashboard_id,
@@ -42,7 +44,9 @@
 			color,
 		};
 
-		if (priority) { request.priority = priority; }
+		if (priority) {
+			request.priority = priority;
+		}
 		if (github_issue_url.trim()) {
 			request.github_issue_url = github_issue_url.trim();
 			const issue_number_match = github_issue_url.match(/\/issues\/(\d+)/);

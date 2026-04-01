@@ -30,7 +30,9 @@
 
 	function handle_submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!issue || !name.trim()) { return; }
+		if (!issue || !name.trim()) {
+			return;
+		}
 
 		const request: UpdateIssueRequest = {
 			id: issue.id,
