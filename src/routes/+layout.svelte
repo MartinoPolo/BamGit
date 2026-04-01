@@ -8,7 +8,11 @@
 	import { initialize_theme } from '$lib/stores/theme.svelte';
 	import { create_dashboard, update_dashboard, delete_dashboard } from '$lib/tauri/commands';
 	import { add_repo_to_portfolio } from '$lib/tauri/portfolio_commands';
-	import type { CreateDashboardRequest, Dashboard, UpdateDashboardRequest } from '$lib/types/dashboard';
+	import type {
+		CreateDashboardRequest,
+		Dashboard,
+		UpdateDashboardRequest,
+	} from '$lib/types/dashboard';
 
 	let { children } = $props();
 
@@ -21,7 +25,10 @@
 		dashboard_store.load_dashboards();
 	});
 
-	async function handle_create_dashboard(request: CreateDashboardRequest, selected_repo_ids: string[]) {
+	async function handle_create_dashboard(
+		request: CreateDashboardRequest,
+		selected_repo_ids: string[],
+	) {
 		try {
 			const created = await create_dashboard(request);
 

@@ -32,7 +32,7 @@ export default defineConfig({
 		},
 	},
 	staged: {
-		'*': ['vp lint --threads=1 --fix', 'vp check --no-lint --fix'],
+		'*': ['vp lint --threads=1 --fix'],
 	},
 	lint: {
 		options: {

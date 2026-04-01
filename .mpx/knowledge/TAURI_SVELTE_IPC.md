@@ -278,20 +278,20 @@ Svelte components must unlisten on destroy to prevent memory leaks:
 
 ```svelte
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
-    import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+	import { onMount, onDestroy } from 'svelte';
+	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 
-    let unlisten: UnlistenFn;
+	let unlisten: UnlistenFn;
 
-    onMount(async () => {
-        unlisten = await listen('session-event', (event) => {
-            // handle event
-        });
-    });
+	onMount(async () => {
+		unlisten = await listen('session-event', (event) => {
+			// handle event
+		});
+	});
 
-    onDestroy(() => {
-        unlisten?.();
-    });
+	onDestroy(() => {
+		unlisten?.();
+	});
 </script>
 ```
 

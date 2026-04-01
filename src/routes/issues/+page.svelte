@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
 	import { get_issue_store } from '$lib/stores/issues.svelte';
-	import { create_issue, archive_issue, unarchive_issue, update_issue, delete_issue } from '$lib/tauri/issue_commands';
+	import {
+		create_issue,
+		archive_issue,
+		unarchive_issue,
+		update_issue,
+		delete_issue,
+	} from '$lib/tauri/issue_commands';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
@@ -77,9 +83,11 @@
 {#if dashboard_store.loading}
 	<p class="text-neutral-500">Loading...</p>
 {:else if dashboard_store.dashboards.length === 0}
-	<OnboardingCard on_create_dashboard={() => {
-		dashboard_store.show_create_dialog = true;
-	}} />
+	<OnboardingCard
+		on_create_dashboard={() => {
+			dashboard_store.show_create_dialog = true;
+		}}
+	/>
 {:else if !dashboard_store.active_dashboard}
 	<p class="text-neutral-500">Select a dashboard from the sidebar.</p>
 {:else}

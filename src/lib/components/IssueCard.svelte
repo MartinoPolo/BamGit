@@ -34,11 +34,16 @@
 
 	const priority_border_class = $derived.by(() => {
 		switch (issue.priority) {
-			case 'top': return 'border-l-red-500';
-			case 'high': return 'border-l-orange-400';
-			case 'medium': return 'border-l-yellow-400';
-			case 'low': return 'border-l-blue-400';
-			default: return 'border-l-transparent';
+			case 'top':
+				return 'border-l-red-500';
+			case 'high':
+				return 'border-l-orange-400';
+			case 'medium':
+				return 'border-l-yellow-400';
+			case 'low':
+				return 'border-l-blue-400';
+			default:
+				return 'border-l-transparent';
 		}
 	});
 </script>

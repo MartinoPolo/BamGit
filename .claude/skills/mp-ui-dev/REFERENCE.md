@@ -84,22 +84,22 @@ pnpm dlx shadcn-svelte@latest add dialog --yes --overwrite
 
 ```svelte
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button';
-  import * as Dialog from '$lib/components/ui/dialog';
+	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
 </script>
 
 <Dialog.Root>
-  <Dialog.Trigger>
-    {#snippet children()}
-      <Button variant="outline">Open</Button>
-    {/snippet}
-  </Dialog.Trigger>
-  <Dialog.Content>
-    <Dialog.Header>
-      <Dialog.Title>Title</Dialog.Title>
-      <Dialog.Description>Description</Dialog.Description>
-    </Dialog.Header>
-  </Dialog.Content>
+	<Dialog.Trigger>
+		{#snippet children()}
+			<Button variant="outline">Open</Button>
+		{/snippet}
+	</Dialog.Trigger>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Title</Dialog.Title>
+			<Dialog.Description>Description</Dialog.Description>
+		</Dialog.Header>
+	</Dialog.Content>
 </Dialog.Root>
 ```
 
@@ -107,23 +107,25 @@ pnpm dlx shadcn-svelte@latest add dialog --yes --overwrite
 
 ```svelte
 <script lang="ts">
-  import { cn } from '$lib/utils';
+	import { cn } from '$lib/utils';
 
-  interface Props {
-    class?: string;
-    variant?: 'default' | 'muted';
-  }
+	interface Props {
+		class?: string;
+		variant?: 'default' | 'muted';
+	}
 
-  let { class: className, variant = 'default' }: Props = $props();
+	let { class: className, variant = 'default' }: Props = $props();
 </script>
 
-<div class={cn(
-  'rounded-md border border-border p-4',
-  variant === 'default' && 'bg-card text-card-foreground',
-  variant === 'muted' && 'bg-muted text-muted-foreground',
-  className
-)}>
-  <!-- content -->
+<div
+	class={cn(
+		'rounded-md border border-border p-4',
+		variant === 'default' && 'bg-card text-card-foreground',
+		variant === 'muted' && 'bg-muted text-muted-foreground',
+		className,
+	)}
+>
+	<!-- content -->
 </div>
 ```
 

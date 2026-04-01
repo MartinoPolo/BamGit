@@ -23,7 +23,7 @@
 		class={cn(button_variants({ variant, size }), class_name)}
 		href={disabled === true ? undefined : href}
 		aria-disabled={disabled === true ? true : undefined}
-		role={disabled === true ? "link" : undefined}
+		role={disabled === true ? 'link' : undefined}
 		tabindex={disabled === true ? -1 : undefined}
 		{...rest_props}
 	>

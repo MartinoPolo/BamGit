@@ -88,13 +88,13 @@ Frontend calls Rust functions through Tauri's IPC bridge:
 
 ```svelte
 <script lang="ts">
-  import { invoke } from '@tauri-apps/api/core';
+	import { invoke } from '@tauri-apps/api/core';
 
-  let result = $state('');
+	let result = $state('');
 
-  async function call_backend() {
-    result = await invoke('greet', { name: 'World' });
-  }
+	async function call_backend() {
+		result = await invoke('greet', { name: 'World' });
+	}
 </script>
 ```
 

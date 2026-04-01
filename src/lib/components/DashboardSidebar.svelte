@@ -54,8 +54,8 @@
 		{#each navigation_items as item (item.href)}
 			<a
 				href={resolve(item.href)}
-				class="flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors {page.url
-					.pathname === item.href || page.url.pathname.startsWith(item.href + '/')
+				class="flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors {page
+					.url.pathname === item.href || page.url.pathname.startsWith(item.href + '/')
 					? 'bg-neutral-800 text-white'
 					: 'text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'}"
 				title={collapsed ? item.label : undefined}

@@ -137,6 +137,74 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 - Settings UI for: action buttons, editor/terminal preference, notification preferences, sound files
 - Per-platform terminal/editor configuration
 
+### R12: Issue Tree Visualization (Forest View)
+
+- Alternative dashboard visualization: "Forest View" showing issues as animated trees in a forest scene
+- Each issue with a worktree = a tree whose shape/stage reflects lifecycle progress
+- Each issue without a worktree = a potted plant with simpler growth stages
+- PRD/epic issues = large oak tree (central), with a stone nameplate showing the PRD title
+- Sub-issue trees arranged in a semicircle around the PRD oak; completed stumps fade to periphery
+- Toggle between card-list view and forest view on the same dashboard
+- Clicking a tree opens the issue detail panel (same as clicking a card)
+
+#### State Dimensions (9 total, determine tree appearance)
+
+1. **GitHub Label:** `HITL` or `AFK` (issues without either label are excluded from forest view, except PRDs)
+2. **Worktree State:** `none`, `pending`, `active`, `failed`, `removing`, `removed`
+3. **Session State (aggregate):** `no-session`, `running`, `needs-input`, `needs-review`, `paused`, `finished`, `errored`. Priority order for aggregate: needs-input > errored > needs-review > running > paused > finished > no-session
+4. **Execution Phase (derived from stream-JSON):** `none`, `analyzing`, `tdd` (red+green+refactor), `reviewing` (review+check+fix), `verifying` (frontend), `committing` (commit+finalize)
+5. **Branch Status:** `no-branch`, `active`, `local-only`, `remote-gone`, `deleted`
+6. **PR State:** `no-pr`, `draft`, `open`, `review-requested`, `changes-requested`, `approved`, `ready-to-merge`, `merged`, `closed`
+7. **GitHub Issue State:** `open`, `closed`
+8. **Sync Status:** `up-to-date`, `behind-base(N)`, `merge-conflict`
+9. **BamGit Status:** `active`, `archived`
+
+#### Tree Lifecycle Stages (worktree issues)
+
+| Stage              | Visual               | Primary Trigger                                                         |
+| ------------------ | -------------------- | ----------------------------------------------------------------------- |
+| Seed               | Seed on soil         | GH issue exists, label=HITL, worktree=none, no session                  |
+| Sprouting          | Sprouting seed       | Label=AFK, worktree=none or pending                                     |
+| Sapling            | Young sapling        | Worktree=active, branch exists, no session run yet                      |
+| Growing (supports) | Sapling with stakes  | Session running (first execution)                                       |
+| Leafy tree         | Tree with leaves     | Session finished, commits exist on branch                               |
+| Fruiting tree      | Tree with fruit      | PR opened (draft or open). Different fruit types per concurrent session |
+| Autumn tree        | Orange/red leaves    | PR review-requested, changes-requested, or approved                     |
+| Ready tree         | Full, glowing tree   | PR ready-to-merge                                                       |
+| Bare tree          | Leafless winter tree | PR merged, GH issue closed                                              |
+| Dead tree          | Fallen/dead tree     | Branch deleted, worktree still exists                                   |
+| Stump (pařez)      | Tree stump           | Worktree removed, issue archived                                        |
+
+#### Potted Plant Stages (worktree-less issues)
+
+Simpler lifecycle: pot with soil → sprout → small plant → flowering → dried
+
+#### Overlay System (cross-cutting states)
+
+- **Error/damage:** Sick/damaged tree, wilting leaves (worktree failed, session errored)
+- **Merge conflict:** Storm clouds, beaver gnawing at trunk
+- **Behind base:** Wind blowing leaves
+- **Needs-input:** Speech bubble or bell on tree (urgent attention needed)
+- **Changes-requested:** Storm clouds
+- **Approved:** Birds singing, flowers blooming
+- **Root connections:** Roots connect to PRD oak tree and visually show sync status; connected roots = in sync, disconnected = diverged
+
+#### Session Overlays
+
+- **Multiple sessions:** Different fruit types per session (apples, pears, oranges)
+- **Sub-agents:** Small companion saplings that sprout when sub-agent starts, wilt when it finishes. Labeled with agent type
+- **Tool calls:** Gardening implements animate near tree trunk when used (shovel=Bash, magnifying glass=Grep, watering can=Write, pruning shears=Edit)
+
+#### Technology
+
+- **Rendering:** SVG + Canvas hybrid (Option E)
+    - Tree structure: SVG elements (clickable, accessible, Svelte-reactive)
+    - Ambient effects: Transparent canvas layer (particles, weather, animated creatures)
+- **Style:** Flat/geometric design for V1
+- **Layout:** Flat 2D, no depth/perspective. Oak centered, sub-issues in semicircle
+- **Performance:** Only trees with active sessions get full animation. Idle trees = static SVG with subtle CSS sway
+- **Future upgrade path:** Rive for polished tree animations with built-in state machines (V2+)
+
 ### R11: Cross-Platform
 
 - Windows, macOS, Linux from day one
@@ -155,14 +223,14 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 ## Open Questions
 
 1. **Navigation/layout** — Sidebar vs tabs vs split layout. Needs UX prototyping.
-2. **Session visualization** — Agent tree, tool timeline, statistics. Separate design session needed.
+2. ~~**Session visualization**~~ — Resolved: R12 (Forest View) covers issue tree visualization. Tool timeline and statistics remain open.
 3. **Reconnection strategy** — How to handle flaky internet beyond disabling buttons. Caching depth, retry behavior, queue-and-send-on-reconnect.
 4. **Offline capabilities** — Exactly which actions to disable, caching strategy depth.
 
 ## Out of Scope for V1
 
 - Multi-provider support (designed in, not implemented beyond Claude Code)
-- Advanced session visualization (agent tree, tool timeline, statistics)
+- Advanced session statistics (tool usage analytics, cost trends) — basic tree visualization is in scope via R12
 - GitHub App for triggering from GitHub UI (using label polling instead)
 - Webhook relay for instant GitHub triggers
 - Built-in code editor (using external VS Code/Cursor)

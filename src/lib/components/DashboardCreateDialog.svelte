@@ -96,7 +96,8 @@
 			<button
 				type="button"
 				onclick={() => (dashboard_type = 'portfolio')}
-				class="flex-1 rounded px-3 py-2 text-sm transition-colors {dashboard_type === 'portfolio'
+				class="flex-1 rounded px-3 py-2 text-sm transition-colors {dashboard_type ===
+				'portfolio'
 					? 'bg-blue-600 text-white'
 					: 'bg-neutral-800 text-neutral-400 hover:text-neutral-200'}"
 			>
@@ -121,21 +122,27 @@
 			<fieldset class="flex flex-col gap-1">
 				<legend class="text-xs text-neutral-400">Repo Dashboards</legend>
 				{#if repo_dashboards.length === 0}
-					<p class="text-xs text-neutral-500">No repo dashboards yet. Create one first.</p>
+					<p class="text-xs text-neutral-500">
+						No repo dashboards yet. Create one first.
+					</p>
 				{:else}
-					<div class="flex flex-col gap-1 rounded border border-neutral-700 bg-neutral-800 p-2">
+					<div
+						class="flex flex-col gap-1 rounded border border-neutral-700 bg-neutral-800 p-2"
+					>
 						{#each repo_dashboards as repo (repo.id)}
-							<label class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-neutral-700">
+							<label
+								class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-neutral-700"
+							>
 								<input
 									type="checkbox"
 									checked={selected_repo_ids.has(repo.id)}
 									onchange={() => {
 										const next = new Set(selected_repo_ids);
 										if (next.has(repo.id)) {
-								next.delete(repo.id);
-							} else {
- next.add(repo.id); 
-}
+											next.delete(repo.id);
+										} else {
+											next.add(repo.id);
+										}
 										selected_repo_ids = next;
 									}}
 									class="accent-blue-500"
