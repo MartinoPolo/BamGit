@@ -1,0 +1,80 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum DashboardType {
+    Repo,
+    Portfolio,
+}
+
+impl std::fmt::Display for DashboardType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DashboardType::Repo => write!(f, "repo"),
+            DashboardType::Portfolio => write!(f, "portfolio"),
+        }
+    }
+}
+
+impl DashboardType {
+    pub fn from_db(value: String) -> Result<Self, String> {
+        match value.as_str() {
+            "repo" => Ok(DashboardType::Repo),
+            "portfolio" => Ok(DashboardType::Portfolio),
+            other => Err(format!("Invalid dashboard type: {other}")),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Dashboard {
+    pub id: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub dashboard_type: DashboardType,
+    pub github_repo: Option<String>,
+    pub local_folder: Option<String>,
+    pub default_base_branch: Option<String>,
+    pub worktree_parent_folder: Option<String>,
+    pub color_palette_id: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateDashboardRequest {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub dashboard_type: DashboardType,
+    pub github_repo: Option<String>,
+    pub local_folder: Option<String>,
+    pub default_base_branch: Option<String>,
+    pub worktree_parent_folder: Option<String>,
+    pub color_palette_id: Option<String>,
+}
+
+/// Option<Option<T>>: absent key = no change, explicit null = clear the field
+#[derive(Debug, Deserialize)]
+pub struct UpdateDashboardRequest {
+    pub id: String,
+    pub name: Option<String>,
+    #[serde(rename = "type")]
+    pub dashboard_type: Option<DashboardType>,
+    #[serde(default, deserialize_with = "deserialize_optional_nullable")]
+    pub github_repo: Option<Option<String>>,
+    #[serde(default, deserialize_with = "deserialize_optional_nullable")]
+    pub local_folder: Option<Option<String>>,
+    #[serde(default, deserialize_with = "deserialize_optional_nullable")]
+    pub default_base_branch: Option<Option<String>>,
+    #[serde(default, deserialize_with = "deserialize_optional_nullable")]
+    pub worktree_parent_folder: Option<Option<String>>,
+    #[serde(default, deserialize_with = "deserialize_optional_nullable")]
+    pub color_palette_id: Option<Option<String>>,
+}
+
+fn deserialize_optional_nullable<'de, D>(deserializer: D) -> Result<Option<Option<String>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    // If the key is present, deserialize its value (which may be null → Some(None), or a string → Some(Some(s)))
+    let value: Option<String> = Option::deserialize(deserializer)?;
+    Ok(Some(value))
+}

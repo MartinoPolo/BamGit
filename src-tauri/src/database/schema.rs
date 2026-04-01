@@ -1,0 +1,99 @@
+use rusqlite::Connection;
+
+pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute_batch(
+        "
+        BEGIN;
+
+        CREATE TABLE IF NOT EXISTS color_palettes (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            colors TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS dashboards (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            type TEXT NOT NULL CHECK (type IN ('repo', 'portfolio')),
+            github_repo TEXT,
+            local_folder TEXT,
+            default_base_branch TEXT,
+            worktree_parent_folder TEXT,
+            color_palette_id TEXT REFERENCES color_palettes(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS issues (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id),
+            name TEXT NOT NULL,
+            priority TEXT CHECK (priority IN ('low', 'medium', 'high', 'top')),
+            color TEXT,
+            status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+            github_issue_url TEXT,
+            github_issue_number INTEGER,
+            branch_name TEXT,
+            base_branch TEXT,
+            worktree_folder TEXT,
+            worktree_state TEXT DEFAULT 'none' CHECK (worktree_state IN ('none', 'pending', 'active', 'failed')),
+            parent_issue_id TEXT REFERENCES issues(id),
+            editor_folder TEXT,
+            dev_server_command TEXT,
+            dev_server_port INTEGER,
+            dev_server_pid INTEGER,
+            browser_url TEXT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS sessions (
+            id TEXT PRIMARY KEY,
+            issue_id TEXT REFERENCES issues(id),
+            provider TEXT NOT NULL DEFAULT 'claude-code',
+            state TEXT NOT NULL DEFAULT 'running'
+                CHECK (state IN ('running', 'needs-input', 'needs-review', 'paused', 'finished', 'errored')),
+            pid INTEGER,
+            session_file_path TEXT,
+            started_at TEXT NOT NULL DEFAULT (datetime('now')),
+            ended_at TEXT,
+            cost_usd REAL,
+            token_count INTEGER,
+            original_intent TEXT,
+            last_prompt TEXT,
+            last_response_summary TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS actions (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT REFERENCES dashboards(id),
+            name TEXT NOT NULL,
+            icon TEXT,
+            command_template TEXT NOT NULL,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            visible INTEGER NOT NULL DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS notification_config (
+            event_type TEXT PRIMARY KEY,
+            sound_enabled INTEGER NOT NULL DEFAULT 0,
+            sound_file TEXT,
+            toast_enabled INTEGER NOT NULL DEFAULT 0,
+            window_flash_enabled INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS git_status_cache (
+            issue_id TEXT PRIMARY KEY REFERENCES issues(id),
+            branch_status TEXT,
+            pr_state TEXT,
+            pr_number INTEGER,
+            pr_url TEXT,
+            github_issue_state TEXT,
+            behind_base_count INTEGER,
+            merge_conflict INTEGER,
+            fetched_at TEXT
+        );
+
+        COMMIT;
+        ",
+    )?;
+
+    Ok(())
+}
