@@ -1,5 +1,5 @@
 export function format_relative_time(date_string: string | null): string {
-	if (!date_string) {
+	if (date_string === null) {
 		return 'Never synced';
 	}
 

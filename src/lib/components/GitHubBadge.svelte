@@ -16,7 +16,7 @@
 	let { icon: Icon, color, bg, label, number, url, prefix, disabled = false }: Props = $props();
 
 	async function handle_click() {
-		if (url && !disabled) {
+		if (url !== null && !disabled) {
 			await openUrl(url);
 		}
 	}

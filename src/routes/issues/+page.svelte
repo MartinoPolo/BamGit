@@ -31,8 +31,9 @@
 
 	// Parse "owner/repo" from dashboard's github_repo field
 	const github_repo_parts = $derived.by(() => {
-		const github_repo = dashboard_store.active_dashboard?.github_repo;
-		if (!github_repo) {
+		const github_repo: string | null | undefined =
+			dashboard_store.active_dashboard?.github_repo;
+		if (github_repo == null) {
 			return null;
 		}
 		const parts = github_repo.split('/');
@@ -64,8 +65,8 @@
 	});
 
 	async function handle_sync_all() {
-		const dashboard_id = dashboard_store.active_dashboard_id;
-		if (!dashboard_id || !github_repo_parts) {
+		const dashboard_id: string | null = dashboard_store.active_dashboard_id;
+		if (dashboard_id === null || github_repo_parts === null) {
 			return;
 		}
 		await github_store.sync_all(dashboard_id, github_repo_parts.owner, github_repo_parts.repo);
@@ -186,7 +187,7 @@
 		{#if github_store.assigned_issues.length > 0}
 			<AssignedIssuesPanel
 				issues={github_store.assigned_issues}
-				disabled={!github_store.is_available}
+				disabled={github_store.is_available !== true}
 			/>
 		{/if}
 	</div>
