@@ -91,7 +91,7 @@
 			dashboard_store.show_create_dialog = true;
 		}}
 	/>
-{:else if !dashboard_store.active_dashboard}
+{:else if dashboard_store.active_dashboard === null}
 	<p class="text-neutral-500">Select a dashboard from the sidebar.</p>
 {:else}
 	<div class="flex flex-col gap-4">
