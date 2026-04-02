@@ -3,6 +3,7 @@
 	import { get_git_status_store } from '$lib/stores/git_status.svelte';
 	import { get_issue_store } from '$lib/stores/issues.svelte';
 	import { get_github_store } from '$lib/stores/github.svelte';
+	import { get_action_store } from '$lib/stores/actions.svelte';
 	import {
 		create_issue,
 		archive_issue,
@@ -10,6 +11,7 @@
 		update_issue,
 		delete_issue,
 	} from '$lib/tauri/issue_commands';
+	import { execute_action } from '$lib/tauri/action_commands';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
@@ -24,6 +26,7 @@
 	const git_status_store = get_git_status_store();
 	const issue_store = get_issue_store();
 	const github_store = get_github_store();
+	const action_store = get_action_store();
 
 	let create_dialog_open = $state(false);
 	let editing_issue = $state<Issue | null>(null);
@@ -58,6 +61,7 @@
 			issue_store.load_issues(dashboard_id);
 			github_store.load_caches(dashboard_id);
 			git_status_store.load_statuses_for_dashboard(dashboard_id);
+			action_store.load_actions(dashboard_id);
 			if (github_repo_parts) {
 				github_store.load_assigned_issues(github_repo_parts.owner, github_repo_parts.repo);
 			}
@@ -116,6 +120,14 @@
 			console.error('Failed to delete issue:', err);
 		}
 	}
+
+	async function handle_execute_action(action_id: string, issue_id: string) {
+		try {
+			await execute_action(action_id, issue_id);
+		} catch (err) {
+			console.error('Failed to execute action:', err);
+		}
+	}
 </script>
 
 {#if dashboard_store.loading}
@@ -171,6 +183,7 @@
 				archived_issues={issue_store.archived_issues}
 				show_archived={issue_store.show_archived}
 				is_portfolio={dashboard_store.active_dashboard.type === 'portfolio'}
+				actions={action_store.visible_actions}
 				force_expanded={all_expanded ? true : undefined}
 				github_cache_map={github_store.cache_map}
 				gh_available={github_store.is_available}
@@ -180,6 +193,7 @@
 				on_unarchive={handle_unarchive_issue}
 				on_edit={(issue) => (editing_issue = issue)}
 				on_delete={handle_delete_issue}
+				on_execute_action={handle_execute_action}
 			/>
 		{/if}
 

@@ -262,11 +262,5 @@ fn open_actor_database_connection(
         .path()
         .app_data_dir()
         .map_err(|e| e.to_string())?;
-    let db_path = app_data_directory.join("bamgit.db");
-    let connection =
-        Connection::open(&db_path).map_err(|e| format!("Failed to open DB for actor: {e}"))?;
-    connection
-        .execute_batch("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;")
-        .map_err(|e| format!("Failed to set pragmas: {e}"))?;
-    Ok(Arc::new(StdMutex::new(connection)))
+    crate::database::connection::open_actor_connection(app_data_directory)
 }

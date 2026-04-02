@@ -1,14 +1,17 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
+	import type { Action } from '$lib/types/action';
 	import type { GitHubStatusCache } from '$lib/types/github';
 	import type { GitStatusCache } from '$lib/types/git_status';
 	import PullRequestBadge from './PullRequestBadge.svelte';
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
 	import GitBadgeGroup from './GitBadgeGroup.svelte';
+	import ActionButtonGroup from './ActionButtonGroup.svelte';
 
 	interface Props {
 		issue: Issue;
+		actions?: Action[];
 		github_cache?: GitHubStatusCache | null;
 		gh_available?: boolean;
 		git_status?: GitStatusCache | undefined;
@@ -20,10 +23,12 @@
 		on_unarchive: (id: string) => void;
 		on_edit: (issue: Issue) => void;
 		on_delete: (id: string) => void;
+		on_execute_action?: (action_id: string, issue_id: string) => void;
 	}
 
 	let {
 		issue,
+		actions = [],
 		github_cache = null,
 		gh_available = false,
 		git_status,
@@ -35,6 +40,7 @@
 		on_unarchive,
 		on_edit,
 		on_delete,
+		on_execute_action,
 	}: Props = $props();
 
 	let local_expanded = $state(false);
@@ -135,6 +141,16 @@
 			</div>
 
 			<!-- Action buttons -->
+			{#if actions.length > 0 && on_execute_action && !is_archived}
+				<div class="opacity-0 transition-opacity group-hover:opacity-100">
+					<ActionButtonGroup
+						{actions}
+						on_execute={(action_id) => on_execute_action(action_id, issue.id)}
+					/>
+				</div>
+			{/if}
+
+			<!-- Overflow menu -->
 			<div class="relative">
 				<button
 					onclick={() => (show_overflow = !show_overflow)}
