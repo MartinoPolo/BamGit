@@ -5,18 +5,19 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"dev": "vp dev",
-		"build": "vp build",
+		"dev": "vite dev",
+		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"check:all": "prettier --write . && vp lint --threads=1 && eslint . && stylelint \"src/**/*.{css,svelte}\" && knip && svelte-check --tsconfig ./tsconfig.json",
-		"lint": "vp lint --threads=1",
+		"check:all": "prettier --write . && oxlint && eslint . && stylelint \"src/**/*.{css,svelte}\" && knip && svelte-check --tsconfig ./tsconfig.json",
+		"lint": "oxlint",
+		"lint:eslint": "eslint .",
 		"lint:css": "stylelint \"src/**/*.{css,svelte}\"",
 		"format": "prettier --write .",
-		"test": "vp test",
+		"test": "vitest",
 		"test:e2e": "playwright test",
-		"prepare": "vp config",
+		"prepare": "husky",
 		"tauri": "tauri",
 		"storybook": "storybook dev -p 6006",
 		"build:storybook": "storybook build"
@@ -53,7 +54,10 @@
 		"eslint-plugin-storybook": "^10.3.3",
 		"eslint-plugin-svelte": "^3.16.0",
 		"globals": "^17.4.0",
+		"husky": "^9.1.7",
 		"knip": "^6.0.6",
+		"lint-staged": "^16.4.0",
+		"oxlint": "^1.58.0",
 		"playwright": "^1.58.2",
 		"postcss-html": "^1.8.1",
 		"prettier": "^3.8.1",
@@ -70,7 +74,7 @@
 		"typescript-eslint": "^8.57.2",
 		"vite": "^7.3.1",
 		"vite-plugin-devtools-json": "^1.0.0",
-		"vite-plus": "^0.1.14",
+		"vitest": "^4.1.2",
 		"vitest-browser-svelte": "^2.1.0"
 	},
 	"engines": {
@@ -80,10 +84,6 @@
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"esbuild"
-		],
-		"overrides": {
-			"vite": "npm:@voidzero-dev/vite-plus-core@latest",
-			"vitest": "npm:@voidzero-dev/vite-plus-test@latest"
-		}
+		]
 	}
 }

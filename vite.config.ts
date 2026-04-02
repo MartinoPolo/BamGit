@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite-plus';
+import { defineConfig } from 'vitest/config';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import devtoolsJson from 'vite-plugin-devtools-json';
@@ -29,18 +29,6 @@ export default defineConfig({
 			: undefined,
 		watch: {
 			ignored: ['**/src-tauri/**'],
-		},
-	},
-	staged: {
-		'*': ['vp lint --threads=1 --fix'],
-	},
-	lint: {
-		options: {
-			typeAware: true,
-			typeCheck: true,
-		},
-		rules: {
-			curly: 'error',
 		},
 	},
 	test: {
