@@ -6,6 +6,7 @@
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
 	import GitBadgeGroup from './GitBadgeGroup.svelte';
+	import WorktreeProgressIndicator from './WorktreeProgressIndicator.svelte';
 
 	interface Props {
 		issue: Issue;
@@ -16,10 +17,13 @@
 		is_last_child?: boolean;
 		child_count?: number;
 		force_expanded?: boolean;
+		progress_lines?: readonly string[];
 		on_archive: (id: string) => void;
 		on_unarchive: (id: string) => void;
 		on_edit: (issue: Issue) => void;
 		on_delete: (id: string) => void;
+		on_setup_worktree?: (issue: Issue) => void;
+		on_remove_worktree?: (issue: Issue) => void;
 	}
 
 	let {
@@ -31,18 +35,37 @@
 		is_last_child = false,
 		child_count = 0,
 		force_expanded,
+		progress_lines = [],
 		on_archive,
 		on_unarchive,
 		on_edit,
 		on_delete,
+		on_setup_worktree,
+		on_remove_worktree,
 	}: Props = $props();
 
 	let local_expanded = $state(false);
-	const expanded = $derived(force_expanded ?? local_expanded);
+	// Auto-expand when worktree is being set up so progress is visible
+	const expanded = $derived(
+		force_expanded ?? (issue.worktree_state === 'pending' || local_expanded),
+	);
 	let show_overflow = $state(false);
 
 	const color = $derived(issue.color ?? '#525252');
 	const is_archived = $derived(issue.status === 'archived');
+
+	const worktree_badge = $derived.by(() => {
+		switch (issue.worktree_state) {
+			case 'pending':
+				return { label: 'Setting up...', class: 'bg-yellow-900/40 text-yellow-400' };
+			case 'active':
+				return { label: 'Worktree', class: 'bg-green-900/40 text-green-400' };
+			case 'failed':
+				return { label: 'WT Failed', class: 'bg-red-900/40 text-red-400' };
+			default:
+				return null;
+		}
+	});
 
 	const priority_border_class = $derived.by(() => {
 		switch (issue.priority) {
@@ -132,6 +155,18 @@
 				{#if issue.branch_name}
 					<GitBadgeGroup branch_name={issue.branch_name} {git_status} />
 				{/if}
+				{#if worktree_badge}
+					<span
+						class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs {worktree_badge.class}"
+					>
+						{#if issue.worktree_state === 'pending'}
+							<span
+								class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"
+							></span>
+						{/if}
+						{worktree_badge.label}
+					</span>
+				{/if}
 			</div>
 
 			<!-- Action buttons -->
@@ -158,6 +193,30 @@
 						>
 							Edit
 						</button>
+						{#if on_setup_worktree && issue.branch_name && (issue.worktree_state === 'none' || issue.worktree_state === 'failed')}
+							<button
+								onclick={() => {
+									on_setup_worktree(issue);
+									show_overflow = false;
+								}}
+								class="w-full px-3 py-1.5 text-left text-sm text-green-400 hover:bg-neutral-700"
+							>
+								{issue.worktree_state === 'failed'
+									? 'Retry Worktree'
+									: 'Add Worktree'}
+							</button>
+						{/if}
+						{#if on_remove_worktree && issue.worktree_state === 'active'}
+							<button
+								onclick={() => {
+									on_remove_worktree(issue);
+									show_overflow = false;
+								}}
+								class="w-full px-3 py-1.5 text-left text-sm text-orange-400 hover:bg-neutral-700"
+							>
+								Remove Worktree
+							</button>
+						{/if}
 						{#if is_archived}
 							<button
 								onclick={() => {
@@ -224,6 +283,9 @@
 						</div>
 					{/if}
 				</div>
+				{#if issue.worktree_state === 'pending' && progress_lines.length > 0}
+					<WorktreeProgressIndicator lines={progress_lines} />
+				{/if}
 			</div>
 		{/if}
 	</div>

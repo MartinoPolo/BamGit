@@ -47,6 +47,10 @@ pub struct UpdateIssueRequest {
     pub color: Option<Option<String>>,
     pub github_issue_url: Option<Option<String>>,
     pub github_issue_number: Option<Option<i64>>,
+    pub branch_name: Option<Option<String>>,
+    pub base_branch: Option<Option<String>>,
+    pub worktree_folder: Option<Option<String>>,
+    pub worktree_state: Option<String>,
     pub parent_issue_id: Option<Option<String>>,
     pub sort_order: Option<i64>,
 }

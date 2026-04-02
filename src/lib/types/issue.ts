@@ -1,3 +1,5 @@
+import type { WorktreeState } from './worktree';
+
 export interface Issue {
 	id: string;
 	dashboard_id: string;
@@ -10,7 +12,7 @@ export interface Issue {
 	branch_name: string | null;
 	base_branch: string | null;
 	worktree_folder: string | null;
-	worktree_state: 'none' | 'pending' | 'active' | 'failed';
+	worktree_state: WorktreeState;
 	parent_issue_id: string | null;
 	editor_folder: string | null;
 	dev_server_command: string | null;
@@ -38,6 +40,10 @@ export interface UpdateIssueRequest {
 	color?: string | null;
 	github_issue_url?: string | null;
 	github_issue_number?: number | null;
+	branch_name?: string | null;
+	base_branch?: string | null;
+	worktree_folder?: string | null;
+	worktree_state?: WorktreeState;
 	parent_issue_id?: string | null;
 	sort_order?: number;
 }

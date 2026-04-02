@@ -14,10 +14,13 @@
 		gh_available?: boolean;
 		get_children: (parent_id: string) => Issue[];
 		get_git_status: (issue_id: string) => GitStatusCache | undefined;
+		get_progress_lines?: (issue_id: string) => readonly string[];
 		on_archive: (id: string) => void;
 		on_unarchive: (id: string) => void;
 		on_edit: (issue: Issue) => void;
 		on_delete: (id: string) => void;
+		on_setup_worktree?: (issue: Issue) => void;
+		on_remove_worktree?: (issue: Issue) => void;
 	}
 
 	let {
@@ -30,10 +33,13 @@
 		gh_available = false,
 		get_children,
 		get_git_status,
+		get_progress_lines,
 		on_archive,
 		on_unarchive,
 		on_edit,
 		on_delete,
+		on_setup_worktree,
+		on_remove_worktree,
 	}: Props = $props();
 </script>
 
@@ -48,10 +54,13 @@
 			git_status={get_git_status(issue.id)}
 			child_count={children.length}
 			{force_expanded}
+			progress_lines={get_progress_lines?.(issue.id) ?? []}
 			{on_archive}
 			{on_unarchive}
 			{on_edit}
 			{on_delete}
+			{on_setup_worktree}
+			{on_remove_worktree}
 		/>
 
 		<!-- Nested children for portfolio dashboards -->
@@ -65,10 +74,13 @@
 					indented={true}
 					is_last_child={index === children.length - 1}
 					{force_expanded}
+					progress_lines={get_progress_lines?.(child.id) ?? []}
 					{on_archive}
 					{on_unarchive}
 					{on_edit}
 					{on_delete}
+					{on_setup_worktree}
+					{on_remove_worktree}
 				/>
 			{/each}
 		{/if}

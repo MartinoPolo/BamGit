@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RefreshCw } from 'lucide-svelte';
+	import { RefreshCw, Scissors } from 'lucide-svelte';
 	import type { SortMode } from '$lib/stores/issues.svelte';
 
 	interface Props {
@@ -14,6 +14,7 @@
 		on_toggle_archived: () => void;
 		on_toggle_expand_all: () => void;
 		on_sync_all?: () => void;
+		on_prune_worktrees?: () => void;
 	}
 
 	let {
@@ -28,6 +29,7 @@
 		on_toggle_archived,
 		on_toggle_expand_all,
 		on_sync_all,
+		on_prune_worktrees,
 	}: Props = $props();
 </script>
 
@@ -49,6 +51,18 @@
 		>
 			<RefreshCw size={13} class={syncing ? 'animate-spin' : ''} />
 			{syncing ? 'Syncing...' : 'Sync All'}
+		</button>
+	{/if}
+
+	<!-- Prune Worktrees -->
+	{#if on_prune_worktrees}
+		<button
+			onclick={on_prune_worktrees}
+			class="inline-flex items-center gap-1.5 rounded border border-neutral-700 px-2.5 py-1.5 text-xs text-neutral-400 transition-colors hover:border-neutral-600 hover:text-neutral-300"
+			title="Prune worktrees for fully-closed issues"
+		>
+			<Scissors size={13} />
+			Prune
 		</button>
 	{/if}
 
