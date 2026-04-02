@@ -1,8 +1,14 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
+	import type { GitHubStatusCache } from '$lib/types/github';
+	import PullRequestBadge from './PullRequestBadge.svelte';
+	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
+	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
 
 	interface Props {
 		issue: Issue;
+		github_cache?: GitHubStatusCache | null;
+		gh_available?: boolean;
 		indented?: boolean;
 		is_last_child?: boolean;
 		child_count?: number;
@@ -15,6 +21,8 @@
 
 	let {
 		issue,
+		github_cache = null,
+		gh_available = false,
 		indented = false,
 		is_last_child = false,
 		child_count = 0,
@@ -95,19 +103,28 @@
 				</span>
 			{/if}
 
-			<!-- Placeholder badge area -->
+			<!-- GitHub badges -->
 			<div class="flex items-center gap-1">
-				{#if issue.github_issue_number}
+				{#if github_cache?.github_issue_state}
+					<GitHubIssueBadge
+						state={github_cache.github_issue_state}
+						url={issue.github_issue_url}
+						issue_number={issue.github_issue_number}
+						disabled={!gh_available}
+					/>
+				{:else if issue.github_issue_number}
 					<span class="rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">
 						#{issue.github_issue_number}
 					</span>
 				{/if}
-				<span
-					class="rounded bg-neutral-800/50 px-1.5 py-0.5 text-[10px] text-neutral-600"
-					title="Badges populated in later slices"
-				>
-					badges
-				</span>
+				{#if github_cache?.pr_state}
+					<PullRequestBadge
+						state={github_cache.pr_state}
+						url={github_cache.pr_url}
+						pr_number={github_cache.pr_number}
+						disabled={!gh_available}
+					/>
+				{/if}
 			</div>
 
 			<!-- Action buttons -->
@@ -169,7 +186,7 @@
 			</div>
 		</div>
 
-		<!-- Expanded section (placeholder for future slices) -->
+		<!-- Expanded section -->
 		{#if expanded}
 			<div class="border-t border-neutral-800 px-3 py-3 text-xs text-neutral-500">
 				<div class="grid grid-cols-2 gap-2">
@@ -191,6 +208,12 @@
 						<div>
 							<span class="text-neutral-600">Created:</span>
 							{new Date(issue.created_at).toLocaleDateString()}
+						</div>
+					{/if}
+					{#if github_cache}
+						<div>
+							<span class="text-neutral-600">Synced:</span>
+							<SyncStatusIndicator fetched_at={github_cache.fetched_at} />
 						</div>
 					{/if}
 				</div>
