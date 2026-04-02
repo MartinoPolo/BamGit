@@ -22,7 +22,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 3);
+        assert_eq!(version, 4);
     }
 
     #[test]
@@ -32,7 +32,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 3);
+        assert_eq!(version, 4);
     }
 
     // --- Schema tests ---
@@ -696,7 +696,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 3);
+        assert_eq!(version, 4);
 
         // portfolio_dashboard_pointers table exists
         let exists: bool = connection
@@ -970,5 +970,224 @@ mod tests {
         );
 
         assert!(result.is_err(), "Invalid source should be rejected");
+    }
+
+    // --- Action CRUD tests ---
+
+    fn insert_test_action(
+        connection: &Connection,
+        id: &str,
+        dashboard_id: Option<&str>,
+        name: &str,
+        command_template: &str,
+    ) {
+        connection
+            .execute(
+                "INSERT INTO actions (id, dashboard_id, name, command_template) VALUES (?1, ?2, ?3, ?4)",
+                rusqlite::params![id, dashboard_id, name, command_template],
+            )
+            .unwrap();
+    }
+
+    #[test]
+    fn action_crud_round_trip() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        // Create
+        connection
+            .execute(
+                "INSERT INTO actions (id, dashboard_id, name, icon, command_template, sort_order, visible) \
+                 VALUES ('a1', 'd1', 'Execute', 'play', 'claude \"/mp-execute #42\"', 0, 1)",
+                [],
+            )
+            .unwrap();
+
+        // Read
+        let (name, icon, command_template, sort_order, visible): (
+            String,
+            Option<String>,
+            String,
+            i64,
+            bool,
+        ) = connection
+            .query_row(
+                "SELECT name, icon, command_template, sort_order, visible FROM actions WHERE id = 'a1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?)),
+            )
+            .unwrap();
+
+        assert_eq!(name, "Execute");
+        assert_eq!(icon.as_deref(), Some("play"));
+        assert_eq!(command_template, "claude \"/mp-execute #42\"");
+        assert_eq!(sort_order, 0);
+        assert!(visible);
+
+        // Update
+        connection
+            .execute(
+                "UPDATE actions SET name = 'Run', icon = 'rocket' WHERE id = 'a1'",
+                [],
+            )
+            .unwrap();
+
+        let updated_name: String = connection
+            .query_row("SELECT name FROM actions WHERE id = 'a1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(updated_name, "Run");
+
+        // Delete
+        let rows_affected = connection
+            .execute("DELETE FROM actions WHERE id = 'a1'", [])
+            .unwrap();
+        assert_eq!(rows_affected, 1);
+    }
+
+    #[test]
+    fn action_sort_order_defaults_to_zero() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_action(&connection, "a1", Some("d1"), "Test", "echo hello");
+
+        let sort_order: i64 = connection
+            .query_row("SELECT sort_order FROM actions WHERE id = 'a1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+
+        assert_eq!(sort_order, 0);
+    }
+
+    #[test]
+    fn action_visible_defaults_to_true() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_action(&connection, "a1", Some("d1"), "Test", "echo hello");
+
+        let visible: bool = connection
+            .query_row("SELECT visible FROM actions WHERE id = 'a1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+
+        assert!(visible);
+    }
+
+    #[test]
+    fn action_with_null_dashboard_id_is_global() {
+        let connection = setup_test_database();
+
+        // Global action (null dashboard_id)
+        insert_test_action(&connection, "a1", None, "Global Action", "echo global");
+
+        let dashboard_id: Option<String> = connection
+            .query_row(
+                "SELECT dashboard_id FROM actions WHERE id = 'a1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(dashboard_id, None);
+    }
+
+    #[test]
+    fn action_foreign_key_rejects_invalid_dashboard_id() {
+        let connection = setup_test_database();
+
+        let result = connection.execute(
+            "INSERT INTO actions (id, dashboard_id, name, command_template) VALUES ('a1', 'nonexistent', 'Test', 'echo')",
+            [],
+        );
+
+        assert!(
+            result.is_err(),
+            "Action with invalid dashboard_id should be rejected"
+        );
+    }
+
+    #[test]
+    fn action_sort_order_persists_and_orders_correctly() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        connection
+            .execute(
+                "INSERT INTO actions (id, dashboard_id, name, command_template, sort_order) VALUES ('a1', 'd1', 'Third', 'echo 3', 2)",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO actions (id, dashboard_id, name, command_template, sort_order) VALUES ('a2', 'd1', 'First', 'echo 1', 0)",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO actions (id, dashboard_id, name, command_template, sort_order) VALUES ('a3', 'd1', 'Second', 'echo 2', 1)",
+                [],
+            )
+            .unwrap();
+
+        let mut statement = connection
+            .prepare("SELECT name FROM actions WHERE dashboard_id = 'd1' ORDER BY sort_order")
+            .unwrap();
+        let names: Vec<String> = statement
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(names, vec!["First", "Second", "Third"]);
+    }
+
+    #[test]
+    fn delete_dashboard_cascades_to_actions() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_action(&connection, "a1", Some("d1"), "Action 1", "echo 1");
+        insert_test_action(&connection, "a2", Some("d1"), "Action 2", "echo 2");
+
+        connection
+            .execute("DELETE FROM dashboards WHERE id = 'd1'", [])
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM actions WHERE dashboard_id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(count, 0, "Deleting dashboard should cascade to actions");
+    }
+
+    #[test]
+    fn global_actions_returned_alongside_dashboard_actions() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        // Global action
+        insert_test_action(&connection, "a_global", None, "Global", "echo global");
+        // Dashboard-specific action
+        insert_test_action(&connection, "a_dash", Some("d1"), "Dashboard", "echo dash");
+
+        let mut statement = connection
+            .prepare(
+                "SELECT name FROM actions WHERE dashboard_id IS NULL OR dashboard_id = 'd1' ORDER BY sort_order",
+            )
+            .unwrap();
+        let names: Vec<String> = statement
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(names, vec!["Global", "Dashboard"]);
     }
 }

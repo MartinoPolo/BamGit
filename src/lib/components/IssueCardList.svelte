@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
+	import type { Action } from '$lib/types/action';
 	import type { GitHubStatusCache } from '$lib/types/github';
 	import type { GitStatusCache } from '$lib/types/git_status';
 	import IssueCard from './IssueCard.svelte';
@@ -9,6 +10,7 @@
 		archived_issues: Issue[];
 		show_archived: boolean;
 		is_portfolio: boolean;
+		actions?: Action[];
 		force_expanded?: boolean;
 		github_cache_map?: Map<string, GitHubStatusCache>;
 		gh_available?: boolean;
@@ -18,6 +20,7 @@
 		on_unarchive: (id: string) => void;
 		on_edit: (issue: Issue) => void;
 		on_delete: (id: string) => void;
+		on_execute_action?: (action_id: string, issue_id: string) => void;
 	}
 
 	let {
@@ -25,6 +28,7 @@
 		archived_issues,
 		show_archived,
 		is_portfolio,
+		actions = [],
 		force_expanded,
 		github_cache_map = new Map(),
 		gh_available = false,
@@ -34,6 +38,7 @@
 		on_unarchive,
 		on_edit,
 		on_delete,
+		on_execute_action,
 	}: Props = $props();
 </script>
 
@@ -43,6 +48,7 @@
 
 		<IssueCard
 			{issue}
+			{actions}
 			github_cache={github_cache_map.get(issue.id)}
 			{gh_available}
 			git_status={get_git_status(issue.id)}
@@ -52,6 +58,7 @@
 			{on_unarchive}
 			{on_edit}
 			{on_delete}
+			{on_execute_action}
 		/>
 
 		<!-- Nested children for portfolio dashboards -->
@@ -59,6 +66,7 @@
 			{#each children as child, index (child.id)}
 				<IssueCard
 					issue={child}
+					{actions}
 					github_cache={github_cache_map.get(child.id)}
 					{gh_available}
 					git_status={get_git_status(child.id)}
@@ -69,6 +77,7 @@
 					{on_unarchive}
 					{on_edit}
 					{on_delete}
+					{on_execute_action}
 				/>
 			{/each}
 		{/if}

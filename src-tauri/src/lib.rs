@@ -5,8 +5,8 @@ mod models;
 mod session;
 
 use commands::{
-    dashboard_commands, git_status_commands, github_commands, issue_commands, portfolio_commands,
-    session_commands,
+    action_commands, dashboard_commands, git_status_commands, github_commands, issue_commands,
+    portfolio_commands, session_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
 use session::discovery_polling::DiscoveryPoller;
@@ -73,6 +73,13 @@ pub fn run() {
             github_commands::fetch_pr_for_branch,
             github_commands::fetch_assigned_issues,
             github_commands::sync_all_github_state,
+            action_commands::create_action,
+            action_commands::get_actions_for_dashboard,
+            action_commands::get_action,
+            action_commands::update_action,
+            action_commands::delete_action,
+            action_commands::reorder_actions,
+            action_commands::execute_action,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

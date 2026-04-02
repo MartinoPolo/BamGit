@@ -2,11 +2,11 @@ use rusqlite::Connection;
 
 use super::schema;
 
-const CURRENT_VERSION: i32 = 3;
+const CURRENT_VERSION: i32 = 4;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
-static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2, migrate_v3];
+static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2, migrate_v3, migrate_v4];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)
@@ -61,6 +61,24 @@ fn migrate_v3(connection: &Connection) -> Result<(), rusqlite::Error> {
     }
 
     Ok(())
+}
+
+fn migrate_v4(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // Create actions table for existing users upgrading from v3.
+    // Also adds ON DELETE CASCADE on dashboard_id (fresh installs via schema.rs already have it).
+    connection.execute_batch(
+        "
+        CREATE TABLE IF NOT EXISTS actions (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT REFERENCES dashboards(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            icon TEXT,
+            command_template TEXT NOT NULL,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            visible INTEGER NOT NULL DEFAULT 1
+        );
+        ",
+    )
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {

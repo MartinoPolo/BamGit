@@ -75,7 +75,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
 
         CREATE TABLE IF NOT EXISTS actions (
             id TEXT PRIMARY KEY,
-            dashboard_id TEXT REFERENCES dashboards(id),
+            dashboard_id TEXT REFERENCES dashboards(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
             icon TEXT,
             command_template TEXT NOT NULL,

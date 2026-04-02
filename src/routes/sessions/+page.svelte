@@ -19,7 +19,6 @@
 	let spawn_prompt = $state('');
 	let spawn_working_directory = $state('');
 	let spawning = $state(false);
-	let adopting_id = $state<string | null>(null);
 	let unlisten_session_event: UnlistenFn | null = null;
 	let unlisten_discovered: UnlistenFn | null = null;
 
@@ -83,7 +82,6 @@
 	}
 
 	async function handle_adopt(discovered: DiscoveredSession) {
-		adopting_id = discovered.id;
 		try {
 			await adopt_session({
 				cli_session_id: discovered.session_id,
@@ -96,8 +94,6 @@
 			await store.refresh();
 		} catch (err) {
 			console.error('Failed to adopt session:', err);
-		} finally {
-			adopting_id = null;
 		}
 	}
 
