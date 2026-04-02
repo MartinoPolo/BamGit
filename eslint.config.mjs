@@ -26,7 +26,7 @@ export default [
 			globals: { ...globals.browser, ...globals.node },
 			parserOptions: {
 				extraFileExtensions: ['.svelte'],
-				project: true,
+				projectService: true,
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
@@ -80,7 +80,7 @@ export default [
 			parserOptions: {
 				parser: '@typescript-eslint/parser',
 				extraFileExtensions: ['.svelte'],
-				project: true,
+				projectService: true,
 				svelteConfig,
 				svelteFeatures: {
 					experimentalGenerics: true,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { BranchStatus, GitStatusCache } from '$lib/types/git_status';
+	import type { GitStatusCache } from '$lib/types/git_status';
 	import BranchStatusBadge from './BranchStatusBadge.svelte';
 	import SyncBadge from './SyncBadge.svelte';
 	import MergeConflictBadge from './MergeConflictBadge.svelte';
