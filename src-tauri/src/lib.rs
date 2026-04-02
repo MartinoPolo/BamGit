@@ -5,7 +5,8 @@ mod models;
 mod session;
 
 use commands::{
-    dashboard_commands, git_status_commands, issue_commands, portfolio_commands, session_commands,
+    dashboard_commands, git_status_commands, github_commands, issue_commands, portfolio_commands,
+    session_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
 use session::manager::SessionManager;
@@ -54,6 +55,13 @@ pub fn run() {
             git_status_commands::refresh_git_status,
             git_status_commands::get_cached_git_status,
             git_status_commands::get_all_git_statuses_for_dashboard,
+            github_commands::get_github_status_cache,
+            github_commands::get_all_github_status_caches,
+            github_commands::check_gh_availability,
+            github_commands::fetch_issue_state,
+            github_commands::fetch_pr_for_branch,
+            github_commands::fetch_assigned_issues,
+            github_commands::sync_all_github_state,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
