@@ -11,8 +11,14 @@
 		update_issue,
 		delete_issue,
 	} from '$lib/tauri/issue_commands';
+	import {
+		setup_worktree,
+		remove_worktree,
+		get_prunable_issues,
+	} from '$lib/tauri/worktree_commands';
 	import { execute_action } from '$lib/tauri/action_commands';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
+	import type { PrunableIssue } from '$lib/types/worktree';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
 	import DashboardToolbar from '$lib/components/DashboardToolbar.svelte';
@@ -21,6 +27,7 @@
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
 	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
 	import AssignedIssuesPanel from '$lib/components/AssignedIssuesPanel.svelte';
+	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 
 	const dashboard_store = get_dashboard_store();
 	const git_status_store = get_git_status_store();
@@ -31,6 +38,9 @@
 	let create_dialog_open = $state(false);
 	let editing_issue = $state<Issue | null>(null);
 	let all_expanded = $state(false);
+	let prune_dialog_open = $state(false);
+	let prunable_issues = $state<PrunableIssue[]>([]);
+	let prune_removing = $state(false);
 
 	// Parse "owner/repo" from dashboard's github_repo field
 	const github_repo_parts = $derived.by(() => {
@@ -121,6 +131,88 @@
 		}
 	}
 
+	async function handle_setup_worktree(issue: Issue) {
+		const dashboard = dashboard_store.active_dashboard;
+		if (dashboard?.local_folder == null) {
+			console.error('Dashboard has no local_folder configured');
+			return;
+		}
+		if (issue.branch_name == null) {
+			console.error('Issue has no branch_name set');
+			return;
+		}
+		try {
+			await setup_worktree({
+				issue_id: issue.id,
+				branch_name: issue.branch_name,
+				color: issue.color,
+				working_directory: dashboard.local_folder,
+				base_branch: issue.base_branch ?? dashboard.default_base_branch,
+			});
+		} catch (err) {
+			console.error('Failed to setup worktree:', err);
+		}
+	}
+
+	async function handle_remove_worktree(issue: Issue) {
+		const dashboard = dashboard_store.active_dashboard;
+		if (dashboard?.local_folder == null) {
+			console.error('Dashboard has no local_folder configured');
+			return;
+		}
+		if (issue.branch_name == null) {
+			console.error('Issue has no branch_name to remove');
+			return;
+		}
+		try {
+			await remove_worktree({
+				issue_id: issue.id,
+				branch_name: issue.branch_name,
+				working_directory: dashboard.local_folder,
+			});
+		} catch (err) {
+			console.error('Failed to remove worktree:', err);
+		}
+	}
+
+	async function handle_open_prune_dialog() {
+		const dashboard_id = dashboard_store.active_dashboard_id;
+		if (dashboard_id == null) {
+			return;
+		}
+		try {
+			prunable_issues = await get_prunable_issues(dashboard_id);
+			prune_dialog_open = true;
+		} catch (err) {
+			console.error('Failed to fetch prunable issues:', err);
+		}
+	}
+
+	async function handle_prune(issue_ids: string[]) {
+		const dashboard = dashboard_store.active_dashboard;
+		if (dashboard?.local_folder == null) {
+			return;
+		}
+		prune_removing = true;
+		try {
+			for (const issue_id of issue_ids) {
+				const issue = issue_store.issues.find((i) => i.id === issue_id);
+				if (issue?.branch_name != null) {
+					await remove_worktree({
+						issue_id,
+						branch_name: issue.branch_name,
+						working_directory: dashboard.local_folder,
+					});
+				}
+			}
+			prune_dialog_open = false;
+		} catch (err) {
+			console.error('Failed to prune worktrees:', err);
+		} finally {
+			prune_removing = false;
+		}
+	}
+
 	async function handle_execute_action(action_id: string, issue_id: string) {
 		try {
 			await execute_action(action_id, issue_id);
@@ -168,6 +260,7 @@
 			on_toggle_archived={() => issue_store.toggle_show_archived()}
 			on_toggle_expand_all={() => (all_expanded = !all_expanded)}
 			on_sync_all={github_repo_parts ? handle_sync_all : undefined}
+			on_prune_worktrees={handle_open_prune_dialog}
 		/>
 
 		<!-- Issue list or empty state -->
@@ -189,10 +282,13 @@
 				gh_available={github_store.is_available}
 				get_children={issue_store.get_children}
 				get_git_status={(issue_id) => git_status_store.get_status(issue_id)}
+				get_progress_lines={(issue_id) => issue_store.get_progress_lines(issue_id)}
 				on_archive={handle_archive_issue}
 				on_unarchive={handle_unarchive_issue}
 				on_edit={(issue) => (editing_issue = issue)}
 				on_delete={handle_delete_issue}
+				on_setup_worktree={handle_setup_worktree}
+				on_remove_worktree={handle_remove_worktree}
 				on_execute_action={handle_execute_action}
 			/>
 		{/if}
@@ -217,5 +313,13 @@
 		issue={editing_issue}
 		on_close={() => (editing_issue = null)}
 		on_update={handle_update_issue}
+	/>
+
+	<PruneWorktreesDialog
+		open={prune_dialog_open}
+		{prunable_issues}
+		removing={prune_removing}
+		on_close={() => (prune_dialog_open = false)}
+		on_prune={handle_prune}
 	/>
 {/if}

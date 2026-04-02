@@ -126,19 +126,29 @@ pub fn update_issue(
     let color = resolve_nullable_field(request.color, existing.color);
     let github_issue_url = resolve_nullable_field(request.github_issue_url, existing.github_issue_url);
     let github_issue_number = resolve_nullable_field(request.github_issue_number, existing.github_issue_number);
+    let branch_name = resolve_nullable_field(request.branch_name, existing.branch_name);
+    let base_branch = resolve_nullable_field(request.base_branch, existing.base_branch);
+    let worktree_folder = resolve_nullable_field(request.worktree_folder, existing.worktree_folder);
+    let worktree_state = request.worktree_state.unwrap_or(existing.worktree_state);
     let parent_issue_id = resolve_nullable_field(request.parent_issue_id, existing.parent_issue_id);
     let sort_order = request.sort_order.unwrap_or(existing.sort_order);
 
     connection
         .execute(
             "UPDATE issues SET name = ?1, priority = ?2, color = ?3, github_issue_url = ?4, \
-             github_issue_number = ?5, parent_issue_id = ?6, sort_order = ?7 WHERE id = ?8",
+             github_issue_number = ?5, branch_name = ?6, base_branch = ?7, \
+             worktree_folder = ?8, worktree_state = ?9, parent_issue_id = ?10, \
+             sort_order = ?11 WHERE id = ?12",
             rusqlite::params![
                 name,
                 priority,
                 color,
                 github_issue_url,
                 github_issue_number,
+                branch_name,
+                base_branch,
+                worktree_folder,
+                worktree_state,
                 parent_issue_id,
                 sort_order,
                 existing.id,

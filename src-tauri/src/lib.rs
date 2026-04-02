@@ -6,7 +6,7 @@ mod session;
 
 use commands::{
     action_commands, dashboard_commands, git_status_commands, github_commands, issue_commands,
-    portfolio_commands, session_commands,
+    portfolio_commands, session_commands, worktree_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
 use session::discovery_polling::DiscoveryPoller;
@@ -73,6 +73,10 @@ pub fn run() {
             github_commands::fetch_pr_for_branch,
             github_commands::fetch_assigned_issues,
             github_commands::sync_all_github_state,
+            worktree_commands::setup_worktree,
+            worktree_commands::remove_worktree,
+            worktree_commands::refresh_worktree_state,
+            worktree_commands::get_prunable_issues,
             action_commands::create_action,
             action_commands::get_actions_for_dashboard,
             action_commands::get_action,
