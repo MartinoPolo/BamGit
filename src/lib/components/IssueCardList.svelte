@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
+	import type { GitStatusCache } from '$lib/types/git_status';
 	import IssueCard from './IssueCard.svelte';
 
 	interface Props {
@@ -9,6 +10,7 @@
 		is_portfolio: boolean;
 		force_expanded?: boolean;
 		get_children: (parent_id: string) => Issue[];
+		get_git_status: (issue_id: string) => GitStatusCache | undefined;
 		on_archive: (id: string) => void;
 		on_unarchive: (id: string) => void;
 		on_edit: (issue: Issue) => void;
@@ -22,6 +24,7 @@
 		is_portfolio,
 		force_expanded,
 		get_children,
+		get_git_status,
 		on_archive,
 		on_unarchive,
 		on_edit,
@@ -35,6 +38,7 @@
 
 		<IssueCard
 			{issue}
+			git_status={get_git_status(issue.id)}
 			child_count={children.length}
 			{force_expanded}
 			{on_archive}
@@ -48,6 +52,7 @@
 			{#each children as child, index (child.id)}
 				<IssueCard
 					issue={child}
+					git_status={get_git_status(child.id)}
 					indented={true}
 					is_last_child={index === children.length - 1}
 					{force_expanded}
@@ -68,7 +73,14 @@
 			</h3>
 			<div class="flex flex-col gap-2">
 				{#each archived_issues as issue (issue.id)}
-					<IssueCard {issue} {on_archive} {on_unarchive} {on_edit} {on_delete} />
+					<IssueCard
+						{issue}
+						git_status={get_git_status(issue.id)}
+						{on_archive}
+						{on_unarchive}
+						{on_edit}
+						{on_delete}
+					/>
 				{/each}
 			</div>
 		</div>

@@ -27,14 +27,14 @@
 			worktree_parent_folder = dashboard.worktree_parent_folder ?? '';
 			confirm_delete = false;
 			dialog_element.showModal();
-		} else if (!dashboard && dialog_element?.open === true) {
+		} else if (dashboard === null && dialog_element?.open === true) {
 			dialog_element.close();
 		}
 	});
 
 	function handle_submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!dashboard || !name.trim()) {
+		if (dashboard === null || !name.trim()) {
 			return;
 		}
 
@@ -55,7 +55,7 @@
 	}
 
 	function handle_delete() {
-		if (!dashboard) {
+		if (dashboard === null) {
 			return;
 		}
 		if (!confirm_delete) {
