@@ -18,6 +18,8 @@ jobs:
                   cache: pnpm
             - run: pnpm install --frozen-lockfile
             - run: pnpm run check:all
+              env:
+                  NODE_OPTIONS: '--max-old-space-size=4096'
             - run: pnpm run test -- --coverage
             - run: pnpm exec playwright install --with-deps chromium
             - run: pnpm run test:e2e
