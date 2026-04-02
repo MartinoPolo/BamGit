@@ -17,7 +17,7 @@
 
 	// Derive live session from store so state updates are always reflected
 	const selected_session = $derived(
-		selected_session_id
+		selected_session_id !== ''
 			? (store.sessions.find((s) => s.id === selected_session_id) ?? null)
 			: null,
 	);
@@ -154,7 +154,7 @@
 		{/if}
 
 		<!-- Empty state -->
-		{#if !store.loading && store.sessions.length === 0}
+		{#if store.loading === false && store.sessions.length === 0}
 			<div class="py-12 text-center">
 				<p class="text-neutral-500">No sessions yet. Spawn one above to get started.</p>
 			</div>

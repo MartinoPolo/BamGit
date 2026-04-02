@@ -44,7 +44,6 @@
 </script>
 
 <!-- Using div instead of button to allow nested Stop button -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="w-full cursor-pointer rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-left transition hover:border-neutral-600 hover:bg-neutral-750"
 	role="button"

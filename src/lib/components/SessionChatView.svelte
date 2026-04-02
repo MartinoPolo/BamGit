@@ -116,6 +116,8 @@
 					];
 					break;
 				}
+				default:
+					break;
 			}
 		});
 	});
@@ -176,7 +178,7 @@
 <div class="flex h-full flex-col">
 	<!-- Messages -->
 	<div class="flex-1 space-y-3 overflow-y-auto p-4">
-		{#each messages as message}
+		{#each messages as message (message.content + message.role)}
 			<div
 				class="rounded-lg p-3 text-sm {message.role === 'user'
 					? 'ml-8 bg-blue-900/30 text-blue-200'
@@ -186,14 +188,14 @@
 							? 'bg-neutral-900 text-center text-xs text-neutral-500'
 							: 'mr-8 bg-neutral-800 text-neutral-200'}"
 			>
-				{#if message.role === 'tool' && message.tool_name}
+				{#if message.role === 'tool' && message.tool_name !== undefined}
 					<div
-						class="mb-1 text-xs font-medium {message.is_error
+						class="mb-1 text-xs font-medium {message.is_error === true
 							? 'text-red-400'
 							: 'text-neutral-500'}"
 					>
 						{message.tool_name}
-						{message.is_error ? ' (error)' : ''}
+						{message.is_error === true ? ' (error)' : ''}
 					</div>
 				{/if}
 				<pre class="whitespace-pre-wrap">{message.content}</pre>
