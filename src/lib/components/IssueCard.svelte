@@ -1,8 +1,11 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
+	import type { GitStatusCache } from '$lib/types/git_status';
+	import GitBadgeGroup from './GitBadgeGroup.svelte';
 
 	interface Props {
 		issue: Issue;
+		git_status?: GitStatusCache | undefined;
 		indented?: boolean;
 		is_last_child?: boolean;
 		child_count?: number;
@@ -15,6 +18,7 @@
 
 	let {
 		issue,
+		git_status,
 		indented = false,
 		is_last_child = false,
 		child_count = 0,
@@ -95,19 +99,16 @@
 				</span>
 			{/if}
 
-			<!-- Placeholder badge area -->
+			<!-- Badge area -->
 			<div class="flex items-center gap-1">
 				{#if issue.github_issue_number}
 					<span class="rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">
 						#{issue.github_issue_number}
 					</span>
 				{/if}
-				<span
-					class="rounded bg-neutral-800/50 px-1.5 py-0.5 text-[10px] text-neutral-600"
-					title="Badges populated in later slices"
-				>
-					badges
-				</span>
+				{#if issue.branch_name}
+					<GitBadgeGroup branch_name={issue.branch_name} {git_status} />
+				{/if}
 			</div>
 
 			<!-- Action buttons -->
