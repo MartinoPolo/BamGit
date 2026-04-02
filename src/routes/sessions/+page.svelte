@@ -1,10 +1,16 @@
 <script lang="ts">
-	import type { Session, SessionEventPayload } from '$lib/types/session';
-	import { spawn_session, terminate_session } from '$lib/tauri/session_commands';
+	import type {
+		DiscoveredSession,
+		DiscoveredSessionsPayload,
+		Session,
+		SessionEventPayload,
+	} from '$lib/types/session';
+	import { adopt_session, spawn_session, terminate_session } from '$lib/tauri/session_commands';
 	import { get_session_store } from '$lib/stores/sessions.svelte';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 	import SessionCard from '$lib/components/SessionCard.svelte';
+	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';
 	import SessionChatView from '$lib/components/SessionChatView.svelte';
 
 	const store = get_session_store();
@@ -13,7 +19,9 @@
 	let spawn_prompt = $state('');
 	let spawn_working_directory = $state('');
 	let spawning = $state(false);
-	let unlisten_fn: UnlistenFn | null = null;
+	let adopting_id = $state<string | null>(null);
+	let unlisten_session_event: UnlistenFn | null = null;
+	let unlisten_discovered: UnlistenFn | null = null;
 
 	// Derive live session from store so state updates are always reflected
 	const selected_session = $derived(
@@ -25,13 +33,21 @@
 	onMount(async () => {
 		await store.load_sessions();
 
-		unlisten_fn = await listen<SessionEventPayload>('session-event', (event) => {
+		unlisten_session_event = await listen<SessionEventPayload>('session-event', (event) => {
 			store.handle_session_event(event.payload);
 		});
+
+		unlisten_discovered = await listen<DiscoveredSessionsPayload>(
+			'discovered-sessions-updated',
+			(event) => {
+				store.handle_discovered_sessions_update(event.payload);
+			},
+		);
 	});
 
 	onDestroy(() => {
-		unlisten_fn?.();
+		unlisten_session_event?.();
+		unlisten_discovered?.();
 	});
 
 	async function handle_spawn() {
@@ -63,6 +79,25 @@
 			await store.refresh();
 		} catch (err) {
 			console.error('Failed to terminate session:', err);
+		}
+	}
+
+	async function handle_adopt(discovered: DiscoveredSession) {
+		adopting_id = discovered.id;
+		try {
+			await adopt_session({
+				cli_session_id: discovered.session_id,
+				working_directory: discovered.working_directory,
+				original_intent: discovered.first_prompt,
+				cost_usd: discovered.cost_usd > 0 ? discovered.cost_usd : null,
+				token_count: discovered.token_count > 0 ? (discovered.token_count as number) : null,
+			});
+			store.remove_discovered_session(discovered.id);
+			await store.refresh();
+		} catch (err) {
+			console.error('Failed to adopt session:', err);
+		} finally {
+			adopting_id = null;
 		}
 	}
 
@@ -125,6 +160,18 @@
 			</div>
 		</div>
 
+		<!-- Discovered external sessions -->
+		{#if store.discovered_sessions.length > 0}
+			<div class="space-y-2">
+				<h3 class="text-sm font-medium text-neutral-400">
+					External Sessions ({store.discovered_sessions.length})
+				</h3>
+				{#each store.discovered_sessions as session (session.id)}
+					<DiscoveredSessionCard {session} on_adopt={handle_adopt} />
+				{/each}
+			</div>
+		{/if}
+
 		<!-- Active sessions -->
 		{#if store.active_sessions.length > 0}
 			<div class="space-y-2">
@@ -154,7 +201,7 @@
 		{/if}
 
 		<!-- Empty state -->
-		{#if store.loading === false && store.sessions.length === 0}
+		{#if store.loading === false && store.sessions.length === 0 && store.discovered_sessions.length === 0}
 			<div class="py-12 text-center">
 				<p class="text-neutral-500">No sessions yet. Spawn one above to get started.</p>
 			</div>

@@ -22,7 +22,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 2);
+        assert_eq!(version, 3);
     }
 
     #[test]
@@ -32,7 +32,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 2);
+        assert_eq!(version, 3);
     }
 
     // --- Schema tests ---
@@ -696,7 +696,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 2);
+        assert_eq!(version, 3);
 
         // portfolio_dashboard_pointers table exists
         let exists: bool = connection
@@ -906,5 +906,69 @@ mod tests {
             .unwrap();
 
         assert_eq!(ids, vec!["i1"]);
+    }
+
+    // --- Migration v3 tests ---
+
+    #[test]
+    fn migration_v3_adds_session_source_and_working_directory() {
+        let connection = Connection::open_in_memory().unwrap();
+        connection
+            .execute_batch("PRAGMA foreign_keys = ON;")
+            .unwrap();
+        migrations::run_migrations(&connection).unwrap();
+
+        // source column exists with default 'spawned'
+        connection
+            .execute(
+                "INSERT INTO sessions (id, state) VALUES ('s1', 'running')",
+                [],
+            )
+            .unwrap();
+
+        let source: String = connection
+            .query_row(
+                "SELECT source FROM sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(source, "spawned");
+
+        // working_directory is nullable
+        let working_directory: Option<String> = connection
+            .query_row(
+                "SELECT working_directory FROM sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(working_directory, None);
+    }
+
+    #[test]
+    fn session_source_check_constraint_accepts_valid_values() {
+        let connection = setup_test_database();
+
+        for (index, source) in ["spawned", "adopted"].iter().enumerate() {
+            let id = format!("s{index}");
+            let result = connection.execute(
+                "INSERT INTO sessions (id, state, source) VALUES (?1, 'running', ?2)",
+                rusqlite::params![id, source],
+            );
+            assert!(result.is_ok(), "Source '{source}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn session_source_check_constraint_rejects_invalid_value() {
+        let connection = setup_test_database();
+
+        let result = connection.execute(
+            "INSERT INTO sessions (id, state, source) VALUES ('s1', 'running', 'external')",
+            [],
+        );
+
+        assert!(result.is_err(), "Invalid source should be rejected");
     }
 }

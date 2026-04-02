@@ -20,6 +20,8 @@ export interface Session {
 	original_intent: string | null;
 	last_prompt: string | null;
 	last_response_summary: string | null;
+	source: 'spawned' | 'adopted';
+	working_directory: string | null;
 }
 
 export interface SpawnSessionRequest {
@@ -54,4 +56,43 @@ export interface SessionEventPayload {
 		type: SessionEventType;
 		[key: string]: unknown;
 	};
+}
+
+// ─── Discovered Session Types ──────────────────────────────────────────────
+
+export type DiscoveredSessionStatus =
+	| 'working'
+	| 'needs_attention'
+	| 'idle'
+	| 'finished'
+	| 'unknown';
+
+export interface DiscoveredSession {
+	id: string;
+	pid: number;
+	working_directory: string;
+	project_directory_name: string;
+	session_id: string;
+	project_name: string;
+	status: DiscoveredSessionStatus;
+	first_prompt: string | null;
+	git_branch: string | null;
+	message_count: number;
+	cost_usd: number;
+	token_count: number;
+	latest_message: string | null;
+	modified_at: string | null;
+}
+
+export interface DiscoveredSessionsPayload {
+	sessions: DiscoveredSession[];
+}
+
+export interface AdoptSessionRequest {
+	cli_session_id: string;
+	working_directory: string;
+	issue_id?: string | null;
+	original_intent?: string | null;
+	cost_usd?: number | null;
+	token_count?: number | null;
 }

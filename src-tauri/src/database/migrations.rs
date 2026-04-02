@@ -2,11 +2,11 @@ use rusqlite::Connection;
 
 use super::schema;
 
-const CURRENT_VERSION: i32 = 2;
+const CURRENT_VERSION: i32 = 3;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
-static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2];
+static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2, migrate_v3];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)
@@ -35,6 +35,32 @@ fn migrate_v2(connection: &Connection) -> Result<(), rusqlite::Error> {
         );
         ",
     )
+}
+
+fn migrate_v3(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // Add source column (spawned vs adopted) — check first since schema may already include it
+    let has_source: bool = connection
+        .prepare("SELECT source FROM sessions LIMIT 0")
+        .is_ok();
+
+    if !has_source {
+        connection.execute_batch(
+            "ALTER TABLE sessions ADD COLUMN source TEXT NOT NULL DEFAULT 'spawned' \
+             CHECK (source IN ('spawned', 'adopted'));",
+        )?;
+    }
+
+    let has_working_directory: bool = connection
+        .prepare("SELECT working_directory FROM sessions LIMIT 0")
+        .is_ok();
+
+    if !has_working_directory {
+        connection.execute_batch(
+            "ALTER TABLE sessions ADD COLUMN working_directory TEXT;",
+        )?;
+    }
+
+    Ok(())
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {

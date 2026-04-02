@@ -1,5 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { Session, SpawnSessionRequest } from '$lib/types/session';
+import type {
+	AdoptSessionRequest,
+	DiscoveredSession,
+	Session,
+	SpawnSessionRequest,
+} from '$lib/types/session';
 
 export async function spawn_session(request: SpawnSessionRequest): Promise<string> {
 	return invoke('spawn_session', { request });
@@ -23,4 +28,20 @@ export async function get_sessions(): Promise<Session[]> {
 
 export async function get_session(id: string): Promise<Session> {
 	return invoke('get_session', { id });
+}
+
+export async function discover_external_sessions(): Promise<DiscoveredSession[]> {
+	return invoke('discover_external_sessions');
+}
+
+export async function adopt_session(request: AdoptSessionRequest): Promise<string> {
+	return invoke('adopt_session', { request });
+}
+
+export async function start_discovery_polling(interval_milliseconds?: number): Promise<void> {
+	return invoke('start_discovery_polling', { intervalMilliseconds: interval_milliseconds });
+}
+
+export async function stop_discovery_polling(): Promise<void> {
+	return invoke('stop_discovery_polling');
 }

@@ -15,6 +15,8 @@ pub struct Session {
     pub original_intent: Option<String>,
     pub last_prompt: Option<String>,
     pub last_response_summary: Option<String>,
+    pub source: String,
+    pub working_directory: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

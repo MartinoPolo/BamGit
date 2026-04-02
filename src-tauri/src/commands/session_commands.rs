@@ -5,14 +5,19 @@ use std::sync::{Arc, Mutex as StdMutex};
 use rusqlite::{Connection, Row};
 use tauri::{AppHandle, Manager, State};
 
+use serde::Deserialize;
+
 use crate::database::connection::DatabaseState;
 use crate::models::session::{Session, SpawnSessionRequest};
+use crate::session::discovery::DiscoveredSession;
+use crate::session::discovery_polling::DiscoveryPoller;
 use crate::session::manager::SessionManager;
 use crate::session::provider::{ActorCommand, SpawnConfig};
 
 const SESSION_SELECT_COLUMNS: &str =
     "id, issue_id, provider, state, pid, session_file_path, started_at, ended_at, \
-     cost_usd, token_count, original_intent, last_prompt, last_response_summary";
+     cost_usd, token_count, original_intent, last_prompt, last_response_summary, \
+     source, working_directory";
 
 fn row_to_session(row: &Row) -> Result<Session, rusqlite::Error> {
     Ok(Session {
@@ -29,6 +34,8 @@ fn row_to_session(row: &Row) -> Result<Session, rusqlite::Error> {
         original_intent: row.get(10)?,
         last_prompt: row.get(11)?,
         last_response_summary: row.get(12)?,
+        source: row.get(13)?,
+        working_directory: row.get(14)?,
     })
 }
 
@@ -51,32 +58,15 @@ pub async fn spawn_session(
         env_vars: HashMap::new(),
     };
 
-    // Clone the inner connection Arc for the actor
-    // The DatabaseState wraps a Mutex<Connection> — we need an Arc for the actor
-    let database_connection = {
-        // We need to create an Arc<StdMutex<Connection>> from DatabaseState
-        // Since DatabaseState owns the Mutex<Connection>, we need a different approach.
-        // The actor needs its own connection for concurrent access.
-        let app_data_dir = app_handle
-            .path()
-            .app_data_dir()
-            .map_err(|e| e.to_string())?;
-        let db_path = app_data_dir.join("bamgit.db");
-        let connection =
-            Connection::open(&db_path).map_err(|e| format!("Failed to open DB for actor: {e}"))?;
-        connection
-            .execute_batch("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;")
-            .map_err(|e| format!("Failed to set pragmas: {e}"))?;
-        Arc::new(StdMutex::new(connection))
-    };
+    let database_connection = open_actor_database_connection(&app_handle)?;
 
     // Also create the session row in the main DB connection (for immediate visibility)
     {
         let conn = state.0.lock().map_err(|e| e.to_string())?;
         conn.execute(
-            "INSERT INTO sessions (id, issue_id, provider, state, original_intent) \
-             VALUES (?1, ?2, 'claude-code', 'running', ?3)",
-            rusqlite::params![session_id, request.issue_id, config.prompt],
+            "INSERT INTO sessions (id, issue_id, provider, state, original_intent, source, working_directory) \
+             VALUES (?1, ?2, 'claude-code', 'running', ?3, 'spawned', ?4)",
+            rusqlite::params![session_id, request.issue_id, config.prompt, request.working_directory],
         )
         .map_err(|e| format!("Failed to create session row: {e}"))?;
     }
@@ -151,4 +141,132 @@ pub fn get_session(state: State<DatabaseState>, id: String) -> Result<Session, S
     connection
         .query_row(&query, [&id], |row| row_to_session(row))
         .map_err(|e| format!("Session not found: {e}"))
+}
+
+// ─── Discovery & Adoption Commands ──────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct AdoptSessionRequest {
+    pub cli_session_id: String,
+    pub working_directory: String,
+    pub issue_id: Option<String>,
+    pub original_intent: Option<String>,
+    pub cost_usd: Option<f64>,
+    pub token_count: Option<i64>,
+}
+
+/// One-shot discovery of external Claude Code sessions.
+#[tauri::command]
+pub async fn discover_external_sessions(
+    state: State<'_, DatabaseState>,
+) -> Result<Vec<DiscoveredSession>, String> {
+    let excluded_pids = get_managed_pids(&state)?;
+    let mut discoverer = crate::session::discovery::SessionDiscoverer::new();
+    Ok(discoverer.discover_sessions(&excluded_pids))
+}
+
+/// Query PIDs of sessions currently managed by BamGit (running/needs-input/needs-review).
+fn get_managed_pids(state: &State<DatabaseState>) -> Result<Vec<u32>, String> {
+    let connection = state.0.lock().map_err(|e| e.to_string())?;
+    let mut statement = connection
+        .prepare(crate::session::discovery::MANAGED_PIDS_QUERY)
+        .map_err(|e| format!("Failed to query managed PIDs: {e}"))?;
+
+    let pids = statement
+        .query_map([], |row| {
+            let pid: i64 = row.get(0)?;
+            Ok(pid as u32)
+        })
+        .map_err(|e| format!("Failed to read PIDs: {e}"))?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    Ok(pids)
+}
+
+/// Adopt an external session: create a DB row and spawn it with --resume.
+#[tauri::command]
+pub async fn adopt_session(
+    state: State<'_, DatabaseState>,
+    manager: State<'_, SessionManager>,
+    app_handle: AppHandle,
+    request: AdoptSessionRequest,
+) -> Result<String, String> {
+    let session_id = uuid::Uuid::new_v4().to_string();
+
+    let config = SpawnConfig {
+        prompt: String::new(),
+        working_directory: PathBuf::from(&request.working_directory),
+        resume_session_id: Some(request.cli_session_id.clone()),
+        permission_mode: None,
+        model: None,
+        max_turns: None,
+        env_vars: HashMap::new(),
+    };
+
+    let database_connection = open_actor_database_connection(&app_handle)?;
+
+    // Create the adopted session row
+    {
+        let conn = state.0.lock().map_err(|e| e.to_string())?;
+        conn.execute(
+            "INSERT INTO sessions (id, issue_id, provider, state, session_file_path, \
+             original_intent, cost_usd, token_count, source, working_directory) \
+             VALUES (?1, ?2, 'claude-code', 'running', ?3, ?4, ?5, ?6, 'adopted', ?7)",
+            rusqlite::params![
+                session_id,
+                request.issue_id,
+                request.cli_session_id,
+                request.original_intent,
+                request.cost_usd,
+                request.token_count,
+                request.working_directory,
+            ],
+        )
+        .map_err(|e| format!("Failed to create adopted session row: {e}"))?;
+    }
+
+    manager
+        .spawn_session(session_id.clone(), config, app_handle, database_connection)
+        .await?;
+
+    Ok(session_id)
+}
+
+/// Start the background discovery polling loop.
+#[tauri::command]
+pub async fn start_discovery_polling(
+    poller: State<'_, DiscoveryPoller>,
+    app_handle: AppHandle,
+    interval_milliseconds: Option<u64>,
+) -> Result<(), String> {
+    let interval = interval_milliseconds.unwrap_or(3000);
+    poller.start(app_handle, interval);
+    Ok(())
+}
+
+/// Stop the background discovery polling loop.
+#[tauri::command]
+pub async fn stop_discovery_polling(
+    poller: State<'_, DiscoveryPoller>,
+) -> Result<(), String> {
+    poller.stop();
+    Ok(())
+}
+
+/// Helper: open a separate DB connection for a session actor.
+fn open_actor_database_connection(
+    app_handle: &AppHandle,
+) -> Result<Arc<StdMutex<Connection>>, String> {
+    let app_data_directory = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    let db_path = app_data_directory.join("bamgit.db");
+    let connection =
+        Connection::open(&db_path).map_err(|e| format!("Failed to open DB for actor: {e}"))?;
+    connection
+        .execute_batch("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;")
+        .map_err(|e| format!("Failed to set pragmas: {e}"))?;
+    Ok(Arc::new(StdMutex::new(connection)))
 }

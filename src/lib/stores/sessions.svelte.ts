@@ -1,7 +1,14 @@
-import type { Session, SessionEventPayload, SessionState } from '$lib/types/session';
+import type {
+	DiscoveredSession,
+	DiscoveredSessionsPayload,
+	Session,
+	SessionEventPayload,
+	SessionState,
+} from '$lib/types/session';
 import { get_sessions } from '$lib/tauri/session_commands';
 
 let sessions = $state<Session[]>([]);
+let discovered_sessions = $state<DiscoveredSession[]>([]);
 let loading = $state(false);
 let error = $state<string | null>(null);
 
@@ -55,6 +62,10 @@ function handle_session_event(payload: SessionEventPayload) {
 	}
 }
 
+function handle_discovered_sessions_update(payload: DiscoveredSessionsPayload) {
+	discovered_sessions = payload.sessions;
+}
+
 export function get_session_store() {
 	return {
 		get sessions() {
@@ -66,6 +77,9 @@ export function get_session_store() {
 		get finished_sessions() {
 			return finished_sessions;
 		},
+		get discovered_sessions() {
+			return discovered_sessions;
+		},
 		get loading() {
 			return loading;
 		},
@@ -74,6 +88,7 @@ export function get_session_store() {
 		},
 
 		handle_session_event,
+		handle_discovered_sessions_update,
 
 		async load_sessions() {
 			try {
@@ -98,6 +113,10 @@ export function get_session_store() {
 
 		add_session(session: Session) {
 			sessions = [session, ...sessions];
+		},
+
+		remove_discovered_session(discovered_session_id: string) {
+			discovered_sessions = discovered_sessions.filter((s) => s.id !== discovered_session_id);
 		},
 	};
 }

@@ -9,6 +9,7 @@ use commands::{
     session_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
+use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
 use tauri::Manager;
 
@@ -28,6 +29,12 @@ pub fn run() {
             app.manage(database_state);
             app.manage(SessionManager::new());
             app.manage(FetchCoordinator::new());
+            app.manage(DiscoveryPoller::new());
+
+            // Auto-start discovery polling (3-second interval)
+            let poller = app.state::<DiscoveryPoller>();
+            poller.start(app.handle().clone(), 3000);
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -52,6 +59,10 @@ pub fn run() {
             session_commands::terminate_session,
             session_commands::get_sessions,
             session_commands::get_session,
+            session_commands::discover_external_sessions,
+            session_commands::adopt_session,
+            session_commands::start_discovery_polling,
+            session_commands::stop_discovery_polling,
             git_status_commands::refresh_git_status,
             git_status_commands::get_cached_git_status,
             git_status_commands::get_all_git_statuses_for_dashboard,
@@ -67,6 +78,9 @@ pub fn run() {
         .expect("error while building tauri application")
         .run(|app_handle, event| {
             if let tauri::RunEvent::Exit = event {
+                let poller = app_handle.state::<DiscoveryPoller>();
+                poller.stop();
+
                 let manager = app_handle.state::<SessionManager>();
                 tauri::async_runtime::block_on(manager.cleanup_all());
             }

@@ -67,7 +67,10 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             token_count INTEGER,
             original_intent TEXT,
             last_prompt TEXT,
-            last_response_summary TEXT
+            last_response_summary TEXT,
+            source TEXT NOT NULL DEFAULT 'spawned'
+                CHECK (source IN ('spawned', 'adopted')),
+            working_directory TEXT
         );
 
         CREATE TABLE IF NOT EXISTS actions (
