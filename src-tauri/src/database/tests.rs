@@ -737,4 +737,174 @@ mod tests {
 
         assert_eq!(status, "active");
     }
+
+    // --- Git status cache tests ---
+
+    #[test]
+    fn git_status_cache_crud_round_trip() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Feature branch");
+
+        // Insert
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status, behind_base_count, merge_conflict, fetched_at) \
+                 VALUES ('i1', 'active', 3, 0, datetime('now'))",
+                [],
+            )
+            .unwrap();
+
+        // Read
+        let (branch_status, behind_count, merge_conflict): (
+            Option<String>,
+            Option<i64>,
+            Option<bool>,
+        ) = connection
+            .query_row(
+                "SELECT branch_status, behind_base_count, merge_conflict FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+
+        assert_eq!(branch_status.as_deref(), Some("active"));
+        assert_eq!(behind_count, Some(3));
+        assert_eq!(merge_conflict, Some(false));
+
+        // Update
+        connection
+            .execute(
+                "UPDATE git_status_cache SET branch_status = 'remote-gone', behind_base_count = 5 WHERE issue_id = 'i1'",
+                [],
+            )
+            .unwrap();
+
+        let updated_status: String = connection
+            .query_row(
+                "SELECT branch_status FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(updated_status, "remote-gone");
+
+        // Delete
+        let rows_affected = connection
+            .execute("DELETE FROM git_status_cache WHERE issue_id = 'i1'", [])
+            .unwrap();
+        assert_eq!(rows_affected, 1);
+    }
+
+    #[test]
+    fn git_status_cache_rejects_invalid_issue_id() {
+        let connection = setup_test_database();
+
+        let result = connection.execute(
+            "INSERT INTO git_status_cache (issue_id, branch_status) VALUES ('nonexistent', 'active')",
+            [],
+        );
+
+        assert!(
+            result.is_err(),
+            "git_status_cache should reject invalid issue_id"
+        );
+    }
+
+    #[test]
+    fn git_status_cache_upsert_updates_existing_row() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Feature");
+
+        // First insert
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status, behind_base_count) \
+                 VALUES ('i1', 'active', 2)",
+                [],
+            )
+            .unwrap();
+
+        // Upsert
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status, behind_base_count, fetched_at) \
+                 VALUES ('i1', 'local', 5, datetime('now')) \
+                 ON CONFLICT(issue_id) DO UPDATE SET \
+                    branch_status = excluded.branch_status, \
+                    behind_base_count = excluded.behind_base_count, \
+                    fetched_at = excluded.fetched_at",
+                [],
+            )
+            .unwrap();
+
+        let (status, count): (String, i64) = connection
+            .query_row(
+                "SELECT branch_status, behind_base_count FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap();
+
+        assert_eq!(status, "local");
+        assert_eq!(count, 5);
+
+        // Should still be one row
+        let row_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(row_count, 1);
+    }
+
+    #[test]
+    fn git_status_cache_returns_only_issues_with_branch_name() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "With branch");
+        insert_test_issue(&connection, "i2", "d1", "No branch");
+
+        // Set branch_name only on i1
+        connection
+            .execute(
+                "UPDATE issues SET branch_name = 'feature-x' WHERE id = 'i1'",
+                [],
+            )
+            .unwrap();
+
+        // Add cache entries for both
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status) VALUES ('i1', 'active')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status) VALUES ('i2', 'unknown')",
+                [],
+            )
+            .unwrap();
+
+        // Query with branch_name filter
+        let mut statement = connection
+            .prepare(
+                "SELECT g.issue_id FROM git_status_cache g \
+                 JOIN issues i ON g.issue_id = i.id \
+                 WHERE i.dashboard_id = 'd1' AND i.branch_name IS NOT NULL",
+            )
+            .unwrap();
+
+        let ids: Vec<String> = statement
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert_eq!(ids, vec!["i1"]);
+    }
 }

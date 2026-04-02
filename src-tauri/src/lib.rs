@@ -1,9 +1,13 @@
 mod commands;
 mod database;
+mod git;
 mod models;
 mod session;
 
-use commands::{dashboard_commands, issue_commands, portfolio_commands, session_commands};
+use commands::{
+    dashboard_commands, git_status_commands, issue_commands, portfolio_commands, session_commands,
+};
+use git::fetch_coordinator::FetchCoordinator;
 use session::manager::SessionManager;
 use tauri::Manager;
 
@@ -22,6 +26,7 @@ pub fn run() {
 
             app.manage(database_state);
             app.manage(SessionManager::new());
+            app.manage(FetchCoordinator::new());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -46,6 +51,9 @@ pub fn run() {
             session_commands::terminate_session,
             session_commands::get_sessions,
             session_commands::get_session,
+            git_status_commands::refresh_git_status,
+            git_status_commands::get_cached_git_status,
+            git_status_commands::get_all_git_statuses_for_dashboard,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

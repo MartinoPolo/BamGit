@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
+	import { get_git_status_store } from '$lib/stores/git_status.svelte';
 	import { get_issue_store } from '$lib/stores/issues.svelte';
 	import {
 		create_issue,
@@ -17,6 +18,7 @@
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
 
 	const dashboard_store = get_dashboard_store();
+	const git_status_store = get_git_status_store();
 	const issue_store = get_issue_store();
 
 	let create_dialog_open = $state(false);
@@ -31,6 +33,7 @@
 		if (dashboard_id !== null && dashboard_id !== last_loaded_dashboard_id) {
 			last_loaded_dashboard_id = dashboard_id;
 			issue_store.load_issues(dashboard_id);
+			git_status_store.load_statuses_for_dashboard(dashboard_id);
 		}
 	});
 
@@ -88,7 +91,7 @@
 			dashboard_store.show_create_dialog = true;
 		}}
 	/>
-{:else if !dashboard_store.active_dashboard}
+{:else if dashboard_store.active_dashboard === null}
 	<p class="text-neutral-500">Select a dashboard from the sidebar.</p>
 {:else}
 	<div class="flex flex-col gap-4">
@@ -127,6 +130,7 @@
 				is_portfolio={dashboard_store.active_dashboard.type === 'portfolio'}
 				force_expanded={all_expanded ? true : undefined}
 				get_children={issue_store.get_children}
+				get_git_status={(issue_id) => git_status_store.get_status(issue_id)}
 				on_archive={handle_archive_issue}
 				on_unarchive={handle_unarchive_issue}
 				on_edit={(issue) => (editing_issue = issue)}
