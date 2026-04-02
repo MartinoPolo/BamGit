@@ -193,7 +193,7 @@
 						>
 							Edit
 						</button>
-						{#if on_setup_worktree && issue.branch_name && (issue.worktree_state === 'none' || issue.worktree_state === 'failed')}
+						{#if on_setup_worktree && issue.branch_name !== null && (issue.worktree_state === 'none' || issue.worktree_state === 'failed')}
 							<button
 								onclick={() => {
 									on_setup_worktree(issue);

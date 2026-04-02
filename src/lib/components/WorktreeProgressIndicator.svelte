@@ -29,7 +29,7 @@
 		bind:this={scroll_container}
 		class="max-h-32 overflow-y-auto rounded bg-neutral-950 p-2 font-mono text-[11px] leading-4 text-neutral-400"
 	>
-		{#each lines as line}
+		{#each lines as line, index (index)}
 			<div class="whitespace-pre-wrap break-all">{strip_ansi(line)}</div>
 		{/each}
 	</div>

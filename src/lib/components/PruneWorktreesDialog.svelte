@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
 	import type { PrunableIssue } from '$lib/types/worktree';
 
 	interface Props {
@@ -11,23 +12,21 @@
 
 	let { open, prunable_issues, removing, on_close, on_prune }: Props = $props();
 
-	let selected_ids = $state<Set<string>>(new Set());
+	let selected_ids = $state(new SvelteSet<string>());
 
 	// Reset selection when dialog opens with new data
 	$effect(() => {
 		if (open) {
-			selected_ids = new Set(prunable_issues.map((issue) => issue.issue_id));
+			selected_ids = new SvelteSet(prunable_issues.map((issue) => issue.issue_id));
 		}
 	});
 
 	function toggle_selection(issue_id: string) {
-		const next = new Set(selected_ids);
-		if (next.has(issue_id)) {
-			next.delete(issue_id);
+		if (selected_ids.has(issue_id)) {
+			selected_ids.delete(issue_id);
 		} else {
-			next.add(issue_id);
+			selected_ids.add(issue_id);
 		}
-		selected_ids = next;
 	}
 
 	function handle_prune() {

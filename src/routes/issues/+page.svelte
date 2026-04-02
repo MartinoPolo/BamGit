@@ -129,11 +129,11 @@
 
 	async function handle_setup_worktree(issue: Issue) {
 		const dashboard = dashboard_store.active_dashboard;
-		if (!dashboard?.local_folder) {
+		if (dashboard?.local_folder == null) {
 			console.error('Dashboard has no local_folder configured');
 			return;
 		}
-		if (!issue.branch_name) {
+		if (issue.branch_name == null) {
 			console.error('Issue has no branch_name set');
 			return;
 		}
@@ -152,11 +152,11 @@
 
 	async function handle_remove_worktree(issue: Issue) {
 		const dashboard = dashboard_store.active_dashboard;
-		if (!dashboard?.local_folder) {
+		if (dashboard?.local_folder == null) {
 			console.error('Dashboard has no local_folder configured');
 			return;
 		}
-		if (!issue.branch_name) {
+		if (issue.branch_name == null) {
 			console.error('Issue has no branch_name to remove');
 			return;
 		}
@@ -173,7 +173,7 @@
 
 	async function handle_open_prune_dialog() {
 		const dashboard_id = dashboard_store.active_dashboard_id;
-		if (!dashboard_id) {
+		if (dashboard_id == null) {
 			return;
 		}
 		try {
@@ -186,14 +186,14 @@
 
 	async function handle_prune(issue_ids: string[]) {
 		const dashboard = dashboard_store.active_dashboard;
-		if (!dashboard?.local_folder) {
+		if (dashboard?.local_folder == null) {
 			return;
 		}
 		prune_removing = true;
 		try {
 			for (const issue_id of issue_ids) {
 				const issue = issue_store.issues.find((i) => i.id === issue_id);
-				if (issue?.branch_name) {
+				if (issue?.branch_name != null) {
 					await remove_worktree({
 						issue_id,
 						branch_name: issue.branch_name,
