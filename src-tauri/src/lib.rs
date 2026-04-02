@@ -1,8 +1,10 @@
 mod commands;
 mod database;
+mod git;
 mod models;
 
-use commands::{dashboard_commands, github_commands, issue_commands, portfolio_commands};
+use commands::{dashboard_commands, git_status_commands, github_commands, issue_commands, portfolio_commands};
+use git::fetch_coordinator::FetchCoordinator;
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -19,6 +21,7 @@ pub fn run() {
                 .expect("Failed to initialize database");
 
             app.manage(database_state);
+            app.manage(FetchCoordinator::new());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -37,6 +40,9 @@ pub fn run() {
             portfolio_commands::add_repo_to_portfolio,
             portfolio_commands::remove_repo_from_portfolio,
             portfolio_commands::get_portfolio_repos,
+            git_status_commands::refresh_git_status,
+            git_status_commands::get_cached_git_status,
+            git_status_commands::get_all_git_statuses_for_dashboard,
             github_commands::get_github_status_cache,
             github_commands::get_all_github_status_caches,
             github_commands::check_gh_availability,

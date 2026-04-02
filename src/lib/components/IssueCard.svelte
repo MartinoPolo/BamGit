@@ -1,14 +1,17 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
 	import type { GitHubStatusCache } from '$lib/types/github';
+	import type { GitStatusCache } from '$lib/types/git_status';
 	import PullRequestBadge from './PullRequestBadge.svelte';
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
+	import GitBadgeGroup from './GitBadgeGroup.svelte';
 
 	interface Props {
 		issue: Issue;
 		github_cache?: GitHubStatusCache | null;
 		gh_available?: boolean;
+		git_status?: GitStatusCache | undefined;
 		indented?: boolean;
 		is_last_child?: boolean;
 		child_count?: number;
@@ -23,6 +26,7 @@
 		issue,
 		github_cache = null,
 		gh_available = false,
+		git_status,
 		indented = false,
 		is_last_child = false,
 		child_count = 0,
@@ -103,7 +107,7 @@
 				</span>
 			{/if}
 
-			<!-- GitHub badges -->
+			<!-- GitHub & git badges -->
 			<div class="flex items-center gap-1">
 				{#if github_cache?.github_issue_state}
 					<GitHubIssueBadge
@@ -124,6 +128,9 @@
 						pr_number={github_cache.pr_number}
 						disabled={!gh_available}
 					/>
+				{/if}
+				{#if issue.branch_name}
+					<GitBadgeGroup branch_name={issue.branch_name} {git_status} />
 				{/if}
 			</div>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
+	import { get_git_status_store } from '$lib/stores/git_status.svelte';
 	import { get_issue_store } from '$lib/stores/issues.svelte';
 	import { get_github_store } from '$lib/stores/github.svelte';
 	import {
@@ -20,6 +21,7 @@
 	import AssignedIssuesPanel from '$lib/components/AssignedIssuesPanel.svelte';
 
 	const dashboard_store = get_dashboard_store();
+	const git_status_store = get_git_status_store();
 	const issue_store = get_issue_store();
 	const github_store = get_github_store();
 
@@ -54,6 +56,7 @@
 			last_loaded_dashboard_id = dashboard_id;
 			issue_store.load_issues(dashboard_id);
 			github_store.load_caches(dashboard_id);
+			git_status_store.load_statuses_for_dashboard(dashboard_id);
 			if (github_repo_parts) {
 				github_store.load_assigned_issues(github_repo_parts.owner, github_repo_parts.repo);
 			}
@@ -122,7 +125,7 @@
 			dashboard_store.show_create_dialog = true;
 		}}
 	/>
-{:else if !dashboard_store.active_dashboard}
+{:else if dashboard_store.active_dashboard === null}
 	<p class="text-neutral-500">Select a dashboard from the sidebar.</p>
 {:else}
 	<div class="flex flex-col gap-4">
@@ -171,6 +174,7 @@
 				github_cache_map={github_store.cache_map}
 				gh_available={github_store.is_available}
 				get_children={issue_store.get_children}
+				get_git_status={(issue_id) => git_status_store.get_status(issue_id)}
 				on_archive={handle_archive_issue}
 				on_unarchive={handle_unarchive_issue}
 				on_edit={(issue) => (editing_issue = issue)}

@@ -51,8 +51,7 @@ export default defineConfig({
 					name: 'client',
 					browser: {
 						enabled: true,
-						// @ts-expect-error -- vite-plus types lag behind vitest runtime; factory import is correct
-						provider: playwright,
+						provider: playwright(),
 						instances: [{ browser: 'chromium', headless: true }],
 					},
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
@@ -79,8 +78,7 @@ export default defineConfig({
 					browser: {
 						enabled: true,
 						headless: true,
-						// @ts-expect-error -- vite-plus types lag behind vitest runtime; factory import is correct
-						provider: playwright,
+						provider: playwright(),
 						instances: [{ browser: 'chromium' }],
 					},
 				},

@@ -23,14 +23,14 @@
 			color = issue.color ?? COLOR_SWATCHES[0];
 			github_issue_url = issue.github_issue_url ?? '';
 			dialog_element.showModal();
-		} else if (!issue && dialog_element?.open === true) {
+		} else if (issue === null && dialog_element?.open === true) {
 			dialog_element.close();
 		}
 	});
 
 	function handle_submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!issue || !name.trim()) {
+		if (issue === null || !name.trim()) {
 			return;
 		}
 

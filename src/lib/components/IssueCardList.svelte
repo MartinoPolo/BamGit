@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
 	import type { GitHubStatusCache } from '$lib/types/github';
+	import type { GitStatusCache } from '$lib/types/git_status';
 	import IssueCard from './IssueCard.svelte';
 
 	interface Props {
@@ -12,6 +13,7 @@
 		github_cache_map?: Map<string, GitHubStatusCache>;
 		gh_available?: boolean;
 		get_children: (parent_id: string) => Issue[];
+		get_git_status: (issue_id: string) => GitStatusCache | undefined;
 		on_archive: (id: string) => void;
 		on_unarchive: (id: string) => void;
 		on_edit: (issue: Issue) => void;
@@ -27,6 +29,7 @@
 		github_cache_map = new Map(),
 		gh_available = false,
 		get_children,
+		get_git_status,
 		on_archive,
 		on_unarchive,
 		on_edit,
@@ -42,6 +45,7 @@
 			{issue}
 			github_cache={github_cache_map.get(issue.id)}
 			{gh_available}
+			git_status={get_git_status(issue.id)}
 			child_count={children.length}
 			{force_expanded}
 			{on_archive}
@@ -57,6 +61,7 @@
 					issue={child}
 					github_cache={github_cache_map.get(child.id)}
 					{gh_available}
+					git_status={get_git_status(child.id)}
 					indented={true}
 					is_last_child={index === children.length - 1}
 					{force_expanded}
@@ -81,6 +86,7 @@
 						{issue}
 						github_cache={github_cache_map.get(issue.id)}
 						{gh_available}
+						git_status={get_git_status(issue.id)}
 						{on_archive}
 						{on_unarchive}
 						{on_edit}
