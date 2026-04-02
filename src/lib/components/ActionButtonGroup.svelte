@@ -15,7 +15,7 @@
 	};
 
 	function get_icon_display(icon: string | null): string {
-		if (!icon) {
+		if (icon === null || icon === '') {
 			return '\u25CF';
 		}
 		return ICON_MAP[icon] ?? icon;
