@@ -19,7 +19,6 @@
 	let spawn_prompt = $state('');
 	let spawn_working_directory = $state('');
 	let spawning = $state(false);
-
 	let unlisten_session_event: UnlistenFn | null = null;
 	let unlisten_discovered: UnlistenFn | null = null;
 
