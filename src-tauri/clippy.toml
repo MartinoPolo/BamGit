@@ -1,0 +1,3 @@
+disallowed-methods = [
+    { path = "tokio::spawn", reason = "Use tauri::async_runtime::spawn instead — tokio::spawn panics outside Tokio runtime context (e.g. in Tauri setup)" },
+]

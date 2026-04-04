@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, State};
 use tokio::io::{AsyncBufReadExt, AsyncRead, BufReader};
 use tokio::process::Command;
-use tokio::task::JoinHandle;
+use tauri::async_runtime::JoinHandle;
 
 use crate::database::connection::DatabaseState;
 
@@ -213,7 +213,7 @@ fn stream_output(
     issue_id: String,
     source: &'static str,
 ) -> JoinHandle<()> {
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         let mut lines = BufReader::new(reader).lines();
         while let Ok(Some(line)) = lines.next_line().await {
             emit_progress(&app_handle, &issue_id, source, &line);

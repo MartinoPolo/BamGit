@@ -12,14 +12,6 @@ pub enum NotificationEventType {
 }
 
 impl NotificationEventType {
-    pub const ALL: &[NotificationEventType] = &[
-        NotificationEventType::NeedsInput,
-        NotificationEventType::NeedsReview,
-        NotificationEventType::Finished,
-        NotificationEventType::Errored,
-        NotificationEventType::PrReady,
-    ];
-
     pub fn as_str(&self) -> &'static str {
         match self {
             NotificationEventType::NeedsInput => "needs-input",
@@ -27,28 +19,6 @@ impl NotificationEventType {
             NotificationEventType::Finished => "finished",
             NotificationEventType::Errored => "errored",
             NotificationEventType::PrReady => "pr-ready",
-        }
-    }
-
-    pub fn from_str(value: &str) -> Option<NotificationEventType> {
-        match value {
-            "needs-input" => Some(NotificationEventType::NeedsInput),
-            "needs-review" => Some(NotificationEventType::NeedsReview),
-            "finished" => Some(NotificationEventType::Finished),
-            "errored" => Some(NotificationEventType::Errored),
-            "pr-ready" => Some(NotificationEventType::PrReady),
-            _ => None,
-        }
-    }
-
-    /// Default sound file name shipped in resources/sounds/.
-    pub fn default_sound_file(&self) -> Option<&'static str> {
-        match self {
-            NotificationEventType::NeedsInput | NotificationEventType::Errored => {
-                Some("urgent.wav")
-            }
-            NotificationEventType::NeedsReview => Some("gentle.wav"),
-            _ => None,
         }
     }
 }
@@ -134,32 +104,6 @@ impl NotificationConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn event_type_round_trip() {
-        for event_type in NotificationEventType::ALL {
-            let as_str = event_type.as_str();
-            let parsed = NotificationEventType::from_str(as_str);
-            assert_eq!(parsed, Some(*event_type), "round-trip failed for {as_str}");
-        }
-    }
-
-    #[test]
-    fn event_type_from_str_unknown_returns_none() {
-        assert_eq!(NotificationEventType::from_str("unknown"), None);
-    }
-
-    #[test]
-    fn defaults_cover_all_event_types() {
-        let defaults = NotificationConfig::defaults();
-        for event_type in NotificationEventType::ALL {
-            assert!(
-                defaults.iter().any(|c| c.event_type == event_type.as_str()),
-                "missing default for {}",
-                event_type.as_str()
-            );
-        }
-    }
 
     #[test]
     fn needs_input_defaults_all_channels_on() {

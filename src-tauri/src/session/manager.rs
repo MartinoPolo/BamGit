@@ -55,7 +55,7 @@ impl SessionManager {
 
         let actor_session_id = session_id.clone();
         let actors_ref = Arc::clone(&self.actors);
-        tokio::spawn(async move {
+        tauri::async_runtime::spawn(async move {
             session_actor::run_actor(
                 actor_session_id.clone(),
                 handle,

@@ -22,14 +22,6 @@ impl BranchStatus {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WorktreeInfo {
-    pub path: String,
-    pub head_commit: Option<String>,
-    pub branch: Option<String>,
-    pub is_bare: bool,
-}
-
 /// Rejects branch refs starting with `-` to prevent argument injection.
 pub fn is_unsafe_branch_ref(ref_name: &str) -> bool {
     ref_name.starts_with('-')

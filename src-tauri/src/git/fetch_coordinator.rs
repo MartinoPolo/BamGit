@@ -72,12 +72,6 @@ impl FetchCoordinator {
 
         result
     }
-
-    pub fn reset(&self) {
-        if let Ok(mut map) = self.in_flight.lock() {
-            map.clear();
-        }
-    }
 }
 
 fn run_git_fetch(repo_root: &Path) -> Result<(), GitError> {
@@ -107,21 +101,6 @@ mod tests {
     #[test]
     fn new_coordinator_has_no_in_flight_fetches() {
         let coordinator = FetchCoordinator::new();
-        let map = coordinator.in_flight.lock().unwrap();
-        assert!(map.is_empty());
-    }
-
-    #[test]
-    fn reset_clears_all_entries() {
-        let coordinator = FetchCoordinator::new();
-        {
-            let mut map = coordinator.in_flight.lock().unwrap();
-            map.insert(
-                PathBuf::from("/some/repo"),
-                Arc::new(Mutex::new(Some(Ok(())))),
-            );
-        }
-        coordinator.reset();
         let map = coordinator.in_flight.lock().unwrap();
         assert!(map.is_empty());
     }

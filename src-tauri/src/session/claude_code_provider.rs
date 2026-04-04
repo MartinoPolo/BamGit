@@ -77,7 +77,6 @@ impl SessionProvider for ClaudeCodeProvider {
             stdout,
             stderr,
             pid,
-            session_id: None,
         })
     }
 
