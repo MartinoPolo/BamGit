@@ -267,7 +267,7 @@
 </script>
 
 {#if dashboard_store.loading}
-	<p class="text-neutral-500">Loading...</p>
+	<p class="text-muted-foreground">Loading...</p>
 {:else if dashboard_store.dashboards.length === 0}
 	<OnboardingCard
 		on_create_dashboard={() => {
@@ -275,13 +275,13 @@
 		}}
 	/>
 {:else if dashboard_store.active_dashboard === null}
-	<p class="text-neutral-500">Select a dashboard from the sidebar.</p>
+	<p class="text-muted-foreground">Select a dashboard from the sidebar.</p>
 {:else}
 	<div class="flex flex-col gap-4">
 		<!-- Dashboard header -->
 		<div class="flex items-center gap-2">
 			<h1 class="text-xl font-semibold">{dashboard_store.active_dashboard.name}</h1>
-			<span class="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-400">
+			<span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
 				{dashboard_store.active_dashboard.type}
 			</span>
 		</div>
@@ -309,9 +309,9 @@
 
 		<!-- Issue list or empty state -->
 		{#if issue_store.loading}
-			<p class="text-neutral-500">Loading issues...</p>
+			<p class="text-muted-foreground">Loading issues...</p>
 		{:else if issue_store.error}
-			<p class="text-red-400">Error: {issue_store.error}</p>
+			<p class="text-destructive">Error: {issue_store.error}</p>
 		{:else if issue_store.active_issues.length === 0 && issue_store.archived_issues.length === 0}
 			<EmptyIssueState on_add_issue={open_create_dialog} />
 		{:else}

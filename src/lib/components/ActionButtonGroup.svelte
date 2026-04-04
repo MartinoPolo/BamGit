@@ -29,7 +29,7 @@
 				event.stopPropagation();
 				on_execute(action.id);
 			}}
-			class="rounded px-1.5 py-0.5 text-xs text-neutral-400 transition-colors hover:bg-neutral-700 hover:text-neutral-200"
+			class="rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 			title={action.name}
 		>
 			<span class="text-[10px]">{get_icon_display(action.icon)}</span>

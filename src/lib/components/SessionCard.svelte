@@ -57,7 +57,7 @@
 
 <!-- Using div instead of button to allow nested Stop button -->
 <div
-	class="w-full cursor-pointer rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-left transition hover:border-neutral-600 hover:bg-neutral-750"
+	class="w-full cursor-pointer rounded-lg border border-border bg-card p-3 text-left transition hover:border-input hover:bg-accent"
 	role="button"
 	tabindex="0"
 	onclick={() => on_click(session)}
@@ -76,12 +76,12 @@
 						title="Pending notification"
 					></span>
 				{/if}
-				<p class="truncate text-sm font-medium text-neutral-200">
+				<p class="truncate text-sm font-medium text-foreground">
 					{session.original_intent ?? 'Session'}
 				</p>
 			</div>
 			{#if session.last_response_summary}
-				<p class="mt-1 truncate text-xs text-neutral-400">
+				<p class="mt-1 truncate text-xs text-muted-foreground">
 					{session.last_response_summary}
 				</p>
 			{/if}
@@ -99,7 +99,7 @@
 		</div>
 	</div>
 
-	<div class="mt-2 flex items-center gap-3 text-xs text-neutral-500">
+	<div class="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
 		<span>{session.provider}</span>
 		<span>{relative_time}</span>
 		{#if formatted_cost}
@@ -111,7 +111,7 @@
 
 		{#if is_active}
 			<button
-				class="ml-auto text-red-400 hover:text-red-300"
+				class="ml-auto text-destructive hover:text-destructive/80"
 				onclick={(e) => {
 					e.stopPropagation();
 					on_terminate(session.id);

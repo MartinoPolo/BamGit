@@ -19,14 +19,14 @@
 
 {#if issues.length > 0}
 	<div class="flex flex-col gap-1">
-		<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-600">
+		<h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
 			Assigned to me ({issues.length})
 		</h3>
 		<div class="flex flex-col gap-0.5">
 			{#each issues as issue (issue.number)}
 				<button
 					onclick={() => handle_click(issue.url)}
-					class="flex items-center gap-2 rounded px-2 py-1 text-left text-xs text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-300"
+					class="flex items-center gap-2 rounded px-2 py-1 text-left text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 					class:cursor-not-allowed={disabled}
 					class:opacity-50={disabled}
 					{disabled}

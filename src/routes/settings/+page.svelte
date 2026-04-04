@@ -101,20 +101,22 @@
 	<!-- Color Palettes Section -->
 	<section class="space-y-4">
 		<h2 class="text-lg font-medium">Color Palettes</h2>
-		<p class="text-sm text-neutral-500">
+		<p class="text-sm text-muted-foreground">
 			Manage color palettes for issue visual identity. Built-in palettes cannot be modified.
 		</p>
 
 		{#if operation_error}
-			<p class="rounded bg-red-900/30 px-3 py-2 text-sm text-red-400">{operation_error}</p>
+			<p class="rounded bg-destructive/20 px-3 py-2 text-sm text-destructive">
+				{operation_error}
+			</p>
 		{/if}
 
 		<!-- Built-in palettes (read-only) -->
 		{#each built_in_palettes as palette (palette.id)}
-			<div class="rounded border border-neutral-700 bg-neutral-800/50 p-3">
+			<div class="rounded border border-border bg-muted/50 p-3">
 				<div class="mb-2 flex items-center gap-2">
 					<span class="text-sm font-medium">{palette.name}</span>
-					<span class="rounded bg-neutral-700 px-1.5 py-0.5 text-xs text-neutral-400"
+					<span class="rounded bg-secondary px-1.5 py-0.5 text-xs text-muted-foreground"
 						>built-in</span
 					>
 				</div>
@@ -132,26 +134,26 @@
 
 		<!-- Custom palettes (editable) -->
 		{#each custom_palettes as palette (palette.id)}
-			<div class="rounded border border-neutral-700 bg-neutral-800/50 p-3">
+			<div class="rounded border border-border bg-muted/50 p-3">
 				{#if editing_palette_id === palette.id}
 					<!-- Edit mode -->
 					<div class="space-y-2">
 						<input
 							bind:value={edit_name}
-							class="w-full rounded border border-neutral-600 bg-neutral-800 px-2 py-1 text-sm text-neutral-100 outline-none focus:border-blue-500"
+							class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
 							placeholder="Palette name"
 						/>
 						<textarea
 							bind:value={edit_colors_input}
 							rows="2"
-							class="w-full rounded border border-neutral-600 bg-neutral-800 px-2 py-1 text-xs text-neutral-300 outline-none focus:border-blue-500"
+							class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
 							placeholder="#ff0000, #00ff00, #0000ff"
 						></textarea>
 						<div class="flex gap-2">
 							<button
 								type="button"
 								onclick={handle_save_edit}
-								class="rounded bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-500"
+								class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
 							>
 								Save
 							</button>
@@ -161,7 +163,7 @@
 									editing_palette_id = null;
 									operation_error = null;
 								}}
-								class="rounded px-3 py-1 text-xs text-neutral-400 hover:text-neutral-200"
+								class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 							>
 								Cancel
 							</button>
@@ -175,14 +177,14 @@
 							<button
 								type="button"
 								onclick={() => start_editing(palette)}
-								class="text-xs text-neutral-400 hover:text-neutral-200"
+								class="text-xs text-muted-foreground hover:text-foreground"
 							>
 								Edit
 							</button>
 							<button
 								type="button"
 								onclick={() => handle_delete(palette.id)}
-								class="text-xs text-red-400 hover:text-red-300"
+								class="text-xs text-destructive hover:text-destructive/80"
 							>
 								Delete
 							</button>
@@ -203,24 +205,24 @@
 
 		<!-- Create new palette -->
 		{#if creating}
-			<div class="rounded border border-dashed border-neutral-600 p-3">
+			<div class="rounded border border-dashed border-input p-3">
 				<div class="space-y-2">
 					<input
 						bind:value={new_palette_name}
-						class="w-full rounded border border-neutral-600 bg-neutral-800 px-2 py-1 text-sm text-neutral-100 outline-none focus:border-blue-500"
+						class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
 						placeholder="Palette name"
 					/>
 					<textarea
 						bind:value={new_palette_colors_input}
 						rows="3"
-						class="w-full rounded border border-neutral-600 bg-neutral-800 px-2 py-1 text-xs text-neutral-300 outline-none focus:border-blue-500"
+						class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
 						placeholder="Paste hex colors separated by commas or spaces: #ff0000, #00ff00, #0000ff"
 					></textarea>
 					<div class="flex gap-2">
 						<button
 							type="button"
 							onclick={handle_create}
-							class="rounded bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-500"
+							class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
 						>
 							Create Palette
 						</button>
@@ -230,7 +232,7 @@
 								creating = false;
 								operation_error = null;
 							}}
-							class="rounded px-3 py-1 text-xs text-neutral-400 hover:text-neutral-200"
+							class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 						>
 							Cancel
 						</button>
@@ -244,7 +246,7 @@
 					creating = true;
 					operation_error = null;
 				}}
-				class="rounded border border-dashed border-neutral-600 px-4 py-2 text-sm text-neutral-400 transition-colors hover:border-neutral-500 hover:text-neutral-300"
+				class="rounded border border-dashed border-input px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground"
 			>
 				+ Add Custom Palette
 			</button>

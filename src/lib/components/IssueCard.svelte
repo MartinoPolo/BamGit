@@ -92,19 +92,19 @@
 </script>
 
 <div
-	class="group flex rounded border border-l-[3px] border-neutral-800 transition-colors {priority_border_class} {is_archived
+	class="group flex rounded border border-l-[3px] border-border transition-colors {priority_border_class} {is_archived
 		? 'opacity-50'
-		: 'hover:border-neutral-700'}"
+		: 'hover:border-input'}"
 	class:ml-6={indented}
 >
 	<!-- Tree connector for nested children -->
 	{#if indented}
 		<div class="relative -ml-6 w-6 flex-shrink-0">
 			<div
-				class="absolute top-0 left-3 h-1/2 w-px bg-neutral-700"
+				class="absolute top-0 left-3 h-1/2 w-px bg-border"
 				class:h-full={!is_last_child}
 			></div>
-			<div class="absolute top-1/2 left-3 h-px w-3 bg-neutral-700"></div>
+			<div class="absolute top-1/2 left-3 h-px w-3 bg-border"></div>
 		</div>
 	{/if}
 
@@ -117,7 +117,10 @@
 					title="Session needs attention"
 				></span>
 			{:else}
-				<div class="h-2 w-2 rounded-full bg-white/30" title="Session state: idle"></div>
+				<div
+					class="h-2 w-2 rounded-full bg-foreground/30"
+					title="Session state: idle"
+				></div>
 			{/if}
 		</div>
 	</div>
@@ -128,9 +131,9 @@
 		<div class="flex items-center gap-2 px-3 py-2">
 			<button
 				onclick={() => (local_expanded = !local_expanded)}
-				class="text-xs text-neutral-500 transition-transform {expanded
+				class="text-xs text-muted-foreground transition-transform {expanded
 					? 'rotate-90'
-					: ''} hover:text-neutral-300"
+					: ''} hover:text-foreground"
 				title={expanded ? 'Collapse' : 'Expand'}
 			>
 				▸
@@ -140,7 +143,7 @@
 
 			<!-- Child count for parent issues -->
 			{#if child_count > 0}
-				<span class="rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">
+				<span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
 					{child_count} child{child_count > 1 ? 'ren' : ''}
 				</span>
 			{/if}
@@ -155,7 +158,7 @@
 						disabled={!gh_available}
 					/>
 				{:else if issue.github_issue_number}
-					<span class="rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">
+					<span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
 						#{issue.github_issue_number}
 					</span>
 				{/if}
@@ -198,7 +201,7 @@
 			<div class="relative">
 				<button
 					onclick={() => (show_overflow = !show_overflow)}
-					class="rounded p-1 text-neutral-500 opacity-0 transition-opacity hover:bg-neutral-800 hover:text-neutral-300 group-hover:opacity-100"
+					class="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100"
 				>
 					⋯
 				</button>
@@ -206,7 +209,7 @@
 				{#if show_overflow}
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
-						class="absolute right-0 z-10 mt-1 min-w-[140px] rounded border border-neutral-700 bg-neutral-800 py-1 shadow-lg"
+						class="absolute right-0 z-10 mt-1 min-w-[140px] rounded border border-border bg-popover py-1 shadow-lg"
 						onmouseleave={() => (show_overflow = false)}
 					>
 						<button
@@ -214,7 +217,7 @@
 								on_edit(issue);
 								show_overflow = false;
 							}}
-							class="w-full px-3 py-1.5 text-left text-sm text-neutral-300 hover:bg-neutral-700"
+							class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 						>
 							Edit
 						</button>
@@ -224,7 +227,7 @@
 									on_setup_worktree(issue);
 									show_overflow = false;
 								}}
-								class="w-full px-3 py-1.5 text-left text-sm text-green-400 hover:bg-neutral-700"
+								class="w-full px-3 py-1.5 text-left text-sm text-green-400 hover:bg-accent"
 							>
 								{issue.worktree_state === 'failed'
 									? 'Retry Worktree'
@@ -237,7 +240,7 @@
 									on_remove_worktree(issue);
 									show_overflow = false;
 								}}
-								class="w-full px-3 py-1.5 text-left text-sm text-orange-400 hover:bg-neutral-700"
+								class="w-full px-3 py-1.5 text-left text-sm text-orange-400 hover:bg-accent"
 							>
 								Remove Worktree
 							</button>
@@ -248,7 +251,7 @@
 									on_unarchive(issue.id);
 									show_overflow = false;
 								}}
-								class="w-full px-3 py-1.5 text-left text-sm text-neutral-300 hover:bg-neutral-700"
+								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 							>
 								Unarchive
 							</button>
@@ -258,7 +261,7 @@
 									on_archive(issue.id);
 									show_overflow = false;
 								}}
-								class="w-full px-3 py-1.5 text-left text-sm text-neutral-300 hover:bg-neutral-700"
+								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 							>
 								Archive
 							</button>
@@ -268,7 +271,7 @@
 								on_delete(issue.id);
 								show_overflow = false;
 							}}
-							class="w-full px-3 py-1.5 text-left text-sm text-red-400 hover:bg-neutral-700"
+							class="w-full px-3 py-1.5 text-left text-sm text-destructive hover:bg-accent"
 						>
 							Delete
 						</button>
@@ -279,31 +282,31 @@
 
 		<!-- Expanded section -->
 		{#if expanded}
-			<div class="border-t border-neutral-800 px-3 py-3 text-xs text-neutral-500">
+			<div class="border-t border-border px-3 py-3 text-xs text-muted-foreground">
 				<div class="grid grid-cols-2 gap-2">
 					<div>
-						<span class="text-neutral-600">Status:</span>
+						<span class="text-muted-foreground/60">Status:</span>
 						{issue.status}
 					</div>
 					<div>
-						<span class="text-neutral-600">Worktree:</span>
+						<span class="text-muted-foreground/60">Worktree:</span>
 						{issue.worktree_state}
 					</div>
 					{#if issue.priority}
 						<div>
-							<span class="text-neutral-600">Priority:</span>
+							<span class="text-muted-foreground/60">Priority:</span>
 							{issue.priority}
 						</div>
 					{/if}
 					{#if issue.created_at}
 						<div>
-							<span class="text-neutral-600">Created:</span>
+							<span class="text-muted-foreground/60">Created:</span>
 							{new Date(issue.created_at).toLocaleDateString()}
 						</div>
 					{/if}
 					{#if github_cache}
 						<div>
-							<span class="text-neutral-600">Synced:</span>
+							<span class="text-muted-foreground/60">Synced:</span>
 							<SyncStatusIndicator fetched_at={github_cache.fetched_at} />
 						</div>
 					{/if}

@@ -19,6 +19,6 @@
 	});
 </script>
 
-<span class="text-[10px] text-neutral-500" title="Last synced: {fetched_at ?? 'never'}">
+<span class="text-[10px] text-muted-foreground" title="Last synced: {fetched_at ?? 'never'}">
 	{display_text}
 </span>

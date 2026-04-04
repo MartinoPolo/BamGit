@@ -52,26 +52,26 @@
 <dialog
 	bind:this={dialog_element}
 	onclose={on_close}
-	class="w-full max-w-md rounded-lg border border-neutral-700 bg-neutral-900 p-0 text-neutral-100 shadow-xl backdrop:bg-black/50"
+	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
 >
 	{#if issue}
 		<form onsubmit={handle_submit} class="flex flex-col gap-4 p-6">
 			<h2 class="text-lg font-semibold">Edit Issue</h2>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-neutral-400">Name *</span>
+				<span class="text-xs text-muted-foreground">Name *</span>
 				<input
 					bind:value={name}
 					required
-					class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				/>
 			</label>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-neutral-400">Priority</span>
+				<span class="text-xs text-muted-foreground">Priority</span>
 				<select
 					bind:value={priority}
-					class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				>
 					<option value="">None</option>
 					<option value="low">Low</option>
@@ -88,10 +88,10 @@
 			/>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-neutral-400">GitHub Issue URL</span>
+				<span class="text-xs text-muted-foreground">GitHub Issue URL</span>
 				<input
 					bind:value={github_issue_url}
-					class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				/>
 			</label>
 
@@ -99,13 +99,13 @@
 				<button
 					type="button"
 					onclick={on_close}
-					class="rounded px-4 py-2 text-sm text-neutral-400 transition-colors hover:text-neutral-200"
+					class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 				>
 					Cancel
 				</button>
 				<button
 					type="submit"
-					class="rounded bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-500"
+					class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 				>
 					Save
 				</button>

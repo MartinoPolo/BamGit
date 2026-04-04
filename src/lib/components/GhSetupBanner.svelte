@@ -32,7 +32,7 @@
 		<AlertTriangle size={14} />
 		<span>
 			GitHub CLI not authenticated. Run
-			<code class="rounded bg-neutral-800 px-1 py-0.5 font-mono">gh auth login</code>
+			<code class="rounded bg-muted px-1 py-0.5 font-mono">gh auth login</code>
 			to connect.
 		</span>
 	</div>

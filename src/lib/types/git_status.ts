@@ -17,7 +17,7 @@ export const BRANCH_STATUS_COLOR: Record<BranchStatus, string> = {
 	local: 'bg-blue-900/60 text-blue-300',
 	'remote-gone': 'bg-orange-900/60 text-orange-300',
 	deleted: 'bg-red-900/60 text-red-300 line-through',
-	unknown: 'bg-neutral-800 text-neutral-400',
+	unknown: 'bg-muted text-muted-foreground',
 };
 
 export const BRANCH_STATUS_TOOLTIP: Record<BranchStatus, string> = {
