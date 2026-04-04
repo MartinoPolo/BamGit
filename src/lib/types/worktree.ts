@@ -1,4 +1,4 @@
-export type WorktreeState = 'none' | 'pending' | 'active' | 'failed';
+export type WorktreeState = 'none' | 'pending' | 'active' | 'failed' | 'removing' | 'removed';
 
 export interface SetupWorktreeRequest {
 	issue_id: string;

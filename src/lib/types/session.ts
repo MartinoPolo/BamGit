@@ -6,6 +6,14 @@ export type SessionState =
 	| 'finished'
 	| 'errored';
 
+export type ExecutionPhase =
+	| 'none'
+	| 'analyzing'
+	| 'tdd'
+	| 'reviewing'
+	| 'verifying'
+	| 'committing';
+
 export interface Session {
 	id: string;
 	issue_id: string | null;
@@ -20,6 +28,7 @@ export interface Session {
 	original_intent: string | null;
 	last_prompt: string | null;
 	last_response_summary: string | null;
+	execution_phase: ExecutionPhase;
 	source: 'spawned' | 'adopted';
 	working_directory: string | null;
 }

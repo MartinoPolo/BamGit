@@ -2,11 +2,12 @@ use rusqlite::Connection;
 
 use super::schema;
 
-const CURRENT_VERSION: i32 = 5;
+const CURRENT_VERSION: i32 = 6;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
-static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2, migrate_v3, migrate_v4, migrate_v5];
+static MIGRATIONS: &[MigrationFunction] =
+    &[migrate_v1, migrate_v2, migrate_v3, migrate_v4, migrate_v5, migrate_v6];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)
@@ -122,6 +123,121 @@ fn migrate_v5(connection: &Connection) -> Result<(), rusqlite::Error> {
         })?;
 
     Ok(())
+}
+
+fn migrate_v6(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // SQLite cannot ALTER CHECK constraints — must recreate tables.
+    // PRAGMA foreign_keys must be toggled outside the transaction (SQLite ignores it inside).
+    connection.execute_batch("PRAGMA foreign_keys = OFF;")?;
+
+    let result = (|| -> Result<(), rusqlite::Error> {
+        connection.execute_batch(
+            "
+            BEGIN;
+
+            -- 1. Widen worktree_state CHECK: add 'removing' and 'removed'
+            CREATE TABLE issues_v6 (
+                id TEXT PRIMARY KEY,
+                dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+                name TEXT NOT NULL,
+                priority TEXT CHECK (priority IN ('low', 'medium', 'high', 'top')),
+                color TEXT,
+                status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+                github_issue_url TEXT,
+                github_issue_number INTEGER,
+                branch_name TEXT,
+                base_branch TEXT,
+                worktree_folder TEXT,
+                worktree_state TEXT DEFAULT 'none'
+                    CHECK (worktree_state IN ('none', 'pending', 'active', 'failed', 'removing', 'removed')),
+                parent_issue_id TEXT REFERENCES issues(id) ON DELETE SET NULL,
+                editor_folder TEXT,
+                dev_server_command TEXT,
+                dev_server_port INTEGER,
+                dev_server_pid INTEGER,
+                browser_url TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+
+            INSERT INTO issues_v6
+                SELECT id, dashboard_id, name, priority, color, status,
+                       github_issue_url, github_issue_number, branch_name, base_branch,
+                       worktree_folder, worktree_state, parent_issue_id,
+                       editor_folder, dev_server_command, dev_server_port, dev_server_pid,
+                       browser_url, sort_order, created_at
+                FROM issues;
+
+            DROP TABLE issues;
+            ALTER TABLE issues_v6 RENAME TO issues;
+
+            -- 2. Add CHECK constraint on pr_state in git_status_cache
+            CREATE TABLE git_status_cache_v6 (
+                issue_id TEXT PRIMARY KEY REFERENCES issues(id),
+                branch_status TEXT,
+                pr_state TEXT CHECK (pr_state IN ('draft', 'open', 'review-requested', 'changes-requested', 'approved', 'merged', 'closed')),
+                pr_number INTEGER,
+                pr_url TEXT,
+                github_issue_state TEXT,
+                behind_base_count INTEGER,
+                merge_conflict INTEGER,
+                fetched_at TEXT
+            );
+
+            INSERT INTO git_status_cache_v6
+                SELECT issue_id, branch_status, pr_state, pr_number, pr_url,
+                       github_issue_state, behind_base_count, merge_conflict, fetched_at
+                FROM git_status_cache;
+
+            DROP TABLE git_status_cache;
+            ALTER TABLE git_status_cache_v6 RENAME TO git_status_cache;
+
+            -- 3. Add execution_phase column to sessions
+            CREATE TABLE sessions_v6 (
+                id TEXT PRIMARY KEY,
+                issue_id TEXT REFERENCES issues(id),
+                provider TEXT NOT NULL DEFAULT 'claude-code',
+                state TEXT NOT NULL DEFAULT 'running'
+                    CHECK (state IN ('running', 'needs-input', 'needs-review', 'paused', 'finished', 'errored')),
+                pid INTEGER,
+                session_file_path TEXT,
+                started_at TEXT NOT NULL DEFAULT (datetime('now')),
+                ended_at TEXT,
+                cost_usd REAL,
+                token_count INTEGER,
+                original_intent TEXT,
+                last_prompt TEXT,
+                last_response_summary TEXT,
+                execution_phase TEXT NOT NULL DEFAULT 'none'
+                    CHECK (execution_phase IN ('none', 'analyzing', 'tdd', 'reviewing', 'verifying', 'committing')),
+                source TEXT NOT NULL DEFAULT 'spawned'
+                    CHECK (source IN ('spawned', 'adopted')),
+                working_directory TEXT
+            );
+
+            INSERT INTO sessions_v6
+                (id, issue_id, provider, state, pid, session_file_path,
+                 started_at, ended_at, cost_usd, token_count,
+                 original_intent, last_prompt, last_response_summary,
+                 source, working_directory)
+                SELECT id, issue_id, provider, state, pid, session_file_path,
+                       started_at, ended_at, cost_usd, token_count,
+                       original_intent, last_prompt, last_response_summary,
+                       source, working_directory
+                FROM sessions;
+
+            DROP TABLE sessions;
+            ALTER TABLE sessions_v6 RENAME TO sessions;
+
+            COMMIT;
+            ",
+        )
+    })();
+
+    // Always re-enable foreign keys, even if the migration failed
+    connection.execute_batch("PRAGMA foreign_keys = ON;")?;
+
+    result
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {
