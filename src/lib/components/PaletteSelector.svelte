@@ -15,14 +15,14 @@
 </script>
 
 <label class="flex flex-col gap-1">
-	<span class="text-xs text-neutral-400">Color Palette</span>
+	<span class="text-xs text-muted-foreground">Color Palette</span>
 	<select
 		value={selected_palette_id ?? ''}
 		onchange={(event) => {
 			const value = event.currentTarget.value;
 			on_select(value || null);
 		}}
-		class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+		class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 	>
 		<option value="">Default ({default_palette_label})</option>
 		{#each palettes as palette (palette.id)}

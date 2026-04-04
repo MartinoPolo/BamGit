@@ -36,7 +36,7 @@
 <div class="flex items-center gap-2">
 	<button
 		onclick={on_add_issue}
-		class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-blue-500"
+		class="rounded bg-primary px-3 py-1.5 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		+ Add Issue
 	</button>
@@ -46,7 +46,7 @@
 		<button
 			onclick={on_sync_all}
 			disabled={!gh_available || syncing}
-			class="inline-flex items-center gap-1.5 rounded border border-neutral-700 px-2.5 py-1.5 text-xs text-neutral-400 transition-colors hover:border-neutral-600 hover:text-neutral-300 disabled:cursor-not-allowed disabled:opacity-40"
+			class="inline-flex items-center gap-1.5 rounded border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-input hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
 			title={gh_available ? 'Sync GitHub state for all issues' : 'gh CLI not available'}
 		>
 			<RefreshCw size={13} class={syncing ? 'animate-spin' : ''} />
@@ -58,7 +58,7 @@
 	{#if on_prune_worktrees}
 		<button
 			onclick={on_prune_worktrees}
-			class="inline-flex items-center gap-1.5 rounded border border-neutral-700 px-2.5 py-1.5 text-xs text-neutral-400 transition-colors hover:border-neutral-600 hover:text-neutral-300"
+			class="inline-flex items-center gap-1.5 rounded border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-input hover:text-foreground"
 			title="Prune worktrees for fully-closed issues"
 		>
 			<Scissors size={13} />
@@ -71,19 +71,19 @@
 	<!-- Collapse/expand all -->
 	<button
 		onclick={on_toggle_expand_all}
-		class="rounded px-2 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-300"
+		class="rounded px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
 		title={all_expanded ? 'Collapse all' : 'Expand all'}
 	>
 		{all_expanded ? '▾ Collapse' : '▸ Expand'}
 	</button>
 
 	<!-- Sort control -->
-	<label class="flex items-center gap-1.5 text-sm text-neutral-400">
+	<label class="flex items-center gap-1.5 text-sm text-muted-foreground">
 		<span class="text-xs">Sort:</span>
 		<select
 			value={sort_mode}
 			onchange={(e) => on_sort_change(e.currentTarget.value as SortMode)}
-			class="rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-xs text-neutral-300 outline-none focus:border-blue-500"
+			class="rounded border border-border bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
 		>
 			<option value="date">Date</option>
 			<option value="priority">Priority</option>
@@ -96,8 +96,8 @@
 		<button
 			onclick={on_toggle_archived}
 			class="rounded px-2 py-1 text-xs transition-colors {show_archived
-				? 'bg-neutral-800 text-neutral-300'
-				: 'text-neutral-500 hover:text-neutral-300'}"
+				? 'bg-muted text-foreground'
+				: 'text-muted-foreground hover:text-foreground'}"
 		>
 			{show_archived ? 'Hide' : 'Show'} archived ({archived_count})
 		</button>

@@ -101,8 +101,10 @@
 
 	<!-- Archived section -->
 	{#if show_archived && archived_issues.length > 0}
-		<div class="mt-4 border-t border-neutral-800 pt-4">
-			<h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-600">
+		<div class="mt-4 border-t border-border pt-4">
+			<h3
+				class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60"
+			>
 				Archived ({archived_issues.length})
 			</h3>
 			<div class="flex flex-col gap-2">

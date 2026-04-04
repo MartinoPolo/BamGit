@@ -76,18 +76,18 @@
 <dialog
 	bind:this={dialog_element}
 	onclose={on_close}
-	class="w-full max-w-md rounded-lg border border-neutral-700 bg-neutral-900 p-0 text-neutral-100 shadow-xl backdrop:bg-black/50"
+	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
 >
 	{#if dashboard}
 		<form onsubmit={handle_submit} class="flex flex-col gap-4 p-6">
 			<h2 class="text-lg font-semibold">Edit Dashboard</h2>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-neutral-400">Name *</span>
+				<span class="text-xs text-muted-foreground">Name *</span>
 				<input
 					bind:value={name}
 					required
-					class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				/>
 			</label>
 
@@ -100,32 +100,32 @@
 
 			{#if dashboard.type === 'repo'}
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-neutral-400">GitHub Repo</span>
+					<span class="text-xs text-muted-foreground">GitHub Repo</span>
 					<input
 						bind:value={github_repo}
-						class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 						placeholder="owner/repo"
 					/>
 				</label>
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-neutral-400">Local Folder</span>
+					<span class="text-xs text-muted-foreground">Local Folder</span>
 					<input
 						bind:value={local_folder}
-						class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 					/>
 				</label>
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-neutral-400">Default Base Branch</span>
+					<span class="text-xs text-muted-foreground">Default Base Branch</span>
 					<input
 						bind:value={default_base_branch}
-						class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 					/>
 				</label>
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-neutral-400">Worktree Parent Folder</span>
+					<span class="text-xs text-muted-foreground">Worktree Parent Folder</span>
 					<input
 						bind:value={worktree_parent_folder}
-						class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
+						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 					/>
 				</label>
 			{/if}
@@ -135,8 +135,8 @@
 					type="button"
 					onclick={handle_delete}
 					class="rounded px-3 py-2 text-sm transition-colors {confirm_delete
-						? 'bg-red-600 text-white'
-						: 'text-red-400 hover:text-red-300'}"
+						? 'bg-destructive text-destructive-foreground'
+						: 'text-destructive hover:text-destructive/80'}"
 				>
 					{confirm_delete ? 'Confirm Delete' : 'Delete'}
 				</button>
@@ -144,13 +144,13 @@
 					<button
 						type="button"
 						onclick={on_close}
-						class="rounded px-4 py-2 text-sm text-neutral-400 transition-colors hover:text-neutral-200"
+						class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						class="rounded bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-500"
+						class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 					>
 						Save
 					</button>

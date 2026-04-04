@@ -21,13 +21,13 @@
 	}
 </script>
 
-<div class="mt-2 border-t border-neutral-800 pt-2">
-	<div class="mb-1 text-[10px] font-medium uppercase tracking-wider text-neutral-600">
+<div class="mt-2 border-t border-border pt-2">
+	<div class="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
 		Progress
 	</div>
 	<div
 		bind:this={scroll_container}
-		class="max-h-32 overflow-y-auto rounded bg-neutral-950 p-2 font-mono text-[11px] leading-4 text-neutral-400"
+		class="max-h-32 overflow-y-auto rounded bg-background p-2 font-mono text-[11px] leading-4 text-muted-foreground"
 	>
 		{#each lines as line, index (index)}
 			<div class="whitespace-pre-wrap break-all">{strip_ansi(line)}</div>

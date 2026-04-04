@@ -56,17 +56,19 @@
 
 <div class="space-y-4">
 	<div>
-		<h2 class="text-lg font-semibold text-neutral-100">Notifications</h2>
-		<p class="text-sm text-neutral-500">Configure how you're notified for each event type.</p>
+		<h2 class="text-lg font-semibold text-foreground">Notifications</h2>
+		<p class="text-sm text-muted-foreground">
+			Configure how you're notified for each event type.
+		</p>
 	</div>
 
 	{#if notification_store.loading}
-		<p class="text-neutral-500">Loading notification settings...</p>
+		<p class="text-muted-foreground">Loading notification settings...</p>
 	{:else}
-		<div class="overflow-hidden rounded-lg border border-neutral-700">
+		<div class="overflow-hidden rounded-lg border border-border">
 			<!-- Header -->
 			<div
-				class="grid grid-cols-[1fr_80px_80px_80px_60px] gap-2 border-b border-neutral-700 bg-neutral-800/50 px-4 py-2 text-xs font-medium uppercase tracking-wider text-neutral-500"
+				class="grid grid-cols-[1fr_80px_80px_80px_60px] gap-2 border-b border-border bg-muted/50 px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground"
 			>
 				<span>Event</span>
 				<span class="text-center">Sound</span>
@@ -78,14 +80,14 @@
 			<!-- Rows -->
 			{#each notification_store.configs as config (config.event_type)}
 				<div
-					class="grid grid-cols-[1fr_80px_80px_80px_60px] items-center gap-2 border-b border-neutral-800 px-4 py-3 last:border-b-0"
+					class="grid grid-cols-[1fr_80px_80px_80px_60px] items-center gap-2 border-b border-border px-4 py-3 last:border-b-0"
 				>
 					<!-- Event label and description -->
 					<div>
-						<span class="text-sm font-medium text-neutral-200">
+						<span class="text-sm font-medium text-foreground">
 							{EVENT_LABELS[config.event_type] ?? config.event_type}
 						</span>
-						<p class="text-xs text-neutral-500">
+						<p class="text-xs text-muted-foreground">
 							{EVENT_DESCRIPTIONS[config.event_type] ?? ''}
 						</p>
 					</div>
@@ -95,8 +97,8 @@
 						<button
 							class="h-5 w-9 rounded-full transition-colors {config.sound_enabled ===
 							true
-								? 'bg-blue-600'
-								: 'bg-neutral-600'}"
+								? 'bg-primary'
+								: 'bg-muted'}"
 							onclick={() =>
 								toggle_channel(
 									config.event_type,
@@ -119,8 +121,8 @@
 						<button
 							class="h-5 w-9 rounded-full transition-colors {config.toast_enabled ===
 							true
-								? 'bg-blue-600'
-								: 'bg-neutral-600'}"
+								? 'bg-primary'
+								: 'bg-muted'}"
 							onclick={() =>
 								toggle_channel(
 									config.event_type,
@@ -143,8 +145,8 @@
 						<button
 							class="h-5 w-9 rounded-full transition-colors {config.window_flash_enabled ===
 							true
-								? 'bg-blue-600'
-								: 'bg-neutral-600'}"
+								? 'bg-primary'
+								: 'bg-muted'}"
 							onclick={() =>
 								toggle_channel(
 									config.event_type,
@@ -168,14 +170,14 @@
 					<div class="flex justify-center">
 						{#if config.sound_file}
 							<button
-								class="rounded px-2 py-1 text-xs text-neutral-400 transition-colors hover:bg-neutral-700 hover:text-neutral-200"
+								class="rounded px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 								onclick={() => handle_test_sound(config.event_type)}
 								title="Play test sound"
 							>
 								&#9654;
 							</button>
 						{:else}
-							<span class="text-xs text-neutral-600">—</span>
+							<span class="text-xs text-muted-foreground/60">—</span>
 						{/if}
 					</div>
 				</div>

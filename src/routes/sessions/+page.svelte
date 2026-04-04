@@ -109,11 +109,14 @@
 {#if selected_session}
 	<!-- Chat view for selected session -->
 	<div class="flex h-full flex-col">
-		<div class="flex items-center gap-3 border-b border-neutral-700 px-4 py-3">
-			<button class="text-sm text-neutral-400 hover:text-neutral-200" onclick={handle_back}>
+		<div class="flex items-center gap-3 border-b border-border px-4 py-3">
+			<button
+				class="text-sm text-muted-foreground hover:text-foreground"
+				onclick={handle_back}
+			>
 				&larr; Back
 			</button>
-			<h2 class="truncate text-sm font-medium text-neutral-200">
+			<h2 class="truncate text-sm font-medium text-foreground">
 				{selected_session.original_intent ?? 'Session'}
 			</h2>
 		</div>
@@ -125,22 +128,22 @@
 	<!-- Session list -->
 	<div class="space-y-4 p-4">
 		<div class="flex items-center justify-between">
-			<h1 class="text-xl font-semibold text-neutral-100">Sessions</h1>
+			<h1 class="text-xl font-semibold text-foreground">Sessions</h1>
 		</div>
 
 		<!-- Spawn form -->
-		<div class="space-y-2 rounded-lg border border-neutral-700 bg-neutral-800/50 p-4">
-			<h3 class="text-sm font-medium text-neutral-300">New Session</h3>
+		<div class="space-y-2 rounded-lg border border-border bg-muted/50 p-4">
+			<h3 class="text-sm font-medium text-foreground">New Session</h3>
 			<input
 				type="text"
-				class="w-full rounded-md border border-neutral-600 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
+				class="w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
 				placeholder="Working directory (e.g., C:\projects\my-app)"
 				bind:value={spawn_working_directory}
 			/>
 			<div class="flex gap-2">
 				<input
 					type="text"
-					class="flex-1 rounded-md border border-neutral-600 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
+					class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
 					placeholder="Prompt (e.g., Fix the login bug in auth.ts)"
 					bind:value={spawn_prompt}
 					onkeydown={(e) => {
@@ -150,7 +153,7 @@
 					}}
 				/>
 				<button
-					class="shrink-0 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+					class="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
 					onclick={handle_spawn}
 					disabled={spawning || !spawn_prompt.trim() || !spawn_working_directory.trim()}
 				>
@@ -162,7 +165,7 @@
 		<!-- Discovered external sessions -->
 		{#if store.discovered_sessions.length > 0}
 			<div class="space-y-2">
-				<h3 class="text-sm font-medium text-neutral-400">
+				<h3 class="text-sm font-medium text-muted-foreground">
 					External Sessions ({store.discovered_sessions.length})
 				</h3>
 				{#each store.discovered_sessions as session (session.id)}
@@ -174,7 +177,7 @@
 		<!-- Active sessions -->
 		{#if store.active_sessions.length > 0}
 			<div class="space-y-2">
-				<h3 class="text-sm font-medium text-neutral-400">Active</h3>
+				<h3 class="text-sm font-medium text-muted-foreground">Active</h3>
 				{#each store.active_sessions as session (session.id)}
 					<SessionCard
 						{session}
@@ -188,7 +191,7 @@
 		<!-- Finished sessions -->
 		{#if store.finished_sessions.length > 0}
 			<div class="space-y-2">
-				<h3 class="text-sm font-medium text-neutral-400">Completed</h3>
+				<h3 class="text-sm font-medium text-muted-foreground">Completed</h3>
 				{#each store.finished_sessions as session (session.id)}
 					<SessionCard
 						{session}
@@ -202,13 +205,15 @@
 		<!-- Empty state -->
 		{#if store.loading === false && store.sessions.length === 0 && store.discovered_sessions.length === 0}
 			<div class="py-12 text-center">
-				<p class="text-neutral-500">No sessions yet. Spawn one above to get started.</p>
+				<p class="text-muted-foreground">
+					No sessions yet. Spawn one above to get started.
+				</p>
 			</div>
 		{/if}
 
 		{#if store.loading}
 			<div class="py-12 text-center">
-				<p class="text-neutral-500">Loading sessions...</p>
+				<p class="text-muted-foreground">Loading sessions...</p>
 			</div>
 		{/if}
 	</div>

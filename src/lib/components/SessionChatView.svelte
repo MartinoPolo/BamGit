@@ -181,18 +181,18 @@
 		{#each messages as message (message.content + message.role)}
 			<div
 				class="rounded-lg p-3 text-sm {message.role === 'user'
-					? 'ml-8 bg-blue-900/30 text-blue-200'
+					? 'ml-8 bg-primary/10 text-primary'
 					: message.role === 'tool'
-						? 'bg-neutral-800 font-mono text-xs text-neutral-300'
+						? 'bg-muted font-mono text-xs text-foreground'
 						: message.role === 'system'
-							? 'bg-neutral-900 text-center text-xs text-neutral-500'
-							: 'mr-8 bg-neutral-800 text-neutral-200'}"
+							? 'bg-card text-center text-xs text-muted-foreground'
+							: 'mr-8 bg-muted text-foreground'}"
 			>
 				{#if message.role === 'tool' && message.tool_name !== undefined}
 					<div
 						class="mb-1 text-xs font-medium {message.is_error === true
-							? 'text-red-400'
-							: 'text-neutral-500'}"
+							? 'text-destructive'
+							: 'text-muted-foreground'}"
 					>
 						{message.tool_name}
 						{message.is_error === true ? ' (error)' : ''}
@@ -203,7 +203,7 @@
 		{/each}
 
 		{#if current_streaming_text}
-			<div class="mr-8 rounded-lg bg-neutral-800 p-3 text-sm text-neutral-200">
+			<div class="mr-8 rounded-lg bg-muted p-3 text-sm text-foreground">
 				<pre class="whitespace-pre-wrap">{current_streaming_text}<span class="animate-pulse"
 						>|</span
 					></pre>
@@ -212,7 +212,7 @@
 	</div>
 
 	<!-- Input bar -->
-	<div class="border-t border-neutral-700 p-3">
+	<div class="border-t border-border p-3">
 		<div class="flex items-center gap-2">
 			{#if session.state === 'running'}
 				<button
@@ -225,7 +225,7 @@
 
 			<input
 				type="text"
-				class="flex-1 rounded-md border border-neutral-600 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 placeholder-neutral-500 focus:border-blue-500 focus:outline-none"
+				class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
 				placeholder={is_active ? 'Send a message...' : 'Session ended'}
 				bind:value={prompt_input}
 				onkeydown={handle_keydown}
@@ -233,7 +233,7 @@
 			/>
 
 			<button
-				class="shrink-0 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+				class="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
 				onclick={handle_send}
 				disabled={!can_send}
 			>

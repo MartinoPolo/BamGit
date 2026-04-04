@@ -21,23 +21,21 @@
 	const formatted_cost = $derived(session.cost_usd > 0 ? `$${session.cost_usd.toFixed(3)}` : '');
 </script>
 
-<div
-	class="w-full rounded-lg border border-dashed border-neutral-600 bg-neutral-800/50 p-3 text-left"
->
+<div class="w-full rounded-lg border border-dashed border-input bg-muted/50 p-3 text-left">
 	<div class="flex items-start justify-between gap-2">
 		<div class="min-w-0 flex-1">
 			<div class="flex items-center gap-2">
-				<p class="truncate text-sm font-medium text-neutral-200">
+				<p class="truncate text-sm font-medium text-foreground">
 					{session.project_name}
 				</p>
 				{#if session.git_branch}
-					<span class="shrink-0 text-xs text-neutral-500">
+					<span class="shrink-0 text-xs text-muted-foreground">
 						{session.git_branch}
 					</span>
 				{/if}
 			</div>
 			{#if session.first_prompt}
-				<p class="mt-1 truncate text-xs text-neutral-400">
+				<p class="mt-1 truncate text-xs text-muted-foreground">
 					{session.first_prompt}
 				</p>
 			{/if}
@@ -55,7 +53,7 @@
 		</div>
 	</div>
 
-	<div class="mt-2 flex items-center gap-3 text-xs text-neutral-500">
+	<div class="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
 		<span>PID {session.pid}</span>
 		<span>{session.message_count} msgs</span>
 		{#if formatted_cost}
@@ -66,7 +64,7 @@
 		{/if}
 
 		<button
-			class="ml-auto rounded-md bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-indigo-500"
+			class="ml-auto rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
 			onclick={(e) => {
 				e.stopPropagation();
 				on_adopt(session);
