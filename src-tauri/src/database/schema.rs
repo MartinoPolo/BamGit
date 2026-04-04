@@ -35,7 +35,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             branch_name TEXT,
             base_branch TEXT,
             worktree_folder TEXT,
-            worktree_state TEXT DEFAULT 'none' CHECK (worktree_state IN ('none', 'pending', 'active', 'failed')),
+            worktree_state TEXT DEFAULT 'none' CHECK (worktree_state IN ('none', 'pending', 'active', 'failed', 'removing', 'removed')),
             parent_issue_id TEXT REFERENCES issues(id) ON DELETE SET NULL,
             editor_folder TEXT,
             dev_server_command TEXT,
@@ -69,6 +69,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             original_intent TEXT,
             last_prompt TEXT,
             last_response_summary TEXT,
+            execution_phase TEXT NOT NULL DEFAULT 'none'
+                CHECK (execution_phase IN ('none', 'analyzing', 'tdd', 'reviewing', 'verifying', 'committing')),
             source TEXT NOT NULL DEFAULT 'spawned'
                 CHECK (source IN ('spawned', 'adopted')),
             working_directory TEXT
@@ -95,7 +97,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE TABLE IF NOT EXISTS git_status_cache (
             issue_id TEXT PRIMARY KEY REFERENCES issues(id),
             branch_status TEXT,
-            pr_state TEXT,
+            pr_state TEXT CHECK (pr_state IN ('draft', 'open', 'review-requested', 'changes-requested', 'approved', 'merged', 'closed')),
             pr_number INTEGER,
             pr_url TEXT,
             github_issue_state TEXT,

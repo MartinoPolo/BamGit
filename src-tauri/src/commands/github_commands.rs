@@ -4,7 +4,8 @@ use tauri::State;
 use crate::database::connection::DatabaseState;
 use crate::models::github::{
     resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, GhCliAvailability,
-    GhIssueViewOutput, GhPullRequestOutput, GhReviewRequest, GitHubStatusCache, SyncAllResult,
+    GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, GitHubStatusCache,
+    SyncAllResult,
 };
 
 const CACHE_SELECT_COLUMNS: &str =
@@ -130,7 +131,7 @@ fn build_bulk_sync_graphql_query(
             let escaped = branch_name.replace('\\', "\\\\").replace('"', "\\\"");
             fragments.push(format!(
                 "pr_{index}: pullRequests(headRefName: \"{escaped}\", first: 1, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ \
-                 nodes {{ number state url isDraft reviewRequests(first: 10) {{ nodes {{ requestedReviewer {{ ... on User {{ login }} ... on Team {{ name }} }} }} }} }} }}"
+                 nodes {{ number state url isDraft reviewRequests(first: 10) {{ nodes {{ requestedReviewer {{ ... on User {{ login }} ... on Team {{ name }} }} }} }} latestReviews(first: 1) {{ nodes {{ state }} }} }} }}"
             ));
         }
     }
@@ -239,7 +240,7 @@ pub async fn fetch_pr_for_branch(
         "--repo",
         &format!("{owner}/{repo}"),
         "--json",
-        "number,state,url,isDraft,reviewRequests",
+        "number,state,url,isDraft,reviewRequests,latestReviews",
         "--limit",
         "1",
     ])
@@ -398,6 +399,21 @@ pub async fn sync_all_github_state(
                             .and_then(|n| n.as_array())
                             .is_some_and(|arr| !arr.is_empty());
 
+                        let latest_reviews: Vec<GhReviewOutput> = pr_node
+                            .get("latestReviews")
+                            .and_then(|lr| lr.get("nodes"))
+                            .and_then(|n| n.as_array())
+                            .map(|arr| {
+                                arr.iter()
+                                    .filter_map(|r| {
+                                        r.get("state")
+                                            .and_then(|s| s.as_str())
+                                            .map(|s| GhReviewOutput { state: s.to_string() })
+                                    })
+                                    .collect()
+                            })
+                            .unwrap_or_default();
+
                         let pr = GhPullRequestOutput {
                             number: num,
                             state: st.to_string(),
@@ -408,6 +424,7 @@ pub async fn sync_all_github_state(
                             } else {
                                 vec![]
                             },
+                            latest_reviews,
                         };
                         pr_state = Some(resolve_pull_request_state(&pr).to_string());
                         pr_number = Some(pr.number);
@@ -620,6 +637,7 @@ mod tests {
             url: "https://github.com/o/r/pull/1".to_string(),
             is_draft: false,
             review_requests: vec![],
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "open");
     }
@@ -632,6 +650,7 @@ mod tests {
             url: "https://github.com/o/r/pull/1".to_string(),
             is_draft: true,
             review_requests: vec![],
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "draft");
     }
@@ -647,6 +666,7 @@ mod tests {
                 login: Some("reviewer".to_string()),
                 name: None,
             }],
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "review-requested");
     }
@@ -659,6 +679,7 @@ mod tests {
             url: "https://github.com/o/r/pull/1".to_string(),
             is_draft: false,
             review_requests: vec![],
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "merged");
     }
@@ -671,6 +692,7 @@ mod tests {
             url: "https://github.com/o/r/pull/1".to_string(),
             is_draft: false,
             review_requests: vec![],
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "closed");
     }
@@ -820,6 +842,7 @@ mod tests {
             } else {
                 vec![]
             },
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "review-requested");
     }
@@ -843,6 +866,7 @@ mod tests {
             url: "https://github.com/o/r/pull/8".to_string(),
             is_draft: false,
             review_requests: vec![],
+            latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), "open");
     }

@@ -17,7 +17,7 @@ use crate::session::provider::{ActorCommand, SpawnConfig};
 const SESSION_SELECT_COLUMNS: &str =
     "id, issue_id, provider, state, pid, session_file_path, started_at, ended_at, \
      cost_usd, token_count, original_intent, last_prompt, last_response_summary, \
-     source, working_directory";
+     execution_phase, source, working_directory";
 
 fn row_to_session(row: &Row) -> Result<Session, rusqlite::Error> {
     Ok(Session {
@@ -34,8 +34,9 @@ fn row_to_session(row: &Row) -> Result<Session, rusqlite::Error> {
         original_intent: row.get(10)?,
         last_prompt: row.get(11)?,
         last_response_summary: row.get(12)?,
-        source: row.get(13)?,
-        working_directory: row.get(14)?,
+        execution_phase: row.get(13)?,
+        source: row.get(14)?,
+        working_directory: row.get(15)?,
     })
 }
 

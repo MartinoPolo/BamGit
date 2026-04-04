@@ -22,7 +22,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 5);
+        assert_eq!(version, 6);
     }
 
     #[test]
@@ -32,7 +32,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 5);
+        assert_eq!(version, 6);
     }
 
     // --- Schema tests ---
@@ -696,7 +696,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 5);
+        assert_eq!(version, 6);
 
         // portfolio_dashboard_pointers table exists
         let exists: bool = connection
@@ -1189,5 +1189,275 @@ mod tests {
             .unwrap();
 
         assert_eq!(names, vec!["Global", "Dashboard"]);
+    }
+
+    // --- Worktree state v6 CHECK constraint tests ---
+
+    #[test]
+    fn worktree_state_check_accepts_removing() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        let result = connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, worktree_state) VALUES ('i1', 'd1', 'Test', 'removing')",
+            [],
+        );
+
+        assert!(result.is_ok(), "worktree_state 'removing' should be accepted");
+    }
+
+    #[test]
+    fn worktree_state_check_accepts_removed() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        let result = connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, worktree_state) VALUES ('i1', 'd1', 'Test', 'removed')",
+            [],
+        );
+
+        assert!(result.is_ok(), "worktree_state 'removed' should be accepted");
+    }
+
+    #[test]
+    fn worktree_state_check_still_rejects_invalid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+
+        let result = connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, worktree_state) VALUES ('i1', 'd1', 'Test', 'bogus')",
+            [],
+        );
+
+        assert!(result.is_err(), "worktree_state 'bogus' should be rejected");
+    }
+
+    // --- PR state v6 CHECK constraint tests ---
+
+    #[test]
+    fn pr_state_check_accepts_all_valid_values() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Feature");
+
+        let valid_states = [
+            "draft",
+            "open",
+            "review-requested",
+            "changes-requested",
+            "approved",
+            "merged",
+            "closed",
+        ];
+
+        for (index, pr_state) in valid_states.iter().enumerate() {
+            let issue_id = format!("pr{index}");
+            insert_test_issue(&connection, &issue_id, "d1", "PR test");
+
+            let result = connection.execute(
+                "INSERT INTO git_status_cache (issue_id, pr_state) VALUES (?1, ?2)",
+                rusqlite::params![issue_id, pr_state],
+            );
+            assert!(result.is_ok(), "pr_state '{pr_state}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn pr_state_check_rejects_invalid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Feature");
+
+        let result = connection.execute(
+            "INSERT INTO git_status_cache (issue_id, pr_state) VALUES ('i1', 'invalid')",
+            [],
+        );
+
+        assert!(result.is_err(), "pr_state 'invalid' should be rejected");
+    }
+
+    #[test]
+    fn pr_state_check_allows_null() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Feature");
+
+        let result = connection.execute(
+            "INSERT INTO git_status_cache (issue_id, pr_state) VALUES ('i1', NULL)",
+            [],
+        );
+
+        assert!(result.is_ok(), "pr_state NULL should be accepted");
+    }
+
+    // --- Execution phase v6 tests ---
+
+    #[test]
+    fn execution_phase_defaults_to_none() {
+        let connection = setup_test_database();
+
+        connection
+            .execute(
+                "INSERT INTO sessions (id, state) VALUES ('s1', 'running')",
+                [],
+            )
+            .unwrap();
+
+        let execution_phase: String = connection
+            .query_row(
+                "SELECT execution_phase FROM sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(execution_phase, "none");
+    }
+
+    #[test]
+    fn execution_phase_accepts_all_valid_values() {
+        let connection = setup_test_database();
+
+        let valid_phases = [
+            "none",
+            "analyzing",
+            "tdd",
+            "reviewing",
+            "verifying",
+            "committing",
+        ];
+
+        for (index, phase) in valid_phases.iter().enumerate() {
+            let id = format!("s{index}");
+            let result = connection.execute(
+                "INSERT INTO sessions (id, state, execution_phase) VALUES (?1, 'running', ?2)",
+                rusqlite::params![id, phase],
+            );
+            assert!(result.is_ok(), "execution_phase '{phase}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn execution_phase_rejects_invalid() {
+        let connection = setup_test_database();
+
+        let result = connection.execute(
+            "INSERT INTO sessions (id, state, execution_phase) VALUES ('s1', 'running', 'building')",
+            [],
+        );
+
+        assert!(result.is_err(), "execution_phase 'building' should be rejected");
+    }
+
+    // --- Migration v6 tests ---
+
+    #[test]
+    fn migration_v6_preserves_existing_issues() {
+        let connection = Connection::open_in_memory().unwrap();
+        connection
+            .execute_batch("PRAGMA foreign_keys = ON;")
+            .unwrap();
+
+        // Migrate to v5
+        migrations::run_migrations(&connection).unwrap();
+
+        // Insert test data at v5
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, worktree_state) VALUES ('i1', 'd1', 'Existing Issue', 'active')",
+                [],
+            )
+            .unwrap();
+
+        // Re-run migrations (v6 should run)
+        migrations::run_migrations(&connection).unwrap();
+
+        // Verify data survived
+        let (name, worktree_state): (String, String) = connection
+            .query_row(
+                "SELECT name, worktree_state FROM issues WHERE id = 'i1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap();
+
+        assert_eq!(name, "Existing Issue");
+        assert_eq!(worktree_state, "active");
+    }
+
+    #[test]
+    fn migration_v6_preserves_existing_git_status_cache() {
+        let connection = Connection::open_in_memory().unwrap();
+        connection
+            .execute_batch("PRAGMA foreign_keys = ON;")
+            .unwrap();
+
+        migrations::run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name) VALUES ('i1', 'd1', 'Feature')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, pr_state, pr_number) VALUES ('i1', 'open', 42)",
+                [],
+            )
+            .unwrap();
+
+        migrations::run_migrations(&connection).unwrap();
+
+        let (pr_state, pr_number): (Option<String>, Option<i64>) = connection
+            .query_row(
+                "SELECT pr_state, pr_number FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap();
+
+        assert_eq!(pr_state.as_deref(), Some("open"));
+        assert_eq!(pr_number, Some(42));
+    }
+
+    #[test]
+    fn migration_v6_adds_execution_phase_to_sessions() {
+        let connection = Connection::open_in_memory().unwrap();
+        connection
+            .execute_batch("PRAGMA foreign_keys = ON;")
+            .unwrap();
+
+        migrations::run_migrations(&connection).unwrap();
+
+        // Insert a session and verify execution_phase defaults to 'none'
+        connection
+            .execute(
+                "INSERT INTO sessions (id, state) VALUES ('s1', 'running')",
+                [],
+            )
+            .unwrap();
+
+        let execution_phase: String = connection
+            .query_row(
+                "SELECT execution_phase FROM sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(execution_phase, "none");
     }
 }

@@ -2,22 +2,17 @@
 // Forest-prefixed types: superset of existing types to avoid breaking backend contracts.
 // The engine operates on these types; mappers convert from existing types at the boundary.
 
-import type { SessionState } from './session';
+import type { ExecutionPhase, SessionState } from './session';
 import type { WorktreeState } from './worktree';
 
 export type GitHubLabel = 'HITL' | 'AFK';
 
-export type ForestWorktreeState = WorktreeState | 'removing' | 'removed';
+// WorktreeState now includes 'removing' | 'removed' — alias kept for engine boundary stability
+export type ForestWorktreeState = WorktreeState;
 
 export type AggregateSessionState = SessionState | 'no-session';
 
-export type ExecutionPhase =
-	| 'none'
-	| 'analyzing'
-	| 'tdd'
-	| 'reviewing'
-	| 'verifying'
-	| 'committing';
+export type { ExecutionPhase };
 
 export type ForestBranchStatus = 'no-branch' | 'active' | 'local-only' | 'remote-gone' | 'deleted';
 

@@ -1,4 +1,11 @@
-export type PullRequestState = 'open' | 'draft' | 'review-requested' | 'merged' | 'closed';
+export type PullRequestState =
+	| 'open'
+	| 'draft'
+	| 'review-requested'
+	| 'changes-requested'
+	| 'approved'
+	| 'merged'
+	| 'closed';
 
 export type GitHubIssueState = 'open' | 'closed';
 

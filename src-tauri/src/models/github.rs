@@ -47,7 +47,7 @@ pub struct GhIssueViewOutput {
     pub url: String,
 }
 
-/// Deserialization target for `gh pr list --json number,state,url,isDraft,reviewRequests`.
+/// Deserialization target for `gh pr list --json number,state,url,isDraft,reviewRequests,latestReviews`.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GhPullRequestOutput {
@@ -56,6 +56,8 @@ pub struct GhPullRequestOutput {
     pub url: String,
     pub is_draft: bool,
     pub review_requests: Vec<GhReviewRequest>,
+    #[serde(default)]
+    pub latest_reviews: Vec<GhReviewOutput>,
 }
 
 /// A review request entry from gh CLI output.
@@ -66,6 +68,12 @@ pub struct GhReviewRequest {
     pub login: Option<String>,
     #[serde(default)]
     pub name: Option<String>,
+}
+
+/// A review entry from `latestReviews` in gh CLI output.
+#[derive(Debug, Deserialize)]
+pub struct GhReviewOutput {
+    pub state: String,
 }
 
 /// Maps gh CLI PR output to our internal state string.
@@ -79,6 +87,13 @@ pub fn resolve_pull_request_state(pr: &GhPullRequestOutput) -> &'static str {
                 "draft"
             } else if !pr.review_requests.is_empty() {
                 "review-requested"
+            // latestReviews is limited to first:1 in both GraphQL and CLI queries
+            } else if let Some(review) = pr.latest_reviews.last() {
+                match review.state.as_str() {
+                    "APPROVED" => "approved",
+                    "CHANGES_REQUESTED" => "changes-requested",
+                    _ => "open",
+                }
             } else {
                 "open"
             }
@@ -91,5 +106,84 @@ pub fn resolve_github_issue_state(gh_state: &str) -> &'static str {
     match gh_state {
         "CLOSED" => "closed",
         _ => "open",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_pr(
+        state: &str,
+        is_draft: bool,
+        review_requests: Vec<GhReviewRequest>,
+        latest_reviews: Vec<GhReviewOutput>,
+    ) -> GhPullRequestOutput {
+        GhPullRequestOutput {
+            number: 1,
+            state: state.to_string(),
+            url: "https://github.com/test/repo/pull/1".to_string(),
+            is_draft,
+            review_requests,
+            latest_reviews,
+        }
+    }
+
+    #[test]
+    fn resolve_pr_state_approved() {
+        let pr = make_pr(
+            "OPEN",
+            false,
+            vec![],
+            vec![GhReviewOutput {
+                state: "APPROVED".to_string(),
+            }],
+        );
+        assert_eq!(resolve_pull_request_state(&pr), "approved");
+    }
+
+    #[test]
+    fn resolve_pr_state_changes_requested() {
+        let pr = make_pr(
+            "OPEN",
+            false,
+            vec![],
+            vec![GhReviewOutput {
+                state: "CHANGES_REQUESTED".to_string(),
+            }],
+        );
+        assert_eq!(resolve_pull_request_state(&pr), "changes-requested");
+    }
+
+    #[test]
+    fn resolve_pr_state_draft() {
+        let pr = make_pr("OPEN", true, vec![], vec![]);
+        assert_eq!(resolve_pull_request_state(&pr), "draft");
+    }
+
+    #[test]
+    fn resolve_pr_state_review_requested() {
+        let pr = make_pr(
+            "OPEN",
+            false,
+            vec![GhReviewRequest {
+                login: Some("reviewer".to_string()),
+                name: None,
+            }],
+            vec![],
+        );
+        assert_eq!(resolve_pull_request_state(&pr), "review-requested");
+    }
+
+    #[test]
+    fn resolve_pr_state_merged() {
+        let pr = make_pr("MERGED", false, vec![], vec![]);
+        assert_eq!(resolve_pull_request_state(&pr), "merged");
+    }
+
+    #[test]
+    fn resolve_pr_state_open_fallback() {
+        let pr = make_pr("OPEN", false, vec![], vec![]);
+        assert_eq!(resolve_pull_request_state(&pr), "open");
     }
 }
