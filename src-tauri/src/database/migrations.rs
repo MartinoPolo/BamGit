@@ -82,6 +82,25 @@ fn migrate_v4(connection: &Connection) -> Result<(), rusqlite::Error> {
 }
 
 fn migrate_v5(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // Seed notification_config with defaults for all event types.
+    // Uses INSERT OR IGNORE so re-running is idempotent.
+    use crate::models::notification::NotificationConfig;
+
+    for config in NotificationConfig::defaults() {
+        connection.execute(
+            "INSERT OR IGNORE INTO notification_config \
+             (event_type, sound_enabled, sound_file, toast_enabled, window_flash_enabled) \
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            rusqlite::params![
+                config.event_type,
+                config.sound_enabled,
+                config.sound_file,
+                config.toast_enabled,
+                config.window_flash_enabled,
+            ],
+        )?;
+    }
+
     // Add is_built_in column to color_palettes (may already exist if v1 ran with updated schema)
     let has_is_built_in: bool = connection
         .prepare("SELECT is_built_in FROM color_palettes LIMIT 0")
@@ -127,4 +146,71 @@ pub fn run_migrations(connection: &Connection) -> Result<(), rusqlite::Error> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn fresh_db() -> Connection {
+        let connection = Connection::open_in_memory().unwrap();
+        connection
+            .execute_batch("PRAGMA foreign_keys=ON;")
+            .unwrap();
+        connection
+    }
+
+    #[test]
+    fn migration_v5_seeds_notification_config_defaults() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM notification_config",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 5, "should seed 5 notification event types");
+
+        // Verify needs-input has all channels on
+        let (sound, toast, flash): (bool, bool, bool) = connection
+            .query_row(
+                "SELECT sound_enabled, toast_enabled, window_flash_enabled \
+                 FROM notification_config WHERE event_type = 'needs-input'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+        assert!(sound);
+        assert!(toast);
+        assert!(flash);
+    }
+
+    #[test]
+    fn migration_v5_is_idempotent() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        // Run v5 again directly — INSERT OR IGNORE should not fail
+        migrate_v5(&connection).unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM notification_config",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 5);
+    }
+
+    #[test]
+    fn schema_version_reaches_current() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+        let version = get_schema_version(&connection).unwrap();
+        assert_eq!(version, CURRENT_VERSION);
+    }
 }

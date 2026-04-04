@@ -2,13 +2,16 @@ mod commands;
 mod database;
 mod git;
 mod models;
+mod notification;
 mod session;
 
 use commands::{
     action_commands, color_palette_commands, dashboard_commands, git_status_commands,
-    github_commands, issue_commands, portfolio_commands, session_commands, worktree_commands,
+    github_commands, issue_commands, notification_commands, portfolio_commands, session_commands,
+    worktree_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
+use notification::service::NotificationService;
 use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
 use tauri::Manager;
@@ -17,6 +20,7 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_notification::init())
         .setup(|app| {
             let app_data_directory = app
                 .path()
@@ -26,10 +30,16 @@ pub fn run() {
             let database_state = database::connection::initialize_database(app_data_directory)
                 .expect("Failed to initialize database");
 
+            let resource_directory = app
+                .path()
+                .resource_dir()
+                .expect("Failed to resolve resource directory");
+
             app.manage(database_state);
             app.manage(SessionManager::new());
             app.manage(FetchCoordinator::new());
             app.manage(DiscoveryPoller::new());
+            app.manage(NotificationService::new(resource_directory));
 
             // Auto-start discovery polling (3-second interval)
             let poller = app.state::<DiscoveryPoller>();
@@ -84,6 +94,9 @@ pub fn run() {
             action_commands::delete_action,
             action_commands::reorder_actions,
             action_commands::execute_action,
+            notification_commands::get_notification_configs,
+            notification_commands::update_notification_config,
+            notification_commands::test_notification_sound,
             color_palette_commands::get_all_color_palettes,
             color_palette_commands::get_color_palette,
             color_palette_commands::create_color_palette,

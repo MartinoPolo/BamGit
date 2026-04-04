@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Session, SessionState } from '$lib/types/session';
+	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
+	import { get_notification_store } from '$lib/stores/notifications.svelte';
 
 	interface Props {
 		session: Session;
@@ -8,6 +10,16 @@
 	}
 
 	let { session, on_click, on_terminate }: Props = $props();
+
+	const notification_store = get_notification_store();
+
+	const notification_dot_color = $derived.by(() => {
+		const pending_type = notification_store.get_pending_type(session.id);
+		if (pending_type === undefined) {
+			return null;
+		}
+		return NOTIFICATION_DOT_COLORS[pending_type];
+	});
 
 	const state_config: Record<SessionState, { label: string; color: string }> = {
 		running: { label: 'Running', color: 'bg-green-500' },
@@ -57,9 +69,17 @@
 >
 	<div class="flex items-start justify-between gap-2">
 		<div class="min-w-0 flex-1">
-			<p class="truncate text-sm font-medium text-neutral-200">
-				{session.original_intent ?? 'Session'}
-			</p>
+			<div class="flex items-center gap-2">
+				{#if notification_dot_color}
+					<span
+						class="h-2 w-2 shrink-0 animate-pulse rounded-full {notification_dot_color}"
+						title="Pending notification"
+					></span>
+				{/if}
+				<p class="truncate text-sm font-medium text-neutral-200">
+					{session.original_intent ?? 'Session'}
+				</p>
+			</div>
 			{#if session.last_response_summary}
 				<p class="mt-1 truncate text-xs text-neutral-400">
 					{session.last_response_summary}

@@ -16,6 +16,7 @@
 		github_cache?: GitHubStatusCache | null;
 		gh_available?: boolean;
 		git_status?: GitStatusCache | undefined;
+		notification_dot_color?: string | null;
 		indented?: boolean;
 		is_last_child?: boolean;
 		child_count?: number;
@@ -36,6 +37,7 @@
 		github_cache = null,
 		gh_available = false,
 		git_status,
+		notification_dot_color = null,
 		indented = false,
 		is_last_child = false,
 		child_count = 0,
@@ -109,7 +111,14 @@
 	<!-- Color identity strip -->
 	<div class="w-10 flex-shrink-0 rounded-l" style="background-color: {color}">
 		<div class="flex h-full items-start justify-center pt-3">
-			<div class="h-2 w-2 rounded-full bg-white/30" title="Session state: idle"></div>
+			{#if notification_dot_color}
+				<span
+					class="h-2.5 w-2.5 animate-pulse rounded-full {notification_dot_color}"
+					title="Session needs attention"
+				></span>
+			{:else}
+				<div class="h-2 w-2 rounded-full bg-white/30" title="Session state: idle"></div>
+			{/if}
 		</div>
 	</div>
 

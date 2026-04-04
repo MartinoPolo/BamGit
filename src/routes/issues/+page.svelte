@@ -4,6 +4,9 @@
 	import { get_issue_store } from '$lib/stores/issues.svelte';
 	import { get_github_store } from '$lib/stores/github.svelte';
 	import { get_action_store } from '$lib/stores/actions.svelte';
+	import { get_notification_store } from '$lib/stores/notifications.svelte';
+	import { get_session_store } from '$lib/stores/sessions.svelte';
+	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
 	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
 	import {
@@ -36,7 +39,25 @@
 	const issue_store = get_issue_store();
 	const github_store = get_github_store();
 	const action_store = get_action_store();
+	const notification_store = get_notification_store();
+	const session_store = get_session_store();
 	const palette_store = get_color_palette_store();
+
+	function get_notification_dot_color(issue_id: string): string | null {
+		for (const session of session_store.sessions) {
+			if (session.issue_id !== issue_id) {
+				continue;
+			}
+			const pending_type = notification_store.get_pending_type(session.id);
+			if (pending_type !== undefined) {
+				const color = NOTIFICATION_DOT_COLORS[pending_type];
+				if (color !== null) {
+					return color;
+				}
+			}
+		}
+		return null;
+	}
 
 	let create_dialog_open = $state(false);
 	let next_available_color = $state<string>(FALLBACK_ISSUE_COLOR);
@@ -305,6 +326,7 @@
 				gh_available={github_store.is_available}
 				get_children={issue_store.get_children}
 				get_git_status={(issue_id) => git_status_store.get_status(issue_id)}
+				{get_notification_dot_color}
 				get_progress_lines={(issue_id) => issue_store.get_progress_lines(issue_id)}
 				on_archive={handle_archive_issue}
 				on_unarchive={handle_unarchive_issue}

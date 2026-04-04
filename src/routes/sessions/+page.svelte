@@ -7,6 +7,7 @@
 	} from '$lib/types/session';
 	import { adopt_session, spawn_session, terminate_session } from '$lib/tauri/session_commands';
 	import { get_session_store } from '$lib/stores/sessions.svelte';
+	import { get_notification_store } from '$lib/stores/notifications.svelte';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 	import SessionCard from '$lib/components/SessionCard.svelte';
@@ -14,6 +15,7 @@
 	import SessionChatView from '$lib/components/SessionChatView.svelte';
 
 	const store = get_session_store();
+	const notification_store = get_notification_store();
 
 	let selected_session_id = $state<string | null>(null);
 	let spawn_prompt = $state('');
@@ -70,6 +72,7 @@
 
 	function handle_select(session: Session) {
 		selected_session_id = session.id;
+		notification_store.clear_pending(session.id);
 	}
 
 	async function handle_terminate(session_id: string) {

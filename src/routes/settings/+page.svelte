@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import type { ColorPalette, CreateColorPaletteRequest } from '$lib/types/color_palette';
 	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
 	import {
@@ -93,8 +94,9 @@
 	}
 </script>
 
-<div class="space-y-6">
+<div class="space-y-6 p-4">
 	<h1 class="text-xl font-semibold">Settings</h1>
+	<NotificationSettingsPanel />
 
 	<!-- Color Palettes Section -->
 	<section class="space-y-4">
