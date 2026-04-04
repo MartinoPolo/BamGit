@@ -122,6 +122,7 @@ export type TreeVisualization =
 
 export interface TreeComputeContext {
 	readonly isPrd: boolean;
+	/** Whether any session on this branch has previously reached 'finished' state. */
 	readonly hasCompletedSession: boolean;
 	readonly hasCommitsOnBranch: boolean;
 	readonly sessionCount: number;

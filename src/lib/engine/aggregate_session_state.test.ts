@@ -43,6 +43,10 @@ describe('aggregate_session_state', () => {
 		expect(aggregate_session_state(['paused', 'running', 'needs-review'])).toBe('needs-review');
 	});
 
+	it('errored wins over needs-review', () => {
+		expect(aggregate_session_state(['needs-review', 'errored'])).toBe('errored');
+	});
+
 	it('needs-input is highest priority across all states', () => {
 		const sessions: readonly SessionState[] = [
 			'finished',
