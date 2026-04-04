@@ -7,6 +7,8 @@
 	import { get_notification_store } from '$lib/stores/notifications.svelte';
 	import { get_session_store } from '$lib/stores/sessions.svelte';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
+	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
+	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
 	import {
 		create_issue,
 		archive_issue,
@@ -39,6 +41,7 @@
 	const action_store = get_action_store();
 	const notification_store = get_notification_store();
 	const session_store = get_session_store();
+	const palette_store = get_color_palette_store();
 
 	function get_notification_dot_color(issue_id: string): string | null {
 		for (const session of session_store.sessions) {
@@ -57,11 +60,19 @@
 	}
 
 	let create_dialog_open = $state(false);
+	let next_available_color = $state<string>(FALLBACK_ISSUE_COLOR);
 	let editing_issue = $state<Issue | null>(null);
 	let all_expanded = $state(false);
 	let prune_dialog_open = $state(false);
 	let prunable_issues = $state<PrunableIssue[]>([]);
 	let prune_removing = $state(false);
+
+	// Active palette colors for the current dashboard
+	const active_palette_colors = $derived.by(() => {
+		const palette_id = dashboard_store.active_dashboard?.color_palette_id ?? null;
+		const palette = palette_store.get_palette_for_dashboard(palette_id);
+		return palette?.colors ?? [];
+	});
 
 	// Parse "owner/repo" from dashboard's github_repo field
 	const github_repo_parts = $derived.by(() => {
@@ -105,6 +116,18 @@
 			return;
 		}
 		await github_store.sync_all(dashboard_id, github_repo_parts.owner, github_repo_parts.repo);
+	}
+
+	async function open_create_dialog() {
+		create_dialog_open = true;
+		const dashboard_id = dashboard_store.active_dashboard_id;
+		if (dashboard_id !== null) {
+			try {
+				next_available_color = await palette_store.get_next_color(dashboard_id);
+			} catch {
+				next_available_color = active_palette_colors[0] ?? FALLBACK_ISSUE_COLOR;
+			}
+		}
 	}
 
 	async function handle_create_issue(request: CreateIssueRequest) {
@@ -276,7 +299,7 @@
 			{all_expanded}
 			gh_available={github_store.is_available}
 			syncing={github_store.syncing}
-			on_add_issue={() => (create_dialog_open = true)}
+			on_add_issue={open_create_dialog}
 			on_sort_change={(mode) => issue_store.set_sort_mode(mode)}
 			on_toggle_archived={() => issue_store.toggle_show_archived()}
 			on_toggle_expand_all={() => (all_expanded = !all_expanded)}
@@ -290,7 +313,7 @@
 		{:else if issue_store.error}
 			<p class="text-red-400">Error: {issue_store.error}</p>
 		{:else if issue_store.active_issues.length === 0 && issue_store.archived_issues.length === 0}
-			<EmptyIssueState on_add_issue={() => (create_dialog_open = true)} />
+			<EmptyIssueState on_add_issue={open_create_dialog} />
 		{:else}
 			<IssueCardList
 				parent_issues={issue_store.parent_issues}
@@ -327,12 +350,15 @@
 	<IssueCreateDialog
 		open={create_dialog_open}
 		dashboard_id={dashboard_store.active_dashboard.id}
+		palette_colors={active_palette_colors}
+		default_color={next_available_color}
 		on_close={() => (create_dialog_open = false)}
 		on_create={handle_create_issue}
 	/>
 
 	<IssueEditDialog
 		issue={editing_issue}
+		palette_colors={active_palette_colors}
 		on_close={() => (editing_issue = null)}
 		on_update={handle_update_issue}
 	/>

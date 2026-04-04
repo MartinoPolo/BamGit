@@ -5,6 +5,7 @@
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/DashboardEditDialog.svelte';
 	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
+	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
 	import { initialize_theme } from '$lib/stores/theme.svelte';
 	import { create_dashboard, update_dashboard, delete_dashboard } from '$lib/tauri/commands';
 	import { add_repo_to_portfolio } from '$lib/tauri/portfolio_commands';
@@ -17,12 +18,14 @@
 	let { children } = $props();
 
 	const dashboard_store = get_dashboard_store();
+	const palette_store = get_color_palette_store();
 	initialize_theme();
 
 	let editing_dashboard = $state<Dashboard | null>(null);
 
 	onMount(() => {
 		dashboard_store.load_dashboards();
+		palette_store.load_palettes();
 	});
 
 	async function handle_create_dashboard(
@@ -87,12 +90,14 @@
 <DashboardCreateDialog
 	open={dashboard_store.show_create_dialog}
 	repo_dashboards={dashboard_store.repo_dashboards}
+	color_palettes={palette_store.palettes}
 	on_close={() => (dashboard_store.show_create_dialog = false)}
 	on_create={handle_create_dashboard}
 />
 
 <DashboardEditDialog
 	dashboard={editing_dashboard}
+	color_palettes={palette_store.palettes}
 	on_close={() => (editing_dashboard = null)}
 	on_update={handle_update_dashboard}
 	on_delete={handle_delete_dashboard}

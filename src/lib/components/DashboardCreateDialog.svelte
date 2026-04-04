@@ -1,14 +1,17 @@
 <script lang="ts">
 	import type { CreateDashboardRequest, Dashboard } from '$lib/types/dashboard';
+	import type { ColorPalette } from '$lib/types/color_palette';
+	import PaletteSelector from './PaletteSelector.svelte';
 
 	interface Props {
 		open: boolean;
 		repo_dashboards: Dashboard[];
+		color_palettes: ColorPalette[];
 		on_close: () => void;
 		on_create: (request: CreateDashboardRequest, selected_repo_ids: string[]) => void;
 	}
 
-	let { open, repo_dashboards, on_close, on_create }: Props = $props();
+	let { open, repo_dashboards, color_palettes, on_close, on_create }: Props = $props();
 
 	let dashboard_type = $state<'repo' | 'portfolio'>('repo');
 	let name = $state('');
@@ -16,6 +19,7 @@
 	let local_folder = $state('');
 	let default_base_branch = $state('');
 	let worktree_parent_folder = $state('');
+	let color_palette_id = $state<string | null>(null);
 	let selected_repo_ids = $state<Set<string>>(new Set());
 	let dialog_element: HTMLDialogElement | undefined = $state();
 
@@ -34,6 +38,7 @@
 		local_folder = '';
 		default_base_branch = '';
 		worktree_parent_folder = '';
+		color_palette_id = null;
 		selected_repo_ids = new Set();
 	}
 
@@ -47,6 +52,10 @@
 			name: name.trim(),
 			type: dashboard_type,
 		};
+
+		if (color_palette_id !== null) {
+			request.color_palette_id = color_palette_id;
+		}
 
 		if (dashboard_type === 'repo') {
 			if (github_repo.trim()) {
@@ -115,6 +124,13 @@
 				placeholder="My Project"
 			/>
 		</label>
+
+		<!-- Color palette -->
+		<PaletteSelector
+			palettes={color_palettes}
+			selected_palette_id={color_palette_id}
+			on_select={(id) => (color_palette_id = id)}
+		/>
 
 		<!-- Repo-specific fields -->
 		{#if dashboard_type === 'portfolio'}

@@ -1,24 +1,28 @@
 <script lang="ts">
 	import type { CreateIssueRequest } from '$lib/types/issue';
-	import { COLOR_SWATCHES } from '$lib/constants/colors';
+	import PaletteColorPicker from './PaletteColorPicker.svelte';
 
 	interface Props {
 		open: boolean;
 		dashboard_id: string;
+		palette_colors: string[];
+		default_color: string;
 		on_close: () => void;
 		on_create: (request: CreateIssueRequest) => void;
 	}
 
-	let { open, dashboard_id, on_close, on_create }: Props = $props();
+	let { open, dashboard_id, palette_colors, default_color, on_close, on_create }: Props =
+		$props();
 
 	let name = $state('');
 	let priority = $state<'low' | 'medium' | 'high' | 'top' | ''>('');
-	let color = $state(COLOR_SWATCHES[0]);
+	let color = $state('');
 	let github_issue_url = $state('');
 	let dialog_element: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
 		if (open && dialog_element !== undefined && !dialog_element.open) {
+			color = default_color;
 			dialog_element.showModal();
 		} else if (!open && dialog_element?.open === true) {
 			dialog_element.close();
@@ -28,7 +32,7 @@
 	function reset_form() {
 		name = '';
 		priority = '';
-		color = COLOR_SWATCHES[0];
+		color = '';
 		github_issue_url = '';
 	}
 
@@ -99,22 +103,11 @@
 		</label>
 
 		<!-- Color picker -->
-		<fieldset class="flex flex-col gap-1">
-			<legend class="text-xs text-neutral-400">Color</legend>
-			<div class="flex flex-wrap gap-1.5">
-				{#each COLOR_SWATCHES as swatch (swatch)}
-					<button
-						type="button"
-						onclick={() => (color = swatch)}
-						class="h-6 w-6 rounded-sm transition-transform {color === swatch
-							? 'scale-125 ring-2 ring-white ring-offset-1 ring-offset-neutral-900'
-							: 'hover:scale-110'}"
-						style="background-color: {swatch}"
-						title={swatch}
-					></button>
-				{/each}
-			</div>
-		</fieldset>
+		<PaletteColorPicker
+			colors={palette_colors}
+			selected_color={color}
+			on_select={(c) => (color = c)}
+		/>
 
 		<label class="flex flex-col gap-1">
 			<span class="text-xs text-neutral-400">GitHub Issue URL</span>

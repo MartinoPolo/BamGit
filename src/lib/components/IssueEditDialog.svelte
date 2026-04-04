@@ -1,14 +1,16 @@
 <script lang="ts">
 	import type { Issue, UpdateIssueRequest } from '$lib/types/issue';
-	import { COLOR_SWATCHES } from '$lib/constants/colors';
+	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
+	import PaletteColorPicker from './PaletteColorPicker.svelte';
 
 	interface Props {
 		issue: Issue | null;
+		palette_colors: string[];
 		on_close: () => void;
 		on_update: (request: UpdateIssueRequest) => void;
 	}
 
-	let { issue, on_close, on_update }: Props = $props();
+	let { issue, palette_colors, on_close, on_update }: Props = $props();
 
 	let name = $state('');
 	let priority = $state<string>('');
@@ -20,7 +22,7 @@
 		if (issue !== null && dialog_element !== undefined && !dialog_element.open) {
 			name = issue.name;
 			priority = issue.priority ?? '';
-			color = issue.color ?? COLOR_SWATCHES[0];
+			color = issue.color ?? palette_colors[0] ?? FALLBACK_ISSUE_COLOR;
 			github_issue_url = issue.github_issue_url ?? '';
 			dialog_element.showModal();
 		} else if (issue === null && dialog_element?.open === true) {
@@ -79,22 +81,11 @@
 				</select>
 			</label>
 
-			<fieldset class="flex flex-col gap-1">
-				<legend class="text-xs text-neutral-400">Color</legend>
-				<div class="flex flex-wrap gap-1.5">
-					{#each COLOR_SWATCHES as swatch (swatch)}
-						<button
-							type="button"
-							onclick={() => (color = swatch)}
-							class="h-6 w-6 rounded-sm transition-transform {color === swatch
-								? 'scale-125 ring-2 ring-white ring-offset-1 ring-offset-neutral-900'
-								: 'hover:scale-110'}"
-							style="background-color: {swatch}"
-							title={swatch}
-						></button>
-					{/each}
-				</div>
-			</fieldset>
+			<PaletteColorPicker
+				colors={palette_colors}
+				selected_color={color}
+				on_select={(c) => (color = c)}
+			/>
 
 			<label class="flex flex-col gap-1">
 				<span class="text-xs text-neutral-400">GitHub Issue URL</span>

@@ -101,6 +101,26 @@ fn migrate_v5(connection: &Connection) -> Result<(), rusqlite::Error> {
         )?;
     }
 
+    // Add is_built_in column to color_palettes (may already exist if v1 ran with updated schema)
+    let has_is_built_in: bool = connection
+        .prepare("SELECT is_built_in FROM color_palettes LIMIT 0")
+        .is_ok();
+
+    if !has_is_built_in {
+        connection.execute_batch(
+            "ALTER TABLE color_palettes ADD COLUMN is_built_in INTEGER NOT NULL DEFAULT 0;",
+        )?;
+    }
+
+    // Seed built-in palettes (idempotent via INSERT OR IGNORE)
+    crate::commands::color_palette_commands::seed_built_in_palettes_with_connection(connection)
+        .map_err(|error| {
+            rusqlite::Error::SqliteFailure(
+                rusqlite::ffi::Error::new(rusqlite::ffi::SQLITE_ERROR),
+                Some(error),
+            )
+        })?;
+
     Ok(())
 }
 
