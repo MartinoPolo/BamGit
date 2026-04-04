@@ -84,14 +84,16 @@ mod tests {
     #[test]
     fn detects_existing_branch() {
         let repo_root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
-        // The current branch must exist locally
-        let result = resolve_branch_status(repo_root, "4-git-cli-integration");
+        let repository = git2::Repository::discover(repo_root).unwrap();
+        let head = repository.head().unwrap();
+        let branch_name = head.shorthand().unwrap();
+
+        let result = resolve_branch_status(repo_root, branch_name);
         assert!(result.is_ok());
         let status = result.unwrap();
-        // Either Active (if pushed) or Local (if not yet pushed)
         assert!(
             status == BranchStatus::Active || status == BranchStatus::Local,
-            "Expected Active or Local, got {:?}",
+            "Expected Active or Local for current branch '{branch_name}', got {:?}",
             status
         );
     }

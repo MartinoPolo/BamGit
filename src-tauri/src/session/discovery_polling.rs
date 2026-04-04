@@ -1,4 +1,3 @@
-use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -37,7 +36,7 @@ impl DiscoveryPoller {
 
         let running = Arc::clone(&self.running);
 
-        tokio::spawn(async move {
+        tauri::async_runtime::spawn(async move {
             let db_path = match app_handle.path().app_data_dir() {
                 Ok(dir) => dir.join("bamgit.db"),
                 Err(_) => {

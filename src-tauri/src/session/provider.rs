@@ -27,8 +27,6 @@ pub struct SessionHandle {
     pub stdout: Option<ChildStdout>,
     pub stderr: Option<ChildStderr>,
     pub pid: u32,
-    /// Captured from the first SessionInit event.
-    pub session_id: Option<String>,
 }
 
 /// Unified event type that all providers map their protocol to.

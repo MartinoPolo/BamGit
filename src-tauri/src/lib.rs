@@ -1,3 +1,5 @@
+#![deny(unused_imports, dead_code, clippy::disallowed_methods)]
+
 mod commands;
 mod database;
 mod git;

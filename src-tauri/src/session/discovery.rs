@@ -97,19 +97,6 @@ impl SessionDiscoverer {
         }
     }
 
-    /// For testing: create with custom directories.
-    #[cfg(test)]
-    pub fn with_directories(
-        projects_directory: PathBuf,
-        sessions_directory: PathBuf,
-    ) -> Self {
-        Self {
-            system: System::new(),
-            claude_projects_directory: projects_directory,
-            claude_sessions_directory: sessions_directory,
-        }
-    }
-
     /// Discover all running Claude Code sessions not managed by BamGit.
     /// `excluded_pids` are PIDs of sessions already managed by BamGit.
     pub fn discover_sessions(&mut self, excluded_pids: &[u32]) -> Vec<DiscoveredSession> {
