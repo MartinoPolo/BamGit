@@ -9,7 +9,9 @@
 
 	let { palettes, selected_palette_id, on_select }: Props = $props();
 
-	const default_palette_label = $derived(palettes.find((p) => p.is_built_in)?.name ?? 'Default');
+	const default_palette_label = $derived(
+		palettes.find((p) => p.is_built_in === true)?.name ?? 'Default',
+	);
 </script>
 
 <label class="flex flex-col gap-1">
@@ -25,7 +27,7 @@
 		<option value="">Default ({default_palette_label})</option>
 		{#each palettes as palette (palette.id)}
 			<option value={palette.id}>
-				{palette.name}{palette.is_built_in ? '' : ' (custom)'}
+				{palette.name}{palette.is_built_in === true ? '' : ' (custom)'}
 			</option>
 		{/each}
 	</select>

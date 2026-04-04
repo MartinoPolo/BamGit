@@ -16,8 +16,10 @@
 	let edit_colors_input = $state('');
 	let operation_error = $state<string | null>(null);
 
-	const built_in_palettes = $derived(palette_store.palettes.filter((p) => p.is_built_in));
-	const custom_palettes = $derived(palette_store.palettes.filter((p) => !p.is_built_in));
+	const built_in_palettes = $derived(
+		palette_store.palettes.filter((p) => p.is_built_in === true),
+	);
+	const custom_palettes = $derived(palette_store.palettes.filter((p) => p.is_built_in === false));
 
 	function parse_colors(input: string): string[] {
 		return input
