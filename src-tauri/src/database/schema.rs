@@ -8,7 +8,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE TABLE IF NOT EXISTS color_palettes (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
-            colors TEXT NOT NULL
+            colors TEXT NOT NULL,
+            is_built_in INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS dashboards (
