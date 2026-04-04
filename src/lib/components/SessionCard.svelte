@@ -15,7 +15,7 @@
 
 	const notification_dot_color = $derived.by(() => {
 		const pending_type = notification_store.get_pending_type(session.id);
-		if (!pending_type) {
+		if (pending_type === undefined) {
 			return null;
 		}
 		return NOTIFICATION_DOT_COLORS[pending_type];

@@ -93,19 +93,21 @@
 					<!-- Sound toggle -->
 					<div class="flex justify-center">
 						<button
-							class="h-5 w-9 rounded-full transition-colors {config.sound_enabled
+							class="h-5 w-9 rounded-full transition-colors {config.sound_enabled ===
+							true
 								? 'bg-blue-600'
 								: 'bg-neutral-600'}"
 							onclick={() =>
 								toggle_channel(
 									config.event_type,
 									'sound_enabled',
-									!config.sound_enabled,
+									config.sound_enabled !== true,
 								)}
-							title={config.sound_enabled ? 'Disable sound' : 'Enable sound'}
+							title={config.sound_enabled === true ? 'Disable sound' : 'Enable sound'}
 						>
 							<span
-								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.sound_enabled
+								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.sound_enabled ===
+								true
 									? 'translate-x-[18px]'
 									: ''}"
 							></span>
@@ -115,19 +117,21 @@
 					<!-- Toast toggle -->
 					<div class="flex justify-center">
 						<button
-							class="h-5 w-9 rounded-full transition-colors {config.toast_enabled
+							class="h-5 w-9 rounded-full transition-colors {config.toast_enabled ===
+							true
 								? 'bg-blue-600'
 								: 'bg-neutral-600'}"
 							onclick={() =>
 								toggle_channel(
 									config.event_type,
 									'toast_enabled',
-									!config.toast_enabled,
+									config.toast_enabled !== true,
 								)}
-							title={config.toast_enabled ? 'Disable toast' : 'Enable toast'}
+							title={config.toast_enabled === true ? 'Disable toast' : 'Enable toast'}
 						>
 							<span
-								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.toast_enabled
+								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.toast_enabled ===
+								true
 									? 'translate-x-[18px]'
 									: ''}"
 							></span>
@@ -137,21 +141,23 @@
 					<!-- Window flash toggle -->
 					<div class="flex justify-center">
 						<button
-							class="h-5 w-9 rounded-full transition-colors {config.window_flash_enabled
+							class="h-5 w-9 rounded-full transition-colors {config.window_flash_enabled ===
+							true
 								? 'bg-blue-600'
 								: 'bg-neutral-600'}"
 							onclick={() =>
 								toggle_channel(
 									config.event_type,
 									'window_flash_enabled',
-									!config.window_flash_enabled,
+									config.window_flash_enabled !== true,
 								)}
-							title={config.window_flash_enabled
+							title={config.window_flash_enabled === true
 								? 'Disable window flash'
 								: 'Enable window flash'}
 						>
 							<span
-								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.window_flash_enabled
+								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.window_flash_enabled ===
+								true
 									? 'translate-x-[18px]'
 									: ''}"
 							></span>

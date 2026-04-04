@@ -46,9 +46,9 @@
 				continue;
 			}
 			const pending_type = notification_store.get_pending_type(session.id);
-			if (pending_type) {
+			if (pending_type !== undefined) {
 				const color = NOTIFICATION_DOT_COLORS[pending_type];
-				if (color) {
+				if (color !== null) {
 					return color;
 				}
 			}
