@@ -5,7 +5,16 @@ import type {
 	SessionEventPayload,
 	SessionState,
 } from '$lib/types/session';
+import type { NotificationEventType } from '$lib/types/notification';
 import { get_sessions } from '$lib/tauri/session_commands';
+import { get_notification_store } from '$lib/stores/notifications.svelte';
+
+/** States that warrant a pending in-app notification indicator. */
+const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
+	'needs-input': 'needs-input',
+	'needs-review': 'needs-review',
+	errored: 'errored',
+};
 
 let sessions = $state<Session[]>([]);
 let discovered_sessions = $state<DiscoveredSession[]>([]);
@@ -40,6 +49,12 @@ function handle_session_event(payload: SessionEventPayload) {
 			const new_state = state_map[event.state as string];
 			if (new_state) {
 				session.state = new_state;
+				const notification_type = NOTIFICATION_STATES[new_state];
+				if (notification_type) {
+					get_notification_store().add_pending(session_id, notification_type);
+				} else {
+					get_notification_store().clear_pending(session_id);
+				}
 			}
 			break;
 		}
@@ -57,6 +72,7 @@ function handle_session_event(payload: SessionEventPayload) {
 		case 'permission_prompt':
 		case 'elicitation_prompt': {
 			session.state = 'needs-input';
+			get_notification_store().add_pending(session_id, 'needs-input');
 			break;
 		}
 	}

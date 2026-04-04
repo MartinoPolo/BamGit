@@ -3,11 +3,12 @@ use std::sync::Mutex as StdMutex;
 use rusqlite::Connection;
 use serde::Serialize;
 use serde_json::Value;
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
 use super::provider::{ActorCommand, SessionEvent, SessionHandle, SessionProvider};
+use crate::notification::service::{session_state_to_event_type, NotificationService};
 
 /// Payload emitted to the frontend via Tauri events.
 #[derive(Debug, Clone, Serialize)]
@@ -165,7 +166,7 @@ fn handle_event(
     emit_event(session_id, event, app_handle);
 
     match event {
-        SessionEvent::RunState { state, .. } => {
+        SessionEvent::RunState { state, error } => {
             let db_state = match state.as_str() {
                 "running" => "running",
                 "idle" => "needs-review",
@@ -175,6 +176,13 @@ fn handle_event(
                 _ => return,
             };
             update_session_state(session_id, db_state, database_connection);
+            fire_notification(
+                session_id,
+                db_state,
+                error.as_deref().unwrap_or(db_state),
+                app_handle,
+                database_connection,
+            );
         }
         SessionEvent::UsageUpdate {
             input_tokens,
@@ -200,8 +208,29 @@ fn handle_event(
         }
         SessionEvent::PermissionPrompt { .. } | SessionEvent::ElicitationPrompt { .. } => {
             update_session_state(session_id, "needs-input", database_connection);
+            fire_notification(
+                session_id,
+                "needs-input",
+                "Session is waiting for your input",
+                app_handle,
+                database_connection,
+            );
         }
         _ => {}
+    }
+}
+
+fn fire_notification(
+    session_id: &str,
+    state: &str,
+    message: &str,
+    app_handle: &AppHandle,
+    database_connection: &std::sync::Arc<StdMutex<Connection>>,
+) {
+    if let Some(event_type) = session_state_to_event_type(state) {
+        if let Some(service) = app_handle.try_state::<NotificationService>() {
+            service.notify(event_type, session_id, message, app_handle, database_connection);
+        }
     }
 }
 

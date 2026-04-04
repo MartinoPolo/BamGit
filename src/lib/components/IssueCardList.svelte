@@ -16,6 +16,7 @@
 		gh_available?: boolean;
 		get_children: (parent_id: string) => Issue[];
 		get_git_status: (issue_id: string) => GitStatusCache | undefined;
+		get_notification_dot_color?: (issue_id: string) => string | null;
 		get_progress_lines?: (issue_id: string) => readonly string[];
 		on_archive: (id: string) => void;
 		on_unarchive: (id: string) => void;
@@ -37,6 +38,7 @@
 		gh_available = false,
 		get_children,
 		get_git_status,
+		get_notification_dot_color,
 		get_progress_lines,
 		on_archive,
 		on_unarchive,
@@ -58,6 +60,7 @@
 			github_cache={github_cache_map.get(issue.id)}
 			{gh_available}
 			git_status={get_git_status(issue.id)}
+			notification_dot_color={get_notification_dot_color?.(issue.id) ?? null}
 			child_count={children.length}
 			{force_expanded}
 			progress_lines={get_progress_lines?.(issue.id) ?? []}
@@ -79,6 +82,7 @@
 					github_cache={github_cache_map.get(child.id)}
 					{gh_available}
 					git_status={get_git_status(child.id)}
+					notification_dot_color={get_notification_dot_color?.(child.id) ?? null}
 					indented={true}
 					is_last_child={index === children.length - 1}
 					{force_expanded}
