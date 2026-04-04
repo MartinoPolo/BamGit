@@ -1,20 +1,24 @@
 <script lang="ts">
 	import type { Dashboard, UpdateDashboardRequest } from '$lib/types/dashboard';
+	import type { ColorPalette } from '$lib/types/color_palette';
+	import PaletteSelector from './PaletteSelector.svelte';
 
 	interface Props {
 		dashboard: Dashboard | null;
+		color_palettes: ColorPalette[];
 		on_close: () => void;
 		on_update: (request: UpdateDashboardRequest) => void;
 		on_delete: (id: string) => void;
 	}
 
-	let { dashboard, on_close, on_update, on_delete }: Props = $props();
+	let { dashboard, color_palettes, on_close, on_update, on_delete }: Props = $props();
 
 	let name = $state('');
 	let github_repo = $state('');
 	let local_folder = $state('');
 	let default_base_branch = $state('');
 	let worktree_parent_folder = $state('');
+	let color_palette_id = $state<string | null>(null);
 	let confirm_delete = $state(false);
 	let dialog_element: HTMLDialogElement | undefined = $state();
 
@@ -25,6 +29,7 @@
 			local_folder = dashboard.local_folder ?? '';
 			default_base_branch = dashboard.default_base_branch ?? '';
 			worktree_parent_folder = dashboard.worktree_parent_folder ?? '';
+			color_palette_id = dashboard.color_palette_id ?? null;
 			confirm_delete = false;
 			dialog_element.showModal();
 		} else if (dashboard === null && dialog_element?.open === true) {
@@ -41,6 +46,7 @@
 		const request: UpdateDashboardRequest = {
 			id: dashboard.id,
 			name: name.trim(),
+			color_palette_id: color_palette_id,
 		};
 
 		if (dashboard.type === 'repo') {
@@ -84,6 +90,13 @@
 					class="rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-blue-500"
 				/>
 			</label>
+
+			<!-- Color palette -->
+			<PaletteSelector
+				palettes={color_palettes}
+				selected_palette_id={color_palette_id}
+				on_select={(id) => (color_palette_id = id)}
+			/>
 
 			{#if dashboard.type === 'repo'}
 				<label class="flex flex-col gap-1">

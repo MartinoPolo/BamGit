@@ -5,8 +5,8 @@ mod models;
 mod session;
 
 use commands::{
-    action_commands, dashboard_commands, git_status_commands, github_commands, issue_commands,
-    portfolio_commands, session_commands, worktree_commands,
+    action_commands, color_palette_commands, dashboard_commands, git_status_commands,
+    github_commands, issue_commands, portfolio_commands, session_commands, worktree_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
 use session::discovery_polling::DiscoveryPoller;
@@ -84,6 +84,12 @@ pub fn run() {
             action_commands::delete_action,
             action_commands::reorder_actions,
             action_commands::execute_action,
+            color_palette_commands::get_all_color_palettes,
+            color_palette_commands::get_color_palette,
+            color_palette_commands::create_color_palette,
+            color_palette_commands::update_color_palette,
+            color_palette_commands::delete_color_palette,
+            color_palette_commands::get_next_available_color,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
