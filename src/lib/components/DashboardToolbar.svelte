@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { RefreshCw, Scissors } from 'lucide-svelte';
 	import type { SortMode } from '$lib/stores/issues.svelte';
+	import type { ViewMode } from '$lib/stores/view_preference.svelte';
+	import ViewToggle from '$lib/components/ViewToggle.svelte';
 
 	interface Props {
 		sort_mode: SortMode;
@@ -9,12 +11,14 @@
 		all_expanded: boolean;
 		gh_available?: boolean;
 		syncing?: boolean;
+		view_mode?: ViewMode;
 		on_add_issue: () => void;
 		on_sort_change: (mode: SortMode) => void;
 		on_toggle_archived: () => void;
 		on_toggle_expand_all: () => void;
 		on_sync_all?: () => void;
 		on_prune_worktrees?: () => void;
+		on_view_mode_change?: (mode: ViewMode) => void;
 	}
 
 	let {
@@ -24,12 +28,14 @@
 		all_expanded,
 		gh_available = false,
 		syncing = false,
+		view_mode,
 		on_add_issue,
 		on_sort_change,
 		on_toggle_archived,
 		on_toggle_expand_all,
 		on_sync_all,
 		on_prune_worktrees,
+		on_view_mode_change,
 	}: Props = $props();
 </script>
 
@@ -67,6 +73,11 @@
 	{/if}
 
 	<div class="flex-1"></div>
+
+	<!-- View mode toggle -->
+	{#if view_mode !== undefined && on_view_mode_change}
+		<ViewToggle {view_mode} on_change={on_view_mode_change} />
+	{/if}
 
 	<!-- Collapse/expand all -->
 	<button

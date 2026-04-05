@@ -8,6 +8,8 @@
 	import { get_session_store } from '$lib/stores/sessions.svelte';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
 	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
+	import { get_view_preference_store } from '$lib/stores/view_preference.svelte';
+	import { get_theme_store } from '$lib/stores/theme.svelte';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
 	import {
 		create_issue,
@@ -28,6 +30,7 @@
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
 	import DashboardToolbar from '$lib/components/DashboardToolbar.svelte';
 	import IssueCardList from '$lib/components/IssueCardList.svelte';
+	import ForestView from '$lib/components/ForestView.svelte';
 	import IssueCreateDialog from '$lib/components/IssueCreateDialog.svelte';
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
 	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
@@ -42,6 +45,8 @@
 	const notification_store = get_notification_store();
 	const session_store = get_session_store();
 	const palette_store = get_color_palette_store();
+	const view_preference_store = get_view_preference_store();
+	const theme_store = get_theme_store();
 
 	function get_notification_dot_color(issue_id: string): string | null {
 		for (const session of session_store.sessions) {
@@ -63,6 +68,14 @@
 	let next_available_color = $state<string>(FALLBACK_ISSUE_COLOR);
 	let editing_issue = $state<Issue | null>(null);
 	let all_expanded = $state(false);
+
+	// Forest view combines active issues (always) with archived issues when show_archived toggled.
+	// Archived issues render as stumps via tree state engine.
+	const forest_issues = $derived.by(() =>
+		issue_store.show_archived
+			? [...issue_store.active_issues, ...issue_store.archived_issues]
+			: issue_store.active_issues,
+	);
 	let prune_dialog_open = $state(false);
 	let prunable_issues = $state<PrunableIssue[]>([]);
 	let prune_removing = $state(false);
@@ -305,6 +318,8 @@
 			on_toggle_expand_all={() => (all_expanded = !all_expanded)}
 			on_sync_all={github_repo_parts ? handle_sync_all : undefined}
 			on_prune_worktrees={handle_open_prune_dialog}
+			view_mode={view_preference_store.mode}
+			on_view_mode_change={(mode) => (view_preference_store.mode = mode)}
 		/>
 
 		<!-- Issue list or empty state -->
@@ -314,6 +329,15 @@
 			<p class="text-destructive">Error: {issue_store.error}</p>
 		{:else if issue_store.active_issues.length === 0 && issue_store.archived_issues.length === 0}
 			<EmptyIssueState on_add_issue={open_create_dialog} />
+		{:else if view_preference_store.mode === 'forest'}
+			<ForestView
+				issues={forest_issues}
+				get_git_status={(issue_id) => git_status_store.get_status(issue_id)}
+				get_sessions_for_issue={(issue_id) =>
+					session_store.sessions.filter((session) => session.issue_id === issue_id)}
+				is_dark={theme_store.is_dark}
+				on_select_issue={(issue) => (editing_issue = issue)}
+			/>
 		{:else}
 			<IssueCardList
 				parent_issues={issue_store.parent_issues}
