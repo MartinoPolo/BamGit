@@ -13,6 +13,7 @@
 	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
 	import TreeRenderer from '$lib/components/tree/TreeRenderer.svelte';
 	import PottedPlantRenderer from '$lib/components/potted-plant/PottedPlantRenderer.svelte';
+	import ForestCanvasOverlay from '$lib/components/forest-canvas/ForestCanvasOverlay.svelte';
 
 	interface Props {
 		issues: readonly Issue[];
@@ -77,6 +78,8 @@
 		}
 		return map;
 	});
+
+	const visible_visualizations = $derived(entries.map((entry) => entry.visualization));
 
 	const layout_result = $derived(
 		compute_forest_layout(
@@ -167,4 +170,10 @@
 			{/if}
 		{/each}
 	{/if}
+	<ForestCanvasOverlay
+		visualizations={visible_visualizations}
+		{is_dark}
+		{viewport_width}
+		{viewport_height}
+	/>
 </div>
