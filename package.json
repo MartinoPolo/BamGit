@@ -19,8 +19,8 @@
 		"test:e2e": "playwright test --pass-with-no-tests",
 		"prepare": "husky",
 		"tauri": "tauri",
-		"storybook": "storybook dev -p 6006",
-		"build:storybook": "storybook build"
+		"storybook": "svelte-kit sync && storybook dev -p 6006",
+		"build:storybook": "svelte-kit sync && storybook build"
 	},
 	"dependencies": {
 		"@tauri-apps/api": "^2",
