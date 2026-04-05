@@ -104,3 +104,28 @@ export function compute_trunk_color(is_dark: boolean): string {
 export function compute_ground_color(is_dark: boolean): string {
 	return is_dark ? 'oklch(0.25 0.01 60)' : 'oklch(0.75 0.01 60)';
 }
+
+// ─── Stone Nameplate Colors ─────────────────────────────────────────
+
+export interface StoneColors {
+	readonly fill: string;
+	readonly shadow: string;
+	readonly highlight: string;
+	readonly text: string;
+}
+
+export function compute_stone_colors(is_dark: boolean): StoneColors {
+	return is_dark
+		? {
+				fill: 'oklch(0.35 0.01 250)',
+				shadow: 'oklch(0.25 0.01 250)',
+				highlight: 'oklch(0.42 0.005 250)',
+				text: 'oklch(0.75 0.01 250)',
+			}
+		: {
+				fill: 'oklch(0.65 0.01 250)',
+				shadow: 'oklch(0.55 0.01 250)',
+				highlight: 'oklch(0.72 0.005 250)',
+				text: 'oklch(0.3 0.01 250)',
+			};
+}

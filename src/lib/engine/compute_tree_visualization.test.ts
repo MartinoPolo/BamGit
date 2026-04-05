@@ -26,6 +26,8 @@ function create_dimensions(overrides: Partial<StateDimensions> = {}): StateDimen
 function create_context(overrides: Partial<TreeComputeContext> = {}): TreeComputeContext {
 	return {
 		isPrd: false,
+		prdTitle: '',
+		subIssueCompletionRatio: 0,
 		hasCompletedSession: false,
 		hasCommitsOnBranch: false,
 		sessionCount: 0,
@@ -281,6 +283,31 @@ describe('compute_tree_visualization — oak', () => {
 		) as TreeVisualizationOak;
 		expect(result.kind).toBe('oak');
 		expect(result.overlays).toEqual([]);
+	});
+
+	it('oak includes title from context', () => {
+		const result = compute_tree_visualization(
+			create_dimensions(),
+			create_context({ isPrd: true, prdTitle: 'Forest Dashboard' }),
+		) as TreeVisualizationOak;
+		expect(result.title).toBe('Forest Dashboard');
+	});
+
+	it('oak includes completionRatio from context', () => {
+		const result = compute_tree_visualization(
+			create_dimensions(),
+			create_context({ isPrd: true, subIssueCompletionRatio: 0.75 }),
+		) as TreeVisualizationOak;
+		expect(result.completionRatio).toBe(0.75);
+	});
+
+	it('oak defaults to empty title and zero ratio', () => {
+		const result = compute_tree_visualization(
+			create_dimensions(),
+			create_context({ isPrd: true }),
+		) as TreeVisualizationOak;
+		expect(result.title).toBe('');
+		expect(result.completionRatio).toBe(0);
 	});
 });
 

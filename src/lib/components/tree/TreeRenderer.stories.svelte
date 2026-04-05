@@ -17,10 +17,14 @@
 </script>
 
 <script lang="ts">
-	import type { TreeVisualizationTree, TreeStage } from '$lib/types/tree_visualization';
+	import type {
+		TreeVisualization,
+		TreeVisualizationTree,
+		TreeStage,
+	} from '$lib/types/tree_visualization';
 
 	interface StoryArgs {
-		visualization?: TreeVisualizationTree;
+		visualization?: TreeVisualization;
 		accent_color: string;
 		is_dark?: boolean;
 	}
