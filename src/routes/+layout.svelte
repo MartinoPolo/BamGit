@@ -7,6 +7,7 @@
 	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
 	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
 	import { initialize_theme } from '$lib/stores/theme.svelte';
+	import { initialize_view_preference } from '$lib/stores/view_preference.svelte';
 	import { create_dashboard, update_dashboard, delete_dashboard } from '$lib/tauri/commands';
 	import { add_repo_to_portfolio } from '$lib/tauri/portfolio_commands';
 	import type {
@@ -20,6 +21,7 @@
 	const dashboard_store = get_dashboard_store();
 	const palette_store = get_color_palette_store();
 	initialize_theme();
+	initialize_view_preference();
 
 	let editing_dashboard = $state<Dashboard | null>(null);
 
