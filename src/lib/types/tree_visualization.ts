@@ -105,6 +105,8 @@ export interface TreeVisualizationPottedPlant {
 
 export interface TreeVisualizationOak {
 	readonly kind: 'oak';
+	readonly title: string;
+	readonly completionRatio: number;
 	readonly overlays: readonly TreeOverlay[];
 }
 
@@ -117,6 +119,8 @@ export type TreeVisualization =
 
 export interface TreeComputeContext {
 	readonly isPrd: boolean;
+	readonly prdTitle: string;
+	readonly subIssueCompletionRatio: number;
 	/** Whether any session on this branch has previously reached 'finished' state. */
 	readonly hasCompletedSession: boolean;
 	readonly hasCommitsOnBranch: boolean;

@@ -10,6 +10,8 @@ import type {
 
 export const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
 	isPrd: false,
+	prdTitle: '',
+	subIssueCompletionRatio: 0,
 	hasCompletedSession: false,
 	hasCommitsOnBranch: false,
 	sessionCount: 0,
@@ -125,7 +127,12 @@ export function compute_tree_visualization(
 	const overlays = compute_overlays(dimensions);
 
 	if (resolved_context.isPrd) {
-		return { kind: 'oak', overlays };
+		return {
+			kind: 'oak',
+			title: resolved_context.prdTitle,
+			completionRatio: resolved_context.subIssueCompletionRatio,
+			overlays,
+		};
 	}
 
 	if (dimensions.label === null) {
