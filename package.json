@@ -9,7 +9,6 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"check:all": "svelte-kit sync && prettier --write . && oxlint && eslint . && stylelint \"src/**/*.{css,svelte}\" && knip && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "oxlint",
 		"lint:eslint": "eslint .",
