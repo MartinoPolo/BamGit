@@ -8,7 +8,8 @@
 		"bits-ui",
 		"lucide-svelte",
 		"postcss-html",
-		"@fallow-cli/win32-x64-msvc"
+		"@fallow-cli/win32-x64-msvc",
+		"low-poly-2d-trees"
 	],
 	"rules": {
 		"unused-files": "error",

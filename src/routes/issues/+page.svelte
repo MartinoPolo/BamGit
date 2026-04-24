@@ -9,7 +9,6 @@
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
 	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
 	import { get_view_preference_store } from '$lib/stores/view_preference.svelte';
-	import { get_theme_store } from '$lib/stores/theme.svelte';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
 	import {
 		create_issue,
@@ -46,7 +45,6 @@
 	const session_store = get_session_store();
 	const palette_store = get_color_palette_store();
 	const view_preference_store = get_view_preference_store();
-	const theme_store = get_theme_store();
 
 	function get_notification_dot_color(issue_id: string): string | null {
 		for (const session of session_store.sessions) {
@@ -335,7 +333,6 @@
 				get_git_status={(issue_id) => git_status_store.get_status(issue_id)}
 				get_sessions_for_issue={(issue_id) =>
 					session_store.sessions.filter((session) => session.issue_id === issue_id)}
-				is_dark={theme_store.is_dark}
 				on_select_issue={(issue) => (editing_issue = issue)}
 			/>
 		{:else}
