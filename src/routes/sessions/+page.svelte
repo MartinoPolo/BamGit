@@ -26,7 +26,7 @@
 
 	// Derive live session from store so state updates are always reflected
 	const selected_session = $derived(
-		selected_session_id !== ''
+		selected_session_id !== null
 			? (store.sessions.find((s) => s.id === selected_session_id) ?? null)
 			: null,
 	);

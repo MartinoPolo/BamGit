@@ -72,9 +72,18 @@ pub async fn spawn_session(
         .map_err(|e| format!("Failed to create session row: {e}"))?;
     }
 
-    manager
+    if let Err(e) = manager
         .spawn_session(session_id.clone(), config, app_handle, database_connection)
-        .await?;
+        .await
+    {
+        if let Ok(conn) = state.0.lock() {
+            let _ = conn.execute(
+                "UPDATE sessions SET state = 'errored', ended_at = datetime('now') WHERE id = ?1",
+                [&session_id],
+            );
+        }
+        return Err(e);
+    }
 
     Ok(session_id)
 }
@@ -166,7 +175,7 @@ pub async fn discover_external_sessions(
     Ok(discoverer.discover_sessions(&excluded_pids))
 }
 
-/// Query PIDs of sessions currently managed by BamGit (running/needs-input/needs-review).
+/// Query PIDs of sessions currently managed by Grovekeeper (running/needs-input/needs-review).
 fn get_managed_pids(state: &State<DatabaseState>) -> Result<Vec<u32>, String> {
     let connection = state.0.lock().map_err(|e| e.to_string())?;
     let mut statement = connection

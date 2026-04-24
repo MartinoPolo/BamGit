@@ -136,8 +136,10 @@ fn build_bulk_sync_graphql_query(
         }
     }
 
+    let safe_owner = owner.replace(['\\', '"'], "");
+    let safe_repo = repo.replace(['\\', '"'], "");
     format!(
-        "query {{ repository(owner: \"{owner}\", name: \"{repo}\") {{ {fragments} }} }}",
+        "query {{ repository(owner: \"{safe_owner}\", name: \"{safe_repo}\") {{ {fragments} }} }}",
         fragments = fragments.join(" ")
     )
 }

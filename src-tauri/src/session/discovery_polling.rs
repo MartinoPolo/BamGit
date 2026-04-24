@@ -7,6 +7,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
 use super::discovery::{DiscoveredSession, SessionDiscoverer};
+use crate::database::connection::open_actor_connection;
 
 /// Payload emitted when discovered sessions change.
 #[derive(Debug, Clone, Serialize)]
@@ -37,15 +38,15 @@ impl DiscoveryPoller {
         let running = Arc::clone(&self.running);
 
         tauri::async_runtime::spawn(async move {
-            let db_path = match app_handle.path().app_data_dir() {
-                Ok(dir) => dir.join("bamgit.db"),
+            let app_data_dir = match app_handle.path().app_data_dir() {
+                Ok(dir) => dir,
                 Err(_) => {
                     log::error!("Discovery poller: failed to resolve app data directory");
                     return;
                 }
             };
 
-            let connection = match Connection::open(&db_path) {
+            let connection_arc = match open_actor_connection(app_data_dir) {
                 Ok(c) => c,
                 Err(e) => {
                     log::error!("Discovery poller: failed to open database: {e}");
@@ -57,7 +58,10 @@ impl DiscoveryPoller {
             let mut previous_fingerprint = String::new();
 
             while running.load(Ordering::SeqCst) {
-                let excluded_pids = query_managed_pids(&connection);
+                let excluded_pids = match connection_arc.lock() {
+                    Ok(conn) => query_managed_pids(&conn),
+                    Err(_) => Vec::new(),
+                };
                 let sessions = discoverer.discover_sessions(&excluded_pids);
 
                 let fingerprint = build_fingerprint(&sessions);
@@ -98,7 +102,7 @@ fn build_fingerprint(sessions: &[DiscoveredSession]) -> String {
     parts.join(",")
 }
 
-/// Query PIDs of BamGit-managed sessions from the database.
+/// Query PIDs of Grovekeeper-managed sessions from the database.
 fn query_managed_pids(connection: &Connection) -> Vec<u32> {
     let mut statement = match connection.prepare(
         super::discovery::MANAGED_PIDS_QUERY,

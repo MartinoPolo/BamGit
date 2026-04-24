@@ -20,6 +20,7 @@ const KNOWN_PR_STATES: ReadonlySet<ForestPullRequestState> = new Set([
 	'review-requested',
 	'changes-requested',
 	'approved',
+	'ready-to-merge',
 	'merged',
 	'closed',
 ]);
@@ -80,6 +81,6 @@ export function map_issue_to_state_dimensions(
 		pullRequestState: map_pr_state(git_status?.pr_state),
 		githubIssueState: git_status?.github_issue_state === 'closed' ? 'closed' : 'open',
 		syncStatus: map_sync_status(git_status),
-		bamgitStatus: issue.status === 'archived' ? 'archived' : 'active',
+		grovekeeperStatus: issue.status === 'archived' ? 'archived' : 'active',
 	};
 }

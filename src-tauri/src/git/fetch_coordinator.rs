@@ -106,12 +106,12 @@ mod tests {
     }
 
     #[test]
+    #[ignore] // Requires network access and a real git remote
     fn fetch_once_succeeds_on_real_repo() {
         let repo_root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
         let coordinator = FetchCoordinator::new();
         let result = coordinator.fetch_once(repo_root);
-        // May fail if no network, but should not panic
-        assert!(result.is_ok() || result.is_err());
+        assert!(result.is_ok(), "fetch_once failed: {:?}", result.err());
     }
 
     #[test]

@@ -97,8 +97,8 @@ impl SessionDiscoverer {
         }
     }
 
-    /// Discover all running Claude Code sessions not managed by BamGit.
-    /// `excluded_pids` are PIDs of sessions already managed by BamGit.
+    /// Discover all running Claude Code sessions not managed by Grovekeeper.
+    /// `excluded_pids` are PIDs of sessions already managed by Grovekeeper.
     pub fn discover_sessions(&mut self, excluded_pids: &[u32]) -> Vec<DiscoveredSession> {
         // Refresh processes
         self.system.refresh_processes_specifics(
@@ -346,7 +346,7 @@ struct ProcessInfo {
 /// How many recent JSONL entries to parse for status determination.
 const STATUS_CONTEXT_ENTRY_COUNT: usize = 20;
 
-/// SQL query for PIDs of BamGit-managed sessions (shared between poller and commands).
+/// SQL query for PIDs of Grovekeeper-managed sessions (shared between poller and commands).
 pub const MANAGED_PIDS_QUERY: &str =
     "SELECT pid FROM sessions WHERE pid IS NOT NULL \
      AND state IN ('running', 'needs-input', 'needs-review', 'paused')";
@@ -378,17 +378,17 @@ fn find_most_recent_jsonl(directory: &Path, process_start_time: u64) -> Option<P
         }
 
         // Skip agent-*.jsonl files
-        let filename = path.file_stem()?.to_string_lossy();
-        if filename.starts_with("agent-") {
+        let Some(stem) = path.file_stem() else { continue };
+        if stem.to_string_lossy().starts_with("agent-") {
             continue;
         }
 
-        let metadata = fs::metadata(&path).ok()?;
-        let modified = metadata.modified().ok()?;
-        let modified_secs = modified
+        let Some(metadata) = fs::metadata(&path).ok() else { continue };
+        let Some(modified) = metadata.modified().ok() else { continue };
+        let Some(modified_secs) = modified
             .duration_since(SystemTime::UNIX_EPOCH)
-            .ok()?
-            .as_secs();
+            .ok()
+            .map(|d| d.as_secs()) else { continue };
 
         // Session JSONL must be modified after process started (with 5s buffer)
         if process_start_time > 0 && modified_secs + 5 < process_start_time {
@@ -537,7 +537,7 @@ pub fn determine_session_status(entries: &[JsonlEntry]) -> DiscoveredSessionStat
             if has_tool_use {
                 if stop_reason == "tool_use" {
                     // External sessions typically run in interactive mode with tool approval.
-                    // BamGit-managed sessions are excluded by PID, so this only fires for
+                    // Grovekeeper-managed sessions are excluded by PID, so this only fires for
                     // external ones that likely need user permission.
                     return DiscoveredSessionStatus::NeedsAttention;
                 }
@@ -798,8 +798,8 @@ mod tests {
     #[test]
     fn encode_path_replaces_non_alphanumeric_with_dashes() {
         assert_eq!(
-            encode_path_for_matching("C:\\Users\\snapy\\Projects\\BamGit"),
-            "C--Users-snapy-Projects-BamGit"
+            encode_path_for_matching("C:\\Users\\snapy\\Projects\\Grovekeeper"),
+            "C--Users-snapy-Projects-Grovekeeper"
         );
     }
 
@@ -1160,8 +1160,8 @@ mod tests {
     #[test]
     fn derive_project_name_from_working_directory() {
         assert_eq!(
-            derive_project_name("C:\\Users\\snapy\\Projects\\BamGit", "some-hash"),
-            "BamGit"
+            derive_project_name("C:\\Users\\snapy\\Projects\\Grovekeeper", "some-hash"),
+            "Grovekeeper"
         );
     }
 

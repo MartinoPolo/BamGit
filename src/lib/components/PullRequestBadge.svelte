@@ -6,6 +6,9 @@
 		GitMerge,
 		GitPullRequestClosed,
 		Eye,
+		MessageSquareWarning,
+		Check,
+		Sparkles,
 	} from 'lucide-svelte';
 	import GitHubBadge from './GitHubBadge.svelte';
 
@@ -40,6 +43,27 @@
 					color: 'text-yellow-400',
 					bg: 'bg-yellow-400/10',
 					label: 'Review',
+				};
+			case 'changes-requested':
+				return {
+					icon: MessageSquareWarning,
+					color: 'text-orange-400',
+					bg: 'bg-orange-400/10',
+					label: 'Changes',
+				};
+			case 'approved':
+				return {
+					icon: Check,
+					color: 'text-emerald-400',
+					bg: 'bg-emerald-400/10',
+					label: 'Approved',
+				};
+			case 'ready-to-merge':
+				return {
+					icon: Sparkles,
+					color: 'text-cyan-400',
+					bg: 'bg-cyan-400/10',
+					label: 'Ready',
 				};
 			case 'merged':
 				return {
