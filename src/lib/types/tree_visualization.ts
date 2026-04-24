@@ -122,7 +122,7 @@ export function resolve_tree_shape(labels: readonly string[]): TreeShape {
 
 import type { ToolVisibility } from 'low-poly-2d-trees';
 
-export function create_default_tool_visibility(): ToolVisibility {
+export function createDefaultToolVisibility(): ToolVisibility {
 	return {
 		[TOOL_TYPES.shovel]: { visible: false, size: 1 },
 		[TOOL_TYPES.wateringCan]: { visible: false, size: 1 },

@@ -4,7 +4,7 @@ import {
 	DEFAULT_TREE_CONFIG,
 	POTTED_PLANT_STAGES,
 	TOOL_TYPES,
-	create_default_tool_visibility,
+	createDefaultToolVisibility,
 	OVERLAY_DEFAULTS,
 	SHAPE_FRUIT_MAP,
 	resolve_tree_shape,
@@ -27,7 +27,7 @@ export const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
 };
 
 function compute_tool_visibility(dimensions: StateDimensions): ToolVisibility {
-	const tools = create_default_tool_visibility();
+	const tools = createDefaultToolVisibility();
 
 	if (dimensions.worktreeState === 'failed' || dimensions.aggregateSessionState === 'errored') {
 		tools[TOOL_TYPES.stormCloud] = { visible: true, size: 1 };
@@ -114,10 +114,10 @@ function compute_potted_plant_stage(
 	return POTTED_PLANT_STAGES.potWithSoil;
 }
 
-function issue_id_to_seed(issue_id: string): number {
+function issueIdToSeed(issueId: string): number {
 	let hash = 0;
-	for (let i = 0; i < issue_id.length; i++) {
-		hash = (hash * 31 + issue_id.charCodeAt(i)) | 0;
+	for (let i = 0; i < issueId.length; i++) {
+		hash = (hash * 31 + issueId.charCodeAt(i)) | 0;
 	}
 	return Math.abs(hash);
 }
@@ -126,15 +126,15 @@ export function compute_tree_visualization(
 	dimensions: StateDimensions,
 	context?: TreeComputeContext,
 ): TreeVisualization {
-	const resolved_context = context ?? DEFAULT_COMPUTE_CONTEXT;
-	const seed = issue_id_to_seed(resolved_context.issueId);
+	const resolvedContext = context ?? DEFAULT_COMPUTE_CONTEXT;
+	const seed = issueIdToSeed(resolvedContext.issueId);
 
-	if (resolved_context.isPrd) {
+	if (resolvedContext.isPrd) {
 		return {
 			kind: 'oak',
-			title: resolved_context.prdTitle,
-			completionRatio: resolved_context.subIssueCompletionRatio,
-			issueCount: resolved_context.subIssueCount,
+			title: resolvedContext.prdTitle,
+			completionRatio: resolvedContext.subIssueCompletionRatio,
+			issueCount: resolvedContext.subIssueCount,
 			seed,
 		};
 	}
@@ -142,16 +142,16 @@ export function compute_tree_visualization(
 	if (dimensions.labels.length === 0) {
 		return {
 			kind: 'potted-plant',
-			stage: compute_potted_plant_stage(dimensions, resolved_context),
+			stage: compute_potted_plant_stage(dimensions, resolvedContext),
 			seed,
 		};
 	}
 
-	const stage = compute_tree_stage(dimensions, resolved_context);
+	const stage = compute_tree_stage(dimensions, resolvedContext);
 	const shape = resolve_tree_shape(dimensions.labels);
-	const tool_visibility = compute_tool_visibility(dimensions);
+	const toolVisibility = compute_tool_visibility(dimensions);
 
-	const fruit_type =
+	const fruitType =
 		shape in SHAPE_FRUIT_MAP
 			? SHAPE_FRUIT_MAP[shape as keyof typeof SHAPE_FRUIT_MAP]
 			: DEFAULT_TREE_CONFIG.fruitType;
@@ -161,22 +161,22 @@ export function compute_tree_visualization(
 		stage,
 		shape,
 		seed,
-		fruitType: fruit_type,
-		fruitCount: Math.min(resolved_context.sessionCount, 7),
+		fruitType,
+		fruitCount: Math.min(resolvedContext.sessionCount, 7),
 	};
 
-	const glow_enabled =
+	const glowEnabled =
 		dimensions.pullRequestState === 'approved' ||
 		dimensions.pullRequestState === 'ready-to-merge';
 
-	const overlay_config = glow_enabled
+	const overlayConfig = glowEnabled
 		? { glow: { enabled: true, color: '#ffd700', intensity: 3, pulse: false } }
 		: OVERLAY_DEFAULTS;
 
 	return {
 		kind: 'tree',
 		config,
-		toolVisibility: tool_visibility,
-		overlayConfig: overlay_config,
+		toolVisibility,
+		overlayConfig,
 	};
 }
