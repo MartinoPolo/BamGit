@@ -13,11 +13,17 @@ jobs:
             NODE_OPTIONS: '--max-old-space-size=4096'
         steps:
             - uses: actions/checkout@v4
+            - uses: actions/checkout@v4
+              with:
+                  repository: MartinoPolo/low-poly-2d-trees
+                  path: ../low-poly-2d-trees
             - uses: pnpm/action-setup@v4
             - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: pnpm
+            - name: Build low-poly-2d-trees library
+              run: cd ../low-poly-2d-trees && pnpm install --frozen-lockfile && pnpm run package
             - run: pnpm install --frozen-lockfile
             - run: pnpm run check:all
             - name: Fallow health report (advisory)
