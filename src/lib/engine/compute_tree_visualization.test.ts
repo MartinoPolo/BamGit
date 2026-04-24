@@ -327,7 +327,9 @@ describe('compute_tree_visualization — tool visibility', () => {
 
 	it('no tools visible when all clear', () => {
 		const result = compute_tree_visualization(create_dimensions()) as TreeVisualizationTree;
-		const visible_tools = Object.values(result.toolVisibility).filter((entry) => entry.visible);
+		const visible_tools = Object.values(result.toolVisibility).filter(
+			(entry) => entry.visible === true,
+		);
 		expect(visible_tools).toHaveLength(0);
 	});
 });
