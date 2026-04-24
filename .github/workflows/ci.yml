@@ -20,6 +20,9 @@ jobs:
                   cache: pnpm
             - run: pnpm install --frozen-lockfile
             - run: pnpm run check:all
+            - name: Fallow health report (advisory)
+              run: pnpm exec fallow health --score --summary
+              continue-on-error: true
             - run: pnpm exec playwright install --with-deps chromium
             - run: pnpm run test -- --coverage
             - run: pnpm run test:e2e

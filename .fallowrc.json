@@ -1,0 +1,24 @@
+{
+	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+	"entry": ["src/lib/components/ui/*/index.ts", "**/*.stories.svelte"],
+	"ignoreDependencies": [
+		"@typescript-eslint/parser",
+		"vitest-browser-svelte",
+		"@tauri-apps/plugin-opener",
+		"bits-ui",
+		"lucide-svelte",
+		"postcss-html",
+		"@fallow-cli/win32-x64-msvc"
+	],
+	"rules": {
+		"unused-files": "error",
+		"unused-exports": "warn",
+		"unused-types": "warn",
+		"unused-dependencies": "error",
+		"unused-class-members": "warn",
+		"unresolved-imports": "error",
+		"duplicate-exports": "off",
+		"circular-dependencies": "error",
+		"boundary-violations": "off"
+	}
+}
