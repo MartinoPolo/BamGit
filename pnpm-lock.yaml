@@ -35,9 +35,6 @@ importers:
             '@chromatic-com/storybook':
                 specifier: ^5.1.1
                 version: 5.1.1(storybook@10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
-            '@fallow-cli/win32-x64-msvc':
-                specifier: ^2.48.4
-                version: 2.48.4
             '@playwright/test':
                 specifier: ^1.58.2
                 version: 1.58.2
@@ -167,6 +164,10 @@ importers:
             vitest-browser-svelte:
                 specifier: ^2.1.0
                 version: 2.1.0(svelte@5.55.0)(vitest@4.1.2)
+        optionalDependencies:
+            '@fallow-cli/win32-x64-msvc':
+                specifier: ^2.48.4
+                version: 2.48.4
 
 packages:
     '@adobe/css-tools@4.4.4':
@@ -5119,7 +5120,8 @@ snapshots:
     '@fallow-cli/win32-arm64-msvc@2.48.4':
         optional: true
 
-    '@fallow-cli/win32-x64-msvc@2.48.4': {}
+    '@fallow-cli/win32-x64-msvc@2.48.4':
+        optional: true
 
     '@floating-ui/core@1.7.5':
         dependencies:

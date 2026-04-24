@@ -31,9 +31,11 @@
 		"tailwind-merge": "^3.5.0",
 		"tailwind-variants": "^3.2.2"
 	},
+	"optionalDependencies": {
+		"@fallow-cli/win32-x64-msvc": "^2.48.4"
+	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "^5.1.1",
-		"@fallow-cli/win32-x64-msvc": "^2.48.4",
 		"@playwright/test": "^1.58.2",
 		"@storybook/addon-a11y": "^10.3.3",
 		"@storybook/addon-docs": "^10.3.3",
