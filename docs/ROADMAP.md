@@ -1,6 +1,6 @@
-# BamGit Roadmap
+# Grovekeeper Roadmap
 
-> Master plan for transforming BamGit from a Git+agent tool into a portfolio-grade AI agent orchestration platform.
+> Master plan for transforming Grovekeeper from a Git+agent tool into a portfolio-grade AI agent orchestration platform.
 > Each phase is designed to be grilled into a PRD, then broken into vertical-slice issues.
 
 Last updated: 2026-04-24
@@ -58,15 +58,15 @@ Last updated: 2026-04-24
 
 ## Tech Stack Overlap
 
-| Repository   | Tauri 2       | Rust       | Svelte     | TypeScript | SQLite        | Shared Libs              |
-| ------------ | ------------- | ---------- | ---------- | ---------- | ------------- | ------------------------ |
-| **BamGit**   | YES           | YES        | YES (5)    | YES        | YES           | —                        |
-| vibe-kanban  | YES           | YES (Axum) | no (React) | YES        | YES (SQLx)    | Tauri 2, SQLite, libgit2 |
-| CodeBurn     | no            | no         | no         | YES        | no            | TypeScript patterns      |
-| t3code       | no (Electron) | no         | no (React) | YES        | YES           | TypeScript contracts     |
-| pixel-agents | no (VS Code)  | no         | no (React) | YES        | no            | Canvas, hooks            |
-| Multica      | no (Electron) | no (Go)    | no (React) | YES        | no (Postgres) | shadcn patterns          |
-| peon-ping    | no            | no         | no         | no (Bash)  | no            | CESP standard            |
+| Repository      | Tauri 2       | Rust       | Svelte     | TypeScript | SQLite        | Shared Libs              |
+| --------------- | ------------- | ---------- | ---------- | ---------- | ------------- | ------------------------ |
+| **Grovekeeper** | YES           | YES        | YES (5)    | YES        | YES           | —                        |
+| vibe-kanban     | YES           | YES (Axum) | no (React) | YES        | YES (SQLx)    | Tauri 2, SQLite, libgit2 |
+| CodeBurn        | no            | no         | no         | YES        | no            | TypeScript patterns      |
+| t3code          | no (Electron) | no         | no (React) | YES        | YES           | TypeScript contracts     |
+| pixel-agents    | no (VS Code)  | no         | no (React) | YES        | no            | Canvas, hooks            |
+| Multica         | no (Electron) | no (Go)    | no (React) | YES        | no (Postgres) | shadcn patterns          |
+| peon-ping       | no            | no         | no         | no (Bash)  | no            | CESP standard            |
 
 **Best code-level match:** vibe-kanban (Tauri 2 + Rust crates)
 **Best feature-level match:** CodeBurn (evaluation dashboard)
@@ -278,7 +278,7 @@ Last updated: 2026-04-24
 
 #### References
 
-- **Multica** `server/pkg/db/`: pgvector integration for embeddings (PostgreSQL-based, BamGit would use LanceDB for local-first)
+- **Multica** `server/pkg/db/`: pgvector integration for embeddings (PostgreSQL-based, Grovekeeper would use LanceDB for local-first)
 - Career recommendations (P1 section): ChromaDB/LanceDB, chunking strategies, embedding model options
 
 #### PRD scope
@@ -328,13 +328,13 @@ Last updated: 2026-04-24
 
 **7a. Enhanced GitHub Trigger**
 
-- Expand existing `bamgit:execute` label polling into full autopilot
+- Expand existing `grovekeeper:execute` label polling into full autopilot
 - Webhook support (when available) alongside polling fallback
 - Trigger types: label, issue creation, PR event, cron schedule
 
 **7b. Execution Pipeline**
 
-- Trigger fires → create BamGit issue + worktree automatically
+- Trigger fires → create Grovekeeper issue + worktree automatically
 - Spawn session with issue description as prompt
 - Monitor execution → handle errors, retries, permission requests
 - On completion: create PR, update issue status, notify
@@ -371,7 +371,7 @@ Last updated: 2026-04-24
 **8a. CESP Integration**
 
 - Adopt peon-ping's Coding Event Sound Pack Specification
-- Map BamGit notification events (R9) to CESP categories
+- Map Grovekeeper notification events (R9) to CESP categories
 - Load peon-ping sound packs directly (compatible manifest format)
 
 **8b. Pack Management**
@@ -402,7 +402,7 @@ Last updated: 2026-04-24
 
 #### PRD scope
 
-- CESP event mapping for BamGit events
+- CESP event mapping for Grovekeeper events
 - Pack manifest format compatibility
 - Czech voice line script (all CESP categories)
 - Forest view integration points
@@ -450,7 +450,7 @@ Each phase should go through the `/mp-grill-me` process before implementation. R
 
 ### Where to track
 
-- **GitHub Issues** on BamGit repo — source of truth for all work items
+- **GitHub Issues** on Grovekeeper repo — source of truth for all work items
 - **PRDs** — one GitHub issue per phase, labeled `prd`
 - **Sub-issues** — vertical slices under each PRD, linked via task lists
 - **This ROADMAP.md** — high-level plan and phase sequencing (update as phases complete)
@@ -498,7 +498,7 @@ WEEK 10-12        WEEK 12-14        WEEK 14+
 
 ## Quick Reference: Which Repo Helps With What
 
-| BamGit Feature          | Primary Reference              | Secondary Reference  | What to Copy/Adapt                        |
+| Grovekeeper Feature     | Primary Reference              | Secondary Reference  | What to Copy/Adapt                        |
 | ----------------------- | ------------------------------ | -------------------- | ----------------------------------------- |
 | Eval Dashboard          | CodeBurn                       | —                    | Classifier, cost engine, dashboard layout |
 | Activity Classification | CodeBurn `classifier.ts`       | —                    | 13-category rules, one-shot detection     |

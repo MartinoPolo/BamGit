@@ -3,7 +3,7 @@ import { MediaQuery } from 'svelte/reactivity';
 
 type ThemeMode = 'dark' | 'light' | 'system';
 
-const THEME_STORAGE_KEY = 'bamgit_theme_mode';
+const THEME_STORAGE_KEY = 'grovekeeper_theme_mode';
 
 let theme_mode = $state<ThemeMode>(load_theme_mode());
 const prefers_dark = browser ? new MediaQuery('(prefers-color-scheme: dark)') : null;

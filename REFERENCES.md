@@ -1,6 +1,6 @@
-# BamGit - Reference Repositories
+# Grovekeeper - Reference Repositories
 
-External repositories that contain reusable patterns, code, and architectural decisions relevant to BamGit development. Agents should explore these when implementing related features.
+External repositories that contain reusable patterns, code, and architectural decisions relevant to Grovekeeper development. Agents should explore these when implementing related features.
 
 ---
 
@@ -10,7 +10,7 @@ External repositories that contain reusable patterns, code, and architectural de
 
 **License: MIT** | **Stack: TypeScript, React 19, Ink 7 (TUI), Vitest** | **LOC: ~7,500** | **Direct code reuse: HIGH**
 
-Multi-provider AI coding cost and token tracker. Reads session data from disk (no proxy, no API keys) — zero-intrusion observability. **Primary reference for BamGit's evaluation dashboard.**
+Multi-provider AI coding cost and token tracker. Reads session data from disk (no proxy, no API keys) — zero-intrusion observability. **Primary reference for Grovekeeper's evaluation dashboard.**
 
 **Key features to adapt:**
 
@@ -24,7 +24,7 @@ Multi-provider AI coding cost and token tracker. Reads session data from disk (n
 - **Subscription plan tracking** (`src/plan-usage.ts`): Claude Pro/Max, Cursor Pro, custom budgets with overage projections.
 - **162-currency support** (`src/currency.ts`): Frankfurter API exchange rates with 24h cache.
 
-**BamGit adaptation:** Port classifier + cost engine + one-shot metrics to Rust backend. Build Svelte dashboard UI inspired by CodeBurn's TUI layout (overview panel, daily chart, projects, sessions, models, activities, tools, MCP servers). Add interactive period switching (Today/7d/30d/Month/All).
+**Grovekeeper adaptation:** Port classifier + cost engine + one-shot metrics to Rust backend. Build Svelte dashboard UI inspired by CodeBurn's TUI layout (overview panel, daily chart, projects, sessions, models, activities, tools, MCP servers). Add interactive period switching (Today/7d/30d/Month/All).
 
 ---
 
@@ -46,7 +46,7 @@ Minimal web GUI + CLI for coding agents. Unified WebSocket interface for Claude 
 - **Distributed tracing** (`apps/server/src/observability/`): NDJSON trace files + OTLP export. Spans for RPC, orchestration, provider, git, terminal, SQL operations.
 - **Pairing auth** (`apps/server/src/auth/`): One-time bootstrap tokens, no long-lived secrets. Session-based WebSocket auth.
 
-**BamGit adaptation:** Study provider adapter pattern for designing R3's multi-provider expansion. The Effect system is React-specific, but the adapter contract (session lifecycle + event streaming + approval workflows) maps directly to BamGit's Rust provider trait.
+**Grovekeeper adaptation:** Study provider adapter pattern for designing R3's multi-provider expansion. The Effect system is React-specific, but the adapter contract (session lifecycle + event streaming + approval workflows) maps directly to Grovekeeper's Rust provider trait.
 
 ---
 
@@ -68,7 +68,7 @@ Agents-as-teammates platform. Full autonomous task lifecycle: enqueue → claim 
 - **Real-time event bus** (`server/internal/realtime/`): WebSocket hub with scope-based authorization. Redis relay for multi-instance sync. Event types: issue/comment/agent/autopilot/chat/task updates.
 - **Workspace isolation**: All data scoped by workspace_id. Multi-user teams with roles (owner/admin/member).
 
-**BamGit adaptation:** Study autopilot pattern for future "automated task execution" feature (GitHub trigger → create issue → spawn session → execute → create PR). The skill system maps to BamGit's R8 action buttons. Daemon architecture is a more sophisticated version of BamGit's session polling.
+**Grovekeeper adaptation:** Study autopilot pattern for future "automated task execution" feature (GitHub trigger → create issue → spawn session → execute → create PR). The skill system maps to Grovekeeper's R8 action buttons. Daemon architecture is a more sophisticated version of Grovekeeper's session polling.
 
 ---
 
@@ -90,7 +90,7 @@ VS Code extension where each Claude Code agent appears as a pixel art character 
 - **Canvas game loop** (`webview-ui/src/office/engine/gameLoop.ts`): 60 FPS requestAnimationFrame, update all characters → render to canvas (single pass). React handles UI overlays separately. Depth sorting by y-coordinate.
 - **Modular asset system** (`shared/assets/`): Per-folder manifest.json for furniture, PNG→SpriteData conversion, HSB color shifting for palette variety, external asset directories.
 
-**BamGit adaptation:** The agent state detection patterns (hooks + JSONL polling) validate BamGit's existing approach. Sub-agent visualization (parent-child linking, spawn/despawn effects) could enhance BamGit's forest view with companion saplings per sub-agent. Character personality system is reference for the peon-ping integration (agent voices).
+**Grovekeeper adaptation:** The agent state detection patterns (hooks + JSONL polling) validate Grovekeeper's existing approach. Sub-agent visualization (parent-child linking, spawn/despawn effects) could enhance Grovekeeper's forest view with companion saplings per sub-agent. Character personality system is reference for the peon-ping integration (agent voices).
 
 ---
 
@@ -116,7 +116,7 @@ Agent orchestration GUI with kanban issues and coding workspaces. 10+ agent exec
 - **Type sharing** (`ts-rs`): Rust types → TypeScript automatic generation. No manual type syncing.
 - **Database** (`crates/db/`): SQLx with compile-time query verification. Migrations tracked in git.
 
-**BamGit adaptation:** The Rust crate architecture is directly applicable — BamGit already has similar modules but can study vibe-kanban's worktree cleanup, review infrastructure, and executor state machine. The kanban UI patterns (drag-and-drop, bulk actions) map to BamGit's issue dashboard if kanban view is added. The ts-rs type sharing pattern could replace BamGit's manual TypeScript command wrappers.
+**Grovekeeper adaptation:** The Rust crate architecture is directly applicable — Grovekeeper already has similar modules but can study vibe-kanban's worktree cleanup, review infrastructure, and executor state machine. The kanban UI patterns (drag-and-drop, bulk actions) map to Grovekeeper's issue dashboard if kanban view is added. The ts-rs type sharing pattern could replace Grovekeeper's manual TypeScript command wrappers.
 
 ---
 
@@ -139,13 +139,13 @@ Game character voice notifications for AI coding agents. 165+ sound packs from W
 - **MCP server** (`mcp/peon-mcp.js`): Agents can call `play_sound` directly. Full pack catalog as MCP Resource.
 - **Peon Trainer** (`trainer/`): Pavel-style exercise reminders during coding. Daily goals, 20-min reminder intervals, logging via skills.
 
-**BamGit adaptation — Future feature: Agent Voices:**
+**Grovekeeper adaptation — Future feature: Agent Voices:**
 
-- Integrate CESP event mapping into BamGit's notification system (R9)
+- Integrate CESP event mapping into Grovekeeper's notification system (R9)
 - Allow users to assign sound packs per issue/session (like peon-ping's path_rules)
 - Add Czech-language Warcraft character voices as custom pack (e.g., Orc Peon speaking Czech: "Práce, práce.", "Hotovo, pane!", "Jo, šéfe.")
-- Use BamGit's existing notification service as the playback layer
-- Pack manifest format is simple JSON — BamGit could load peon-ping packs directly
+- Use Grovekeeper's existing notification service as the playback layer
+- Pack manifest format is simple JSON — Grovekeeper could load peon-ping packs directly
 
 ---
 
@@ -193,7 +193,7 @@ Obsidian plugin implementing two dashboard types: one-repo-many-issues and many-
 
 ### C:\_MP_projects\mpx-claude-code
 
-Custom Claude Code configuration system: 20+ skills (mp-execute, mp-grill-me, mp-review, mp-commit-push-pr, etc.), agent definitions with model assignments (Opus/Sonnet/Haiku), lifecycle hooks (pre-commit gate with secret detection, dangerous command guard, format-on-save, notification flash+beep), and utility scripts. Key patterns: worktree setup script (`scripts/setup-worktree.sh` - copies IDE configs, .env, Peacock color, Claude settings, installs deps), notification system (`hooks/notify-flash-beep.ps1` - Win32 taskbar flash + sound), status line script (`scripts/context-bar.sh`), centralized settings.json with hook/plugin configuration. BamGit should invoke these skills and scripts via its GUI rather than reimplementing them.
+Custom Claude Code configuration system: 20+ skills (mp-execute, mp-grill-me, mp-review, mp-commit-push-pr, etc.), agent definitions with model assignments (Opus/Sonnet/Haiku), lifecycle hooks (pre-commit gate with secret detection, dangerous command guard, format-on-save, notification flash+beep), and utility scripts. Key patterns: worktree setup script (`scripts/setup-worktree.sh` - copies IDE configs, .env, Peacock color, Claude settings, installs deps), notification system (`hooks/notify-flash-beep.ps1` - Win32 taskbar flash + sound), status line script (`scripts/context-bar.sh`), centralized settings.json with hook/plugin configuration. Grovekeeper should invoke these skills and scripts via its GUI rather than reimplementing them.
 
 ---
 
@@ -201,11 +201,11 @@ Custom Claude Code configuration system: 20+ skills (mp-execute, mp-grill-me, mp
 
 ### https://github.com/yigitkonur/cli-continues/
 
-CLI tool for resuming agent sessions across providers. Relevant for BamGit's ability to pick up an externally-launched session and continue it inside the app, or vice versa.
+CLI tool for resuming agent sessions across providers. Relevant for Grovekeeper's ability to pick up an externally-launched session and continue it inside the app, or vice versa.
 
 ### C:\_MP_github_cloned\claude-code-templates
 
-Contains a session-handoff skill (`cli-tool/components/skills/enterprise-communication/session-handoff/`) that creates comprehensive handoff documents for fresh agents to continue work. Features CREATE/RESUME modes, handoff chaining for long-running projects, and staleness detection. Useful pattern for BamGit's session continuity across app restarts or provider switches.
+Contains a session-handoff skill (`cli-tool/components/skills/enterprise-communication/session-handoff/`) that creates comprehensive handoff documents for fresh agents to continue work. Features CREATE/RESUME modes, handoff chaining for long-running projects, and staleness detection. Useful pattern for Grovekeeper's session continuity across app restarts or provider switches.
 
 ### C:\_MP_github_cloned\claude-code-hooks-multi-agent-observability
 
@@ -213,7 +213,7 @@ Real-time multi-agent monitoring via Claude Code hooks. Hook scripts capture eve
 
 ### C:\_MP_github_cloned\agent-flow
 
-Visualizes agent execution flow, subagent coordination, and tool call chains in real-time. Uses Claude Code hooks for zero-latency event streaming. Features timeline & transcript panels, multi-session tab support, and JSONL replay. Directly relevant to BamGit's session log visualization feature. Also available at https://github.com/patoles/agent-flow — primary reference for the visualization grilling session.
+Visualizes agent execution flow, subagent coordination, and tool call chains in real-time. Uses Claude Code hooks for zero-latency event streaming. Features timeline & transcript panels, multi-session tab support, and JSONL replay. Directly relevant to Grovekeeper's session log visualization feature. Also available at https://github.com/patoles/agent-flow — primary reference for the visualization grilling session.
 
 ---
 

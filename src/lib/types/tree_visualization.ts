@@ -211,7 +211,7 @@ export type ForestSyncStatus =
 	| { readonly type: 'behind-base'; readonly count: number }
 	| { readonly type: 'merge-conflict' };
 
-export type ForestBamGitStatus = 'active' | 'archived';
+export type ForestGrovekeeperStatus = 'active' | 'archived';
 
 export interface StateDimensions {
 	readonly labels: readonly string[];
@@ -222,7 +222,7 @@ export interface StateDimensions {
 	readonly pullRequestState: ForestPullRequestState;
 	readonly githubIssueState: ForestGitHubIssueState;
 	readonly syncStatus: ForestSyncStatus;
-	readonly bamgitStatus: ForestBamGitStatus;
+	readonly grovekeeperStatus: ForestGrovekeeperStatus;
 }
 
 // ─── Visualization Result (library-typed output) ─────────────────────────

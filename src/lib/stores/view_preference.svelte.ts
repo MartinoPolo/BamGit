@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 
 export type ViewMode = 'cards' | 'forest';
 
-const VIEW_MODE_STORAGE_KEY = 'bamgit_view_mode';
+const VIEW_MODE_STORAGE_KEY = 'grovekeeper_view_mode';
 const DEFAULT_VIEW_MODE: ViewMode = 'cards';
 
 let view_mode = $state<ViewMode>(load_view_mode());

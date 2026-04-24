@@ -105,7 +105,7 @@ impl SessionProvider for ClaudeCodeProvider {
     async fn interrupt(&self, handle: &mut SessionHandle) -> Result<(), ProviderError> {
         let stdin = handle.stdin.as_mut().ok_or(ProviderError::NotRunning)?;
 
-        let request_id = format!("bamgit_ctrl_{}", uuid::Uuid::new_v4());
+        let request_id = format!("grovekeeper_ctrl_{}", uuid::Uuid::new_v4());
         let payload = serde_json::json!({
             "type": "control_request",
             "request_id": request_id,
