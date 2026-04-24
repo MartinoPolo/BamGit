@@ -50,12 +50,12 @@ export default [
 				'warn',
 				{
 					selector: 'variableLike',
-					format: ['snake_case', 'PascalCase'],
+					format: ['snake_case', 'camelCase', 'PascalCase'],
 					leadingUnderscore: 'allow',
 				},
 				{
 					selector: 'variable',
-					format: ['UPPER_CASE', 'snake_case', 'PascalCase'],
+					format: ['UPPER_CASE', 'snake_case', 'camelCase', 'PascalCase'],
 					modifiers: ['global', 'const'],
 					leadingUnderscore: 'allow',
 				},

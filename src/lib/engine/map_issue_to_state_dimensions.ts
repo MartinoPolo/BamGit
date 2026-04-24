@@ -9,10 +9,6 @@ import type {
 } from '$lib/types/tree_visualization';
 import { aggregate_session_state } from './aggregate_session_state';
 
-/**
- * Minimal session shape needed by the mapper. Matches {@link Session} but decoupled
- * to allow callers to pass any session-like object.
- */
 export interface SessionForMapping {
 	readonly state: SessionState;
 	readonly execution_phase: ExecutionPhase;
@@ -32,7 +28,6 @@ function map_branch_status(
 	issue_branch_name: string | null,
 	raw: BranchStatus | null | undefined,
 ): ForestBranchStatus {
-	// TODO(#25): when issue.label is added, revisit 'no-branch' stub policy.
 	if (issue_branch_name === null || raw == null || raw === 'unknown') {
 		return 'no-branch';
 	}
@@ -71,20 +66,13 @@ function pick_execution_phase(sessions: readonly SessionForMapping[]): Execution
 	return running?.execution_phase ?? 'none';
 }
 
-/**
- * Pure adapter that converts backend types (Issue, GitStatusCache, sessions) into
- * the engine's StateDimensions contract. Safe to call in derived state — no side effects.
- *
- * Label is currently stubbed as 'AFK' (no label field on Issue yet) so issues render
- * as trees instead of potted plants. Revisit when GitHub label sync lands.
- */
 export function map_issue_to_state_dimensions(
 	issue: Issue,
 	git_status: GitStatusCache | undefined,
 	sessions: readonly SessionForMapping[],
 ): StateDimensions {
 	return {
-		label: 'AFK',
+		labels: ['AFK'],
 		worktreeState: issue.worktree_state,
 		aggregateSessionState: aggregate_session_state(sessions.map((session) => session.state)),
 		executionPhase: pick_execution_phase(sessions),

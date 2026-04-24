@@ -10,29 +10,19 @@
 		type SessionForMapping,
 	} from '$lib/engine/map_issue_to_state_dimensions';
 	import { SvelteMap } from 'svelte/reactivity';
-	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
-	import TreeRenderer from '$lib/components/tree/TreeRenderer.svelte';
-	import PottedPlantRenderer from '$lib/components/potted-plant/PottedPlantRenderer.svelte';
-	import ForestCanvasOverlay from '$lib/components/forest-canvas/ForestCanvasOverlay.svelte';
+	import { LowPolyTree, PottedPlant } from 'low-poly-2d-trees';
 
 	interface Props {
 		issues: readonly Issue[];
 		get_git_status: (issue_id: string) => GitStatusCache | undefined;
 		get_sessions_for_issue: (issue_id: string) => readonly SessionForMapping[];
-		is_dark?: boolean;
 		on_select_issue: (issue: Issue) => void;
 	}
 
-	let {
-		issues,
-		get_git_status,
-		get_sessions_for_issue,
-		is_dark = false,
-		on_select_issue,
-	}: Props = $props();
+	let { issues, get_git_status, get_sessions_for_issue, on_select_issue }: Props = $props();
 
-	const TREE_NATURAL_WIDTH = 80;
-	const TREE_NATURAL_HEIGHT = 120;
+	const TREE_NATURAL_WIDTH = 100;
+	const TREE_NATURAL_HEIGHT = 100;
 	const POTTED_NATURAL_WIDTH = 60;
 	const POTTED_NATURAL_HEIGHT = 90;
 
@@ -56,8 +46,6 @@
 				get_sessions_for_issue(issue.id),
 			);
 			const visualization = compute_tree_visualization(dimensions);
-			// Oak rendering is deferred until PRD integration lands (see issues #26+).
-			// Skip oak items so they don't produce invisible clickable areas.
 			if (visualization.kind === 'oak') {
 				continue;
 			}
@@ -79,8 +67,6 @@
 		return map;
 	});
 
-	const visible_visualizations = $derived(entries.map((entry) => entry.visualization));
-
 	const layout_result = $derived(
 		compute_forest_layout(
 			entries.map((entry) => entry.layout_item),
@@ -96,7 +82,7 @@
 			return {
 				id: issue.id,
 				kind: 'tree',
-				stage: visualization.stage,
+				stage: visualization.config.stage,
 				priority: issue.priority,
 				sortOrder: issue.sort_order,
 			};
@@ -154,26 +140,19 @@
 					aria-label="Open issue {entry.issue.name}"
 				>
 					{#if entry.visualization.kind === 'tree'}
-						<TreeRenderer
-							visualization={entry.visualization}
-							accent_color={entry.issue.color ?? FALLBACK_ISSUE_COLOR}
-							{is_dark}
+						<LowPolyTree
+							config={entry.visualization.config}
+							toolVisibility={entry.visualization.toolVisibility}
+							overlayConfig={entry.visualization.overlayConfig}
 						/>
 					{:else if entry.visualization.kind === 'potted-plant'}
-						<PottedPlantRenderer
-							visualization={entry.visualization}
-							accent_color={entry.issue.color ?? FALLBACK_ISSUE_COLOR}
-							{is_dark}
+						<PottedPlant
+							stage={entry.visualization.stage}
+							seed={entry.visualization.seed}
 						/>
 					{/if}
 				</button>
 			{/if}
 		{/each}
 	{/if}
-	<ForestCanvasOverlay
-		visualizations={visible_visualizations}
-		{is_dark}
-		{viewport_width}
-		{viewport_height}
-	/>
 </div>

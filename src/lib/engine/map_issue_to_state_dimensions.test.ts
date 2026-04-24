@@ -351,11 +351,11 @@ describe('map_issue_to_state_dimensions — bamgitStatus', () => {
 	});
 });
 
-// ─── label ──────────────────────────────────────────────────────────────
+// ─── labels ─────────────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — label', () => {
-	it('stubs label as AFK (Issue has no label field yet)', () => {
+describe('map_issue_to_state_dimensions — labels', () => {
+	it('stubs labels as ["AFK"] (Issue has no labels field yet)', () => {
 		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
-		expect(dimensions.label).toBe('AFK');
+		expect(dimensions.labels).toEqual(['AFK']);
 	});
 });
