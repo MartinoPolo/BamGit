@@ -242,10 +242,12 @@ fn update_session_state(
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
-        let _ = conn.execute(
+        if let Err(e) = conn.execute(
             "UPDATE sessions SET state = ?1 WHERE id = ?2",
             rusqlite::params![state, session_id],
-        );
+        ) {
+            log::error!("Failed to update session state for {session_id}: {e}");
+        }
     }
 }
 
@@ -256,10 +258,12 @@ fn update_session_usage(
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
-        let _ = conn.execute(
+        if let Err(e) = conn.execute(
             "UPDATE sessions SET cost_usd = ?1, token_count = ?2 WHERE id = ?3",
             rusqlite::params![cost_usd, token_count, session_id],
-        );
+        ) {
+            log::error!("Failed to update session usage for {session_id}: {e}");
+        }
     }
 }
 
@@ -268,10 +272,12 @@ fn update_session_ended(
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
-        let _ = conn.execute(
+        if let Err(e) = conn.execute(
             "UPDATE sessions SET ended_at = datetime('now') WHERE id = ?1",
             [session_id],
-        );
+        ) {
+            log::error!("Failed to update session ended_at for {session_id}: {e}");
+        }
     }
 }
 
@@ -281,10 +287,12 @@ fn update_last_prompt(
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
-        let _ = conn.execute(
+        if let Err(e) = conn.execute(
             "UPDATE sessions SET last_prompt = ?1 WHERE id = ?2",
             rusqlite::params![message, session_id],
-        );
+        ) {
+            log::error!("Failed to update last_prompt for {session_id}: {e}");
+        }
     }
 }
 
@@ -294,10 +302,12 @@ fn update_last_response_summary(
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
-        let _ = conn.execute(
+        if let Err(e) = conn.execute(
             "UPDATE sessions SET last_response_summary = ?1 WHERE id = ?2",
             rusqlite::params![summary, session_id],
-        );
+        ) {
+            log::error!("Failed to update last_response_summary for {session_id}: {e}");
+        }
     }
 }
 
@@ -307,10 +317,12 @@ fn update_session_file_path(
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
-        let _ = conn.execute(
+        if let Err(e) = conn.execute(
             "UPDATE sessions SET session_file_path = ?1 WHERE id = ?2",
             rusqlite::params![cli_session_id, session_id],
-        );
+        ) {
+            log::error!("Failed to update session_file_path for {session_id}: {e}");
+        }
     }
 }
 

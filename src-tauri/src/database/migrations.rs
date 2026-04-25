@@ -2,12 +2,12 @@ use rusqlite::Connection;
 
 use super::schema;
 
-const CURRENT_VERSION: i32 = 6;
+const CURRENT_VERSION: i32 = 7;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
 static MIGRATIONS: &[MigrationFunction] =
-    &[migrate_v1, migrate_v2, migrate_v3, migrate_v4, migrate_v5, migrate_v6];
+    &[migrate_v1, migrate_v2, migrate_v3, migrate_v4, migrate_v5, migrate_v6, migrate_v7];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)
@@ -238,6 +238,13 @@ fn migrate_v6(connection: &Connection) -> Result<(), rusqlite::Error> {
     connection.execute_batch("PRAGMA foreign_keys = ON;")?;
 
     result
+}
+
+fn migrate_v7(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute_batch(
+        "CREATE INDEX IF NOT EXISTS idx_issues_dashboard_id ON issues(dashboard_id);
+         CREATE INDEX IF NOT EXISTS idx_sessions_issue_id ON sessions(issue_id);",
+    )
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {

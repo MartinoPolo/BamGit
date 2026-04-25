@@ -1,22 +1,22 @@
-# BamGit
+# Grovekeeper
 
 Desktop Git client built with Tauri v2, Svelte 5, and Rust.
 
 ## Stack
 
-| Layer         | Technology                                  |
-| ------------- | ------------------------------------------- |
-| Framework     | SvelteKit 2 + Svelte 5 (runes)              |
-| Desktop       | Tauri v2 (Rust backend)                     |
-| Build         | Vite 7 via Vite Plus                        |
-| Language      | TypeScript (strict) + Rust                  |
-| Styling       | Tailwind CSS 4                              |
-| Database      | SQLite (rusqlite, bundled)                  |
-| Testing       | Vitest + Playwright + Storybook             |
-| Linting       | ESLint + Stylelint + OxLint (via Vite Plus) |
-| Formatting    | OxFormatter (via Vite Plus)                 |
-| Dead code     | Knip                                        |
-| Component dev | Storybook 10                                |
+| Layer         | Technology                      |
+| ------------- | ------------------------------- |
+| Framework     | SvelteKit 2 + Svelte 5 (runes)  |
+| Desktop       | Tauri v2 (Rust backend)         |
+| Build         | Vite 7                          |
+| Language      | TypeScript (strict) + Rust      |
+| Styling       | Tailwind CSS 4                  |
+| Database      | SQLite (rusqlite, bundled)      |
+| Testing       | Vitest + Playwright + Storybook |
+| Linting       | ESLint + Stylelint + OxLint     |
+| Formatting    | Prettier                        |
+| Dead code     | Fallow                          |
+| Component dev | Storybook 10                    |
 
 ## Getting Started
 
@@ -44,20 +44,20 @@ pnpm tauri dev
 | -------------------- | -------------------------------------- |
 | `pnpm tauri dev`     | Start dev server + native Tauri window |
 | `pnpm tauri build`   | Production build (native installer)    |
-| `pnpm run dev`       | Frontend dev server only (`vp dev`)    |
-| `pnpm run build`     | Frontend build only (`vp build`)       |
+| `pnpm run dev`       | Frontend dev server only               |
+| `pnpm run build`     | Frontend build only                    |
 | `pnpm run preview`   | Preview production build locally       |
 | `pnpm run storybook` | Start Storybook on port 6006           |
 
 ### Code Quality
 
-| Script               | Description                                                             |
-| -------------------- | ----------------------------------------------------------------------- |
-| `pnpm run check:all` | Full suite: lint + typecheck + eslint + stylelint + knip + svelte-check |
-| `pnpm run check`     | Quick svelte-check only                                                 |
-| `pnpm run lint`      | OxLint + ESLint (type-aware)                                            |
-| `pnpm run lint:css`  | Stylelint for CSS and Svelte                                            |
-| `pnpm run format`    | Format with OxFormatter                                                 |
+| Script               | Description                                                              |
+| -------------------- | ------------------------------------------------------------------------ |
+| `pnpm run check:all` | Full suite: format + oxlint + eslint + stylelint + fallow + svelte-check |
+| `pnpm run check`     | Quick svelte-check only                                                  |
+| `pnpm run lint`      | OxLint + ESLint (type-aware)                                             |
+| `pnpm run lint:css`  | Stylelint for CSS and Svelte                                             |
+| `pnpm run format`    | Format with Prettier                                                     |
 
 ### Testing
 
@@ -143,7 +143,7 @@ Place story files next to components: `src/lib/components/Button.stories.svelte`
 - **Trailing commas**: Yes
 - **Line width**: 100 characters
 - **Line endings**: LF
-- **Variable naming**: `snake_case` or `PascalCase` (no camelCase)
+- **Variable naming**: `snake_case` preferred; `camelCase` acceptable in tree visualization layer (matches `low-poly-2d-trees` library API)
 - **Type naming**: `PascalCase`
 - **Constants**: `UPPER_CASE`, `snake_case`, or `PascalCase`
 - **Svelte**: Svelte 5 runes only (`$state`, `$derived`, `$props`). No legacy patterns.

@@ -1,10 +1,10 @@
 # Provider Trait Architecture
 
-How BamGit abstracts over different agent CLI backends.
+How Grovekeeper abstracts over different agent CLI backends.
 
 ## The Problem
 
-BamGit v1 only supports Claude Code. But the PRD explicitly calls out future support for GPT Codex, GitHub Copilot, and other agent CLIs. Each has a different:
+Grovekeeper v1 only supports Claude Code. But the PRD explicitly calls out future support for GPT Codex, GitHub Copilot, and other agent CLIs. Each has a different:
 
 - CLI command and flags
 - Output format (stream-JSON, SSE, plain text)
@@ -15,7 +15,7 @@ Without abstraction, every session management function would have `if provider =
 
 ## The Solution: Provider Trait
 
-A Rust trait that defines the contract any agent CLI backend must implement. BamGit's session manager calls trait methods, not provider-specific code.
+A Rust trait that defines the contract any agent CLI backend must implement. Grovekeeper's session manager calls trait methods, not provider-specific code.
 
 ```rust
 /// A provider is an agent CLI backend (Claude Code, Codex, etc.)
@@ -56,7 +56,7 @@ pub trait SessionProvider: Send + Sync {
 
 ### Why `get_state` Is NOT on the Trait
 
-State is derived from events, not queried from the provider. When `parse_event` returns a `SessionEvent::RunState { state: "idle" }`, BamGit updates SQLite. There's no need to ask the provider "what state are you in?" — the event stream IS the state source.
+State is derived from events, not queried from the provider. When `parse_event` returns a `SessionEvent::RunState { state: "idle" }`, Grovekeeper updates SQLite. There's no need to ask the provider "what state are you in?" — the event stream IS the state source.
 
 ## Supporting Types
 
@@ -83,7 +83,7 @@ pub struct SessionHandle {
 }
 
 /// Unified event type that all providers map to.
-/// BamGit only deals with SessionEvent, never raw provider formats.
+/// Grovekeeper only deals with SessionEvent, never raw provider formats.
 pub enum SessionEvent {
     SessionInit { session_id: String, model: String, tools: Vec<String> },
     MessageDelta { text: String },

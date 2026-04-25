@@ -1,21 +1,21 @@
 # Claude Code Stream-JSON Protocol Reference
 
-Complete reference for the bidirectional protocol between BamGit and spawned Claude Code CLI sessions.
+Complete reference for the bidirectional protocol between Grovekeeper and spawned Claude Code CLI sessions.
 
 ## Overview
 
-When BamGit spawns `claude -p "prompt" --output-format stream-json`, it gets:
+When Grovekeeper spawns `claude -p "prompt" --output-format stream-json`, it gets:
 
 - **stdout:** Newline-delimited JSON objects (one per line), each representing a protocol event
 - **stdin:** JSON messages for sending prompts, control requests (interrupt), and permission responses
 
 ## Implementation Priority by Tier
 
-Events grouped by what they enable in BamGit and when to implement them.
+Events grouped by what they enable in Grovekeeper and when to implement them.
 
 ### Tier 1: Session Lifecycle (state machine + cost tracking) — Must Have
 
-| Event           | What it is                                                                                                                                  | BamGit use                                                                                                                                     |
+| Event           | What it is                                                                                                                                  | Grovekeeper use                                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | **SessionInit** | Fires at session start. Carries `session_id`, `model`, available `tools`, `permission_mode`, `mcp_servers`, `claude_code_version`.          | Capture session ID for resume. Show model in session card. Store MCP server status.                                                            |
 | **RunState**    | State transitions: `running`, `idle`, `failed`, `stopped`, `completed`.                                                                     | **Core of the state machine.** Maps to: `running`=running, `idle`=needs-input, `failed`=errored, `completed`=finished. Triggers notifications. |
@@ -23,7 +23,7 @@ Events grouped by what they enable in BamGit and when to implement them.
 
 ### Tier 2: Text Streaming (rich chat view) — Must Have
 
-| Event               | What it is                                                                                | BamGit use                                                                                                             |
+| Event               | What it is                                                                                | Grovekeeper use                                                                                                        |
 | ------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | **MessageDelta**    | Streaming text tokens, one chunk at a time (e.g., `"Hello, "`, `"I'll "`, `"run that."`). | **Live text streaming** in chat view — render tokens as they arrive for real-time feel.                                |
 | **MessageComplete** | Full assistant message with all text joined, `message_id`, `stop_reason`, `model`.        | Finalize the chat bubble. Store in transcript. `stop_reason` tells you if Claude stopped naturally or hit a tool call. |
@@ -31,7 +31,7 @@ Events grouped by what they enable in BamGit and when to implement them.
 
 ### Tier 3: Tool Execution (tool call cards in chat) — Must Have
 
-| Event              | What it is                                                                                                   | BamGit use                                                                                                                                                                     |
+| Event              | What it is                                                                                                   | Grovekeeper use                                                                                                                                                                |
 | ------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **ToolStart**      | Tool call began. Carries `tool_name` (e.g., "Bash", "Edit", "Read"), `tool_use_id`, `input` (the arguments). | Render tool card header: "Running Bash: `ls -la`". Show spinner.                                                                                                               |
 | **ToolInputDelta** | Streaming partial JSON of tool input as Claude types it.                                                     | Live preview of what Claude is about to do — e.g., watching the Edit diff build up in real-time. Advanced UX. Can defer to v2 — full input arrives in the `assistant` message. |
@@ -41,17 +41,17 @@ Events grouped by what they enable in BamGit and when to implement them.
 
 ### Tier 4: Permission & Interaction (HITL triggers) — Must Have
 
-| Event                 | What it is                                                                                                            | BamGit use                                                                                                                                                              |
+| Event                 | What it is                                                                                                            | Grovekeeper use                                                                                                                                                         |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **PermissionPrompt**  | Claude wants to run a tool but needs user approval. Carries `tool_name`, `tool_input`, `suggestions`.                 | **Critical for notifications.** This IS the "needs-input" state. Show approval dialog. Flash taskbar. Play urgent sound. Suggestions can pre-fill approve/deny buttons. |
 | **PermissionDenied**  | Permission was denied (reported in the result event).                                                                 | Log in transcript. Could show "Permission denied for Bash: rm -rf" card.                                                                                                |
 | **ElicitationPrompt** | MCP server needs user input (e.g., OAuth login, API key entry). Carries `message`, `mode`, `url`, `requested_schema`. | Show input dialog. If `mode: "oauth"`, open browser. Also a "needs-input" trigger for notifications.                                                                    |
-| **HookCallback**      | A user-defined hook needs approval (specifically `PreToolUse` hooks).                                                 | If you run custom hooks via BamGit, show an approval UI. For non-PreToolUse hooks, auto-approve.                                                                        |
+| **HookCallback**      | A user-defined hook needs approval (specifically `PreToolUse` hooks).                                                 | If you run custom hooks via Grovekeeper, show an approval UI. For non-PreToolUse hooks, auto-approve.                                                                   |
 | **ControlCancelled**  | CLI cancelled a pending permission/hook request before user responded.                                                | Dismiss the approval dialog. Clean up pending notification.                                                                                                             |
 
 ### Tier 5: System Events (informational / polish) — Add Incrementally
 
-| Event                             | What it is                                                                            | BamGit use                                                                                  |
+| Event                             | What it is                                                                            | Grovekeeper use                                                                             |
 | --------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | **CompactBoundary**               | Context was auto-compacted (conversation too long). Shows `trigger` and `pre_tokens`. | Show "Context compacted" indicator in chat. Warn user that early context may be summarized. |
 | **SystemStatus**                  | CLI status string (e.g., `"compacting"`).                                             | Show status pill on session tab: "Compacting..."                                            |
@@ -61,9 +61,9 @@ Events grouped by what they enable in BamGit and when to implement them.
 | **AuthStatus**                    | OAuth flow state (`isAuthenticating`, `output` messages).                             | Show auth flow UI if Claude Code needs re-authentication mid-session.                       |
 | **CommandOutput**                 | Output from slash commands (e.g., `/cost`, `/context`).                               | Display in chat transcript.                                                                 |
 
-### Tier 6: Synthetic (BamGit generates these itself) — Trivial
+### Tier 6: Synthetic (Grovekeeper generates these itself) — Trivial
 
-| Event            | What it is                             | BamGit use                                                                   |
+| Event            | What it is                             | Grovekeeper use                                                              |
 | ---------------- | -------------------------------------- | ---------------------------------------------------------------------------- |
 | **UserMessage**  | What the user sent to the session.     | Store in transcript for the chat view. Show "You: fix the login bug" bubble. |
 | **Raw** (stderr) | Unparseable output or stderr from CLI. | Debug logging. Could show as dimmed text in terminal view.                   |
@@ -72,7 +72,7 @@ Events grouped by what they enable in BamGit and when to implement them.
 
 ## Event Categories (Detailed Reference)
 
-Events are grouped by what BamGit feature they serve.
+Events are grouped by what Grovekeeper feature they serve.
 
 ### Category 1: Session Lifecycle
 
@@ -94,7 +94,7 @@ Fires once per turn (and at session start). Carries full session metadata.
 }
 ```
 
-**BamGit use:** Capture `session_id` (needed for `--resume`). Store `model` on session record. Show available tools and MCP server status.
+**Grovekeeper use:** Capture `session_id` (needed for `--resume`). Store `model` on session record. Show available tools and MCP server status.
 
 #### RunState (derived from `type: "result"` and synthetic events)
 
@@ -102,8 +102,8 @@ State transitions for the session. Not a raw CLI event — derived by the protoc
 
 States: `running`, `idle`, `failed`, `completed`, `stopped`
 
-**BamGit mapping:**
-| RunState | BamGit state | Notification? |
+**Grovekeeper mapping:**
+| RunState | Grovekeeper state | Notification? |
 |---|---|---|
 | `running` | `running` | No |
 | `idle` | `needs-input` | Yes (urgent) |
@@ -132,7 +132,7 @@ End-of-turn cost and token stats.
 }
 ```
 
-**BamGit use:** Update `cost_usd` and `token_count` on session record. Show in expanded issue card.
+**Grovekeeper use:** Update `cost_usd` and `token_count` on session record. Show in expanded issue card.
 
 ### Category 2: Text Streaming
 
@@ -152,7 +152,7 @@ Streaming text tokens from the assistant.
 }
 ```
 
-**BamGit use:** Live text rendering in chat view. Append each delta to the current chat bubble.
+**Grovekeeper use:** Live text rendering in chat view. Append each delta to the current chat bubble.
 
 #### MessageComplete (from `type: "assistant"`)
 
@@ -178,13 +178,13 @@ Full assistant message with all content blocks resolved.
 }
 ```
 
-**BamGit use:** Finalize chat bubble. Store full text for `last_response_summary`. Extract tool_use blocks for tool cards.
+**Grovekeeper use:** Finalize chat bubble. Store full text for `last_response_summary`. Extract tool_use blocks for tool cards.
 
 #### ThinkingDelta (`content_block_delta` with `thinking_delta`)
 
 Extended thinking (reasoning) text.
 
-**BamGit use:** Optional "show reasoning" toggle in chat view.
+**Grovekeeper use:** Optional "show reasoning" toggle in chat view.
 
 ### Category 3: Tool Execution
 
@@ -199,7 +199,7 @@ A tool call is beginning.
 }
 ```
 
-**BamGit use:** Render tool card header with tool name and spinner. In streaming mode, input comes later.
+**Grovekeeper use:** Render tool card header with tool name and spinner. In streaming mode, input comes later.
 
 #### ToolInputDelta (`content_block_delta` with `input_json_delta`)
 
@@ -212,7 +212,7 @@ Partial JSON of the tool's input, streamed incrementally.
 }
 ```
 
-**BamGit use:** Live preview of what Claude is about to do (e.g., watching an Edit diff build in real-time). Requires accumulating partial JSON across multiple deltas. Can be deferred to v2 — the full input arrives in the `assistant` message.
+**Grovekeeper use:** Live preview of what Claude is about to do (e.g., watching an Edit diff build in real-time). Requires accumulating partial JSON across multiple deltas. Can be deferred to v2 — the full input arrives in the `assistant` message.
 
 #### ToolEnd (from `type: "user"` with `tool_result` content)
 
@@ -234,7 +234,7 @@ A tool finished executing.
 }
 ```
 
-**BamGit use:** Complete tool card — show output, mark success/error. Collapse behind summary.
+**Grovekeeper use:** Complete tool card — show output, mark success/error. Collapse behind summary.
 
 #### ToolProgress (`type: "tool_progress"`)
 
@@ -244,7 +244,7 @@ Elapsed time while a tool runs.
 { "type": "tool_progress", "tool_use_id": "toolu_01abc", "elapsed_time_seconds": 4.7 }
 ```
 
-**BamGit use:** Show timer on running tool cards: "Bash running... 4.7s".
+**Grovekeeper use:** Show timer on running tool cards: "Bash running... 4.7s".
 
 #### ToolUseSummary (`type: "tool_use_summary"`)
 
@@ -259,7 +259,7 @@ Human-readable summary after tool(s) finish.
 }
 ```
 
-**BamGit use:** Collapsed tool card label. Show summary instead of verbose output.
+**Grovekeeper use:** Collapsed tool card label. Show summary instead of verbose output.
 
 ### Category 4: Permission & Interaction
 
@@ -281,7 +281,7 @@ Claude wants to run a tool but needs user approval.
 }
 ```
 
-**BamGit use:** This IS the "needs-input" trigger. Show approval dialog with tool details. Flash taskbar. Play urgent sound. Respond via stdin with permission decision.
+**Grovekeeper use:** This IS the "needs-input" trigger. Show approval dialog with tool details. Flash taskbar. Play urgent sound. Respond via stdin with permission decision.
 
 **Response (sent to stdin):**
 
@@ -311,19 +311,19 @@ MCP server needs user input (OAuth, API key, etc.).
 }
 ```
 
-**BamGit use:** Show auth dialog or open browser. Also a "needs-input" notification trigger.
+**Grovekeeper use:** Show auth dialog or open browser. Also a "needs-input" notification trigger.
 
 #### HookCallback (`control_request` with `hook_callback`)
 
 User-defined hook needs approval (PreToolUse hooks only).
 
-**BamGit use:** Show hook approval dialog if `hook_event == "PreToolUse"`. Auto-approve all other hook types.
+**Grovekeeper use:** Show hook approval dialog if `hook_event == "PreToolUse"`. Auto-approve all other hook types.
 
 #### ControlCancelled (`control_cancel_request`)
 
 CLI cancelled a pending permission/hook request.
 
-**BamGit use:** Dismiss the pending approval dialog.
+**Grovekeeper use:** Dismiss the pending approval dialog.
 
 ### Category 5: System Events
 
@@ -331,39 +331,39 @@ CLI cancelled a pending permission/hook request.
 
 Context auto-compacted (conversation too long).
 
-**BamGit use:** Show "Context compacted" marker in chat timeline. Informational.
+**Grovekeeper use:** Show "Context compacted" marker in chat timeline. Informational.
 
 #### SystemStatus (`system/status`)
 
 CLI status string (e.g., "compacting").
 
-**BamGit use:** Show status indicator on session tab.
+**Grovekeeper use:** Show status indicator on session tab.
 
 #### HookStarted/Progress/Response (`system/hook_*`)
 
 Hook script lifecycle.
 
-**BamGit use:** Show hook execution in transcript if hooks are configured.
+**Grovekeeper use:** Show hook execution in transcript if hooks are configured.
 
 #### AuthStatus (`system/auth_status`)
 
 OAuth flow state.
 
-**BamGit use:** Show auth flow progress if re-authentication needed.
+**Grovekeeper use:** Show auth flow progress if re-authentication needed.
 
 #### FilesPersisted (`system/files_persisted`)
 
 Files saved to disk.
 
-**BamGit use:** Could trigger dev server refresh or file watcher notification.
+**Grovekeeper use:** Could trigger dev server refresh or file watcher notification.
 
 #### TaskNotification (`system/task_notification`)
 
 Background task (indexer) status.
 
-**BamGit use:** Low priority. Informational only.
+**Grovekeeper use:** Low priority. Informational only.
 
-## Stdin Protocol (BamGit → Claude Code)
+## Stdin Protocol (Grovekeeper → Claude Code)
 
 ### Send a new prompt
 
@@ -376,7 +376,7 @@ Background task (indexer) status.
 ```json
 {
 	"type": "control_request",
-	"request_id": "bamgit_ctrl_<uuid>",
+	"request_id": "grovekeeper_ctrl_<uuid>",
 	"request": { "subtype": "interrupt" }
 }
 ```

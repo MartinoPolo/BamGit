@@ -30,14 +30,11 @@ pub fn resolve_sound_path(
     sound_file: &str,
     resource_directory: &Path,
 ) -> Option<PathBuf> {
-    let custom_path = PathBuf::from(sound_file);
-    if custom_path.is_absolute() && custom_path.exists() {
-        return Some(custom_path);
-    }
+    let sounds_directory = resource_directory.join("sounds");
 
-    let bundled_path = resource_directory.join("sounds").join(sound_file);
-    if bundled_path.exists() {
-        return Some(bundled_path);
+    let resolved = sounds_directory.join(sound_file);
+    if resolved.starts_with(&sounds_directory) && resolved.exists() {
+        return Some(resolved);
     }
 
     None

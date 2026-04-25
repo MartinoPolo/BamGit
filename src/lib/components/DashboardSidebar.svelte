@@ -39,7 +39,7 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between border-b border-sidebar-border px-3 py-2">
 		{#if !collapsed}
-			<span class="text-sm font-bold tracking-wide text-sidebar-foreground">BamGit</span>
+			<span class="text-sm font-bold tracking-wide text-sidebar-foreground">Grovekeeper</span>
 		{/if}
 		<button
 			onclick={on_toggle_sidebar}

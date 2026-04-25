@@ -1,7 +1,7 @@
 import type { Dashboard } from '$lib/types/dashboard';
 import { get_dashboards } from '$lib/tauri/commands';
 
-const LAST_VIEWED_KEY = 'bamgit_last_viewed_dashboard_id';
+const LAST_VIEWED_KEY = 'grovekeeper_last_viewed_dashboard_id';
 
 let dashboards = $state<Dashboard[]>([]);
 let active_dashboard_id = $state<string | null>(null);

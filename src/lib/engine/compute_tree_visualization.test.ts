@@ -19,7 +19,7 @@ function create_dimensions(overrides: Partial<StateDimensions> = {}): StateDimen
 		pullRequestState: 'no-pr',
 		githubIssueState: 'open',
 		syncStatus: { type: 'up-to-date' },
-		bamgitStatus: 'active',
+		grovekeeperStatus: 'active',
 		...overrides,
 	};
 }
@@ -105,6 +105,18 @@ describe('compute_tree_visualization — tree stages', () => {
 		expect(result.config.stage).toBe(TREE_STAGES.growing);
 	});
 
+	it('growing: aggregateSessionState=running, with completed session (re-execution)', () => {
+		const result = compute_tree_visualization(
+			create_dimensions({
+				worktreeState: 'active',
+				branchStatus: 'active',
+				aggregateSessionState: 'running',
+			}),
+			create_context({ hasCompletedSession: true }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.growing);
+	});
+
 	it('leafy: aggregateSessionState=finished, hasCommitsOnBranch=true', () => {
 		const result = compute_tree_visualization(
 			create_dimensions({
@@ -182,9 +194,9 @@ describe('compute_tree_visualization — tree stages', () => {
 		expect(result.config.stage).toBe(TREE_STAGES.dead);
 	});
 
-	it('stump: worktreeState=removed, bamgitStatus=archived', () => {
+	it('stump: worktreeState=removed, grovekeeperStatus=archived', () => {
 		const result = compute_tree_visualization(
-			create_dimensions({ worktreeState: 'removed', bamgitStatus: 'archived' }),
+			create_dimensions({ worktreeState: 'removed', grovekeeperStatus: 'archived' }),
 		) as TreeVisualizationTree;
 		expect(result.config.stage).toBe(TREE_STAGES.stump);
 	});

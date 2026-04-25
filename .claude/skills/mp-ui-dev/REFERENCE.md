@@ -1,4 +1,4 @@
-# BamGit UI & Theming Reference
+# Grovekeeper UI & Theming Reference
 
 ## Tech Stack
 

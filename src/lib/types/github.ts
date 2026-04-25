@@ -4,6 +4,7 @@ export type PullRequestState =
 	| 'review-requested'
 	| 'changes-requested'
 	| 'approved'
+	| 'ready-to-merge'
 	| 'merged'
 	| 'closed';
 

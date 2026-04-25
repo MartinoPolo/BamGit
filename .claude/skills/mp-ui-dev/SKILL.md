@@ -1,6 +1,6 @@
 ---
 name: mp-ui-dev
-description: 'Fetch UI library docs and apply BamGit theming conventions when building components. Use when: "build UI", "create component", "add shadcn component", "theme", "styling"'
+description: 'Fetch UI library docs and apply Grovekeeper theming conventions when building components. Use when: "build UI", "create component", "add shadcn component", "theme", "styling"'
 allowed-tools: Read, Glob, Grep, Bash(pnpm dlx shadcn-svelte*), Agent
 metadata:
     author: MartinoPolo
@@ -8,9 +8,9 @@ metadata:
     category: execution
 ---
 
-# UI Development with BamGit Theming
+# UI Development with Grovekeeper Theming
 
-Build UI components using shadcn-svelte + Bits UI + Tailwind CSS v4, following BamGit's theming system.
+Build UI components using shadcn-svelte + Bits UI + Tailwind CSS v4, following Grovekeeper's theming system.
 
 ## Process
 
@@ -42,7 +42,7 @@ Components are installed to `$lib/components/ui/<name>/`. After adding:
 3. Update `index.ts` to import types/variants from the `.ts` file and default export from the `.svelte` file
 4. This avoids oxlint TS2614 errors with Svelte module script imports
 
-### Step 3: Apply BamGit Theming Conventions
+### Step 3: Apply Grovekeeper Theming Conventions
 
 Read [REFERENCE.md](REFERENCE.md) for the full theming system. Key rules:
 

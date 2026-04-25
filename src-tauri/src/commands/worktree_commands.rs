@@ -58,12 +58,13 @@ pub struct PrunableIssue {
 // ─── Bash Detection ────────────────────────────────────────────────────────────
 
 /// Find bash executable. On Windows, use Git Bash; on Unix, use system bash.
-fn detect_bash_path() -> Result<PathBuf, String> {
+async fn detect_bash_path() -> Result<PathBuf, String> {
     if cfg!(windows) {
         // Try git --exec-path to find Git installation
-        if let Ok(output) = std::process::Command::new("git")
+        if let Ok(output) = tokio::process::Command::new("git")
             .args(["--exec-path"])
             .output()
+            .await
         {
             if output.status.success() {
                 let exec_path = String::from_utf8_lossy(&output.stdout).trim().to_string();
@@ -229,7 +230,7 @@ pub async fn setup_worktree(
     app_handle: AppHandle,
     request: SetupWorktreeRequest,
 ) -> Result<String, String> {
-    let bash_path = detect_bash_path()?;
+    let bash_path = detect_bash_path().await?;
     let scripts_dir = resolve_scripts_directory()?;
     let setup_script = scripts_dir.join("setup-worktree.sh");
 
@@ -275,7 +276,7 @@ pub async fn setup_worktree(
     let mut child = Command::new(&bash_path)
         .args(&args)
         .current_dir(&request.working_directory)
-        .env("BAMGIT", "1") // Signal to script it's being called from BamGit
+        .env("GROVEKEEPER", "1") // Signal to script it's being called from Grovekeeper
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
@@ -358,7 +359,7 @@ pub async fn remove_worktree(
     app_handle: AppHandle,
     request: RemoveWorktreeRequest,
 ) -> Result<(), String> {
-    let bash_path = detect_bash_path()?;
+    let bash_path = detect_bash_path().await?;
     let scripts_dir = resolve_scripts_directory()?;
     let remove_script = scripts_dir.join("remove-worktree.sh");
 

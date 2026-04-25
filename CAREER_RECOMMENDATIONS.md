@@ -8,7 +8,7 @@ Generated: 2026-04-23 | Context: Career pivot from fullstack web dev to AI engin
 
 ### What You Built (current framing)
 
-"BamGit — a desktop Git client with agent session management and tree visualization."
+"Grovekeeper — a desktop Git client with agent session management and tree visualization."
 
 ### What You Actually Built (correct framing)
 
@@ -43,7 +43,7 @@ Generated: 2026-04-23 | Context: Career pivot from fullstack web dev to AI engin
 
 ## 2. Project Name Options
 
-Current name "BamGit" signals "Git tool." The tree metaphor is strong and should stay. The name should signal agent/AI orchestration, not Git.
+Current name "Grovekeeper" signals "Git tool." The tree metaphor is strong and should stay. The name should signal agent/AI orchestration, not Git.
 
 | #   | Name            | Rationale                                                                       | Collision Risk     |
 | --- | --------------- | ------------------------------------------------------------------------------- | ------------------ |

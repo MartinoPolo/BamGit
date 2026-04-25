@@ -1,10 +1,10 @@
 # Tauri + Svelte IPC Architecture
 
-How the Rust backend communicates with the Svelte frontend in BamGit.
+How the Rust backend communicates with the Svelte frontend in Grovekeeper.
 
 ## Two Communication Patterns
 
-Tauri provides two IPC mechanisms. BamGit uses both for different purposes.
+Tauri provides two IPC mechanisms. Grovekeeper uses both for different purposes.
 
 ### Pattern 1: Commands (Request/Response)
 
@@ -240,7 +240,7 @@ export const sessionStore = new SessionStore();
 
 ## Tauri Event Naming Conventions
 
-BamGit uses a flat event namespace:
+Grovekeeper uses a flat event namespace:
 
 | Event name              | Payload                                | Source                                 |
 | ----------------------- | -------------------------------------- | -------------------------------------- |
@@ -300,4 +300,4 @@ Svelte components must unlisten on destroy to prevent memory leaks:
 - **Tauri v2 IPC docs:** https://v2.tauri.app/develop/calling-rust/
 - **Tauri v2 events:** https://v2.tauri.app/develop/calling-rust/#event-system
 - **OpenCovibe session actor:** Primary reference for the actor → emit pattern
-- **Existing BamGit commands:** `src/lib/tauri/commands.ts` (dashboard CRUD pattern)
+- **Existing Grovekeeper commands:** `src/lib/tauri/commands.ts` (dashboard CRUD pattern)

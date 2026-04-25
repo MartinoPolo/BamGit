@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schema.tauri.app/config/2",
-	"productName": "bamgit",
+	"productName": "Grovekeeper",
 	"version": "0.1.0",
-	"identifier": "com.bamgit.app",
+	"identifier": "com.grovekeeper.app",
 	"build": {
 		"beforeDevCommand": "pnpm dev",
 		"devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
 	"app": {
 		"windows": [
 			{
-				"title": "bamgit",
+				"title": "Grovekeeper",
 				"width": 1600,
 				"height": 900,
 				"center": true

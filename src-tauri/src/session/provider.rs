@@ -30,7 +30,7 @@ pub struct SessionHandle {
 }
 
 /// Unified event type that all providers map their protocol to.
-/// BamGit only deals with SessionEvent — never raw provider formats.
+/// Grovekeeper only deals with SessionEvent — never raw provider formats.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum SessionEvent {

@@ -227,6 +227,7 @@ describe('map_issue_to_state_dimensions — pullRequestState', () => {
 		'review-requested',
 		'changes-requested',
 		'approved',
+		'ready-to-merge',
 		'merged',
 		'closed',
 	] as const)('passes through known pr_state "%s"', (state) => {
@@ -329,16 +330,16 @@ describe('map_issue_to_state_dimensions — syncStatus', () => {
 	});
 });
 
-// ─── bamgitStatus ───────────────────────────────────────────────────────
+// ─── grovekeeperStatus ───────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — bamgitStatus', () => {
+describe('map_issue_to_state_dimensions — grovekeeperStatus', () => {
 	it('maps active issue.status → active', () => {
 		const dimensions = map_issue_to_state_dimensions(
 			create_issue({ status: 'active' }),
 			undefined,
 			[],
 		);
-		expect(dimensions.bamgitStatus).toBe('active');
+		expect(dimensions.grovekeeperStatus).toBe('active');
 	});
 
 	it('maps archived issue.status → archived', () => {
@@ -347,7 +348,7 @@ describe('map_issue_to_state_dimensions — bamgitStatus', () => {
 			undefined,
 			[],
 		);
-		expect(dimensions.bamgitStatus).toBe('archived');
+		expect(dimensions.grovekeeperStatus).toBe('archived');
 	});
 });
 

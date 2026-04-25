@@ -11,7 +11,7 @@ C:\_MP_projects\low-poly-2d-trees This project relies heavily on rendering 2D tr
 
 ## Stack
 
-Tauri v2 (Rust backend) + SvelteKit (static adapter) + Vite Plus
+Tauri v2 (Rust backend) + SvelteKit (static adapter) + Vite
 TypeScript (strict) + Rust
 Tailwind CSS 4
 SQLite (rusqlite, bundled)
@@ -20,9 +20,9 @@ Vitest + Playwright
 ## Commands
 
 `pnpm tauri dev` -- full dev (frontend + native window)
-`vp dev` -- frontend only
-`pnpm check:all` -- full check suite
-`vp test` -- unit tests
+`pnpm run dev` -- frontend only
+`pnpm run check:all` -- full check suite
+`pnpm run test` -- unit tests
 `pnpm test:e2e` -- E2E tests
 
 ## Architecture

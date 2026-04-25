@@ -1,4 +1,4 @@
-# BamGit — Rough Architecture
+# Grovekeeper — Rough Architecture
 
 ## Vision
 
@@ -23,7 +23,7 @@ See `.mpx/VOCABULARY.md` for canonical terms.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    BamGit Desktop App                   │
+│                    Grovekeeper Desktop App                   │
 ├─────────────────────────────────────────────────────────┤
 │  FRONTEND (Svelte 5 + SvelteKit SPA)                    │
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
@@ -95,9 +95,9 @@ External:
 
 - **Primary interface:** `gh` CLI for all single-item queries and mutations.
 - **Bulk sync:** `gh api graphql` for refreshing state across many issues.
-- **Immediate fetch:** After BamGit-initiated actions (create issue, create PR), immediately fetch related state.
+- **Immediate fetch:** After Grovekeeper-initiated actions (create issue, create PR), immediately fetch related state.
 - **Manual sync:** "Sync All" button refreshes all GitHub state.
-- **Polling:** Check for `bamgit:execute` label on issues (30s-5min interval). Future: webhook relay for instant triggers.
+- **Polling:** Check for `grovekeeper:execute` label on issues (30s-5min interval). Future: webhook relay for instant triggers.
 - **Cache:** git_status_cache table with fetched_at timestamps. "Last synced X ago" indicator in UI.
 
 ### Git Service

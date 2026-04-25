@@ -52,7 +52,7 @@ function compute_tool_visibility(dimensions: StateDimensions): ToolVisibility {
 }
 
 function compute_tree_stage(dimensions: StateDimensions, context: TreeComputeContext): TreeStage {
-	if (dimensions.worktreeState === 'removed' && dimensions.bamgitStatus === 'archived') {
+	if (dimensions.worktreeState === 'removed' && dimensions.grovekeeperStatus === 'archived') {
 		return TREE_STAGES.stump;
 	}
 	if (dimensions.branchStatus === 'deleted') {
@@ -77,7 +77,7 @@ function compute_tree_stage(dimensions: StateDimensions, context: TreeComputeCon
 	if (dimensions.aggregateSessionState === 'finished' && context.hasCommitsOnBranch) {
 		return TREE_STAGES.leafy;
 	}
-	if (dimensions.aggregateSessionState === 'running' && !context.hasCompletedSession) {
+	if (dimensions.aggregateSessionState === 'running') {
 		return TREE_STAGES.growing;
 	}
 	if (

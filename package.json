@@ -1,7 +1,7 @@
 {
-	"name": "bamgit",
+	"name": "grovekeeper",
 	"version": "0.1.0",
-	"description": "",
+	"description": "Desktop agent orchestration GUI for parallel Claude Code sessions",
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
@@ -9,7 +9,7 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:all": "svelte-kit sync && prettier --write . && oxlint && eslint . && stylelint \"src/**/*.{css,svelte}\" && fallow dead-code && svelte-check --tsconfig ./tsconfig.json",
+		"check:all": "svelte-kit sync && prettier --check . && oxlint && eslint . && stylelint \"src/**/*.{css,svelte}\" && fallow dead-code && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "oxlint",
 		"lint:eslint": "eslint .",
 		"lint:css": "stylelint \"src/**/*.{css,svelte}\"",

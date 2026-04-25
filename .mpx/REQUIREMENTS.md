@@ -1,4 +1,4 @@
-# BamGit Requirements
+# Grovekeeper Requirements
 
 ## Problem Statement
 
@@ -30,19 +30,19 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 - **Quick add (no worktree):** One-click from assigned GitHub issue. Auto-fills name, GitHub link, assigns next color.
 - **Quick add (with worktree):** One-click from assigned issue or GitHub trigger. Auto-fills everything, auto-detects base branch, runs setup-worktree.sh.
 - **From raw requirements:** Enter raw text -> fork to (a) create GitHub issue directly via `gh`, or (b) invoke /mp-grill-requirements first to refine, then create GitHub issue.
-- **GitHub trigger:** Poll for `bamgit:execute` label on GitHub issues. Auto-creates BamGit issue + worktree + starts execution session.
+- **GitHub trigger:** Poll for `grovekeeper:execute` label on GitHub issues. Auto-creates Grovekeeper issue + worktree + starts execution session.
 - **Portfolio child:** "Add worktree" button on portfolio parent issue. Inherits parent metadata.
 
 #### Issue Creation Paths Summary
 
-| Path                 | Trigger                                   | Auto-fills                                | Worktree       |
-| -------------------- | ----------------------------------------- | ----------------------------------------- | -------------- |
-| Manual create        | "Add Issue" in dashboard                  | From GitHub search or typed name          | Optional       |
-| Quick add            | Button on assigned GitHub issue           | Name, GitHub link, next color             | No             |
-| Quick add + worktree | Button on assigned issue / GitHub trigger | All above + base branch auto-detect       | Yes            |
-| From requirements    | "Add Requirements" button                 | After grilling/refinement -> GitHub issue | Then quick add |
-| GitHub trigger       | `bamgit:execute` label on GitHub issue    | Full auto                                 | Yes            |
-| Portfolio child      | "Add worktree" on portfolio parent issue  | Inherits parent metadata                  | Yes            |
+| Path                 | Trigger                                     | Auto-fills                                | Worktree       |
+| -------------------- | ------------------------------------------- | ----------------------------------------- | -------------- |
+| Manual create        | "Add Issue" in dashboard                    | From GitHub search or typed name          | Optional       |
+| Quick add            | Button on assigned GitHub issue             | Name, GitHub link, next color             | No             |
+| Quick add + worktree | Button on assigned issue / GitHub trigger   | All above + base branch auto-detect       | Yes            |
+| From requirements    | "Add Requirements" button                   | After grilling/refinement -> GitHub issue | Then quick add |
+| GitHub trigger       | `grovekeeper:execute` label on GitHub issue | Full auto                                 | Yes            |
+| Portfolio child      | "Add worktree" on portfolio parent issue    | Inherits parent metadata                  | Yes            |
 
 ### R3: Session Management
 
@@ -50,9 +50,9 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 - One issue can have many sessions (over time and concurrently)
 - Session states: running, needs-input, needs-review, paused, finished, errored
 - Three modes of session management:
-    - **Spawn:** BamGit launches Claude Code CLI as child process, communicates via stream-JSON protocol
-    - **Monitor:** BamGit discovers externally-launched sessions by polling ~/.claude/projects/ JSONL files
-    - **Adopt:** Externally-launched session can be closed and resumed inside BamGit (or vice versa)
+    - **Spawn:** Grovekeeper launches Claude Code CLI as child process, communicates via stream-JSON protocol
+    - **Monitor:** Grovekeeper discovers externally-launched sessions by polling ~/.claude/projects/ JSONL files
+    - **Adopt:** Externally-launched session can be closed and resumed inside Grovekeeper (or vice versa)
 - **Context card on session switch:** Shows original intent, last user prompt, and summary of last response — so user can quickly re-orient when switching between tasks
 - Provider field on every session (v1: Claude Code only; future: Codex, Copilot, etc.)
 - Track per-session: cost (USD), token count, duration, transcript
@@ -71,7 +71,7 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 ### R5: Workspace Management
 
 - Each issue has one workspace: worktree folder, editor instance, dev server (port), browser URL
-- **Dev server:** BamGit can launch dev server per issue with deterministic port assignment. Configurable command (default: `pnpm dev`). Parses stdout for URL. Detects already-running servers.
+- **Dev server:** Grovekeeper can launch dev server per issue with deterministic port assignment. Configurable command (default: `pnpm dev`). Parses stdout for URL. Detects already-running servers.
 - **Editor:** Launch user's preferred editor (VS Code, Cursor, other VS Code forks). Focus existing window via `code <folder>` / `cursor <folder>`.
 - **Embedded terminal:** xterm.js terminal per issue for dev server output and manual commands
 - **Embedded browser preview:** Shows dev server URL, auto-assigned port
@@ -89,8 +89,8 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 
 - **GitHub:** `gh` CLI as primary interface. `gh api graphql` for bulk sync. `gh auth` for authentication (required dependency).
 - **Git:** `git` CLI primary for worktree ops, merge-tree, rev-list, fetch, merge, push. `git2` crate for performance-critical batch reads.
-- **State sync:** Immediate fetch after BamGit-initiated actions. Manual "Sync All" button. Cached state with "last synced X ago" indicator.
-- **GitHub polling:** Check for `bamgit:execute` label (30s-5min interval).
+- **State sync:** Immediate fetch after Grovekeeper-initiated actions. Manual "Sync All" button. Cached state with "last synced X ago" indicator.
+- **GitHub polling:** Check for `grovekeeper:execute` label (30s-5min interval).
 - **Sync operations:** Detect behind-base, detect merge conflicts (git merge-tree), merge + push, Claude Code fallback for conflict resolution (/mp-sync-base).
 - **Fetch coordinator:** Deduplicate parallel git fetch calls per repo root.
 
@@ -157,7 +157,7 @@ Developer who uses Claude Code CLI for parallel task execution across GitHub iss
 6. **PR State:** `no-pr`, `draft`, `open`, `review-requested`, `changes-requested`, `approved`, `ready-to-merge`, `merged`, `closed`
 7. **GitHub Issue State:** `open`, `closed`
 8. **Sync Status:** `up-to-date`, `behind-base(N)`, `merge-conflict`
-9. **BamGit Status:** `active`, `archived`
+9. **Grovekeeper Status:** `active`, `archived`
 
 #### Tree Lifecycle Stages (worktree issues)
 
@@ -218,7 +218,7 @@ Simpler lifecycle: pot with soil → sprout → small plant → flowering → dr
 - **Performance:** UI must remain responsive during git/GitHub operations (async Rust backend)
 - **Reliability:** Notification system must have zero false positives for needs-input (open research item)
 - **Offline:** Graceful degradation — cached data with "last synced" indicator, disabled buttons for internet-dependent actions
-- **Security:** No token/secret storage in BamGit (relies on `gh auth`). No secrets in SQLite.
+- **Security:** No token/secret storage in Grovekeeper (relies on `gh auth`). No secrets in SQLite.
 
 ## Open Questions
 
