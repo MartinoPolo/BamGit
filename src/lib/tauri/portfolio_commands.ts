@@ -7,6 +7,7 @@ export async function add_repo_to_portfolio(
 	return invoke('add_repo_to_portfolio', { request });
 }
 
+// fallow-ignore-next-line unused-export
 export async function remove_repo_from_portfolio(
 	portfolio_dashboard_id: string,
 	repo_dashboard_id: string,
@@ -17,6 +18,7 @@ export async function remove_repo_from_portfolio(
 	});
 }
 
+// fallow-ignore-next-line unused-export
 export async function get_portfolio_repos(
 	portfolio_dashboard_id: string,
 ): Promise<PortfolioDashboardPointer[]> {

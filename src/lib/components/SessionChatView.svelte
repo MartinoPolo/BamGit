@@ -32,6 +32,78 @@
 			(session.state === 'needs-review' || session.state === 'needs-input'),
 	);
 
+	function append_message(message: ChatMessage) {
+		messages = [...messages, message];
+	}
+
+	function handle_message_delta(event: Record<string, unknown>) {
+		current_streaming_text += event.text as string;
+	}
+
+	function handle_message_complete() {
+		if (current_streaming_text) {
+			append_message({
+				role: 'assistant',
+				content: current_streaming_text,
+				timestamp: Date.now(),
+			});
+			current_streaming_text = '';
+		}
+	}
+
+	function handle_tool_start(event: Record<string, unknown>) {
+		append_message({
+			role: 'tool',
+			content: `Running ${event.tool_name as string}...`,
+			tool_name: event.tool_name as string,
+			timestamp: Date.now(),
+		});
+	}
+
+	function handle_tool_end(event: Record<string, unknown>) {
+		const output = event.output;
+		const content = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
+		const truncated = content.length > 500 ? content.slice(0, 497) + '...' : content;
+		append_message({
+			role: 'tool',
+			content: truncated,
+			tool_name: event.tool_name as string,
+			is_error: event.is_error as boolean,
+			timestamp: Date.now(),
+		});
+	}
+
+	function handle_run_state(event: Record<string, unknown>) {
+		const state = event.state as string;
+		if (state === 'failed' || state === 'completed') {
+			append_message({
+				role: 'system',
+				content:
+					state === 'failed'
+						? `Session errored: ${(event.error as string) ?? 'unknown'}`
+						: 'Session completed.',
+				timestamp: Date.now(),
+			});
+		}
+	}
+
+	function handle_permission_prompt(event: Record<string, unknown>) {
+		append_message({
+			role: 'system',
+			content: `Permission needed: ${event.tool_name as string}`,
+			timestamp: Date.now(),
+		});
+	}
+
+	const SESSION_EVENT_HANDLERS: Record<string, (event: Record<string, unknown>) => void> = {
+		message_delta: handle_message_delta,
+		message_complete: handle_message_complete,
+		tool_start: handle_tool_start,
+		tool_end: handle_tool_end,
+		run_state: handle_run_state,
+		permission_prompt: handle_permission_prompt,
+	};
+
 	onMount(async () => {
 		unlisten_fn = await listen<SessionEventPayload>('session-event', (event) => {
 			const { session_id, event: session_event } = event.payload;
@@ -39,86 +111,7 @@
 				return;
 			}
 
-			switch (session_event.type) {
-				case 'message_delta': {
-					current_streaming_text += session_event.text as string;
-					break;
-				}
-				case 'message_complete': {
-					if (current_streaming_text) {
-						messages = [
-							...messages,
-							{
-								role: 'assistant',
-								content: current_streaming_text,
-								timestamp: Date.now(),
-							},
-						];
-						current_streaming_text = '';
-					}
-					break;
-				}
-				case 'tool_start': {
-					messages = [
-						...messages,
-						{
-							role: 'tool',
-							content: `Running ${session_event.tool_name as string}...`,
-							tool_name: session_event.tool_name as string,
-							timestamp: Date.now(),
-						},
-					];
-					break;
-				}
-				case 'tool_end': {
-					const output = session_event.output;
-					const content =
-						typeof output === 'string' ? output : JSON.stringify(output, null, 2);
-					const truncated =
-						content.length > 500 ? content.slice(0, 497) + '...' : content;
-					messages = [
-						...messages,
-						{
-							role: 'tool',
-							content: truncated,
-							tool_name: session_event.tool_name as string,
-							is_error: session_event.is_error as boolean,
-							timestamp: Date.now(),
-						},
-					];
-					break;
-				}
-				case 'run_state': {
-					const state = session_event.state as string;
-					if (state === 'failed' || state === 'completed') {
-						messages = [
-							...messages,
-							{
-								role: 'system',
-								content:
-									state === 'failed'
-										? `Session errored: ${(session_event.error as string) ?? 'unknown'}`
-										: 'Session completed.',
-								timestamp: Date.now(),
-							},
-						];
-					}
-					break;
-				}
-				case 'permission_prompt': {
-					messages = [
-						...messages,
-						{
-							role: 'system',
-							content: `Permission needed: ${session_event.tool_name as string}`,
-							timestamp: Date.now(),
-						},
-					];
-					break;
-				}
-				default:
-					break;
-			}
+			SESSION_EVENT_HANDLERS[session_event.type]?.(session_event);
 		});
 	});
 

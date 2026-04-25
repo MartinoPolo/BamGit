@@ -15,6 +15,7 @@ export async function get_issues_for_dashboard(
 	});
 }
 
+// fallow-ignore-next-line unused-export
 export async function get_issue(id: string): Promise<Issue> {
 	return invoke('get_issue', { id });
 }

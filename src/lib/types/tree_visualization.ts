@@ -24,7 +24,7 @@ export const TREE_STAGES = {
 	stump: 'stump',
 } as const satisfies Record<string, TreeStage>;
 
-export const TREE_SHAPES = {
+const TREE_SHAPES = {
 	oak: 'oak',
 	pine: 'pine',
 	birch: 'birch',
@@ -59,8 +59,6 @@ export const TOOL_TYPES = {
 	speechBubble: 'speechBubble',
 	stormCloud: 'stormCloud',
 } as const;
-
-export type ToolTypeKey = (typeof TOOL_TYPES)[keyof typeof TOOL_TYPES];
 
 export const OVERLAY_DEFAULTS = {
 	glow: { enabled: false, color: '#ffd700', intensity: 3, pulse: false },
@@ -183,13 +181,9 @@ export const DEFAULT_TREE_CONFIG: TreeConfig = {
 
 // ─── R12 State Dimensions ─────────────────────────────────────────────────
 
-export type GitHubLabel = string;
-
-export type ForestWorktreeState = WorktreeState;
+type ForestWorktreeState = WorktreeState;
 
 export type AggregateSessionState = SessionState | 'no-session';
-
-export type { ExecutionPhase };
 
 export type ForestBranchStatus = 'no-branch' | 'active' | 'local-only' | 'remote-gone' | 'deleted';
 
@@ -204,14 +198,14 @@ export type ForestPullRequestState =
 	| 'merged'
 	| 'closed';
 
-export type ForestGitHubIssueState = 'open' | 'closed';
+type ForestGitHubIssueState = 'open' | 'closed';
 
 export type ForestSyncStatus =
 	| { readonly type: 'up-to-date' }
 	| { readonly type: 'behind-base'; readonly count: number }
 	| { readonly type: 'merge-conflict' };
 
-export type ForestGrovekeeperStatus = 'active' | 'archived';
+type ForestGrovekeeperStatus = 'active' | 'archived';
 
 export interface StateDimensions {
 	readonly labels: readonly string[];

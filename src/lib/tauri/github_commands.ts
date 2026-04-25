@@ -6,6 +6,7 @@ import type {
 	SyncAllResult,
 } from '$lib/types/github';
 
+// fallow-ignore-next-line unused-export
 export async function get_github_status_cache(issue_id: string): Promise<GitHubStatusCache | null> {
 	return invoke('get_github_status_cache', { issueId: issue_id });
 }
@@ -20,6 +21,7 @@ export async function check_gh_availability(): Promise<GhCliAvailability> {
 	return invoke('check_gh_availability');
 }
 
+// fallow-ignore-next-line unused-export
 export async function fetch_issue_state(
 	issue_id: string,
 	owner: string,
@@ -34,6 +36,7 @@ export async function fetch_issue_state(
 	});
 }
 
+// fallow-ignore-next-line unused-export
 export async function fetch_pr_for_branch(
 	issue_id: string,
 	owner: string,

@@ -9,6 +9,7 @@ export async function get_all_color_palettes(): Promise<ColorPalette[]> {
 	return invoke('get_all_color_palettes');
 }
 
+// fallow-ignore-next-line unused-export
 export async function get_color_palette(id: string): Promise<ColorPalette> {
 	return invoke('get_color_palette', { id });
 }

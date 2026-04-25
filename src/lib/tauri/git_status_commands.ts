@@ -5,6 +5,7 @@ export async function refresh_git_status(issue_id: string): Promise<GitStatusCac
 	return invoke('refresh_git_status', { issueId: issue_id });
 }
 
+// fallow-ignore-next-line unused-export
 export async function get_cached_git_status(issue_id: string): Promise<GitStatusCache | null> {
 	return invoke('get_cached_git_status', { issueId: issue_id });
 }

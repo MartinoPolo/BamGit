@@ -29,6 +29,43 @@ const finished_sessions = $derived(
 	sessions.filter((session) => session.state === 'finished' || session.state === 'errored'),
 );
 
+const RUN_STATE_MAP: Record<string, SessionState> = {
+	running: 'running',
+	idle: 'needs-review',
+	failed: 'errored',
+	completed: 'finished',
+	stopped: 'finished',
+};
+
+function apply_run_state(session: Session, session_id: string, event: Record<string, unknown>) {
+	const new_state = RUN_STATE_MAP[event.state as string];
+	if (new_state) {
+		session.state = new_state;
+		const notification_type = NOTIFICATION_STATES[new_state];
+		if (notification_type) {
+			get_notification_store().add_pending(session_id, notification_type);
+		} else {
+			get_notification_store().clear_pending(session_id);
+		}
+	}
+}
+
+function apply_usage_update(session: Session, event: Record<string, unknown>) {
+	session.cost_usd = (event.cost_usd as number) ?? session.cost_usd;
+	session.token_count =
+		((event.input_tokens as number) ?? 0) + ((event.output_tokens as number) ?? 0);
+}
+
+function apply_message_complete(session: Session, event: Record<string, unknown>) {
+	const text = event.text as string;
+	session.last_response_summary = text.length > 200 ? text.slice(0, 197) + '...' : text;
+}
+
+function apply_input_prompt(session: Session, session_id: string) {
+	session.state = 'needs-input';
+	get_notification_store().add_pending(session_id, 'needs-input');
+}
+
 function handle_session_event(payload: SessionEventPayload) {
 	const { session_id, event } = payload;
 
@@ -38,43 +75,19 @@ function handle_session_event(payload: SessionEventPayload) {
 	}
 
 	switch (event.type) {
-		case 'run_state': {
-			const state_map: Record<string, SessionState> = {
-				running: 'running',
-				idle: 'needs-review',
-				failed: 'errored',
-				completed: 'finished',
-				stopped: 'finished',
-			};
-			const new_state = state_map[event.state as string];
-			if (new_state) {
-				session.state = new_state;
-				const notification_type = NOTIFICATION_STATES[new_state];
-				if (notification_type) {
-					get_notification_store().add_pending(session_id, notification_type);
-				} else {
-					get_notification_store().clear_pending(session_id);
-				}
-			}
+		case 'run_state':
+			apply_run_state(session, session_id, event);
 			break;
-		}
-		case 'usage_update': {
-			session.cost_usd = (event.cost_usd as number) ?? session.cost_usd;
-			session.token_count =
-				((event.input_tokens as number) ?? 0) + ((event.output_tokens as number) ?? 0);
+		case 'usage_update':
+			apply_usage_update(session, event);
 			break;
-		}
-		case 'message_complete': {
-			const text = event.text as string;
-			session.last_response_summary = text.length > 200 ? text.slice(0, 197) + '...' : text;
+		case 'message_complete':
+			apply_message_complete(session, event);
 			break;
-		}
 		case 'permission_prompt':
-		case 'elicitation_prompt': {
-			session.state = 'needs-input';
-			get_notification_store().add_pending(session_id, 'needs-input');
+		case 'elicitation_prompt':
+			apply_input_prompt(session, session_id);
 			break;
-		}
 	}
 }
 

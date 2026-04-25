@@ -13,6 +13,7 @@ export async function remove_worktree(request: RemoveWorktreeRequest): Promise<v
 	return invoke('remove_worktree', { request });
 }
 
+// fallow-ignore-next-line unused-export
 export async function refresh_worktree_state(issue_id: string): Promise<string> {
 	return invoke('refresh_worktree_state', { issueId: issue_id });
 }

@@ -3,6 +3,7 @@
 	import type { Action } from '$lib/types/action';
 	import type { GitHubStatusCache } from '$lib/types/github';
 	import type { GitStatusCache } from '$lib/types/git_status';
+	import type { IssueCardCallbacks } from '$lib/types/issue_card_callbacks';
 	import PullRequestBadge from './PullRequestBadge.svelte';
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
@@ -10,7 +11,7 @@
 	import WorktreeProgressIndicator from './WorktreeProgressIndicator.svelte';
 	import ActionButtonGroup from './ActionButtonGroup.svelte';
 
-	interface Props {
+	interface Props extends IssueCardCallbacks {
 		issue: Issue;
 		actions?: Action[];
 		github_cache?: GitHubStatusCache | null;
@@ -22,13 +23,6 @@
 		child_count?: number;
 		force_expanded?: boolean;
 		progress_lines?: readonly string[];
-		on_archive: (id: string) => void;
-		on_unarchive: (id: string) => void;
-		on_edit: (issue: Issue) => void;
-		on_delete: (id: string) => void;
-		on_setup_worktree?: (issue: Issue) => void;
-		on_remove_worktree?: (issue: Issue) => void;
-		on_execute_action?: (action_id: string, issue_id: string) => void;
 	}
 
 	let {

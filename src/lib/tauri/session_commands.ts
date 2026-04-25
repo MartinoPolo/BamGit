@@ -26,10 +26,12 @@ export async function get_sessions(): Promise<Session[]> {
 	return invoke('get_sessions');
 }
 
+// fallow-ignore-next-line unused-export
 export async function get_session(id: string): Promise<Session> {
 	return invoke('get_session', { id });
 }
 
+// fallow-ignore-next-line unused-export
 export async function discover_external_sessions(): Promise<DiscoveredSession[]> {
 	return invoke('discover_external_sessions');
 }
@@ -38,10 +40,12 @@ export async function adopt_session(request: AdoptSessionRequest): Promise<strin
 	return invoke('adopt_session', { request });
 }
 
+// fallow-ignore-next-line unused-export
 export async function start_discovery_polling(interval_milliseconds?: number): Promise<void> {
 	return invoke('start_discovery_polling', { intervalMilliseconds: interval_milliseconds });
 }
 
+// fallow-ignore-next-line unused-export
 export async function stop_discovery_polling(): Promise<void> {
 	return invoke('stop_discovery_polling');
 }
