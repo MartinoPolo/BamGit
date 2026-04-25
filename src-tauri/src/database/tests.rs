@@ -22,7 +22,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 6);
+        assert_eq!(version, 7);
     }
 
     #[test]
@@ -32,7 +32,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 6);
+        assert_eq!(version, 7);
     }
 
     // --- Schema tests ---
@@ -696,7 +696,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 6);
+        assert_eq!(version, 7);
 
         // portfolio_dashboard_pointers table exists
         let exists: bool = connection

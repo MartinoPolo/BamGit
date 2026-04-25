@@ -104,7 +104,7 @@ fn build_fingerprint(sessions: &[DiscoveredSession]) -> String {
 
 /// Query PIDs of Grovekeeper-managed sessions from the database.
 fn query_managed_pids(connection: &Connection) -> Vec<u32> {
-    let mut statement = match connection.prepare(
+    let mut statement = match connection.prepare_cached(
         super::discovery::MANAGED_PIDS_QUERY,
     ) {
         Ok(s) => s,

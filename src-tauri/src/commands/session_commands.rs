@@ -127,7 +127,7 @@ pub fn get_sessions(state: State<DatabaseState>) -> Result<Vec<Session>, String>
     let connection = state.0.lock().map_err(|e| e.to_string())?;
 
     let query = format!(
-        "SELECT {SESSION_SELECT_COLUMNS} FROM sessions ORDER BY started_at DESC"
+        "SELECT {SESSION_SELECT_COLUMNS} FROM sessions ORDER BY started_at DESC LIMIT 500"
     );
 
     let mut statement = connection

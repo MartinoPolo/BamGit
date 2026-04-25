@@ -71,15 +71,27 @@ mod tests {
         let custom_file = temp_directory.path().join("my_sound.wav");
         fs::write(&custom_file, b"custom wav").unwrap();
 
-        // Also create a bundled version with the same name
         let sounds_directory = temp_directory.path().join("sounds");
         fs::create_dir_all(&sounds_directory).unwrap();
         fs::write(sounds_directory.join("my_sound.wav"), b"bundled wav").unwrap();
 
+        // Absolute paths outside sounds/ are blocked by path traversal protection
         let result = resolve_sound_path(
             custom_file.to_str().unwrap(),
             &temp_directory.path().to_path_buf(),
         );
-        assert_eq!(result, Some(custom_file));
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn resolve_sound_path_allows_file_inside_sounds_directory() {
+        let temp_directory = tempfile::tempdir().unwrap();
+        let sounds_directory = temp_directory.path().join("sounds");
+        fs::create_dir_all(&sounds_directory).unwrap();
+        let sound_file = sounds_directory.join("alert.wav");
+        fs::write(&sound_file, b"bundled wav").unwrap();
+
+        let result = resolve_sound_path("alert.wav", &temp_directory.path().to_path_buf());
+        assert_eq!(result, Some(sound_file));
     }
 }

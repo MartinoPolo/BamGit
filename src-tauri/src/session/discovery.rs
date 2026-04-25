@@ -721,13 +721,13 @@ fn extract_text_from_message(entry: &JsonlEntry, reverse: bool) -> Option<String
     let content = message.get("content")?;
 
     if let Some(text) = content.as_str() {
-        return Some(truncate_string(text, 200));
+        return Some(super::truncate_utf8(text, 200));
     }
 
     let arr = content.as_array()?;
     let find_text_block = |block: &serde_json::Value| -> Option<String> {
         if block.get("type")?.as_str()? == "text" {
-            Some(truncate_string(block.get("text")?.as_str()?, 200))
+            Some(super::truncate_utf8(block.get("text")?.as_str()?, 200))
         } else {
             None
         }
@@ -777,15 +777,6 @@ fn derive_project_name(working_directory: &str, directory_name: &str) -> String 
     }
 }
 
-/// Truncate a string to max_len characters.
-fn truncate_string(text: &str, max_len: usize) -> String {
-    if text.chars().count() <= max_len {
-        text.to_string()
-    } else {
-        let truncated: String = text.chars().take(max_len - 3).collect();
-        format!("{truncated}...")
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -1145,14 +1136,14 @@ mod tests {
     // ─── Helper Functions ────────────────────────────────────────────
 
     #[test]
-    fn truncate_string_leaves_short_strings_unchanged() {
-        assert_eq!(truncate_string("hello", 10), "hello");
+    fn truncate_utf8_leaves_short_strings_unchanged() {
+        assert_eq!(crate::session::truncate_utf8("hello", 10), "hello");
     }
 
     #[test]
-    fn truncate_string_truncates_long_strings() {
+    fn truncate_utf8_truncates_long_strings() {
         let long = "a".repeat(300);
-        let truncated = truncate_string(&long, 200);
+        let truncated = crate::session::truncate_utf8(&long, 200);
         assert_eq!(truncated.chars().count(), 200);
         assert!(truncated.ends_with("..."));
     }

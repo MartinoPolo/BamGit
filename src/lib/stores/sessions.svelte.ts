@@ -2,6 +2,7 @@ import type {
 	DiscoveredSession,
 	DiscoveredSessionsPayload,
 	Session,
+	SessionEvent,
 	SessionEventPayload,
 	SessionState,
 } from '$lib/types/session';
@@ -37,8 +38,12 @@ const RUN_STATE_MAP: Record<string, SessionState> = {
 	stopped: 'finished',
 };
 
-function applyRunState(session: Session, sessionId: string, event: Record<string, unknown>) {
-	const newState = RUN_STATE_MAP[event.state as string];
+function applyRunState(
+	session: Session,
+	sessionId: string,
+	event: Extract<SessionEvent, { type: 'run_state' }>,
+) {
+	const newState = RUN_STATE_MAP[event.state];
 	if (newState) {
 		session.state = newState;
 		const notificationType = NOTIFICATION_STATES[newState];
@@ -50,14 +55,19 @@ function applyRunState(session: Session, sessionId: string, event: Record<string
 	}
 }
 
-function applyUsageUpdate(session: Session, event: Record<string, unknown>) {
-	session.cost_usd = (event.cost_usd as number) ?? session.cost_usd;
-	session.token_count =
-		((event.input_tokens as number) ?? 0) + ((event.output_tokens as number) ?? 0);
+function applyUsageUpdate(
+	session: Session,
+	event: Extract<SessionEvent, { type: 'usage_update' }>,
+) {
+	session.cost_usd = event.cost_usd ?? session.cost_usd;
+	session.token_count = (event.input_tokens ?? 0) + (event.output_tokens ?? 0);
 }
 
-function applyMessageComplete(session: Session, event: Record<string, unknown>) {
-	const text = event.text as string;
+function applyMessageComplete(
+	session: Session,
+	event: Extract<SessionEvent, { type: 'message_complete' }>,
+) {
+	const { text } = event;
 	session.last_response_summary = text.length > 200 ? text.slice(0, 197) + '...' : text;
 }
 
@@ -74,6 +84,7 @@ function handleSessionEvent(payload: SessionEventPayload) {
 		return;
 	}
 
+	// Keep in sync with session_actor.rs handle_event()
 	switch (event.type) {
 		case 'run_state':
 			applyRunState(session, sessionId, event);

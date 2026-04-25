@@ -20,6 +20,7 @@
 	import { setupWorktree, removeWorktree, getPrunableIssues } from '$lib/tauri/worktree_commands';
 	import { executeAction } from '$lib/tauri/action_commands';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
+	import type { Session } from '$lib/types/session';
 	import type { PrunableIssue } from '$lib/types/worktree';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
@@ -41,6 +42,22 @@
 	const sessionStore = getSessionStore();
 	const paletteStore = getColorPaletteStore();
 	const viewPreferenceStore = getViewPreferenceStore();
+
+	const sessionsByIssueId = $derived.by(() => {
+		const map = new Map<string, Session[]>();
+		for (const session of sessionStore.sessions) {
+			if (session.issue_id === null) {
+				continue;
+			}
+			const existing = map.get(session.issue_id);
+			if (existing !== undefined) {
+				existing.push(session);
+			} else {
+				map.set(session.issue_id, [session]);
+			}
+		}
+		return map;
+	});
 
 	function getNotificationDotColor(issueId: string): string | null {
 		for (const session of sessionStore.sessions) {
@@ -326,8 +343,7 @@
 			<ForestView
 				issues={forestIssues}
 				getGitStatus={(issueId) => gitStatusStore.getStatus(issueId)}
-				getSessionsForIssue={(issueId) =>
-					sessionStore.sessions.filter((session) => session.issue_id === issueId)}
+				getSessionsForIssue={(issueId) => sessionsByIssueId.get(issueId) ?? []}
 				onSelectIssue={(issue) => (editingIssue = issue)}
 			/>
 		{:else}

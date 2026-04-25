@@ -41,30 +41,35 @@ export interface SpawnSessionRequest {
 	model?: string | null;
 }
 
-type SessionEventType =
-	| 'session_init'
-	| 'message_delta'
-	| 'message_complete'
-	| 'thinking_delta'
-	| 'tool_start'
-	| 'tool_end'
-	| 'tool_progress'
-	| 'tool_use_summary'
-	| 'run_state'
-	| 'usage_update'
-	| 'permission_prompt'
-	| 'elicitation_prompt'
-	| 'compact_boundary'
-	| 'system_status'
-	| 'control_cancelled'
-	| 'raw';
+export type SessionEvent =
+	| { type: 'session_init'; session_id: string; model: string; tools: string[] }
+	| { type: 'message_delta'; text: string }
+	| { type: 'message_complete'; text: string; message_id: string }
+	| { type: 'thinking_delta'; text: string }
+	| { type: 'tool_start'; tool_use_id: string; tool_name: string; input: unknown }
+	| {
+			type: 'tool_end';
+			tool_use_id: string;
+			tool_name: string;
+			output: unknown;
+			is_error: boolean;
+	  }
+	| { type: 'tool_progress'; tool_use_id: string; elapsed_seconds: number }
+	| { type: 'tool_use_summary'; tool_use_id: string; summary: string }
+	| { type: 'run_state'; state: string; error: string | null }
+	| { type: 'usage_update'; input_tokens: number; output_tokens: number; cost_usd: number }
+	| { type: 'permission_prompt'; request_id: string; tool_name: string; tool_input: unknown }
+	| { type: 'elicitation_prompt'; request_id: string; message: string }
+	| { type: 'compact_boundary'; trigger: string }
+	| { type: 'system_status'; status: string }
+	| { type: 'control_cancelled'; request_id: string }
+	| { type: 'raw'; source: string; data: unknown };
+
+export type SessionEventType = SessionEvent['type'];
 
 export interface SessionEventPayload {
 	session_id: string;
-	event: {
-		type: SessionEventType;
-		[key: string]: unknown;
-	};
+	event: SessionEvent;
 }
 
 // ─── Discovered Session Types ──────────────────────────────────────────────

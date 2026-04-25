@@ -73,60 +73,51 @@ Autofix: ON
 18. **tauri.conf.json lowercase names** — "grovekeeper"→"Grovekeeper"
 19. **package.json `check:all`** — `prettier --write` → `prettier --check`
 
-### Important — Not Fixed (Requires Design Decisions)
+### Important — Fixed (Second Pass)
 
-20. **CSP disabled** — `tauri.conf.json:22` has `"csp": null`
-    - Expands XSS attack surface to full IPC
-    - Needs evaluation of which CSP directives are compatible with app features
+20. **CSP enabled** — `tauri.conf.json:22`
+    - **Fix:** Set CSP policy: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'`
+    - `'unsafe-inline'` needed for 3 dynamic color picker style attributes
 
-21. **Labels hardcoded to `['AFK']`** — `map_issue_to_state_dimensions.ts:75`
-    - Issue type has no `labels` field; all issues get same tree shape
-    - Needs backend Issue model change + GitHub label sync
+21. **Cross-reference comments added** — `session_actor.rs` + `sessions.svelte.ts`
+    - **Fix:** Both files now reference each other's state mapping
 
-22. **R9: Only 5 of 10 notification events** — `notification.rs`
-    - Missing: `pr-review-requested`, `merge-conflict-detected`, `branch-behind-base`, `github-issue-assigned`, `github-trigger-received`
-    - Feature work tracked by existing requirements
+22. **Shared truncate util extracted** — `session/mod.rs:truncate_utf8`
+    - **Fix:** Single function used by both `session_actor.rs` and `discovery.rs`
 
-23. **R10: Export/import not implemented** — No commands exist
-    - Roadmap says "Complete" but feature is absent
+23. **Stable `{#each}` key** — `SessionChatView.svelte`
+    - **Fix:** Added auto-incrementing `id` field to `ChatMessage`, keyed by `message.id`
 
-24. **R12 "Complete" overstated** — Issues #61-#65 still open
-    - Engine logic done; rendering integration via library not complete
+24. **Double session-ended guard** — `session_actor.rs`
+    - **Fix:** Added `has_ended` flag preventing duplicate finished/errored emissions
 
-25. **`wilting` tree stage unused** — `tree_visualization.ts:21`
-    - Defined but never referenced in compute logic
-    - Likely intended for error overlay (#64); keep for now
+25. **Bounded `get_sessions` query** — `session_commands.rs`
+    - **Fix:** Added `LIMIT 500`
 
-26. **Duplicated state mapping** — Rust `session_actor.rs` + TS `sessions.svelte.ts`
-    - CLI→DB session state mapping written identically in both languages
-    - Cross-reference comment would help
+26. **O(1) session lookup in ForestView** — `+page.svelte`
+    - **Fix:** Pre-computed `sessions_by_issue_id` Map via `$derived.by`
 
-27. **Duplicated truncate logic** — `discovery.rs` + `session_actor.rs`
-    - Functionally identical functions; extract to shared util
+27. **Dead `discover_external_sessions` wrapper removed** — `session_commands.ts`
+28. **Dead polling wrappers removed** — `session_commands.ts`
+29. **Cached prepared statement** — `discovery_polling.rs`
+    - **Fix:** Changed `prepare()` to `prepare_cached()`
 
-28. **Fragile `{#each}` key** — `SessionChatView.svelte:181`
-    - Uses `message.content + message.role` as key; duplicates collide
+30. **Strong `SessionEventPayload` type** — `session.ts`
+    - **Fix:** Replaced `[key: string]: unknown` with discriminated union matching Rust `SessionEvent`
 
-29. **Double session-ended emission** — `session_actor.rs`
-    - Terminate + stdout EOF race can emit finished twice
+### Important — Tracked as GitHub Issues
 
-30. **Unbounded `get_sessions` query** — `session_commands.rs:121`
-    - No LIMIT; grows indefinitely
+21. **Labels hardcoded to `['AFK']`** — #71
+22. **R9: Only 5 of 10 notification events** — #72
+23. **R10: Export/import not implemented** — #73
+24. **R12 "Complete" overstated** — Roadmap corrected to "Partial"
+25. **`wilting` tree stage unused** — Intentional; used by #64
+26. **Context API migration** — #59 (tagged HITL)
+27. **`grovekeeper:execute` label polling** — #74
 
-31. **O(N×M) session filtering in ForestView** — `+page.svelte:335`
-    - Should pre-compute Map<issue_id, Session[]>
+### Nice-to-Have — Skipped
 
-32. **Context API migration (#59)** — Module-level store singletons remain
-
-33. **`grovekeeper:execute` label polling** — R7 feature not implemented
-
-## Nice-to-Have
-
-34. **`discover_external_sessions` frontend wrapper dead code** — `session_commands.ts:33-35`
-35. **`start_discovery_polling`/`stop_discovery_polling` never called from frontend** — Dead IPC wrappers
-36. **Statement re-prepared every 3s tick** — `discovery_polling.rs:102-118`
-37. **`onMount`/`onDestroy` instead of `$effect` pattern** — `SessionChatView.svelte`
-38. **Weak `SessionEventPayload` type** — Uses `[key: string]: unknown` instead of discriminated union
+37. **`onMount`/`onDestroy` in `SessionChatView`** — Correct per Svelte 5 conventions (fire-once setup)
 
 ---
 
@@ -138,13 +129,12 @@ Autofix: true
 Findings:
 
 - total: 38
-- critical: 14 (all fixed)
-- important: 18 (5 fixed by config agent, 13 documented)
-- minor: 6
+- critical: 14 (all fixed — pass 1)
+- important: 24 (16 fixed, 7 tracked as issues, 1 skipped)
 
 Report: REVIEW.md
 
 Fix Step:
 
-- executed: yes
-- result: all critical fixed, CI green
+- pass 1: all critical fixed, CI green
+- pass 2: 12 additional fixes, 4 new issues created, roadmap corrected

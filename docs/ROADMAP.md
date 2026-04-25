@@ -19,9 +19,9 @@ Last updated: 2026-04-24
 | R6: Worktree Lifecycle (setup/remove scripts)       | Complete | state machine, progress UI           |
 | R7: Git & GitHub Integration (sync, fetch, merge)   | Complete | GraphQL bulk sync, fetch coordinator |
 | R8: Action Buttons / Skills                         | Complete | template variables, defaults         |
-| R9: Notification System (toasts, sounds, flash)     | Complete | per-event config, SQLite             |
-| R10: Configuration & Data (SQLite, export/import)   | Complete | dashboard management                 |
-| R12: Forest View (11 tree stages, overlays, canvas) | Complete | #20-#26, #52-#58                     |
+| R9: Notification System (toasts, sounds, flash)     | Partial  | 5/10 events (#72)                    |
+| R10: Configuration & Data (SQLite, export/import)   | Partial  | export/import missing (#73)          |
+| R12: Forest View (11 tree stages, overlays, canvas) | Partial  | library integration #61-#65          |
 
 ### Partially Done
 

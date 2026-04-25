@@ -9,14 +9,19 @@
 	}
 
 	interface ChatMessage {
+		id: number;
 		role: 'user' | 'assistant' | 'tool' | 'system';
 		content: string;
 		tool_name?: string;
 		is_error?: boolean;
-		timestamp: number;
 	}
 
 	let { session }: Props = $props();
+
+	let next_message_id = 0;
+	function create_message(fields: Omit<ChatMessage, 'id'>): ChatMessage {
+		return { id: next_message_id++, ...fields };
+	}
 
 	let messages = $state<ChatMessage[]>([]);
 	let currentStreamingText = $state('');
@@ -42,57 +47,57 @@
 
 	function handleMessageComplete() {
 		if (currentStreamingText) {
-			appendMessage({
-				role: 'assistant',
-				content: currentStreamingText,
-				timestamp: Date.now(),
-			});
+			appendMessage(create_message({ role: 'assistant', content: currentStreamingText }));
 			currentStreamingText = '';
 		}
 	}
 
 	function handleToolStart(event: Record<string, unknown>) {
-		appendMessage({
-			role: 'tool',
-			content: `Running ${event.tool_name as string}...`,
-			tool_name: event.tool_name as string,
-			timestamp: Date.now(),
-		});
+		appendMessage(
+			create_message({
+				role: 'tool',
+				content: `Running ${event.tool_name as string}...`,
+				tool_name: event.tool_name as string,
+			}),
+		);
 	}
 
 	function handleToolEnd(event: Record<string, unknown>) {
 		const output = event.output;
 		const content = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
 		const truncated = content.length > 500 ? content.slice(0, 497) + '...' : content;
-		appendMessage({
-			role: 'tool',
-			content: truncated,
-			tool_name: event.tool_name as string,
-			is_error: event.is_error as boolean,
-			timestamp: Date.now(),
-		});
+		appendMessage(
+			create_message({
+				role: 'tool',
+				content: truncated,
+				tool_name: event.tool_name as string,
+				is_error: event.is_error as boolean,
+			}),
+		);
 	}
 
 	function handleRunState(event: Record<string, unknown>) {
 		const state = event.state as string;
 		if (state === 'failed' || state === 'completed') {
-			appendMessage({
-				role: 'system',
-				content:
-					state === 'failed'
-						? `Session errored: ${(event.error as string) ?? 'unknown'}`
-						: 'Session completed.',
-				timestamp: Date.now(),
-			});
+			appendMessage(
+				create_message({
+					role: 'system',
+					content:
+						state === 'failed'
+							? `Session errored: ${(event.error as string) ?? 'unknown'}`
+							: 'Session completed.',
+				}),
+			);
 		}
 	}
 
 	function handlePermissionPrompt(event: Record<string, unknown>) {
-		appendMessage({
-			role: 'system',
-			content: `Permission needed: ${event.tool_name as string}`,
-			timestamp: Date.now(),
-		});
+		appendMessage(
+			create_message({
+				role: 'system',
+				content: `Permission needed: ${event.tool_name as string}`,
+			}),
+		);
 	}
 
 	const SESSION_EVENT_HANDLERS: Record<string, (event: Record<string, unknown>) => void> = {
@@ -127,18 +132,14 @@
 		promptInput = '';
 		sending = true;
 
-		messages = [...messages, { role: 'user', content: message, timestamp: Date.now() }];
+		messages = [...messages, create_message({ role: 'user', content: message })];
 
 		try {
 			await sendMessage(session.id, message);
 		} catch (err) {
 			messages = [
 				...messages,
-				{
-					role: 'system',
-					content: `Failed to send: ${String(err)}`,
-					timestamp: Date.now(),
-				},
+				create_message({ role: 'system', content: `Failed to send: ${String(err)}` }),
 			];
 		} finally {
 			sending = false;
@@ -151,11 +152,7 @@
 		} catch (err) {
 			messages = [
 				...messages,
-				{
-					role: 'system',
-					content: `Failed to interrupt: ${String(err)}`,
-					timestamp: Date.now(),
-				},
+				create_message({ role: 'system', content: `Failed to interrupt: ${String(err)}` }),
 			];
 		}
 	}
@@ -171,7 +168,7 @@
 <div class="flex h-full flex-col">
 	<!-- Messages -->
 	<div class="flex-1 space-y-3 overflow-y-auto p-4">
-		{#each messages as message (message.content + message.role)}
+		{#each messages as message (message.id)}
 			<div
 				class="rounded-lg p-3 text-sm {message.role === 'user'
 					? 'ml-8 bg-primary/10 text-primary'
