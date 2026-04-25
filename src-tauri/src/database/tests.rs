@@ -3,16 +3,7 @@ mod tests {
     use rusqlite::Connection;
 
     use crate::database::migrations;
-    use crate::database::schema;
-
-    fn setup_test_database() -> Connection {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-        schema::create_tables(&connection).unwrap();
-        connection
-    }
+    use crate::database::test_helpers::setup_test_database;
 
     // --- Migration tests ---
 
@@ -22,7 +13,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 7);
+        assert_eq!(version, migrations::CURRENT_VERSION);
     }
 
     #[test]
@@ -32,7 +23,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 7);
+        assert_eq!(version, migrations::CURRENT_VERSION);
     }
 
     // --- Schema tests ---
@@ -696,7 +687,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 7);
+        assert_eq!(version, migrations::CURRENT_VERSION);
 
         // portfolio_dashboard_pointers table exists
         let exists: bool = connection

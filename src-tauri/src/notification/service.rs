@@ -9,6 +9,7 @@ use crate::models::notification::{
     row_to_notification_config, NotificationConfig, NotificationEventType,
     NOTIFICATION_CONFIG_SELECT_COLUMNS,
 };
+use crate::models::session::SessionState;
 
 use super::sound;
 
@@ -144,17 +145,17 @@ impl NotificationService {
     }
 }
 
-/// Map a session state string (from DB/events) to a notification event type.
-/// Returns None for states that should not trigger notifications (e.g. "running").
+/// Map a SessionState to a notification event type.
+/// Returns None for states that should not trigger notifications (e.g. Running, Paused).
 /// Note: PrReady is not mapped here — it will be triggered by a future GitHub
 /// polling hook, not by session state transitions.
-pub fn session_state_to_event_type(state: &str) -> Option<NotificationEventType> {
+pub fn session_state_to_event_type(state: &SessionState) -> Option<NotificationEventType> {
     match state {
-        "needs-input" => Some(NotificationEventType::NeedsInput),
-        "needs-review" => Some(NotificationEventType::NeedsReview),
-        "finished" => Some(NotificationEventType::Finished),
-        "errored" => Some(NotificationEventType::Errored),
-        _ => None,
+        SessionState::NeedsInput => Some(NotificationEventType::NeedsInput),
+        SessionState::NeedsReview => Some(NotificationEventType::NeedsReview),
+        SessionState::Finished => Some(NotificationEventType::Finished),
+        SessionState::Errored => Some(NotificationEventType::Errored),
+        SessionState::Running | SessionState::Paused => None,
     }
 }
 
@@ -165,35 +166,30 @@ mod tests {
     #[test]
     fn session_state_to_event_type_maps_correctly() {
         assert_eq!(
-            session_state_to_event_type("needs-input"),
+            session_state_to_event_type(&SessionState::NeedsInput),
             Some(NotificationEventType::NeedsInput)
         );
         assert_eq!(
-            session_state_to_event_type("needs-review"),
+            session_state_to_event_type(&SessionState::NeedsReview),
             Some(NotificationEventType::NeedsReview)
         );
         assert_eq!(
-            session_state_to_event_type("finished"),
+            session_state_to_event_type(&SessionState::Finished),
             Some(NotificationEventType::Finished)
         );
         assert_eq!(
-            session_state_to_event_type("errored"),
+            session_state_to_event_type(&SessionState::Errored),
             Some(NotificationEventType::Errored)
         );
     }
 
     #[test]
     fn session_state_to_event_type_ignores_running() {
-        assert_eq!(session_state_to_event_type("running"), None);
+        assert_eq!(session_state_to_event_type(&SessionState::Running), None);
     }
 
     #[test]
     fn session_state_to_event_type_ignores_paused() {
-        assert_eq!(session_state_to_event_type("paused"), None);
-    }
-
-    #[test]
-    fn session_state_to_event_type_ignores_unknown() {
-        assert_eq!(session_state_to_event_type("unknown-state"), None);
+        assert_eq!(session_state_to_event_type(&SessionState::Paused), None);
     }
 }
