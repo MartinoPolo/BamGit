@@ -81,39 +81,36 @@ export const SHAPE_FRUIT_MAP: Readonly<Record<Exclude<TreeShape, 'custom'>, Frui
 
 // ─── GitHub Label → Tree Shape Mapping ───────────────────────────────────
 
-const LABEL_TO_SHAPE: Readonly<Record<string, TreeShape>> = {
-	bug: TREE_SHAPES.maple,
-	task: TREE_SHAPES.pine,
-	feature: TREE_SHAPES.oak,
-	prd: TREE_SHAPES.apple,
-	epic: TREE_SHAPES.baobab,
-	documentation: TREE_SHAPES.willow,
-	refactor: TREE_SHAPES.birch,
-	infrastructure: TREE_SHAPES.cypress,
-	ci: TREE_SHAPES.cypress,
-} as const;
+export interface LabelShapeMappingEntry {
+	readonly labelName: string;
+	readonly treeShape: TreeShape;
+}
 
-const LABEL_PRIORITY: readonly string[] = [
-	'prd',
-	'epic',
-	'bug',
-	'feature',
-	'task',
-	'documentation',
-	'refactor',
-	'infrastructure',
-	'ci',
+const DEFAULT_LABEL_MAPPINGS: readonly LabelShapeMappingEntry[] = [
+	{ labelName: 'prd', treeShape: TREE_SHAPES.apple },
+	{ labelName: 'epic', treeShape: TREE_SHAPES.baobab },
+	{ labelName: 'bug', treeShape: TREE_SHAPES.maple },
+	{ labelName: 'feature', treeShape: TREE_SHAPES.oak },
+	{ labelName: 'task', treeShape: TREE_SHAPES.pine },
+	{ labelName: 'documentation', treeShape: TREE_SHAPES.willow },
+	{ labelName: 'refactor', treeShape: TREE_SHAPES.birch },
+	{ labelName: 'infrastructure', treeShape: TREE_SHAPES.cypress },
+	{ labelName: 'ci', treeShape: TREE_SHAPES.cypress },
 ];
 
 const DEFAULT_TREE_SHAPE: TreeShape = TREE_SHAPES.cherry;
 
-export function resolveTreeShape(labels: readonly string[]): TreeShape {
-	for (const prioritized of LABEL_PRIORITY) {
-		if (labels.some((label) => label.toLowerCase() === prioritized)) {
-			return LABEL_TO_SHAPE[prioritized];
+export function resolveTreeShape(
+	labels: readonly string[],
+	mappings: readonly LabelShapeMappingEntry[] = DEFAULT_LABEL_MAPPINGS,
+	defaultShape: TreeShape = DEFAULT_TREE_SHAPE,
+): TreeShape {
+	for (const mapping of mappings) {
+		if (labels.some((label) => label.toLowerCase() === mapping.labelName.toLowerCase())) {
+			return mapping.treeShape;
 		}
 	}
-	return DEFAULT_TREE_SHAPE;
+	return defaultShape;
 }
 
 // ─── Tool Visibility Factory ─────────────────────────────────────────────

@@ -110,6 +110,23 @@ async fn run_gh_command(args: &[&str]) -> Result<String, String> {
         .map_err(|error| format!("Invalid UTF-8 in gh output: {error}"))
 }
 
+const GITHUB_DEFAULT_LABEL_COLOR: &str = "6e7681";
+
+fn parse_label_nodes_to_json(label_nodes: &[serde_json::Value]) -> String {
+    let labels: Vec<serde_json::Value> = label_nodes
+        .iter()
+        .filter_map(|node| {
+            let name = node.get("name")?.as_str()?;
+            let color = node
+                .get("color")
+                .and_then(|c| c.as_str())
+                .unwrap_or(GITHUB_DEFAULT_LABEL_COLOR);
+            Some(serde_json::json!({"name": name, "color": format!("#{color}")}))
+        })
+        .collect();
+    serde_json::to_string(&labels).unwrap_or_else(|_| "[]".to_string())
+}
+
 /// Build a GraphQL query to fetch multiple issues and their associated PRs in one call.
 fn build_bulk_sync_graphql_query(
     owner: &str,
@@ -121,7 +138,7 @@ fn build_bulk_sync_graphql_query(
 
     for (index, &number) in issue_numbers.iter().enumerate() {
         fragments.push(format!(
-            "issue_{index}: issue(number: {number}) {{ state url }}"
+            "issue_{index}: issue(number: {number}) {{ state url labels(first: 20) {{ nodes {{ name color }} }} }}"
         ));
     }
 
@@ -368,18 +385,28 @@ pub async fn sync_all_github_state(
 
     // Parse all results first (no DB lock needed)
     let mut caches_to_write = Vec::with_capacity(syncable.len());
+    let mut labels_to_write: Vec<(String, Option<String>)> = Vec::with_capacity(syncable.len());
 
     for (index, (issue_id, _, _)) in syncable.iter().enumerate() {
         let mut github_issue_state = None;
         let mut pr_state = None;
         let mut pr_number = None;
         let mut pr_url = None;
+        let mut labels_json: Option<String> = None;
 
-        // Parse issue state
+        // Parse issue state and labels
         let issue_key = format!("issue_{index}");
         if let Some(issue_data) = repository.get(&issue_key) {
             if let Some(state_str) = issue_data.get("state").and_then(|s| s.as_str()) {
                 github_issue_state = Some(resolve_github_issue_state(state_str).to_string());
+            }
+
+            if let Some(label_nodes) = issue_data
+                .get("labels")
+                .and_then(|l| l.get("nodes"))
+                .and_then(|n| n.as_array())
+            {
+                labels_json = Some(parse_label_nodes_to_json(label_nodes));
             }
         }
 
@@ -436,6 +463,8 @@ pub async fn sync_all_github_state(
             }
         }
 
+        labels_to_write.push((issue_id.clone(), labels_json));
+
         caches_to_write.push(GitHubStatusCache {
             issue_id: issue_id.clone(),
             branch_status: None,
@@ -458,6 +487,17 @@ pub async fn sync_all_github_state(
             match upsert_cache(&connection, cache) {
                 Ok(()) => synced_count += 1,
                 Err(error) => errors.push(format!("Failed to cache {}: {error}", cache.issue_id)),
+            }
+        }
+
+        for (issue_id, labels_json) in &labels_to_write {
+            if let Some(labels) = labels_json {
+                if let Err(error) = connection.execute(
+                    "UPDATE issues SET labels = ?1 WHERE id = ?2",
+                    rusqlite::params![labels, issue_id],
+                ) {
+                    errors.push(format!("Failed to update labels for {issue_id}: {error}"));
+                }
             }
         }
     }
@@ -748,6 +788,8 @@ mod tests {
         let query = build_bulk_sync_graphql_query("owner", "repo", &[1, 2], &[None, None]);
         assert!(query.contains("issue_0: issue(number: 1)"));
         assert!(query.contains("issue_1: issue(number: 2)"));
+        assert!(query.contains("labels(first: 20)"));
+        assert!(query.contains("nodes { name color }"));
         assert!(!query.contains("pr_"));
     }
 
@@ -862,5 +904,56 @@ mod tests {
             latest_reviews: vec![],
         };
         assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Open);
+    }
+
+    #[test]
+    fn parse_graphql_labels_from_issue() {
+        let response_json = r#"{
+            "data": {
+                "repository": {
+                    "issue_0": {
+                        "state": "OPEN",
+                        "url": "https://github.com/o/r/issues/1",
+                        "labels": {
+                            "nodes": [
+                                {"name": "bug", "color": "d73a4a"},
+                                {"name": "task", "color": "0E8A16"}
+                            ]
+                        }
+                    }
+                }
+            }
+        }"#;
+
+        let response: serde_json::Value = serde_json::from_str(response_json).unwrap();
+        let repository = response
+            .get("data")
+            .unwrap()
+            .get("repository")
+            .unwrap();
+
+        let issue_data = repository.get("issue_0").unwrap();
+        let label_nodes = issue_data
+            .get("labels")
+            .unwrap()
+            .get("nodes")
+            .unwrap()
+            .as_array()
+            .unwrap();
+
+        let json = parse_label_nodes_to_json(label_nodes);
+        let parsed: Vec<serde_json::Value> = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.len(), 2);
+        assert_eq!(parsed[0]["name"], "bug");
+        assert_eq!(parsed[0]["color"], "#d73a4a");
+        assert_eq!(parsed[1]["name"], "task");
+        assert_eq!(parsed[1]["color"], "#0E8A16");
+    }
+
+    #[test]
+    fn parse_graphql_issue_without_labels() {
+        let label_nodes: Vec<serde_json::Value> = vec![];
+        let json = parse_label_nodes_to_json(&label_nodes);
+        assert_eq!(json, "[]");
     }
 }

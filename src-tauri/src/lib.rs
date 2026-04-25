@@ -9,7 +9,8 @@ mod session;
 
 use commands::{
     action_commands, color_palette_commands, dashboard_commands, git_status_commands,
-    github_commands, issue_commands, notification_commands, portfolio_commands, session_commands,
+    github_commands, issue_commands, label_shape_mapping_commands, notification_commands,
+    portfolio_commands, session_commands,
     worktree_commands,
 };
 use git::fetch_coordinator::FetchCoordinator;
@@ -105,6 +106,8 @@ pub fn run() {
             color_palette_commands::update_color_palette,
             color_palette_commands::delete_color_palette,
             color_palette_commands::get_next_available_color,
+            label_shape_mapping_commands::get_label_shape_mappings,
+            label_shape_mapping_commands::upsert_label_shape_mapping,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

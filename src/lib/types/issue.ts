@@ -1,5 +1,10 @@
 import type { WorktreeState } from './worktree';
 
+export interface IssueLabel {
+	name: string;
+	color: string;
+}
+
 export interface Issue {
 	id: string;
 	dashboard_id: string;
@@ -19,6 +24,7 @@ export interface Issue {
 	dev_server_port: number | null;
 	dev_server_pid: number | null;
 	browser_url: string | null;
+	labels: IssueLabel[];
 	sort_order: number;
 	created_at: string;
 }
@@ -31,6 +37,7 @@ export interface CreateIssueRequest {
 	github_issue_url?: string | null;
 	github_issue_number?: number | null;
 	parent_issue_id?: string | null;
+	labels?: string | null;
 }
 
 export interface UpdateIssueRequest {
@@ -45,5 +52,6 @@ export interface UpdateIssueRequest {
 	worktree_folder?: string | null;
 	worktree_state?: WorktreeState;
 	parent_issue_id?: string | null;
+	labels?: string | null;
 	sort_order?: number;
 }

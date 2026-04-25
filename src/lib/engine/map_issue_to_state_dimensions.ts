@@ -73,7 +73,7 @@ export function mapIssueToStateDimensions(
 	sessions: readonly SessionForMapping[],
 ): StateDimensions {
 	return {
-		labels: ['AFK'],
+		labels: issue.labels.map((label) => label.name),
 		worktreeState: issue.worktree_state,
 		aggregateSessionState: aggregateSessionState(sessions.map((session) => session.state)),
 		executionPhase: pickExecutionPhase(sessions),

@@ -11,7 +11,7 @@ import type {
 
 function createDimensions(overrides: Partial<StateDimensions> = {}): StateDimensions {
 	return {
-		labels: ['AFK'],
+		labels: ['task'],
 		worktreeState: 'none',
 		aggregateSessionState: 'no-session',
 		executionPhase: 'none',

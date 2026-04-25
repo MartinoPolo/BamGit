@@ -1,4 +1,10 @@
-import type { TreeStage, PottedPlantStage, TreeConfig, ToolVisibility } from 'low-poly-2d-trees';
+import type {
+	TreeShape,
+	TreeStage,
+	PottedPlantStage,
+	TreeConfig,
+	ToolVisibility,
+} from 'low-poly-2d-trees';
 import {
 	TREE_STAGES,
 	DEFAULT_TREE_CONFIG,
@@ -10,6 +16,7 @@ import {
 	resolveTreeShape,
 } from '$lib/types/tree_visualization';
 import type {
+	LabelShapeMappingEntry,
 	StateDimensions,
 	TreeComputeContext,
 	TreeVisualization,
@@ -145,6 +152,8 @@ function issueIdToSeed(issueId: string): number {
 export function computeTreeVisualization(
 	dimensions: StateDimensions,
 	context?: TreeComputeContext,
+	labelMappings?: readonly LabelShapeMappingEntry[],
+	defaultShape?: TreeShape,
 ): TreeVisualization {
 	const resolvedContext = context ?? DEFAULT_COMPUTE_CONTEXT;
 	const seed = issueIdToSeed(resolvedContext.issueId);
@@ -168,7 +177,7 @@ export function computeTreeVisualization(
 	}
 
 	const stage = computeTreeStage(dimensions, resolvedContext);
-	const shape = resolveTreeShape(dimensions.labels);
+	const shape = resolveTreeShape(dimensions.labels, labelMappings, defaultShape);
 	const toolVisibility = computeToolVisibility(dimensions);
 
 	const fruitType =

@@ -29,13 +29,14 @@ mod tests {
     // --- Schema tests ---
 
     #[test]
-    fn all_eight_tables_are_created() {
+    fn all_nine_tables_are_created() {
         let connection = setup_test_database();
 
         let expected_tables = [
             "color_palettes",
             "dashboards",
             "issues",
+            "label_shape_mappings",
             "sessions",
             "actions",
             "notification_config",

@@ -133,7 +133,22 @@
 				▸
 			</button>
 
-			<span class="min-w-0 flex-1 truncate text-sm font-medium">{issue.name}</span>
+			<div class="min-w-0 flex-1">
+				<span class="truncate text-sm font-medium">{issue.name}</span>
+				{#if issue.labels.length > 0}
+					<div class="mt-0.5 flex flex-wrap gap-1">
+						{#each issue.labels as label (label.name)}
+							<span
+								class="inline-block rounded-full px-1.5 py-px text-[10px] font-medium leading-3"
+								style="background-color: {label.color}33; color: {label.color}; border: 1px solid {label.color}44;"
+								title={label.name}
+							>
+								{label.name}
+							</span>
+						{/each}
+					</div>
+				{/if}
+			</div>
 
 			<!-- Child count for parent issues -->
 			{#if childCount > 0}

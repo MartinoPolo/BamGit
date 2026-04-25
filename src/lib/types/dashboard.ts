@@ -7,6 +7,7 @@ export interface Dashboard {
 	default_base_branch: string | null;
 	worktree_parent_folder: string | null;
 	color_palette_id: string | null;
+	default_shape: string;
 }
 
 export interface CreateDashboardRequest {
@@ -17,8 +18,8 @@ export interface CreateDashboardRequest {
 	default_base_branch?: string | null;
 	worktree_parent_folder?: string | null;
 	color_palette_id?: string | null;
+	default_shape?: string;
 }
-
 /** Absent key = no change, explicit null = clear the field */
 export interface UpdateDashboardRequest {
 	id: string;
@@ -29,4 +30,5 @@ export interface UpdateDashboardRequest {
 	default_base_branch?: string | null;
 	worktree_parent_folder?: string | null;
 	color_palette_id?: string | null;
+	default_shape?: string;
 }

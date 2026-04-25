@@ -3,12 +3,13 @@ use tauri::State;
 use uuid::Uuid;
 
 use crate::database::connection::DatabaseState;
+use crate::database::migrations::{seed_label_shape_mappings_for_dashboard, DEFAULT_TREE_SHAPE};
 use crate::models::dashboard::{
     CreateDashboardRequest, Dashboard, DashboardType, UpdateDashboardRequest,
 };
 
 const DASHBOARD_SELECT_COLUMNS: &str =
-    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id";
+    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, default_shape";
 
 fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
     let dashboard_type_string: String = row.get(2)?;
@@ -26,6 +27,7 @@ fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
         default_base_branch: row.get(5)?,
         worktree_parent_folder: row.get(6)?,
         color_palette_id: row.get(7)?,
+        default_shape: row.get(8)?,
     })
 }
 
@@ -54,6 +56,9 @@ pub fn create_dashboard(
         )
         .map_err(|error| format!("Failed to create dashboard: {error}"))?;
 
+    seed_label_shape_mappings_for_dashboard(&connection, &id)
+        .map_err(|error| format!("Failed to seed label shape mappings: {error}"))?;
+
     Ok(Dashboard {
         id,
         name: request.name,
@@ -63,6 +68,7 @@ pub fn create_dashboard(
         default_base_branch: request.default_base_branch,
         worktree_parent_folder: request.worktree_parent_folder,
         color_palette_id: request.color_palette_id,
+        default_shape: DEFAULT_TREE_SHAPE.to_string(),
     })
 }
 
@@ -126,12 +132,14 @@ pub fn update_dashboard(
             request.color_palette_id,
             existing.color_palette_id,
         ),
+        default_shape: request.default_shape.unwrap_or(existing.default_shape),
     };
 
     connection
         .execute(
-            "UPDATE dashboards SET name = ?1, type = ?2, github_repo = ?3, local_folder = ?4, default_base_branch = ?5, worktree_parent_folder = ?6, color_palette_id = ?7
-             WHERE id = ?8",
+            "UPDATE dashboards SET name = ?1, type = ?2, github_repo = ?3, local_folder = ?4, \
+             default_base_branch = ?5, worktree_parent_folder = ?6, color_palette_id = ?7, \
+             default_shape = ?8 WHERE id = ?9",
             rusqlite::params![
                 updated.name,
                 updated.dashboard_type.to_string(),
@@ -140,6 +148,7 @@ pub fn update_dashboard(
                 updated.default_base_branch,
                 updated.worktree_parent_folder,
                 updated.color_palette_id,
+                updated.default_shape,
                 updated.id,
             ],
         )
