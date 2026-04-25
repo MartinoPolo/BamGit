@@ -7,111 +7,111 @@
 	import IssueCard from './IssueCard.svelte';
 
 	interface Props extends IssueCardCallbacks {
-		parent_issues: Issue[];
-		archived_issues: Issue[];
-		show_archived: boolean;
-		is_portfolio: boolean;
+		parentIssues: Issue[];
+		archivedIssues: Issue[];
+		showArchived: boolean;
+		isPortfolio: boolean;
 		actions?: Action[];
-		force_expanded?: boolean;
-		github_cache_map?: Map<string, GitHubStatusCache>;
-		gh_available?: boolean;
-		get_children: (parent_id: string) => Issue[];
-		get_git_status: (issue_id: string) => GitStatusCache | undefined;
-		get_notification_dot_color?: (issue_id: string) => string | null;
-		get_progress_lines?: (issue_id: string) => readonly string[];
+		forceExpanded?: boolean;
+		githubCacheMap?: Map<string, GitHubStatusCache>;
+		ghAvailable?: boolean;
+		getChildren: (parentId: string) => Issue[];
+		getGitStatus: (issueId: string) => GitStatusCache | undefined;
+		getNotificationDotColor?: (issueId: string) => string | null;
+		getProgressLines?: (issueId: string) => readonly string[];
 	}
 
 	let {
-		parent_issues,
-		archived_issues,
-		show_archived,
-		is_portfolio,
+		parentIssues,
+		archivedIssues,
+		showArchived,
+		isPortfolio,
 		actions = [],
-		force_expanded,
-		github_cache_map = new Map(),
-		gh_available = false,
-		get_children,
-		get_git_status,
-		get_notification_dot_color,
-		get_progress_lines,
-		on_archive,
-		on_unarchive,
-		on_edit,
-		on_delete,
-		on_setup_worktree,
-		on_remove_worktree,
-		on_execute_action,
+		forceExpanded,
+		githubCacheMap = new Map(),
+		ghAvailable = false,
+		getChildren,
+		getGitStatus,
+		getNotificationDotColor,
+		getProgressLines,
+		onArchive,
+		onUnarchive,
+		onEdit,
+		onDelete,
+		onSetupWorktree,
+		onRemoveWorktree,
+		onExecuteAction,
 	}: Props = $props();
 </script>
 
 <div class="flex flex-col gap-2">
-	{#each parent_issues as issue (issue.id)}
-		{@const children = is_portfolio ? get_children(issue.id) : []}
+	{#each parentIssues as issue (issue.id)}
+		{@const children = isPortfolio ? getChildren(issue.id) : []}
 
 		<IssueCard
 			{issue}
 			{actions}
-			github_cache={github_cache_map.get(issue.id)}
-			{gh_available}
-			git_status={get_git_status(issue.id)}
-			notification_dot_color={get_notification_dot_color?.(issue.id) ?? null}
-			child_count={children.length}
-			{force_expanded}
-			progress_lines={get_progress_lines?.(issue.id) ?? []}
-			{on_archive}
-			{on_unarchive}
-			{on_edit}
-			{on_delete}
-			{on_setup_worktree}
-			{on_remove_worktree}
-			{on_execute_action}
+			githubCache={githubCacheMap.get(issue.id)}
+			{ghAvailable}
+			gitStatus={getGitStatus(issue.id)}
+			notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
+			childCount={children.length}
+			{forceExpanded}
+			progressLines={getProgressLines?.(issue.id) ?? []}
+			{onArchive}
+			{onUnarchive}
+			{onEdit}
+			{onDelete}
+			{onSetupWorktree}
+			{onRemoveWorktree}
+			{onExecuteAction}
 		/>
 
 		<!-- Nested children for portfolio dashboards -->
-		{#if is_portfolio && children.length > 0}
+		{#if isPortfolio && children.length > 0}
 			{#each children as child, index (child.id)}
 				<IssueCard
 					issue={child}
 					{actions}
-					github_cache={github_cache_map.get(child.id)}
-					{gh_available}
-					git_status={get_git_status(child.id)}
-					notification_dot_color={get_notification_dot_color?.(child.id) ?? null}
+					githubCache={githubCacheMap.get(child.id)}
+					{ghAvailable}
+					gitStatus={getGitStatus(child.id)}
+					notificationDotColor={getNotificationDotColor?.(child.id) ?? null}
 					indented={true}
-					is_last_child={index === children.length - 1}
-					{force_expanded}
-					progress_lines={get_progress_lines?.(child.id) ?? []}
-					{on_archive}
-					{on_unarchive}
-					{on_edit}
-					{on_delete}
-					{on_setup_worktree}
-					{on_remove_worktree}
-					{on_execute_action}
+					isLastChild={index === children.length - 1}
+					{forceExpanded}
+					progressLines={getProgressLines?.(child.id) ?? []}
+					{onArchive}
+					{onUnarchive}
+					{onEdit}
+					{onDelete}
+					{onSetupWorktree}
+					{onRemoveWorktree}
+					{onExecuteAction}
 				/>
 			{/each}
 		{/if}
 	{/each}
 
 	<!-- Archived section -->
-	{#if show_archived && archived_issues.length > 0}
+	{#if showArchived && archivedIssues.length > 0}
 		<div class="mt-4 border-t border-border pt-4">
 			<h3
 				class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60"
 			>
-				Archived ({archived_issues.length})
+				Archived ({archivedIssues.length})
 			</h3>
 			<div class="flex flex-col gap-2">
-				{#each archived_issues as issue (issue.id)}
+				{#each archivedIssues as issue (issue.id)}
 					<IssueCard
 						{issue}
-						github_cache={github_cache_map.get(issue.id)}
-						{gh_available}
-						git_status={get_git_status(issue.id)}
-						{on_archive}
-						{on_unarchive}
-						{on_edit}
-						{on_delete}
+						githubCache={githubCacheMap.get(issue.id)}
+						{ghAvailable}
+						gitStatus={getGitStatus(issue.id)}
+						{onArchive}
+						{onUnarchive}
+						{onEdit}
+						{onDelete}
 					/>
 				{/each}
 			</div>

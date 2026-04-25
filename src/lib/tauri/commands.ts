@@ -5,23 +5,23 @@ import type {
 	UpdateDashboardRequest,
 } from '$lib/types/dashboard';
 
-export async function create_dashboard(request: CreateDashboardRequest): Promise<Dashboard> {
+export async function createDashboard(request: CreateDashboardRequest): Promise<Dashboard> {
 	return invoke('create_dashboard', { request });
 }
 
-export async function get_dashboards(): Promise<Dashboard[]> {
+export async function getDashboards(): Promise<Dashboard[]> {
 	return invoke('get_dashboards');
 }
 
 // fallow-ignore-next-line unused-export
-export async function get_dashboard(id: string): Promise<Dashboard> {
+export async function getDashboard(id: string): Promise<Dashboard> {
 	return invoke('get_dashboard', { id });
 }
 
-export async function update_dashboard(request: UpdateDashboardRequest): Promise<Dashboard> {
+export async function updateDashboard(request: UpdateDashboardRequest): Promise<Dashboard> {
 	return invoke('update_dashboard', { request });
 }
 
-export async function delete_dashboard(id: string): Promise<void> {
+export async function deleteDashboard(id: string): Promise<void> {
 	return invoke('delete_dashboard', { id });
 }

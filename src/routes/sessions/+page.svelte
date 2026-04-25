@@ -5,63 +5,63 @@
 		Session,
 		SessionEventPayload,
 	} from '$lib/types/session';
-	import { adopt_session, spawn_session, terminate_session } from '$lib/tauri/session_commands';
-	import { get_session_store } from '$lib/stores/sessions.svelte';
-	import { get_notification_store } from '$lib/stores/notifications.svelte';
+	import { adoptSession, spawnSession, terminateSession } from '$lib/tauri/session_commands';
+	import { getSessionStore } from '$lib/stores/sessions.svelte';
+	import { getNotificationStore } from '$lib/stores/notifications.svelte';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 	import SessionCard from '$lib/components/SessionCard.svelte';
 	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';
 	import SessionChatView from '$lib/components/SessionChatView.svelte';
 
-	const store = get_session_store();
-	const notification_store = get_notification_store();
+	const store = getSessionStore();
+	const notificationStore = getNotificationStore();
 
-	let selected_session_id = $state<string | null>(null);
-	let spawn_prompt = $state('');
-	let spawn_working_directory = $state('');
+	let selectedSessionId = $state<string | null>(null);
+	let spawnPrompt = $state('');
+	let spawnWorkingDirectory = $state('');
 	let spawning = $state(false);
-	let unlisten_session_event: UnlistenFn | null = null;
-	let unlisten_discovered: UnlistenFn | null = null;
+	let unlistenSessionEvent: UnlistenFn | null = null;
+	let unlistenDiscovered: UnlistenFn | null = null;
 
 	// Derive live session from store so state updates are always reflected
-	const selected_session = $derived(
-		selected_session_id !== null
-			? (store.sessions.find((s) => s.id === selected_session_id) ?? null)
+	const selectedSession = $derived(
+		selectedSessionId !== null
+			? (store.sessions.find((s) => s.id === selectedSessionId) ?? null)
 			: null,
 	);
 
 	onMount(async () => {
-		await store.load_sessions();
+		await store.loadSessions();
 
-		unlisten_session_event = await listen<SessionEventPayload>('session-event', (event) => {
-			store.handle_session_event(event.payload);
+		unlistenSessionEvent = await listen<SessionEventPayload>('session-event', (event) => {
+			store.handleSessionEvent(event.payload);
 		});
 
-		unlisten_discovered = await listen<DiscoveredSessionsPayload>(
+		unlistenDiscovered = await listen<DiscoveredSessionsPayload>(
 			'discovered-sessions-updated',
 			(event) => {
-				store.handle_discovered_sessions_update(event.payload);
+				store.handleDiscoveredSessionsUpdate(event.payload);
 			},
 		);
 	});
 
 	onDestroy(() => {
-		unlisten_session_event?.();
-		unlisten_discovered?.();
+		unlistenSessionEvent?.();
+		unlistenDiscovered?.();
 	});
 
-	async function handle_spawn() {
-		if (!spawn_prompt.trim() || !spawn_working_directory.trim()) {
+	async function handleSpawn() {
+		if (!spawnPrompt.trim() || !spawnWorkingDirectory.trim()) {
 			return;
 		}
 		spawning = true;
 		try {
-			await spawn_session({
-				prompt: spawn_prompt.trim(),
-				working_directory: spawn_working_directory.trim(),
+			await spawnSession({
+				prompt: spawnPrompt.trim(),
+				working_directory: spawnWorkingDirectory.trim(),
 			});
-			spawn_prompt = '';
+			spawnPrompt = '';
 			await store.refresh();
 		} catch (err) {
 			console.error('Failed to spawn session:', err);
@@ -70,58 +70,58 @@
 		}
 	}
 
-	function handle_select(session: Session) {
-		selected_session_id = session.id;
-		notification_store.clear_pending(session.id);
+	function handleSelect(session: Session) {
+		selectedSessionId = session.id;
+		notificationStore.clearPending(session.id);
 	}
 
-	async function handle_terminate(session_id: string) {
+	async function handleTerminate(sessionId: string) {
 		try {
-			await terminate_session(session_id);
+			await terminateSession(sessionId);
 			await store.refresh();
 		} catch (err) {
 			console.error('Failed to terminate session:', err);
 		}
 	}
 
-	async function handle_adopt(discovered: DiscoveredSession) {
+	async function handleAdopt(discovered: DiscoveredSession) {
 		try {
-			await adopt_session({
+			await adoptSession({
 				cli_session_id: discovered.session_id,
 				working_directory: discovered.working_directory,
 				original_intent: discovered.first_prompt,
 				cost_usd: discovered.cost_usd > 0 ? discovered.cost_usd : null,
 				token_count: discovered.token_count > 0 ? (discovered.token_count as number) : null,
 			});
-			store.remove_discovered_session(discovered.id);
+			store.removeDiscoveredSession(discovered.id);
 			await store.refresh();
 		} catch (err) {
 			console.error('Failed to adopt session:', err);
 		}
 	}
 
-	function handle_back() {
-		selected_session_id = null;
+	function handleBack() {
+		selectedSessionId = null;
 		store.refresh();
 	}
 </script>
 
-{#if selected_session}
+{#if selectedSession}
 	<!-- Chat view for selected session -->
 	<div class="flex h-full flex-col">
 		<div class="flex items-center gap-3 border-b border-border px-4 py-3">
 			<button
 				class="text-sm text-muted-foreground hover:text-foreground"
-				onclick={handle_back}
+				onclick={handleBack}
 			>
 				&larr; Back
 			</button>
 			<h2 class="truncate text-sm font-medium text-foreground">
-				{selected_session.original_intent ?? 'Session'}
+				{selectedSession.original_intent ?? 'Session'}
 			</h2>
 		</div>
 		<div class="flex-1">
-			<SessionChatView session={selected_session} />
+			<SessionChatView session={selectedSession} />
 		</div>
 	</div>
 {:else}
@@ -138,24 +138,24 @@
 				type="text"
 				class="w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
 				placeholder="Working directory (e.g., C:\projects\my-app)"
-				bind:value={spawn_working_directory}
+				bind:value={spawnWorkingDirectory}
 			/>
 			<div class="flex gap-2">
 				<input
 					type="text"
 					class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
 					placeholder="Prompt (e.g., Fix the login bug in auth.ts)"
-					bind:value={spawn_prompt}
+					bind:value={spawnPrompt}
 					onkeydown={(e) => {
 						if (e.key === 'Enter') {
-							handle_spawn();
+							handleSpawn();
 						}
 					}}
 				/>
 				<button
 					class="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-					onclick={handle_spawn}
-					disabled={spawning || !spawn_prompt.trim() || !spawn_working_directory.trim()}
+					onclick={handleSpawn}
+					disabled={spawning || !spawnPrompt.trim() || !spawnWorkingDirectory.trim()}
 				>
 					{spawning ? 'Spawning...' : 'Spawn'}
 				</button>
@@ -163,47 +163,39 @@
 		</div>
 
 		<!-- Discovered external sessions -->
-		{#if store.discovered_sessions.length > 0}
+		{#if store.discoveredSessions.length > 0}
 			<div class="space-y-2">
 				<h3 class="text-sm font-medium text-muted-foreground">
-					External Sessions ({store.discovered_sessions.length})
+					External Sessions ({store.discoveredSessions.length})
 				</h3>
-				{#each store.discovered_sessions as session (session.id)}
-					<DiscoveredSessionCard {session} on_adopt={handle_adopt} />
+				{#each store.discoveredSessions as session (session.id)}
+					<DiscoveredSessionCard {session} onAdopt={handleAdopt} />
 				{/each}
 			</div>
 		{/if}
 
 		<!-- Active sessions -->
-		{#if store.active_sessions.length > 0}
+		{#if store.activeSessions.length > 0}
 			<div class="space-y-2">
 				<h3 class="text-sm font-medium text-muted-foreground">Active</h3>
-				{#each store.active_sessions as session (session.id)}
-					<SessionCard
-						{session}
-						on_click={handle_select}
-						on_terminate={handle_terminate}
-					/>
+				{#each store.activeSessions as session (session.id)}
+					<SessionCard {session} onClick={handleSelect} onTerminate={handleTerminate} />
 				{/each}
 			</div>
 		{/if}
 
 		<!-- Finished sessions -->
-		{#if store.finished_sessions.length > 0}
+		{#if store.finishedSessions.length > 0}
 			<div class="space-y-2">
 				<h3 class="text-sm font-medium text-muted-foreground">Completed</h3>
-				{#each store.finished_sessions as session (session.id)}
-					<SessionCard
-						{session}
-						on_click={handle_select}
-						on_terminate={handle_terminate}
-					/>
+				{#each store.finishedSessions as session (session.id)}
+					<SessionCard {session} onClick={handleSelect} onTerminate={handleTerminate} />
 				{/each}
 			</div>
 		{/if}
 
 		<!-- Empty state -->
-		{#if store.loading === false && store.sessions.length === 0 && store.discovered_sessions.length === 0}
+		{#if store.loading === false && store.sessions.length === 0 && store.discoveredSessions.length === 0}
 			<div class="py-12 text-center">
 				<p class="text-muted-foreground">
 					No sessions yet. Spawn one above to get started.

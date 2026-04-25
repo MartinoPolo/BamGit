@@ -2,34 +2,34 @@ import { invoke } from '@tauri-apps/api/core';
 import type { Action, CreateActionRequest, UpdateActionRequest } from '$lib/types/action';
 
 // fallow-ignore-next-line unused-export
-export async function create_action(request: CreateActionRequest): Promise<Action> {
+export async function createAction(request: CreateActionRequest): Promise<Action> {
 	return invoke('create_action', { request });
 }
 
-export async function get_actions_for_dashboard(dashboard_id: string): Promise<Action[]> {
-	return invoke('get_actions_for_dashboard', { dashboardId: dashboard_id });
+export async function getActionsForDashboard(dashboardId: string): Promise<Action[]> {
+	return invoke('get_actions_for_dashboard', { dashboardId });
 }
 
 // fallow-ignore-next-line unused-export
-export async function get_action(id: string): Promise<Action> {
+export async function getAction(id: string): Promise<Action> {
 	return invoke('get_action', { id });
 }
 
 // fallow-ignore-next-line unused-export
-export async function update_action(request: UpdateActionRequest): Promise<Action> {
+export async function updateAction(request: UpdateActionRequest): Promise<Action> {
 	return invoke('update_action', { request });
 }
 
 // fallow-ignore-next-line unused-export
-export async function delete_action(id: string): Promise<void> {
+export async function deleteAction(id: string): Promise<void> {
 	return invoke('delete_action', { id });
 }
 
 // fallow-ignore-next-line unused-export
-export async function reorder_actions(action_ids: string[]): Promise<void> {
-	return invoke('reorder_actions', { actionIds: action_ids });
+export async function reorderActions(actionIds: string[]): Promise<void> {
+	return invoke('reorder_actions', { actionIds });
 }
 
-export async function execute_action(action_id: string, issue_id: string): Promise<string> {
-	return invoke('execute_action', { actionId: action_id, issueId: issue_id });
+export async function executeAction(actionId: string, issueId: string): Promise<string> {
+	return invoke('execute_action', { actionId, issueId });
 }

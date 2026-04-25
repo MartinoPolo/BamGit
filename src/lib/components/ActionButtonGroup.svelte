@@ -3,20 +3,20 @@
 
 	interface Props {
 		actions: Action[];
-		on_execute: (action_id: string) => void;
+		onExecute: (actionId: string) => void;
 	}
 
-	let { actions, on_execute }: Props = $props();
+	let { actions, onExecute }: Props = $props();
 
 	const ICON_MAP: Record<string, string> = {
-		play: '\u25B6',
-		eye: '\uD83D\uDC41',
-		wrench: '\uD83D\uDD27',
+		play: '▶',
+		eye: '👁',
+		wrench: '🔧',
 	};
 
-	function get_icon_display(icon: string | null): string {
+	function getIconDisplay(icon: string | null): string {
 		if (icon === null || icon === '') {
-			return '\u25CF';
+			return '●';
 		}
 		return ICON_MAP[icon] ?? icon;
 	}
@@ -27,12 +27,12 @@
 		<button
 			onclick={(event) => {
 				event.stopPropagation();
-				on_execute(action.id);
+				onExecute(action.id);
 			}}
 			class="rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 			title={action.name}
 		>
-			<span class="text-[10px]">{get_icon_display(action.icon)}</span>
+			<span class="text-[10px]">{getIconDisplay(action.icon)}</span>
 		</button>
 	{/each}
 </div>

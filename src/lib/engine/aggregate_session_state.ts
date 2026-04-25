@@ -10,15 +10,15 @@ const PRIORITY: readonly SessionState[] = [
 	'finished',
 ];
 
-export function aggregate_session_state(sessions: readonly SessionState[]): AggregateSessionState {
+export function aggregateSessionState(sessions: readonly SessionState[]): AggregateSessionState {
 	if (sessions.length === 0) {
 		return 'no-session';
 	}
 
-	const state_set = new Set(sessions);
+	const stateSet = new Set(sessions);
 
 	for (const state of PRIORITY) {
-		if (state_set.has(state)) {
+		if (stateSet.has(state)) {
 			return state;
 		}
 	}

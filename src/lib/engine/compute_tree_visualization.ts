@@ -7,7 +7,7 @@ import {
 	createDefaultToolVisibility,
 	OVERLAY_DEFAULTS,
 	SHAPE_FRUIT_MAP,
-	resolve_tree_shape,
+	resolveTreeShape,
 } from '$lib/types/tree_visualization';
 import type {
 	StateDimensions,
@@ -26,7 +26,7 @@ const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
 	issueId: '',
 };
 
-function compute_tool_visibility(dimensions: StateDimensions): ToolVisibility {
+function computeToolVisibility(dimensions: StateDimensions): ToolVisibility {
 	const tools = createDefaultToolVisibility();
 
 	if (dimensions.worktreeState === 'failed' || dimensions.aggregateSessionState === 'errored') {
@@ -105,7 +105,7 @@ const TREE_STAGE_RULES: readonly TreeStageRule[] = [
 	},
 ];
 
-function compute_tree_stage(dimensions: StateDimensions, context: TreeComputeContext): TreeStage {
+function computeTreeStage(dimensions: StateDimensions, context: TreeComputeContext): TreeStage {
 	for (const rule of TREE_STAGE_RULES) {
 		if (rule.condition(dimensions, context)) {
 			return rule.stage;
@@ -114,7 +114,7 @@ function compute_tree_stage(dimensions: StateDimensions, context: TreeComputeCon
 	return TREE_STAGES.seed;
 }
 
-function compute_potted_plant_stage(
+function computePottedPlantStage(
 	dimensions: StateDimensions,
 	context: TreeComputeContext,
 ): PottedPlantStage {
@@ -142,7 +142,7 @@ function issueIdToSeed(issueId: string): number {
 	return Math.abs(hash);
 }
 
-export function compute_tree_visualization(
+export function computeTreeVisualization(
 	dimensions: StateDimensions,
 	context?: TreeComputeContext,
 ): TreeVisualization {
@@ -162,14 +162,14 @@ export function compute_tree_visualization(
 	if (dimensions.labels.length === 0) {
 		return {
 			kind: 'potted-plant',
-			stage: compute_potted_plant_stage(dimensions, resolvedContext),
+			stage: computePottedPlantStage(dimensions, resolvedContext),
 			seed,
 		};
 	}
 
-	const stage = compute_tree_stage(dimensions, resolvedContext);
-	const shape = resolve_tree_shape(dimensions.labels);
-	const toolVisibility = compute_tool_visibility(dimensions);
+	const stage = computeTreeStage(dimensions, resolvedContext);
+	const shape = resolveTreeShape(dimensions.labels);
+	const toolVisibility = computeToolVisibility(dimensions);
 
 	const fruitType =
 		shape in SHAPE_FRUIT_MAP

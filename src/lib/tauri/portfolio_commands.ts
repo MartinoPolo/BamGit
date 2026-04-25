@@ -1,28 +1,28 @@
 import { invoke } from '@tauri-apps/api/core';
 import type { AddRepoToPortfolioRequest, PortfolioDashboardPointer } from '$lib/types/portfolio';
 
-export async function add_repo_to_portfolio(
+export async function addRepoToPortfolio(
 	request: AddRepoToPortfolioRequest,
 ): Promise<PortfolioDashboardPointer> {
 	return invoke('add_repo_to_portfolio', { request });
 }
 
 // fallow-ignore-next-line unused-export
-export async function remove_repo_from_portfolio(
-	portfolio_dashboard_id: string,
-	repo_dashboard_id: string,
+export async function removeRepoFromPortfolio(
+	portfolioDashboardId: string,
+	repoDashboardId: string,
 ): Promise<void> {
 	return invoke('remove_repo_from_portfolio', {
-		portfolioDashboardId: portfolio_dashboard_id,
-		repoDashboardId: repo_dashboard_id,
+		portfolioDashboardId,
+		repoDashboardId,
 	});
 }
 
 // fallow-ignore-next-line unused-export
-export async function get_portfolio_repos(
-	portfolio_dashboard_id: string,
+export async function getPortfolioRepos(
+	portfolioDashboardId: string,
 ): Promise<PortfolioDashboardPointer[]> {
 	return invoke('get_portfolio_repos', {
-		portfolioDashboardId: portfolio_dashboard_id,
+		portfolioDashboardId,
 	});
 }

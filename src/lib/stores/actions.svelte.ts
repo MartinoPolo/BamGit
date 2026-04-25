@@ -1,20 +1,20 @@
 import type { Action } from '$lib/types/action';
-import { get_actions_for_dashboard } from '$lib/tauri/action_commands';
+import { getActionsForDashboard } from '$lib/tauri/action_commands';
 
 let actions = $state<Action[]>([]);
 let loading = $state(false);
 let error = $state<string | null>(null);
-let current_dashboard_id = $state<string | null>(null);
+let currentDashboardId = $state<string | null>(null);
 
-const visible_actions = $derived(actions.filter((action) => action.visible));
+const visibleActions = $derived(actions.filter((action) => action.visible));
 
-export function get_action_store() {
+export function getActionStore() {
 	return {
 		get actions() {
 			return actions;
 		},
-		get visible_actions() {
-			return visible_actions;
+		get visibleActions() {
+			return visibleActions;
 		},
 		get loading() {
 			return loading;
@@ -23,11 +23,11 @@ export function get_action_store() {
 			return error;
 		},
 
-		async load_actions(dashboard_id: string) {
+		async loadActions(dashboardId: string) {
 			try {
 				loading = true;
-				current_dashboard_id = dashboard_id;
-				actions = await get_actions_for_dashboard(dashboard_id);
+				currentDashboardId = dashboardId;
+				actions = await getActionsForDashboard(dashboardId);
 				error = null;
 			} catch (err) {
 				error = String(err);
@@ -37,9 +37,9 @@ export function get_action_store() {
 		},
 
 		async refresh() {
-			if (current_dashboard_id) {
+			if (currentDashboardId) {
 				try {
-					actions = await get_actions_for_dashboard(current_dashboard_id);
+					actions = await getActionsForDashboard(currentDashboardId);
 					error = null;
 				} catch (err) {
 					error = String(err);

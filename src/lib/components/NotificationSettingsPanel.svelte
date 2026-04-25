@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { NotificationEventType } from '$lib/types/notification';
 	import {
-		update_notification_config,
-		test_notification_sound,
+		updateNotificationConfig,
+		testNotificationSound,
 	} from '$lib/tauri/notification_commands';
-	import { get_notification_store } from '$lib/stores/notifications.svelte';
+	import { getNotificationStore } from '$lib/stores/notifications.svelte';
 	import { onMount } from 'svelte';
 
-	const notification_store = get_notification_store();
+	const notificationStore = getNotificationStore();
 
 	const EVENT_LABELS: Record<NotificationEventType, string> = {
 		'needs-input': 'Needs Input',
@@ -26,28 +26,28 @@
 	};
 
 	onMount(() => {
-		notification_store.load_configs();
+		notificationStore.loadConfigs();
 	});
 
-	async function toggle_channel(
-		event_type: NotificationEventType,
+	async function toggleChannel(
+		eventType: NotificationEventType,
 		channel: 'sound_enabled' | 'toast_enabled' | 'window_flash_enabled',
 		value: boolean,
 	) {
 		try {
-			const updated = await update_notification_config({
-				event_type,
+			const updated = await updateNotificationConfig({
+				event_type: eventType,
 				[channel]: value,
 			});
-			notification_store.update_config(updated);
+			notificationStore.updateConfig(updated);
 		} catch (error) {
 			console.error('Failed to update notification config:', error);
 		}
 	}
 
-	async function handle_test_sound(event_type: NotificationEventType) {
+	async function handleTestSound(eventType: NotificationEventType) {
 		try {
-			await test_notification_sound(event_type);
+			await testNotificationSound(eventType);
 		} catch (error) {
 			console.error('Failed to test sound:', error);
 		}
@@ -62,7 +62,7 @@
 		</p>
 	</div>
 
-	{#if notification_store.loading}
+	{#if notificationStore.loading}
 		<p class="text-muted-foreground">Loading notification settings...</p>
 	{:else}
 		<div class="overflow-hidden rounded-lg border border-border">
@@ -78,7 +78,7 @@
 			</div>
 
 			<!-- Rows -->
-			{#each notification_store.configs as config (config.event_type)}
+			{#each notificationStore.configs as config (config.event_type)}
 				<div
 					class="grid grid-cols-[1fr_80px_80px_80px_60px] items-center gap-2 border-b border-border px-4 py-3 last:border-b-0"
 				>
@@ -100,7 +100,7 @@
 								? 'bg-primary'
 								: 'bg-muted'}"
 							onclick={() =>
-								toggle_channel(
+								toggleChannel(
 									config.event_type,
 									'sound_enabled',
 									config.sound_enabled !== true,
@@ -124,7 +124,7 @@
 								? 'bg-primary'
 								: 'bg-muted'}"
 							onclick={() =>
-								toggle_channel(
+								toggleChannel(
 									config.event_type,
 									'toast_enabled',
 									config.toast_enabled !== true,
@@ -148,7 +148,7 @@
 								? 'bg-primary'
 								: 'bg-muted'}"
 							onclick={() =>
-								toggle_channel(
+								toggleChannel(
 									config.event_type,
 									'window_flash_enabled',
 									config.window_flash_enabled !== true,
@@ -171,7 +171,7 @@
 						{#if config.sound_file}
 							<button
 								class="rounded px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-								onclick={() => handle_test_sound(config.event_type)}
+								onclick={() => handleTestSound(config.event_type)}
 								title="Play test sound"
 							>
 								&#9654;

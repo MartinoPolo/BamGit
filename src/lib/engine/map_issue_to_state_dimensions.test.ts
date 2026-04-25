@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { map_issue_to_state_dimensions } from './map_issue_to_state_dimensions';
+import { mapIssueToStateDimensions } from './map_issue_to_state_dimensions';
 import type { Issue } from '$lib/types/issue';
 import type { GitStatusCache } from '$lib/types/git_status';
 import type { SessionState, ExecutionPhase } from '$lib/types/session';
 
-function create_issue(overrides: Partial<Issue> = {}): Issue {
+function createIssue(overrides: Partial<Issue> = {}): Issue {
 	return {
 		id: 'i1',
 		dashboard_id: 'd1',
@@ -30,7 +30,7 @@ function create_issue(overrides: Partial<Issue> = {}): Issue {
 	};
 }
 
-function create_git_status(overrides: Partial<GitStatusCache> = {}): GitStatusCache {
+function createGitStatus(overrides: Partial<GitStatusCache> = {}): GitStatusCache {
 	return {
 		issue_id: 'i1',
 		branch_status: null,
@@ -50,16 +50,16 @@ interface SessionStub {
 	execution_phase: ExecutionPhase;
 }
 
-function create_session(overrides: Partial<SessionStub> = {}): SessionStub {
+function createSession(overrides: Partial<SessionStub> = {}): SessionStub {
 	return { state: 'running', execution_phase: 'none', ...overrides };
 }
 
 // ─── worktreeState ──────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — worktreeState', () => {
+describe('mapIssueToStateDimensions — worktreeState', () => {
 	it('passes through issue.worktree_state verbatim', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ worktree_state: 'active' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ worktree_state: 'active' }),
 			undefined,
 			[],
 		);
@@ -69,8 +69,8 @@ describe('map_issue_to_state_dimensions — worktreeState', () => {
 	it('handles every WorktreeState value', () => {
 		const states = ['none', 'pending', 'active', 'failed', 'removing', 'removed'] as const;
 		for (const state of states) {
-			const dimensions = map_issue_to_state_dimensions(
-				create_issue({ worktree_state: state }),
+			const dimensions = mapIssueToStateDimensions(
+				createIssue({ worktree_state: state }),
 				undefined,
 				[],
 			);
@@ -81,24 +81,24 @@ describe('map_issue_to_state_dimensions — worktreeState', () => {
 
 // ─── aggregateSessionState ──────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — aggregateSessionState', () => {
+describe('mapIssueToStateDimensions — aggregateSessionState', () => {
 	it('returns no-session when sessions array empty', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
 		expect(dimensions.aggregateSessionState).toBe('no-session');
 	});
 
 	it('aggregates from session states using priority order', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, [
-			create_session({ state: 'running' }),
-			create_session({ state: 'needs-input' }),
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, [
+			createSession({ state: 'running' }),
+			createSession({ state: 'needs-input' }),
 		]);
 		expect(dimensions.aggregateSessionState).toBe('needs-input');
 	});
 
 	it('returns running when all sessions running', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, [
-			create_session({ state: 'running' }),
-			create_session({ state: 'running' }),
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, [
+			createSession({ state: 'running' }),
+			createSession({ state: 'running' }),
 		]);
 		expect(dimensions.aggregateSessionState).toBe('running');
 	});
@@ -106,23 +106,23 @@ describe('map_issue_to_state_dimensions — aggregateSessionState', () => {
 
 // ─── executionPhase ─────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — executionPhase', () => {
+describe('mapIssueToStateDimensions — executionPhase', () => {
 	it('returns none when no sessions', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
 		expect(dimensions.executionPhase).toBe('none');
 	});
 
 	it('returns first running session execution phase', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, [
-			create_session({ state: 'finished', execution_phase: 'committing' }),
-			create_session({ state: 'running', execution_phase: 'tdd' }),
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, [
+			createSession({ state: 'finished', execution_phase: 'committing' }),
+			createSession({ state: 'running', execution_phase: 'tdd' }),
 		]);
 		expect(dimensions.executionPhase).toBe('tdd');
 	});
 
 	it('returns none when no running session exists', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, [
-			create_session({ state: 'finished', execution_phase: 'committing' }),
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, [
+			createSession({ state: 'finished', execution_phase: 'committing' }),
 		]);
 		expect(dimensions.executionPhase).toBe('none');
 	});
@@ -130,19 +130,19 @@ describe('map_issue_to_state_dimensions — executionPhase', () => {
 
 // ─── branchStatus ───────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — branchStatus', () => {
+describe('mapIssueToStateDimensions — branchStatus', () => {
 	it('returns no-branch when issue has no branch_name', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: null }),
-			create_git_status({ branch_status: 'active' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: null }),
+			createGitStatus({ branch_status: 'active' }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('no-branch');
 	});
 
 	it('returns no-branch when git_status is missing', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
 			undefined,
 			[],
 		);
@@ -150,54 +150,54 @@ describe('map_issue_to_state_dimensions — branchStatus', () => {
 	});
 
 	it('returns no-branch when branch_status is null', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
-			create_git_status({ branch_status: null }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
+			createGitStatus({ branch_status: null }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('no-branch');
 	});
 
 	it('returns no-branch when branch_status is unknown', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
-			create_git_status({ branch_status: 'unknown' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
+			createGitStatus({ branch_status: 'unknown' }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('no-branch');
 	});
 
 	it('maps active → active', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
-			create_git_status({ branch_status: 'active' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
+			createGitStatus({ branch_status: 'active' }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('active');
 	});
 
 	it('maps local → local-only', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
-			create_git_status({ branch_status: 'local' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
+			createGitStatus({ branch_status: 'local' }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('local-only');
 	});
 
 	it('maps remote-gone → remote-gone', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
-			create_git_status({ branch_status: 'remote-gone' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
+			createGitStatus({ branch_status: 'remote-gone' }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('remote-gone');
 	});
 
 	it('maps deleted → deleted', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ branch_name: 'feat/x' }),
-			create_git_status({ branch_status: 'deleted' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ branch_name: 'feat/x' }),
+			createGitStatus({ branch_status: 'deleted' }),
 			[],
 		);
 		expect(dimensions.branchStatus).toBe('deleted');
@@ -206,16 +206,16 @@ describe('map_issue_to_state_dimensions — branchStatus', () => {
 
 // ─── pullRequestState ───────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — pullRequestState', () => {
+describe('mapIssueToStateDimensions — pullRequestState', () => {
 	it('returns no-pr when git_status missing', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
 		expect(dimensions.pullRequestState).toBe('no-pr');
 	});
 
 	it('returns no-pr when pr_state is null', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ pr_state: null }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ pr_state: null }),
 			[],
 		);
 		expect(dimensions.pullRequestState).toBe('no-pr');
@@ -231,18 +231,18 @@ describe('map_issue_to_state_dimensions — pullRequestState', () => {
 		'merged',
 		'closed',
 	] as const)('passes through known pr_state "%s"', (state) => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ pr_state: state }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ pr_state: state }),
 			[],
 		);
 		expect(dimensions.pullRequestState).toBe(state);
 	});
 
 	it('falls back to open for unrecognised pr_state string', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ pr_state: 'some-new-state' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ pr_state: 'some-new-state' }),
 			[],
 		);
 		expect(dimensions.pullRequestState).toBe('open');
@@ -251,34 +251,34 @@ describe('map_issue_to_state_dimensions — pullRequestState', () => {
 
 // ─── githubIssueState ───────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — githubIssueState', () => {
+describe('mapIssueToStateDimensions — githubIssueState', () => {
 	it('defaults to open when git_status missing', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
 		expect(dimensions.githubIssueState).toBe('open');
 	});
 
 	it('defaults to open when github_issue_state is null', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ github_issue_state: null }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ github_issue_state: null }),
 			[],
 		);
 		expect(dimensions.githubIssueState).toBe('open');
 	});
 
 	it('maps closed → closed', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ github_issue_state: 'closed' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ github_issue_state: 'closed' }),
 			[],
 		);
 		expect(dimensions.githubIssueState).toBe('closed');
 	});
 
 	it('maps open → open', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ github_issue_state: 'open' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ github_issue_state: 'open' }),
 			[],
 		);
 		expect(dimensions.githubIssueState).toBe('open');
@@ -287,43 +287,43 @@ describe('map_issue_to_state_dimensions — githubIssueState', () => {
 
 // ─── syncStatus ─────────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — syncStatus', () => {
+describe('mapIssueToStateDimensions — syncStatus', () => {
 	it('returns up-to-date when git_status missing', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
 		expect(dimensions.syncStatus).toEqual({ type: 'up-to-date' });
 	});
 
 	it('returns merge-conflict when merge_conflict true', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ merge_conflict: true, behind_base_count: 3 }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ merge_conflict: true, behind_base_count: 3 }),
 			[],
 		);
 		expect(dimensions.syncStatus).toEqual({ type: 'merge-conflict' });
 	});
 
 	it('returns behind-base when behind_base_count > 0 and no merge conflict', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ merge_conflict: false, behind_base_count: 5 }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ merge_conflict: false, behind_base_count: 5 }),
 			[],
 		);
 		expect(dimensions.syncStatus).toEqual({ type: 'behind-base', count: 5 });
 	});
 
 	it('returns up-to-date when behind_base_count is 0', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ merge_conflict: false, behind_base_count: 0 }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ merge_conflict: false, behind_base_count: 0 }),
 			[],
 		);
 		expect(dimensions.syncStatus).toEqual({ type: 'up-to-date' });
 	});
 
 	it('returns up-to-date when behind_base_count is null', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue(),
-			create_git_status({ merge_conflict: false, behind_base_count: null }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue(),
+			createGitStatus({ merge_conflict: false, behind_base_count: null }),
 			[],
 		);
 		expect(dimensions.syncStatus).toEqual({ type: 'up-to-date' });
@@ -332,10 +332,10 @@ describe('map_issue_to_state_dimensions — syncStatus', () => {
 
 // ─── grovekeeperStatus ───────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — grovekeeperStatus', () => {
+describe('mapIssueToStateDimensions — grovekeeperStatus', () => {
 	it('maps active issue.status → active', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ status: 'active' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ status: 'active' }),
 			undefined,
 			[],
 		);
@@ -343,8 +343,8 @@ describe('map_issue_to_state_dimensions — grovekeeperStatus', () => {
 	});
 
 	it('maps archived issue.status → archived', () => {
-		const dimensions = map_issue_to_state_dimensions(
-			create_issue({ status: 'archived' }),
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ status: 'archived' }),
 			undefined,
 			[],
 		);
@@ -354,9 +354,9 @@ describe('map_issue_to_state_dimensions — grovekeeperStatus', () => {
 
 // ─── labels ─────────────────────────────────────────────────────────────
 
-describe('map_issue_to_state_dimensions — labels', () => {
+describe('mapIssueToStateDimensions — labels', () => {
 	it('stubs labels as ["AFK"] (Issue has no labels field yet)', () => {
-		const dimensions = map_issue_to_state_dimensions(create_issue(), undefined, []);
+		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
 		expect(dimensions.labels).toEqual(['AFK']);
 	});
 });

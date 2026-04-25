@@ -3,10 +3,10 @@
 	import type { GitStatusCache } from '$lib/types/git_status';
 	import type { TreeVisualization } from '$lib/types/tree_visualization';
 	import type { ForestLayoutItem, PositionedForestItem } from '$lib/engine/forest_layout';
-	import { compute_forest_layout } from '$lib/engine/forest_layout';
-	import { compute_tree_visualization } from '$lib/engine/compute_tree_visualization';
+	import { computeForestLayout } from '$lib/engine/forest_layout';
+	import { computeTreeVisualization } from '$lib/engine/compute_tree_visualization';
 	import {
-		map_issue_to_state_dimensions,
+		mapIssueToStateDimensions,
 		type SessionForMapping,
 	} from '$lib/engine/map_issue_to_state_dimensions';
 	import { SvelteMap } from 'svelte/reactivity';
@@ -14,38 +14,38 @@
 
 	interface Props {
 		issues: readonly Issue[];
-		get_git_status: (issue_id: string) => GitStatusCache | undefined;
-		get_sessions_for_issue: (issue_id: string) => readonly SessionForMapping[];
-		on_select_issue: (issue: Issue) => void;
+		getGitStatus: (issueId: string) => GitStatusCache | undefined;
+		getSessionsForIssue: (issueId: string) => readonly SessionForMapping[];
+		onSelectIssue: (issue: Issue) => void;
 	}
 
-	let { issues, get_git_status, get_sessions_for_issue, on_select_issue }: Props = $props();
+	let { issues, getGitStatus, getSessionsForIssue, onSelectIssue }: Props = $props();
 
 	const TREE_NATURAL_WIDTH = 100;
 	const TREE_NATURAL_HEIGHT = 100;
 	const POTTED_NATURAL_WIDTH = 60;
 	const POTTED_NATURAL_HEIGHT = 90;
 
-	let viewport_width = $state(0);
-	let viewport_height = $state(0);
+	let viewportWidth = $state(0);
+	let viewportHeight = $state(0);
 
 	type RenderableVisualization = Exclude<TreeVisualization, { kind: 'oak' }>;
 
 	interface IssueEntry {
 		readonly issue: Issue;
 		readonly visualization: RenderableVisualization;
-		readonly layout_item: ForestLayoutItem;
+		readonly layoutItem: ForestLayoutItem;
 	}
 
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const results: IssueEntry[] = [];
 		for (const issue of issues) {
-			const dimensions = map_issue_to_state_dimensions(
+			const dimensions = mapIssueToStateDimensions(
 				issue,
-				get_git_status(issue.id),
-				get_sessions_for_issue(issue.id),
+				getGitStatus(issue.id),
+				getSessionsForIssue(issue.id),
 			);
-			const visualization = compute_tree_visualization(dimensions);
+			const visualization = computeTreeVisualization(dimensions);
 			if (visualization.kind === 'oak') {
 				continue;
 			}
@@ -53,13 +53,13 @@
 			results.push({
 				issue,
 				visualization: renderable,
-				layout_item: build_layout_item(issue, renderable),
+				layoutItem: buildLayoutItem(issue, renderable),
 			});
 		}
 		return results;
 	});
 
-	const entry_by_id = $derived.by(() => {
+	const entryById = $derived.by(() => {
 		const map = new SvelteMap<string, IssueEntry>();
 		for (const entry of entries) {
 			map.set(entry.issue.id, entry);
@@ -67,14 +67,14 @@
 		return map;
 	});
 
-	const layout_result = $derived(
-		compute_forest_layout(
-			entries.map((entry) => entry.layout_item),
-			{ width: viewport_width, height: viewport_height },
+	const layoutResult = $derived(
+		computeForestLayout(
+			entries.map((entry) => entry.layoutItem),
+			{ width: viewportWidth, height: viewportHeight },
 		),
 	);
 
-	function build_layout_item(
+	function buildLayoutItem(
 		issue: Issue,
 		visualization: RenderableVisualization,
 	): ForestLayoutItem {
@@ -96,35 +96,35 @@
 		};
 	}
 
-	function get_natural_size(entry: IssueEntry): { width: number; height: number } {
+	function getNaturalSize(entry: IssueEntry): { width: number; height: number } {
 		if (entry.visualization.kind === 'potted-plant') {
 			return { width: POTTED_NATURAL_WIDTH, height: POTTED_NATURAL_HEIGHT };
 		}
 		return { width: TREE_NATURAL_WIDTH, height: TREE_NATURAL_HEIGHT };
 	}
 
-	function handle_select(positioned: PositionedForestItem) {
-		const entry = entry_by_id.get(positioned.id);
+	function handleSelect(positioned: PositionedForestItem) {
+		const entry = entryById.get(positioned.id);
 		if (entry !== undefined) {
-			on_select_issue(entry.issue);
+			onSelectIssue(entry.issue);
 		}
 	}
 </script>
 
 <div
 	class="relative h-[600px] w-full overflow-hidden rounded-md border border-border bg-muted/10"
-	bind:clientWidth={viewport_width}
-	bind:clientHeight={viewport_height}
+	bind:clientWidth={viewportWidth}
+	bind:clientHeight={viewportHeight}
 >
 	{#if issues.length === 0}
 		<p class="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
 			No issues to visualise.
 		</p>
 	{:else}
-		{#each layout_result.items as positioned (positioned.id)}
-			{@const entry = entry_by_id.get(positioned.id)}
+		{#each layoutResult.items as positioned (positioned.id)}
+			{@const entry = entryById.get(positioned.id)}
 			{#if entry}
-				{@const size = get_natural_size(entry)}
+				{@const size = getNaturalSize(entry)}
 				<button
 					type="button"
 					class="absolute cursor-pointer border-0 bg-transparent p-0 transition-transform hover:brightness-110 focus-visible:outline-2 focus-visible:outline-ring"
@@ -135,7 +135,7 @@
 					style:transform="translate(-50%, -50%) scale({positioned.scale})"
 					style:opacity={positioned.opacity}
 					style:z-index={positioned.zIndex}
-					onclick={() => handle_select(positioned)}
+					onclick={() => handleSelect(positioned)}
 					title={entry.issue.name}
 					aria-label="Open issue {entry.issue.name}"
 				>
