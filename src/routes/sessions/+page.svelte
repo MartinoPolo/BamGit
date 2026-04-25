@@ -6,16 +6,16 @@
 		SessionEventPayload,
 	} from '$lib/types/session';
 	import { adoptSession, spawnSession, terminateSession } from '$lib/tauri/session_commands';
-	import { getSessionStore } from '$lib/stores/sessions.svelte';
-	import { getNotificationStore } from '$lib/stores/notifications.svelte';
+	import { useSessions } from '$lib/context/sessions.context.svelte.js';
+	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 	import SessionCard from '$lib/components/SessionCard.svelte';
 	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';
 	import SessionChatView from '$lib/components/SessionChatView.svelte';
 
-	const store = getSessionStore();
-	const notificationStore = getNotificationStore();
+	const store = useSessions();
+	const notificationStore = useNotifications();
 
 	let selectedSessionId = $state<string | null>(null);
 	let spawnPrompt = $state('');

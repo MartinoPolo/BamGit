@@ -1,3 +1,4 @@
+import { createContext } from 'svelte';
 import type {
 	AssignedIssue,
 	GhCliAvailability,
@@ -11,14 +12,16 @@ import {
 	syncAllGithubState,
 } from '$lib/tauri/github_commands';
 
-let cacheMap = $state<Map<string, GitHubStatusCache>>(new Map());
-let availability = $state<GhCliAvailability>('not-installed');
-let syncing = $state(false);
-let syncError = $state<string | null>(null);
-let lastSyncTime = $state<Date | null>(null);
-let assignedIssues = $state<AssignedIssue[]>([]);
+type GithubContext = ReturnType<typeof createGithubContext>;
 
-const isAvailable = $derived(availability === 'available');
+const [useGithub, setGithubInternal] = createContext<GithubContext>();
+export { useGithub };
+
+export function setGithubContext() {
+	const ctx = createGithubContext();
+	setGithubInternal(ctx);
+	return ctx;
+}
 
 function buildCacheMap(caches: readonly GitHubStatusCache[]): Map<string, GitHubStatusCache> {
 	const map = new Map<string, GitHubStatusCache>();
@@ -28,7 +31,16 @@ function buildCacheMap(caches: readonly GitHubStatusCache[]): Map<string, GitHub
 	return map;
 }
 
-export function getGithubStore() {
+function createGithubContext() {
+	let cacheMap = $state<Map<string, GitHubStatusCache>>(new Map());
+	let availability = $state<GhCliAvailability>('not-installed');
+	let syncing = $state(false);
+	let syncError = $state<string | null>(null);
+	let lastSyncTime = $state<Date | null>(null);
+	let assignedIssues = $state<AssignedIssue[]>([]);
+
+	const isAvailable = $derived(availability === 'available');
+
 	return {
 		get cacheMap() {
 			return cacheMap;
@@ -95,7 +107,6 @@ export function getGithubStore() {
 				const result = await syncAllGithubState(dashboardId, owner, repo);
 				lastSyncTime = new Date();
 
-				// Reload caches after sync
 				const caches = await getAllGithubStatusCaches(dashboardId);
 				cacheMap = buildCacheMap(caches);
 

@@ -4,10 +4,10 @@
 		updateNotificationConfig,
 		testNotificationSound,
 	} from '$lib/tauri/notification_commands';
-	import { getNotificationStore } from '$lib/stores/notifications.svelte';
+	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
 	import { onMount } from 'svelte';
 
-	const notificationStore = getNotificationStore();
+	const notificationStore = useNotifications();
 
 	const EVENT_LABELS: Record<NotificationEventType, string> = {
 		'needs-input': 'Needs Input',

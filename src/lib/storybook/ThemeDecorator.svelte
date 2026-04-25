@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { initializeTheme, getThemeStore } from '$lib/stores/theme.svelte';
+	import { setThemeContext, useTheme } from '$lib/context/theme.context.svelte.js';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
 
-	initializeTheme();
-	const theme = getThemeStore();
+	setThemeContext();
+	const theme = useTheme();
 </script>
 
 <div class="flex flex-col gap-4 p-4" class:dark={theme.isDark}>

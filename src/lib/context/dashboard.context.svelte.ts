@@ -1,23 +1,35 @@
+import { createContext } from 'svelte';
 import type { Dashboard } from '$lib/types/dashboard';
 import { getDashboards } from '$lib/tauri/commands';
 
 const LAST_VIEWED_KEY = 'grovekeeper_last_viewed_dashboard_id';
 
-let dashboards = $state<Dashboard[]>([]);
-let activeDashboardId = $state<string | null>(null);
-let sidebarCollapsed = $state(false);
-let loading = $state(true);
-let error = $state<string | null>(null);
-let showCreateDialog = $state(false);
+type DashboardContext = ReturnType<typeof createDashboardContext>;
 
-const activeDashboard = $derived(
-	dashboards.find((dashboard) => dashboard.id === activeDashboardId) ?? null,
-);
+const [useDashboard, setDashboardInternal] = createContext<DashboardContext>();
+export { useDashboard };
 
-const repoDashboards = $derived(dashboards.filter((d) => d.type === 'repo'));
-const portfolioDashboards = $derived(dashboards.filter((d) => d.type === 'portfolio'));
+export function setDashboardContext() {
+	const ctx = createDashboardContext();
+	setDashboardInternal(ctx);
+	return ctx;
+}
 
-export function getDashboardStore() {
+function createDashboardContext() {
+	let dashboards = $state<Dashboard[]>([]);
+	let activeDashboardId = $state<string | null>(null);
+	let sidebarCollapsed = $state(false);
+	let loading = $state(true);
+	let error = $state<string | null>(null);
+	let showCreateDialog = $state(false);
+
+	const activeDashboard = $derived(
+		dashboards.find((dashboard) => dashboard.id === activeDashboardId) ?? null,
+	);
+
+	const repoDashboards = $derived(dashboards.filter((d) => d.type === 'repo'));
+	const portfolioDashboards = $derived(dashboards.filter((d) => d.type === 'portfolio'));
+
 	return {
 		get dashboards() {
 			return dashboards;
@@ -56,7 +68,6 @@ export function getDashboardStore() {
 				dashboards = await getDashboards();
 				error = null;
 
-				// Restore last viewed dashboard
 				const lastId = localStorage.getItem(LAST_VIEWED_KEY);
 				if (lastId && dashboards.some((d) => d.id === lastId)) {
 					activeDashboardId = lastId;
@@ -81,12 +92,10 @@ export function getDashboardStore() {
 			sidebarCollapsed = !sidebarCollapsed;
 		},
 
-		/** Call after create/update/delete to refresh the list */
 		async refresh() {
 			try {
 				dashboards = await getDashboards();
 				error = null;
-				// If active dashboard was deleted, select first available
 				if (activeDashboardId && !dashboards.some((d) => d.id === activeDashboardId)) {
 					activeDashboardId = dashboards.length > 0 ? dashboards[0].id : null;
 				}

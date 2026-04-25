@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { getDashboardStore } from '$lib/stores/dashboard.svelte';
-	import { getGitStatusStore } from '$lib/stores/git_status.svelte';
-	import { getIssueStore } from '$lib/stores/issues.svelte';
-	import { getGithubStore } from '$lib/stores/github.svelte';
-	import { getActionStore } from '$lib/stores/actions.svelte';
-	import { getNotificationStore } from '$lib/stores/notifications.svelte';
-	import { getSessionStore } from '$lib/stores/sessions.svelte';
+	import { useDashboard } from '$lib/context/dashboard.context.svelte.js';
+	import { useGitStatus } from '$lib/context/git_status.context.svelte.js';
+	import { useIssues } from '$lib/context/issues.context.svelte.js';
+	import { useGithub } from '$lib/context/github.context.svelte.js';
+	import { useActions } from '$lib/context/actions.context.svelte.js';
+	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
+	import { useSessions } from '$lib/context/sessions.context.svelte.js';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
-	import { getColorPaletteStore } from '$lib/stores/color_palettes.svelte';
-	import { getViewPreferenceStore } from '$lib/stores/view_preference.svelte';
+	import { useColorPalettes } from '$lib/context/color_palettes.context.svelte.js';
+	import { useViewPreference } from '$lib/context/view_preference.context.svelte.js';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
 	import {
 		createIssue,
@@ -21,6 +21,7 @@
 	import { executeAction } from '$lib/tauri/action_commands';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
 	import type { Session } from '$lib/types/session';
+	import { SvelteMap } from 'svelte/reactivity';
 	import type { PrunableIssue } from '$lib/types/worktree';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
@@ -33,18 +34,18 @@
 	import AssignedIssuesPanel from '$lib/components/AssignedIssuesPanel.svelte';
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 
-	const dashboardStore = getDashboardStore();
-	const gitStatusStore = getGitStatusStore();
-	const issueStore = getIssueStore();
-	const githubStore = getGithubStore();
-	const actionStore = getActionStore();
-	const notificationStore = getNotificationStore();
-	const sessionStore = getSessionStore();
-	const paletteStore = getColorPaletteStore();
-	const viewPreferenceStore = getViewPreferenceStore();
+	const dashboardStore = useDashboard();
+	const gitStatusStore = useGitStatus();
+	const issueStore = useIssues();
+	const githubStore = useGithub();
+	const actionStore = useActions();
+	const notificationStore = useNotifications();
+	const sessionStore = useSessions();
+	const paletteStore = useColorPalettes();
+	const viewPreferenceStore = useViewPreference();
 
 	const sessionsByIssueId = $derived.by(() => {
-		const map = new Map<string, Session[]>();
+		const map = new SvelteMap<string, Session[]>();
 		for (const session of sessionStore.sessions) {
 			if (session.issue_id === null) {
 				continue;

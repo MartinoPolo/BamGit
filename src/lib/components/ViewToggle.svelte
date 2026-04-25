@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { List, Trees } from 'lucide-svelte';
-	import type { ViewMode } from '$lib/stores/view_preference.svelte';
+	import type { ViewMode } from '$lib/context/view_preference.context.svelte.js';
 
 	interface Props {
 		viewMode: ViewMode;

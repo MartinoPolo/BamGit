@@ -1,13 +1,13 @@
 <script lang="ts">
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import type { ColorPalette, CreateColorPaletteRequest } from '$lib/types/color_palette';
-	import { getColorPaletteStore } from '$lib/stores/color_palettes.svelte';
+	import { useColorPalettes } from '$lib/context/color_palettes.context.svelte.js';
 	import {
 		createColorPalette,
 		updateColorPalette,
 		deleteColorPalette,
 	} from '$lib/tauri/color_palette_commands';
-	const paletteStore = getColorPaletteStore();
+	const paletteStore = useColorPalettes();
 
 	let creating = $state(false);
 	let newPaletteName = $state('');
