@@ -1,50 +1,50 @@
 import { describe, it, expect } from 'vitest';
-import { aggregate_session_state } from './aggregate_session_state';
+import { aggregateSessionState } from './aggregate_session_state';
 import type { SessionState } from '$lib/types/session';
 
-describe('aggregate_session_state', () => {
+describe('aggregateSessionState', () => {
 	it('returns no-session for empty array', () => {
-		expect(aggregate_session_state([])).toBe('no-session');
+		expect(aggregateSessionState([])).toBe('no-session');
 	});
 
 	it('returns running for single running session', () => {
-		expect(aggregate_session_state(['running'])).toBe('running');
+		expect(aggregateSessionState(['running'])).toBe('running');
 	});
 
 	it('returns needs-input for single needs-input session', () => {
-		expect(aggregate_session_state(['needs-input'])).toBe('needs-input');
+		expect(aggregateSessionState(['needs-input'])).toBe('needs-input');
 	});
 
 	it('returns errored for single errored session', () => {
-		expect(aggregate_session_state(['errored'])).toBe('errored');
+		expect(aggregateSessionState(['errored'])).toBe('errored');
 	});
 
 	it('returns needs-review for single needs-review session', () => {
-		expect(aggregate_session_state(['needs-review'])).toBe('needs-review');
+		expect(aggregateSessionState(['needs-review'])).toBe('needs-review');
 	});
 
 	it('returns paused for single paused session', () => {
-		expect(aggregate_session_state(['paused'])).toBe('paused');
+		expect(aggregateSessionState(['paused'])).toBe('paused');
 	});
 
 	it('returns finished for single finished session', () => {
-		expect(aggregate_session_state(['finished'])).toBe('finished');
+		expect(aggregateSessionState(['finished'])).toBe('finished');
 	});
 
 	it('needs-input wins over running', () => {
-		expect(aggregate_session_state(['running', 'needs-input'])).toBe('needs-input');
+		expect(aggregateSessionState(['running', 'needs-input'])).toBe('needs-input');
 	});
 
 	it('errored wins over finished', () => {
-		expect(aggregate_session_state(['finished', 'errored'])).toBe('errored');
+		expect(aggregateSessionState(['finished', 'errored'])).toBe('errored');
 	});
 
 	it('needs-review wins over paused and running', () => {
-		expect(aggregate_session_state(['paused', 'running', 'needs-review'])).toBe('needs-review');
+		expect(aggregateSessionState(['paused', 'running', 'needs-review'])).toBe('needs-review');
 	});
 
 	it('errored wins over needs-review', () => {
-		expect(aggregate_session_state(['needs-review', 'errored'])).toBe('errored');
+		expect(aggregateSessionState(['needs-review', 'errored'])).toBe('errored');
 	});
 
 	it('needs-input is highest priority across all states', () => {
@@ -55,14 +55,14 @@ describe('aggregate_session_state', () => {
 			'errored',
 			'needs-input',
 		];
-		expect(aggregate_session_state(sessions)).toBe('needs-input');
+		expect(aggregateSessionState(sessions)).toBe('needs-input');
 	});
 
 	it('returns finished when all sessions are finished', () => {
-		expect(aggregate_session_state(['finished', 'finished', 'finished'])).toBe('finished');
+		expect(aggregateSessionState(['finished', 'finished', 'finished'])).toBe('finished');
 	});
 
 	it('running wins over finished', () => {
-		expect(aggregate_session_state(['finished', 'running'])).toBe('running');
+		expect(aggregateSessionState(['finished', 'running'])).toBe('running');
 	});
 });

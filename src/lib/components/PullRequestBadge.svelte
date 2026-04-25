@@ -15,11 +15,11 @@
 	interface Props {
 		state: PullRequestState | null;
 		url: string | null;
-		pr_number: number | null;
+		prNumber: number | null;
 		disabled?: boolean;
 	}
 
-	let { state, url, pr_number, disabled = false }: Props = $props();
+	let { state, url, prNumber, disabled = false }: Props = $props();
 
 	const config = $derived.by(() => {
 		switch (state) {
@@ -91,7 +91,7 @@
 		color={config.color}
 		bg={config.bg}
 		label={config.label}
-		number={pr_number}
+		number={prNumber}
 		{url}
 		prefix="PR"
 		{disabled}

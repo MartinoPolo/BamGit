@@ -4,12 +4,12 @@
 	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/DashboardEditDialog.svelte';
-	import { get_dashboard_store } from '$lib/stores/dashboard.svelte';
-	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
-	import { initialize_theme } from '$lib/stores/theme.svelte';
-	import { initialize_view_preference } from '$lib/stores/view_preference.svelte';
-	import { create_dashboard, update_dashboard, delete_dashboard } from '$lib/tauri/commands';
-	import { add_repo_to_portfolio } from '$lib/tauri/portfolio_commands';
+	import { getDashboardStore } from '$lib/stores/dashboard.svelte';
+	import { getColorPaletteStore } from '$lib/stores/color_palettes.svelte';
+	import { initializeTheme } from '$lib/stores/theme.svelte';
+	import { initializeViewPreference } from '$lib/stores/view_preference.svelte';
+	import { createDashboard, updateDashboard, deleteDashboard } from '$lib/tauri/commands';
+	import { addRepoToPortfolio } from '$lib/tauri/portfolio_commands';
 	import type {
 		CreateDashboardRequest,
 		Dashboard,
@@ -18,55 +18,55 @@
 
 	let { children } = $props();
 
-	const dashboard_store = get_dashboard_store();
-	const palette_store = get_color_palette_store();
-	initialize_theme();
-	initialize_view_preference();
+	const dashboardStore = getDashboardStore();
+	const paletteStore = getColorPaletteStore();
+	initializeTheme();
+	initializeViewPreference();
 
-	let editing_dashboard = $state<Dashboard | null>(null);
+	let editingDashboard = $state<Dashboard | null>(null);
 
 	onMount(() => {
-		dashboard_store.load_dashboards();
-		palette_store.load_palettes();
+		dashboardStore.loadDashboards();
+		paletteStore.loadPalettes();
 	});
 
-	async function handle_create_dashboard(
+	async function handleCreateDashboard(
 		request: CreateDashboardRequest,
-		selected_repo_ids: string[],
+		selectedRepoIds: string[],
 	) {
 		try {
-			const created = await create_dashboard(request);
+			const created = await createDashboard(request);
 
 			// Add repo pointers for portfolio dashboards
-			if (request.type === 'portfolio' && selected_repo_ids.length > 0) {
-				for (const repo_id of selected_repo_ids) {
-					await add_repo_to_portfolio({
+			if (request.type === 'portfolio' && selectedRepoIds.length > 0) {
+				for (const repoId of selectedRepoIds) {
+					await addRepoToPortfolio({
 						portfolio_dashboard_id: created.id,
-						repo_dashboard_id: repo_id,
+						repo_dashboard_id: repoId,
 					});
 				}
 			}
 
-			await dashboard_store.refresh();
-			dashboard_store.select_dashboard(created.id);
+			await dashboardStore.refresh();
+			dashboardStore.selectDashboard(created.id);
 		} catch (err) {
 			console.error('Failed to create dashboard:', err);
 		}
 	}
 
-	async function handle_update_dashboard(request: UpdateDashboardRequest) {
+	async function handleUpdateDashboard(request: UpdateDashboardRequest) {
 		try {
-			await update_dashboard(request);
-			await dashboard_store.refresh();
+			await updateDashboard(request);
+			await dashboardStore.refresh();
 		} catch (err) {
 			console.error('Failed to update dashboard:', err);
 		}
 	}
 
-	async function handle_delete_dashboard(id: string) {
+	async function handleDeleteDashboard(id: string) {
 		try {
-			await delete_dashboard(id);
-			await dashboard_store.refresh();
+			await deleteDashboard(id);
+			await dashboardStore.refresh();
 		} catch (err) {
 			console.error('Failed to delete dashboard:', err);
 		}
@@ -75,13 +75,13 @@
 
 <div class="flex h-screen bg-background text-foreground">
 	<DashboardSidebar
-		dashboards={dashboard_store.dashboards}
-		active_dashboard_id={dashboard_store.active_dashboard_id}
-		collapsed={dashboard_store.sidebar_collapsed}
-		on_select_dashboard={(id) => dashboard_store.select_dashboard(id)}
-		on_toggle_sidebar={() => dashboard_store.toggle_sidebar()}
-		on_create_dashboard={() => (dashboard_store.show_create_dialog = true)}
-		on_edit_dashboard={(d) => (editing_dashboard = d)}
+		dashboards={dashboardStore.dashboards}
+		activeDashboardId={dashboardStore.activeDashboardId}
+		collapsed={dashboardStore.sidebarCollapsed}
+		onSelectDashboard={(id) => dashboardStore.selectDashboard(id)}
+		onToggleSidebar={() => dashboardStore.toggleSidebar()}
+		onCreateDashboard={() => (dashboardStore.showCreateDialog = true)}
+		onEditDashboard={(d) => (editingDashboard = d)}
 	/>
 
 	<main class="flex-1 overflow-auto p-4">
@@ -90,17 +90,17 @@
 </div>
 
 <DashboardCreateDialog
-	open={dashboard_store.show_create_dialog}
-	repo_dashboards={dashboard_store.repo_dashboards}
-	color_palettes={palette_store.palettes}
-	on_close={() => (dashboard_store.show_create_dialog = false)}
-	on_create={handle_create_dashboard}
+	open={dashboardStore.showCreateDialog}
+	repoDashboards={dashboardStore.repoDashboards}
+	colorPalettes={paletteStore.palettes}
+	onClose={() => (dashboardStore.showCreateDialog = false)}
+	onCreate={handleCreateDashboard}
 />
 
 <DashboardEditDialog
-	dashboard={editing_dashboard}
-	color_palettes={palette_store.palettes}
-	on_close={() => (editing_dashboard = null)}
-	on_update={handle_update_dashboard}
-	on_delete={handle_delete_dashboard}
+	dashboard={editingDashboard}
+	colorPalettes={paletteStore.palettes}
+	onClose={() => (editingDashboard = null)}
+	onUpdate={handleUpdateDashboard}
+	onDelete={handleDeleteDashboard}
 />

@@ -1,41 +1,41 @@
 import type { Dashboard } from '$lib/types/dashboard';
-import { get_dashboards } from '$lib/tauri/commands';
+import { getDashboards } from '$lib/tauri/commands';
 
 const LAST_VIEWED_KEY = 'grovekeeper_last_viewed_dashboard_id';
 
 let dashboards = $state<Dashboard[]>([]);
-let active_dashboard_id = $state<string | null>(null);
-let sidebar_collapsed = $state(false);
+let activeDashboardId = $state<string | null>(null);
+let sidebarCollapsed = $state(false);
 let loading = $state(true);
 let error = $state<string | null>(null);
-let show_create_dialog = $state(false);
+let showCreateDialog = $state(false);
 
-const active_dashboard = $derived(
-	dashboards.find((dashboard) => dashboard.id === active_dashboard_id) ?? null,
+const activeDashboard = $derived(
+	dashboards.find((dashboard) => dashboard.id === activeDashboardId) ?? null,
 );
 
-const repo_dashboards = $derived(dashboards.filter((d) => d.type === 'repo'));
-const portfolio_dashboards = $derived(dashboards.filter((d) => d.type === 'portfolio'));
+const repoDashboards = $derived(dashboards.filter((d) => d.type === 'repo'));
+const portfolioDashboards = $derived(dashboards.filter((d) => d.type === 'portfolio'));
 
-export function get_dashboard_store() {
+export function getDashboardStore() {
 	return {
 		get dashboards() {
 			return dashboards;
 		},
-		get active_dashboard() {
-			return active_dashboard;
+		get activeDashboard() {
+			return activeDashboard;
 		},
-		get active_dashboard_id() {
-			return active_dashboard_id;
+		get activeDashboardId() {
+			return activeDashboardId;
 		},
-		get repo_dashboards() {
-			return repo_dashboards;
+		get repoDashboards() {
+			return repoDashboards;
 		},
-		get portfolio_dashboards() {
-			return portfolio_dashboards;
+		get portfolioDashboards() {
+			return portfolioDashboards;
 		},
-		get sidebar_collapsed() {
-			return sidebar_collapsed;
+		get sidebarCollapsed() {
+			return sidebarCollapsed;
 		},
 		get loading() {
 			return loading;
@@ -43,27 +43,27 @@ export function get_dashboard_store() {
 		get error() {
 			return error;
 		},
-		get show_create_dialog() {
-			return show_create_dialog;
+		get showCreateDialog() {
+			return showCreateDialog;
 		},
-		set show_create_dialog(value: boolean) {
-			show_create_dialog = value;
+		set showCreateDialog(value: boolean) {
+			showCreateDialog = value;
 		},
 
-		async load_dashboards() {
+		async loadDashboards() {
 			try {
 				loading = true;
-				dashboards = await get_dashboards();
+				dashboards = await getDashboards();
 				error = null;
 
 				// Restore last viewed dashboard
-				const last_id = localStorage.getItem(LAST_VIEWED_KEY);
-				if (last_id && dashboards.some((d) => d.id === last_id)) {
-					active_dashboard_id = last_id;
+				const lastId = localStorage.getItem(LAST_VIEWED_KEY);
+				if (lastId && dashboards.some((d) => d.id === lastId)) {
+					activeDashboardId = lastId;
 				} else if (dashboards.length > 0) {
-					active_dashboard_id = dashboards[0].id;
+					activeDashboardId = dashboards[0].id;
 				} else {
-					active_dashboard_id = null;
+					activeDashboardId = null;
 				}
 			} catch (err) {
 				error = String(err);
@@ -72,23 +72,23 @@ export function get_dashboard_store() {
 			}
 		},
 
-		select_dashboard(id: string) {
-			active_dashboard_id = id;
+		selectDashboard(id: string) {
+			activeDashboardId = id;
 			localStorage.setItem(LAST_VIEWED_KEY, id);
 		},
 
-		toggle_sidebar() {
-			sidebar_collapsed = !sidebar_collapsed;
+		toggleSidebar() {
+			sidebarCollapsed = !sidebarCollapsed;
 		},
 
 		/** Call after create/update/delete to refresh the list */
 		async refresh() {
 			try {
-				dashboards = await get_dashboards();
+				dashboards = await getDashboards();
 				error = null;
 				// If active dashboard was deleted, select first available
-				if (active_dashboard_id && !dashboards.some((d) => d.id === active_dashboard_id)) {
-					active_dashboard_id = dashboards.length > 0 ? dashboards[0].id : null;
+				if (activeDashboardId && !dashboards.some((d) => d.id === activeDashboardId)) {
+					activeDashboardId = dashboards.length > 0 ? dashboards[0].id : null;
 				}
 			} catch (err) {
 				error = String(err);

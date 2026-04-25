@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { initialize_theme, get_theme_store } from '$lib/stores/theme.svelte';
+	import { initializeTheme, getThemeStore } from '$lib/stores/theme.svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
 
-	initialize_theme();
-	const theme = get_theme_store();
+	initializeTheme();
+	const theme = getThemeStore();
 </script>
 
-<div class="flex flex-col gap-4 p-4" class:dark={theme.is_dark}>
+<div class="flex flex-col gap-4 p-4" class:dark={theme.isDark}>
 	<div class="flex items-center gap-2 border-b border-border pb-3">
 		<span class="text-sm font-medium text-muted-foreground">Theme:</span>
 		<button

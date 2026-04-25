@@ -1,9 +1,9 @@
 <script lang="ts">
 	interface Props {
-		on_create_dashboard: () => void;
+		onCreateDashboard: () => void;
 	}
 
-	let { on_create_dashboard }: Props = $props();
+	let { onCreateDashboard }: Props = $props();
 </script>
 
 <div class="flex h-full items-center justify-center">
@@ -18,7 +18,7 @@
 			repos together.
 		</p>
 		<button
-			onclick={on_create_dashboard}
+			onclick={onCreateDashboard}
 			class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 		>
 			Create Dashboard

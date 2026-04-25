@@ -6,8 +6,8 @@ import type {
 	SessionState,
 } from '$lib/types/session';
 import type { NotificationEventType } from '$lib/types/notification';
-import { get_sessions } from '$lib/tauri/session_commands';
-import { get_notification_store } from '$lib/stores/notifications.svelte';
+import { getSessions } from '$lib/tauri/session_commands';
+import { getNotificationStore } from '$lib/stores/notifications.svelte';
 
 /** States that warrant a pending in-app notification indicator. */
 const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
@@ -17,43 +17,43 @@ const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
 };
 
 let sessions = $state<Session[]>([]);
-let discovered_sessions = $state<DiscoveredSession[]>([]);
+let discoveredSessions = $state<DiscoveredSession[]>([]);
 let loading = $state(false);
 let error = $state<string | null>(null);
 
-const active_sessions = $derived(
+const activeSessions = $derived(
 	sessions.filter((session) => session.state !== 'finished' && session.state !== 'errored'),
 );
 
-const finished_sessions = $derived(
+const finishedSessions = $derived(
 	sessions.filter((session) => session.state === 'finished' || session.state === 'errored'),
 );
 
-function handle_session_event(payload: SessionEventPayload) {
-	const { session_id, event } = payload;
+function handleSessionEvent(payload: SessionEventPayload) {
+	const { session_id: sessionId, event } = payload;
 
-	const session = sessions.find((s) => s.id === session_id);
+	const session = sessions.find((s) => s.id === sessionId);
 	if (!session) {
 		return;
 	}
 
 	switch (event.type) {
 		case 'run_state': {
-			const state_map: Record<string, SessionState> = {
+			const stateMap: Record<string, SessionState> = {
 				running: 'running',
 				idle: 'needs-review',
 				failed: 'errored',
 				completed: 'finished',
 				stopped: 'finished',
 			};
-			const new_state = state_map[event.state as string];
-			if (new_state) {
-				session.state = new_state;
-				const notification_type = NOTIFICATION_STATES[new_state];
-				if (notification_type) {
-					get_notification_store().add_pending(session_id, notification_type);
+			const newState = stateMap[event.state as string];
+			if (newState) {
+				session.state = newState;
+				const notificationType = NOTIFICATION_STATES[newState];
+				if (notificationType) {
+					getNotificationStore().addPending(sessionId, notificationType);
 				} else {
-					get_notification_store().clear_pending(session_id);
+					getNotificationStore().clearPending(sessionId);
 				}
 			}
 			break;
@@ -72,29 +72,29 @@ function handle_session_event(payload: SessionEventPayload) {
 		case 'permission_prompt':
 		case 'elicitation_prompt': {
 			session.state = 'needs-input';
-			get_notification_store().add_pending(session_id, 'needs-input');
+			getNotificationStore().addPending(sessionId, 'needs-input');
 			break;
 		}
 	}
 }
 
-function handle_discovered_sessions_update(payload: DiscoveredSessionsPayload) {
-	discovered_sessions = payload.sessions;
+function handleDiscoveredSessionsUpdate(payload: DiscoveredSessionsPayload) {
+	discoveredSessions = payload.sessions;
 }
 
-export function get_session_store() {
+export function getSessionStore() {
 	return {
 		get sessions() {
 			return sessions;
 		},
-		get active_sessions() {
-			return active_sessions;
+		get activeSessions() {
+			return activeSessions;
 		},
-		get finished_sessions() {
-			return finished_sessions;
+		get finishedSessions() {
+			return finishedSessions;
 		},
-		get discovered_sessions() {
-			return discovered_sessions;
+		get discoveredSessions() {
+			return discoveredSessions;
 		},
 		get loading() {
 			return loading;
@@ -103,13 +103,13 @@ export function get_session_store() {
 			return error;
 		},
 
-		handle_session_event,
-		handle_discovered_sessions_update,
+		handleSessionEvent,
+		handleDiscoveredSessionsUpdate,
 
-		async load_sessions() {
+		async loadSessions() {
 			try {
 				loading = true;
-				sessions = await get_sessions();
+				sessions = await getSessions();
 				error = null;
 			} catch (err) {
 				error = String(err);
@@ -120,19 +120,19 @@ export function get_session_store() {
 
 		async refresh() {
 			try {
-				sessions = await get_sessions();
+				sessions = await getSessions();
 				error = null;
 			} catch (err) {
 				error = String(err);
 			}
 		},
 
-		add_session(session: Session) {
+		addSession(session: Session) {
 			sessions = [session, ...sessions];
 		},
 
-		remove_discovered_session(discovered_session_id: string) {
-			discovered_sessions = discovered_sessions.filter((s) => s.id !== discovered_session_id);
+		removeDiscoveredSession(discoveredSessionId: string) {
+			discoveredSessions = discoveredSessions.filter((s) => s.id !== discoveredSessionId);
 		},
 	};
 }

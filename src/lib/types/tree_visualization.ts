@@ -109,7 +109,7 @@ const LABEL_PRIORITY: readonly string[] = [
 
 const DEFAULT_TREE_SHAPE: TreeShape = TREE_SHAPES.cherry;
 
-export function resolve_tree_shape(labels: readonly string[]): TreeShape {
+export function resolveTreeShape(labels: readonly string[]): TreeShape {
 	for (const prioritized of LABEL_PRIORITY) {
 		if (labels.some((label) => label.toLowerCase() === prioritized)) {
 			return LABEL_TO_SHAPE[prioritized];

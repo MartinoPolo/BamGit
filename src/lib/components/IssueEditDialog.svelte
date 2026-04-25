@@ -5,32 +5,32 @@
 
 	interface Props {
 		issue: Issue | null;
-		palette_colors: string[];
-		on_close: () => void;
-		on_update: (request: UpdateIssueRequest) => void;
+		paletteColors: string[];
+		onClose: () => void;
+		onUpdate: (request: UpdateIssueRequest) => void;
 	}
 
-	let { issue, palette_colors, on_close, on_update }: Props = $props();
+	let { issue, paletteColors, onClose, onUpdate }: Props = $props();
 
 	let name = $state('');
 	let priority = $state<string>('');
 	let color = $state('');
-	let github_issue_url = $state('');
-	let dialog_element: HTMLDialogElement | undefined = $state();
+	let githubIssueUrl = $state('');
+	let dialogElement: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
-		if (issue !== null && dialog_element !== undefined && !dialog_element.open) {
+		if (issue !== null && dialogElement !== undefined && !dialogElement.open) {
 			name = issue.name;
 			priority = issue.priority ?? '';
-			color = issue.color ?? palette_colors[0] ?? FALLBACK_ISSUE_COLOR;
-			github_issue_url = issue.github_issue_url ?? '';
-			dialog_element.showModal();
-		} else if (issue === null && dialog_element?.open === true) {
-			dialog_element.close();
+			color = issue.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
+			githubIssueUrl = issue.github_issue_url ?? '';
+			dialogElement.showModal();
+		} else if (issue === null && dialogElement?.open === true) {
+			dialogElement.close();
 		}
 	});
 
-	function handle_submit(event: SubmitEvent) {
+	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (issue === null || !name.trim()) {
 			return;
@@ -41,21 +41,21 @@
 			name: name.trim(),
 			priority: (priority as 'low' | 'medium' | 'high' | 'top') || null,
 			color: color || null,
-			github_issue_url: github_issue_url.trim() || null,
+			github_issue_url: githubIssueUrl.trim() || null,
 		};
 
-		on_update(request);
-		on_close();
+		onUpdate(request);
+		onClose();
 	}
 </script>
 
 <dialog
-	bind:this={dialog_element}
-	onclose={on_close}
+	bind:this={dialogElement}
+	onclose={onClose}
 	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
 >
 	{#if issue}
-		<form onsubmit={handle_submit} class="flex flex-col gap-4 p-6">
+		<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
 			<h2 class="text-lg font-semibold">Edit Issue</h2>
 
 			<label class="flex flex-col gap-1">
@@ -82,15 +82,15 @@
 			</label>
 
 			<PaletteColorPicker
-				colors={palette_colors}
-				selected_color={color}
-				on_select={(c) => (color = c)}
+				colors={paletteColors}
+				selectedColor={color}
+				onSelect={(c) => (color = c)}
 			/>
 
 			<label class="flex flex-col gap-1">
 				<span class="text-xs text-muted-foreground">GitHub Issue URL</span>
 				<input
-					bind:value={github_issue_url}
+					bind:value={githubIssueUrl}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				/>
 			</label>
@@ -98,7 +98,7 @@
 			<div class="flex justify-end gap-2 pt-2">
 				<button
 					type="button"
-					onclick={on_close}
+					onclick={onClose}
 					class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 				>
 					Cancel

@@ -5,19 +5,19 @@
 
 	let { lines }: Props = $props();
 
-	let scroll_container: HTMLDivElement | undefined = $state();
+	let scrollContainer: HTMLDivElement | undefined = $state();
 
 	// Auto-scroll to bottom when new lines arrive
 	$effect(() => {
-		if (lines.length > 0 && scroll_container) {
-			scroll_container.scrollTop = scroll_container.scrollHeight;
+		if (lines.length > 0 && scrollContainer) {
+			scrollContainer.scrollTop = scrollContainer.scrollHeight;
 		}
 	});
 
 	/** Strip ANSI escape codes for display */
-	function strip_ansi(text: string): string {
+	function stripAnsi(text: string): string {
 		// oxlint-disable-next-line no-control-regex -- intentional: stripping ANSI escape sequences
-		return text.replace(/\u001B\[[0-9;]*[a-zA-Z]/g, '');
+		return text.replace(/\[[0-9;]*[a-zA-Z]/g, '');
 	}
 </script>
 
@@ -26,11 +26,11 @@
 		Progress
 	</div>
 	<div
-		bind:this={scroll_container}
+		bind:this={scrollContainer}
 		class="max-h-32 overflow-y-auto rounded bg-background p-2 font-mono text-[11px] leading-4 text-muted-foreground"
 	>
 		{#each lines as line, index (index)}
-			<div class="whitespace-pre-wrap break-all">{strip_ansi(line)}</div>
+			<div class="whitespace-pre-wrap break-all">{stripAnsi(line)}</div>
 		{/each}
 	</div>
 </div>

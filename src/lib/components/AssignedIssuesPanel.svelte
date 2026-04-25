@@ -10,7 +10,7 @@
 
 	let { issues, disabled = false }: Props = $props();
 
-	async function handle_click(url: string) {
+	async function handleClick(url: string) {
 		if (!disabled) {
 			await openUrl(url);
 		}
@@ -25,7 +25,7 @@
 		<div class="flex flex-col gap-0.5">
 			{#each issues as issue (issue.number)}
 				<button
-					onclick={() => handle_click(issue.url)}
+					onclick={() => handleClick(issue.url)}
 					class="flex items-center gap-2 rounded px-2 py-1 text-left text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 					class:cursor-not-allowed={disabled}
 					class:opacity-50={disabled}

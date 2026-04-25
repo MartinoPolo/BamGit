@@ -15,7 +15,7 @@
 
 	let { icon: Icon, color, bg, label, number, url, prefix, disabled = false }: Props = $props();
 
-	async function handle_click() {
+	async function handleClick() {
 		if (url !== null && !disabled) {
 			await openUrl(url);
 		}
@@ -23,7 +23,7 @@
 </script>
 
 <button
-	onclick={handle_click}
+	onclick={handleClick}
 	class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-opacity {bg} {color}"
 	class:opacity-50={disabled}
 	class:cursor-not-allowed={disabled}

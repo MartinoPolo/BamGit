@@ -3,13 +3,13 @@
 
 	interface Props {
 		palettes: ColorPalette[];
-		selected_palette_id: string | null;
-		on_select: (palette_id: string | null) => void;
+		selectedPaletteId: string | null;
+		onSelect: (paletteId: string | null) => void;
 	}
 
-	let { palettes, selected_palette_id, on_select }: Props = $props();
+	let { palettes, selectedPaletteId, onSelect }: Props = $props();
 
-	const default_palette_label = $derived(
+	const defaultPaletteLabel = $derived(
 		palettes.find((p) => p.is_built_in === true)?.name ?? 'Default',
 	);
 </script>
@@ -17,14 +17,14 @@
 <label class="flex flex-col gap-1">
 	<span class="text-xs text-muted-foreground">Color Palette</span>
 	<select
-		value={selected_palette_id ?? ''}
+		value={selectedPaletteId ?? ''}
 		onchange={(event) => {
 			const value = event.currentTarget.value;
-			on_select(value || null);
+			onSelect(value || null);
 		}}
 		class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 	>
-		<option value="">Default ({default_palette_label})</option>
+		<option value="">Default ({defaultPaletteLabel})</option>
 		{#each palettes as palette (palette.id)}
 			<option value={palette.id}>
 				{palette.name}{palette.is_built_in === true ? '' : ' (custom)'}

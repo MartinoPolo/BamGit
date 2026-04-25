@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Session, SessionEventPayload } from '$lib/types/session';
-	import { send_message, interrupt_session } from '$lib/tauri/session_commands';
+	import { sendMessage, interruptSession } from '$lib/tauri/session_commands';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 
@@ -19,42 +19,42 @@
 	let { session }: Props = $props();
 
 	let messages = $state<ChatMessage[]>([]);
-	let current_streaming_text = $state('');
-	let prompt_input = $state('');
+	let currentStreamingText = $state('');
+	let promptInput = $state('');
 	let sending = $state(false);
-	let unlisten_fn: UnlistenFn | null = null;
+	let unlistenFn: UnlistenFn | null = null;
 
-	const is_active = $derived(session.state !== 'finished' && session.state !== 'errored');
+	const isActive = $derived(session.state !== 'finished' && session.state !== 'errored');
 
-	const can_send = $derived(
-		prompt_input.trim().length > 0 &&
+	const canSend = $derived(
+		promptInput.trim().length > 0 &&
 			!sending &&
 			(session.state === 'needs-review' || session.state === 'needs-input'),
 	);
 
 	onMount(async () => {
-		unlisten_fn = await listen<SessionEventPayload>('session-event', (event) => {
-			const { session_id, event: session_event } = event.payload;
-			if (session_id !== session.id) {
+		unlistenFn = await listen<SessionEventPayload>('session-event', (event) => {
+			const { session_id: sessionId, event: sessionEvent } = event.payload;
+			if (sessionId !== session.id) {
 				return;
 			}
 
-			switch (session_event.type) {
+			switch (sessionEvent.type) {
 				case 'message_delta': {
-					current_streaming_text += session_event.text as string;
+					currentStreamingText += sessionEvent.text as string;
 					break;
 				}
 				case 'message_complete': {
-					if (current_streaming_text) {
+					if (currentStreamingText) {
 						messages = [
 							...messages,
 							{
 								role: 'assistant',
-								content: current_streaming_text,
+								content: currentStreamingText,
 								timestamp: Date.now(),
 							},
 						];
-						current_streaming_text = '';
+						currentStreamingText = '';
 					}
 					break;
 				}
@@ -63,15 +63,15 @@
 						...messages,
 						{
 							role: 'tool',
-							content: `Running ${session_event.tool_name as string}...`,
-							tool_name: session_event.tool_name as string,
+							content: `Running ${sessionEvent.tool_name as string}...`,
+							tool_name: sessionEvent.tool_name as string,
 							timestamp: Date.now(),
 						},
 					];
 					break;
 				}
 				case 'tool_end': {
-					const output = session_event.output;
+					const output = sessionEvent.output;
 					const content =
 						typeof output === 'string' ? output : JSON.stringify(output, null, 2);
 					const truncated =
@@ -81,15 +81,15 @@
 						{
 							role: 'tool',
 							content: truncated,
-							tool_name: session_event.tool_name as string,
-							is_error: session_event.is_error as boolean,
+							tool_name: sessionEvent.tool_name as string,
+							is_error: sessionEvent.is_error as boolean,
 							timestamp: Date.now(),
 						},
 					];
 					break;
 				}
 				case 'run_state': {
-					const state = session_event.state as string;
+					const state = sessionEvent.state as string;
 					if (state === 'failed' || state === 'completed') {
 						messages = [
 							...messages,
@@ -97,7 +97,7 @@
 								role: 'system',
 								content:
 									state === 'failed'
-										? `Session errored: ${(session_event.error as string) ?? 'unknown'}`
+										? `Session errored: ${(sessionEvent.error as string) ?? 'unknown'}`
 										: 'Session completed.',
 								timestamp: Date.now(),
 							},
@@ -110,7 +110,7 @@
 						...messages,
 						{
 							role: 'system',
-							content: `Permission needed: ${session_event.tool_name as string}`,
+							content: `Permission needed: ${sessionEvent.tool_name as string}`,
 							timestamp: Date.now(),
 						},
 					];
@@ -123,21 +123,21 @@
 	});
 
 	onDestroy(() => {
-		unlisten_fn?.();
+		unlistenFn?.();
 	});
 
-	async function handle_send() {
-		if (!can_send) {
+	async function handleSend() {
+		if (!canSend) {
 			return;
 		}
-		const message = prompt_input.trim();
-		prompt_input = '';
+		const message = promptInput.trim();
+		promptInput = '';
 		sending = true;
 
 		messages = [...messages, { role: 'user', content: message, timestamp: Date.now() }];
 
 		try {
-			await send_message(session.id, message);
+			await sendMessage(session.id, message);
 		} catch (err) {
 			messages = [
 				...messages,
@@ -152,9 +152,9 @@
 		}
 	}
 
-	async function handle_interrupt() {
+	async function handleInterrupt() {
 		try {
-			await interrupt_session(session.id);
+			await interruptSession(session.id);
 		} catch (err) {
 			messages = [
 				...messages,
@@ -167,10 +167,10 @@
 		}
 	}
 
-	function handle_keydown(event: KeyboardEvent) {
+	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
-			handle_send();
+			handleSend();
 		}
 	}
 </script>
@@ -202,9 +202,9 @@
 			</div>
 		{/each}
 
-		{#if current_streaming_text}
+		{#if currentStreamingText}
 			<div class="mr-8 rounded-lg bg-muted p-3 text-sm text-foreground">
-				<pre class="whitespace-pre-wrap">{current_streaming_text}<span class="animate-pulse"
+				<pre class="whitespace-pre-wrap">{currentStreamingText}<span class="animate-pulse"
 						>|</span
 					></pre>
 			</div>
@@ -217,7 +217,7 @@
 			{#if session.state === 'running'}
 				<button
 					class="shrink-0 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-500"
-					onclick={handle_interrupt}
+					onclick={handleInterrupt}
 				>
 					Interrupt
 				</button>
@@ -226,16 +226,16 @@
 			<input
 				type="text"
 				class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
-				placeholder={is_active ? 'Send a message...' : 'Session ended'}
-				bind:value={prompt_input}
-				onkeydown={handle_keydown}
-				disabled={!is_active}
+				placeholder={isActive ? 'Send a message...' : 'Session ended'}
+				bind:value={promptInput}
+				onkeydown={handleKeydown}
+				disabled={!isActive}
 			/>
 
 			<button
 				class="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-				onclick={handle_send}
-				disabled={!can_send}
+				onclick={handleSend}
+				disabled={!canSend}
 			>
 				Send
 			</button>

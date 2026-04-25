@@ -6,25 +6,25 @@
 
 	interface Props {
 		dashboards: Dashboard[];
-		active_dashboard_id: string | null;
+		activeDashboardId: string | null;
 		collapsed: boolean;
-		on_select_dashboard: (id: string) => void;
-		on_toggle_sidebar: () => void;
-		on_create_dashboard: () => void;
-		on_edit_dashboard: (dashboard: Dashboard) => void;
+		onSelectDashboard: (id: string) => void;
+		onToggleSidebar: () => void;
+		onCreateDashboard: () => void;
+		onEditDashboard: (dashboard: Dashboard) => void;
 	}
 
 	let {
 		dashboards,
-		active_dashboard_id,
+		activeDashboardId,
 		collapsed,
-		on_select_dashboard,
-		on_toggle_sidebar,
-		on_create_dashboard,
-		on_edit_dashboard,
+		onSelectDashboard,
+		onToggleSidebar,
+		onCreateDashboard,
+		onEditDashboard,
 	}: Props = $props();
 
-	const navigation_items = [
+	const navigationItems = [
 		{ href: '/issues' as const, label: 'Issues', icon: '☰' },
 		{ href: '/sessions' as const, label: 'Sessions', icon: '▶' },
 		{ href: '/settings' as const, label: 'Settings', icon: '⚙' },
@@ -42,7 +42,7 @@
 			<span class="text-sm font-bold tracking-wide text-sidebar-foreground">Grovekeeper</span>
 		{/if}
 		<button
-			onclick={on_toggle_sidebar}
+			onclick={onToggleSidebar}
 			class="rounded p-1 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
 			title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
 		>
@@ -52,7 +52,7 @@
 
 	<!-- Navigation -->
 	<nav class="flex flex-col gap-0.5 border-b border-sidebar-border p-2">
-		{#each navigation_items as item (item.href)}
+		{#each navigationItems as item (item.href)}
 			<a
 				href={resolve(item.href)}
 				class="flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors {page
@@ -76,7 +76,7 @@
 				>Dashboards</span
 			>
 			<button
-				onclick={on_create_dashboard}
+				onclick={onCreateDashboard}
 				class="rounded p-0.5 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
 				title="Create dashboard"
 			>
@@ -87,10 +87,10 @@
 		<div class="flex-1 overflow-y-auto px-2 pb-2">
 			{#each dashboards as dashboard (dashboard.id)}
 				<button
-					onclick={() => on_select_dashboard(dashboard.id)}
-					ondblclick={() => on_edit_dashboard(dashboard)}
+					onclick={() => onSelectDashboard(dashboard.id)}
+					ondblclick={() => onEditDashboard(dashboard)}
 					class="group flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors {dashboard.id ===
-					active_dashboard_id
+					activeDashboardId
 						? 'bg-sidebar-accent text-sidebar-accent-foreground'
 						: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'}"
 				>
