@@ -1,12 +1,24 @@
+import { createContext } from 'svelte';
 import type { ColorPalette } from '$lib/types/color_palette';
 import { DEFAULT_PALETTE_ID } from '$lib/types/color_palette';
 import { getAllColorPalettes, getNextAvailableColor } from '$lib/tauri/color_palette_commands';
 
-let palettes = $state<ColorPalette[]>([]);
-let loading = $state(false);
-let error = $state<string | null>(null);
+type ColorPalettesContext = ReturnType<typeof createColorPalettesContext>;
 
-export function getColorPaletteStore() {
+const [useColorPalettes, setColorPalettesInternal] = createContext<ColorPalettesContext>();
+export { useColorPalettes };
+
+export function setColorPalettesContext() {
+	const ctx = createColorPalettesContext();
+	setColorPalettesInternal(ctx);
+	return ctx;
+}
+
+function createColorPalettesContext() {
+	let palettes = $state<ColorPalette[]>([]);
+	let loading = $state(false);
+	let error = $state<string | null>(null);
+
 	return {
 		get palettes() {
 			return palettes;

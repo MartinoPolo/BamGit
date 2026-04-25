@@ -1,14 +1,26 @@
+import { createContext } from 'svelte';
 import type { Action } from '$lib/types/action';
 import { getActionsForDashboard } from '$lib/tauri/action_commands';
 
-let actions = $state<Action[]>([]);
-let loading = $state(false);
-let error = $state<string | null>(null);
-let currentDashboardId = $state<string | null>(null);
+type ActionsContext = ReturnType<typeof createActionsContext>;
 
-const visibleActions = $derived(actions.filter((action) => action.visible));
+const [useActions, setActionsInternal] = createContext<ActionsContext>();
+export { useActions };
 
-export function getActionStore() {
+export function setActionsContext() {
+	const ctx = createActionsContext();
+	setActionsInternal(ctx);
+	return ctx;
+}
+
+function createActionsContext() {
+	let actions = $state<Action[]>([]);
+	let loading = $state(false);
+	let error = $state<string | null>(null);
+	let currentDashboardId = $state<string | null>(null);
+
+	const visibleActions = $derived(actions.filter((action) => action.visible));
+
 	return {
 		get actions() {
 			return actions;

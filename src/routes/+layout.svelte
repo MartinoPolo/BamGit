@@ -4,10 +4,16 @@
 	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/DashboardEditDialog.svelte';
-	import { getDashboardStore } from '$lib/stores/dashboard.svelte';
-	import { getColorPaletteStore } from '$lib/stores/color_palettes.svelte';
-	import { initializeTheme } from '$lib/stores/theme.svelte';
-	import { initializeViewPreference } from '$lib/stores/view_preference.svelte';
+	import { setThemeContext } from '$lib/context/theme.context.svelte.js';
+	import { setViewPreferenceContext } from '$lib/context/view_preference.context.svelte.js';
+	import { setDashboardContext } from '$lib/context/dashboard.context.svelte.js';
+	import { setColorPalettesContext } from '$lib/context/color_palettes.context.svelte.js';
+	import { setNotificationsContext } from '$lib/context/notifications.context.svelte.js';
+	import { setSessionsContext } from '$lib/context/sessions.context.svelte.js';
+	import { setIssuesContext } from '$lib/context/issues.context.svelte.js';
+	import { setGitStatusContext } from '$lib/context/git_status.context.svelte.js';
+	import { setGithubContext } from '$lib/context/github.context.svelte.js';
+	import { setActionsContext } from '$lib/context/actions.context.svelte.js';
 	import { createDashboard, updateDashboard, deleteDashboard } from '$lib/tauri/commands';
 	import { addRepoToPortfolio } from '$lib/tauri/portfolio_commands';
 	import type {
@@ -18,10 +24,16 @@
 
 	let { children } = $props();
 
-	const dashboardStore = getDashboardStore();
-	const paletteStore = getColorPaletteStore();
-	initializeTheme();
-	initializeViewPreference();
+	setThemeContext();
+	setViewPreferenceContext();
+	const dashboardStore = setDashboardContext();
+	const paletteStore = setColorPalettesContext();
+	const notificationsCtx = setNotificationsContext();
+	setSessionsContext(notificationsCtx);
+	setIssuesContext();
+	setGitStatusContext();
+	setGithubContext();
+	setActionsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 

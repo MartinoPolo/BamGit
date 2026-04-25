@@ -47,7 +47,7 @@ Components are installed to `$lib/components/ui/<name>/`. After adding:
 Read [REFERENCE.md](REFERENCE.md) for the full theming system. Key rules:
 
 1. **Use semantic color tokens** — `bg-background`, `text-foreground`, `bg-primary`, `border-border` — never hardcode raw colors
-2. **Dark mode** — use Tailwind's `dark:` variant via `.dark` class on `<html>`. The theme store (`$lib/stores/theme.svelte.ts`) manages the mode
+2. **Dark mode** — use Tailwind's `dark:` variant via `.dark` class on `<html>`. The theme context (`$lib/context/theme.context.svelte.ts`) manages the mode
 3. **OKLCH color space** — all theme colors use `oklch()` in CSS variables defined in `src/app.css`
 4. **Component structure** — follow Svelte 5 runes: `$props()`, `$state()`, `$derived()`. Use `cn()` from `$lib/utils` for class merging
 5. **Icons** — use `lucide-svelte` (`import { IconName } from 'lucide-svelte'`)

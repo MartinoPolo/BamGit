@@ -1,11 +1,23 @@
+import { createContext } from 'svelte';
 import type { GitStatusCache } from '$lib/types/git_status';
 import { getAllGitStatusesForDashboard, refreshGitStatus } from '$lib/tauri/git_status_commands';
 
-let statusMap = $state<Map<string, GitStatusCache>>(new Map());
-let loading = $state(false);
-let error = $state<string | null>(null);
+type GitStatusContext = ReturnType<typeof createGitStatusContext>;
 
-export function getGitStatusStore() {
+const [useGitStatus, setGitStatusInternal] = createContext<GitStatusContext>();
+export { useGitStatus };
+
+export function setGitStatusContext() {
+	const ctx = createGitStatusContext();
+	setGitStatusInternal(ctx);
+	return ctx;
+}
+
+function createGitStatusContext() {
+	let statusMap = $state<Map<string, GitStatusCache>>(new Map());
+	let loading = $state(false);
+	let error = $state<string | null>(null);
+
 	return {
 		get loading() {
 			return loading;

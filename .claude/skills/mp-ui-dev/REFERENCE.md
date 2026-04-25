@@ -57,20 +57,20 @@ All colors defined in `src/app.css` using OKLCH color space. Variables are set i
 3. **Dark mode is automatic** — `.dark` class swaps all variables
 4. **OKLCH format** — `oklch(lightness chroma hue)` for perceptual uniformity
 
-## Dark Mode Store
+## Dark Mode Context
 
-Located at `src/lib/stores/theme.svelte.ts`:
+Located at `src/lib/context/theme.context.svelte.ts`:
 
 ```ts
-import { get_theme_store } from '$lib/stores/theme.svelte';
+import { useTheme } from '$lib/context/theme.context.svelte.js';
 
-const theme = get_theme_store();
+const theme = useTheme();
 theme.mode; // 'system' | 'light' | 'dark'
-theme.is_dark; // boolean (resolved)
+theme.isDark; // boolean (resolved)
 theme.mode = 'dark'; // set mode
 ```
 
-The store persists to localStorage and applies `.dark` class to `<html>`.
+The context uses `Persisted` for localStorage sync and applies `.dark` class to `<html>` via `$effect.pre`.
 
 ## Component Patterns
 

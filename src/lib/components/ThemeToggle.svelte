@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getThemeStore } from '$lib/stores/theme.svelte';
+	import { useTheme } from '$lib/context/theme.context.svelte.js';
 	import { Sun, Moon, Monitor } from 'lucide-svelte';
 
 	interface Props {
@@ -8,7 +8,7 @@
 
 	let { collapsed = false }: Props = $props();
 
-	const theme = getThemeStore();
+	const theme = useTheme();
 
 	const modes = [
 		{ value: 'light' as const, Icon: Sun, label: 'Light' },

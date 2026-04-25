@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Session, SessionState } from '$lib/types/session';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
-	import { getNotificationStore } from '$lib/stores/notifications.svelte';
+	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
 
 	interface Props {
 		session: Session;
@@ -11,7 +11,7 @@
 
 	let { session, onClick, onTerminate }: Props = $props();
 
-	const notificationStore = getNotificationStore();
+	const notificationStore = useNotifications();
 
 	const notificationDotColor = $derived.by(() => {
 		const pendingType = notificationStore.getPendingType(session.id);

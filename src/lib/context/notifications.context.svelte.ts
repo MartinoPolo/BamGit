@@ -1,11 +1,23 @@
+import { createContext } from 'svelte';
 import type { NotificationConfig, NotificationEventType } from '$lib/types/notification';
 import { getNotificationConfigs } from '$lib/tauri/notification_commands';
 
-let configs = $state<NotificationConfig[]>([]);
-let pendingNotifications = $state<Map<string, NotificationEventType>>(new Map());
-let loading = $state(false);
+type NotificationsContext = ReturnType<typeof createNotificationsContext>;
 
-export function getNotificationStore() {
+const [useNotifications, setNotificationsInternal] = createContext<NotificationsContext>();
+export { useNotifications };
+
+export function setNotificationsContext() {
+	const ctx = createNotificationsContext();
+	setNotificationsInternal(ctx);
+	return ctx;
+}
+
+function createNotificationsContext() {
+	let configs = $state<NotificationConfig[]>([]);
+	let pendingNotifications = $state<Map<string, NotificationEventType>>(new Map());
+	let loading = $state(false);
+
 	return {
 		get configs() {
 			return configs;
@@ -21,8 +33,8 @@ export function getNotificationStore() {
 			try {
 				loading = true;
 				configs = await getNotificationConfigs();
-			} catch (error) {
-				console.error('Failed to load notification configs:', error);
+			} catch (err) {
+				console.error('Failed to load notification configs:', err);
 			} finally {
 				loading = false;
 			}
@@ -34,14 +46,12 @@ export function getNotificationStore() {
 			);
 		},
 
-		/** Mark a session as having a pending notification. */
 		addPending(sessionId: string, eventType: NotificationEventType) {
 			const next = new Map(pendingNotifications);
 			next.set(sessionId, eventType);
 			pendingNotifications = next;
 		},
 
-		/** Clear pending notification for a session (user acknowledged it). */
 		clearPending(sessionId: string) {
 			if (!pendingNotifications.has(sessionId)) {
 				return;
@@ -51,12 +61,10 @@ export function getNotificationStore() {
 			pendingNotifications = next;
 		},
 
-		/** Check if a session has a pending notification. */
 		hasPending(sessionId: string): boolean {
 			return pendingNotifications.has(sessionId);
 		},
 
-		/** Get the notification event type for a session. */
 		getPendingType(sessionId: string): NotificationEventType | undefined {
 			return pendingNotifications.get(sessionId);
 		},
