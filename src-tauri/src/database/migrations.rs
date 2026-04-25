@@ -2,12 +2,20 @@ use rusqlite::Connection;
 
 use super::schema;
 
-const CURRENT_VERSION: i32 = 7;
+const CURRENT_VERSION: i32 = 8;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
-static MIGRATIONS: &[MigrationFunction] =
-    &[migrate_v1, migrate_v2, migrate_v3, migrate_v4, migrate_v5, migrate_v6, migrate_v7];
+static MIGRATIONS: &[MigrationFunction] = &[
+    migrate_v1,
+    migrate_v2,
+    migrate_v3,
+    migrate_v4,
+    migrate_v5,
+    migrate_v6,
+    migrate_v7,
+    migrate_v8,
+];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)
@@ -247,6 +255,91 @@ fn migrate_v7(connection: &Connection) -> Result<(), rusqlite::Error> {
     )
 }
 
+pub const DEFAULT_TREE_SHAPE: &str = "cherry";
+
+fn migrate_v8(connection: &Connection) -> Result<(), rusqlite::Error> {
+    let has_labels: bool = connection
+        .prepare("SELECT labels FROM issues LIMIT 0")
+        .is_ok();
+
+    if !has_labels {
+        connection.execute_batch("ALTER TABLE issues ADD COLUMN labels TEXT;")?;
+    }
+
+    let has_default_shape: bool = connection
+        .prepare("SELECT default_shape FROM dashboards LIMIT 0")
+        .is_ok();
+
+    if !has_default_shape {
+        connection.execute_batch(
+            &format!("ALTER TABLE dashboards ADD COLUMN default_shape TEXT NOT NULL DEFAULT '{DEFAULT_TREE_SHAPE}';"),
+        )?;
+    }
+
+    connection.execute_batch(
+        "CREATE TABLE IF NOT EXISTS label_shape_mappings (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            label_name TEXT NOT NULL,
+            tree_shape TEXT NOT NULL,
+            color TEXT,
+            priority_order INTEGER NOT NULL DEFAULT 0,
+            UNIQUE(dashboard_id, label_name)
+        );",
+    )?;
+
+    seed_default_label_shape_mappings(connection)?;
+
+    Ok(())
+}
+
+const DEFAULT_LABEL_SHAPE_MAPPINGS: &[(&str, &str, i32)] = &[
+    ("prd", "apple", 0),
+    ("epic", "baobab", 1),
+    ("bug", "maple", 2),
+    ("feature", "oak", 3),
+    ("task", "pine", 4),
+    ("documentation", "willow", 5),
+    ("refactor", "birch", 6),
+    ("infrastructure", "cypress", 7),
+    ("ci", "cypress", 8),
+];
+
+pub fn seed_default_label_shape_mappings(
+    connection: &Connection,
+) -> Result<(), rusqlite::Error> {
+    let mut dashboard_ids: Vec<String> = Vec::new();
+    {
+        let mut statement = connection.prepare("SELECT id FROM dashboards")?;
+        let rows = statement.query_map([], |row| row.get(0))?;
+        for row in rows {
+            dashboard_ids.push(row?);
+        }
+    }
+
+    for dashboard_id in &dashboard_ids {
+        seed_label_shape_mappings_for_dashboard(connection, dashboard_id)?;
+    }
+
+    Ok(())
+}
+
+pub fn seed_label_shape_mappings_for_dashboard(
+    connection: &Connection,
+    dashboard_id: &str,
+) -> Result<(), rusqlite::Error> {
+    for (label_name, tree_shape, priority_order) in DEFAULT_LABEL_SHAPE_MAPPINGS {
+        let id = uuid::Uuid::new_v4().to_string();
+        connection.execute(
+            "INSERT OR IGNORE INTO label_shape_mappings \
+             (id, dashboard_id, label_name, tree_shape, priority_order) \
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            rusqlite::params![id, dashboard_id, label_name, tree_shape, priority_order],
+        )?;
+    }
+    Ok(())
+}
+
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {
     let version: i32 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
     Ok(version)
@@ -335,5 +428,153 @@ mod tests {
         run_migrations(&connection).unwrap();
         let version = get_schema_version(&connection).unwrap();
         assert_eq!(version, CURRENT_VERSION);
+    }
+
+    #[test]
+    fn migration_v8_adds_labels_column_to_issues() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        // Insert a dashboard and issue with labels
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, labels) \
+                 VALUES ('i1', 'd1', 'Test Issue', '[{\"name\":\"bug\",\"color\":\"#d73a4a\"}]')",
+                [],
+            )
+            .unwrap();
+
+        let labels: Option<String> = connection
+            .query_row("SELECT labels FROM issues WHERE id = 'i1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(
+            labels.unwrap(),
+            r##"[{"name":"bug","color":"#d73a4a"}]"##
+        );
+
+        // NULL labels should also work
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name) VALUES ('i2', 'd1', 'No labels')",
+                [],
+            )
+            .unwrap();
+        let null_labels: Option<String> = connection
+            .query_row("SELECT labels FROM issues WHERE id = 'i2'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert!(null_labels.is_none());
+    }
+
+    #[test]
+    fn migration_v8_adds_default_shape_to_dashboards() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+
+        let default_shape: String = connection
+            .query_row(
+                "SELECT default_shape FROM dashboards WHERE id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(default_shape, "cherry");
+    }
+
+    #[test]
+    fn migration_v8_creates_label_shape_mappings_table() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+
+        let id = uuid::Uuid::new_v4().to_string();
+        connection
+            .execute(
+                "INSERT INTO label_shape_mappings (id, dashboard_id, label_name, tree_shape, color, priority_order) \
+                 VALUES (?1, 'd1', 'bug', 'maple', '#d73a4a', 0)",
+                [&id],
+            )
+            .unwrap();
+
+        let (label_name, tree_shape, color): (String, String, Option<String>) = connection
+            .query_row(
+                "SELECT label_name, tree_shape, color FROM label_shape_mappings WHERE id = ?1",
+                [&id],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!(label_name, "bug");
+        assert_eq!(tree_shape, "maple");
+        assert_eq!(color.unwrap(), "#d73a4a");
+    }
+
+    #[test]
+    fn migration_v8_seeds_defaults_for_existing_dashboards() {
+        let connection = fresh_db();
+        // Create a DB at v7 first, then add a dashboard, then run v8
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d_existing', 'Existing', 'repo')",
+                [],
+            )
+            .unwrap();
+
+        // Manually seed (simulates what migration does for pre-existing dashboards)
+        seed_label_shape_mappings_for_dashboard(&connection, "d_existing").unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM label_shape_mappings WHERE dashboard_id = 'd_existing'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 9, "should seed 9 default label→shape mappings");
+
+        // Verify priority order
+        let (label, shape, priority): (String, String, i32) = connection
+            .query_row(
+                "SELECT label_name, tree_shape, priority_order FROM label_shape_mappings \
+                 WHERE dashboard_id = 'd_existing' ORDER BY priority_order LIMIT 1",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!(label, "prd");
+        assert_eq!(shape, "apple");
+        assert_eq!(priority, 0);
+    }
+
+    #[test]
+    fn migration_v8_is_idempotent() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        // Running v8 again should not fail (INSERT OR IGNORE)
+        migrate_v8(&connection).unwrap();
     }
 }

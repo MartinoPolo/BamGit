@@ -24,6 +24,7 @@ function createIssue(overrides: Partial<Issue> = {}): Issue {
 		dev_server_port: null,
 		dev_server_pid: null,
 		browser_url: null,
+		labels: [],
 		sort_order: 0,
 		created_at: '2026-01-01T00:00:00Z',
 		...overrides,
@@ -355,8 +356,31 @@ describe('mapIssueToStateDimensions — grovekeeperStatus', () => {
 // ─── labels ─────────────────────────────────────────────────────────────
 
 describe('mapIssueToStateDimensions — labels', () => {
-	it('stubs labels as ["AFK"] (Issue has no labels field yet)', () => {
+	it('returns empty labels for issue with no labels', () => {
 		const dimensions = mapIssueToStateDimensions(createIssue(), undefined, []);
-		expect(dimensions.labels).toEqual(['AFK']);
+		expect(dimensions.labels).toEqual([]);
+	});
+
+	it('extracts label names from issue labels', () => {
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({
+				labels: [
+					{ name: 'bug', color: '#d73a4a' },
+					{ name: 'task', color: '#0E8A16' },
+				],
+			}),
+			undefined,
+			[],
+		);
+		expect(dimensions.labels).toEqual(['bug', 'task']);
+	});
+
+	it('handles single label', () => {
+		const dimensions = mapIssueToStateDimensions(
+			createIssue({ labels: [{ name: 'feature', color: '#a2eeef' }] }),
+			undefined,
+			[],
+		);
+		expect(dimensions.labels).toEqual(['feature']);
 	});
 });

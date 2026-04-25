@@ -22,7 +22,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 7);
+        assert_eq!(version, 8);
     }
 
     #[test]
@@ -32,19 +32,20 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 7);
+        assert_eq!(version, 8);
     }
 
     // --- Schema tests ---
 
     #[test]
-    fn all_eight_tables_are_created() {
+    fn all_nine_tables_are_created() {
         let connection = setup_test_database();
 
         let expected_tables = [
             "color_palettes",
             "dashboards",
             "issues",
+            "label_shape_mappings",
             "sessions",
             "actions",
             "notification_config",
@@ -696,7 +697,7 @@ mod tests {
         migrations::run_migrations(&connection).unwrap();
 
         let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, 7);
+        assert_eq!(version, 8);
 
         // portfolio_dashboard_pointers table exists
         let exists: bool = connection

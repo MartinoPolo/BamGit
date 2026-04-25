@@ -24,6 +24,7 @@ pub struct Issue {
     pub dev_server_port: Option<i64>,
     pub dev_server_pid: Option<i64>,
     pub browser_url: Option<String>,
+    pub labels: Option<String>,
     pub sort_order: i64,
     pub created_at: String,
 }
@@ -37,6 +38,7 @@ pub struct CreateIssueRequest {
     pub github_issue_url: Option<String>,
     pub github_issue_number: Option<i64>,
     pub parent_issue_id: Option<String>,
+    pub labels: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -52,5 +54,6 @@ pub struct UpdateIssueRequest {
     pub worktree_folder: Option<Option<String>>,
     pub worktree_state: Option<String>,
     pub parent_issue_id: Option<Option<String>>,
+    pub labels: Option<Option<String>>,
     pub sort_order: Option<i64>,
 }

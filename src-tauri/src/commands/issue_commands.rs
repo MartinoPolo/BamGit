@@ -10,7 +10,7 @@ use super::shared::resolve_nullable_field;
 const ISSUE_SELECT_COLUMNS: &str =
     "id, dashboard_id, name, priority, color, status, github_issue_url, github_issue_number, \
      branch_name, base_branch, worktree_folder, worktree_state, parent_issue_id, editor_folder, \
-     dev_server_command, dev_server_port, dev_server_pid, browser_url, sort_order, created_at";
+     dev_server_command, dev_server_port, dev_server_pid, browser_url, labels, sort_order, created_at";
 
 fn row_to_issue(row: &Row) -> Result<Issue, rusqlite::Error> {
     Ok(Issue {
@@ -32,8 +32,9 @@ fn row_to_issue(row: &Row) -> Result<Issue, rusqlite::Error> {
         dev_server_port: row.get(15)?,
         dev_server_pid: row.get(16)?,
         browser_url: row.get(17)?,
-        sort_order: row.get(18)?,
-        created_at: row.get(19)?,
+        labels: row.get(18)?,
+        sort_order: row.get(19)?,
+        created_at: row.get(20)?,
     })
 }
 
@@ -47,8 +48,8 @@ pub fn create_issue(
 
     connection
         .execute(
-            "INSERT INTO issues (id, dashboard_id, name, priority, color, github_issue_url, github_issue_number, parent_issue_id)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            "INSERT INTO issues (id, dashboard_id, name, priority, color, github_issue_url, github_issue_number, parent_issue_id, labels)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
             rusqlite::params![
                 id,
                 request.dashboard_id,
@@ -58,6 +59,7 @@ pub fn create_issue(
                 request.github_issue_url,
                 request.github_issue_number,
                 request.parent_issue_id,
+                request.labels,
             ],
         )
         .map_err(|error| format!("Failed to create issue: {error}"))?;
@@ -131,6 +133,7 @@ pub fn update_issue(
     let worktree_folder = resolve_nullable_field(request.worktree_folder, existing.worktree_folder);
     let worktree_state = request.worktree_state.unwrap_or(existing.worktree_state);
     let parent_issue_id = resolve_nullable_field(request.parent_issue_id, existing.parent_issue_id);
+    let labels = resolve_nullable_field(request.labels, existing.labels);
     let sort_order = request.sort_order.unwrap_or(existing.sort_order);
 
     connection
@@ -138,7 +141,7 @@ pub fn update_issue(
             "UPDATE issues SET name = ?1, priority = ?2, color = ?3, github_issue_url = ?4, \
              github_issue_number = ?5, branch_name = ?6, base_branch = ?7, \
              worktree_folder = ?8, worktree_state = ?9, parent_issue_id = ?10, \
-             sort_order = ?11 WHERE id = ?12",
+             labels = ?11, sort_order = ?12 WHERE id = ?13",
             rusqlite::params![
                 name,
                 priority,
@@ -150,6 +153,7 @@ pub fn update_issue(
                 worktree_folder,
                 worktree_state,
                 parent_issue_id,
+                labels,
                 sort_order,
                 existing.id,
             ],

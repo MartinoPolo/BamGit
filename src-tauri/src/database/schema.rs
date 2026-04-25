@@ -20,7 +20,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             local_folder TEXT,
             default_base_branch TEXT,
             worktree_parent_folder TEXT,
-            color_palette_id TEXT REFERENCES color_palettes(id)
+            color_palette_id TEXT REFERENCES color_palettes(id),
+            default_shape TEXT NOT NULL DEFAULT 'cherry'
         );
 
         CREATE TABLE IF NOT EXISTS issues (
@@ -42,6 +43,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             dev_server_port INTEGER,
             dev_server_pid INTEGER,
             browser_url TEXT,
+            labels TEXT,
             sort_order INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
@@ -52,6 +54,16 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             repo_dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
             sort_order INTEGER NOT NULL DEFAULT 0,
             UNIQUE(portfolio_dashboard_id, repo_dashboard_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS label_shape_mappings (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            label_name TEXT NOT NULL,
+            tree_shape TEXT NOT NULL,
+            color TEXT,
+            priority_order INTEGER NOT NULL DEFAULT 0,
+            UNIQUE(dashboard_id, label_name)
         );
 
         CREATE TABLE IF NOT EXISTS sessions (
