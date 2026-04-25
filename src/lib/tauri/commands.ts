@@ -13,6 +13,7 @@ export async function getDashboards(): Promise<Dashboard[]> {
 	return invoke('get_dashboards');
 }
 
+// fallow-ignore-next-line unused-export
 export async function getDashboard(id: string): Promise<Dashboard> {
 	return invoke('get_dashboard', { id });
 }

@@ -41,7 +41,7 @@ export interface SpawnSessionRequest {
 	model?: string | null;
 }
 
-export type SessionEventType =
+type SessionEventType =
 	| 'session_init'
 	| 'message_delta'
 	| 'message_complete'

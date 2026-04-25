@@ -13,6 +13,7 @@ export default [
 			'.storybook',
 			'build',
 			'node_modules',
+			'scripts',
 			'src-tauri',
 			'**/*.config.*',
 			'*.d.ts',

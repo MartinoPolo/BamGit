@@ -48,7 +48,7 @@ export interface PositionedForestItem {
 	readonly zIndex: number;
 }
 
-export interface ForestLayoutResult {
+interface ForestLayoutResult {
 	readonly items: readonly PositionedForestItem[];
 	readonly oakPosition: PositionedForestItem | null;
 	readonly shelfY: number;
@@ -304,6 +304,71 @@ function enforceMinimumSpacing(
 	return positions;
 }
 
+// ─── Section Placers ───────────────────────────────────────────────────
+
+function placeOak(oak: ForestLayoutItem, centerX: number, oakY: number): PositionedForestItem {
+	return {
+		id: oak.id,
+		x: centerX,
+		y: oakY,
+		scale: 1.0,
+		opacity: 1.0,
+		zIndex: Z_OAK,
+	};
+}
+
+function placeStumps(
+	stumps: readonly ForestLayoutItem[],
+	treeCount: number,
+	centerX: number,
+	treeCenterY: number,
+	viewportWidth: number,
+): PositionedForestItem[] {
+	if (stumps.length === 0) {
+		return [];
+	}
+
+	const treeRingCount = countTreeRings(treeCount) || 1;
+	const baseRadius = viewportWidth * BASE_RING_RADIUS_FRACTION;
+	const radiusStep = viewportWidth * RING_RADIUS_STEP_FRACTION;
+	const stumpRadius = baseRadius + (treeRingCount + 0.5) * radiusStep;
+	const stumpAngles = semicircleAngles(stumps.length);
+
+	return stumps.map((stump, i) => ({
+		id: stump.id,
+		x: centerX + stumpRadius * Math.cos(stumpAngles[i]),
+		y: treeCenterY + stumpRadius * Math.sin(stumpAngles[i]) * SEMICIRCLE_VERTICAL_FLATTEN,
+		scale: STUMP_SCALE,
+		opacity: STUMP_OPACITY,
+		zIndex: Z_STUMP,
+	}));
+}
+
+function placePottedPlants(
+	pottedPlants: readonly ForestLayoutItem[],
+	centerX: number,
+	shelfY: number,
+	viewportWidth: number,
+): PositionedForestItem[] {
+	if (pottedPlants.length === 0) {
+		return [];
+	}
+
+	const margin = viewportWidth * SHELF_MARGIN_FRACTION;
+	const availableWidth = viewportWidth - 2 * margin;
+	const spacing = pottedPlants.length > 1 ? availableWidth / (pottedPlants.length - 1) : 0;
+	const startX = pottedPlants.length > 1 ? margin : centerX;
+
+	return pottedPlants.map((plant, i) => ({
+		id: plant.id,
+		x: startX + i * spacing,
+		y: shelfY,
+		scale: POTTED_PLANT_SCALE,
+		opacity: 1.0,
+		zIndex: Z_POTTED_PLANT,
+	}));
+}
+
 // ─── Layout Engine ──────────────────────────────────────────────────────
 
 export function computeForestLayout(
@@ -317,70 +382,19 @@ export function computeForestLayout(
 	const { oak, trees, stumps, pottedPlants } = classifyItems(items);
 	const centerX = viewport.width / 2;
 	const shelfY = viewport.height * SHELF_Y_FRACTION;
-	const allPositioned: PositionedForestItem[] = [];
-
-	// ── Oak ──────────────────────────────────────────────────────────────
 	const oakY = viewport.height * OAK_Y_FRACTION;
-	if (oak) {
-		allPositioned.push({
-			id: oak.id,
-			x: centerX,
-			y: oakY,
-			scale: 1.0,
-			opacity: 1.0,
-			zIndex: Z_OAK,
-		});
-	}
 
-	// ── Trees (semicircle rings) ────────────────────────────────────────
 	const treeCenterY = oak
 		? oakY + viewport.height * TREE_CENTER_OFFSET_FRACTION
 		: viewport.height * TREE_CENTER_NO_OAK_FRACTION;
-	const treePositions = placeOnSemicircles(trees, centerX, treeCenterY, viewport.width);
-	allPositioned.push(...treePositions);
 
-	// ── Stumps (periphery beyond last tree ring) ────────────────────────
-	if (stumps.length > 0) {
-		const treeRingCount = countTreeRings(trees.length) || 1;
-		const baseRadius = viewport.width * BASE_RING_RADIUS_FRACTION;
-		const radiusStep = viewport.width * RING_RADIUS_STEP_FRACTION;
-		const stumpRadius = baseRadius + (treeRingCount + 0.5) * radiusStep;
-		const stumpAngles = semicircleAngles(stumps.length);
+	const allPositioned: PositionedForestItem[] = [
+		...(oak ? [placeOak(oak, centerX, oakY)] : []),
+		...placeOnSemicircles(trees, centerX, treeCenterY, viewport.width),
+		...placeStumps(stumps, trees.length, centerX, treeCenterY, viewport.width),
+		...placePottedPlants(pottedPlants, centerX, shelfY, viewport.width),
+	];
 
-		for (let i = 0; i < stumps.length; i++) {
-			allPositioned.push({
-				id: stumps[i].id,
-				x: centerX + stumpRadius * Math.cos(stumpAngles[i]),
-				y:
-					treeCenterY +
-					stumpRadius * Math.sin(stumpAngles[i]) * SEMICIRCLE_VERTICAL_FLATTEN,
-				scale: STUMP_SCALE,
-				opacity: STUMP_OPACITY,
-				zIndex: Z_STUMP,
-			});
-		}
-	}
-
-	// ── Potted Plants (shelf strip) ─────────────────────────────────────
-	if (pottedPlants.length > 0) {
-		const margin = viewport.width * SHELF_MARGIN_FRACTION;
-		const availableWidth = viewport.width - 2 * margin;
-		const spacing = pottedPlants.length > 1 ? availableWidth / (pottedPlants.length - 1) : 0;
-		const startX = pottedPlants.length > 1 ? margin : centerX;
-
-		for (let i = 0; i < pottedPlants.length; i++) {
-			allPositioned.push({
-				id: pottedPlants[i].id,
-				x: startX + i * spacing,
-				y: shelfY,
-				scale: POTTED_PLANT_SCALE,
-				opacity: 1.0,
-				zIndex: Z_POTTED_PLANT,
-			});
-		}
-	}
-
-	// ── Collision resolution ────────────────────────────────────────────
 	const resolved = enforceMinimumSpacing(allPositioned, centerX, treeCenterY);
 	const resolvedOak = oak ? (resolved.find((item) => item.id === oak.id) ?? null) : null;
 

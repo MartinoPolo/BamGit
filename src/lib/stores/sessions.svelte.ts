@@ -29,6 +29,43 @@ const finishedSessions = $derived(
 	sessions.filter((session) => session.state === 'finished' || session.state === 'errored'),
 );
 
+const RUN_STATE_MAP: Record<string, SessionState> = {
+	running: 'running',
+	idle: 'needs-review',
+	failed: 'errored',
+	completed: 'finished',
+	stopped: 'finished',
+};
+
+function applyRunState(session: Session, sessionId: string, event: Record<string, unknown>) {
+	const newState = RUN_STATE_MAP[event.state as string];
+	if (newState) {
+		session.state = newState;
+		const notificationType = NOTIFICATION_STATES[newState];
+		if (notificationType) {
+			getNotificationStore().addPending(sessionId, notificationType);
+		} else {
+			getNotificationStore().clearPending(sessionId);
+		}
+	}
+}
+
+function applyUsageUpdate(session: Session, event: Record<string, unknown>) {
+	session.cost_usd = (event.cost_usd as number) ?? session.cost_usd;
+	session.token_count =
+		((event.input_tokens as number) ?? 0) + ((event.output_tokens as number) ?? 0);
+}
+
+function applyMessageComplete(session: Session, event: Record<string, unknown>) {
+	const text = event.text as string;
+	session.last_response_summary = text.length > 200 ? text.slice(0, 197) + '...' : text;
+}
+
+function applyInputPrompt(session: Session, sessionId: string) {
+	session.state = 'needs-input';
+	getNotificationStore().addPending(sessionId, 'needs-input');
+}
+
 function handleSessionEvent(payload: SessionEventPayload) {
 	const { session_id: sessionId, event } = payload;
 
@@ -38,43 +75,19 @@ function handleSessionEvent(payload: SessionEventPayload) {
 	}
 
 	switch (event.type) {
-		case 'run_state': {
-			const stateMap: Record<string, SessionState> = {
-				running: 'running',
-				idle: 'needs-review',
-				failed: 'errored',
-				completed: 'finished',
-				stopped: 'finished',
-			};
-			const newState = stateMap[event.state as string];
-			if (newState) {
-				session.state = newState;
-				const notificationType = NOTIFICATION_STATES[newState];
-				if (notificationType) {
-					getNotificationStore().addPending(sessionId, notificationType);
-				} else {
-					getNotificationStore().clearPending(sessionId);
-				}
-			}
+		case 'run_state':
+			applyRunState(session, sessionId, event);
 			break;
-		}
-		case 'usage_update': {
-			session.cost_usd = (event.cost_usd as number) ?? session.cost_usd;
-			session.token_count =
-				((event.input_tokens as number) ?? 0) + ((event.output_tokens as number) ?? 0);
+		case 'usage_update':
+			applyUsageUpdate(session, event);
 			break;
-		}
-		case 'message_complete': {
-			const text = event.text as string;
-			session.last_response_summary = text.length > 200 ? text.slice(0, 197) + '...' : text;
+		case 'message_complete':
+			applyMessageComplete(session, event);
 			break;
-		}
 		case 'permission_prompt':
-		case 'elicitation_prompt': {
-			session.state = 'needs-input';
-			getNotificationStore().addPending(sessionId, 'needs-input');
+		case 'elicitation_prompt':
+			applyInputPrompt(session, sessionId);
 			break;
-		}
 	}
 }
 

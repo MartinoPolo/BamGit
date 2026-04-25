@@ -15,7 +15,7 @@ import type {
 	TreeVisualization,
 } from '$lib/types/tree_visualization';
 
-export const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
+const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
 	isPrd: false,
 	prdTitle: '',
 	subIssueCompletionRatio: 0,
@@ -51,46 +51,66 @@ function computeToolVisibility(dimensions: StateDimensions): ToolVisibility {
 	return tools;
 }
 
-function computeTreeStage(dimensions: StateDimensions, context: TreeComputeContext): TreeStage {
-	if (dimensions.worktreeState === 'removed' && dimensions.grovekeeperStatus === 'archived') {
-		return TREE_STAGES.stump;
-	}
-	if (dimensions.branchStatus === 'deleted') {
-		return TREE_STAGES.dead;
-	}
-	if (dimensions.pullRequestState === 'merged' && dimensions.githubIssueState === 'closed') {
-		return TREE_STAGES.bare;
-	}
-	if (dimensions.pullRequestState === 'approved') {
-		return TREE_STAGES.flowering;
-	}
-	if (
-		dimensions.pullRequestState === 'ready-to-merge' ||
-		dimensions.pullRequestState === 'review-requested' ||
-		dimensions.pullRequestState === 'changes-requested'
-	) {
-		return TREE_STAGES.seasonal;
-	}
-	if (dimensions.pullRequestState === 'draft' || dimensions.pullRequestState === 'open') {
-		return TREE_STAGES.fruiting;
-	}
-	if (dimensions.aggregateSessionState === 'finished' && context.hasCommitsOnBranch) {
-		return TREE_STAGES.leafy;
-	}
-	if (dimensions.aggregateSessionState === 'running') {
-		return TREE_STAGES.growing;
-	}
-	if (
-		dimensions.worktreeState === 'active' &&
-		dimensions.branchStatus !== 'no-branch' &&
-		dimensions.aggregateSessionState === 'no-session'
-	) {
-		return TREE_STAGES.sapling;
-	}
-	if (dimensions.worktreeState === 'pending') {
-		return TREE_STAGES.sprouting;
-	}
+interface TreeStageRule {
+	readonly condition: (dimensions: StateDimensions, context: TreeComputeContext) => boolean;
+	readonly stage: TreeStage;
+}
 
+const TREE_STAGE_RULES: readonly TreeStageRule[] = [
+	{
+		condition: (d) => d.worktreeState === 'removed' && d.grovekeeperStatus === 'archived',
+		stage: TREE_STAGES.stump,
+	},
+	{
+		condition: (d) => d.branchStatus === 'deleted',
+		stage: TREE_STAGES.dead,
+	},
+	{
+		condition: (d) => d.pullRequestState === 'merged' && d.githubIssueState === 'closed',
+		stage: TREE_STAGES.bare,
+	},
+	{
+		condition: (d) => d.pullRequestState === 'approved',
+		stage: TREE_STAGES.flowering,
+	},
+	{
+		condition: (d) =>
+			d.pullRequestState === 'ready-to-merge' ||
+			d.pullRequestState === 'review-requested' ||
+			d.pullRequestState === 'changes-requested',
+		stage: TREE_STAGES.seasonal,
+	},
+	{
+		condition: (d) => d.pullRequestState === 'draft' || d.pullRequestState === 'open',
+		stage: TREE_STAGES.fruiting,
+	},
+	{
+		condition: (d, c) => d.aggregateSessionState === 'finished' && c.hasCommitsOnBranch,
+		stage: TREE_STAGES.leafy,
+	},
+	{
+		condition: (d) => d.aggregateSessionState === 'running',
+		stage: TREE_STAGES.growing,
+	},
+	{
+		condition: (d) =>
+			d.worktreeState === 'active' &&
+			d.branchStatus !== 'no-branch' &&
+			d.aggregateSessionState === 'no-session',
+		stage: TREE_STAGES.sapling,
+	},
+	{
+		condition: (d) => d.worktreeState === 'pending',
+		stage: TREE_STAGES.sprouting,
+	},
+];
+
+function computeTreeStage(dimensions: StateDimensions, context: TreeComputeContext): TreeStage {
+	for (const rule of TREE_STAGE_RULES) {
+		if (rule.condition(dimensions, context)) {
+			return rule.stage;
+		}
+	}
 	return TREE_STAGES.seed;
 }
 

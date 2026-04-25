@@ -3,9 +3,10 @@
 	import type { Action } from '$lib/types/action';
 	import type { GitHubStatusCache } from '$lib/types/github';
 	import type { GitStatusCache } from '$lib/types/git_status';
+	import type { IssueCardCallbacks } from '$lib/types/issue_card_callbacks';
 	import IssueCard from './IssueCard.svelte';
 
-	interface Props {
+	interface Props extends IssueCardCallbacks {
 		parentIssues: Issue[];
 		archivedIssues: Issue[];
 		showArchived: boolean;
@@ -18,13 +19,6 @@
 		getGitStatus: (issueId: string) => GitStatusCache | undefined;
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
-		onArchive: (id: string) => void;
-		onUnarchive: (id: string) => void;
-		onEdit: (issue: Issue) => void;
-		onDelete: (id: string) => void;
-		onSetupWorktree?: (issue: Issue) => void;
-		onRemoveWorktree?: (issue: Issue) => void;
-		onExecuteAction?: (actionId: string, issueId: string) => void;
 	}
 
 	let {
