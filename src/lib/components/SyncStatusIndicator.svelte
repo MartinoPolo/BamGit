@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { format_relative_time } from '$lib/utils/time';
+	import { formatRelativeTime } from '$lib/utils/time';
 
-	let { fetched_at }: { fetched_at: string | null } = $props();
+	let { fetchedAt }: { fetchedAt: string | null } = $props();
 
 	let tick = $state(0);
-	const display_text = $derived.by(() => {
+	const displayText = $derived.by(() => {
 		// Reference tick to re-derive on interval updates
 		void tick;
-		return format_relative_time(fetched_at);
+		return formatRelativeTime(fetchedAt);
 	});
 
 	// Re-tick every 30 seconds to update relative time
@@ -19,6 +19,6 @@
 	});
 </script>
 
-<span class="text-[10px] text-muted-foreground" title="Last synced: {fetched_at ?? 'never'}">
-	{display_text}
+<span class="text-[10px] text-muted-foreground" title="Last synced: {fetchedAt ?? 'never'}">
+	{displayText}
 </span>

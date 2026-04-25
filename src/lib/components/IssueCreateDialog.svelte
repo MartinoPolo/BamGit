@@ -4,46 +4,45 @@
 
 	interface Props {
 		open: boolean;
-		dashboard_id: string;
-		palette_colors: string[];
-		default_color: string;
-		on_close: () => void;
-		on_create: (request: CreateIssueRequest) => void;
+		dashboardId: string;
+		paletteColors: string[];
+		defaultColor: string;
+		onClose: () => void;
+		onCreate: (request: CreateIssueRequest) => void;
 	}
 
-	let { open, dashboard_id, palette_colors, default_color, on_close, on_create }: Props =
-		$props();
+	let { open, dashboardId, paletteColors, defaultColor, onClose, onCreate }: Props = $props();
 
 	let name = $state('');
 	let priority = $state<'low' | 'medium' | 'high' | 'top' | ''>('');
 	let color = $state('');
-	let github_issue_url = $state('');
-	let dialog_element: HTMLDialogElement | undefined = $state();
+	let githubIssueUrl = $state('');
+	let dialogElement: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
-		if (open && dialog_element !== undefined && !dialog_element.open) {
-			color = default_color;
-			dialog_element.showModal();
-		} else if (!open && dialog_element?.open === true) {
-			dialog_element.close();
+		if (open && dialogElement !== undefined && !dialogElement.open) {
+			color = defaultColor;
+			dialogElement.showModal();
+		} else if (!open && dialogElement?.open === true) {
+			dialogElement.close();
 		}
 	});
 
-	function reset_form() {
+	function resetForm() {
 		name = '';
 		priority = '';
 		color = '';
-		github_issue_url = '';
+		githubIssueUrl = '';
 	}
 
-	function handle_submit(event: SubmitEvent) {
+	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (!name.trim()) {
 			return;
 		}
 
 		const request: CreateIssueRequest = {
-			dashboard_id,
+			dashboard_id: dashboardId,
 			name: name.trim(),
 			color,
 		};
@@ -51,31 +50,31 @@
 		if (priority) {
 			request.priority = priority;
 		}
-		if (github_issue_url.trim()) {
-			request.github_issue_url = github_issue_url.trim();
-			const issue_number_match = github_issue_url.match(/\/issues\/(\d+)/);
-			if (issue_number_match) {
-				request.github_issue_number = parseInt(issue_number_match[1], 10);
+		if (githubIssueUrl.trim()) {
+			request.github_issue_url = githubIssueUrl.trim();
+			const issueNumberMatch = githubIssueUrl.match(/\/issues\/(\d+)/);
+			if (issueNumberMatch) {
+				request.github_issue_number = parseInt(issueNumberMatch[1], 10);
 			}
 		}
 
-		on_create(request);
-		reset_form();
-		on_close();
+		onCreate(request);
+		resetForm();
+		onClose();
 	}
 
-	function handle_cancel() {
-		reset_form();
-		on_close();
+	function handleCancel() {
+		resetForm();
+		onClose();
 	}
 </script>
 
 <dialog
-	bind:this={dialog_element}
-	onclose={handle_cancel}
+	bind:this={dialogElement}
+	onclose={handleCancel}
 	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
 >
-	<form onsubmit={handle_submit} class="flex flex-col gap-4 p-6">
+	<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
 		<h2 class="text-lg font-semibold">Create Issue</h2>
 
 		<label class="flex flex-col gap-1">
@@ -104,15 +103,15 @@
 
 		<!-- Color picker -->
 		<PaletteColorPicker
-			colors={palette_colors}
-			selected_color={color}
-			on_select={(c) => (color = c)}
+			colors={paletteColors}
+			selectedColor={color}
+			onSelect={(c) => (color = c)}
 		/>
 
 		<label class="flex flex-col gap-1">
 			<span class="text-xs text-muted-foreground">GitHub Issue URL</span>
 			<input
-				bind:value={github_issue_url}
+				bind:value={githubIssueUrl}
 				class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				placeholder="https://github.com/owner/repo/issues/42"
 			/>
@@ -121,7 +120,7 @@
 		<div class="flex justify-end gap-2 pt-2">
 			<button
 				type="button"
-				onclick={handle_cancel}
+				onclick={handleCancel}
 				class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 			>
 				Cancel

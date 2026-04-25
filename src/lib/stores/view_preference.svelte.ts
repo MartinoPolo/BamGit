@@ -5,9 +5,9 @@ export type ViewMode = 'cards' | 'forest';
 const VIEW_MODE_STORAGE_KEY = 'grovekeeper_view_mode';
 const DEFAULT_VIEW_MODE: ViewMode = 'cards';
 
-let view_mode = $state<ViewMode>(load_view_mode());
+let viewMode = $state<ViewMode>(loadViewMode());
 
-function load_view_mode(): ViewMode {
+function loadViewMode(): ViewMode {
 	if (!browser) {
 		return DEFAULT_VIEW_MODE;
 	}
@@ -22,21 +22,21 @@ function load_view_mode(): ViewMode {
  * Must be called once from a root component (e.g., +layout.svelte) during initialization.
  * Sets up reactive effect for localStorage persistence.
  */
-export function initialize_view_preference() {
+export function initializeViewPreference() {
 	$effect(() => {
 		if (browser) {
-			localStorage.setItem(VIEW_MODE_STORAGE_KEY, view_mode);
+			localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
 		}
 	});
 }
 
-export function get_view_preference_store() {
+export function getViewPreferenceStore() {
 	return {
 		get mode() {
-			return view_mode;
+			return viewMode;
 		},
 		set mode(value: ViewMode) {
-			view_mode = value;
+			viewMode = value;
 		},
 	};
 }

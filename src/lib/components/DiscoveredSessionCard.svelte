@@ -3,12 +3,12 @@
 
 	interface Props {
 		session: DiscoveredSession;
-		on_adopt: (session: DiscoveredSession) => void;
+		onAdopt: (session: DiscoveredSession) => void;
 	}
 
-	let { session, on_adopt }: Props = $props();
+	let { session, onAdopt }: Props = $props();
 
-	const status_config: Record<DiscoveredSessionStatus, { label: string; color: string }> = {
+	const statusConfig: Record<DiscoveredSessionStatus, { label: string; color: string }> = {
 		working: { label: 'Working', color: 'bg-green-500' },
 		needs_attention: { label: 'Needs Attention', color: 'bg-amber-500' },
 		idle: { label: 'Idle', color: 'bg-blue-500' },
@@ -16,9 +16,9 @@
 		unknown: { label: 'Unknown', color: 'bg-neutral-500' },
 	};
 
-	const badge = $derived(status_config[session.status] ?? status_config.unknown);
+	const badge = $derived(statusConfig[session.status] ?? statusConfig.unknown);
 
-	const formatted_cost = $derived(session.cost_usd > 0 ? `$${session.cost_usd.toFixed(3)}` : '');
+	const formattedCost = $derived(session.cost_usd > 0 ? `$${session.cost_usd.toFixed(3)}` : '');
 </script>
 
 <div class="w-full rounded-lg border border-dashed border-input bg-muted/50 p-3 text-left">
@@ -56,8 +56,8 @@
 	<div class="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
 		<span>PID {session.pid}</span>
 		<span>{session.message_count} msgs</span>
-		{#if formatted_cost}
-			<span>{formatted_cost}</span>
+		{#if formattedCost}
+			<span>{formattedCost}</span>
 		{/if}
 		{#if session.token_count > 0}
 			<span>{session.token_count.toLocaleString()} tokens</span>
@@ -67,7 +67,7 @@
 			class="ml-auto rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
 			onclick={(e) => {
 				e.stopPropagation();
-				on_adopt(session);
+				onAdopt(session);
 			}}
 		>
 			Adopt

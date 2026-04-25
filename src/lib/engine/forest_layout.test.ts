@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-	compute_forest_layout,
+	computeForestLayout,
 	type ForestLayoutItem,
 	type ForestLayoutItemOak,
 	type ForestLayoutItemTree,
@@ -12,11 +12,11 @@ import {
 
 // ─── Factories ──────────────────────────────────────────────────────────
 
-function create_viewport(overrides: Partial<Viewport> = {}): Viewport {
+function createViewport(overrides: Partial<Viewport> = {}): Viewport {
 	return { width: 1200, height: 800, ...overrides };
 }
 
-function create_oak(
+function createOak(
 	overrides: Partial<Omit<ForestLayoutItemOak, 'kind'>> = {},
 ): ForestLayoutItemOak {
 	return {
@@ -28,7 +28,7 @@ function create_oak(
 	};
 }
 
-function create_tree(
+function createTree(
 	id: string,
 	overrides: Partial<Omit<ForestLayoutItemTree, 'kind' | 'id'>> = {},
 ): ForestLayoutItemTree {
@@ -42,7 +42,7 @@ function create_tree(
 	};
 }
 
-function create_stump(
+function createStump(
 	id: string,
 	overrides: Partial<Omit<ForestLayoutItemTree, 'kind' | 'id' | 'stage'>> = {},
 ): ForestLayoutItemTree {
@@ -56,7 +56,7 @@ function create_stump(
 	};
 }
 
-function create_potted_plant(
+function createPottedPlant(
 	id: string,
 	overrides: Partial<Omit<ForestLayoutItemPottedPlant, 'kind' | 'id'>> = {},
 ): ForestLayoutItemPottedPlant {
@@ -70,7 +70,7 @@ function create_potted_plant(
 	};
 }
 
-function find_item(items: readonly PositionedForestItem[], id: string): PositionedForestItem {
+function findItem(items: readonly PositionedForestItem[], id: string): PositionedForestItem {
 	const found = items.find((item) => item.id === id);
 	if (!found) {
 		throw new Error(`Item ${id} not found in layout result`);
@@ -78,15 +78,15 @@ function find_item(items: readonly PositionedForestItem[], id: string): Position
 	return found;
 }
 
-function euclidean_distance(a: PositionedForestItem, b: PositionedForestItem): number {
+function euclideanDistance(a: PositionedForestItem, b: PositionedForestItem): number {
 	return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
 
 // ─── Empty Input ────────────────────────────────────────────────────────
 
-describe('compute_forest_layout — empty input', () => {
+describe('computeForestLayout — empty input', () => {
 	it('returns empty result for no items', () => {
-		const result = compute_forest_layout([], create_viewport());
+		const result = computeForestLayout([], createViewport());
 		expect(result.items).toEqual([]);
 		expect(result.oakPosition).toBeNull();
 	});
@@ -94,10 +94,10 @@ describe('compute_forest_layout — empty input', () => {
 
 // ─── Oak Placement ──────────────────────────────────────────────────────
 
-describe('compute_forest_layout — oak placement', () => {
+describe('computeForestLayout — oak placement', () => {
 	it('positions oak at center-top of viewport', () => {
-		const viewport = create_viewport({ width: 1200, height: 800 });
-		const result = compute_forest_layout([create_oak()], viewport);
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const result = computeForestLayout([createOak()], viewport);
 
 		expect(result.oakPosition).not.toBeNull();
 		const oak = result.oakPosition!;
@@ -108,15 +108,12 @@ describe('compute_forest_layout — oak placement', () => {
 	});
 
 	it('returns null oakPosition when no oak provided', () => {
-		const result = compute_forest_layout(
-			[create_tree('t1'), create_tree('t2')],
-			create_viewport(),
-		);
+		const result = computeForestLayout([createTree('t1'), createTree('t2')], createViewport());
 		expect(result.oakPosition).toBeNull();
 	});
 
 	it('includes oak in items array', () => {
-		const result = compute_forest_layout([create_oak()], create_viewport());
+		const result = computeForestLayout([createOak()], createViewport());
 		expect(result.items).toHaveLength(1);
 		expect(result.items[0].id).toBe('oak-1');
 	});
@@ -124,144 +121,144 @@ describe('compute_forest_layout — oak placement', () => {
 
 // ─── Tree Semicircle Arrangement ────────────────────────────────────────
 
-describe('compute_forest_layout — tree semicircle', () => {
+describe('computeForestLayout — tree semicircle', () => {
 	it('distributes trees with y below oak position', () => {
-		const oak = create_oak();
-		const trees = Array.from({ length: 5 }, (_, i) => create_tree(`t${i}`));
-		const viewport = create_viewport();
-		const result = compute_forest_layout([oak, ...trees], viewport);
+		const oak = createOak();
+		const trees = Array.from({ length: 5 }, (_, i) => createTree(`t${i}`));
+		const viewport = createViewport();
+		const result = computeForestLayout([oak, ...trees], viewport);
 
-		const oak_pos = result.oakPosition!;
+		const oakPos = result.oakPosition!;
 		for (const tree of trees) {
-			const pos = find_item(result.items, tree.id);
-			expect(pos.y).toBeGreaterThan(oak_pos.y);
+			const pos = findItem(result.items, tree.id);
+			expect(pos.y).toBeGreaterThan(oakPos.y);
 		}
 	});
 
 	it('distributes trees symmetrically around center x', () => {
-		const trees = Array.from({ length: 4 }, (_, i) => create_tree(`t${i}`));
-		const viewport = create_viewport({ width: 1000, height: 800 });
-		const result = compute_forest_layout(trees, viewport);
+		const trees = Array.from({ length: 4 }, (_, i) => createTree(`t${i}`));
+		const viewport = createViewport({ width: 1000, height: 800 });
+		const result = computeForestLayout(trees, viewport);
 
-		const center_x = 500;
-		const positions = trees.map((t) => find_item(result.items, t.id));
-		const left_count = positions.filter((p) => p.x < center_x).length;
-		const right_count = positions.filter((p) => p.x > center_x).length;
+		const centerX = 500;
+		const positions = trees.map((t) => findItem(result.items, t.id));
+		const leftCount = positions.filter((p) => p.x < centerX).length;
+		const rightCount = positions.filter((p) => p.x > centerX).length;
 		// Even count should split evenly
-		expect(left_count).toBe(right_count);
+		expect(leftCount).toBe(rightCount);
 	});
 
 	it('places single tree centered in tree zone', () => {
-		const viewport = create_viewport({ width: 1000, height: 800 });
-		const result = compute_forest_layout([create_tree('solo')], viewport);
+		const viewport = createViewport({ width: 1000, height: 800 });
+		const result = computeForestLayout([createTree('solo')], viewport);
 
-		const pos = find_item(result.items, 'solo');
+		const pos = findItem(result.items, 'solo');
 		expect(pos.x).toBeCloseTo(500, 0);
 	});
 
 	it('orders trees by priority then sort_order — higher priority closer to center', () => {
 		const items: ForestLayoutItem[] = [
-			create_oak(),
-			create_tree('low', { priority: 'low', sortOrder: 0 }),
-			create_tree('top', { priority: 'top', sortOrder: 0 }),
-			create_tree('med', { priority: 'medium', sortOrder: 0 }),
-			create_tree('high', { priority: 'high', sortOrder: 0 }),
+			createOak(),
+			createTree('low', { priority: 'low', sortOrder: 0 }),
+			createTree('top', { priority: 'top', sortOrder: 0 }),
+			createTree('med', { priority: 'medium', sortOrder: 0 }),
+			createTree('high', { priority: 'high', sortOrder: 0 }),
 		];
-		const viewport = create_viewport();
-		const result = compute_forest_layout(items, viewport);
+		const viewport = createViewport();
+		const result = computeForestLayout(items, viewport);
 
-		const oak_pos = result.oakPosition!;
-		const top_pos = find_item(result.items, 'top');
-		const low_pos = find_item(result.items, 'low');
+		const oakPos = result.oakPosition!;
+		const topPos = findItem(result.items, 'top');
+		const lowPos = findItem(result.items, 'low');
 
 		// Higher-priority tree should be in inner ring (closer to oak center)
-		const top_distance = euclidean_distance(top_pos, oak_pos);
-		const low_distance = euclidean_distance(low_pos, oak_pos);
-		expect(top_distance).toBeLessThan(low_distance);
+		const topDistance = euclideanDistance(topPos, oakPos);
+		const lowDistance = euclideanDistance(lowPos, oakPos);
+		expect(topDistance).toBeLessThan(lowDistance);
 	});
 });
 
 // ─── Stump Placement ───────────────────────────────────────────────────
 
-describe('compute_forest_layout — stumps', () => {
+describe('computeForestLayout — stumps', () => {
 	it('places stumps with reduced opacity', () => {
-		const items = [create_oak(), create_stump('s1'), create_tree('t1')];
-		const result = compute_forest_layout(items, create_viewport());
+		const items = [createOak(), createStump('s1'), createTree('t1')];
+		const result = computeForestLayout(items, createViewport());
 
-		const stump = find_item(result.items, 's1');
+		const stump = findItem(result.items, 's1');
 		expect(stump.opacity).toBeLessThanOrEqual(0.5);
 	});
 
 	it('places stumps at periphery — further from center than trees', () => {
-		const items = [create_oak(), create_tree('t1'), create_tree('t2'), create_stump('s1')];
-		const viewport = create_viewport();
-		const result = compute_forest_layout(items, viewport);
+		const items = [createOak(), createTree('t1'), createTree('t2'), createStump('s1')];
+		const viewport = createViewport();
+		const result = computeForestLayout(items, viewport);
 
-		const oak_pos = result.oakPosition!;
-		const tree_distances = ['t1', 't2'].map((id) =>
-			euclidean_distance(find_item(result.items, id), oak_pos),
+		const oakPos = result.oakPosition!;
+		const treeDistances = ['t1', 't2'].map((id) =>
+			euclideanDistance(findItem(result.items, id), oakPos),
 		);
-		const stump_distance = euclidean_distance(find_item(result.items, 's1'), oak_pos);
-		const max_tree_distance = Math.max(...tree_distances);
-		expect(stump_distance).toBeGreaterThanOrEqual(max_tree_distance);
+		const stumpDistance = euclideanDistance(findItem(result.items, 's1'), oakPos);
+		const maxTreeDistance = Math.max(...treeDistances);
+		expect(stumpDistance).toBeGreaterThanOrEqual(maxTreeDistance);
 	});
 
 	it('gives stumps reduced scale', () => {
-		const result = compute_forest_layout([create_stump('s1')], create_viewport());
-		const stump = find_item(result.items, 's1');
+		const result = computeForestLayout([createStump('s1')], createViewport());
+		const stump = findItem(result.items, 's1');
 		expect(stump.scale).toBeLessThanOrEqual(0.6);
 	});
 });
 
 // ─── Potted Plants Shelf ────────────────────────────────────────────────
 
-describe('compute_forest_layout — potted plants', () => {
+describe('computeForestLayout — potted plants', () => {
 	it('positions potted plants on bottom shelf strip', () => {
-		const viewport = create_viewport({ height: 800 });
-		const plants = [create_potted_plant('p1'), create_potted_plant('p2')];
-		const result = compute_forest_layout(plants, viewport);
+		const viewport = createViewport({ height: 800 });
+		const plants = [createPottedPlant('p1'), createPottedPlant('p2')];
+		const result = computeForestLayout(plants, viewport);
 
 		for (const plant of plants) {
-			const pos = find_item(result.items, plant.id);
+			const pos = findItem(result.items, plant.id);
 			expect(pos.y).toBeGreaterThanOrEqual(viewport.height * 0.8);
 		}
 	});
 
 	it('distributes potted plants horizontally across shelf', () => {
-		const viewport = create_viewport({ width: 1000 });
-		const plants = Array.from({ length: 3 }, (_, i) => create_potted_plant(`p${i}`));
-		const result = compute_forest_layout(plants, viewport);
+		const viewport = createViewport({ width: 1000 });
+		const plants = Array.from({ length: 3 }, (_, i) => createPottedPlant(`p${i}`));
+		const result = computeForestLayout(plants, viewport);
 
-		const positions = plants.map((p) => find_item(result.items, p.id));
-		const x_values = positions.map((p) => p.x).sort((a, b) => a - b);
+		const positions = plants.map((p) => findItem(result.items, p.id));
+		const xValues = positions.map((p) => p.x).sort((a, b) => a - b);
 
 		// Should be spread out, not stacked
-		for (let i = 1; i < x_values.length; i++) {
-			expect(x_values[i] - x_values[i - 1]).toBeGreaterThan(0);
+		for (let i = 1; i < xValues.length; i++) {
+			expect(xValues[i] - xValues[i - 1]).toBeGreaterThan(0);
 		}
 	});
 
 	it('exposes shelfY coordinate', () => {
-		const viewport = create_viewport({ height: 800 });
-		const result = compute_forest_layout([create_potted_plant('p1')], viewport);
+		const viewport = createViewport({ height: 800 });
+		const result = computeForestLayout([createPottedPlant('p1')], viewport);
 		expect(result.shelfY).toBeGreaterThanOrEqual(viewport.height * 0.8);
 	});
 });
 
 // ─── Minimum Spacing ────────────────────────────────────────────────────
 
-describe('compute_forest_layout — minimum spacing', () => {
+describe('computeForestLayout — minimum spacing', () => {
 	it('enforces minimum spacing between all items', () => {
 		const items: ForestLayoutItem[] = [
-			create_oak(),
-			...Array.from({ length: 15 }, (_, i) => create_tree(`t${i}`)),
+			createOak(),
+			...Array.from({ length: 15 }, (_, i) => createTree(`t${i}`)),
 		];
-		const viewport = create_viewport({ width: 800, height: 600 });
-		const result = compute_forest_layout(items, viewport);
+		const viewport = createViewport({ width: 800, height: 600 });
+		const result = computeForestLayout(items, viewport);
 
 		for (let i = 0; i < result.items.length; i++) {
 			for (let j = i + 1; j < result.items.length; j++) {
-				const distance = euclidean_distance(result.items[i], result.items[j]);
+				const distance = euclideanDistance(result.items[i], result.items[j]);
 				expect(distance).toBeGreaterThanOrEqual(MIN_SPACING_PX * 0.9); // 10% tolerance
 			}
 		}
@@ -270,24 +267,24 @@ describe('compute_forest_layout — minimum spacing', () => {
 
 // ─── Viewport Responsiveness ────────────────────────────────────────────
 
-describe('compute_forest_layout — viewport responsiveness', () => {
+describe('computeForestLayout — viewport responsiveness', () => {
 	it('produces different positions for different viewport sizes', () => {
-		const items = [create_oak(), create_tree('t1'), create_tree('t2')];
-		const small = compute_forest_layout(items, create_viewport({ width: 600, height: 400 }));
-		const large = compute_forest_layout(items, create_viewport({ width: 1600, height: 1000 }));
+		const items = [createOak(), createTree('t1'), createTree('t2')];
+		const small = computeForestLayout(items, createViewport({ width: 600, height: 400 }));
+		const large = computeForestLayout(items, createViewport({ width: 1600, height: 1000 }));
 
-		const small_oak = small.oakPosition!;
-		const large_oak = large.oakPosition!;
-		expect(small_oak.x).not.toBeCloseTo(large_oak.x, 0);
+		const smallOak = small.oakPosition!;
+		const largeOak = large.oakPosition!;
+		expect(smallOak.x).not.toBeCloseTo(largeOak.x, 0);
 	});
 
 	it('scales positions proportionally to viewport', () => {
-		const items = [create_oak(), create_tree('t1')];
-		const v1 = create_viewport({ width: 1000, height: 800 });
-		const v2 = create_viewport({ width: 2000, height: 1600 });
+		const items = [createOak(), createTree('t1')];
+		const v1 = createViewport({ width: 1000, height: 800 });
+		const v2 = createViewport({ width: 2000, height: 1600 });
 
-		const r1 = compute_forest_layout(items, v1);
-		const r2 = compute_forest_layout(items, v2);
+		const r1 = computeForestLayout(items, v1);
+		const r2 = computeForestLayout(items, v2);
 
 		// Positions should roughly double
 		const oak1 = r1.oakPosition!;
@@ -299,39 +296,39 @@ describe('compute_forest_layout — viewport responsiveness', () => {
 
 // ─── Many Trees Overflow ────────────────────────────────────────────────
 
-describe('compute_forest_layout — large item counts', () => {
+describe('computeForestLayout — large item counts', () => {
 	it('handles 30+ trees without crashing', () => {
 		const items: ForestLayoutItem[] = [
-			create_oak(),
-			...Array.from({ length: 35 }, (_, i) => create_tree(`t${i}`)),
+			createOak(),
+			...Array.from({ length: 35 }, (_, i) => createTree(`t${i}`)),
 		];
-		const result = compute_forest_layout(items, create_viewport());
+		const result = computeForestLayout(items, createViewport());
 		expect(result.items).toHaveLength(36);
 	});
 });
 
 // ─── Mixed Kinds ────────────────────────────────────────────────────────
 
-describe('compute_forest_layout — mixed kinds', () => {
+describe('computeForestLayout — mixed kinds', () => {
 	it('correctly zones all kinds simultaneously', () => {
-		const viewport = create_viewport({ width: 1200, height: 800 });
+		const viewport = createViewport({ width: 1200, height: 800 });
 		const items: ForestLayoutItem[] = [
-			create_oak(),
-			create_tree('t1'),
-			create_tree('t2'),
-			create_stump('s1'),
-			create_potted_plant('p1'),
-			create_potted_plant('p2'),
+			createOak(),
+			createTree('t1'),
+			createTree('t2'),
+			createStump('s1'),
+			createPottedPlant('p1'),
+			createPottedPlant('p2'),
 		];
-		const result = compute_forest_layout(items, viewport);
+		const result = computeForestLayout(items, viewport);
 
 		expect(result.items).toHaveLength(6);
 		expect(result.oakPosition).not.toBeNull();
 
 		const oak = result.oakPosition!;
-		const t1 = find_item(result.items, 't1');
-		const s1 = find_item(result.items, 's1');
-		const p1 = find_item(result.items, 'p1');
+		const t1 = findItem(result.items, 't1');
+		const s1 = findItem(result.items, 's1');
+		const p1 = findItem(result.items, 'p1');
 
 		// Oak at top
 		expect(oak.y).toBeLessThan(t1.y);
@@ -346,10 +343,10 @@ describe('compute_forest_layout — mixed kinds', () => {
 
 // ─── zIndex Ordering ────────────────────────────────────────────────────
 
-describe('compute_forest_layout — zIndex', () => {
+describe('computeForestLayout — zIndex', () => {
 	it('gives oak the highest zIndex', () => {
-		const items = [create_oak(), create_tree('t1'), create_potted_plant('p1')];
-		const result = compute_forest_layout(items, create_viewport());
+		const items = [createOak(), createTree('t1'), createPottedPlant('p1')];
+		const result = computeForestLayout(items, createViewport());
 
 		const oak = result.oakPosition!;
 		for (const item of result.items) {
@@ -360,11 +357,11 @@ describe('compute_forest_layout — zIndex', () => {
 	});
 
 	it('gives stumps the lowest zIndex', () => {
-		const items = [create_tree('t1'), create_stump('s1'), create_potted_plant('p1')];
-		const result = compute_forest_layout(items, create_viewport());
+		const items = [createTree('t1'), createStump('s1'), createPottedPlant('p1')];
+		const result = computeForestLayout(items, createViewport());
 
-		const stump = find_item(result.items, 's1');
-		const tree = find_item(result.items, 't1');
+		const stump = findItem(result.items, 's1');
+		const tree = findItem(result.items, 't1');
 		expect(stump.zIndex).toBeLessThan(tree.zIndex);
 	});
 });

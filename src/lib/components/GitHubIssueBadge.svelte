@@ -6,11 +6,11 @@
 	interface Props {
 		state: GitHubIssueState | null;
 		url: string | null;
-		issue_number: number | null;
+		issueNumber: number | null;
 		disabled?: boolean;
 	}
 
-	let { state, url, issue_number, disabled = false }: Props = $props();
+	let { state, url, issueNumber, disabled = false }: Props = $props();
 
 	const config = $derived.by(() => {
 		switch (state) {
@@ -40,7 +40,7 @@
 		color={config.color}
 		bg={config.bg}
 		label={config.label}
-		number={issue_number}
+		number={issueNumber}
 		{url}
 		prefix="Issue"
 		{disabled}

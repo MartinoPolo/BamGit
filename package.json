@@ -26,7 +26,7 @@
 		"@tauri-apps/plugin-opener": "^2",
 		"bits-ui": "^2.16.5",
 		"clsx": "^2.1.1",
-		"low-poly-2d-trees": "link:..\\low-poly-2d-trees",
+		"low-poly-2d-trees": "link:..\\..\\low-poly-2d-trees",
 		"lucide-svelte": "^1.0.1",
 		"tailwind-merge": "^3.5.0",
 		"tailwind-variants": "^3.2.2"

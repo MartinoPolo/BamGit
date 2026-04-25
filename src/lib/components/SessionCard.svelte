@@ -1,27 +1,27 @@
 <script lang="ts">
 	import type { Session, SessionState } from '$lib/types/session';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
-	import { get_notification_store } from '$lib/stores/notifications.svelte';
+	import { getNotificationStore } from '$lib/stores/notifications.svelte';
 
 	interface Props {
 		session: Session;
-		on_click: (session: Session) => void;
-		on_terminate: (id: string) => void;
+		onClick: (session: Session) => void;
+		onTerminate: (id: string) => void;
 	}
 
-	let { session, on_click, on_terminate }: Props = $props();
+	let { session, onClick, onTerminate }: Props = $props();
 
-	const notification_store = get_notification_store();
+	const notificationStore = getNotificationStore();
 
-	const notification_dot_color = $derived.by(() => {
-		const pending_type = notification_store.get_pending_type(session.id);
-		if (pending_type === undefined) {
+	const notificationDotColor = $derived.by(() => {
+		const pendingType = notificationStore.getPendingType(session.id);
+		if (pendingType === undefined) {
 			return null;
 		}
-		return NOTIFICATION_DOT_COLORS[pending_type];
+		return NOTIFICATION_DOT_COLORS[pendingType];
 	});
 
-	const state_config: Record<SessionState, { label: string; color: string }> = {
+	const stateConfig: Record<SessionState, { label: string; color: string }> = {
 		running: { label: 'Running', color: 'bg-green-500' },
 		'needs-input': { label: 'Needs Input', color: 'bg-amber-500' },
 		'needs-review': { label: 'Needs Review', color: 'bg-blue-500' },
@@ -30,28 +30,28 @@
 		errored: { label: 'Errored', color: 'bg-red-500' },
 	};
 
-	const badge = $derived(state_config[session.state] ?? state_config.running);
-	const is_active = $derived(session.state !== 'finished' && session.state !== 'errored');
+	const badge = $derived(stateConfig[session.state] ?? stateConfig.running);
+	const isActive = $derived(session.state !== 'finished' && session.state !== 'errored');
 
-	const formatted_cost = $derived(
+	const formattedCost = $derived(
 		session.cost_usd != null ? `$${session.cost_usd.toFixed(3)}` : '',
 	);
 
-	const relative_time = $derived.by(() => {
+	const relativeTime = $derived.by(() => {
 		const started = new Date(session.started_at + 'Z');
 		const now = new Date();
-		const diff_seconds = Math.floor((now.getTime() - started.getTime()) / 1000);
+		const diffSeconds = Math.floor((now.getTime() - started.getTime()) / 1000);
 
-		if (diff_seconds < 60) {
-			return `${diff_seconds}s ago`;
+		if (diffSeconds < 60) {
+			return `${diffSeconds}s ago`;
 		}
-		if (diff_seconds < 3600) {
-			return `${Math.floor(diff_seconds / 60)}m ago`;
+		if (diffSeconds < 3600) {
+			return `${Math.floor(diffSeconds / 60)}m ago`;
 		}
-		if (diff_seconds < 86400) {
-			return `${Math.floor(diff_seconds / 3600)}h ago`;
+		if (diffSeconds < 86400) {
+			return `${Math.floor(diffSeconds / 3600)}h ago`;
 		}
-		return `${Math.floor(diff_seconds / 86400)}d ago`;
+		return `${Math.floor(diffSeconds / 86400)}d ago`;
 	});
 </script>
 
@@ -60,19 +60,19 @@
 	class="w-full cursor-pointer rounded-lg border border-border bg-card p-3 text-left transition hover:border-input hover:bg-accent"
 	role="button"
 	tabindex="0"
-	onclick={() => on_click(session)}
+	onclick={() => onClick(session)}
 	onkeydown={(e) => {
 		if (e.key === 'Enter' || e.key === ' ') {
-			on_click(session);
+			onClick(session);
 		}
 	}}
 >
 	<div class="flex items-start justify-between gap-2">
 		<div class="min-w-0 flex-1">
 			<div class="flex items-center gap-2">
-				{#if notification_dot_color}
+				{#if notificationDotColor}
 					<span
-						class="h-2 w-2 shrink-0 animate-pulse rounded-full {notification_dot_color}"
+						class="h-2 w-2 shrink-0 animate-pulse rounded-full {notificationDotColor}"
 						title="Pending notification"
 					></span>
 				{/if}
@@ -101,20 +101,20 @@
 
 	<div class="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
 		<span>{session.provider}</span>
-		<span>{relative_time}</span>
-		{#if formatted_cost}
-			<span>{formatted_cost}</span>
+		<span>{relativeTime}</span>
+		{#if formattedCost}
+			<span>{formattedCost}</span>
 		{/if}
 		{#if session.token_count}
 			<span>{session.token_count.toLocaleString()} tokens</span>
 		{/if}
 
-		{#if is_active}
+		{#if isActive}
 			<button
 				class="ml-auto text-destructive hover:text-destructive/80"
 				onclick={(e) => {
 					e.stopPropagation();
-					on_terminate(session.id);
+					onTerminate(session.id);
 				}}
 			>
 				Stop

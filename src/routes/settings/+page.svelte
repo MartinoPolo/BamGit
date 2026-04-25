@@ -1,95 +1,93 @@
 <script lang="ts">
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import type { ColorPalette, CreateColorPaletteRequest } from '$lib/types/color_palette';
-	import { get_color_palette_store } from '$lib/stores/color_palettes.svelte';
+	import { getColorPaletteStore } from '$lib/stores/color_palettes.svelte';
 	import {
-		create_color_palette,
-		update_color_palette,
-		delete_color_palette,
+		createColorPalette,
+		updateColorPalette,
+		deleteColorPalette,
 	} from '$lib/tauri/color_palette_commands';
-	const palette_store = get_color_palette_store();
+	const paletteStore = getColorPaletteStore();
 
 	let creating = $state(false);
-	let new_palette_name = $state('');
-	let new_palette_colors_input = $state('');
-	let editing_palette_id = $state<string | null>(null);
-	let edit_name = $state('');
-	let edit_colors_input = $state('');
-	let operation_error = $state<string | null>(null);
+	let newPaletteName = $state('');
+	let newPaletteColorsInput = $state('');
+	let editingPaletteId = $state<string | null>(null);
+	let editName = $state('');
+	let editColorsInput = $state('');
+	let operationError = $state<string | null>(null);
 
-	const built_in_palettes = $derived(
-		palette_store.palettes.filter((p) => p.is_built_in === true),
-	);
-	const custom_palettes = $derived(palette_store.palettes.filter((p) => p.is_built_in === false));
+	const builtInPalettes = $derived(paletteStore.palettes.filter((p) => p.is_built_in === true));
+	const customPalettes = $derived(paletteStore.palettes.filter((p) => p.is_built_in === false));
 
-	function parse_colors(input: string): string[] {
+	function parseColors(input: string): string[] {
 		return input
 			.split(/[,\s]+/)
 			.map((c) => c.trim())
 			.filter((c) => /^#[0-9a-fA-F]{6}$/.test(c));
 	}
 
-	async function handle_create() {
-		const colors = parse_colors(new_palette_colors_input);
-		if (!new_palette_name.trim() || colors.length === 0) {
-			operation_error = 'Name and at least one valid hex color (#rrggbb) required';
+	async function handleCreate() {
+		const colors = parseColors(newPaletteColorsInput);
+		if (!newPaletteName.trim() || colors.length === 0) {
+			operationError = 'Name and at least one valid hex color (#rrggbb) required';
 			return;
 		}
 
 		try {
 			const request: CreateColorPaletteRequest = {
-				name: new_palette_name.trim(),
+				name: newPaletteName.trim(),
 				colors,
 			};
-			await create_color_palette(request);
-			await palette_store.refresh();
-			new_palette_name = '';
-			new_palette_colors_input = '';
+			await createColorPalette(request);
+			await paletteStore.refresh();
+			newPaletteName = '';
+			newPaletteColorsInput = '';
 			creating = false;
-			operation_error = null;
+			operationError = null;
 		} catch (err) {
-			operation_error = String(err);
+			operationError = String(err);
 		}
 	}
 
-	function start_editing(palette: ColorPalette) {
-		editing_palette_id = palette.id;
-		edit_name = palette.name;
-		edit_colors_input = palette.colors.join(', ');
-		operation_error = null;
+	function startEditing(palette: ColorPalette) {
+		editingPaletteId = palette.id;
+		editName = palette.name;
+		editColorsInput = palette.colors.join(', ');
+		operationError = null;
 	}
 
-	async function handle_save_edit() {
-		if (editing_palette_id === null) {
+	async function handleSaveEdit() {
+		if (editingPaletteId === null) {
 			return;
 		}
-		const colors = parse_colors(edit_colors_input);
-		if (!edit_name.trim() || colors.length === 0) {
-			operation_error = 'Name and at least one valid hex color required';
+		const colors = parseColors(editColorsInput);
+		if (!editName.trim() || colors.length === 0) {
+			operationError = 'Name and at least one valid hex color required';
 			return;
 		}
 
 		try {
-			await update_color_palette({
-				id: editing_palette_id,
-				name: edit_name.trim(),
+			await updateColorPalette({
+				id: editingPaletteId,
+				name: editName.trim(),
 				colors,
 			});
-			await palette_store.refresh();
-			editing_palette_id = null;
-			operation_error = null;
+			await paletteStore.refresh();
+			editingPaletteId = null;
+			operationError = null;
 		} catch (err) {
-			operation_error = String(err);
+			operationError = String(err);
 		}
 	}
 
-	async function handle_delete(id: string) {
+	async function handleDelete(id: string) {
 		try {
-			await delete_color_palette(id);
-			await palette_store.refresh();
-			operation_error = null;
+			await deleteColorPalette(id);
+			await paletteStore.refresh();
+			operationError = null;
 		} catch (err) {
-			operation_error = String(err);
+			operationError = String(err);
 		}
 	}
 </script>
@@ -105,14 +103,14 @@
 			Manage color palettes for issue visual identity. Built-in palettes cannot be modified.
 		</p>
 
-		{#if operation_error}
+		{#if operationError}
 			<p class="rounded bg-destructive/20 px-3 py-2 text-sm text-destructive">
-				{operation_error}
+				{operationError}
 			</p>
 		{/if}
 
 		<!-- Built-in palettes (read-only) -->
-		{#each built_in_palettes as palette (palette.id)}
+		{#each builtInPalettes as palette (palette.id)}
 			<div class="rounded border border-border bg-muted/50 p-3">
 				<div class="mb-2 flex items-center gap-2">
 					<span class="text-sm font-medium">{palette.name}</span>
@@ -133,18 +131,18 @@
 		{/each}
 
 		<!-- Custom palettes (editable) -->
-		{#each custom_palettes as palette (palette.id)}
+		{#each customPalettes as palette (palette.id)}
 			<div class="rounded border border-border bg-muted/50 p-3">
-				{#if editing_palette_id === palette.id}
+				{#if editingPaletteId === palette.id}
 					<!-- Edit mode -->
 					<div class="space-y-2">
 						<input
-							bind:value={edit_name}
+							bind:value={editName}
 							class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
 							placeholder="Palette name"
 						/>
 						<textarea
-							bind:value={edit_colors_input}
+							bind:value={editColorsInput}
 							rows="2"
 							class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
 							placeholder="#ff0000, #00ff00, #0000ff"
@@ -152,7 +150,7 @@
 						<div class="flex gap-2">
 							<button
 								type="button"
-								onclick={handle_save_edit}
+								onclick={handleSaveEdit}
 								class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
 							>
 								Save
@@ -160,8 +158,8 @@
 							<button
 								type="button"
 								onclick={() => {
-									editing_palette_id = null;
-									operation_error = null;
+									editingPaletteId = null;
+									operationError = null;
 								}}
 								class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 							>
@@ -176,14 +174,14 @@
 						<div class="flex gap-2">
 							<button
 								type="button"
-								onclick={() => start_editing(palette)}
+								onclick={() => startEditing(palette)}
 								class="text-xs text-muted-foreground hover:text-foreground"
 							>
 								Edit
 							</button>
 							<button
 								type="button"
-								onclick={() => handle_delete(palette.id)}
+								onclick={() => handleDelete(palette.id)}
 								class="text-xs text-destructive hover:text-destructive/80"
 							>
 								Delete
@@ -208,12 +206,12 @@
 			<div class="rounded border border-dashed border-input p-3">
 				<div class="space-y-2">
 					<input
-						bind:value={new_palette_name}
+						bind:value={newPaletteName}
 						class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
 						placeholder="Palette name"
 					/>
 					<textarea
-						bind:value={new_palette_colors_input}
+						bind:value={newPaletteColorsInput}
 						rows="3"
 						class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
 						placeholder="Paste hex colors separated by commas or spaces: #ff0000, #00ff00, #0000ff"
@@ -221,7 +219,7 @@
 					<div class="flex gap-2">
 						<button
 							type="button"
-							onclick={handle_create}
+							onclick={handleCreate}
 							class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
 						>
 							Create Palette
@@ -230,7 +228,7 @@
 							type="button"
 							onclick={() => {
 								creating = false;
-								operation_error = null;
+								operationError = null;
 							}}
 							class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 						>
@@ -244,7 +242,7 @@
 				type="button"
 				onclick={() => {
 					creating = true;
-					operation_error = null;
+					operationError = null;
 				}}
 				class="rounded border border-dashed border-input px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground"
 			>

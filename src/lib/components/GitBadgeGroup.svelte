@@ -5,23 +5,23 @@
 	import MergeConflictBadge from './MergeConflictBadge.svelte';
 
 	interface Props {
-		branch_name: string;
-		git_status: GitStatusCache | undefined;
+		branchName: string;
+		gitStatus: GitStatusCache | undefined;
 	}
 
-	let { branch_name, git_status }: Props = $props();
+	let { branchName, gitStatus }: Props = $props();
 
-	const branch_status = $derived(git_status?.branch_status ?? 'unknown');
+	const branchStatus = $derived(gitStatus?.branch_status ?? 'unknown');
 </script>
 
 <div class="flex items-center gap-1">
-	<BranchStatusBadge {branch_name} status={branch_status} />
+	<BranchStatusBadge {branchName} status={branchStatus} />
 
-	{#if git_status?.behind_base_count != null}
-		<SyncBadge behind_base_count={git_status.behind_base_count} />
+	{#if gitStatus?.behind_base_count != null}
+		<SyncBadge behindBaseCount={gitStatus.behind_base_count} />
 	{/if}
 
-	{#if git_status?.merge_conflict === true}
+	{#if gitStatus?.merge_conflict === true}
 		<MergeConflictBadge />
 	{/if}
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get_theme_store } from '$lib/stores/theme.svelte';
+	import { getThemeStore } from '$lib/stores/theme.svelte';
 	import { Sun, Moon, Monitor } from 'lucide-svelte';
 
 	interface Props {
@@ -8,7 +8,7 @@
 
 	let { collapsed = false }: Props = $props();
 
-	const theme = get_theme_store();
+	const theme = getThemeStore();
 
 	const modes = [
 		{ value: 'light' as const, Icon: Sun, label: 'Light' },
@@ -16,22 +16,22 @@
 		{ value: 'system' as const, Icon: Monitor, label: 'System' },
 	];
 
-	function cycle_mode() {
-		const current_index = modes.findIndex((m) => m.value === theme.mode);
-		theme.mode = modes[(current_index + 1) % modes.length].value;
+	function cycleMode() {
+		const currentIndex = modes.findIndex((m) => m.value === theme.mode);
+		theme.mode = modes[(currentIndex + 1) % modes.length].value;
 	}
 
-	const current_mode = $derived(modes.find((m) => m.value === theme.mode)!);
+	const currentMode = $derived(modes.find((m) => m.value === theme.mode)!);
 </script>
 
 {#if collapsed}
 	<button
-		onclick={cycle_mode}
+		onclick={cycleMode}
 		class="flex w-full items-center justify-center rounded p-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-		aria-label="{current_mode.label} theme"
-		title="{current_mode.label} mode"
+		aria-label="{currentMode.label} theme"
+		title="{currentMode.label} mode"
 	>
-		<current_mode.Icon class="size-4" />
+		<currentMode.Icon class="size-4" />
 	</button>
 {:else}
 	<div class="flex items-center gap-1 rounded-md bg-secondary p-1">

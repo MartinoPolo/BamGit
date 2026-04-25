@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import { button_variants, type ButtonProps } from './button-variants.js';
+	import { buttonVariants, type ButtonProps } from './button-variants.js';
 
 	let {
-		class: class_name,
+		class: className,
 		variant = 'default',
 		size = 'default',
 		ref = $bindable(null),
@@ -11,7 +11,7 @@
 		type = 'button',
 		disabled,
 		children,
-		...rest_props
+		...restProps
 	}: ButtonProps = $props();
 </script>
 
@@ -20,12 +20,12 @@
 	<a
 		bind:this={ref}
 		data-slot="button"
-		class={cn(button_variants({ variant, size }), class_name)}
+		class={cn(buttonVariants({ variant, size }), className)}
 		href={disabled === true ? undefined : href}
 		aria-disabled={disabled === true ? true : undefined}
 		role={disabled === true ? 'link' : undefined}
 		tabindex={disabled === true ? -1 : undefined}
-		{...rest_props}
+		{...restProps}
 	>
 		{@render children?.()}
 	</a>
@@ -34,10 +34,10 @@
 	<button
 		bind:this={ref}
 		data-slot="button"
-		class={cn(button_variants({ variant, size }), class_name)}
+		class={cn(buttonVariants({ variant, size }), className)}
 		{type}
 		{disabled}
-		{...rest_props}
+		{...restProps}
 	>
 		{@render children?.()}
 	</button>

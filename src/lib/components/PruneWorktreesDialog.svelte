@@ -4,33 +4,33 @@
 
 	interface Props {
 		open: boolean;
-		prunable_issues: PrunableIssue[];
+		prunableIssues: PrunableIssue[];
 		removing: boolean;
-		on_close: () => void;
-		on_prune: (issue_ids: string[]) => void;
+		onClose: () => void;
+		onPrune: (issueIds: string[]) => void;
 	}
 
-	let { open, prunable_issues, removing, on_close, on_prune }: Props = $props();
+	let { open, prunableIssues, removing, onClose, onPrune }: Props = $props();
 
-	let selected_ids = $state(new SvelteSet<string>());
+	let selectedIds = $state(new SvelteSet<string>());
 
 	// Reset selection when dialog opens with new data
 	$effect(() => {
 		if (open) {
-			selected_ids = new SvelteSet(prunable_issues.map((issue) => issue.issue_id));
+			selectedIds = new SvelteSet(prunableIssues.map((issue) => issue.issue_id));
 		}
 	});
 
-	function toggle_selection(issue_id: string) {
-		if (selected_ids.has(issue_id)) {
-			selected_ids.delete(issue_id);
+	function toggleSelection(issueId: string) {
+		if (selectedIds.has(issueId)) {
+			selectedIds.delete(issueId);
 		} else {
-			selected_ids.add(issue_id);
+			selectedIds.add(issueId);
 		}
 	}
 
-	function handle_prune() {
-		on_prune([...selected_ids]);
+	function handlePrune() {
+		onPrune([...selectedIds]);
 	}
 </script>
 
@@ -40,12 +40,12 @@
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
 		onkeydown={(e) => {
 			if (e.key === 'Escape') {
-				on_close();
+				onClose();
 			}
 		}}
 	>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div class="absolute inset-0" onclick={on_close}></div>
+		<div class="absolute inset-0" onclick={onClose}></div>
 		<div
 			class="relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-xl"
 		>
@@ -58,18 +58,18 @@
 			</div>
 
 			<div class="max-h-64 overflow-y-auto px-4 py-3">
-				{#if prunable_issues.length === 0}
+				{#if prunableIssues.length === 0}
 					<p class="text-sm text-muted-foreground">No prunable worktrees found.</p>
 				{:else}
 					<div class="flex flex-col gap-2">
-						{#each prunable_issues as issue (issue.issue_id)}
+						{#each prunableIssues as issue (issue.issue_id)}
 							<label
 								class="flex cursor-pointer items-center gap-3 rounded px-2 py-1.5 hover:bg-accent"
 							>
 								<input
 									type="checkbox"
-									checked={selected_ids.has(issue.issue_id)}
-									onchange={() => toggle_selection(issue.issue_id)}
+									checked={selectedIds.has(issue.issue_id)}
+									onchange={() => toggleSelection(issue.issue_id)}
 									class="rounded border-input"
 								/>
 								<div class="min-w-0 flex-1">
@@ -103,21 +103,21 @@
 
 			<div class="flex items-center justify-end gap-2 border-t border-border px-4 py-3">
 				<button
-					onclick={on_close}
+					onclick={onClose}
 					disabled={removing}
 					class="rounded px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
 				>
 					Cancel
 				</button>
 				<button
-					onclick={handle_prune}
-					disabled={selected_ids.size === 0 || removing}
+					onclick={handlePrune}
+					disabled={selectedIds.size === 0 || removing}
 					class="rounded bg-destructive px-3 py-1.5 text-sm text-destructive-foreground transition-colors hover:bg-destructive/90 disabled:opacity-40"
 				>
 					{#if removing}
 						Removing...
 					{:else}
-						Remove {selected_ids.size} worktree{selected_ids.size !== 1 ? 's' : ''}
+						Remove {selectedIds.size} worktree{selectedIds.size !== 1 ? 's' : ''}
 					{/if}
 				</button>
 			</div>
