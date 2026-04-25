@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
 
+use crate::models::github::PullRequestState;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GitStatusCache {
     pub issue_id: String,
     pub branch_status: Option<String>,
-    pub pr_state: Option<String>,
+    pub pr_state: Option<PullRequestState>,
     pub pr_number: Option<i64>,
     pub pr_url: Option<String>,
     pub github_issue_state: Option<String>,

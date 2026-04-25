@@ -1,11 +1,64 @@
+use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
 use serde::{Deserialize, Serialize};
+
+/// PR lifecycle states matching the DB CHECK constraint on `git_status_cache.pr_state`.
+/// Note: Does NOT include `ready-to-merge` — that exists in TypeScript but not in the DB schema.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum PullRequestState {
+    Draft,
+    Open,
+    ReviewRequested,
+    ChangesRequested,
+    Approved,
+    Merged,
+    Closed,
+}
+
+impl PullRequestState {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PullRequestState::Draft => "draft",
+            PullRequestState::Open => "open",
+            PullRequestState::ReviewRequested => "review-requested",
+            PullRequestState::ChangesRequested => "changes-requested",
+            PullRequestState::Approved => "approved",
+            PullRequestState::Merged => "merged",
+            PullRequestState::Closed => "closed",
+        }
+    }
+}
+
+impl FromSql for PullRequestState {
+    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
+        let text = value.as_str()?;
+        match text {
+            "draft" => Ok(PullRequestState::Draft),
+            "open" => Ok(PullRequestState::Open),
+            "review-requested" => Ok(PullRequestState::ReviewRequested),
+            "changes-requested" => Ok(PullRequestState::ChangesRequested),
+            "approved" => Ok(PullRequestState::Approved),
+            "merged" => Ok(PullRequestState::Merged),
+            "closed" => Ok(PullRequestState::Closed),
+            other => Err(FromSqlError::Other(
+                format!("Unknown PullRequestState: {other}").into(),
+            )),
+        }
+    }
+}
+
+impl ToSql for PullRequestState {
+    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+        Ok(ToSqlOutput::from(self.as_str()))
+    }
+}
 
 /// Cached GitHub status for an issue, mirroring the `git_status_cache` table.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GitHubStatusCache {
     pub issue_id: String,
     pub branch_status: Option<String>,
-    pub pr_state: Option<String>,
+    pub pr_state: Option<PullRequestState>,
     pub pr_number: Option<i64>,
     pub pr_url: Option<String>,
     pub github_issue_state: Option<String>,
@@ -76,26 +129,26 @@ pub struct GhReviewOutput {
     pub state: String,
 }
 
-/// Maps gh CLI PR output to our internal state string.
-pub fn resolve_pull_request_state(pr: &GhPullRequestOutput) -> &'static str {
+/// Maps gh CLI PR output to our internal PR state enum.
+pub fn resolve_pull_request_state(pr: &GhPullRequestOutput) -> PullRequestState {
     match pr.state.as_str() {
-        "MERGED" => "merged",
-        "CLOSED" => "closed",
+        "MERGED" => PullRequestState::Merged,
+        "CLOSED" => PullRequestState::Closed,
         _ => {
             // OPEN state with sub-states
             if pr.is_draft {
-                "draft"
+                PullRequestState::Draft
             } else if !pr.review_requests.is_empty() {
-                "review-requested"
+                PullRequestState::ReviewRequested
             // latestReviews is limited to first:1 in both GraphQL and CLI queries
             } else if let Some(review) = pr.latest_reviews.last() {
                 match review.state.as_str() {
-                    "APPROVED" => "approved",
-                    "CHANGES_REQUESTED" => "changes-requested",
-                    _ => "open",
+                    "APPROVED" => PullRequestState::Approved,
+                    "CHANGES_REQUESTED" => PullRequestState::ChangesRequested,
+                    _ => PullRequestState::Open,
                 }
             } else {
-                "open"
+                PullRequestState::Open
             }
         }
     }
@@ -139,7 +192,7 @@ mod tests {
                 state: "APPROVED".to_string(),
             }],
         );
-        assert_eq!(resolve_pull_request_state(&pr), "approved");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Approved);
     }
 
     #[test]
@@ -152,13 +205,13 @@ mod tests {
                 state: "CHANGES_REQUESTED".to_string(),
             }],
         );
-        assert_eq!(resolve_pull_request_state(&pr), "changes-requested");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::ChangesRequested);
     }
 
     #[test]
     fn resolve_pr_state_draft() {
         let pr = make_pr("OPEN", true, vec![], vec![]);
-        assert_eq!(resolve_pull_request_state(&pr), "draft");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Draft);
     }
 
     #[test]
@@ -172,18 +225,27 @@ mod tests {
             }],
             vec![],
         );
-        assert_eq!(resolve_pull_request_state(&pr), "review-requested");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::ReviewRequested);
     }
 
     #[test]
     fn resolve_pr_state_merged() {
         let pr = make_pr("MERGED", false, vec![], vec![]);
-        assert_eq!(resolve_pull_request_state(&pr), "merged");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Merged);
     }
 
     #[test]
     fn resolve_pr_state_open_fallback() {
         let pr = make_pr("OPEN", false, vec![], vec![]);
-        assert_eq!(resolve_pull_request_state(&pr), "open");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Open);
+    }
+
+    #[test]
+    fn pull_request_state_serde_round_trip() {
+        let json = "\"review-requested\"";
+        let deserialized: PullRequestState = serde_json::from_str(json).unwrap();
+        assert_eq!(deserialized, PullRequestState::ReviewRequested);
+        let serialized = serde_json::to_string(&deserialized).unwrap();
+        assert_eq!(serialized, "\"review-requested\"");
     }
 }

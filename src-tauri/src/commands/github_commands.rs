@@ -270,7 +270,7 @@ pub async fn fetch_pr_for_branch(
 
     let (pr_state, pr_number, pr_url) = if let Some(pr) = prs.first() {
         (
-            Some(resolve_pull_request_state(pr).to_string()),
+            Some(resolve_pull_request_state(pr)),
             Some(pr.number),
             Some(pr.url.clone()),
         )
@@ -455,7 +455,7 @@ pub async fn sync_all_github_state(
                             },
                             latest_reviews,
                         };
-                        pr_state = Some(resolve_pull_request_state(&pr).to_string());
+                        pr_state = Some(resolve_pull_request_state(&pr));
                         pr_number = Some(pr.number);
                         pr_url = Some(pr.url);
                     }
@@ -513,17 +513,8 @@ mod tests {
     use super::*;
     use rusqlite::Connection;
 
-    use crate::database::schema;
-    use crate::models::github::GhReviewRequest;
-
-    fn setup_test_database() -> Connection {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-        schema::create_tables(&connection).unwrap();
-        connection
-    }
+    use crate::database::test_helpers::setup_test_database;
+    use crate::models::github::{GhReviewRequest, PullRequestState};
 
     fn insert_dashboard(connection: &Connection, id: &str) {
         connection
@@ -561,7 +552,7 @@ mod tests {
         let cache = GitHubStatusCache {
             issue_id: "i1".to_string(),
             branch_status: None,
-            pr_state: Some("open".to_string()),
+            pr_state: Some(PullRequestState::Open),
             pr_number: Some(10),
             pr_url: Some("https://github.com/owner/repo/pull/10".to_string()),
             github_issue_state: Some("open".to_string()),
@@ -573,7 +564,7 @@ mod tests {
         upsert_cache(&connection, &cache).unwrap();
 
         let result = read_cache(&connection, "i1").unwrap().unwrap();
-        assert_eq!(result.pr_state.as_deref(), Some("open"));
+        assert_eq!(result.pr_state, Some(PullRequestState::Open));
         assert_eq!(result.pr_number, Some(10));
         assert_eq!(result.github_issue_state.as_deref(), Some("open"));
         assert!(result.fetched_at.is_some(), "fetched_at should be set by DB");
@@ -588,7 +579,7 @@ mod tests {
         let initial = GitHubStatusCache {
             issue_id: "i1".to_string(),
             branch_status: None,
-            pr_state: Some("open".to_string()),
+            pr_state: Some(PullRequestState::Open),
             pr_number: Some(10),
             pr_url: Some("https://github.com/owner/repo/pull/10".to_string()),
             github_issue_state: Some("open".to_string()),
@@ -602,7 +593,7 @@ mod tests {
         let update = GitHubStatusCache {
             issue_id: "i1".to_string(),
             branch_status: None,
-            pr_state: Some("merged".to_string()),
+            pr_state: Some(PullRequestState::Merged),
             pr_number: Some(10),
             pr_url: Some("https://github.com/owner/repo/pull/10".to_string()),
             github_issue_state: None, // Should preserve "open" via COALESCE
@@ -613,7 +604,7 @@ mod tests {
         upsert_cache(&connection, &update).unwrap();
 
         let result = read_cache(&connection, "i1").unwrap().unwrap();
-        assert_eq!(result.pr_state.as_deref(), Some("merged"));
+        assert_eq!(result.pr_state, Some(PullRequestState::Merged));
         assert_eq!(
             result.github_issue_state.as_deref(),
             Some("open"),
@@ -641,7 +632,7 @@ mod tests {
             let cache = GitHubStatusCache {
                 issue_id: id.to_string(),
                 branch_status: None,
-                pr_state: Some("open".to_string()),
+                pr_state: Some(PullRequestState::Open),
                 pr_number: None,
                 pr_url: None,
                 github_issue_state: Some("open".to_string()),
@@ -681,7 +672,7 @@ mod tests {
             review_requests: vec![],
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "open");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Open);
     }
 
     #[test]
@@ -694,7 +685,7 @@ mod tests {
             review_requests: vec![],
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "draft");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Draft);
     }
 
     #[test]
@@ -710,7 +701,7 @@ mod tests {
             }],
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "review-requested");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::ReviewRequested);
     }
 
     #[test]
@@ -723,7 +714,7 @@ mod tests {
             review_requests: vec![],
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "merged");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Merged);
     }
 
     #[test]
@@ -736,7 +727,7 @@ mod tests {
             review_requests: vec![],
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "closed");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Closed);
     }
 
     // --- Issue state resolution tests ---
@@ -888,7 +879,7 @@ mod tests {
             },
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "review-requested");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::ReviewRequested);
     }
 
     #[test]
@@ -912,7 +903,7 @@ mod tests {
             review_requests: vec![],
             latest_reviews: vec![],
         };
-        assert_eq!(resolve_pull_request_state(&pr), "open");
+        assert_eq!(resolve_pull_request_state(&pr), PullRequestState::Open);
     }
 
     #[test]

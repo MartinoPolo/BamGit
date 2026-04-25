@@ -8,6 +8,7 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
 use super::provider::{ActorCommand, SessionEvent, SessionHandle, SessionProvider};
+use crate::models::session::SessionState;
 use crate::notification::service::{session_state_to_event_type, NotificationService};
 
 /// Payload emitted to the frontend via Tauri events.
@@ -126,7 +127,7 @@ pub async fn run_actor(
                         } else {
                             // Set paused state immediately — the CLI will emit
                             // result(idle) later which transitions to needs-review
-                            update_session_state(&session_id, "paused", &database_connection);
+                            update_session_state(&session_id, &SessionState::Paused, &database_connection);
                             let pause_event = SessionEvent::RunState {
                                 state: "paused".into(),
                                 error: None,
@@ -179,18 +180,18 @@ fn handle_event(
         // Keep in sync with sessions.svelte.ts handle_session_event()
         SessionEvent::RunState { state, error } => {
             let db_state = match state.as_str() {
-                "running" => "running",
-                "idle" => "needs-review",
-                "failed" => "errored",
-                "completed" => "finished",
-                "stopped" => "finished",
+                "running" => SessionState::Running,
+                "idle" => SessionState::NeedsReview,
+                "failed" => SessionState::Errored,
+                "completed" => SessionState::Finished,
+                "stopped" => SessionState::Finished,
                 _ => return,
             };
-            update_session_state(session_id, db_state, database_connection);
+            update_session_state(session_id, &db_state, database_connection);
             fire_notification(
                 session_id,
-                db_state,
-                error.as_deref().unwrap_or(db_state),
+                &db_state,
+                error.as_deref().unwrap_or(db_state.as_str()),
                 app_handle,
                 database_connection,
             );
@@ -218,10 +219,10 @@ fn handle_event(
             update_session_file_path(session_id, cli_session_id, database_connection);
         }
         SessionEvent::PermissionPrompt { .. } | SessionEvent::ElicitationPrompt { .. } => {
-            update_session_state(session_id, "needs-input", database_connection);
+            update_session_state(session_id, &SessionState::NeedsInput, database_connection);
             fire_notification(
                 session_id,
-                "needs-input",
+                &SessionState::NeedsInput,
                 "Session is waiting for your input",
                 app_handle,
                 database_connection,
@@ -233,7 +234,7 @@ fn handle_event(
 
 fn fire_notification(
     session_id: &str,
-    state: &str,
+    state: &SessionState,
     message: &str,
     app_handle: &AppHandle,
     database_connection: &std::sync::Arc<StdMutex<Connection>>,
@@ -249,7 +250,7 @@ fn fire_notification(
 
 fn update_session_state(
     session_id: &str,
-    state: &str,
+    state: &SessionState,
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
