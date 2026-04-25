@@ -2,7 +2,7 @@ use rusqlite::Connection;
 
 use super::schema;
 
-const CURRENT_VERSION: i32 = 7;
+pub(crate) const CURRENT_VERSION: i32 = 7;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
