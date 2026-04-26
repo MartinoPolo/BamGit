@@ -168,7 +168,7 @@ pub fn get_github_status_cache(
     state: State<DatabaseState>,
     issue_id: String,
 ) -> Result<Option<GitHubStatusCache>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
     read_cache(&connection, &issue_id)
 }
 
@@ -177,7 +177,7 @@ pub fn get_all_github_status_caches(
     state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<Vec<GitHubStatusCache>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
     read_all_caches_for_dashboard(&connection, &dashboard_id)
 }
 
@@ -231,14 +231,14 @@ pub async fn fetch_issue_state(
         fetched_at: None, // Set by DB via datetime('now')
     };
 
-    // Acquire lock only for DB write (not held across .await)
+    // Acquire write lock only for DB write (not held across .await)
     {
-        let connection = state.0.lock().map_err(|error| error.to_string())?;
+        let connection = state.write();
         upsert_cache(&connection, &cache)?;
     }
 
     // Re-read to get fetched_at from DB
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
     read_cache(&connection, &issue_id)?
         .ok_or_else(|| "Cache entry not found after upsert".to_string())
 }
@@ -291,11 +291,11 @@ pub async fn fetch_pr_for_branch(
     };
 
     {
-        let connection = state.0.lock().map_err(|error| error.to_string())?;
+        let connection = state.write();
         upsert_cache(&connection, &cache)?;
     }
 
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
     read_cache(&connection, &issue_id)?
         .ok_or_else(|| "Cache entry not found after upsert".to_string())
 }
@@ -330,9 +330,9 @@ pub async fn sync_all_github_state(
     owner: String,
     repo: String,
 ) -> Result<SyncAllResult, String> {
-    // Read issues from DB (lock released before async work)
+    // Read issues from DB (connection released before async work)
     let issues_data: Vec<(String, Option<i64>, Option<String>)> = {
-        let connection = state.0.lock().map_err(|error| error.to_string())?;
+        let connection = state.read();
         let mut statement = connection
             .prepare(
                 "SELECT id, github_issue_number, branch_name FROM issues \
@@ -478,11 +478,11 @@ pub async fn sync_all_github_state(
         });
     }
 
-    // Scoped DB lock for batch write only
+    // Scoped write connection for batch write only
     let mut synced_count = 0;
     let mut errors = Vec::new();
     {
-        let connection = state.0.lock().map_err(|error| error.to_string())?;
+        let connection = state.write();
         for cache in &caches_to_write {
             match upsert_cache(&connection, cache) {
                 Ok(()) => synced_count += 1,

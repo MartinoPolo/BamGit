@@ -68,7 +68,7 @@ pub fn create_action(
     state: State<DatabaseState>,
     request: CreateActionRequest,
 ) -> Result<Action, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
     let id = Uuid::new_v4().to_string();
 
     connection
@@ -98,7 +98,8 @@ pub fn get_actions_for_dashboard(
     state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<Vec<Action>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    // Uses write because it may seed default actions on first access
+    let connection = state.write();
 
     // Seed defaults if no actions exist for this dashboard (including global ones)
     let count: i64 = connection
@@ -135,7 +136,7 @@ pub fn get_actions_for_dashboard(
 
 #[tauri::command]
 pub fn get_action(state: State<DatabaseState>, id: String) -> Result<Action, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let query = format!("SELECT {ACTION_SELECT_COLUMNS} FROM actions WHERE id = ?1");
     connection
@@ -148,7 +149,7 @@ pub fn update_action(
     state: State<DatabaseState>,
     request: UpdateActionRequest,
 ) -> Result<Action, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     let select_query = format!("SELECT {ACTION_SELECT_COLUMNS} FROM actions WHERE id = ?1");
     let existing = connection
@@ -176,7 +177,7 @@ pub fn update_action(
 
 #[tauri::command]
 pub fn delete_action(state: State<DatabaseState>, id: String) -> Result<(), String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     let rows_affected = connection
         .execute("DELETE FROM actions WHERE id = ?1", [&id])
@@ -194,7 +195,7 @@ pub fn reorder_actions(
     state: State<DatabaseState>,
     action_ids: Vec<String>,
 ) -> Result<(), String> {
-    let mut connection = state.0.lock().map_err(|error| error.to_string())?;
+    let mut connection = state.write();
 
     let transaction = connection
         .transaction()
@@ -235,7 +236,7 @@ pub async fn execute_action(
     issue_id: String,
 ) -> Result<String, String> {
     let (resolved_command, working_directory) = {
-        let connection = state.0.lock().map_err(|error| error.to_string())?;
+        let connection = state.read();
 
         // Load action
         let action_query = format!("SELECT {ACTION_SELECT_COLUMNS} FROM actions WHERE id = ?1");
@@ -306,7 +307,7 @@ pub async fn execute_action(
 
     // Create session row before spawning (needs resolved_command for original_intent)
     {
-        let conn = state.0.lock().map_err(|error| error.to_string())?;
+        let conn = state.write();
         conn.execute(
             "INSERT INTO sessions (id, issue_id, provider, state, original_intent, source, working_directory) \
              VALUES (?1, ?2, 'claude-code', 'running', ?3, 'spawned', ?4)",
