@@ -1,15 +1,8 @@
 <script lang="ts">
-	import type {
-		DiscoveredSession,
-		DiscoveredSessionsPayload,
-		Session,
-		SessionEventPayload,
-	} from '$lib/types/session';
-	import { adoptSession, spawnSession, terminateSession } from '$lib/tauri/session_commands';
-	import { useSessions } from '$lib/context/sessions.context.svelte.js';
+	import type { Session, DiscoveredSession } from '$lib/types/generated';
+	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
 	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
-	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import SessionCard from '$lib/components/SessionCard.svelte';
 	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';
 	import SessionChatView from '$lib/components/SessionChatView.svelte';
@@ -21,8 +14,6 @@
 	let spawnPrompt = $state('');
 	let spawnWorkingDirectory = $state('');
 	let spawning = $state(false);
-	let unlistenSessionEvent: UnlistenFn | null = null;
-	let unlistenDiscovered: UnlistenFn | null = null;
 
 	// Derive live session from store so state updates are always reflected
 	const selectedSession = $derived(
@@ -33,22 +24,6 @@
 
 	onMount(async () => {
 		await store.loadSessions();
-
-		unlistenSessionEvent = await listen<SessionEventPayload>('session-event', (event) => {
-			store.handleSessionEvent(event.payload);
-		});
-
-		unlistenDiscovered = await listen<DiscoveredSessionsPayload>(
-			'discovered-sessions-updated',
-			(event) => {
-				store.handleDiscoveredSessionsUpdate(event.payload);
-			},
-		);
-	});
-
-	onDestroy(() => {
-		unlistenSessionEvent?.();
-		unlistenDiscovered?.();
 	});
 
 	async function handleSpawn() {
@@ -57,7 +32,7 @@
 		}
 		spawning = true;
 		try {
-			await spawnSession({
+			await store.spawnSession({
 				prompt: spawnPrompt.trim(),
 				working_directory: spawnWorkingDirectory.trim(),
 			});
@@ -77,7 +52,7 @@
 
 	async function handleTerminate(sessionId: string) {
 		try {
-			await terminateSession(sessionId);
+			await store.terminateSession(sessionId);
 			await store.refresh();
 		} catch (err) {
 			console.error('Failed to terminate session:', err);
@@ -86,12 +61,12 @@
 
 	async function handleAdopt(discovered: DiscoveredSession) {
 		try {
-			await adoptSession({
+			await store.adoptSession({
 				cli_session_id: discovered.session_id,
 				working_directory: discovered.working_directory,
 				original_intent: discovered.first_prompt,
 				cost_usd: discovered.cost_usd > 0 ? discovered.cost_usd : null,
-				token_count: discovered.token_count > 0 ? (discovered.token_count as number) : null,
+				token_count: discovered.token_count > 0 ? discovered.token_count : null,
 			});
 			store.removeDiscoveredSession(discovered.id);
 			await store.refresh();

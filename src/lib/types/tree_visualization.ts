@@ -1,4 +1,4 @@
-import type { ExecutionPhase, SessionState } from './session';
+import type { ExecutionPhase, SessionState } from '$lib/types/generated';
 import type { WorktreeState } from './worktree';
 
 // ─── Library Types (erased at runtime — no barrel import) ────────────────

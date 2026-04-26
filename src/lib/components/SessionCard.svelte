@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Session, SessionState } from '$lib/types/session';
+	import type { Session, SessionState } from '$lib/types/generated';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
 	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
 

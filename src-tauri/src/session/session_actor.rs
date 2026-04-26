@@ -18,6 +18,7 @@ use crate::notification::service::{session_state_to_event_type, NotificationServ
 pub struct SessionEventPayload {
     pub session_id: String,
     pub event: SessionEvent,
+    pub resolved_state: Option<SessionState>,
 }
 
 /// Runs the session actor loop as a tokio task.
@@ -110,7 +111,7 @@ pub async fn run_actor(
                         source: "stderr".into(),
                         data: Value::String(line),
                     };
-                    emit_event(&session_id, &raw_event, &app_handle);
+                    emit_event(&session_id, &raw_event, &app_handle, None);
                 }
             }
 
@@ -134,7 +135,7 @@ pub async fn run_actor(
                                 state: "paused".into(),
                                 error: None,
                             };
-                            emit_event(&session_id, &pause_event, &app_handle);
+                            emit_event(&session_id, &pause_event, &app_handle, Some(SessionState::Paused));
                         }
                     }
                     Some(ActorCommand::Terminate) => {
@@ -162,10 +163,11 @@ pub async fn run_actor(
     }
 }
 
-fn emit_event(session_id: &str, event: &SessionEvent, app_handle: &AppHandle) {
+fn emit_event(session_id: &str, event: &SessionEvent, app_handle: &AppHandle, resolved_state: Option<SessionState>) {
     let payload = SessionEventPayload {
         session_id: session_id.to_string(),
         event: event.clone(),
+        resolved_state,
     };
     let _ = app_handle.emit("session-event", &payload);
 }
@@ -176,27 +178,38 @@ fn handle_event(
     app_handle: &AppHandle,
     database_connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
-    emit_event(session_id, event, app_handle);
+    // Compute resolved_state so frontend doesn't need its own state mapping
+    let resolved_state = match event {
+        SessionEvent::RunState { state, .. } => {
+            match state.as_str() {
+                "running" => Some(SessionState::Running),
+                "idle" => Some(SessionState::NeedsReview),
+                "failed" => Some(SessionState::Errored),
+                "completed" => Some(SessionState::Finished),
+                "stopped" => Some(SessionState::Finished),
+                _ => None,
+            }
+        }
+        SessionEvent::PermissionPrompt { .. } | SessionEvent::ElicitationPrompt { .. } => {
+            Some(SessionState::NeedsInput)
+        }
+        _ => None,
+    };
+
+    emit_event(session_id, event, app_handle, resolved_state.clone());
 
     match event {
-        // Keep in sync with sessions.svelte.ts handle_session_event()
-        SessionEvent::RunState { state, error } => {
-            let db_state = match state.as_str() {
-                "running" => SessionState::Running,
-                "idle" => SessionState::NeedsReview,
-                "failed" => SessionState::Errored,
-                "completed" => SessionState::Finished,
-                "stopped" => SessionState::Finished,
-                _ => return,
-            };
-            update_session_state(session_id, &db_state, database_connection);
-            fire_notification(
-                session_id,
-                &db_state,
-                error.as_deref().unwrap_or(db_state.as_str()),
-                app_handle,
-                database_connection,
-            );
+        SessionEvent::RunState { error, .. } => {
+            if let Some(ref db_state) = resolved_state {
+                update_session_state(session_id, db_state, database_connection);
+                fire_notification(
+                    session_id,
+                    db_state,
+                    error.as_deref().unwrap_or(db_state.as_str()),
+                    app_handle,
+                    database_connection,
+                );
+            }
         }
         SessionEvent::UsageUpdate {
             input_tokens,
@@ -221,14 +234,16 @@ fn handle_event(
             update_session_file_path(session_id, cli_session_id, database_connection);
         }
         SessionEvent::PermissionPrompt { .. } | SessionEvent::ElicitationPrompt { .. } => {
-            update_session_state(session_id, &SessionState::NeedsInput, database_connection);
-            fire_notification(
-                session_id,
-                &SessionState::NeedsInput,
-                "Session is waiting for your input",
-                app_handle,
-                database_connection,
-            );
+            if let Some(ref db_state) = resolved_state {
+                update_session_state(session_id, db_state, database_connection);
+                fire_notification(
+                    session_id,
+                    db_state,
+                    "Session is waiting for your input",
+                    app_handle,
+                    database_connection,
+                );
+            }
         }
         _ => {}
     }

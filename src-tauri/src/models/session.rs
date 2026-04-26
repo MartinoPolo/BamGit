@@ -141,11 +141,13 @@ pub struct Session {
     pub issue_id: Option<String>,
     pub provider: String,
     pub state: SessionState,
+    #[ts(type = "number | null")]
     pub pid: Option<i64>,
     pub session_file_path: Option<String>,
     pub started_at: String,
     pub ended_at: Option<String>,
     pub cost_usd: Option<f64>,
+    #[ts(type = "number | null")]
     pub token_count: Option<i64>,
     pub original_intent: Option<String>,
     pub last_prompt: Option<String>,

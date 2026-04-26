@@ -9,6 +9,7 @@ pub struct Action {
     pub name: String,
     pub icon: Option<String>,
     pub command_template: String,
+    #[ts(type = "number")]
     pub sort_order: i64,
     pub visible: bool,
 }

@@ -1,4 +1,4 @@
-import type { SessionState } from '$lib/types/session';
+import type { SessionState } from '$lib/types/generated';
 import type { AggregateSessionState } from '$lib/types/tree_visualization';
 
 const PRIORITY: readonly SessionState[] = [

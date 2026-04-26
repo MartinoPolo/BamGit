@@ -7,6 +7,7 @@ pub struct PortfolioDashboardPointer {
     pub id: String,
     pub portfolio_dashboard_id: String,
     pub repo_dashboard_id: String,
+    #[ts(type = "number")]
     pub sort_order: i64,
 }
 

@@ -35,6 +35,7 @@ pub struct DiscoveredSession {
     pub git_branch: Option<String>,
     pub message_count: u32,
     pub cost_usd: f64,
+    #[ts(type = "number")]
     pub token_count: u64,
     pub latest_message: Option<String>,
     pub modified_at: Option<String>,

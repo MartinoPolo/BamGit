@@ -5,7 +5,7 @@
 	import { useGithub } from '$lib/context/github.context.svelte.js';
 	import { useActions } from '$lib/context/actions.context.svelte.js';
 	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
-	import { useSessions } from '$lib/context/sessions.context.svelte.js';
+	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
 	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
 	import { useColorPalettes } from '$lib/context/color_palettes.context.svelte.js';
 	import { useViewPreference } from '$lib/context/view_preference.context.svelte.js';
@@ -20,8 +20,6 @@
 	import { setupWorktree, removeWorktree, getPrunableIssues } from '$lib/tauri/worktree_commands';
 	import { executeAction } from '$lib/tauri/action_commands';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
-	import type { Session } from '$lib/types/session';
-	import { SvelteMap } from 'svelte/reactivity';
 	import type { PrunableIssue } from '$lib/types/worktree';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
@@ -43,22 +41,6 @@
 	const sessionStore = useSessions();
 	const paletteStore = useColorPalettes();
 	const viewPreferenceStore = useViewPreference();
-
-	const sessionsByIssueId = $derived.by(() => {
-		const map = new SvelteMap<string, Session[]>();
-		for (const session of sessionStore.sessions) {
-			if (session.issue_id === null) {
-				continue;
-			}
-			const existing = map.get(session.issue_id);
-			if (existing !== undefined) {
-				existing.push(session);
-			} else {
-				map.set(session.issue_id, [session]);
-			}
-		}
-		return map;
-	});
 
 	function getNotificationDotColor(issueId: string): string | null {
 		for (const session of sessionStore.sessions) {
@@ -344,7 +326,7 @@
 			<ForestView
 				issues={forestIssues}
 				getGitStatus={(issueId) => gitStatusStore.getStatus(issueId)}
-				getSessionsForIssue={(issueId) => sessionsByIssueId.get(issueId) ?? []}
+				getSessionsForIssue={(issueId) => sessionStore.sessionsByIssueId.get(issueId) ?? []}
 				onSelectIssue={(issue) => (editingIssue = issue)}
 			/>
 		{:else}

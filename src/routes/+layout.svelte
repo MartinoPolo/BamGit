@@ -9,7 +9,7 @@
 	import { setDashboardContext } from '$lib/context/dashboard.context.svelte.js';
 	import { setColorPalettesContext } from '$lib/context/color_palettes.context.svelte.js';
 	import { setNotificationsContext } from '$lib/context/notifications.context.svelte.js';
-	import { setSessionsContext } from '$lib/context/sessions.context.svelte.js';
+	import { setSessionsContext } from '$lib/modules/sessions/index.svelte.js';
 	import { setIssuesContext } from '$lib/context/issues.context.svelte.js';
 	import { setGitStatusContext } from '$lib/context/git_status.context.svelte.js';
 	import { setGithubContext } from '$lib/context/github.context.svelte.js';

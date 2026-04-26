@@ -3,4 +3,4 @@
 /**
  * A GitHub issue assigned to the current user, returned by `gh issue list --assignee @me`.
  */
-export type AssignedIssue = { number: bigint, title: string, state: string, url: string, };
+export type AssignedIssue = { number: number, title: string, state: string, url: string, };

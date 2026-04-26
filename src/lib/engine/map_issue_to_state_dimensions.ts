@@ -1,6 +1,6 @@
 import type { Issue } from '$lib/types/issue';
 import type { BranchStatus, GitStatusCache } from '$lib/types/git_status';
-import type { ExecutionPhase, SessionState } from '$lib/types/session';
+import type { ExecutionPhase, SessionState } from '$lib/types/generated';
 import type {
 	ForestBranchStatus,
 	ForestPullRequestState,

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mapIssueToStateDimensions } from './map_issue_to_state_dimensions';
 import type { Issue } from '$lib/types/issue';
 import type { GitStatusCache } from '$lib/types/git_status';
-import type { SessionState, ExecutionPhase } from '$lib/types/session';
+import type { SessionState, ExecutionPhase } from '$lib/types/generated';
 
 function createIssue(overrides: Partial<Issue> = {}): Issue {
 	return {

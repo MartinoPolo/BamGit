@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { aggregateSessionState } from './aggregate_session_state';
-import type { SessionState } from '$lib/types/session';
+import type { SessionState } from '$lib/types/generated';
 
 describe('aggregateSessionState', () => {
 	it('returns no-session for empty array', () => {

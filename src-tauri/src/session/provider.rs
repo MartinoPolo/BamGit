@@ -75,7 +75,9 @@ pub enum SessionEvent {
         error: Option<String>,
     },
     UsageUpdate {
+        #[ts(type = "number")]
         input_tokens: u64,
+        #[ts(type = "number")]
         output_tokens: u64,
         cost_usd: f64,
     },

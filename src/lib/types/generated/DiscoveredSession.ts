@@ -8,4 +8,4 @@ export type DiscoveredSession = {
 /**
  * Composite key: "{project_dir_name}/{session_uuid}"
  */
-id: string, pid: number, working_directory: string, project_directory_name: string, session_id: string, project_name: string, status: DiscoveredSessionStatus, first_prompt: string | null, git_branch: string | null, message_count: number, cost_usd: number, token_count: bigint, latest_message: string | null, modified_at: string | null, };
+id: string, pid: number, working_directory: string, project_directory_name: string, session_id: string, project_name: string, status: DiscoveredSessionStatus, first_prompt: string | null, git_branch: string | null, message_count: number, cost_usd: number, token_count: number, latest_message: string | null, modified_at: string | null, };

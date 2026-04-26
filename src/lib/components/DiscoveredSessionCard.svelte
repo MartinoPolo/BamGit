@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DiscoveredSession, DiscoveredSessionStatus } from '$lib/types/session';
+	import type { DiscoveredSession, DiscoveredSessionStatus } from '$lib/types/generated';
 
 	interface Props {
 		session: DiscoveredSession;
