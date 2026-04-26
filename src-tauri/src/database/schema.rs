@@ -109,7 +109,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE TABLE IF NOT EXISTS git_status_cache (
             issue_id TEXT PRIMARY KEY REFERENCES issues(id),
             branch_status TEXT,
-            pr_state TEXT CHECK (pr_state IN ('draft', 'open', 'review-requested', 'changes-requested', 'approved', 'merged', 'closed')),
+            pr_state TEXT CHECK (pr_state IN ('draft', 'open', 'review-requested', 'changes-requested', 'approved', 'ready-to-merge', 'merged', 'closed')),
             pr_number INTEGER,
             pr_url TEXT,
             github_issue_state TEXT,

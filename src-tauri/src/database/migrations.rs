@@ -2,7 +2,7 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 8;
+pub(crate) const CURRENT_VERSION: i32 = 9;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
@@ -15,6 +15,7 @@ static MIGRATIONS: &[MigrationFunction] = &[
     migrate_v6,
     migrate_v7,
     migrate_v8,
+    migrate_v9,
 ];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
@@ -338,6 +339,47 @@ pub fn seed_label_shape_mappings_for_dashboard(
         )?;
     }
     Ok(())
+}
+
+fn migrate_v9(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // Widen pr_state CHECK constraint to include 'ready-to-merge'.
+    // SQLite cannot ALTER CHECK constraints — must recreate the table.
+    connection.execute_batch("PRAGMA foreign_keys = OFF;")?;
+
+    let result = (|| -> Result<(), rusqlite::Error> {
+        connection.execute_batch(
+            "
+            BEGIN;
+
+            CREATE TABLE git_status_cache_v9 (
+                issue_id TEXT PRIMARY KEY REFERENCES issues(id),
+                branch_status TEXT,
+                pr_state TEXT CHECK (pr_state IN ('draft', 'open', 'review-requested', 'changes-requested', 'approved', 'ready-to-merge', 'merged', 'closed')),
+                pr_number INTEGER,
+                pr_url TEXT,
+                github_issue_state TEXT,
+                behind_base_count INTEGER,
+                merge_conflict INTEGER,
+                fetched_at TEXT
+            );
+
+            INSERT INTO git_status_cache_v9
+                SELECT issue_id, branch_status, pr_state, pr_number, pr_url,
+                       github_issue_state, behind_base_count, merge_conflict, fetched_at
+                FROM git_status_cache;
+
+            DROP TABLE git_status_cache;
+            ALTER TABLE git_status_cache_v9 RENAME TO git_status_cache;
+
+            COMMIT;
+            ",
+        )
+    })();
+
+    // Always re-enable foreign keys, even if the migration failed
+    connection.execute_batch("PRAGMA foreign_keys = ON;")?;
+
+    result
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {

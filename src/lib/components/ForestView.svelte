@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
-	import type { GitStatusCache } from '$lib/types/git_status';
+	import type { GitStatusCache } from '$lib/types/generated';
 	import type { TreeVisualization } from '$lib/types/tree_visualization';
 	import type { ForestLayoutItem, PositionedForestItem } from '$lib/engine/forest_layout';
 	import { computeForestLayout } from '$lib/engine/forest_layout';

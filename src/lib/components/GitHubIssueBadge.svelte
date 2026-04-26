@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { GitHubIssueState } from '$lib/types/github';
 	import { CircleDot, CircleCheck } from 'lucide-svelte';
+
 	import GitHubBadge from './GitHubBadge.svelte';
 
 	interface Props {
-		state: GitHubIssueState | null;
+		state: string | null;
 		url: string | null;
 		issueNumber: number | null;
 		disabled?: boolean;

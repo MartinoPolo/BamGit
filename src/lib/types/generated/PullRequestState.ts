@@ -2,6 +2,5 @@
 
 /**
  * PR lifecycle states matching the DB CHECK constraint on `git_status_cache.pr_state`.
- * Note: Does NOT include `ready-to-merge` — that exists in TypeScript but not in the DB schema.
  */
-export type PullRequestState = "draft" | "open" | "review-requested" | "changes-requested" | "approved" | "merged" | "closed";
+export type PullRequestState = "draft" | "open" | "review-requested" | "changes-requested" | "approved" | "ready-to-merge" | "merged" | "closed";

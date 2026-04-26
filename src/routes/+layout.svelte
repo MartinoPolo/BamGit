@@ -11,8 +11,7 @@
 	import { setNotificationsContext } from '$lib/context/notifications.context.svelte.js';
 	import { setSessionsContext } from '$lib/modules/sessions/index.svelte.js';
 	import { setIssuesContext } from '$lib/context/issues.context.svelte.js';
-	import { setGitStatusContext } from '$lib/context/git_status.context.svelte.js';
-	import { setGithubContext } from '$lib/context/github.context.svelte.js';
+	import { setVersionControlContext } from '$lib/modules/version-control/index.svelte.js';
 	import { setActionsContext } from '$lib/context/actions.context.svelte.js';
 	import { createDashboard, updateDashboard, deleteDashboard } from '$lib/tauri/commands';
 	import { addRepoToPortfolio } from '$lib/tauri/portfolio_commands';
@@ -31,8 +30,7 @@
 	const notificationsCtx = setNotificationsContext();
 	setSessionsContext(notificationsCtx);
 	setIssuesContext();
-	setGitStatusContext();
-	setGithubContext();
+	setVersionControlContext();
 	setActionsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);

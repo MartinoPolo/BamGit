@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PullRequestState } from '$lib/types/github';
+	import type { PullRequestState } from '$lib/types/generated';
 	import {
 		GitPullRequest,
 		GitPullRequestDraft,

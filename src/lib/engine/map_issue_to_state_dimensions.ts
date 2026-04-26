@@ -1,6 +1,5 @@
 import type { Issue } from '$lib/types/issue';
-import type { BranchStatus, GitStatusCache } from '$lib/types/git_status';
-import type { ExecutionPhase, SessionState } from '$lib/types/generated';
+import type { GitStatusCache, ExecutionPhase, SessionState } from '$lib/types/generated';
 import type {
 	ForestBranchStatus,
 	ForestPullRequestState,
@@ -25,17 +24,30 @@ const KNOWN_PR_STATES: ReadonlySet<ForestPullRequestState> = new Set([
 	'closed',
 ]);
 
+const KNOWN_BRANCH_STATUSES: ReadonlySet<string> = new Set([
+	'active',
+	'local',
+	'remote-gone',
+	'deleted',
+	'unknown',
+]);
+
 function mapBranchStatus(
 	issueBranchName: string | null,
-	raw: BranchStatus | null | undefined,
+	raw: string | null | undefined,
 ): ForestBranchStatus {
-	if (issueBranchName === null || raw == null || raw === 'unknown') {
+	if (
+		issueBranchName === null ||
+		raw == null ||
+		raw === 'unknown' ||
+		!KNOWN_BRANCH_STATUSES.has(raw)
+	) {
 		return 'no-branch';
 	}
 	if (raw === 'local') {
 		return 'local-only';
 	}
-	return raw;
+	return raw as ForestBranchStatus;
 }
 
 function mapPrState(raw: string | null | undefined): ForestPullRequestState {

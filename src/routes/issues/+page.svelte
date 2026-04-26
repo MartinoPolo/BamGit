@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { useDashboard } from '$lib/context/dashboard.context.svelte.js';
-	import { useGitStatus } from '$lib/context/git_status.context.svelte.js';
 	import { useIssues } from '$lib/context/issues.context.svelte.js';
-	import { useGithub } from '$lib/context/github.context.svelte.js';
+	import { useVersionControl } from '$lib/modules/version-control/index.svelte.js';
 	import { useActions } from '$lib/context/actions.context.svelte.js';
 	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
 	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
@@ -33,9 +32,8 @@
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 
 	const dashboardStore = useDashboard();
-	const gitStatusStore = useGitStatus();
 	const issueStore = useIssues();
-	const githubStore = useGithub();
+	const versionControlStore = useVersionControl();
 	const actionStore = useActions();
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
@@ -96,10 +94,10 @@
 
 	// Check gh availability on mount
 	$effect(() => {
-		githubStore.checkAvailability();
+		versionControlStore.checkAvailability();
 	});
 
-	// Load issues and GitHub caches when active dashboard changes
+	// Load issues and version control state when active dashboard changes
 	let lastLoadedDashboardId = $state<string | null>(null);
 
 	$effect(() => {
@@ -107,11 +105,10 @@
 		if (dashboardId !== null && dashboardId !== lastLoadedDashboardId) {
 			lastLoadedDashboardId = dashboardId;
 			issueStore.loadIssues(dashboardId);
-			githubStore.loadCaches(dashboardId);
-			gitStatusStore.loadStatusesForDashboard(dashboardId);
+			versionControlStore.loadStates(dashboardId);
 			actionStore.loadActions(dashboardId);
 			if (githubRepoParts) {
-				githubStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
+				versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
 			}
 		}
 	});
@@ -121,7 +118,7 @@
 		if (dashboardId === null || githubRepoParts === null) {
 			return;
 		}
-		await githubStore.syncAll(dashboardId, githubRepoParts.owner, githubRepoParts.repo);
+		await versionControlStore.syncAll(dashboardId, githubRepoParts.owner, githubRepoParts.repo);
 	}
 
 	async function openCreateDialog() {
@@ -293,8 +290,8 @@
 		</div>
 
 		<!-- gh CLI setup banner -->
-		{#if githubRepoParts && githubStore.availability !== 'available'}
-			<GhSetupBanner availability={githubStore.availability} />
+		{#if githubRepoParts && versionControlStore.ghAvailability !== 'available'}
+			<GhSetupBanner availability={versionControlStore.ghAvailability} />
 		{/if}
 
 		<!-- Toolbar -->
@@ -303,8 +300,8 @@
 			showArchived={issueStore.showArchived}
 			archivedCount={issueStore.archivedIssues.length}
 			{allExpanded}
-			ghAvailable={githubStore.isAvailable}
-			syncing={githubStore.syncing}
+			ghAvailable={versionControlStore.isGhAvailable}
+			syncing={versionControlStore.syncing}
 			onAddIssue={openCreateDialog}
 			onSortChange={(mode) => issueStore.setSortMode(mode)}
 			onToggleArchived={() => issueStore.toggleShowArchived()}
@@ -325,7 +322,7 @@
 		{:else if viewPreferenceStore.mode === 'forest'}
 			<ForestView
 				issues={forestIssues}
-				getGitStatus={(issueId) => gitStatusStore.getStatus(issueId)}
+				getGitStatus={(issueId) => versionControlStore.getState(issueId)}
 				getSessionsForIssue={(issueId) => sessionStore.sessionsByIssueId.get(issueId) ?? []}
 				onSelectIssue={(issue) => (editingIssue = issue)}
 			/>
@@ -337,10 +334,9 @@
 				isPortfolio={dashboardStore.activeDashboard.type === 'portfolio'}
 				actions={actionStore.visibleActions}
 				forceExpanded={allExpanded ? true : undefined}
-				githubCacheMap={githubStore.cacheMap}
-				ghAvailable={githubStore.isAvailable}
+				cacheMap={versionControlStore.stateMap}
+				ghAvailable={versionControlStore.isGhAvailable}
 				getChildren={issueStore.getChildren}
-				getGitStatus={(issueId) => gitStatusStore.getStatus(issueId)}
 				{getNotificationDotColor}
 				getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
 				onArchive={handleArchiveIssue}
@@ -354,10 +350,10 @@
 		{/if}
 
 		<!-- Assigned issues panel -->
-		{#if githubStore.assignedIssues.length > 0}
+		{#if versionControlStore.assignedIssues.length > 0}
 			<AssignedIssuesPanel
-				issues={githubStore.assignedIssues}
-				disabled={githubStore.isAvailable !== true}
+				issues={versionControlStore.assignedIssues}
+				disabled={versionControlStore.isGhAvailable !== true}
 			/>
 		{/if}
 	</div>

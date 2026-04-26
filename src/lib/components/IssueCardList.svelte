@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { Issue } from '$lib/types/issue';
 	import type { Action } from '$lib/types/action';
-	import type { GitHubStatusCache } from '$lib/types/github';
-	import type { GitStatusCache } from '$lib/types/git_status';
+	import type { GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks } from '$lib/types/issue_card_callbacks';
 	import IssueCard from './IssueCard.svelte';
 
@@ -13,10 +12,9 @@
 		isPortfolio: boolean;
 		actions?: Action[];
 		forceExpanded?: boolean;
-		githubCacheMap?: Map<string, GitHubStatusCache>;
+		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
 		getChildren: (parentId: string) => Issue[];
-		getGitStatus: (issueId: string) => GitStatusCache | undefined;
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
 	}
@@ -28,10 +26,9 @@
 		isPortfolio,
 		actions = [],
 		forceExpanded,
-		githubCacheMap = new Map(),
+		cacheMap = new Map(),
 		ghAvailable = false,
 		getChildren,
-		getGitStatus,
 		getNotificationDotColor,
 		getProgressLines,
 		onArchive,
@@ -51,9 +48,8 @@
 		<IssueCard
 			{issue}
 			{actions}
-			githubCache={githubCacheMap.get(issue.id)}
+			cache={cacheMap.get(issue.id)}
 			{ghAvailable}
-			gitStatus={getGitStatus(issue.id)}
 			notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
 			childCount={children.length}
 			{forceExpanded}
@@ -73,9 +69,8 @@
 				<IssueCard
 					issue={child}
 					{actions}
-					githubCache={githubCacheMap.get(child.id)}
+					cache={cacheMap.get(child.id)}
 					{ghAvailable}
-					gitStatus={getGitStatus(child.id)}
 					notificationDotColor={getNotificationDotColor?.(child.id) ?? null}
 					indented={true}
 					isLastChild={index === children.length - 1}
@@ -105,9 +100,8 @@
 				{#each archivedIssues as issue (issue.id)}
 					<IssueCard
 						{issue}
-						githubCache={githubCacheMap.get(issue.id)}
+						cache={cacheMap.get(issue.id)}
 						{ghAvailable}
-						gitStatus={getGitStatus(issue.id)}
 						{onArchive}
 						{onUnarchive}
 						{onEdit}

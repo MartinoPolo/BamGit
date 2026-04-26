@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mapIssueToStateDimensions } from './map_issue_to_state_dimensions';
 import type { Issue } from '$lib/types/issue';
-import type { GitStatusCache } from '$lib/types/git_status';
+import type { GitStatusCache } from '$lib/types/generated';
 import type { SessionState, ExecutionPhase } from '$lib/types/generated';
 
 function createIssue(overrides: Partial<Issue> = {}): Issue {
@@ -243,7 +243,8 @@ describe('mapIssueToStateDimensions — pullRequestState', () => {
 	it('falls back to open for unrecognised pr_state string', () => {
 		const dimensions = mapIssueToStateDimensions(
 			createIssue(),
-			createGitStatus({ pr_state: 'some-new-state' }),
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			createGitStatus({ pr_state: 'some-new-state' as any }),
 			[],
 		);
 		expect(dimensions.pullRequestState).toBe('open');

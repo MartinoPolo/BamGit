@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 /// PR lifecycle states matching the DB CHECK constraint on `git_status_cache.pr_state`.
-/// Note: Does NOT include `ready-to-merge` — that exists in TypeScript but not in the DB schema.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
 #[ts(export)]
 #[serde(rename_all = "kebab-case")]
@@ -13,6 +12,7 @@ pub enum PullRequestState {
     ReviewRequested,
     ChangesRequested,
     Approved,
+    ReadyToMerge,
     Merged,
     Closed,
 }
@@ -25,6 +25,7 @@ impl PullRequestState {
             PullRequestState::ReviewRequested => "review-requested",
             PullRequestState::ChangesRequested => "changes-requested",
             PullRequestState::Approved => "approved",
+            PullRequestState::ReadyToMerge => "ready-to-merge",
             PullRequestState::Merged => "merged",
             PullRequestState::Closed => "closed",
         }
@@ -40,6 +41,7 @@ impl FromSql for PullRequestState {
             "review-requested" => Ok(PullRequestState::ReviewRequested),
             "changes-requested" => Ok(PullRequestState::ChangesRequested),
             "approved" => Ok(PullRequestState::Approved),
+            "ready-to-merge" => Ok(PullRequestState::ReadyToMerge),
             "merged" => Ok(PullRequestState::Merged),
             "closed" => Ok(PullRequestState::Closed),
             other => Err(FromSqlError::Other(

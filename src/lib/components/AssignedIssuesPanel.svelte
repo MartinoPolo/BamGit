@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AssignedIssue } from '$lib/types/github';
+	import type { AssignedIssue } from '$lib/types/generated';
 	import { CircleDot, CircleCheck } from 'lucide-svelte';
 	import { openUrl } from '@tauri-apps/plugin-opener';
 
