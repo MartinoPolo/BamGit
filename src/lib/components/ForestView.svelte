@@ -1,14 +1,13 @@
 <script lang="ts">
 	import type { Issue } from '$lib/modules/issues/index.svelte.js';
 	import type { GitStatusCache } from '$lib/types/generated';
-	import type { TreeVisualization } from '$lib/types/tree_visualization';
-	import type { ForestLayoutItem, PositionedForestItem } from '$lib/engine/forest_layout';
-	import { computeForestLayout } from '$lib/engine/forest_layout';
-	import { computeTreeVisualization } from '$lib/engine/compute_tree_visualization';
-	import {
-		mapIssueToStateDimensions,
-		type SessionForMapping,
-	} from '$lib/engine/map_issue_to_state_dimensions';
+	import { computeVisualization, computeForestLayout } from '$lib/modules/visualization';
+	import type {
+		TreeVisualization,
+		ForestLayoutItem,
+		PositionedForestItem,
+		SessionForMapping,
+	} from '$lib/modules/visualization';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { LowPolyTree, PottedPlant } from 'low-poly-2d-trees';
 
@@ -40,12 +39,11 @@
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const results: IssueEntry[] = [];
 		for (const issue of issues) {
-			const dimensions = mapIssueToStateDimensions(
+			const visualization = computeVisualization(
 				issue,
 				getGitStatus(issue.id),
 				getSessionsForIssue(issue.id),
 			);
-			const visualization = computeTreeVisualization(dimensions);
 			if (visualization.kind === 'oak') {
 				continue;
 			}
