@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 // Note: priority, status, and worktree_state are stored as String fields in the Issue struct.
 // Type safety is enforced by SQLite CHECK constraints. Typed enums can be introduced later
 // with rusqlite::types::FromSql if compile-time exhaustive matching is needed.
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct Issue {
     pub id: String,
     pub dashboard_id: String,

@@ -3,5 +3,11 @@
 	"rules": {
 		"curly": "error"
 	},
-	"ignorePatterns": [".svelte-kit", "build", "node_modules", "src-tauri"]
+	"ignorePatterns": [
+		".svelte-kit",
+		"build",
+		"node_modules",
+		"src-tauri",
+		"src/lib/types/generated"
+	]
 }

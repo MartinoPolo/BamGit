@@ -1,9 +1,11 @@
 use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 /// PR lifecycle states matching the DB CHECK constraint on `git_status_cache.pr_state`.
 /// Note: Does NOT include `ready-to-merge` — that exists in TypeScript but not in the DB schema.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export)]
 #[serde(rename_all = "kebab-case")]
 pub enum PullRequestState {
     Draft,
@@ -54,7 +56,8 @@ impl ToSql for PullRequestState {
 }
 
 /// Cached GitHub status for an issue, mirroring the `git_status_cache` table.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct GitHubStatusCache {
     pub issue_id: String,
     pub branch_status: Option<String>,
@@ -68,7 +71,8 @@ pub struct GitHubStatusCache {
 }
 
 /// Result of `gh auth status` check.
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+#[ts(export)]
 #[serde(rename_all = "kebab-case")]
 pub enum GhCliAvailability {
     Available,
@@ -77,7 +81,8 @@ pub enum GhCliAvailability {
 }
 
 /// A GitHub issue assigned to the current user, returned by `gh issue list --assignee @me`.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct AssignedIssue {
     pub number: i64,
     pub title: String,
@@ -86,7 +91,8 @@ pub struct AssignedIssue {
 }
 
 /// Result of a bulk sync operation.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct SyncAllResult {
     pub synced_count: usize,
     pub errors: Vec<String>,

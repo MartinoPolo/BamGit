@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 /// All event types that can trigger notifications.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
 #[serde(rename_all = "kebab-case")]
 pub enum NotificationEventType {
     NeedsInput,
@@ -24,7 +26,8 @@ impl NotificationEventType {
 }
 
 /// Per-event notification configuration stored in SQLite.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct NotificationConfig {
     pub event_type: String,
     pub sound_enabled: bool,

@@ -3,6 +3,7 @@ use std::sync::Mutex as StdMutex;
 use rusqlite::Connection;
 use serde::Serialize;
 use serde_json::Value;
+use ts_rs::TS;
 use tauri::{AppHandle, Emitter, Manager};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
@@ -12,7 +13,8 @@ use crate::models::session::SessionState;
 use crate::notification::service::{session_state_to_event_type, NotificationService};
 
 /// Payload emitted to the frontend via Tauri events.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, TS)]
+#[ts(export)]
 pub struct SessionEventPayload {
     pub session_id: String,
     pub event: SessionEvent,

@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use ts_rs::TS;
 use tokio::process::{Child, ChildStderr, ChildStdin, ChildStdout};
 
 /// Configuration for spawning a new CLI session.
@@ -31,7 +32,8 @@ pub struct SessionHandle {
 
 /// Unified event type that all providers map their protocol to.
 /// Grovekeeper only deals with SessionEvent — never raw provider formats.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum SessionEvent {
     SessionInit {

@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, State};
+use ts_rs::TS;
 use tokio::io::{AsyncBufReadExt, AsyncRead, BufReader};
 use tokio::process::Command;
 use tauri::async_runtime::JoinHandle;
@@ -29,14 +30,16 @@ pub struct RemoveWorktreeRequest {
     pub working_directory: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, TS)]
+#[ts(export)]
 pub struct WorktreeProgressPayload {
     pub issue_id: String,
     pub source: String,
     pub line: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, TS)]
+#[ts(export)]
 pub struct WorktreeStateChangePayload {
     pub issue_id: String,
     pub old_state: String,
@@ -44,7 +47,8 @@ pub struct WorktreeStateChangePayload {
     pub worktree_folder: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct PrunableIssue {
     pub issue_id: String,
     pub name: String,
