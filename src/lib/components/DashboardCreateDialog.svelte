@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { CreateDashboardRequest, Dashboard } from '$lib/types/dashboard';
-	import type { ColorPalette } from '$lib/types/color_palette';
+	import type { CreateDashboardRequest } from '$lib/modules/board/index.svelte.js';
+	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
 
 	interface Props {

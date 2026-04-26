@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { SvelteSet } from 'svelte/reactivity';
-	import type { PrunableIssue } from '$lib/types/worktree';
+	import type { PrunableIssue } from '$lib/types/generated';
 
 	interface Props {
 		open: boolean;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import type { Dashboard } from '$lib/types/dashboard';
+	import type { Dashboard } from '$lib/types/generated';
 	import ThemeToggle from './ThemeToggle.svelte';
 
 	interface Props {

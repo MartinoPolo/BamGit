@@ -9,7 +9,7 @@ import type {
 } from 'low-poly-2d-trees';
 import type { Issue } from '$lib/modules/issues/index.svelte.js';
 import type { GitStatusCache, ExecutionPhase, SessionState } from '$lib/types/generated';
-import type { WorktreeState } from '$lib/types/worktree';
+import type { WorktreeState } from '$lib/modules/issues/index.svelte.js';
 
 // ─── Re-exported Library Types (erased at runtime) ──────────────────────
 

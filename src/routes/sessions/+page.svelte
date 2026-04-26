@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Session, DiscoveredSession } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
-	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
+	import { useNotifications } from '$lib/modules/notifications/index.svelte.js';
 	import { onMount } from 'svelte';
 	import SessionCard from '$lib/components/SessionCard.svelte';
 	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';

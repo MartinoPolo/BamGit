@@ -1,13 +1,8 @@
 <script lang="ts">
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
-	import type { ColorPalette, CreateColorPaletteRequest } from '$lib/types/color_palette';
-	import { useColorPalettes } from '$lib/context/color_palettes.context.svelte.js';
-	import {
-		createColorPalette,
-		updateColorPalette,
-		deleteColorPalette,
-	} from '$lib/tauri/color_palette_commands';
-	const paletteStore = useColorPalettes();
+	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board/index.svelte.js';
+	import type { ColorPalette } from '$lib/types/generated';
+	const boardStore = useBoard();
 
 	let creating = $state(false);
 	let newPaletteName = $state('');
@@ -17,8 +12,8 @@
 	let editColorsInput = $state('');
 	let operationError = $state<string | null>(null);
 
-	const builtInPalettes = $derived(paletteStore.palettes.filter((p) => p.is_built_in === true));
-	const customPalettes = $derived(paletteStore.palettes.filter((p) => p.is_built_in === false));
+	const builtInPalettes = $derived(boardStore.palettes.filter((p) => p.is_built_in === true));
+	const customPalettes = $derived(boardStore.palettes.filter((p) => p.is_built_in === false));
 
 	function parseColors(input: string): string[] {
 		return input
@@ -39,8 +34,8 @@
 				name: newPaletteName.trim(),
 				colors,
 			};
-			await createColorPalette(request);
-			await paletteStore.refresh();
+			await boardStore.createPalette(request);
+			await boardStore.refreshPalettes();
 			newPaletteName = '';
 			newPaletteColorsInput = '';
 			creating = false;
@@ -68,12 +63,12 @@
 		}
 
 		try {
-			await updateColorPalette({
+			await boardStore.updatePalette({
 				id: editingPaletteId,
 				name: editName.trim(),
 				colors,
 			});
-			await paletteStore.refresh();
+			await boardStore.refreshPalettes();
 			editingPaletteId = null;
 			operationError = null;
 		} catch (err) {
@@ -83,8 +78,8 @@
 
 	async function handleDelete(id: string) {
 		try {
-			await deleteColorPalette(id);
-			await paletteStore.refresh();
+			await boardStore.deletePalette(id);
+			await boardStore.refreshPalettes();
 			operationError = null;
 		} catch (err) {
 			operationError = String(err);

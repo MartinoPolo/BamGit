@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { Session, SessionState } from '$lib/types/generated';
-	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
-	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
+	import {
+		NOTIFICATION_DOT_COLORS,
+		useNotifications,
+	} from '$lib/modules/notifications/index.svelte.js';
 
 	interface Props {
 		session: Session;

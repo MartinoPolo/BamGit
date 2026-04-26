@@ -1,0 +1,353 @@
+import { createContext } from 'svelte';
+import { browser } from '$app/environment';
+import { MediaQuery } from 'svelte/reactivity';
+import { invoke } from '@tauri-apps/api/core';
+import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
+import type {
+	Dashboard,
+	ColorPalette,
+	PortfolioDashboardPointer,
+	LabelShapeMapping,
+} from '$lib/types/generated';
+
+// ─── Frontend-only request types ──────────────────────────────────────────
+
+export interface CreateDashboardRequest {
+	name: string;
+	type: 'repo' | 'portfolio';
+	github_repo?: string | null;
+	local_folder?: string | null;
+	default_base_branch?: string | null;
+	worktree_parent_folder?: string | null;
+	color_palette_id?: string | null;
+	default_shape?: string;
+}
+
+/** Absent key = no change, explicit null = clear the field */
+export interface UpdateDashboardRequest {
+	id: string;
+	name?: string;
+	type?: 'repo' | 'portfolio';
+	github_repo?: string | null;
+	local_folder?: string | null;
+	default_base_branch?: string | null;
+	worktree_parent_folder?: string | null;
+	color_palette_id?: string | null;
+	default_shape?: string;
+}
+
+export interface CreateColorPaletteRequest {
+	name: string;
+	colors: string[];
+}
+
+// fallow-ignore-next-line unused-types
+export interface UpdateColorPaletteRequest {
+	id: string;
+	name?: string;
+	colors?: string[];
+}
+
+// fallow-ignore-next-line unused-types
+export interface AddRepoToPortfolioRequest {
+	portfolio_dashboard_id: string;
+	repo_dashboard_id: string;
+}
+
+// ─── Frontend-only value types ────────────────────────────────────────────
+
+export type ViewMode = 'cards' | 'forest';
+// fallow-ignore-next-line unused-types
+export type ThemeMode = 'dark' | 'light' | 'system';
+
+// ─── Constants ────────────────────────────────────────────────────────────
+
+// fallow-ignore-next-line unused-exports
+export const DEFAULT_PALETTE_ID = 'palette-vivid';
+export const FALLBACK_ISSUE_COLOR = '#ef4444';
+
+const LAST_VIEWED_KEY = 'grovekeeper_last_viewed_dashboard_id';
+
+// ─── Type guards ──────────────────────────────────────────────────────────
+
+function isThemeMode(value: unknown): value is ThemeMode {
+	return value === 'dark' || value === 'light' || value === 'system';
+}
+
+function isViewMode(value: unknown): value is ViewMode {
+	return value === 'cards' || value === 'forest';
+}
+
+// ─── Context ──────────────────────────────────────────────────────────────
+
+type BoardContext = ReturnType<typeof createBoardContext>;
+
+const [useBoard, setBoardInternal] = createContext<BoardContext>();
+export { useBoard };
+
+export function setBoardContext() {
+	const ctx = createBoardContext();
+	setBoardInternal(ctx);
+	return ctx;
+}
+
+// ─── Factory ──────────────────────────────────────────────────────────────
+
+function createBoardContext() {
+	// ── Dashboard state ────────────────────────────────────────────────────
+	let dashboards = $state<Dashboard[]>([]);
+	let activeDashboardId = $state<string | null>(null);
+	let sidebarCollapsed = $state(false);
+	let loading = $state(true);
+	let error = $state<string | null>(null);
+	let showCreateDialog = $state(false);
+
+	const activeDashboard = $derived(
+		dashboards.find((dashboard) => dashboard.id === activeDashboardId) ?? null,
+	);
+
+	const repoDashboards = $derived(dashboards.filter((d) => d.type === 'repo'));
+	const portfolioDashboards = $derived(dashboards.filter((d) => d.type === 'portfolio'));
+
+	// ── Color palette state ────────────────────────────────────────────────
+	let palettes = $state<ColorPalette[]>([]);
+	let palettesLoading = $state(false);
+	let palettesError = $state<string | null>(null);
+
+	// ── Theme state ────────────────────────────────────────────────────────
+	const themeMode = new Persisted<ThemeMode>({
+		key: 'grovekeeper_theme_mode',
+		serde: stringSerde(isThemeMode),
+		defaultValue: 'system',
+	});
+
+	const prefersDark = browser ? new MediaQuery('(prefers-color-scheme: dark)') : null;
+
+	const isDark = $derived.by(() => {
+		if (themeMode.current === 'system') {
+			return prefersDark?.current ?? true;
+		}
+		return themeMode.current === 'dark';
+	});
+
+	$effect.pre(() => {
+		if (browser) {
+			document.documentElement.classList.toggle('dark', isDark);
+		}
+	});
+
+	// ── View preference state ──────────────────────────────────────────────
+	const viewMode = new Persisted<ViewMode>({
+		key: 'grovekeeper_view_mode',
+		serde: stringSerde(isViewMode),
+		defaultValue: 'cards',
+	});
+
+	// ── Public interface ───────────────────────────────────────────────────
+	return {
+		// Dashboard
+		get dashboards() {
+			return dashboards;
+		},
+		get activeDashboard() {
+			return activeDashboard;
+		},
+		get activeDashboardId() {
+			return activeDashboardId;
+		},
+		get repoDashboards() {
+			return repoDashboards;
+		},
+		get portfolioDashboards() {
+			return portfolioDashboards;
+		},
+		get sidebarCollapsed() {
+			return sidebarCollapsed;
+		},
+		get loading() {
+			return loading;
+		},
+		get error() {
+			return error;
+		},
+		get showCreateDialog() {
+			return showCreateDialog;
+		},
+		set showCreateDialog(value: boolean) {
+			showCreateDialog = value;
+		},
+
+		async loadDashboards() {
+			try {
+				loading = true;
+				dashboards = await invoke<Dashboard[]>('get_dashboards');
+				error = null;
+
+				const lastId = localStorage.getItem(LAST_VIEWED_KEY);
+				if (lastId && dashboards.some((d) => d.id === lastId)) {
+					activeDashboardId = lastId;
+				} else if (dashboards.length > 0) {
+					activeDashboardId = dashboards[0].id;
+				} else {
+					activeDashboardId = null;
+				}
+			} catch (err) {
+				error = String(err);
+			} finally {
+				loading = false;
+			}
+		},
+
+		selectDashboard(id: string) {
+			activeDashboardId = id;
+			localStorage.setItem(LAST_VIEWED_KEY, id);
+		},
+
+		toggleSidebar() {
+			sidebarCollapsed = !sidebarCollapsed;
+		},
+
+		async refreshDashboards() {
+			try {
+				dashboards = await invoke<Dashboard[]>('get_dashboards');
+				error = null;
+				if (activeDashboardId && !dashboards.some((d) => d.id === activeDashboardId)) {
+					activeDashboardId = dashboards.length > 0 ? dashboards[0].id : null;
+				}
+			} catch (err) {
+				error = String(err);
+			}
+		},
+
+		async createDashboard(request: CreateDashboardRequest): Promise<Dashboard> {
+			return invoke('create_dashboard', { request });
+		},
+
+		async updateDashboard(request: UpdateDashboardRequest): Promise<Dashboard> {
+			return invoke('update_dashboard', { request });
+		},
+
+		async deleteDashboard(id: string): Promise<void> {
+			return invoke('delete_dashboard', { id });
+		},
+
+		// Portfolio
+		async addRepoToPortfolio(
+			request: AddRepoToPortfolioRequest,
+		): Promise<PortfolioDashboardPointer> {
+			return invoke('add_repo_to_portfolio', { request });
+		},
+
+		async removeRepoFromPortfolio(
+			portfolioDashboardId: string,
+			repoDashboardId: string,
+		): Promise<void> {
+			return invoke('remove_repo_from_portfolio', {
+				portfolioDashboardId,
+				repoDashboardId,
+			});
+		},
+
+		// Color palettes
+		get palettes() {
+			return palettes;
+		},
+		get palettesLoading() {
+			return palettesLoading;
+		},
+		get palettesError() {
+			return palettesError;
+		},
+
+		getPaletteForDashboard(colorPaletteId: string | null): ColorPalette | null {
+			if (colorPaletteId === null) {
+				return palettes.find((p) => p.id === DEFAULT_PALETTE_ID) ?? palettes[0] ?? null;
+			}
+			return palettes.find((p) => p.id === colorPaletteId) ?? null;
+		},
+
+		async loadPalettes() {
+			try {
+				palettesLoading = true;
+				palettes = await invoke<ColorPalette[]>('get_all_color_palettes');
+				palettesError = null;
+			} catch (err) {
+				palettesError = String(err);
+			} finally {
+				palettesLoading = false;
+			}
+		},
+
+		async refreshPalettes() {
+			try {
+				palettes = await invoke<ColorPalette[]>('get_all_color_palettes');
+				palettesError = null;
+			} catch (err) {
+				palettesError = String(err);
+			}
+		},
+
+		async getNextColor(dashboardId: string): Promise<string> {
+			return invoke('get_next_available_color', { dashboardId });
+		},
+
+		async createPalette(request: CreateColorPaletteRequest): Promise<ColorPalette> {
+			return invoke('create_color_palette', { request });
+		},
+
+		async updatePalette(request: UpdateColorPaletteRequest): Promise<ColorPalette> {
+			return invoke('update_color_palette', { request });
+		},
+
+		async deletePalette(id: string): Promise<void> {
+			return invoke('delete_color_palette', { id });
+		},
+
+		// Label shape mappings
+		async getLabelShapeMappings(dashboardId: string): Promise<LabelShapeMapping[]> {
+			return invoke('get_label_shape_mappings', { dashboardId });
+		},
+
+		async upsertLabelShapeMapping(
+			dashboardId: string,
+			labelName: string,
+			treeShape: string,
+			color: string | null,
+			priorityOrder: number,
+		): Promise<LabelShapeMapping> {
+			return invoke('upsert_label_shape_mapping', {
+				dashboardId,
+				labelName,
+				treeShape,
+				color,
+				priorityOrder,
+			});
+		},
+
+		// Theme
+		get theme() {
+			return {
+				get mode() {
+					return themeMode.current;
+				},
+				set mode(value: ThemeMode) {
+					themeMode.current = value;
+				},
+				get isDark() {
+					return isDark;
+				},
+				get prefersDark() {
+					return prefersDark?.current ?? true;
+				},
+			};
+		},
+
+		// View preference
+		get viewMode() {
+			return viewMode.current;
+		},
+		set viewMode(value: ViewMode) {
+			viewMode.current = value;
+		},
+	};
+}

@@ -1,11 +1,16 @@
 import { createContext } from 'svelte';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { Issue as GeneratedIssue } from '$lib/types/generated';
-import type { WorktreeProgressPayload, WorktreeStateChangePayload } from '$lib/types/generated';
-import type { WorktreeState } from '$lib/types/worktree';
+import type {
+	Issue as GeneratedIssue,
+	WorktreeProgressPayload,
+	WorktreeStateChangePayload,
+	PrunableIssue,
+} from '$lib/types/generated';
 
 // ─── Public types ──────────────────────────────────────────────────────────
+
+export type WorktreeState = 'none' | 'pending' | 'active' | 'failed' | 'removing' | 'removed';
 
 export type SortMode = 'priority' | 'name' | 'date';
 
@@ -57,6 +62,32 @@ export interface UpdateIssueRequest {
 	parent_issue_id?: string | null;
 	labels?: IssueLabel[];
 	sort_order?: number;
+}
+
+// fallow-ignore-next-line unused-types
+export interface SetupWorktreeRequest {
+	issue_id: string;
+	branch_name: string;
+	color?: string | null;
+	working_directory: string;
+	base_branch?: string | null;
+}
+
+// fallow-ignore-next-line unused-types
+export interface RemoveWorktreeRequest {
+	issue_id: string;
+	branch_name: string;
+	working_directory: string;
+}
+
+export interface IssueCardCallbacks {
+	onArchive: (id: string) => void;
+	onUnarchive: (id: string) => void;
+	onEdit: (issue: Issue) => void;
+	onDelete: (id: string) => void;
+	onSetupWorktree?: (issue: Issue) => void;
+	onRemoveWorktree?: (issue: Issue) => void;
+	onExecuteAction?: (actionId: string, issueId: string) => void;
 }
 
 // ─── Internal helpers (NOT exported) ───────────────────────────────────────
@@ -310,6 +341,19 @@ function createIssuesContext() {
 
 		cleanup() {
 			stopWorktreeListeners();
+		},
+
+		// Worktree commands (inlined)
+		async setupWorktree(request: SetupWorktreeRequest): Promise<string> {
+			return invoke('setup_worktree', { request });
+		},
+
+		async removeWorktree(request: RemoveWorktreeRequest): Promise<void> {
+			return invoke('remove_worktree', { request });
+		},
+
+		async getPrunableIssues(dashboardId: string): Promise<PrunableIssue[]> {
+			return invoke('get_prunable_issues', { dashboardId });
 		},
 	};
 }

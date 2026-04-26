@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Action } from '$lib/types/action';
+	import type { Action } from '$lib/types/generated';
 
 	interface Props {
 		actions: Action[];
