@@ -10,7 +10,7 @@
 	import { setColorPalettesContext } from '$lib/context/color_palettes.context.svelte.js';
 	import { setNotificationsContext } from '$lib/context/notifications.context.svelte.js';
 	import { setSessionsContext } from '$lib/modules/sessions/index.svelte.js';
-	import { setIssuesContext } from '$lib/context/issues.context.svelte.js';
+	import { setIssuesContext } from '$lib/modules/issues/index.svelte.js';
 	import { setVersionControlContext } from '$lib/modules/version-control/index.svelte.js';
 	import { setActionsContext } from '$lib/context/actions.context.svelte.js';
 	import { createDashboard, updateDashboard, deleteDashboard } from '$lib/tauri/commands';

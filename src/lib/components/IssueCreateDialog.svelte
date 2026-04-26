@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CreateIssueRequest } from '$lib/types/issue';
+	import type { CreateIssueRequest } from '$lib/modules/issues/index.svelte.js';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
 
 	interface Props {

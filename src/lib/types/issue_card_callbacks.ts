@@ -1,4 +1,4 @@
-import type { Issue } from './issue';
+import type { Issue } from '$lib/modules/issues/index.svelte.js';
 
 export interface IssueCardCallbacks {
 	onArchive: (id: string) => void;

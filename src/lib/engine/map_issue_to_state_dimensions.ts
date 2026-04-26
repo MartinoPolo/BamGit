@@ -1,4 +1,4 @@
-import type { Issue } from '$lib/types/issue';
+import type { Issue } from '$lib/modules/issues/index.svelte.js';
 import type { GitStatusCache, ExecutionPhase, SessionState } from '$lib/types/generated';
 import type {
 	ForestBranchStatus,

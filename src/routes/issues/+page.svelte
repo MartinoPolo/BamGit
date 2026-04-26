@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useDashboard } from '$lib/context/dashboard.context.svelte.js';
-	import { useIssues } from '$lib/context/issues.context.svelte.js';
+	import { useIssues } from '$lib/modules/issues/index.svelte.js';
 	import { useVersionControl } from '$lib/modules/version-control/index.svelte.js';
 	import { useActions } from '$lib/context/actions.context.svelte.js';
 	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
@@ -9,16 +9,13 @@
 	import { useColorPalettes } from '$lib/context/color_palettes.context.svelte.js';
 	import { useViewPreference } from '$lib/context/view_preference.context.svelte.js';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
-	import {
-		createIssue,
-		archiveIssue,
-		unarchiveIssue,
-		updateIssue,
-		deleteIssue,
-	} from '$lib/tauri/issue_commands';
 	import { setupWorktree, removeWorktree, getPrunableIssues } from '$lib/tauri/worktree_commands';
 	import { executeAction } from '$lib/tauri/action_commands';
-	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
+	import type {
+		Issue,
+		CreateIssueRequest,
+		UpdateIssueRequest,
+	} from '$lib/modules/issues/index.svelte.js';
 	import type { PrunableIssue } from '$lib/types/worktree';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
@@ -135,7 +132,7 @@
 
 	async function handleCreateIssue(request: CreateIssueRequest) {
 		try {
-			await createIssue(request);
+			await issueStore.addIssue(request);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to create issue:', err);
@@ -144,7 +141,7 @@
 
 	async function handleArchiveIssue(id: string) {
 		try {
-			await archiveIssue(id);
+			await issueStore.archiveIssue(id);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to archive issue:', err);
@@ -153,7 +150,7 @@
 
 	async function handleUnarchiveIssue(id: string) {
 		try {
-			await unarchiveIssue(id);
+			await issueStore.unarchiveIssue(id);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to unarchive issue:', err);
@@ -162,7 +159,7 @@
 
 	async function handleUpdateIssue(request: UpdateIssueRequest) {
 		try {
-			await updateIssue(request);
+			await issueStore.updateIssue(request);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to update issue:', err);
@@ -171,7 +168,7 @@
 
 	async function handleDeleteIssue(id: string) {
 		try {
-			await deleteIssue(id);
+			await issueStore.removeIssue(id);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to delete issue:', err);

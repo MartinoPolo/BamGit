@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Issue } from '$lib/types/issue';
+	import type { Issue } from '$lib/modules/issues/index.svelte.js';
 	import type { Action } from '$lib/types/action';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks } from '$lib/types/issue_card_callbacks';

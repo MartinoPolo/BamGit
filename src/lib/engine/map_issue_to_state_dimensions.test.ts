@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mapIssueToStateDimensions } from './map_issue_to_state_dimensions';
-import type { Issue } from '$lib/types/issue';
+import type { Issue } from '$lib/modules/issues/index.svelte.js';
 import type { GitStatusCache } from '$lib/types/generated';
 import type { SessionState, ExecutionPhase } from '$lib/types/generated';
 

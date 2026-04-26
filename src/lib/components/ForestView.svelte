@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Issue } from '$lib/types/issue';
+	import type { Issue } from '$lib/modules/issues/index.svelte.js';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import type { TreeVisualization } from '$lib/types/tree_visualization';
 	import type { ForestLayoutItem, PositionedForestItem } from '$lib/engine/forest_layout';
