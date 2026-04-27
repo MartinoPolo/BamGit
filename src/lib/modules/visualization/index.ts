@@ -13,7 +13,8 @@ import type { WorktreeState } from '$lib/modules/issues/index.svelte.js';
 
 // ─── Re-exported Library Types (erased at runtime) ──────────────────────
 
-export type { TreeStage, PottedPlantStage } from 'low-poly-2d-trees';
+/** @public */
+export type { TreeStage, PottedPlantStage };
 
 // ─── Library Constants (local mirrors — avoids barrel Svelte import in Node) ─
 
@@ -89,6 +90,7 @@ const SHAPE_FRUIT_MAP: Readonly<Record<Exclude<TreeShape, 'custom'>, FruitType>>
 
 // ─── GitHub Label -> Tree Shape Mapping ─────────────────────────────────
 
+/** @public */
 export interface LabelShapeMappingEntry {
 	readonly labelName: string;
 	readonly treeShape: TreeShape;
@@ -184,10 +186,13 @@ const DEFAULT_TREE_CONFIG: TreeConfig = {
 
 type ForestWorktreeState = WorktreeState;
 
+/** @public */
 export type AggregateSessionState = SessionState | 'no-session';
 
+/** @public */
 export type ForestBranchStatus = 'no-branch' | 'active' | 'local-only' | 'remote-gone' | 'deleted';
 
+/** @public */
 export type ForestPullRequestState =
 	| 'no-pr'
 	| 'draft'
@@ -199,6 +204,7 @@ export type ForestPullRequestState =
 	| 'merged'
 	| 'closed';
 
+/** @public */
 export type ForestSyncStatus =
 	| { readonly type: 'up-to-date' }
 	| { readonly type: 'behind-base'; readonly count: number }

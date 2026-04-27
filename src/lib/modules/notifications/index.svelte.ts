@@ -9,14 +9,14 @@ import { SvelteMap } from 'svelte/reactivity';
 // ─── Narrowed types ──────────────────────────────────────────���────────────
 
 /** NotificationConfig with event_type narrowed from string to NotificationEventType. */
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface NotificationConfig extends Omit<GeneratedNotificationConfig, 'event_type'> {
 	event_type: NotificationEventType;
 }
 
 // ─── Frontend-only request types ──────────────────────────────────────────
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface UpdateNotificationConfigRequest {
 	event_type: NotificationEventType;
 	sound_enabled?: boolean;

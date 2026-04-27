@@ -41,14 +41,14 @@ export interface CreateColorPaletteRequest {
 	colors: string[];
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface UpdateColorPaletteRequest {
 	id: string;
 	name?: string;
 	colors?: string[];
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface AddRepoToPortfolioRequest {
 	portfolio_dashboard_id: string;
 	repo_dashboard_id: string;
@@ -57,12 +57,12 @@ export interface AddRepoToPortfolioRequest {
 // ─── Frontend-only value types ────────────────────────────────────────────
 
 export type ViewMode = 'cards' | 'forest';
-// fallow-ignore-next-line unused-types
+/** @public */
 export type ThemeMode = 'dark' | 'light' | 'system';
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
-// fallow-ignore-next-line unused-exports
+/** @public */
 export const DEFAULT_PALETTE_ID = 'palette-vivid';
 export const FALLBACK_ISSUE_COLOR = '#ef4444';
 

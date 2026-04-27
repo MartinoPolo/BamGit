@@ -15,13 +15,13 @@ export type WorktreeState = 'none' | 'pending' | 'active' | 'failed' | 'removing
 
 export type SortMode = 'priority' | 'name' | 'date';
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export type IssuePriority = 'low' | 'medium' | 'high' | 'top';
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export type IssueStatus = 'active' | 'archived';
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface IssueLabel {
 	name: string;
 	color: string;
@@ -65,7 +65,7 @@ export interface UpdateIssueRequest {
 	sort_order?: number;
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface SetupWorktreeRequest {
 	issue_id: string;
 	branch_name: string;
@@ -74,7 +74,7 @@ export interface SetupWorktreeRequest {
 	base_branch?: string | null;
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface RemoveWorktreeRequest {
 	issue_id: string;
 	branch_name: string;

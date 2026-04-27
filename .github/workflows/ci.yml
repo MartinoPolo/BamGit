@@ -13,6 +13,8 @@ jobs:
             NODE_OPTIONS: '--max-old-space-size=4096'
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
             - uses: pnpm/action-setup@v4
             - uses: actions/setup-node@v4
               with:
@@ -25,10 +27,10 @@ jobs:
                   pnpm install --frozen-lockfile
                   pnpm run package
             - run: pnpm install --frozen-lockfile
-            - run: pnpm run check:all
-            - name: Fallow health report (advisory)
-              run: pnpm exec fallow health --score --summary
-              continue-on-error: true
+            - run: pnpm check:all
+            - name: Audit changed files for quality regressions
+              if: github.event_name == 'pull_request'
+              run: pnpm exec fallow audit --format json --quiet --explain --base origin/${{ github.base_ref }}
             - run: pnpm exec playwright install --with-deps chromium
-            - run: pnpm run test -- --coverage
-            - run: pnpm run test:e2e
+            - run: pnpm test -- --coverage
+            - run: pnpm test:e2e

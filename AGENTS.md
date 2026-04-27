@@ -20,9 +20,11 @@ Vitest + Playwright
 ## Commands
 
 `pnpm tauri dev` -- full dev (frontend + native window)
-`pnpm run dev` -- frontend only
-`pnpm run check:all` -- full check suite
-`pnpm run test` -- unit tests
+`pnpm dev` -- frontend only
+`pnpm check:fast` -- prettier + oxlint (pre-commit tier)
+`pnpm check:fallow` -- dead-code regression gate
+`pnpm check:all` -- full check suite (format + lint + fallow + typecheck + eslint)
+`pnpm test` -- unit tests
 `pnpm test:e2e` -- E2E tests
 
 ## Architecture
