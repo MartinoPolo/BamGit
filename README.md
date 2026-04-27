@@ -41,31 +41,31 @@ pnpm tauri dev
 
 ### Development
 
-| Script               | Description                            |
-| -------------------- | -------------------------------------- |
-| `pnpm tauri dev`     | Start dev server + native Tauri window |
-| `pnpm tauri build`   | Production build (native installer)    |
-| `pnpm run dev`       | Frontend dev server only               |
-| `pnpm run build`     | Frontend build only                    |
-| `pnpm run preview`   | Preview production build locally       |
-| `pnpm run storybook` | Start Storybook on port 6006           |
+| Script             | Description                            |
+| ------------------ | -------------------------------------- |
+| `pnpm tauri dev`   | Start dev server + native Tauri window |
+| `pnpm tauri build` | Production build (native installer)    |
+| `pnpm dev`         | Frontend dev server only               |
+| `pnpm build`       | Frontend build only                    |
+| `pnpm preview`     | Preview production build locally       |
+| `pnpm storybook`   | Start Storybook on port 6006           |
 
 ### Code Quality
 
-| Script               | Description                                                              |
-| -------------------- | ------------------------------------------------------------------------ |
-| `pnpm run check:all` | Full suite: format + oxlint + eslint + stylelint + fallow + svelte-check |
-| `pnpm run check`     | Quick svelte-check only                                                  |
-| `pnpm run lint`      | OxLint + ESLint (type-aware)                                             |
-| `pnpm run lint:css`  | Stylelint for CSS and Svelte                                             |
-| `pnpm run format`    | Format with Prettier                                                     |
+| Script           | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| `pnpm check:all` | Full suite: format + oxlint + eslint + stylelint + fallow + svelte-check |
+| `pnpm check`     | Quick svelte-check only                                                  |
+| `pnpm lint`      | OxLint + ESLint (type-aware)                                             |
+| `pnpm lint:css`  | Stylelint for CSS and Svelte                                             |
+| `pnpm format`    | Format with Prettier                                                     |
 
 ### Testing
 
-| Script              | Description                                     |
-| ------------------- | ----------------------------------------------- |
-| `pnpm run test`     | Unit tests with Vitest (80% coverage threshold) |
-| `pnpm run test:e2e` | E2E tests with Playwright (Chromium)            |
+| Script          | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `pnpm test`     | Unit tests with Vitest (80% coverage threshold) |
+| `pnpm test:e2e` | E2E tests with Playwright (Chromium)            |
 
 ## Architecture
 
@@ -109,8 +109,8 @@ Use `await` directly in Svelte components without `{#await}` blocks. Enabled via
 Component development environment with Tailwind CSS support.
 
 ```sh
-pnpm run storybook        # dev server on port 6006
-pnpm run build:storybook  # static build
+pnpm storybook        # dev server on port 6006
+pnpm build:storybook  # static build
 ```
 
 Place story files next to components: `src/lib/components/Button.stories.svelte` or `Button.stories.ts`.

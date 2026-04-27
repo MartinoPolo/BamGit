@@ -21,7 +21,7 @@ pnpm exec prettier --write .
 
 ## `check:all` (manual + CI)
 
-Runs during CI and via `pnpm run check:all`. Sequential, fails on first error:
+Runs during CI and via `pnpm check:all`. Sequential, fails on first error:
 
 | Order | Command                                   | What it does                                                   |
 | ----- | ----------------------------------------- | -------------------------------------------------------------- |
@@ -48,18 +48,18 @@ pnpm exec svelte-check --tsconfig ./tsconfig.json
 | Order | Step                                        | Fails build?  |
 | ----- | ------------------------------------------- | ------------- |
 | 1     | `pnpm install --frozen-lockfile`            | Yes           |
-| 2     | `pnpm run check:all` (all 7 commands above) | Yes           |
+| 2     | `pnpm check:all` (all 7 commands above)     | Yes           |
 | 3     | `pnpm exec fallow health --score --summary` | No (advisory) |
-| 4     | `pnpm run test -- --coverage`               | Yes           |
-| 5     | `pnpm run test:e2e`                         | Yes           |
+| 4     | `pnpm test -- --coverage`                   | Yes           |
+| 5     | `pnpm test:e2e`                             | Yes           |
 
 Simulate full CI locally:
 
 ```bash
-pnpm run check:all
+pnpm check:all
 pnpm exec fallow health --score --summary
-pnpm run test -- --coverage
-pnpm run test:e2e
+pnpm test -- --coverage
+pnpm test:e2e
 ```
 
 ## Fallow-specific commands (manual/exploratory)
