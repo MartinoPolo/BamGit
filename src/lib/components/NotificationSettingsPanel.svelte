@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NotificationEventType } from '$lib/types/generated';
-	import { useNotifications } from '$lib/modules/notifications/index.svelte.js';
+	import { useNotifications } from '$lib/modules/notifications';
 	import { onMount } from 'svelte';
 
 	const notificationStore = useNotifications();
@@ -106,7 +106,7 @@
 							<span
 								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.sound_enabled ===
 								true
-									? 'translate-x-[18px]'
+									? 'translate-x-4.5'
 									: ''}"
 							></span>
 						</button>
@@ -130,7 +130,7 @@
 							<span
 								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.toast_enabled ===
 								true
-									? 'translate-x-[18px]'
+									? 'translate-x-4.5'
 									: ''}"
 							></span>
 						</button>
@@ -156,7 +156,7 @@
 							<span
 								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.window_flash_enabled ===
 								true
-									? 'translate-x-[18px]'
+									? 'translate-x-4.5'
 									: ''}"
 							></span>
 						</button>

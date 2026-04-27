@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { setBoardContext, useBoard } from '$lib/modules/board/index.svelte.js';
+	import { setBoardContext, useBoard } from '$lib/modules/board';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();

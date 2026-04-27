@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
-	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board/index.svelte.js';
+	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import type { ColorPalette } from '$lib/types/generated';
 	const boardStore = useBoard();
 
@@ -57,15 +57,15 @@
 			return;
 		}
 		const colors = parseColors(editColorsInput);
-		if (!editName.trim() || colors.length === 0) {
+		const trimmedName = editName.trim();
+		if (!trimmedName || colors.length === 0) {
 			operationError = 'Name and at least one valid hex color required';
 			return;
 		}
-
 		try {
 			await boardStore.updatePalette({
 				id: editingPaletteId,
-				name: editName.trim(),
+				name: trimmedName,
 				colors,
 			});
 			await boardStore.refreshPalettes();

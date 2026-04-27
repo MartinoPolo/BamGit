@@ -6,7 +6,7 @@ import type {
 	NotificationEventType,
 } from '$lib/types/generated';
 
-// ─── Narrowed types ──────────────────────────────────────────���────────────
+// ─── Narrowed types ───────────────────────────────────────────────────────
 
 /** NotificationConfig with event_type narrowed from string to NotificationEventType. */
 /** @public */

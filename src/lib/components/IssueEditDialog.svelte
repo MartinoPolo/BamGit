@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues/index.svelte.js';
-	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board/index.svelte.js';
+	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues';
+	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
+	import { syncDialogVisibility, buildUpdateIssueRequest } from './dialog_helpers.js';
 
 	interface Props {
 		issue: Issue | null;
@@ -19,31 +20,28 @@
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
-		if (issue !== null && dialogElement !== undefined && !dialogElement.open) {
-			name = issue.name;
-			priority = issue.priority ?? '';
-			color = issue.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
-			githubIssueUrl = issue.github_issue_url ?? '';
-			dialogElement.showModal();
-		} else if (issue === null && dialogElement?.open === true) {
-			dialogElement.close();
-		}
+		syncDialogVisibility(issue !== null, dialogElement, () => {
+			if (issue !== null) {
+				name = issue.name;
+				priority = issue.priority ?? '';
+				color = issue.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
+				githubIssueUrl = issue.github_issue_url ?? '';
+			}
+		});
 	});
 
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (issue === null || !name.trim()) {
+		const request = buildUpdateIssueRequest(
+			issue?.id ?? null,
+			name,
+			priority,
+			color,
+			githubIssueUrl,
+		);
+		if (request === null) {
 			return;
 		}
-
-		const request: UpdateIssueRequest = {
-			id: issue.id,
-			name: name.trim(),
-			priority: (priority as 'low' | 'medium' | 'high' | 'top') || null,
-			color: color || null,
-			github_issue_url: githubIssueUrl.trim() || null,
-		};
-
 		onUpdate(request);
 		onClose();
 	}

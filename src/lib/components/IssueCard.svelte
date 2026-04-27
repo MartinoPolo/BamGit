@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Issue } from '$lib/modules/issues/index.svelte.js';
+	import type { Issue, IssuePriority } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
-	import type { IssueCardCallbacks } from '$lib/modules/issues/index.svelte.js';
+	import type { IssueCardCallbacks } from '$lib/modules/issues';
 	import PullRequestBadge from './PullRequestBadge.svelte';
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
@@ -65,20 +65,16 @@
 		}
 	});
 
-	const priorityBorderClass = $derived.by(() => {
-		switch (issue.priority) {
-			case 'top':
-				return 'border-l-red-500';
-			case 'high':
-				return 'border-l-orange-400';
-			case 'medium':
-				return 'border-l-yellow-400';
-			case 'low':
-				return 'border-l-blue-400';
-			default:
-				return 'border-l-transparent';
-		}
-	});
+	const PRIORITY_BORDER_CLASSES = {
+		top: 'border-l-red-500',
+		high: 'border-l-orange-400',
+		medium: 'border-l-yellow-400',
+		low: 'border-l-blue-400',
+	} as const satisfies Record<IssuePriority, string>;
+
+	const priorityBorderClass = $derived(
+		issue.priority !== null ? PRIORITY_BORDER_CLASSES[issue.priority] : 'border-l-transparent',
+	);
 </script>
 
 <div
@@ -89,7 +85,7 @@
 >
 	<!-- Tree connector for nested children -->
 	{#if indented}
-		<div class="relative -ml-6 w-6 flex-shrink-0">
+		<div class="relative -ml-6 w-6 shrink-0">
 			<div
 				class="absolute top-0 left-3 h-1/2 w-px bg-border"
 				class:h-full={!isLastChild}
@@ -99,7 +95,7 @@
 	{/if}
 
 	<!-- Color identity strip -->
-	<div class="w-10 flex-shrink-0 rounded-l" style="background-color: {color}">
+	<div class="w-10 shrink-0 rounded-l" style="background-color: {color}">
 		<div class="flex h-full items-start justify-center pt-3">
 			{#if notificationDotColor}
 				<span
@@ -214,7 +210,7 @@
 				{#if showOverflow}
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
-						class="absolute right-0 z-10 mt-1 min-w-[140px] rounded border border-border bg-popover py-1 shadow-lg"
+						class="absolute right-0 z-10 mt-1 min-w-35 rounded border border-border bg-popover py-1 shadow-lg"
 						onmouseleave={() => (showOverflow = false)}
 					>
 						<button

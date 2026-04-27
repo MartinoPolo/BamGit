@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Issue } from '$lib/modules/issues/index.svelte.js';
+	import type { Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import { computeVisualization, computeForestLayout } from '$lib/modules/visualization';
 	import type {
@@ -110,7 +110,7 @@
 </script>
 
 <div
-	class="relative h-[600px] w-full overflow-hidden rounded-md border border-border bg-muted/10"
+	class="relative h-150 w-full overflow-hidden rounded-md border border-border bg-muted/10"
 	bind:clientWidth={viewportWidth}
 	bind:clientHeight={viewportHeight}
 >

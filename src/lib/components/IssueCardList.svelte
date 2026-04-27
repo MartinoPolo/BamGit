@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Issue } from '$lib/modules/issues/index.svelte.js';
+	import type { Issue } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
-	import type { IssueCardCallbacks } from '$lib/modules/issues/index.svelte.js';
+	import type { IssueCardCallbacks } from '$lib/modules/issues';
 	import IssueCard from './IssueCard.svelte';
 
 	interface Props extends IssueCardCallbacks {

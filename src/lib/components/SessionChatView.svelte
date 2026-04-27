@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Session, SessionEventPayload } from '$lib/types/generated';
-	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
+	import { useSessions } from '$lib/modules/sessions';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 
@@ -78,7 +78,6 @@
 		);
 	}
 
-	// fallow-ignore-next-line complexity
 	function handleRunState(event: Record<string, unknown>) {
 		const state = event.state as string;
 		if (state === 'failed' || state === 'completed') {

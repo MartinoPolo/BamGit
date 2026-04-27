@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { UpdateDashboardRequest } from '$lib/modules/board/index.svelte.js';
+	import type { UpdateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
+	import { syncDialogVisibility, buildUpdateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
 		dashboard: Dashboard | null;
@@ -23,39 +24,33 @@
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
-		if (dashboard !== null && dialogElement !== undefined && !dialogElement.open) {
-			name = dashboard.name;
-			githubRepo = dashboard.github_repo ?? '';
-			localFolder = dashboard.local_folder ?? '';
-			defaultBaseBranch = dashboard.default_base_branch ?? '';
-			worktreeParentFolder = dashboard.worktree_parent_folder ?? '';
-			colorPaletteId = dashboard.color_palette_id ?? null;
-			confirmDelete = false;
-			dialogElement.showModal();
-		} else if (dashboard === null && dialogElement?.open === true) {
-			dialogElement.close();
-		}
+		syncDialogVisibility(dashboard !== null, dialogElement, () => {
+			if (dashboard !== null) {
+				name = dashboard.name;
+				githubRepo = dashboard.github_repo ?? '';
+				localFolder = dashboard.local_folder ?? '';
+				defaultBaseBranch = dashboard.default_base_branch ?? '';
+				worktreeParentFolder = dashboard.worktree_parent_folder ?? '';
+				colorPaletteId = dashboard.color_palette_id ?? null;
+				confirmDelete = false;
+			}
+		});
 	});
 
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (dashboard === null || !name.trim()) {
+		const request = buildUpdateDashboardRequest(
+			dashboard,
+			name,
+			colorPaletteId,
+			githubRepo,
+			localFolder,
+			defaultBaseBranch,
+			worktreeParentFolder,
+		);
+		if (request === null) {
 			return;
 		}
-
-		const request: UpdateDashboardRequest = {
-			id: dashboard.id,
-			name: name.trim(),
-			color_palette_id: colorPaletteId,
-		};
-
-		if (dashboard.type === 'repo') {
-			request.github_repo = githubRepo.trim() || null;
-			request.local_folder = localFolder.trim() || null;
-			request.default_base_branch = defaultBaseBranch.trim() || null;
-			request.worktree_parent_folder = worktreeParentFolder.trim() || null;
-		}
-
 		onUpdate(request);
 		onClose();
 	}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { RefreshCw, Scissors } from 'lucide-svelte';
-	import type { SortMode } from '$lib/modules/issues/index.svelte.js';
-	import type { ViewMode } from '$lib/modules/board/index.svelte.js';
+	import type { SortMode } from '$lib/modules/issues';
+	import type { ViewMode } from '$lib/modules/board';
 	import ViewToggle from '$lib/components/ViewToggle.svelte';
 
 	interface Props {

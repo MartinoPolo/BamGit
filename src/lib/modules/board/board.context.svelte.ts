@@ -9,56 +9,22 @@ import type {
 	PortfolioDashboardPointer,
 	LabelShapeMapping,
 } from '$lib/types/generated';
-
-// ─── Frontend-only request types ──────────────────────────────────────────
-
-export interface CreateDashboardRequest {
-	name: string;
-	type: 'repo' | 'portfolio';
-	github_repo?: string | null;
-	local_folder?: string | null;
-	default_base_branch?: string | null;
-	worktree_parent_folder?: string | null;
-	color_palette_id?: string | null;
-	default_shape?: string;
-}
-
-/** Absent key = no change, explicit null = clear the field */
-export interface UpdateDashboardRequest {
-	id: string;
-	name?: string;
-	type?: 'repo' | 'portfolio';
-	github_repo?: string | null;
-	local_folder?: string | null;
-	default_base_branch?: string | null;
-	worktree_parent_folder?: string | null;
-	color_palette_id?: string | null;
-	default_shape?: string;
-}
-
-export interface CreateColorPaletteRequest {
-	name: string;
-	colors: string[];
-}
-
-/** @public */
-export interface UpdateColorPaletteRequest {
-	id: string;
-	name?: string;
-	colors?: string[];
-}
-
-/** @public */
-export interface AddRepoToPortfolioRequest {
-	portfolio_dashboard_id: string;
-	repo_dashboard_id: string;
-}
-
-// ─── Frontend-only value types ────────────────────────────────────────────
-
-export type ViewMode = 'cards' | 'forest';
-/** @public */
-export type ThemeMode = 'dark' | 'light' | 'system';
+import type {
+	CreateDashboardRequest,
+	UpdateDashboardRequest,
+	CreateColorPaletteRequest,
+	UpdateColorPaletteRequest,
+	AddRepoToPortfolioRequest,
+	ViewMode,
+	ThemeMode,
+} from './types.js';
+import {
+	isThemeMode,
+	isViewMode,
+	findPaletteForDashboard,
+	selectActiveDashboardId,
+	resolveActiveDashboardId,
+} from './types.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
@@ -67,16 +33,6 @@ export const DEFAULT_PALETTE_ID = 'palette-vivid';
 export const FALLBACK_ISSUE_COLOR = '#ef4444';
 
 const LAST_VIEWED_KEY = 'grovekeeper_last_viewed_dashboard_id';
-
-// ─── Type guards ──────────────────────────────────────────────────────────
-
-function isThemeMode(value: unknown): value is ThemeMode {
-	return value === 'dark' || value === 'light' || value === 'system';
-}
-
-function isViewMode(value: unknown): value is ViewMode {
-	return value === 'cards' || value === 'forest';
-}
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -177,21 +133,16 @@ function createBoardContext() {
 			showCreateDialog = value;
 		},
 
-		// fallow-ignore-next-line complexity
 		async loadDashboards() {
 			try {
 				loading = true;
 				dashboards = await invoke<Dashboard[]>('get_dashboards');
 				error = null;
 
-				const lastId = localStorage.getItem(LAST_VIEWED_KEY);
-				if (lastId != null && dashboards.some((d) => d.id === lastId)) {
-					activeDashboardId = lastId;
-				} else if (dashboards.length > 0) {
-					activeDashboardId = dashboards[0].id;
-				} else {
-					activeDashboardId = null;
-				}
+				activeDashboardId = selectActiveDashboardId(
+					dashboards,
+					localStorage.getItem(LAST_VIEWED_KEY),
+				);
 			} catch (err) {
 				error = String(err);
 			} finally {
@@ -208,17 +159,11 @@ function createBoardContext() {
 			sidebarCollapsed = !sidebarCollapsed;
 		},
 
-		// fallow-ignore-next-line complexity
 		async refreshDashboards() {
 			try {
 				dashboards = await invoke<Dashboard[]>('get_dashboards');
 				error = null;
-				if (
-					activeDashboardId != null &&
-					!dashboards.some((d) => d.id === activeDashboardId)
-				) {
-					activeDashboardId = dashboards.length > 0 ? dashboards[0].id : null;
-				}
+				activeDashboardId = resolveActiveDashboardId(dashboards, activeDashboardId);
 			} catch (err) {
 				error = String(err);
 			}
@@ -264,12 +209,8 @@ function createBoardContext() {
 			return palettesError;
 		},
 
-		// fallow-ignore-next-line complexity
 		getPaletteForDashboard(colorPaletteId: string | null): ColorPalette | null {
-			if (colorPaletteId === null) {
-				return palettes.find((p) => p.id === DEFAULT_PALETTE_ID) ?? palettes[0] ?? null;
-			}
-			return palettes.find((p) => p.id === colorPaletteId) ?? null;
+			return findPaletteForDashboard(palettes, colorPaletteId, DEFAULT_PALETTE_ID);
 		},
 
 		async loadPalettes() {

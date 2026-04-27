@@ -8,12 +8,12 @@
 		setBoardContext,
 		type CreateDashboardRequest,
 		type UpdateDashboardRequest,
-	} from '$lib/modules/board/index.svelte.js';
-	import { setNotificationsContext } from '$lib/modules/notifications/index.svelte.js';
-	import { setSessionsContext } from '$lib/modules/sessions/index.svelte.js';
-	import { setIssuesContext } from '$lib/modules/issues/index.svelte.js';
-	import { setVersionControlContext } from '$lib/modules/version-control/index.svelte.js';
-	import { setActionsContext } from '$lib/modules/actions/index.svelte.js';
+	} from '$lib/modules/board';
+	import { setNotificationsContext } from '$lib/modules/notifications';
+	import { setSessionsContext } from '$lib/modules/sessions';
+	import { setIssuesContext } from '$lib/modules/issues';
+	import { setVersionControlContext } from '$lib/modules/version-control';
+	import { setActionsContext } from '$lib/modules/actions';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -38,8 +38,6 @@
 	) {
 		try {
 			const created = await boardStore.createDashboard(request);
-
-			// Add repo pointers for portfolio dashboards
 			if (request.type === 'portfolio' && selectedRepoIds.length > 0) {
 				for (const repoId of selectedRepoIds) {
 					await boardStore.addRepoToPortfolio({
@@ -48,7 +46,6 @@
 					});
 				}
 			}
-
 			await boardStore.refreshDashboards();
 			boardStore.selectDashboard(created.id);
 		} catch (err) {

@@ -130,13 +130,34 @@ The codebase follows John Ousterhout's "A Philosophy of Software Design" — dee
 ```
 src/lib/
   modules/
-    sessions/index.svelte.ts      — reactive, event listeners
-    version-control/index.svelte.ts — reactive
-    issues/index.svelte.ts         — reactive, worktree events
-    board/index.svelte.ts          — reactive, localStorage
-    notifications/index.svelte.ts  — reactive
-    actions/index.svelte.ts        — reactive
-    visualization/index.ts         — pure functions, no reactivity
+    actions/
+      index.ts                          — barrel re-exports
+      actions.context.svelte.ts         — reactive context
+    board/
+      index.ts                          — barrel re-exports
+      board.context.svelte.ts           — reactive context
+      types.ts                          — request/config types, view/theme modes
+    issues/
+      index.ts                          — barrel re-exports
+      issues.context.svelte.ts          — reactive context
+      types.ts                          — Issue, WorktreeState, request types
+      serialization.ts                  — label/issue (de)serialization
+    notifications/
+      index.ts                          — barrel re-exports
+      notifications.context.svelte.ts   — reactive context
+    sessions/
+      index.ts                          — barrel re-exports
+      sessions.context.svelte.ts        — reactive context
+    version-control/
+      index.ts                          — barrel re-exports
+      version_control.context.svelte.ts — reactive context
+    visualization/
+      index.ts                          — barrel re-exports
+      types.ts                          — all visualization types
+      constants.ts                      — stage/shape/tool constants
+      tree_computation.ts               — computeVisualization pipeline
+      forest_layout.ts                  — computeForestLayout pipeline
+      testing.ts                        — test-only re-exports
   types/
     generated/                     — ts-rs output (DO NOT EDIT)
       index.ts                     — barrel re-export of all 27 types
@@ -180,10 +201,12 @@ function createModuleContext(/* dependencies */) {
 }
 ```
 
-- **Entry point:** always `index.svelte.ts` (or `index.ts` for pure modules)
-- **Context hooks:** `use<ModuleName>()` (consumer) + `set<ModuleName>Context()` (provider)
+- **Entry point:** always `index.ts` (barrel re-exports only)
+- **Context file:** `<name>.context.svelte.ts`
+- **Context hooks:** `use<Module>()` (consumer) + `set<Module>Context()` (provider)
 - **IPC:** `invoke()` calls are inlined inside the module — not a separate layer
-- **Types:** import from `$lib/types/generated` for Rust-generated types; define module-internal types locally
+- **Types:** in `types.ts` when module has 5+ exported types; import from `$lib/types/generated` for Rust-generated types
+- **Pure helpers:** in named `.ts` files when context file exceeds 200 lines
 - **Naming:** kebab-case folders (`version-control`), PascalCase types, snake_case variables
 
 ### Import Convention
@@ -192,13 +215,13 @@ function createModuleContext(/* dependencies */) {
 // Generated types (from Rust via ts-rs)
 import type { Session, Dashboard } from '$lib/types/generated';
 
-// Module APIs
-import { useIssues, type Issue } from '$lib/modules/issues/index.svelte.js';
-import { useSessions } from '$lib/modules/sessions/index.svelte.js';
-import { useVersionControl } from '$lib/modules/version-control/index.svelte.js';
-import { useBoard } from '$lib/modules/board/index.svelte.js';
-import { useNotifications } from '$lib/modules/notifications/index.svelte.js';
-import { useActions } from '$lib/modules/actions/index.svelte.js';
+// Module APIs (directory import resolves to index.ts barrel)
+import { useIssues, type Issue } from '$lib/modules/issues';
+import { useSessions } from '$lib/modules/sessions';
+import { useVersionControl } from '$lib/modules/version-control';
+import { useBoard } from '$lib/modules/board';
+import { useNotifications } from '$lib/modules/notifications';
+import { useActions } from '$lib/modules/actions';
 
 // Pure functions
 import { computeVisualization, computeForestLayout } from '$lib/modules/visualization';

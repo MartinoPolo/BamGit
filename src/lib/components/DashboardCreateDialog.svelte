@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { CreateDashboardRequest } from '$lib/modules/board/index.svelte.js';
+	import type { CreateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
+	import { syncDialogVisibility, buildCreateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
 		open: boolean;
@@ -24,11 +25,7 @@
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
 	$effect(() => {
-		if (open && dialogElement !== undefined && !dialogElement.open) {
-			dialogElement.showModal();
-		} else if (!open && dialogElement?.open === true) {
-			dialogElement.close();
-		}
+		syncDialogVisibility(open, dialogElement);
 	});
 
 	function resetForm() {
@@ -44,34 +41,18 @@
 
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!name.trim()) {
+		const request = buildCreateDashboardRequest(
+			name,
+			dashboardType,
+			colorPaletteId,
+			githubRepo,
+			localFolder,
+			defaultBaseBranch,
+			worktreeParentFolder,
+		);
+		if (request === null) {
 			return;
 		}
-
-		const request: CreateDashboardRequest = {
-			name: name.trim(),
-			type: dashboardType,
-		};
-
-		if (colorPaletteId !== null) {
-			request.color_palette_id = colorPaletteId;
-		}
-
-		if (dashboardType === 'repo') {
-			if (githubRepo.trim()) {
-				request.github_repo = githubRepo.trim();
-			}
-			if (localFolder.trim()) {
-				request.local_folder = localFolder.trim();
-			}
-			if (defaultBaseBranch.trim()) {
-				request.default_base_branch = defaultBaseBranch.trim();
-			}
-			if (worktreeParentFolder.trim()) {
-				request.worktree_parent_folder = worktreeParentFolder.trim();
-			}
-		}
-
 		onCreate(request, [...selectedRepoIds]);
 		resetForm();
 		onClose();
