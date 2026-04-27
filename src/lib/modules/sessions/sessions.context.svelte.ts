@@ -9,6 +9,7 @@ import type {
 	DiscoveredSessionsPayload,
 	NotificationEventType,
 } from '$lib/types/generated';
+import { computeSessionEventEffects, type NotificationAction } from './session-events.js';
 import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Module-internal request types ──────────────────────────────────────────
@@ -29,14 +30,6 @@ interface AdoptSessionRequest {
 	cost_usd?: number | null;
 	token_count?: number | null;
 }
-
-// ─── Notification mapping ───────────────────────────────────────────────────
-
-const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
-	'needs-input': 'needs-input',
-	'needs-review': 'needs-review',
-	errored: 'errored',
-};
 
 // ─── Dependency type ────────────────────────────────────────────────────────
 
@@ -128,7 +121,17 @@ function createSessionsContext(notifications: NotificationsApi) {
 
 	// ─── Event handlers (internal, not exported) ────────────────────────────
 
-	// fallow-ignore-next-line complexity
+	function applyNotificationAction(sessionId: string, notificationAction: NotificationAction) {
+		if (notificationAction === null) {
+			return;
+		}
+		if (notificationAction.type === 'add') {
+			notifications.addPending(sessionId, notificationAction.notificationType);
+		} else {
+			notifications.clearPending(sessionId);
+		}
+	}
+
 	function handleSessionEvent(payload: SessionEventPayload) {
 		const { session_id: sessionId, event, resolved_state: resolvedState } = payload;
 
@@ -137,30 +140,14 @@ function createSessionsContext(notifications: NotificationsApi) {
 			return;
 		}
 
-		// Use resolved_state from Rust (no more RUN_STATE_MAP)
-		if (resolvedState) {
-			session.state = resolvedState;
-			const notificationType = NOTIFICATION_STATES[resolvedState];
-			if (notificationType) {
-				notifications.addPending(sessionId, notificationType);
-			} else {
-				notifications.clearPending(sessionId);
-			}
-		}
+		const { sessionPatch, notificationAction } = computeSessionEventEffects(
+			event,
+			resolvedState,
+			session.cost_usd,
+		);
 
-		// Handle other event-specific side effects
-		switch (event.type) {
-			case 'usage_update':
-				session.cost_usd = event.cost_usd ?? session.cost_usd;
-				session.token_count = (event.input_tokens ?? 0) + (event.output_tokens ?? 0);
-				break;
-			case 'message_complete':
-				session.last_response_summary =
-					event.text.length > 200 ? event.text.slice(0, 197) + '...' : event.text;
-				break;
-			default:
-				break;
-		}
+		Object.assign(session, sessionPatch);
+		applyNotificationAction(sessionId, notificationAction);
 	}
 
 	function handleDiscoveredSessionsUpdate(payload: DiscoveredSessionsPayload) {
