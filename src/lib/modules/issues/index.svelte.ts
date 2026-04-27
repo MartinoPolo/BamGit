@@ -155,7 +155,7 @@ function createIssuesContext() {
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let currentDashboardId = $state<string | null>(null);
-	const worktreeProgress = $state(new SvelteMap<string, string[]>());
+	const worktreeProgress = new SvelteMap<string, string[]>();
 
 	const sortedIssues = $derived.by(() => {
 		const list = [...issues];
@@ -181,7 +181,7 @@ function createIssuesContext() {
 	const parentIssues = $derived(activeIssues.filter((issue) => issue.parent_issue_id == null));
 
 	const childrenByParentId = $derived.by(() => {
-		const map = new Map<string, Issue[]>();
+		const map = new SvelteMap<string, Issue[]>();
 		for (const issue of activeIssues) {
 			if (issue.parent_issue_id !== null) {
 				const existing = map.get(issue.parent_issue_id);

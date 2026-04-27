@@ -53,7 +53,7 @@ export function setNotificationsContext() {
 
 function createNotificationsContext() {
 	let configs = $state<NotificationConfig[]>([]);
-	const pendingNotifications = $state(new SvelteMap<string, NotificationEventType>());
+	const pendingNotifications = new SvelteMap<string, NotificationEventType>();
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 

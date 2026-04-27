@@ -37,7 +37,7 @@ function buildStateMap(caches: readonly GitStatusCache[]): SvelteMap<string, Git
 }
 
 function createVersionControlContext() {
-	let stateMap = $state(new SvelteMap<string, GitStatusCache>());
+	let stateMap = new SvelteMap<string, GitStatusCache>();
 	let ghAvailability = $state<GhCliAvailability>('not-installed');
 	let syncing = $state(false);
 	let syncError = $state<string | null>(null);
