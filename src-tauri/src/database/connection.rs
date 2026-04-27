@@ -13,12 +13,16 @@ pub struct DatabaseState {
 }
 
 impl DatabaseState {
-    pub fn read(&self) -> r2d2::PooledConnection<SqliteConnectionManager> {
-        self.read_pool.get().expect("Failed to get read connection from pool")
+    pub fn read(&self) -> Result<r2d2::PooledConnection<SqliteConnectionManager>, String> {
+        self.read_pool
+            .get()
+            .map_err(|error| format!("Failed to get read connection from pool: {error}"))
     }
 
-    pub fn write(&self) -> std::sync::MutexGuard<'_, Connection> {
-        self.write_conn.lock().expect("Failed to lock write connection")
+    pub fn write(&self) -> Result<std::sync::MutexGuard<'_, Connection>, String> {
+        self.write_conn
+            .lock()
+            .map_err(|error| format!("Failed to lock write connection: {error}"))
     }
 }
 

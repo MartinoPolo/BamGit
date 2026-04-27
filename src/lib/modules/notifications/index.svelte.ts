@@ -1,4 +1,5 @@
 import { createContext } from 'svelte';
+import { SvelteMap } from 'svelte/reactivity';
 import { invoke } from '@tauri-apps/api/core';
 import type {
 	NotificationConfig as GeneratedNotificationConfig,
@@ -52,8 +53,9 @@ export function setNotificationsContext() {
 
 function createNotificationsContext() {
 	let configs = $state<NotificationConfig[]>([]);
-	let pendingNotifications = $state<Map<string, NotificationEventType>>(new Map());
+	let pendingNotifications = $state(new SvelteMap<string, NotificationEventType>());
 	let loading = $state(false);
+	let error = $state<string | null>(null);
 
 	return {
 		get configs() {
@@ -65,14 +67,19 @@ function createNotificationsContext() {
 		get loading() {
 			return loading;
 		},
+		get error() {
+			return error;
+		},
 
 		async loadConfigs() {
 			try {
 				loading = true;
+				error = null;
 				configs = (await invoke<GeneratedNotificationConfig[]>(
 					'get_notification_configs',
 				)) as NotificationConfig[];
 			} catch (err) {
+				error = String(err);
 				console.error('Failed to load notification configs:', err);
 			} finally {
 				loading = false;
@@ -86,18 +93,11 @@ function createNotificationsContext() {
 		},
 
 		addPending(sessionId: string, eventType: NotificationEventType) {
-			const next = new Map(pendingNotifications);
-			next.set(sessionId, eventType);
-			pendingNotifications = next;
+			pendingNotifications.set(sessionId, eventType);
 		},
 
 		clearPending(sessionId: string) {
-			if (!pendingNotifications.has(sessionId)) {
-				return;
-			}
-			const next = new Map(pendingNotifications);
-			next.delete(sessionId);
-			pendingNotifications = next;
+			pendingNotifications.delete(sessionId);
 		},
 
 		hasPending(sessionId: string): boolean {

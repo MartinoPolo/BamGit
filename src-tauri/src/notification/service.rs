@@ -83,7 +83,7 @@ impl NotificationService {
              FROM notification_config WHERE event_type = ?1"
         );
         connection
-            .query_row(&query, [event_type.as_str()], |row| {
+            .query_row(&query, rusqlite::params![event_type], |row| {
                 row_to_notification_config(row)
             })
             .ok()

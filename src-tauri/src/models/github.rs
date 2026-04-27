@@ -1,4 +1,3 @@
-use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -17,62 +16,16 @@ pub enum PullRequestState {
     Closed,
 }
 
-impl PullRequestState {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            PullRequestState::Draft => "draft",
-            PullRequestState::Open => "open",
-            PullRequestState::ReviewRequested => "review-requested",
-            PullRequestState::ChangesRequested => "changes-requested",
-            PullRequestState::Approved => "approved",
-            PullRequestState::ReadyToMerge => "ready-to-merge",
-            PullRequestState::Merged => "merged",
-            PullRequestState::Closed => "closed",
-        }
-    }
-}
-
-impl FromSql for PullRequestState {
-    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
-        let text = value.as_str()?;
-        match text {
-            "draft" => Ok(PullRequestState::Draft),
-            "open" => Ok(PullRequestState::Open),
-            "review-requested" => Ok(PullRequestState::ReviewRequested),
-            "changes-requested" => Ok(PullRequestState::ChangesRequested),
-            "approved" => Ok(PullRequestState::Approved),
-            "ready-to-merge" => Ok(PullRequestState::ReadyToMerge),
-            "merged" => Ok(PullRequestState::Merged),
-            "closed" => Ok(PullRequestState::Closed),
-            other => Err(FromSqlError::Other(
-                format!("Unknown PullRequestState: {other}").into(),
-            )),
-        }
-    }
-}
-
-impl ToSql for PullRequestState {
-    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        Ok(ToSqlOutput::from(self.as_str()))
-    }
-}
-
-/// Cached GitHub status for an issue, mirroring the `git_status_cache` table.
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[ts(export)]
-pub struct GitHubStatusCache {
-    pub issue_id: String,
-    pub branch_status: Option<String>,
-    pub pr_state: Option<PullRequestState>,
-    #[ts(type = "number | null")]
-    pub pr_number: Option<i64>,
-    pub pr_url: Option<String>,
-    pub github_issue_state: Option<String>,
-    #[ts(type = "number | null")]
-    pub behind_base_count: Option<i64>,
-    pub merge_conflict: Option<bool>,
-    pub fetched_at: Option<String>,
-}
+impl_sql_enum!(PullRequestState {
+    Draft => "draft",
+    Open => "open",
+    ReviewRequested => "review-requested",
+    ChangesRequested => "changes-requested",
+    Approved => "approved",
+    ReadyToMerge => "ready-to-merge",
+    Merged => "merged",
+    Closed => "closed",
+});
 
 /// Result of `gh auth status` check.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]

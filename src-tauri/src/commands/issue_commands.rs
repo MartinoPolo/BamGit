@@ -43,7 +43,7 @@ pub fn create_issue(
     state: State<DatabaseState>,
     request: CreateIssueRequest,
 ) -> Result<Issue, String> {
-    let connection = state.write();
+    let connection = state.write()?;
     let id = Uuid::new_v4().to_string();
 
     connection
@@ -76,7 +76,7 @@ pub fn get_issues_for_dashboard(
     dashboard_id: String,
     include_archived: bool,
 ) -> Result<Vec<Issue>, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let query = if include_archived {
         format!(
@@ -103,7 +103,7 @@ pub fn get_issues_for_dashboard(
 
 #[tauri::command]
 pub fn get_issue(state: State<DatabaseState>, id: String) -> Result<Issue, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
     connection
@@ -116,7 +116,7 @@ pub fn update_issue(
     state: State<DatabaseState>,
     request: UpdateIssueRequest,
 ) -> Result<Issue, String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let select_query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
     let existing = connection
@@ -167,7 +167,7 @@ pub fn update_issue(
 
 #[tauri::command]
 pub fn delete_issue(state: State<DatabaseState>, id: String) -> Result<(), String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let rows_affected = connection
         .execute("DELETE FROM issues WHERE id = ?1", [&id])
@@ -182,7 +182,7 @@ pub fn delete_issue(state: State<DatabaseState>, id: String) -> Result<(), Strin
 
 #[tauri::command]
 pub fn archive_issue(state: State<DatabaseState>, id: String) -> Result<Issue, String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let rows_affected = connection
         .execute(
@@ -203,7 +203,7 @@ pub fn archive_issue(state: State<DatabaseState>, id: String) -> Result<Issue, S
 
 #[tauri::command]
 pub fn unarchive_issue(state: State<DatabaseState>, id: String) -> Result<Issue, String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let rows_affected = connection
         .execute(

@@ -37,7 +37,6 @@
 				working_directory: spawnWorkingDirectory.trim(),
 			});
 			spawnPrompt = '';
-			await store.refresh();
 		} catch (err) {
 			console.error('Failed to spawn session:', err);
 		} finally {

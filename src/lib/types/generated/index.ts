@@ -13,7 +13,6 @@ export type { DiscoveredSessionsPayload } from './DiscoveredSessionsPayload';
 export type { DiscoveredSessionStatus } from './DiscoveredSessionStatus';
 export type { ExecutionPhase } from './ExecutionPhase';
 export type { GhCliAvailability } from './GhCliAvailability';
-export type { GitHubStatusCache } from './GitHubStatusCache';
 export type { GitStatusCache } from './GitStatusCache';
 export type { Issue } from './Issue';
 export type { LabelShapeMapping } from './LabelShapeMapping';

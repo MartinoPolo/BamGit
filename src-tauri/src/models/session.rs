@@ -1,4 +1,3 @@
-use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -14,41 +13,14 @@ pub enum SessionState {
     Errored,
 }
 
-impl SessionState {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            SessionState::Running => "running",
-            SessionState::NeedsInput => "needs-input",
-            SessionState::NeedsReview => "needs-review",
-            SessionState::Paused => "paused",
-            SessionState::Finished => "finished",
-            SessionState::Errored => "errored",
-        }
-    }
-}
-
-impl FromSql for SessionState {
-    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
-        let text = value.as_str()?;
-        match text {
-            "running" => Ok(SessionState::Running),
-            "needs-input" => Ok(SessionState::NeedsInput),
-            "needs-review" => Ok(SessionState::NeedsReview),
-            "paused" => Ok(SessionState::Paused),
-            "finished" => Ok(SessionState::Finished),
-            "errored" => Ok(SessionState::Errored),
-            other => Err(FromSqlError::Other(
-                format!("Unknown SessionState: {other}").into(),
-            )),
-        }
-    }
-}
-
-impl ToSql for SessionState {
-    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        Ok(ToSqlOutput::from(self.as_str()))
-    }
-}
+impl_sql_enum!(SessionState {
+    Running => "running",
+    NeedsInput => "needs-input",
+    NeedsReview => "needs-review",
+    Paused => "paused",
+    Finished => "finished",
+    Errored => "errored",
+});
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
 #[ts(export)]
@@ -62,41 +34,14 @@ pub enum ExecutionPhase {
     Committing,
 }
 
-impl ExecutionPhase {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            ExecutionPhase::None => "none",
-            ExecutionPhase::Analyzing => "analyzing",
-            ExecutionPhase::Tdd => "tdd",
-            ExecutionPhase::Reviewing => "reviewing",
-            ExecutionPhase::Verifying => "verifying",
-            ExecutionPhase::Committing => "committing",
-        }
-    }
-}
-
-impl FromSql for ExecutionPhase {
-    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
-        let text = value.as_str()?;
-        match text {
-            "none" => Ok(ExecutionPhase::None),
-            "analyzing" => Ok(ExecutionPhase::Analyzing),
-            "tdd" => Ok(ExecutionPhase::Tdd),
-            "reviewing" => Ok(ExecutionPhase::Reviewing),
-            "verifying" => Ok(ExecutionPhase::Verifying),
-            "committing" => Ok(ExecutionPhase::Committing),
-            other => Err(FromSqlError::Other(
-                format!("Unknown ExecutionPhase: {other}").into(),
-            )),
-        }
-    }
-}
-
-impl ToSql for ExecutionPhase {
-    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        Ok(ToSqlOutput::from(self.as_str()))
-    }
-}
+impl_sql_enum!(ExecutionPhase {
+    None => "none",
+    Analyzing => "analyzing",
+    Tdd => "tdd",
+    Reviewing => "reviewing",
+    Verifying => "verifying",
+    Committing => "committing",
+});
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
 #[ts(export)]
@@ -106,33 +51,10 @@ pub enum SessionSource {
     Adopted,
 }
 
-impl SessionSource {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            SessionSource::Spawned => "spawned",
-            SessionSource::Adopted => "adopted",
-        }
-    }
-}
-
-impl FromSql for SessionSource {
-    fn column_result(value: ValueRef<'_>) -> FromSqlResult<Self> {
-        let text = value.as_str()?;
-        match text {
-            "spawned" => Ok(SessionSource::Spawned),
-            "adopted" => Ok(SessionSource::Adopted),
-            other => Err(FromSqlError::Other(
-                format!("Unknown SessionSource: {other}").into(),
-            )),
-        }
-    }
-}
-
-impl ToSql for SessionSource {
-    fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
-        Ok(ToSqlOutput::from(self.as_str()))
-    }
-}
+impl_sql_enum!(SessionSource {
+    Spawned => "spawned",
+    Adopted => "adopted",
+});
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]

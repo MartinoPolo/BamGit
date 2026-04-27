@@ -19,7 +19,7 @@ pub fn add_repo_to_portfolio(
     state: State<DatabaseState>,
     request: AddRepoToPortfolioRequest,
 ) -> Result<PortfolioDashboardPointer, String> {
-    let connection = state.write();
+    let connection = state.write()?;
     let id = Uuid::new_v4().to_string();
 
     connection
@@ -46,7 +46,7 @@ pub fn remove_repo_from_portfolio(
     portfolio_dashboard_id: String,
     repo_dashboard_id: String,
 ) -> Result<(), String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let rows_affected = connection
         .execute(
@@ -67,7 +67,7 @@ pub fn get_portfolio_repos(
     state: State<DatabaseState>,
     portfolio_dashboard_id: String,
 ) -> Result<Vec<PortfolioDashboardPointer>, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let mut statement = connection
         .prepare(

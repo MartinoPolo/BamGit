@@ -13,23 +13,19 @@ pub enum NotificationEventType {
     PrReady,
 }
 
-impl NotificationEventType {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            NotificationEventType::NeedsInput => "needs-input",
-            NotificationEventType::NeedsReview => "needs-review",
-            NotificationEventType::Finished => "finished",
-            NotificationEventType::Errored => "errored",
-            NotificationEventType::PrReady => "pr-ready",
-        }
-    }
-}
+impl_sql_enum!(NotificationEventType {
+    NeedsInput => "needs-input",
+    NeedsReview => "needs-review",
+    Finished => "finished",
+    Errored => "errored",
+    PrReady => "pr-ready",
+});
 
 /// Per-event notification configuration stored in SQLite.
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct NotificationConfig {
-    pub event_type: String,
+    pub event_type: NotificationEventType,
     pub sound_enabled: bool,
     pub sound_file: Option<String>,
     pub toast_enabled: bool,
@@ -54,7 +50,7 @@ pub fn row_to_notification_config(
 /// Request to update a single event type's notification settings.
 #[derive(Debug, Deserialize)]
 pub struct UpdateNotificationConfigRequest {
-    pub event_type: String,
+    pub event_type: NotificationEventType,
     pub sound_enabled: Option<bool>,
     pub sound_file: Option<Option<String>>,
     pub toast_enabled: Option<bool>,
@@ -66,35 +62,35 @@ impl NotificationConfig {
     pub fn defaults() -> Vec<NotificationConfig> {
         vec![
             NotificationConfig {
-                event_type: "needs-input".into(),
+                event_type: NotificationEventType::NeedsInput,
                 sound_enabled: true,
                 sound_file: Some("urgent.wav".into()),
                 toast_enabled: true,
                 window_flash_enabled: true,
             },
             NotificationConfig {
-                event_type: "needs-review".into(),
+                event_type: NotificationEventType::NeedsReview,
                 sound_enabled: true,
                 sound_file: Some("gentle.wav".into()),
                 toast_enabled: true,
                 window_flash_enabled: false,
             },
             NotificationConfig {
-                event_type: "finished".into(),
+                event_type: NotificationEventType::Finished,
                 sound_enabled: false,
                 sound_file: None,
                 toast_enabled: true,
                 window_flash_enabled: false,
             },
             NotificationConfig {
-                event_type: "errored".into(),
+                event_type: NotificationEventType::Errored,
                 sound_enabled: true,
                 sound_file: Some("urgent.wav".into()),
                 toast_enabled: true,
                 window_flash_enabled: true,
             },
             NotificationConfig {
-                event_type: "pr-ready".into(),
+                event_type: NotificationEventType::PrReady,
                 sound_enabled: false,
                 sound_file: None,
                 toast_enabled: true,
@@ -113,7 +109,7 @@ mod tests {
         let defaults = NotificationConfig::defaults();
         let config = defaults
             .iter()
-            .find(|c| c.event_type == "needs-input")
+            .find(|c| c.event_type == NotificationEventType::NeedsInput)
             .unwrap();
         assert!(config.sound_enabled);
         assert!(config.toast_enabled);
@@ -126,7 +122,7 @@ mod tests {
         let defaults = NotificationConfig::defaults();
         let config = defaults
             .iter()
-            .find(|c| c.event_type == "needs-review")
+            .find(|c| c.event_type == NotificationEventType::NeedsReview)
             .unwrap();
         assert!(config.sound_enabled);
         assert!(config.toast_enabled);
@@ -139,7 +135,7 @@ mod tests {
         let defaults = NotificationConfig::defaults();
         let config = defaults
             .iter()
-            .find(|c| c.event_type == "errored")
+            .find(|c| c.event_type == NotificationEventType::Errored)
             .unwrap();
         assert!(config.sound_enabled);
         assert!(config.toast_enabled);
@@ -152,7 +148,7 @@ mod tests {
         let defaults = NotificationConfig::defaults();
         let config = defaults
             .iter()
-            .find(|c| c.event_type == "finished")
+            .find(|c| c.event_type == NotificationEventType::Finished)
             .unwrap();
         assert!(!config.sound_enabled);
         assert!(config.toast_enabled);
@@ -162,7 +158,7 @@ mod tests {
     #[test]
     fn serde_round_trip() {
         let config = NotificationConfig {
-            event_type: "needs-input".into(),
+            event_type: NotificationEventType::NeedsInput,
             sound_enabled: true,
             sound_file: Some("urgent.wav".into()),
             toast_enabled: true,

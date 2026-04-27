@@ -1,6 +1,7 @@
-import { createContext } from 'svelte';
+import { createContext, onDestroy } from 'svelte';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { SvelteMap } from 'svelte/reactivity';
 import type {
 	Issue as GeneratedIssue,
 	WorktreeProgressPayload,
@@ -92,6 +93,8 @@ export interface IssueCardCallbacks {
 
 // ─── Internal helpers (NOT exported) ───────────────────────────────────────
 
+const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+
 function deserializeLabels(raw: string | null): IssueLabel[] {
 	if (raw === null) {
 		return [];
@@ -101,7 +104,10 @@ function deserializeLabels(raw: string | null): IssueLabel[] {
 		if (!Array.isArray(parsed)) {
 			return [];
 		}
-		return parsed as IssueLabel[];
+		return (parsed as IssueLabel[]).map((label) => ({
+			...label,
+			color: HEX_COLOR_PATTERN.test(label.color) ? label.color : '#808080',
+		}));
 	} catch {
 		return [];
 	}
@@ -117,9 +123,9 @@ function toIssue(raw: GeneratedIssue): Issue {
 	};
 }
 
-function serializeLabels(labels: IssueLabel[] | undefined): string | null {
+function serializeLabels(labels: IssueLabel[] | undefined): string | null | undefined {
 	if (labels === undefined) {
-		return undefined as unknown as string | null;
+		return undefined;
 	}
 	return JSON.stringify(labels);
 }
@@ -136,6 +142,7 @@ export { useIssues };
 export function setIssuesContext() {
 	const ctx = createIssuesContext();
 	setIssuesInternal(ctx);
+	onDestroy(() => ctx.cleanup());
 	return ctx;
 }
 
@@ -148,7 +155,7 @@ function createIssuesContext() {
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let currentDashboardId = $state<string | null>(null);
-	let worktreeProgress = $state<Map<string, string[]>>(new Map());
+	let worktreeProgress = $state(new SvelteMap<string, string[]>());
 
 	const sortedIssues = $derived.by(() => {
 		const list = [...issues];
@@ -173,8 +180,23 @@ function createIssuesContext() {
 	const archivedIssues = $derived(sortedIssues.filter((issue) => issue.status === 'archived'));
 	const parentIssues = $derived(activeIssues.filter((issue) => !issue.parent_issue_id));
 
+	const childrenByParentId = $derived.by(() => {
+		const map = new Map<string, Issue[]>();
+		for (const issue of activeIssues) {
+			if (issue.parent_issue_id !== null) {
+				const existing = map.get(issue.parent_issue_id);
+				if (existing !== undefined) {
+					existing.push(issue);
+				} else {
+					map.set(issue.parent_issue_id, [issue]);
+				}
+			}
+		}
+		return map;
+	});
+
 	function getChildren(parentId: string): Issue[] {
-		return activeIssues.filter((issue) => issue.parent_issue_id === parentId);
+		return childrenByParentId.get(parentId) ?? [];
 	}
 
 	// ─── Worktree event listeners ──────────────────────────────────────────
@@ -188,7 +210,7 @@ function createIssuesContext() {
 		unlistenProgress = await listen<WorktreeProgressPayload>('worktree-progress', (event) => {
 			const { issue_id: issueId, line } = event.payload;
 			const existing = worktreeProgress.get(issueId) ?? [];
-			worktreeProgress = new Map(worktreeProgress).set(issueId, [...existing, line]);
+			worktreeProgress.set(issueId, [...existing, line]);
 		});
 
 		unlistenStateChange = await listen<WorktreeStateChangePayload>(
@@ -212,9 +234,7 @@ function createIssuesContext() {
 				});
 
 				if (newState !== 'pending') {
-					const updated = new Map(worktreeProgress);
-					updated.delete(issueId);
-					worktreeProgress = updated;
+					worktreeProgress.delete(issueId);
 				}
 			},
 		);
