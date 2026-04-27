@@ -222,10 +222,8 @@ Simpler lifecycle: pot with soil → sprout → small plant → flowering → dr
 
 ## Open Questions
 
-1. **Navigation/layout** — Sidebar vs tabs vs split layout. Needs UX prototyping.
-2. ~~**Session visualization**~~ — Resolved: R12 (Forest View) covers issue tree visualization. Tool timeline and statistics remain open.
-3. **Reconnection strategy** — How to handle flaky internet beyond disabling buttons. Caching depth, retry behavior, queue-and-send-on-reconnect.
-4. **Offline capabilities** — Exactly which actions to disable, caching strategy depth.
+1. **Reconnection strategy** — How to handle flaky internet beyond disabling buttons. Caching depth, retry behavior, queue-and-send-on-reconnect.
+2. **Offline capabilities** — Exactly which actions to disable, caching strategy depth.
 
 ## Out of Scope for V1
 

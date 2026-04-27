@@ -1,6 +1,6 @@
 # Grovekeeper
 
-Desktop Git client built with Tauri v2, Svelte 5, and Rust.
+Desktop agent orchestration GUI built with Tauri v2, Svelte 5, and Rust. Unifies task state, editor, terminal, browser, and agent session into a single per-task view with reliable notifications.
 
 ## Stack
 
@@ -11,7 +11,8 @@ Desktop Git client built with Tauri v2, Svelte 5, and Rust.
 | Build         | Vite 7                          |
 | Language      | TypeScript (strict) + Rust      |
 | Styling       | Tailwind CSS 4                  |
-| Database      | SQLite (rusqlite, bundled)      |
+| Database      | SQLite (rusqlite + r2d2 pool)   |
+| Type gen      | ts-rs (Rust → TypeScript)       |
 | Testing       | Vitest + Playwright + Storybook |
 | Linting       | ESLint + Stylelint + OxLint     |
 | Formatting    | Prettier                        |
@@ -68,42 +69,30 @@ pnpm tauri dev
 
 ## Architecture
 
+See `.mpx/ARCHITECTURE.md` for the full architecture document with diagrams.
+
 ### Frontend (SvelteKit + Static Adapter)
 
-The frontend runs as a Single Page Application inside Tauri's webview. SvelteKit is configured with `@sveltejs/adapter-static` and `fallback: 'index.html'` for SPA mode. SSR is disabled (`ssr = false`) since there is no Node.js server in a Tauri app.
+The frontend runs as a Single Page Application inside Tauri's webview. SvelteKit is configured with `@sveltejs/adapter-static` and `fallback: 'index.html'` for SPA mode. SSR is disabled (`ssr = false`) since there is no Node.js server in a Tauri app. The Vite dev server runs on port **1420** (required by Tauri's `devUrl` config).
 
-The Vite dev server runs on port **1420** (required by Tauri's `devUrl` config).
+The frontend uses a **deep module architecture** — domain modules in `src/lib/modules/` that each own their types, IPC calls, state management, and event listeners behind a minimal `use*()` API. Modules use Svelte 5's `createContext()` for scoped state.
 
 ### Backend (Rust + Tauri)
 
 The Rust backend in `src-tauri/` handles:
 
-- **Tauri commands** -- functions callable from the frontend via `invoke()`
-- **SQLite database** -- local data storage via `rusqlite` (bundled, no system dependency)
-- **Native APIs** -- file system, system tray, window management via Tauri plugins
+- **Tauri commands** — functions callable from the frontend via `invoke()`
+- **SQLite database** — r2d2 connection pool (4 concurrent readers + 1 writer) with WAL mode
+- **Session management** — tokio-based session actors with stream-JSON protocol parsing
+- **Type generation** — ts-rs generates TypeScript types from Rust structs (27 IPC-crossing types)
+- **Native APIs** — notifications, sound, window management via Tauri plugins
 
 ### Communication
 
-Frontend calls Rust functions through Tauri's IPC bridge:
+Two IPC patterns:
 
-```svelte
-<script lang="ts">
-	import { invoke } from '@tauri-apps/api/core';
-
-	let result = $state('');
-
-	async function call_backend() {
-		result = await invoke('greet', { name: 'World' });
-	}
-</script>
-```
-
-```rust
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}!", name)
-}
-```
+- **Commands** (`invoke()`) — request/response for CRUD, spawning sessions, syncing state
+- **Events** (`listen()`) — push from Rust for session streaming, state changes, worktree progress
 
 ## Svelte Inspector
 
@@ -153,24 +142,42 @@ Place story files next to components: `src/lib/components/Button.stories.svelte`
 
 ```
 src/
-  app.css                    # Tailwind CSS entry point
-  app.d.ts                   # Global type definitions
+  app.css                    # Tailwind CSS entry point (OKLCH design tokens)
   app.html                   # HTML shell
   routes/
-    +layout.svelte           # Root layout (CSS import)
+    +layout.svelte           # Root layout — initializes all module contexts
     +layout.ts               # SPA config (ssr=false, prerender=true)
-    +page.svelte             # Home page
-  lib/                       # Shared frontend code ($lib alias)
+    issues/+page.svelte      # Issue dashboard (cards + forest view)
+    sessions/+page.svelte    # Session management
+    settings/+page.svelte    # Configuration
+  lib/
+    modules/                 # Deep domain modules ($lib/modules/*)
+      sessions/              # Session spawn, terminate, state, events
+      version-control/       # Git status, GitHub sync, PR state
+      issues/                # Issue CRUD, labels, worktrees
+      board/                 # Dashboards, palettes, theme, view mode
+      notifications/         # Notification routing + config
+      actions/               # Action templates + execution
+      visualization/         # Tree visualization + forest layout (pure)
+    types/generated/         # ts-rs output — DO NOT EDIT (27 types)
+    reactivity/              # Shared primitives (StateRaw, Persisted)
+    components/              # UI components (import from modules)
 src-tauri/
+  .cargo/config.toml         # ts-rs export directory config
   src/
-    lib.rs                   # Rust commands and app setup
+    lib.rs                   # Tauri app setup + command registration
     main.rs                  # Entry point
+    commands/                # Tauri IPC command handlers (11 files)
+    session/                 # Session actor, protocol parser, discovery
+    models/                  # Data models with ts-rs annotations
+    database/                # SQLite schema, migrations, connection pool
+    notification/            # Notification service (toast, sound, flash)
+    git/                     # Git types and helpers
   Cargo.toml                 # Rust dependencies
-  tauri.conf.json            # Tauri app config (window, permissions, bundle)
-  capabilities/              # Tauri security capabilities
-  icons/                     # App icons (PNG, ICO, ICNS)
+  tauri.conf.json            # Tauri app config
 static/                      # Static assets
 tests/e2e/                   # Playwright E2E tests
 .storybook/                  # Storybook configuration
 .github/workflows/           # CI pipeline
+.mpx/                        # Project documentation (architecture, roadmap, etc.)
 ```

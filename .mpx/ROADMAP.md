@@ -3,25 +3,26 @@
 > Master plan for transforming Grovekeeper from a Git+agent tool into a portfolio-grade AI agent orchestration platform.
 > Each phase is designed to be grilled into a PRD, then broken into vertical-slice issues.
 
-Last updated: 2026-04-24
+Last updated: 2026-04-27
 
 ---
 
-## Current State (v0.1 — 56 PRs shipped)
+## Current State (v0.1)
 
 ### Done
 
-| Requirement                                         | Status   | PRs                                  |
-| --------------------------------------------------- | -------- | ------------------------------------ |
-| R1: Issue Dashboard (cards, badges, palettes)       | Complete | #1-#18                               |
-| R2: Issue Creation (manual, quick add, GitHub)      | Complete | early PRs                            |
-| R3: Session Management (spawn, monitor, adopt)      | Complete | stream-JSON parser, provider trait   |
-| R6: Worktree Lifecycle (setup/remove scripts)       | Complete | state machine, progress UI           |
-| R7: Git & GitHub Integration (sync, fetch, merge)   | Complete | GraphQL bulk sync, fetch coordinator |
-| R8: Action Buttons / Skills                         | Complete | template variables, defaults         |
-| R9: Notification System (toasts, sounds, flash)     | Partial  | 5/10 events (#72)                    |
-| R10: Configuration & Data (SQLite, export/import)   | Partial  | export/import missing (#73)          |
-| R12: Forest View (11 tree stages, overlays, canvas) | Partial  | library integration #61-#65          |
+| Requirement                                         | Status                             |
+| --------------------------------------------------- | ---------------------------------- |
+| R1: Issue Dashboard (cards, badges, palettes)       | Complete                           |
+| R2: Issue Creation (manual, quick add, GitHub)      | Complete                           |
+| R3: Session Management (spawn, monitor, adopt)      | Complete                           |
+| R6: Worktree Lifecycle (setup/remove scripts)       | Complete                           |
+| R7: Git & GitHub Integration (sync, fetch, merge)   | Complete                           |
+| R8: Action Buttons / Skills                         | Complete                           |
+| R9: Notification System (toasts, sounds, flash)     | Partial (5/10 events)              |
+| R10: Configuration & Data (SQLite, export/import)   | Partial (export/import missing)    |
+| R12: Forest View (11 tree stages, overlays, canvas) | Partial (library integration done) |
+| Deep Module Architecture (ts-rs, r2d2, 7 modules)   | Complete                           |
 
 ### Partially Done
 
