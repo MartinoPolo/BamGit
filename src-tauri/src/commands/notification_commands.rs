@@ -2,8 +2,8 @@ use tauri::{AppHandle, Manager, State};
 
 use crate::database::connection::DatabaseState;
 use crate::models::notification::{
-    row_to_notification_config, NotificationConfig, UpdateNotificationConfigRequest,
-    NOTIFICATION_CONFIG_SELECT_COLUMNS,
+    row_to_notification_config, NotificationConfig, NotificationEventType,
+    UpdateNotificationConfigRequest, NOTIFICATION_CONFIG_SELECT_COLUMNS,
 };
 use crate::notification::service::NotificationService;
 
@@ -11,7 +11,7 @@ use crate::notification::service::NotificationService;
 pub fn get_notification_configs(
     state: State<DatabaseState>,
 ) -> Result<Vec<NotificationConfig>, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let query = format!(
         "SELECT {NOTIFICATION_CONFIG_SELECT_COLUMNS} FROM notification_config ORDER BY event_type"
@@ -34,14 +34,14 @@ pub fn update_notification_config(
     state: State<DatabaseState>,
     request: UpdateNotificationConfigRequest,
 ) -> Result<NotificationConfig, String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let select_query = format!(
         "SELECT {NOTIFICATION_CONFIG_SELECT_COLUMNS} FROM notification_config WHERE event_type = ?1"
     );
 
     let existing = connection
-        .query_row(&select_query, [&request.event_type], |row| {
+        .query_row(&select_query, rusqlite::params![request.event_type], |row| {
             row_to_notification_config(row)
         })
         .map_err(|error| format!("Notification config not found: {error}"))?;
@@ -71,7 +71,7 @@ pub fn update_notification_config(
         .map_err(|error| format!("Failed to update notification config: {error}"))?;
 
     connection
-        .query_row(&select_query, [&request.event_type], |row| {
+        .query_row(&select_query, rusqlite::params![request.event_type], |row| {
             row_to_notification_config(row)
         })
         .map_err(|error| format!("Failed to read updated config: {error}"))
@@ -80,15 +80,15 @@ pub fn update_notification_config(
 #[tauri::command]
 pub fn test_notification_sound(
     app_handle: AppHandle,
-    event_type: String,
+    event_type: NotificationEventType,
     state: State<DatabaseState>,
 ) -> Result<(), String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let sound_file: Option<String> = connection
         .query_row(
             "SELECT sound_file FROM notification_config WHERE event_type = ?1",
-            [&event_type],
+            rusqlite::params![event_type],
             |row| row.get(0),
         )
         .map_err(|error| format!("Config not found: {error}"))?;

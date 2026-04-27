@@ -1,16 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {
-	computeTreeVisualization,
-	computeForestLayout,
-	mapIssueToStateDimensions,
-	aggregateSessionState,
-	TREE_STAGES,
-	POTTED_PLANT_STAGES,
-	TOOL_TYPES,
-	MIN_SPACING_PX,
-} from './index';
+import { computeForestLayout, MIN_SPACING_PX } from './index';
 import type {
-	StateDimensions,
 	TreeVisualizationTree,
 	TreeVisualizationPottedPlant,
 	TreeVisualizationOak,
@@ -22,6 +12,15 @@ import type {
 	Viewport,
 	PositionedForestItem,
 } from './index';
+import {
+	computeTreeVisualization,
+	mapIssueToStateDimensions,
+	aggregateSessionState,
+	TREE_STAGES,
+	POTTED_PLANT_STAGES,
+	TOOL_TYPES,
+} from './testing';
+import type { StateDimensions } from './testing';
 import type { Issue } from '$lib/modules/issues/index.svelte.js';
 import type { GitStatusCache, SessionState, ExecutionPhase } from '$lib/types/generated';
 

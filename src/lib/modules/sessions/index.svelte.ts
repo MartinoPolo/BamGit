@@ -46,37 +46,51 @@ type NotificationsApi = {
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
-type SessionsContext = ReturnType<typeof createSessionsContext>;
+type SessionsContext = ReturnType<typeof createSessionsContext>['publicApi'];
 
 const [useSessions, setSessionsInternal] = createContext<SessionsContext>();
 export { useSessions };
 
 export function setSessionsContext(notifications: NotificationsApi) {
-	const ctx = createSessionsContext(notifications);
-	setSessionsInternal(ctx);
+	const { publicApi, handleSessionEvent, handleDiscoveredSessionsUpdate } =
+		createSessionsContext(notifications);
+	setSessionsInternal(publicApi);
 
 	// Set up event listeners (runs in layout component lifecycle)
+	let cancelled = false;
 	let unlistenSessionEvent: UnlistenFn | null = null;
 	let unlistenDiscovered: UnlistenFn | null = null;
 
 	onMount(async () => {
-		unlistenSessionEvent = await listen<SessionEventPayload>('session-event', (event) => {
-			ctx.handleSessionEvent(event.payload);
+		const unlistenSession = await listen<SessionEventPayload>('session-event', (event) => {
+			handleSessionEvent(event.payload);
 		});
-		unlistenDiscovered = await listen<DiscoveredSessionsPayload>(
+		if (cancelled) {
+			unlistenSession();
+			return;
+		}
+		unlistenSessionEvent = unlistenSession;
+
+		const unlistenDisc = await listen<DiscoveredSessionsPayload>(
 			'discovered-sessions-updated',
 			(event) => {
-				ctx.handleDiscoveredSessionsUpdate(event.payload);
+				handleDiscoveredSessionsUpdate(event.payload);
 			},
 		);
+		if (cancelled) {
+			unlistenDisc();
+			return;
+		}
+		unlistenDiscovered = unlistenDisc;
 	});
 
 	onDestroy(() => {
+		cancelled = true;
 		unlistenSessionEvent?.();
 		unlistenDiscovered?.();
 	});
 
-	return ctx;
+	return publicApi;
 }
 
 // ─── Factory ────────────────────────────────────────────────────────────────
@@ -149,9 +163,25 @@ function createSessionsContext(notifications: NotificationsApi) {
 		discoveredSessions = payload.sessions;
 	}
 
+	async function fetchAndSetSessions(showLoading: boolean) {
+		try {
+			if (showLoading) {
+				loading = true;
+			}
+			sessions = await invoke<Session[]>('get_sessions');
+			error = null;
+		} catch (err) {
+			error = String(err);
+		} finally {
+			if (showLoading) {
+				loading = false;
+			}
+		}
+	}
+
 	// ─── Public interface ───────────────────────────────────────────────────
 
-	return {
+	const publicApi = {
 		get sessions() {
 			return sessions;
 		},
@@ -174,29 +204,12 @@ function createSessionsContext(notifications: NotificationsApi) {
 			return sessionsByIssueId;
 		},
 
-		// Internal event handlers — used by setSessionsContext event listeners
-		handleSessionEvent,
-		handleDiscoveredSessionsUpdate,
-
 		async loadSessions() {
-			try {
-				loading = true;
-				sessions = await invoke<Session[]>('get_sessions');
-				error = null;
-			} catch (err) {
-				error = String(err);
-			} finally {
-				loading = false;
-			}
+			await fetchAndSetSessions(true);
 		},
 
 		async refresh() {
-			try {
-				sessions = await invoke<Session[]>('get_sessions');
-				error = null;
-			} catch (err) {
-				error = String(err);
-			}
+			await fetchAndSetSessions(false);
 		},
 
 		addSession(session: Session) {
@@ -207,8 +220,16 @@ function createSessionsContext(notifications: NotificationsApi) {
 			discoveredSessions = discoveredSessions.filter((s) => s.id !== discoveredSessionId);
 		},
 
-		async spawnSession(request: SpawnSessionRequest): Promise<string> {
-			return invoke('spawn_session', { request });
+		async spawnSession(request: SpawnSessionRequest): Promise<Session> {
+			const sessionId = await invoke<string>('spawn_session', { request });
+			const allSessions = await invoke<Session[]>('get_sessions');
+			sessions = allSessions;
+			error = null;
+			const session = allSessions.find((s) => s.id === sessionId);
+			if (session === undefined) {
+				throw new Error(`Session ${sessionId} not found after spawn`);
+			}
+			return session;
 		},
 
 		async terminateSession(sessionId: string): Promise<void> {
@@ -227,4 +248,6 @@ function createSessionsContext(notifications: NotificationsApi) {
 			return invoke('adopt_session', { request });
 		},
 	};
+
+	return { publicApi, handleSessionEvent, handleDiscoveredSessionsUpdate };
 }
