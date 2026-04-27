@@ -30,6 +30,7 @@ coverage/
 *.egg
 *.whl
 target/
+src-tauri/bindings/
 bin/
 obj/
 .turbo/

@@ -1,4 +1,5 @@
 import { createContext } from 'svelte';
+import { SvelteMap } from 'svelte/reactivity';
 import { invoke } from '@tauri-apps/api/core';
 import type {
 	AssignedIssue,
@@ -6,7 +7,11 @@ import type {
 	GitStatusCache,
 	SyncAllResult,
 } from '$lib/types/generated';
-import { SvelteMap } from 'svelte/reactivity';
+
+type SyncResult =
+	| { status: 'success'; result: SyncAllResult }
+	| { status: 'already-syncing' }
+	| { status: 'error'; message: string };
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -23,7 +28,7 @@ export function setVersionControlContext() {
 
 // ─── Factory ────────────────────────────────────────────────────────────────
 
-function buildStateMap(caches: readonly GitStatusCache[]): Map<string, GitStatusCache> {
+function buildStateMap(caches: readonly GitStatusCache[]): SvelteMap<string, GitStatusCache> {
 	const map = new SvelteMap<string, GitStatusCache>();
 	for (const cache of caches) {
 		map.set(cache.issue_id, cache);
@@ -32,7 +37,7 @@ function buildStateMap(caches: readonly GitStatusCache[]): Map<string, GitStatus
 }
 
 function createVersionControlContext() {
-	let stateMap = $state<Map<string, GitStatusCache>>(new Map());
+	let stateMap = $state(new SvelteMap<string, GitStatusCache>());
 	let ghAvailability = $state<GhCliAvailability>('not-installed');
 	let syncing = $state(false);
 	let syncError = $state<string | null>(null);
@@ -88,13 +93,9 @@ function createVersionControlContext() {
 			}
 		},
 
-		async syncAll(
-			dashboardId: string,
-			owner: string,
-			repo: string,
-		): Promise<SyncAllResult | null> {
+		async syncAll(dashboardId: string, owner: string, repo: string): Promise<SyncResult> {
 			if (syncing) {
-				return null;
+				return { status: 'already-syncing' };
 			}
 			try {
 				syncing = true;
@@ -115,10 +116,10 @@ function createVersionControlContext() {
 				if (result.errors.length > 0) {
 					syncError = result.errors.join('; ');
 				}
-				return result;
+				return { status: 'success', result };
 			} catch (err) {
 				syncError = String(err);
-				return null;
+				return { status: 'error', message: String(err) };
 			} finally {
 				syncing = false;
 			}
@@ -127,15 +128,16 @@ function createVersionControlContext() {
 		async refreshGitStatus(issueId: string) {
 			try {
 				const status = await invoke<GitStatusCache>('refresh_git_status', { issueId });
-				const newMap = new SvelteMap(stateMap);
-				newMap.set(issueId, status);
-				stateMap = newMap;
+				stateMap.set(issueId, status);
 				error = null;
 			} catch (err) {
 				error = String(err);
 			}
 		},
 
+		// TODO: N+1 IPC pattern — fires one refresh_git_status call per issue.
+		// Ideally replaced by a single batch Rust command (e.g. refresh_all_git_statuses).
+		// Promise.all parallelizes the calls, which is the best client-side mitigation for now.
 		async refreshAllForDashboard(dashboardId: string) {
 			try {
 				loading = true;
@@ -173,12 +175,13 @@ function createVersionControlContext() {
 					repo,
 				});
 			} catch (err) {
+				error = String(err);
 				console.error('Failed to load assigned issues:', err);
 			}
 		},
 
 		clear() {
-			stateMap = new Map();
+			stateMap.clear();
 			error = null;
 		},
 	};

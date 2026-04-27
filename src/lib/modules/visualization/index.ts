@@ -11,13 +11,9 @@ import type { Issue } from '$lib/modules/issues/index.svelte.js';
 import type { GitStatusCache, ExecutionPhase, SessionState } from '$lib/types/generated';
 import type { WorktreeState } from '$lib/modules/issues/index.svelte.js';
 
-// ─── Re-exported Library Types (erased at runtime) ──────────────────────
-
-/** @public */
-export type { TreeStage, PottedPlantStage };
-
 // ─── Library Constants (local mirrors — avoids barrel Svelte import in Node) ─
 
+/** @internal Exported for testing only — use `computeVisualization` for production code. */
 export const TREE_STAGES = {
 	seed: 'seed',
 	sprouting: 'sprouting',
@@ -49,6 +45,7 @@ const TREE_SHAPES = {
 	custom: 'custom',
 } as const satisfies Record<string, TreeShape>;
 
+/** @internal Exported for testing only — use `computeVisualization` for production code. */
 export const POTTED_PLANT_STAGES = {
 	potWithSoil: 'pot-with-soil',
 	sprout: 'sprout',
@@ -57,6 +54,7 @@ export const POTTED_PLANT_STAGES = {
 	dried: 'dried',
 } as const satisfies Record<string, PottedPlantStage>;
 
+/** @internal Exported for testing only — use `computeVisualization` for production code. */
 export const TOOL_TYPES = {
 	shovel: 'shovel',
 	wateringCan: 'wateringCan',
@@ -186,13 +184,13 @@ const DEFAULT_TREE_CONFIG: TreeConfig = {
 
 type ForestWorktreeState = WorktreeState;
 
-/** @public */
+/** @internal Exported for testing only. */
 export type AggregateSessionState = SessionState | 'no-session';
 
-/** @public */
+/** @internal Exported for testing only. */
 export type ForestBranchStatus = 'no-branch' | 'active' | 'local-only' | 'remote-gone' | 'deleted';
 
-/** @public */
+/** @internal Exported for testing only. */
 export type ForestPullRequestState =
 	| 'no-pr'
 	| 'draft'
@@ -204,7 +202,7 @@ export type ForestPullRequestState =
 	| 'merged'
 	| 'closed';
 
-/** @public */
+/** @internal Exported for testing only. */
 export type ForestSyncStatus =
 	| { readonly type: 'up-to-date' }
 	| { readonly type: 'behind-base'; readonly count: number }
@@ -213,6 +211,7 @@ export type ForestSyncStatus =
 type ForestGitHubIssueState = 'open' | 'closed';
 type ForestGrovekeeperStatus = 'active' | 'archived';
 
+/** @internal Exported for testing only. */
 export interface StateDimensions {
 	readonly labels: readonly string[];
 	readonly worktreeState: ForestWorktreeState;
@@ -286,6 +285,7 @@ const SESSION_PRIORITY: readonly SessionState[] = [
 	'finished',
 ];
 
+/** @internal Exported for testing only — use `computeVisualization` for production code. */
 export function aggregateSessionState(sessions: readonly SessionState[]): AggregateSessionState {
 	if (sessions.length === 0) {
 		return 'no-session';
@@ -372,6 +372,7 @@ function pickExecutionPhase(sessions: readonly SessionForMapping[]): ExecutionPh
 	return running?.execution_phase ?? 'none';
 }
 
+/** @internal Exported for testing only — use `computeVisualization` for production code. */
 export function mapIssueToStateDimensions(
 	issue: Issue,
 	gitStatus: GitStatusCache | undefined,
@@ -521,6 +522,7 @@ function issueIdToSeed(issueId: string): number {
 	return Math.abs(hash);
 }
 
+/** @internal Exported for testing only — use `computeVisualization` for production code. */
 export function computeTreeVisualization(
 	dimensions: StateDimensions,
 	context?: TreeComputeContext,
@@ -590,11 +592,12 @@ export function computeVisualization(
 	issue: Issue,
 	gitStatus: GitStatusCache | undefined,
 	sessions: readonly SessionForMapping[],
+	context?: TreeComputeContext,
 	labelMappings?: readonly LabelShapeMappingEntry[],
 	defaultShape?: TreeShape,
 ): TreeVisualization {
 	const dimensions = mapIssueToStateDimensions(issue, gitStatus, sessions);
-	return computeTreeVisualization(dimensions, undefined, labelMappings, defaultShape);
+	return computeTreeVisualization(dimensions, context, labelMappings, defaultShape);
 }
 
 // ════════════════════════════════════════════════════════════════════════

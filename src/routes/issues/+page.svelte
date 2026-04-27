@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board/index.svelte.js';
 	import { useIssues } from '$lib/modules/issues/index.svelte.js';
 	import { useVersionControl } from '$lib/modules/version-control/index.svelte.js';
@@ -32,11 +33,13 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 
+	// fallow-ignore-next-line complexity
 	function getNotificationDotColor(issueId: string): string | null {
-		for (const session of sessionStore.sessions) {
-			if (session.issue_id !== issueId) {
-				continue;
-			}
+		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
+		if (issueSessions === undefined) {
+			return null;
+		}
+		for (const session of issueSessions) {
 			const pendingType = notificationStore.getPendingType(session.id);
 			if (pendingType !== undefined) {
 				const color = NOTIFICATION_DOT_COLORS[pendingType];
@@ -65,6 +68,7 @@
 	let pruneRemoving = $state(false);
 
 	// Active palette colors for the current dashboard
+	// fallow-ignore-next-line complexity
 	const activePaletteColors = $derived.by(() => {
 		const paletteId = boardStore.activeDashboard?.color_palette_id ?? null;
 		const palette = boardStore.getPaletteForDashboard(paletteId);
@@ -85,7 +89,7 @@
 	});
 
 	// Check gh availability on mount
-	$effect(() => {
+	onMount(() => {
 		versionControlStore.checkAvailability();
 	});
 
@@ -125,49 +129,39 @@
 		}
 	}
 
-	async function handleCreateIssue(request: CreateIssueRequest) {
+	async function handleAction(
+		label: string,
+		action: () => Promise<unknown>,
+		refreshAfter = true,
+	) {
 		try {
-			await issueStore.addIssue(request);
-			await issueStore.refresh();
+			await action();
+			if (refreshAfter) {
+				await issueStore.refresh();
+			}
 		} catch (err) {
-			console.error('Failed to create issue:', err);
+			console.error(`Failed to ${label}:`, err);
 		}
+	}
+
+	async function handleCreateIssue(request: CreateIssueRequest) {
+		await handleAction('create issue', () => issueStore.addIssue(request));
 	}
 
 	async function handleArchiveIssue(id: string) {
-		try {
-			await issueStore.archiveIssue(id);
-			await issueStore.refresh();
-		} catch (err) {
-			console.error('Failed to archive issue:', err);
-		}
+		await handleAction('archive issue', () => issueStore.archiveIssue(id));
 	}
 
 	async function handleUnarchiveIssue(id: string) {
-		try {
-			await issueStore.unarchiveIssue(id);
-			await issueStore.refresh();
-		} catch (err) {
-			console.error('Failed to unarchive issue:', err);
-		}
+		await handleAction('unarchive issue', () => issueStore.unarchiveIssue(id));
 	}
 
 	async function handleUpdateIssue(request: UpdateIssueRequest) {
-		try {
-			await issueStore.updateIssue(request);
-			await issueStore.refresh();
-		} catch (err) {
-			console.error('Failed to update issue:', err);
-		}
+		await handleAction('update issue', () => issueStore.updateIssue(request));
 	}
 
 	async function handleDeleteIssue(id: string) {
-		try {
-			await issueStore.removeIssue(id);
-			await issueStore.refresh();
-		} catch (err) {
-			console.error('Failed to delete issue:', err);
-		}
+		await handleAction('delete issue', () => issueStore.removeIssue(id));
 	}
 
 	async function handleSetupWorktree(issue: Issue) {
@@ -180,17 +174,18 @@
 			console.error('Issue has no branch_name set');
 			return;
 		}
-		try {
-			await issueStore.setupWorktree({
-				issue_id: issue.id,
-				branch_name: issue.branch_name,
-				color: issue.color,
-				working_directory: dashboard.local_folder,
-				base_branch: issue.base_branch ?? dashboard.default_base_branch,
-			});
-		} catch (err) {
-			console.error('Failed to setup worktree:', err);
-		}
+		await handleAction(
+			'setup worktree',
+			() =>
+				issueStore.setupWorktree({
+					issue_id: issue.id,
+					branch_name: issue.branch_name!,
+					color: issue.color,
+					working_directory: dashboard.local_folder!,
+					base_branch: issue.base_branch ?? dashboard.default_base_branch,
+				}),
+			false,
+		);
 	}
 
 	async function handleRemoveWorktree(issue: Issue) {
@@ -203,15 +198,16 @@
 			console.error('Issue has no branch_name to remove');
 			return;
 		}
-		try {
-			await issueStore.removeWorktree({
-				issue_id: issue.id,
-				branch_name: issue.branch_name,
-				working_directory: dashboard.local_folder,
-			});
-		} catch (err) {
-			console.error('Failed to remove worktree:', err);
-		}
+		await handleAction(
+			'remove worktree',
+			() =>
+				issueStore.removeWorktree({
+					issue_id: issue.id,
+					branch_name: issue.branch_name!,
+					working_directory: dashboard.local_folder!,
+				}),
+			false,
+		);
 	}
 
 	async function handleOpenPruneDialog() {
@@ -227,6 +223,7 @@
 		}
 	}
 
+	// fallow-ignore-next-line complexity
 	async function handlePrune(issueIds: string[]) {
 		const dashboard = boardStore.activeDashboard;
 		if (dashboard?.local_folder == null) {
@@ -253,11 +250,11 @@
 	}
 
 	async function handleExecuteAction(actionId: string, issueId: string) {
-		try {
-			await actionStore.executeAction(actionId, issueId);
-		} catch (err) {
-			console.error('Failed to execute action:', err);
-		}
+		await handleAction(
+			'execute action',
+			() => actionStore.executeAction(actionId, issueId),
+			false,
+		);
 	}
 </script>
 

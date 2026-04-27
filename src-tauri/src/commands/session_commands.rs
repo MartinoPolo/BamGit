@@ -63,7 +63,7 @@ pub async fn spawn_session(
 
     // Also create the session row in the main DB connection (for immediate visibility)
     {
-        let conn = state.write();
+        let conn = state.write()?;
         conn.execute(
             "INSERT INTO sessions (id, issue_id, provider, state, original_intent, source, working_directory) \
              VALUES (?1, ?2, 'claude-code', 'running', ?3, 'spawned', ?4)",
@@ -77,7 +77,7 @@ pub async fn spawn_session(
         .await
     {
         {
-            let conn = state.write();
+            let conn = state.write()?;
             let _ = conn.execute(
                 "UPDATE sessions SET state = 'errored', ended_at = datetime('now') WHERE id = ?1",
                 [&session_id],
@@ -125,7 +125,7 @@ pub async fn terminate_session(
 
 #[tauri::command]
 pub fn get_sessions(state: State<DatabaseState>) -> Result<Vec<Session>, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let query = format!(
         "SELECT {SESSION_SELECT_COLUMNS} FROM sessions ORDER BY started_at DESC LIMIT 500"
@@ -146,7 +146,7 @@ pub fn get_sessions(state: State<DatabaseState>) -> Result<Vec<Session>, String>
 
 #[tauri::command]
 pub fn get_session(state: State<DatabaseState>, id: String) -> Result<Session, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     let query = format!("SELECT {SESSION_SELECT_COLUMNS} FROM sessions WHERE id = ?1");
     connection
@@ -178,7 +178,7 @@ pub async fn discover_external_sessions(
 
 /// Query PIDs of sessions currently managed by Grovekeeper (running/needs-input/needs-review).
 fn get_managed_pids(state: &State<DatabaseState>) -> Result<Vec<u32>, String> {
-    let connection = state.read();
+    let connection = state.read()?;
     let mut statement = connection
         .prepare(crate::session::discovery::MANAGED_PIDS_QUERY)
         .map_err(|e| format!("Failed to query managed PIDs: {e}"))?;
@@ -219,7 +219,7 @@ pub async fn adopt_session(
 
     // Create the adopted session row
     {
-        let conn = state.write();
+        let conn = state.write()?;
         conn.execute(
             "INSERT INTO sessions (id, issue_id, provider, state, session_file_path, \
              original_intent, cost_usd, token_count, source, working_directory) \

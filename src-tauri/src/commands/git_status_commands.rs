@@ -37,7 +37,7 @@ pub fn refresh_git_status(
     fetch_coordinator: State<FetchCoordinator>,
     issue_id: String,
 ) -> Result<GitStatusCache, String> {
-    let connection = database_state.write();
+    let connection = database_state.write()?;
 
     // Load issue + dashboard to get branch_name, base_branch, local_folder
     let (branch_name, base_branch, local_folder, default_base_branch): (
@@ -113,7 +113,7 @@ pub fn get_cached_git_status(
     database_state: State<DatabaseState>,
     issue_id: String,
 ) -> Result<Option<GitStatusCache>, String> {
-    let connection = database_state.read();
+    let connection = database_state.read()?;
 
     let query = format!(
         "SELECT {GIT_STATUS_SELECT_COLUMNS} FROM git_status_cache WHERE issue_id = ?1"
@@ -131,7 +131,7 @@ pub fn get_all_git_statuses_for_dashboard(
     database_state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<Vec<GitStatusCache>, String> {
-    let connection = database_state.read();
+    let connection = database_state.read()?;
 
     let query = format!(
         "SELECT {GIT_STATUS_SELECT_COLUMNS_ALIASED} FROM git_status_cache g \

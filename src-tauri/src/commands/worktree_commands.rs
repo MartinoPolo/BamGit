@@ -247,7 +247,7 @@ pub async fn setup_worktree(
 
     // Validate state transition: only setup from 'none' or 'failed'
     let old_state = {
-        let connection = state.write();
+        let connection = state.write()?;
         let current_state = get_worktree_state(&connection, &request.issue_id)?;
         if current_state != "none" && current_state != "failed" {
             return Err(format!(
@@ -286,8 +286,9 @@ pub async fn setup_worktree(
         .spawn()
         .map_err(|error| {
             // Revert to old state on spawn failure
-            let conn = state.write();
-            let _ = update_worktree_state(&conn, &request.issue_id, &old_state);
+            if let Ok(conn) = state.write() {
+                let _ = update_worktree_state(&conn, &request.issue_id, &old_state);
+            }
             format!("Failed to spawn setup-worktree.sh: {error}")
         })?;
 
@@ -324,7 +325,7 @@ pub async fn setup_worktree(
             .join(&request.branch_name);
         let worktree_folder_str = worktree_folder.to_string_lossy().to_string();
 
-        let connection = state.write();
+        let connection = state.write()?;
         update_worktree_fields(
             &connection,
             &request.issue_id,
@@ -345,7 +346,7 @@ pub async fn setup_worktree(
         Ok(worktree_folder_str)
     } else {
         let exit_code = exit_status.code().unwrap_or(-1);
-        let connection = state.write();
+        let connection = state.write()?;
         update_worktree_state(&connection, &request.issue_id, "failed")?;
 
         emit_state_change(&app_handle, &request.issue_id, "pending", "failed", None);
@@ -375,7 +376,7 @@ pub async fn remove_worktree(
 
     // Validate state: only remove from 'active' or 'failed'
     let old_state = {
-        let connection = state.write();
+        let connection = state.write()?;
         let current_state = get_worktree_state(&connection, &request.issue_id)?;
         if current_state != "active" && current_state != "failed" {
             return Err(format!(
@@ -407,8 +408,9 @@ pub async fn remove_worktree(
         .stderr(std::process::Stdio::piped())
         .spawn()
         .map_err(|error| {
-            let conn = state.write();
-            let _ = update_worktree_state(&conn, &request.issue_id, &old_state);
+            if let Ok(conn) = state.write() {
+                let _ = update_worktree_state(&conn, &request.issue_id, &old_state);
+            }
             format!("Failed to spawn remove-worktree.sh: {error}")
         })?;
 
@@ -434,7 +436,7 @@ pub async fn remove_worktree(
     }
 
     if exit_status.success() {
-        let connection = state.write();
+        let connection = state.write()?;
         update_worktree_fields(
             &connection,
             &request.issue_id,
@@ -448,7 +450,7 @@ pub async fn remove_worktree(
         Ok(())
     } else {
         let exit_code = exit_status.code().unwrap_or(-1);
-        let connection = state.write();
+        let connection = state.write()?;
         update_worktree_state(&connection, &request.issue_id, "failed")?;
 
         emit_state_change(&app_handle, &request.issue_id, "pending", "failed", None);
@@ -464,7 +466,7 @@ pub fn refresh_worktree_state(
     app_handle: AppHandle,
     issue_id: String,
 ) -> Result<String, String> {
-    let connection = state.write();
+    let connection = state.write()?;
 
     let (current_state, worktree_folder): (String, Option<String>) = connection
         .query_row(
@@ -515,7 +517,7 @@ pub fn get_prunable_issues(
     state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<Vec<PrunableIssue>, String> {
-    let connection = state.read();
+    let connection = state.read()?;
 
     // Find issues with active worktrees that are fully closed:
     // PR merged + GitHub issue closed + branch gone/deleted

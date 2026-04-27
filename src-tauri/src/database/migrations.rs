@@ -243,10 +243,21 @@ fn migrate_v6(connection: &Connection) -> Result<(), rusqlite::Error> {
         )
     })();
 
-    // Always re-enable foreign keys, even if the migration failed
-    connection.execute_batch("PRAGMA foreign_keys = ON;")?;
+    // Always re-enable foreign keys, even if the migration failed.
+    // Preserve the original migration error if the PRAGMA also fails.
+    let foreign_key_result = connection.execute_batch("PRAGMA foreign_keys = ON;");
 
-    result
+    match (result, foreign_key_result) {
+        (Err(migration_error), Err(foreign_key_error)) => Err(rusqlite::Error::SqliteFailure(
+            rusqlite::ffi::Error::new(rusqlite::ffi::SQLITE_ERROR),
+            Some(format!(
+                "Migration failed: {migration_error}; additionally PRAGMA foreign_keys = ON failed: {foreign_key_error}"
+            )),
+        )),
+        (Err(migration_error), _) => Err(migration_error),
+        (_, Err(foreign_key_error)) => Err(foreign_key_error),
+        (Ok(()), Ok(())) => Ok(()),
+    }
 }
 
 fn migrate_v7(connection: &Connection) -> Result<(), rusqlite::Error> {
@@ -376,10 +387,21 @@ fn migrate_v9(connection: &Connection) -> Result<(), rusqlite::Error> {
         )
     })();
 
-    // Always re-enable foreign keys, even if the migration failed
-    connection.execute_batch("PRAGMA foreign_keys = ON;")?;
+    // Always re-enable foreign keys, even if the migration failed.
+    // Preserve the original migration error if the PRAGMA also fails.
+    let foreign_key_result = connection.execute_batch("PRAGMA foreign_keys = ON;");
 
-    result
+    match (result, foreign_key_result) {
+        (Err(migration_error), Err(foreign_key_error)) => Err(rusqlite::Error::SqliteFailure(
+            rusqlite::ffi::Error::new(rusqlite::ffi::SQLITE_ERROR),
+            Some(format!(
+                "Migration failed: {migration_error}; additionally PRAGMA foreign_keys = ON failed: {foreign_key_error}"
+            )),
+        )),
+        (Err(migration_error), _) => Err(migration_error),
+        (_, Err(foreign_key_error)) => Err(foreign_key_error),
+        (Ok(()), Ok(())) => Ok(()),
+    }
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {

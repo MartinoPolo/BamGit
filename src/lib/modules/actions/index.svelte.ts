@@ -47,6 +47,28 @@ function createActionsContext() {
 
 	const visibleActions = $derived(actions.filter((action) => action.visible));
 
+	// fallow-ignore-next-line complexity
+	async function fetchAndSetActions(showLoading: boolean) {
+		if (currentDashboardId === null) {
+			return;
+		}
+		try {
+			if (showLoading) {
+				loading = true;
+			}
+			actions = await invoke<Action[]>('get_actions_for_dashboard', {
+				dashboardId: currentDashboardId,
+			});
+			error = null;
+		} catch (err) {
+			error = String(err);
+		} finally {
+			if (showLoading) {
+				loading = false;
+			}
+		}
+	}
+
 	return {
 		get actions() {
 			return actions;
@@ -62,29 +84,12 @@ function createActionsContext() {
 		},
 
 		async loadActions(dashboardId: string) {
-			try {
-				loading = true;
-				currentDashboardId = dashboardId;
-				actions = await invoke<Action[]>('get_actions_for_dashboard', { dashboardId });
-				error = null;
-			} catch (err) {
-				error = String(err);
-			} finally {
-				loading = false;
-			}
+			currentDashboardId = dashboardId;
+			await fetchAndSetActions(true);
 		},
 
 		async refresh() {
-			if (currentDashboardId != null) {
-				try {
-					actions = await invoke<Action[]>('get_actions_for_dashboard', {
-						dashboardId: currentDashboardId,
-					});
-					error = null;
-				} catch (err) {
-					error = String(err);
-				}
-			}
+			await fetchAndSetActions(false);
 		},
 
 		// Action commands (inlined)

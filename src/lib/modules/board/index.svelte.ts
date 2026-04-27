@@ -177,6 +177,7 @@ function createBoardContext() {
 			showCreateDialog = value;
 		},
 
+		// fallow-ignore-next-line complexity
 		async loadDashboards() {
 			try {
 				loading = true;
@@ -207,6 +208,7 @@ function createBoardContext() {
 			sidebarCollapsed = !sidebarCollapsed;
 		},
 
+		// fallow-ignore-next-line complexity
 		async refreshDashboards() {
 			try {
 				dashboards = await invoke<Dashboard[]>('get_dashboards');
@@ -262,6 +264,7 @@ function createBoardContext() {
 			return palettesError;
 		},
 
+		// fallow-ignore-next-line complexity
 		getPaletteForDashboard(colorPaletteId: string | null): ColorPalette | null {
 			if (colorPaletteId === null) {
 				return palettes.find((p) => p.id === DEFAULT_PALETTE_ID) ?? palettes[0] ?? null;

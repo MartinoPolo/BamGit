@@ -2,18 +2,18 @@ use rusqlite::{Connection, Row};
 use tauri::State;
 
 use crate::database::connection::DatabaseState;
+use crate::models::git_status::GitStatusCache;
 use crate::models::github::{
     resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, GhCliAvailability,
-    GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, GitHubStatusCache,
-    SyncAllResult,
+    GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, SyncAllResult,
 };
 
 const CACHE_SELECT_COLUMNS: &str =
     "issue_id, branch_status, pr_state, pr_number, pr_url, github_issue_state, \
      behind_base_count, merge_conflict, fetched_at";
 
-fn row_to_github_status_cache(row: &Row) -> Result<GitHubStatusCache, rusqlite::Error> {
-    Ok(GitHubStatusCache {
+fn row_to_github_status_cache(row: &Row) -> Result<GitStatusCache, rusqlite::Error> {
+    Ok(GitStatusCache {
         issue_id: row.get(0)?,
         branch_status: row.get(1)?,
         pr_state: row.get(2)?,
@@ -26,7 +26,7 @@ fn row_to_github_status_cache(row: &Row) -> Result<GitHubStatusCache, rusqlite::
     })
 }
 
-fn upsert_cache(connection: &Connection, cache: &GitHubStatusCache) -> Result<(), String> {
+fn upsert_cache(connection: &Connection, cache: &GitStatusCache) -> Result<(), String> {
     connection
         .execute(
             "INSERT INTO git_status_cache (issue_id, branch_status, pr_state, pr_number, pr_url, \
@@ -59,7 +59,7 @@ fn upsert_cache(connection: &Connection, cache: &GitHubStatusCache) -> Result<()
 fn read_cache(
     connection: &Connection,
     issue_id: &str,
-) -> Result<Option<GitHubStatusCache>, String> {
+) -> Result<Option<GitStatusCache>, String> {
     let query = format!("SELECT {CACHE_SELECT_COLUMNS} FROM git_status_cache WHERE issue_id = ?1");
     match connection.query_row(&query, [issue_id], |row| row_to_github_status_cache(row)) {
         Ok(cache) => Ok(Some(cache)),
@@ -71,7 +71,7 @@ fn read_cache(
 fn read_all_caches_for_dashboard(
     connection: &Connection,
     dashboard_id: &str,
-) -> Result<Vec<GitHubStatusCache>, String> {
+) -> Result<Vec<GitStatusCache>, String> {
     let query = format!(
         "SELECT {CACHE_SELECT_COLUMNS} FROM git_status_cache \
          WHERE issue_id IN (SELECT id FROM issues WHERE dashboard_id = ?1)"
@@ -167,8 +167,8 @@ fn build_bulk_sync_graphql_query(
 pub fn get_github_status_cache(
     state: State<DatabaseState>,
     issue_id: String,
-) -> Result<Option<GitHubStatusCache>, String> {
-    let connection = state.read();
+) -> Result<Option<GitStatusCache>, String> {
+    let connection = state.read()?;
     read_cache(&connection, &issue_id)
 }
 
@@ -176,8 +176,8 @@ pub fn get_github_status_cache(
 pub fn get_all_github_status_caches(
     state: State<DatabaseState>,
     dashboard_id: String,
-) -> Result<Vec<GitHubStatusCache>, String> {
-    let connection = state.read();
+) -> Result<Vec<GitStatusCache>, String> {
+    let connection = state.read()?;
     read_all_caches_for_dashboard(&connection, &dashboard_id)
 }
 
@@ -202,7 +202,7 @@ pub async fn fetch_issue_state(
     owner: String,
     repo: String,
     issue_number: i64,
-) -> Result<GitHubStatusCache, String> {
+) -> Result<GitStatusCache, String> {
     let stdout = run_gh_command(&[
         "issue",
         "view",
@@ -219,7 +219,7 @@ pub async fn fetch_issue_state(
 
     let resolved_state = resolve_github_issue_state(&gh_issue.state);
 
-    let cache = GitHubStatusCache {
+    let cache = GitStatusCache {
         issue_id: issue_id.clone(),
         branch_status: None,
         pr_state: None,
@@ -233,12 +233,12 @@ pub async fn fetch_issue_state(
 
     // Acquire write lock only for DB write (not held across .await)
     {
-        let connection = state.write();
+        let connection = state.write()?;
         upsert_cache(&connection, &cache)?;
     }
 
     // Re-read to get fetched_at from DB
-    let connection = state.read();
+    let connection = state.read()?;
     read_cache(&connection, &issue_id)?
         .ok_or_else(|| "Cache entry not found after upsert".to_string())
 }
@@ -250,7 +250,7 @@ pub async fn fetch_pr_for_branch(
     owner: String,
     repo: String,
     branch_name: String,
-) -> Result<GitHubStatusCache, String> {
+) -> Result<GitStatusCache, String> {
     let stdout = run_gh_command(&[
         "pr",
         "list",
@@ -278,7 +278,7 @@ pub async fn fetch_pr_for_branch(
         (None, None, None)
     };
 
-    let cache = GitHubStatusCache {
+    let cache = GitStatusCache {
         issue_id: issue_id.clone(),
         branch_status: None,
         pr_state,
@@ -291,11 +291,11 @@ pub async fn fetch_pr_for_branch(
     };
 
     {
-        let connection = state.write();
+        let connection = state.write()?;
         upsert_cache(&connection, &cache)?;
     }
 
-    let connection = state.read();
+    let connection = state.read()?;
     read_cache(&connection, &issue_id)?
         .ok_or_else(|| "Cache entry not found after upsert".to_string())
 }
@@ -332,7 +332,7 @@ pub async fn sync_all_github_state(
 ) -> Result<SyncAllResult, String> {
     // Read issues from DB (connection released before async work)
     let issues_data: Vec<(String, Option<i64>, Option<String>)> = {
-        let connection = state.read();
+        let connection = state.read()?;
         let mut statement = connection
             .prepare(
                 "SELECT id, github_issue_number, branch_name FROM issues \
@@ -465,7 +465,7 @@ pub async fn sync_all_github_state(
 
         labels_to_write.push((issue_id.clone(), labels_json));
 
-        caches_to_write.push(GitHubStatusCache {
+        caches_to_write.push(GitStatusCache {
             issue_id: issue_id.clone(),
             branch_status: None,
             pr_state,
@@ -482,7 +482,7 @@ pub async fn sync_all_github_state(
     let mut synced_count = 0;
     let mut errors = Vec::new();
     {
-        let connection = state.write();
+        let connection = state.write()?;
         for cache in &caches_to_write {
             match upsert_cache(&connection, cache) {
                 Ok(()) => synced_count += 1,
@@ -549,7 +549,7 @@ mod tests {
         insert_dashboard(&connection, "d1");
         insert_issue(&connection, "i1", "d1", Some(42), None);
 
-        let cache = GitHubStatusCache {
+        let cache = GitStatusCache {
             issue_id: "i1".to_string(),
             branch_status: None,
             pr_state: Some(PullRequestState::Open),
@@ -576,7 +576,7 @@ mod tests {
         insert_dashboard(&connection, "d1");
         insert_issue(&connection, "i1", "d1", Some(42), None);
 
-        let initial = GitHubStatusCache {
+        let initial = GitStatusCache {
             issue_id: "i1".to_string(),
             branch_status: None,
             pr_state: Some(PullRequestState::Open),
@@ -590,7 +590,7 @@ mod tests {
         upsert_cache(&connection, &initial).unwrap();
 
         // Update only PR state (github_issue_state = None should preserve existing)
-        let update = GitHubStatusCache {
+        let update = GitStatusCache {
             issue_id: "i1".to_string(),
             branch_status: None,
             pr_state: Some(PullRequestState::Merged),
@@ -629,7 +629,7 @@ mod tests {
         insert_issue(&connection, "i3", "d2", Some(3), None);
 
         for id in &["i1", "i2", "i3"] {
-            let cache = GitHubStatusCache {
+            let cache = GitStatusCache {
                 issue_id: id.to_string(),
                 branch_status: None,
                 pr_state: Some(PullRequestState::Open),
