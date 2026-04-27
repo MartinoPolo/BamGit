@@ -9,56 +9,16 @@ import type {
 	PortfolioDashboardPointer,
 	LabelShapeMapping,
 } from '$lib/types/generated';
-
-// ─── Frontend-only request types ──────────────────────────────────────────
-
-export interface CreateDashboardRequest {
-	name: string;
-	type: 'repo' | 'portfolio';
-	github_repo?: string | null;
-	local_folder?: string | null;
-	default_base_branch?: string | null;
-	worktree_parent_folder?: string | null;
-	color_palette_id?: string | null;
-	default_shape?: string;
-}
-
-/** Absent key = no change, explicit null = clear the field */
-export interface UpdateDashboardRequest {
-	id: string;
-	name?: string;
-	type?: 'repo' | 'portfolio';
-	github_repo?: string | null;
-	local_folder?: string | null;
-	default_base_branch?: string | null;
-	worktree_parent_folder?: string | null;
-	color_palette_id?: string | null;
-	default_shape?: string;
-}
-
-export interface CreateColorPaletteRequest {
-	name: string;
-	colors: string[];
-}
-
-/** @public */
-export interface UpdateColorPaletteRequest {
-	id: string;
-	name?: string;
-	colors?: string[];
-}
-
-/** @public */
-export interface AddRepoToPortfolioRequest {
-	portfolio_dashboard_id: string;
-	repo_dashboard_id: string;
-}
-
-// ─── Frontend-only value types ────────────────────────────────────────────
-
-export type ViewMode = 'cards' | 'forest';
-/** @public */
-export type ThemeMode = 'dark' | 'light' | 'system';
+import type {
+	CreateDashboardRequest,
+	UpdateDashboardRequest,
+	CreateColorPaletteRequest,
+	UpdateColorPaletteRequest,
+	AddRepoToPortfolioRequest,
+	ViewMode,
+	ThemeMode,
+} from './types.js';
+import { isThemeMode, isViewMode } from './types.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
@@ -67,16 +27,6 @@ export const DEFAULT_PALETTE_ID = 'palette-vivid';
 export const FALLBACK_ISSUE_COLOR = '#ef4444';
 
 const LAST_VIEWED_KEY = 'grovekeeper_last_viewed_dashboard_id';
-
-// ─── Type guards ──────────────────────────────────────────────────────────
-
-function isThemeMode(value: unknown): value is ThemeMode {
-	return value === 'dark' || value === 'light' || value === 'system';
-}
-
-function isViewMode(value: unknown): value is ViewMode {
-	return value === 'cards' || value === 'forest';
-}
 
 // ─── Context ──────────────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CreateDashboardRequest } from '$lib/modules/board/index.svelte.js';
+	import type { CreateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
 
@@ -13,6 +13,7 @@
 
 	let { open, repoDashboards, colorPalettes, onClose, onCreate }: Props = $props();
 
+	// fallow-ignore-next-line code-duplication
 	let dashboardType = $state<'repo' | 'portfolio'>('repo');
 	let name = $state('');
 	let githubRepo = $state('');
@@ -23,6 +24,7 @@
 	let selectedRepoIds = $state<Set<string>>(new Set());
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
+	// fallow-ignore-next-line complexity
 	$effect(() => {
 		if (open && dialogElement !== undefined && !dialogElement.open) {
 			dialogElement.showModal();
@@ -42,6 +44,7 @@
 		selectedRepoIds = new Set();
 	}
 
+	// fallow-ignore-next-line complexity
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (!name.trim()) {

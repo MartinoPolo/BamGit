@@ -17,7 +17,7 @@
 - `components.json` — shadcn-svelte config (aliases, registry, base color)
 - `src/app.css` — CSS variables (OKLCH), Tailwind theme, base styles
 - `src/lib/utils.ts` — `cn()` utility + `WithElementRef` type
-- `src/lib/modules/board/index.svelte.ts` — dark mode via board module's `theme` property
+- `src/lib/modules/board/board.context.svelte.ts` — dark mode via board module's `theme` property
 
 ## CSS Variable System
 
@@ -59,10 +59,10 @@ All colors defined in `src/app.css` using OKLCH color space. Variables are set i
 
 ## Dark Mode Context
 
-Located in the board module at `src/lib/modules/board/index.svelte.ts`:
+Located in the board module at `src/lib/modules/board/board.context.svelte.ts`:
 
 ```ts
-import { useBoard } from '$lib/modules/board/index.svelte.js';
+import { useBoard } from '$lib/modules/board';
 
 const boardStore = useBoard();
 boardStore.theme.mode; // 'system' | 'light' | 'dark'

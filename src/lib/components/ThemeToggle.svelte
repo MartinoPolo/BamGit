@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useBoard } from '$lib/modules/board/index.svelte.js';
+	import { useBoard } from '$lib/modules/board';
 	import { Sun, Moon, Monitor } from 'lucide-svelte';
 
 	interface Props {

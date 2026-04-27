@@ -8,129 +8,16 @@ import type {
 	WorktreeStateChangePayload,
 	PrunableIssue,
 } from '$lib/types/generated';
-
-// ─── Public types ──────────────────────────────────────────────────────────
-
-export type WorktreeState = 'none' | 'pending' | 'active' | 'failed' | 'removing' | 'removed';
-
-export type SortMode = 'priority' | 'name' | 'date';
-
-/** @public */
-export type IssuePriority = 'low' | 'medium' | 'high' | 'top';
-
-/** @public */
-export type IssueStatus = 'active' | 'archived';
-
-/** @public */
-export interface IssueLabel {
-	name: string;
-	color: string;
-}
-
-/** Issue with deserialized labels and narrowed enum fields. */
-export interface Issue extends Omit<
-	GeneratedIssue,
-	'labels' | 'priority' | 'status' | 'worktree_state'
-> {
-	labels: IssueLabel[];
-	priority: IssuePriority | null;
-	status: IssueStatus;
-	worktree_state: WorktreeState;
-}
-
-export interface CreateIssueRequest {
-	dashboard_id: string;
-	name: string;
-	priority?: 'low' | 'medium' | 'high' | 'top' | null;
-	color?: string | null;
-	github_issue_url?: string | null;
-	github_issue_number?: number | null;
-	parent_issue_id?: string | null;
-	labels?: IssueLabel[];
-}
-
-export interface UpdateIssueRequest {
-	id: string;
-	name?: string;
-	priority?: 'low' | 'medium' | 'high' | 'top' | null;
-	color?: string | null;
-	github_issue_url?: string | null;
-	github_issue_number?: number | null;
-	branch_name?: string | null;
-	base_branch?: string | null;
-	worktree_folder?: string | null;
-	worktree_state?: string;
-	parent_issue_id?: string | null;
-	labels?: IssueLabel[];
-	sort_order?: number;
-}
-
-/** @public */
-export interface SetupWorktreeRequest {
-	issue_id: string;
-	branch_name: string;
-	color?: string | null;
-	working_directory: string;
-	base_branch?: string | null;
-}
-
-/** @public */
-export interface RemoveWorktreeRequest {
-	issue_id: string;
-	branch_name: string;
-	working_directory: string;
-}
-
-export interface IssueCardCallbacks {
-	onArchive: (id: string) => void;
-	onUnarchive: (id: string) => void;
-	onEdit: (issue: Issue) => void;
-	onDelete: (id: string) => void;
-	onSetupWorktree?: (issue: Issue) => void;
-	onRemoveWorktree?: (issue: Issue) => void;
-	onExecuteAction?: (actionId: string, issueId: string) => void;
-}
-
-// ─── Internal helpers (NOT exported) ───────────────────────────────────────
-
-const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
-
-function deserializeLabels(raw: string | null): IssueLabel[] {
-	if (raw === null) {
-		return [];
-	}
-	try {
-		const parsed: unknown = JSON.parse(raw);
-		if (!Array.isArray(parsed)) {
-			return [];
-		}
-		return (parsed as IssueLabel[]).map((label) => ({
-			...label,
-			color: HEX_COLOR_PATTERN.test(label.color) ? label.color : '#808080',
-		}));
-	} catch {
-		return [];
-	}
-}
-
-function toIssue(raw: GeneratedIssue): Issue {
-	return {
-		...raw,
-		labels: deserializeLabels(raw.labels),
-		priority: raw.priority as IssuePriority | null,
-		status: raw.status as IssueStatus,
-		worktree_state: raw.worktree_state as WorktreeState,
-	};
-}
-
-function serializeLabels(labels: IssueLabel[] | undefined): string | null | undefined {
-	if (labels === undefined) {
-		return undefined;
-	}
-	return JSON.stringify(labels);
-}
-
-const PRIORITY_ORDER: Record<string, number> = { top: 0, high: 1, medium: 2, low: 3 };
+import type {
+	Issue,
+	SortMode,
+	WorktreeState,
+	CreateIssueRequest,
+	UpdateIssueRequest,
+	SetupWorktreeRequest,
+	RemoveWorktreeRequest,
+} from './types.js';
+import { serializeLabels, toIssue } from './serialization.js';
 
 // ─── Context ───────────────────────────────────────────────────────────────
 
@@ -157,14 +44,16 @@ function createIssuesContext() {
 	let currentDashboardId = $state<string | null>(null);
 	const worktreeProgress = new SvelteMap<string, string[]>();
 
+	const priorityOrder: Record<string, number> = { top: 0, high: 1, medium: 2, low: 3 };
+
 	const sortedIssues = $derived.by(() => {
 		const list = [...issues];
 		switch (sortMode) {
 			case 'priority':
 				return list.sort(
 					(a, b) =>
-						(PRIORITY_ORDER[a.priority ?? 'low'] ?? 4) -
-						(PRIORITY_ORDER[b.priority ?? 'low'] ?? 4),
+						(priorityOrder[a.priority ?? 'low'] ?? 4) -
+						(priorityOrder[b.priority ?? 'low'] ?? 4),
 				);
 			case 'name':
 				return list.sort((a, b) => a.name.localeCompare(b.name));
@@ -363,7 +252,7 @@ function createIssuesContext() {
 			stopWorktreeListeners();
 		},
 
-		// Worktree commands (inlined)
+		// Worktree commands
 		async setupWorktree(request: SetupWorktreeRequest): Promise<string> {
 			return invoke('setup_worktree', { request });
 		},

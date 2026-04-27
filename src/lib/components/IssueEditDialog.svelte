@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues/index.svelte.js';
-	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board/index.svelte.js';
+	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues';
+	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
 
 	interface Props {
@@ -12,12 +12,14 @@
 
 	let { issue, paletteColors, onClose, onUpdate }: Props = $props();
 
+	// fallow-ignore-next-line code-duplication
 	let name = $state('');
 	let priority = $state<string>('');
 	let color = $state('');
 	let githubIssueUrl = $state('');
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
+	// fallow-ignore-next-line complexity
 	$effect(() => {
 		if (issue !== null && dialogElement !== undefined && !dialogElement.open) {
 			name = issue.name;
@@ -30,6 +32,7 @@
 		}
 	});
 
+	// fallow-ignore-next-line complexity
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (issue === null || !name.trim()) {

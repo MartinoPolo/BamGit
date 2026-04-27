@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NotificationEventType } from '$lib/types/generated';
-	import { useNotifications } from '$lib/modules/notifications/index.svelte.js';
+	import { useNotifications } from '$lib/modules/notifications';
 	import { onMount } from 'svelte';
 
 	const notificationStore = useNotifications();

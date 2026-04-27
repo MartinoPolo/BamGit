@@ -21,7 +21,7 @@ import {
 	TOOL_TYPES,
 } from './testing';
 import type { StateDimensions } from './testing';
-import type { Issue } from '$lib/modules/issues/index.svelte.js';
+import type { Issue } from '$lib/modules/issues';
 import type { GitStatusCache, SessionState, ExecutionPhase } from '$lib/types/generated';
 
 // ════════════════════════════════════════════════════════════════════════

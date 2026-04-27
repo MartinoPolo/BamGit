@@ -1,19 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board/index.svelte.js';
-	import { useIssues } from '$lib/modules/issues/index.svelte.js';
-	import { useVersionControl } from '$lib/modules/version-control/index.svelte.js';
-	import { useActions } from '$lib/modules/actions/index.svelte.js';
-	import {
-		useNotifications,
-		NOTIFICATION_DOT_COLORS,
-	} from '$lib/modules/notifications/index.svelte.js';
-	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
-	import type {
-		Issue,
-		CreateIssueRequest,
-		UpdateIssueRequest,
-	} from '$lib/modules/issues/index.svelte.js';
+	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
+	import { useIssues } from '$lib/modules/issues';
+	import { useVersionControl } from '$lib/modules/version-control';
+	import { useActions } from '$lib/modules/actions';
+	import { useNotifications, NOTIFICATION_DOT_COLORS } from '$lib/modules/notifications';
+	import { useSessions } from '$lib/modules/sessions';
+	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/modules/issues';
 	import type { PrunableIssue } from '$lib/types/generated';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';

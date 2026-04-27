@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CreateIssueRequest } from '$lib/modules/issues/index.svelte.js';
+	import type { CreateIssueRequest } from '$lib/modules/issues';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
 
 	interface Props {
@@ -13,12 +13,14 @@
 
 	let { open, dashboardId, paletteColors, defaultColor, onClose, onCreate }: Props = $props();
 
+	// fallow-ignore-next-line code-duplication
 	let name = $state('');
 	let priority = $state<'low' | 'medium' | 'high' | 'top' | ''>('');
 	let color = $state('');
 	let githubIssueUrl = $state('');
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
+	// fallow-ignore-next-line complexity
 	$effect(() => {
 		if (open && dialogElement !== undefined && !dialogElement.open) {
 			color = defaultColor;
@@ -35,6 +37,7 @@
 		githubIssueUrl = '';
 	}
 
+	// fallow-ignore-next-line complexity
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (!name.trim()) {

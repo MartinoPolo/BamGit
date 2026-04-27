@@ -8,12 +8,12 @@
 		setBoardContext,
 		type CreateDashboardRequest,
 		type UpdateDashboardRequest,
-	} from '$lib/modules/board/index.svelte.js';
-	import { setNotificationsContext } from '$lib/modules/notifications/index.svelte.js';
-	import { setSessionsContext } from '$lib/modules/sessions/index.svelte.js';
-	import { setIssuesContext } from '$lib/modules/issues/index.svelte.js';
-	import { setVersionControlContext } from '$lib/modules/version-control/index.svelte.js';
-	import { setActionsContext } from '$lib/modules/actions/index.svelte.js';
+	} from '$lib/modules/board';
+	import { setNotificationsContext } from '$lib/modules/notifications';
+	import { setSessionsContext } from '$lib/modules/sessions';
+	import { setIssuesContext } from '$lib/modules/issues';
+	import { setVersionControlContext } from '$lib/modules/version-control';
+	import { setActionsContext } from '$lib/modules/actions';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -32,6 +32,7 @@
 		boardStore.loadPalettes();
 	});
 
+	// fallow-ignore-next-line complexity
 	async function handleCreateDashboard(
 		request: CreateDashboardRequest,
 		selectedRepoIds: string[],

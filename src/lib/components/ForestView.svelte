@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Issue } from '$lib/modules/issues/index.svelte.js';
+	import type { Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import { computeVisualization, computeForestLayout } from '$lib/modules/visualization';
 	import type {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
-	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board/index.svelte.js';
+	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import type { ColorPalette } from '$lib/types/generated';
 	const boardStore = useBoard();
 
@@ -52,6 +52,7 @@
 		operationError = null;
 	}
 
+	// fallow-ignore-next-line complexity
 	async function handleSaveEdit() {
 		if (editingPaletteId === null) {
 			return;

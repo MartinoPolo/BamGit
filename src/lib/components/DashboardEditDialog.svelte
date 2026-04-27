@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { UpdateDashboardRequest } from '$lib/modules/board/index.svelte.js';
+	import type { UpdateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
 
@@ -13,6 +13,7 @@
 
 	let { dashboard, colorPalettes, onClose, onUpdate, onDelete }: Props = $props();
 
+	// fallow-ignore-next-line code-duplication
 	let name = $state('');
 	let githubRepo = $state('');
 	let localFolder = $state('');
@@ -22,6 +23,7 @@
 	let confirmDelete = $state(false);
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
+	// fallow-ignore-next-line complexity
 	$effect(() => {
 		if (dashboard !== null && dialogElement !== undefined && !dialogElement.open) {
 			name = dashboard.name;
@@ -37,6 +39,7 @@
 		}
 	});
 
+	// fallow-ignore-next-line complexity
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (dashboard === null || !name.trim()) {

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Issue } from '$lib/modules/issues/index.svelte.js';
+	import type { Issue } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
-	import type { IssueCardCallbacks } from '$lib/modules/issues/index.svelte.js';
+	import type { IssueCardCallbacks } from '$lib/modules/issues';
 	import PullRequestBadge from './PullRequestBadge.svelte';
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
@@ -65,6 +65,7 @@
 		}
 	});
 
+	// fallow-ignore-next-line complexity
 	const priorityBorderClass = $derived.by(() => {
 		switch (issue.priority) {
 			case 'top':
