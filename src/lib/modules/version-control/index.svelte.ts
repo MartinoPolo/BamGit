@@ -6,6 +6,7 @@ import type {
 	GitStatusCache,
 	SyncAllResult,
 } from '$lib/types/generated';
+import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ export function setVersionControlContext() {
 // ─── Factory ────────────────────────────────────────────────────────────────
 
 function buildStateMap(caches: readonly GitStatusCache[]): Map<string, GitStatusCache> {
-	const map = new Map<string, GitStatusCache>();
+	const map = new SvelteMap<string, GitStatusCache>();
 	for (const cache of caches) {
 		map.set(cache.issue_id, cache);
 	}
@@ -126,7 +127,7 @@ function createVersionControlContext() {
 		async refreshGitStatus(issueId: string) {
 			try {
 				const status = await invoke<GitStatusCache>('refresh_git_status', { issueId });
-				const newMap = new Map(stateMap);
+				const newMap = new SvelteMap(stateMap);
 				newMap.set(issueId, status);
 				stateMap = newMap;
 				error = null;

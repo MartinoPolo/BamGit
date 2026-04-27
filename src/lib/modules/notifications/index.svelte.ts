@@ -4,6 +4,7 @@ import type {
 	NotificationConfig as GeneratedNotificationConfig,
 	NotificationEventType,
 } from '$lib/types/generated';
+import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Narrowed types ──────────────────────────────────────────���────────────
 
@@ -86,7 +87,7 @@ function createNotificationsContext() {
 		},
 
 		addPending(sessionId: string, eventType: NotificationEventType) {
-			const next = new Map(pendingNotifications);
+			const next = new SvelteMap(pendingNotifications);
 			next.set(sessionId, eventType);
 			pendingNotifications = next;
 		},
@@ -95,7 +96,7 @@ function createNotificationsContext() {
 			if (!pendingNotifications.has(sessionId)) {
 				return;
 			}
-			const next = new Map(pendingNotifications);
+			const next = new SvelteMap(pendingNotifications);
 			next.delete(sessionId);
 			pendingNotifications = next;
 		},

@@ -2,9 +2,9 @@ import tseslint from 'typescript-eslint';
 import sveltePlugin from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
 import storybook from 'eslint-plugin-storybook';
-import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 import svelteConfig from './svelte.config.js';
+import checkFile from 'eslint-plugin-check-file';
 
 export default [
 	{
@@ -18,7 +18,6 @@ export default [
 			'src/lib/types/generated',
 			'**/*.config.*',
 			'*.d.ts',
-			'**/*.svelte.ts',
 		],
 	},
 	...tseslint.configs.recommended,
@@ -32,12 +31,7 @@ export default [
 				tsconfigRootDir: import.meta.dirname,
 			},
 		},
-		plugins: {
-			'@stylistic': stylistic,
-		},
 		rules: {
-			// Enforce multi-line if blocks — never collapse { body; } onto the if line
-			'@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: false }],
 			// typescript-eslint recommends disabling no-undef for TS projects
 			// https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
 			'no-undef': 'off',
@@ -49,7 +43,7 @@ export default [
 			],
 			'@typescript-eslint/require-array-sort-compare': 'error',
 			'@typescript-eslint/naming-convention': [
-				'warn',
+				'error',
 				{
 					selector: 'variableLike',
 					format: ['camelCase', 'PascalCase'],
@@ -66,12 +60,12 @@ export default [
 					format: ['PascalCase'],
 				},
 			],
-			'@typescript-eslint/consistent-type-definitions': 'warn',
+			'@typescript-eslint/consistent-type-definitions': 'error',
 			'@typescript-eslint/consistent-type-imports': [
-				'warn',
+				'error',
 				{ fixStyle: 'inline-type-imports' },
 			],
-			'@typescript-eslint/no-import-type-side-effects': 'warn',
+			'@typescript-eslint/no-import-type-side-effects': 'error',
 		},
 	},
 	...sveltePlugin.configs['flat/recommended'],
@@ -88,6 +82,63 @@ export default [
 					experimentalGenerics: true,
 				},
 			},
+		},
+	},
+	{
+		files: ['**/*.svelte.ts', '**/*.svelte.js'],
+		languageOptions: {
+			parser: tseslint.parser,
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname,
+			},
+		},
+	},
+	{
+		files: ['src/**/*.ts'],
+		ignores: ['src/routes/**/+*', 'src/lib/components/ui/**', 'src/lib/hooks/**'],
+		plugins: { 'check-file': checkFile },
+		rules: {
+			'check-file/filename-naming-convention': [
+				'error',
+				{ '**/*.ts': 'SNAKE_CASE' },
+				{ ignoreMiddleExtensions: true },
+			],
+		},
+	},
+	{
+		files: ['src/lib/**/*.svelte'],
+		ignores: ['src/lib/components/ui/**'],
+		plugins: { 'check-file': checkFile },
+		rules: {
+			'check-file/filename-naming-convention': ['error', { '**/*.svelte': 'PASCAL_CASE' }],
+		},
+	},
+	{
+		files: ['src/lib/context/*.context.svelte.ts'],
+		rules: {
+			'@typescript-eslint/naming-convention': [
+				'error',
+				{
+					selector: 'function',
+					format: ['snake_case', 'camelCase'],
+				},
+				{
+					selector: 'variableLike',
+					format: ['camelCase', 'PascalCase'],
+					leadingUnderscore: 'allow',
+				},
+				{
+					selector: 'variable',
+					format: ['UPPER_CASE', 'camelCase', 'PascalCase'],
+					modifiers: ['global', 'const'],
+					leadingUnderscore: 'allow',
+				},
+				{
+					selector: 'typeLike',
+					format: ['PascalCase'],
+				},
+			],
 		},
 	},
 ];

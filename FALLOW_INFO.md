@@ -28,7 +28,7 @@ Runs during CI and via `pnpm run check:all`. Sequential, fails on first error:
 | 1     | `svelte-kit sync`                         | Generate types (`$lib`, route types)                           |
 | 2     | `prettier --write .`                      | Format everything                                              |
 | 3     | `oxlint`                                  | Fast Rust linter (curly rule)                                  |
-| 4     | `eslint .`                                | Full TS/Svelte lint (naming, stylistic, type-checked)          |
+| 4     | `eslint .`                                | Full TS/Svelte lint (naming, type-checked)                     |
 | 5     | `stylelint "src/**/*.{css,svelte}"`       | CSS lint (Tailwind v4 aware)                                   |
 | 6     | `fallow dead-code`                        | Dead code: unused files/deps/imports=error, exports/types=warn |
 | 7     | `svelte-check --tsconfig ./tsconfig.json` | TypeScript + Svelte type checking                              |

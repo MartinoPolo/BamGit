@@ -184,7 +184,7 @@ function createBoardContext() {
 				error = null;
 
 				const lastId = localStorage.getItem(LAST_VIEWED_KEY);
-				if (lastId && dashboards.some((d) => d.id === lastId)) {
+				if (lastId != null && dashboards.some((d) => d.id === lastId)) {
 					activeDashboardId = lastId;
 				} else if (dashboards.length > 0) {
 					activeDashboardId = dashboards[0].id;
@@ -211,7 +211,10 @@ function createBoardContext() {
 			try {
 				dashboards = await invoke<Dashboard[]>('get_dashboards');
 				error = null;
-				if (activeDashboardId && !dashboards.some((d) => d.id === activeDashboardId)) {
+				if (
+					activeDashboardId != null &&
+					!dashboards.some((d) => d.id === activeDashboardId)
+				) {
 					activeDashboardId = dashboards.length > 0 ? dashboards[0].id : null;
 				}
 			} catch (err) {

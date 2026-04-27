@@ -20,9 +20,9 @@
 
 	const sessionStore = useSessions();
 
-	let next_message_id = 0;
-	function create_message(fields: Omit<ChatMessage, 'id'>): ChatMessage {
-		return { id: next_message_id++, ...fields };
+	let nextMessageId = 0;
+	function createMessage(fields: Omit<ChatMessage, 'id'>): ChatMessage {
+		return { id: nextMessageId++, ...fields };
 	}
 
 	let messages = $state<ChatMessage[]>([]);
@@ -49,14 +49,14 @@
 
 	function handleMessageComplete() {
 		if (currentStreamingText) {
-			appendMessage(create_message({ role: 'assistant', content: currentStreamingText }));
+			appendMessage(createMessage({ role: 'assistant', content: currentStreamingText }));
 			currentStreamingText = '';
 		}
 	}
 
 	function handleToolStart(event: Record<string, unknown>) {
 		appendMessage(
-			create_message({
+			createMessage({
 				role: 'tool',
 				content: `Running ${event.tool_name as string}...`,
 				tool_name: event.tool_name as string,
@@ -69,7 +69,7 @@
 		const content = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
 		const truncated = content.length > 500 ? content.slice(0, 497) + '...' : content;
 		appendMessage(
-			create_message({
+			createMessage({
 				role: 'tool',
 				content: truncated,
 				tool_name: event.tool_name as string,
@@ -82,7 +82,7 @@
 		const state = event.state as string;
 		if (state === 'failed' || state === 'completed') {
 			appendMessage(
-				create_message({
+				createMessage({
 					role: 'system',
 					content:
 						state === 'failed'
@@ -95,7 +95,7 @@
 
 	function handlePermissionPrompt(event: Record<string, unknown>) {
 		appendMessage(
-			create_message({
+			createMessage({
 				role: 'system',
 				content: `Permission needed: ${event.tool_name as string}`,
 			}),
@@ -134,14 +134,14 @@
 		promptInput = '';
 		sending = true;
 
-		messages = [...messages, create_message({ role: 'user', content: message })];
+		messages = [...messages, createMessage({ role: 'user', content: message })];
 
 		try {
 			await sessionStore.sendMessage(session.id, message);
 		} catch (err) {
 			messages = [
 				...messages,
-				create_message({ role: 'system', content: `Failed to send: ${String(err)}` }),
+				createMessage({ role: 'system', content: `Failed to send: ${String(err)}` }),
 			];
 		} finally {
 			sending = false;
@@ -154,7 +154,7 @@
 		} catch (err) {
 			messages = [
 				...messages,
-				create_message({ role: 'system', content: `Failed to interrupt: ${String(err)}` }),
+				createMessage({ role: 'system', content: `Failed to interrupt: ${String(err)}` }),
 			];
 		}
 	}

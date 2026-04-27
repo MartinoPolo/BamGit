@@ -75,7 +75,7 @@ function createActionsContext() {
 		},
 
 		async refresh() {
-			if (currentDashboardId) {
+			if (currentDashboardId != null) {
 				try {
 					actions = await invoke<Action[]>('get_actions_for_dashboard', {
 						dashboardId: currentDashboardId,

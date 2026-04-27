@@ -7,6 +7,7 @@ import type {
 	WorktreeStateChangePayload,
 	PrunableIssue,
 } from '$lib/types/generated';
+import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Public types ──────────────────────────────────────────────────────────
 
@@ -171,7 +172,7 @@ function createIssuesContext() {
 
 	const activeIssues = $derived(sortedIssues.filter((issue) => issue.status === 'active'));
 	const archivedIssues = $derived(sortedIssues.filter((issue) => issue.status === 'archived'));
-	const parentIssues = $derived(activeIssues.filter((issue) => !issue.parent_issue_id));
+	const parentIssues = $derived(activeIssues.filter((issue) => issue.parent_issue_id == null));
 
 	function getChildren(parentId: string): Issue[] {
 		return activeIssues.filter((issue) => issue.parent_issue_id === parentId);
@@ -188,7 +189,7 @@ function createIssuesContext() {
 		unlistenProgress = await listen<WorktreeProgressPayload>('worktree-progress', (event) => {
 			const { issue_id: issueId, line } = event.payload;
 			const existing = worktreeProgress.get(issueId) ?? [];
-			worktreeProgress = new Map(worktreeProgress).set(issueId, [...existing, line]);
+			worktreeProgress = new SvelteMap(worktreeProgress).set(issueId, [...existing, line]);
 		});
 
 		unlistenStateChange = await listen<WorktreeStateChangePayload>(
@@ -212,7 +213,7 @@ function createIssuesContext() {
 				});
 
 				if (newState !== 'pending') {
-					const updated = new Map(worktreeProgress);
+					const updated = new SvelteMap(worktreeProgress);
 					updated.delete(issueId);
 					worktreeProgress = updated;
 				}
@@ -287,7 +288,7 @@ function createIssuesContext() {
 		},
 
 		async refresh() {
-			if (currentDashboardId) {
+			if (currentDashboardId != null) {
 				try {
 					issues = await fetchIssues(currentDashboardId);
 					error = null;
