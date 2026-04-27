@@ -1,6 +1,6 @@
 import { createContext } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '$lib/tauri.js';
 import type {
 	AssignedIssue,
 	GhCliAvailability,

@@ -1,7 +1,7 @@
 import { createContext } from 'svelte';
 import { browser } from '$app/environment';
 import { MediaQuery } from 'svelte/reactivity';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '$lib/tauri.js';
 import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
 import type {
 	Dashboard,

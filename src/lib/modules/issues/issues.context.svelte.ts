@@ -1,6 +1,5 @@
 import { createContext, onDestroy } from 'svelte';
-import { invoke } from '@tauri-apps/api/core';
-import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { invoke, listen, type UnlistenFn } from '$lib/tauri.js';
 import { SvelteMap } from 'svelte/reactivity';
 import type {
 	Issue as GeneratedIssue,

@@ -1,6 +1,6 @@
 import { createContext } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, isTauri } from '$lib/tauri.js';
 import type {
 	NotificationConfig as GeneratedNotificationConfig,
 	NotificationEventType,
@@ -72,6 +72,9 @@ function createNotificationsContext() {
 		},
 
 		async loadConfigs() {
+			if (!isTauri()) {
+				return;
+			}
 			try {
 				loading = true;
 				error = null;

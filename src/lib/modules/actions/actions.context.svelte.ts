@@ -1,5 +1,5 @@
 import { createContext } from 'svelte';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '$lib/tauri.js';
 import type { Action } from '$lib/types/generated';
 
 // ─── Frontend-only request types ──────────────────────────────────────────

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Session, SessionEventPayload } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
-	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+	import { listen, type UnlistenFn } from '$lib/tauri.js';
 	import { onMount, onDestroy } from 'svelte';
 
 	interface Props {
