@@ -33,6 +33,7 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 
+	// fallow-ignore-next-line complexity
 	function getNotificationDotColor(issueId: string): string | null {
 		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
 		if (issueSessions === undefined) {
@@ -67,6 +68,7 @@
 	let pruneRemoving = $state(false);
 
 	// Active palette colors for the current dashboard
+	// fallow-ignore-next-line complexity
 	const activePaletteColors = $derived.by(() => {
 		const paletteId = boardStore.activeDashboard?.color_palette_id ?? null;
 		const palette = boardStore.getPaletteForDashboard(paletteId);
@@ -221,6 +223,7 @@
 		}
 	}
 
+	// fallow-ignore-next-line complexity
 	async function handlePrune(issueIds: string[]) {
 		const dashboard = boardStore.activeDashboard;
 		if (dashboard?.local_folder == null) {

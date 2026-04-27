@@ -9,6 +9,7 @@ import type {
 	DiscoveredSessionsPayload,
 	NotificationEventType,
 } from '$lib/types/generated';
+import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Module-internal request types ──────────────────────────────────────────
 
@@ -39,10 +40,10 @@ const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
 
 // ─── Dependency type ────────────────────────────────────────────────────────
 
-type NotificationsApi = {
+interface NotificationsApi {
 	addPending: (sessionId: string, eventType: NotificationEventType) => void;
 	clearPending: (sessionId: string) => void;
-};
+}
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -110,7 +111,7 @@ function createSessionsContext(notifications: NotificationsApi) {
 	);
 
 	const sessionsByIssueId = $derived.by(() => {
-		const map = new Map<string, Session[]>();
+		const map = new SvelteMap<string, Session[]>();
 		for (const session of sessions) {
 			if (session.issue_id === null) {
 				continue;
@@ -127,6 +128,7 @@ function createSessionsContext(notifications: NotificationsApi) {
 
 	// ─── Event handlers (internal, not exported) ────────────────────────────
 
+	// fallow-ignore-next-line complexity
 	function handleSessionEvent(payload: SessionEventPayload) {
 		const { session_id: sessionId, event, resolved_state: resolvedState } = payload;
 
@@ -155,6 +157,8 @@ function createSessionsContext(notifications: NotificationsApi) {
 			case 'message_complete':
 				session.last_response_summary =
 					event.text.length > 200 ? event.text.slice(0, 197) + '...' : event.text;
+				break;
+			default:
 				break;
 		}
 	}

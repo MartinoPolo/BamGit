@@ -11,10 +11,6 @@ import type { Issue } from '$lib/modules/issues/index.svelte.js';
 import type { GitStatusCache, ExecutionPhase, SessionState } from '$lib/types/generated';
 import type { WorktreeState } from '$lib/modules/issues/index.svelte.js';
 
-// ─── Re-exported Library Types (erased at runtime) ──────────────────────
-
-export type { TreeStage, PottedPlantStage } from 'low-poly-2d-trees';
-
 // ─── Library Constants (local mirrors — avoids barrel Svelte import in Node) ─
 
 /** @internal Exported for testing only — use `computeVisualization` for production code. */
@@ -33,7 +29,7 @@ export const TREE_STAGES = {
 	stump: 'stump',
 } as const satisfies Record<string, TreeStage>;
 
-export const TREE_SHAPES = {
+const TREE_SHAPES = {
 	oak: 'oak',
 	pine: 'pine',
 	birch: 'birch',
@@ -92,6 +88,7 @@ const SHAPE_FRUIT_MAP: Readonly<Record<Exclude<TreeShape, 'custom'>, FruitType>>
 
 // ─── GitHub Label -> Tree Shape Mapping ─────────────────────────────────
 
+/** @public */
 export interface LabelShapeMappingEntry {
 	readonly labelName: string;
 	readonly treeShape: TreeShape;
@@ -655,7 +652,7 @@ export interface PositionedForestItem {
 	readonly zIndex: number;
 }
 
-export interface ForestLayoutResult {
+interface ForestLayoutResult {
 	readonly items: readonly PositionedForestItem[];
 	readonly oakPosition: PositionedForestItem | null;
 	readonly shelfY: number;

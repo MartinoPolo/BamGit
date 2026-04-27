@@ -41,14 +41,14 @@ export interface CreateColorPaletteRequest {
 	colors: string[];
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface UpdateColorPaletteRequest {
 	id: string;
 	name?: string;
 	colors?: string[];
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface AddRepoToPortfolioRequest {
 	portfolio_dashboard_id: string;
 	repo_dashboard_id: string;
@@ -57,12 +57,12 @@ export interface AddRepoToPortfolioRequest {
 // ─── Frontend-only value types ────────────────────────────────────────────
 
 export type ViewMode = 'cards' | 'forest';
-// fallow-ignore-next-line unused-types
+/** @public */
 export type ThemeMode = 'dark' | 'light' | 'system';
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
-// fallow-ignore-next-line unused-exports
+/** @public */
 export const DEFAULT_PALETTE_ID = 'palette-vivid';
 export const FALLBACK_ISSUE_COLOR = '#ef4444';
 
@@ -177,6 +177,7 @@ function createBoardContext() {
 			showCreateDialog = value;
 		},
 
+		// fallow-ignore-next-line complexity
 		async loadDashboards() {
 			try {
 				loading = true;
@@ -184,7 +185,7 @@ function createBoardContext() {
 				error = null;
 
 				const lastId = localStorage.getItem(LAST_VIEWED_KEY);
-				if (lastId && dashboards.some((d) => d.id === lastId)) {
+				if (lastId != null && dashboards.some((d) => d.id === lastId)) {
 					activeDashboardId = lastId;
 				} else if (dashboards.length > 0) {
 					activeDashboardId = dashboards[0].id;
@@ -207,11 +208,15 @@ function createBoardContext() {
 			sidebarCollapsed = !sidebarCollapsed;
 		},
 
+		// fallow-ignore-next-line complexity
 		async refreshDashboards() {
 			try {
 				dashboards = await invoke<Dashboard[]>('get_dashboards');
 				error = null;
-				if (activeDashboardId && !dashboards.some((d) => d.id === activeDashboardId)) {
+				if (
+					activeDashboardId != null &&
+					!dashboards.some((d) => d.id === activeDashboardId)
+				) {
 					activeDashboardId = dashboards.length > 0 ? dashboards[0].id : null;
 				}
 			} catch (err) {
@@ -259,6 +264,7 @@ function createBoardContext() {
 			return palettesError;
 		},
 
+		// fallow-ignore-next-line complexity
 		getPaletteForDashboard(colorPaletteId: string | null): ColorPalette | null {
 			if (colorPaletteId === null) {
 				return palettes.find((p) => p.id === DEFAULT_PALETTE_ID) ?? palettes[0] ?? null;

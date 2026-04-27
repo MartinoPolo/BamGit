@@ -9,14 +9,14 @@ import type {
 // ─── Narrowed types ──────────────────────────────────────────���────────────
 
 /** NotificationConfig with event_type narrowed from string to NotificationEventType. */
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface NotificationConfig extends Omit<GeneratedNotificationConfig, 'event_type'> {
 	event_type: NotificationEventType;
 }
 
 // ─── Frontend-only request types ──────────────────────────────────────────
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface UpdateNotificationConfigRequest {
 	event_type: NotificationEventType;
 	sound_enabled?: boolean;
@@ -53,7 +53,7 @@ export function setNotificationsContext() {
 
 function createNotificationsContext() {
 	let configs = $state<NotificationConfig[]>([]);
-	let pendingNotifications = $state(new SvelteMap<string, NotificationEventType>());
+	const pendingNotifications = new SvelteMap<string, NotificationEventType>();
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 

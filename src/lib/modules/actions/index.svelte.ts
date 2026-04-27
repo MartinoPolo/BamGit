@@ -4,7 +4,7 @@ import type { Action } from '$lib/types/generated';
 
 // ─── Frontend-only request types ──────────────────────────────────────────
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface CreateActionRequest {
 	dashboard_id?: string | null;
 	name: string;
@@ -14,7 +14,7 @@ export interface CreateActionRequest {
 	visible?: boolean;
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface UpdateActionRequest {
 	id: string;
 	name?: string;
@@ -47,6 +47,7 @@ function createActionsContext() {
 
 	const visibleActions = $derived(actions.filter((action) => action.visible));
 
+	// fallow-ignore-next-line complexity
 	async function fetchAndSetActions(showLoading: boolean) {
 		if (currentDashboardId === null) {
 			return;

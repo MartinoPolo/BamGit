@@ -15,13 +15,13 @@ export type WorktreeState = 'none' | 'pending' | 'active' | 'failed' | 'removing
 
 export type SortMode = 'priority' | 'name' | 'date';
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export type IssuePriority = 'low' | 'medium' | 'high' | 'top';
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export type IssueStatus = 'active' | 'archived';
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface IssueLabel {
 	name: string;
 	color: string;
@@ -65,7 +65,7 @@ export interface UpdateIssueRequest {
 	sort_order?: number;
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface SetupWorktreeRequest {
 	issue_id: string;
 	branch_name: string;
@@ -74,7 +74,7 @@ export interface SetupWorktreeRequest {
 	base_branch?: string | null;
 }
 
-// fallow-ignore-next-line unused-types
+/** @public */
 export interface RemoveWorktreeRequest {
 	issue_id: string;
 	branch_name: string;
@@ -155,7 +155,7 @@ function createIssuesContext() {
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let currentDashboardId = $state<string | null>(null);
-	let worktreeProgress = $state(new SvelteMap<string, string[]>());
+	const worktreeProgress = new SvelteMap<string, string[]>();
 
 	const sortedIssues = $derived.by(() => {
 		const list = [...issues];
@@ -178,10 +178,10 @@ function createIssuesContext() {
 
 	const activeIssues = $derived(sortedIssues.filter((issue) => issue.status === 'active'));
 	const archivedIssues = $derived(sortedIssues.filter((issue) => issue.status === 'archived'));
-	const parentIssues = $derived(activeIssues.filter((issue) => !issue.parent_issue_id));
+	const parentIssues = $derived(activeIssues.filter((issue) => issue.parent_issue_id == null));
 
 	const childrenByParentId = $derived.by(() => {
-		const map = new Map<string, Issue[]>();
+		const map = new SvelteMap<string, Issue[]>();
 		for (const issue of activeIssues) {
 			if (issue.parent_issue_id !== null) {
 				const existing = map.get(issue.parent_issue_id);
@@ -307,7 +307,7 @@ function createIssuesContext() {
 		},
 
 		async refresh() {
-			if (currentDashboardId) {
+			if (currentDashboardId != null) {
 				try {
 					issues = await fetchIssues(currentDashboardId);
 					error = null;

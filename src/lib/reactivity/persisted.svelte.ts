@@ -8,7 +8,7 @@ interface Serde<T> {
 	deserialize: (value: string) => { success: true; data: T } | { success: false };
 }
 
-// fallow-ignore-next-line unused-exports
+/** @public */
 export function jsonSerde<T>(validate: (value: unknown) => value is T): Serde<T> {
 	return {
 		serialize: (value: T) => JSON.stringify(value),
@@ -114,14 +114,14 @@ export class Persisted<T> implements MutableState<T> {
 		this.#update?.();
 	}
 
-	// fallow-ignore-next-line unused-class-members
+	/** @public */
 	setDefaultValue(): void {
 		this.#cached = this.#defaultValue;
 		this.#setToStorage(this.#defaultValue);
 		this.#update?.();
 	}
 
-	// fallow-ignore-next-line unused-class-members
+	/** @public */
 	readonly(): ReadableState<T> {
 		return new ReadonlyState(this);
 	}

@@ -38,19 +38,20 @@ pub async fn spawn_session(
 }
 ```
 
-**Svelte side (`src/lib/tauri/commands.ts`):**
+**Svelte side (inside a domain module, e.g., `src/lib/modules/sessions/index.svelte.ts`):**
 
 ```typescript
 import { invoke } from '@tauri-apps/api/core';
-import type { Session } from '$lib/types/session';
+import type { Session } from '$lib/types/generated';
 
-export async function getSessions(): Promise<Session[]> {
-	return invoke('get_sessions');
-}
+// IPC calls are inlined inside modules — no separate wrapper layer
+async loadSessions() {
+    sessions = await invoke<Session[]>('get_sessions');
+},
 
-export async function spawnSession(request: SpawnSessionRequest): Promise<string> {
-	return invoke('spawn_session', { request });
-}
+async spawnSession(request: SpawnSessionRequest): Promise<string> {
+    return invoke('spawn_session', { request });
+},
 ```
 
 **When to use:** Any operation where Svelte asks for something and waits for a single response. The caller blocks (awaits) until the Rust function returns.
@@ -98,50 +99,24 @@ fn on_state_change(&self, new_state: &str) {
 }
 ```
 
-**Svelte side (`src/lib/stores/session-events.svelte.ts`):**
+**Svelte side (inside `setSessionsContext()` in `src/lib/modules/sessions/index.svelte.ts`):**
 
 ```typescript
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import type { SessionEventPayload } from '$lib/types/generated';
 
-interface SessionEventPayload {
-	session_id: string;
-	event: SessionEvent;
-}
+// Event listeners are set up inside the module's context provider
+let unlistenSessionEvent: UnlistenFn | null = null;
 
-// In a Svelte 5 component or store:
-let unlistenFn: UnlistenFn | null = null;
-
-// Start listening (call in onMount or store init)
-async function startListening() {
-	unlistenFn = await listen<SessionEventPayload>('session-event', (event) => {
-		const { session_id, event: sessionEvent } = event.payload;
-
-		// Filter to the session we're viewing
-		if (session_id !== activeSessionId) return;
-
-		switch (sessionEvent.type) {
-			case 'message_delta':
-				// Append text to the current chat bubble
-				appendText(sessionEvent.text);
-				break;
-			case 'run_state':
-				// Update session state in the store
-				updateSessionState(session_id, sessionEvent.state);
-				break;
-			case 'tool_start':
-				// Add a new tool card to the chat
-				addToolCard(sessionEvent);
-				break;
-			// ... handle other event types
-		}
+onMount(async () => {
+	unlistenSessionEvent = await listen<SessionEventPayload>('session-event', (event) => {
+		ctx.handleSessionEvent(event.payload);
 	});
-}
+});
 
-// Stop listening (call in onDestroy or cleanup)
-function stopListening() {
-	unlistenFn?.();
-	unlistenFn = null;
-}
+onDestroy(() => {
+	unlistenSessionEvent?.();
+});
 ```
 
 **When to use:** Any data that flows continuously from Rust to Svelte without Svelte asking for it. Session streaming is the primary use case.
@@ -201,41 +176,46 @@ Svelte: listen("session-event") callback fires
 
 ## Svelte 5 Reactivity Integration
 
-Tauri events bridge into Svelte 5 runes via stores:
+Tauri events bridge into Svelte 5 runes via deep domain modules using `createContext()`:
 
 ```typescript
-// src/lib/stores/session-store.svelte.ts
+// src/lib/modules/sessions/index.svelte.ts (simplified)
 
-class SessionStore {
-	// Svelte 5 runes for reactivity
-	sessions = $state<Map<string, SessionState>>(new Map());
-	activeSessionId = $state<string | null>(null);
+function createSessionsContext(notifications: NotificationsApi) {
+	let sessions = $state<Session[]>([]);
 
-	// Derived state — automatically updates when sessions or activeSessionId changes
-	activeSession = $derived(this.activeSessionId ? this.sessions.get(this.activeSessionId) : null);
+	const sessionsByIssueId = $derived.by(() => {
+		const map = new SvelteMap<string, Session[]>();
+		for (const session of sessions) {
+			if (session.issue_id !== null) {
+				const existing = map.get(session.issue_id) ?? [];
+				map.set(session.issue_id, [...existing, session]);
+			}
+		}
+		return map;
+	});
 
-	// Called from Tauri event listener
-	handleSessionEvent(sessionId: string, event: SessionEvent) {
-		const session = this.sessions.get(sessionId);
+	function handleSessionEvent(payload: SessionEventPayload) {
+		const session = sessions.find((s) => s.id === payload.session_id);
 		if (!session) return;
 
-		// Mutating $state triggers re-renders in any component reading it
-		switch (event.type) {
-			case 'message_delta':
-				session.transcript.push({ type: 'text_delta', text: event.text });
-				break;
-			case 'run_state':
-				session.state = event.state;
-				break;
-			case 'usage_update':
-				session.costUsd = event.total_cost_usd;
-				session.tokenCount = event.input_tokens + event.output_tokens;
-				break;
+		// resolved_state comes from Rust — no frontend state mapping needed
+		if (payload.resolved_state) {
+			session.state = payload.resolved_state;
 		}
 	}
-}
 
-export const sessionStore = new SessionStore();
+	return {
+		get sessions() {
+			return sessions;
+		},
+		get sessionsByIssueId() {
+			return sessionsByIssueId;
+		},
+		handleSessionEvent,
+		// ...
+	};
+}
 ```
 
 ## Tauri Event Naming Conventions
@@ -274,25 +254,19 @@ self.emit_session_event(&SessionEvent::RunState {
 
 ## Cleanup
 
-Svelte components must unlisten on destroy to prevent memory leaks:
+Event listeners are set up inside domain modules (in `set*Context()` calls) and cleaned up via `onDestroy`. Each module manages its own listeners — components don't need to handle listener cleanup.
 
-```svelte
-<script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-
-	let unlisten: UnlistenFn;
-
-	onMount(async () => {
-		unlisten = await listen('session-event', (event) => {
-			// handle event
-		});
+```typescript
+// Inside setSessionsContext() — listeners are module-internal
+onMount(async () => {
+	unlistenSessionEvent = await listen<SessionEventPayload>('session-event', (event) => {
+		ctx.handleSessionEvent(event.payload);
 	});
+});
 
-	onDestroy(() => {
-		unlisten?.();
-	});
-</script>
+onDestroy(() => {
+	unlistenSessionEvent?.();
+});
 ```
 
 ## Reference
@@ -300,4 +274,4 @@ Svelte components must unlisten on destroy to prevent memory leaks:
 - **Tauri v2 IPC docs:** https://v2.tauri.app/develop/calling-rust/
 - **Tauri v2 events:** https://v2.tauri.app/develop/calling-rust/#event-system
 - **OpenCovibe session actor:** Primary reference for the actor → emit pattern
-- **Existing Grovekeeper commands:** `src/lib/tauri/commands.ts` (dashboard CRUD pattern)
+- **Grovekeeper modules:** `src/lib/modules/*/index.svelte.ts` (IPC inlined per module)
