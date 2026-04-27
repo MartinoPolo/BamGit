@@ -1,3 +1,5 @@
+import type { ColorPalette } from '$lib/types/generated';
+
 // ─── Frontend-only request types ──────────────────────────────────────────
 
 export interface CreateDashboardRequest {
@@ -56,4 +58,38 @@ export function isThemeMode(value: unknown): value is ThemeMode {
 
 export function isViewMode(value: unknown): value is ViewMode {
 	return value === 'cards' || value === 'forest';
+}
+
+export function findPaletteForDashboard(
+	palettes: ColorPalette[],
+	colorPaletteId: string | null,
+	defaultPaletteId: string,
+): ColorPalette | null {
+	if (colorPaletteId === null) {
+		return palettes.find((p) => p.id === defaultPaletteId) ?? palettes[0] ?? null;
+	}
+	return palettes.find((p) => p.id === colorPaletteId) ?? null;
+}
+
+export function selectActiveDashboardId(
+	dashboards: { id: string }[],
+	lastViewedId: string | null,
+): string | null {
+	if (lastViewedId !== null && dashboards.some((d) => d.id === lastViewedId)) {
+		return lastViewedId;
+	}
+	if (dashboards.length > 0) {
+		return dashboards[0].id;
+	}
+	return null;
+}
+
+export function resolveActiveDashboardId(
+	dashboards: { id: string }[],
+	currentActiveId: string | null,
+): string | null {
+	if (currentActiveId !== null && dashboards.some((d) => d.id === currentActiveId)) {
+		return currentActiveId;
+	}
+	return dashboards.length > 0 ? dashboards[0].id : null;
 }

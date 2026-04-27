@@ -78,7 +78,6 @@
 		);
 	}
 
-	// fallow-ignore-next-line complexity
 	function handleRunState(event: Record<string, unknown>) {
 		const state = event.state as string;
 		if (state === 'failed' || state === 'completed') {

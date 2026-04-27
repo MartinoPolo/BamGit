@@ -3,7 +3,8 @@
 	"entry": [
 		"src/lib/components/ui/*/index.ts",
 		"src/lib/modules/*/index.ts",
-		"**/*.stories.svelte"
+		"**/*.stories.svelte",
+		"src/lib/reactivity/*.svelte.ts"
 	],
 	"ignorePatterns": ["src/lib/types/generated/**"],
 	"ignoreDependencies": [
@@ -16,6 +17,9 @@
 		"@fallow-cli/win32-x64-msvc",
 		"low-poly-2d-trees"
 	],
+	"health": {
+		"maxCrap": 60
+	},
 	"rules": {
 		"unused-files": "error",
 		"unused-exports": "warn",

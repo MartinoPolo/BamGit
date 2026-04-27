@@ -32,9 +32,9 @@
 					{disabled}
 				>
 					{#if issue.state === 'OPEN'}
-						<CircleDot size={12} class="flex-shrink-0 text-green-400" />
+						<CircleDot size={12} class="shrink-0 text-green-400" />
 					{:else}
-						<CircleCheck size={12} class="flex-shrink-0 text-purple-400" />
+						<CircleCheck size={12} class="shrink-0 text-purple-400" />
 					{/if}
 					<span class="min-w-0 truncate">#{issue.number} {issue.title}</span>
 				</button>

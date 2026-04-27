@@ -52,21 +52,20 @@
 		operationError = null;
 	}
 
-	// fallow-ignore-next-line complexity
 	async function handleSaveEdit() {
 		if (editingPaletteId === null) {
 			return;
 		}
 		const colors = parseColors(editColorsInput);
-		if (!editName.trim() || colors.length === 0) {
+		const trimmedName = editName.trim();
+		if (!trimmedName || colors.length === 0) {
 			operationError = 'Name and at least one valid hex color required';
 			return;
 		}
-
 		try {
 			await boardStore.updatePalette({
 				id: editingPaletteId,
-				name: editName.trim(),
+				name: trimmedName,
 				colors,
 			});
 			await boardStore.refreshPalettes();

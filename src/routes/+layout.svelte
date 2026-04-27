@@ -32,15 +32,12 @@
 		boardStore.loadPalettes();
 	});
 
-	// fallow-ignore-next-line complexity
 	async function handleCreateDashboard(
 		request: CreateDashboardRequest,
 		selectedRepoIds: string[],
 	) {
 		try {
 			const created = await boardStore.createDashboard(request);
-
-			// Add repo pointers for portfolio dashboards
 			if (request.type === 'portfolio' && selectedRepoIds.length > 0) {
 				for (const repoId of selectedRepoIds) {
 					await boardStore.addRepoToPortfolio({
@@ -49,7 +46,6 @@
 					});
 				}
 			}
-
 			await boardStore.refreshDashboards();
 			boardStore.selectDashboard(created.id);
 		} catch (err) {

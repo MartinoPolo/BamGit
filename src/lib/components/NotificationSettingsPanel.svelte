@@ -106,7 +106,7 @@
 							<span
 								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.sound_enabled ===
 								true
-									? 'translate-x-[18px]'
+									? 'translate-x-4.5'
 									: ''}"
 							></span>
 						</button>
@@ -130,7 +130,7 @@
 							<span
 								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.toast_enabled ===
 								true
-									? 'translate-x-[18px]'
+									? 'translate-x-4.5'
 									: ''}"
 							></span>
 						</button>
@@ -156,7 +156,7 @@
 							<span
 								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.window_flash_enabled ===
 								true
-									? 'translate-x-[18px]'
+									? 'translate-x-4.5'
 									: ''}"
 							></span>
 						</button>

@@ -5,6 +5,7 @@
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { useActions } from '$lib/modules/actions';
 	import { useNotifications, NOTIFICATION_DOT_COLORS } from '$lib/modules/notifications';
+	import { findNotificationDotColor } from '$lib/modules/notifications/notification-helpers.js';
 	import { useSessions } from '$lib/modules/sessions';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/modules/issues';
 	import type { PrunableIssue } from '$lib/types/generated';
@@ -26,22 +27,16 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 
-	// fallow-ignore-next-line complexity
 	function getNotificationDotColor(issueId: string): string | null {
 		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
 		if (issueSessions === undefined) {
 			return null;
 		}
-		for (const session of issueSessions) {
-			const pendingType = notificationStore.getPendingType(session.id);
-			if (pendingType !== undefined) {
-				const color = NOTIFICATION_DOT_COLORS[pendingType];
-				if (color !== null) {
-					return color;
-				}
-			}
-		}
-		return null;
+		return findNotificationDotColor(
+			issueSessions.map((s) => s.id),
+			(id) => notificationStore.getPendingType(id),
+			NOTIFICATION_DOT_COLORS,
+		);
 	}
 
 	let createDialogOpen = $state(false);
@@ -60,8 +55,6 @@
 	let prunableIssues = $state<PrunableIssue[]>([]);
 	let pruneRemoving = $state(false);
 
-	// Active palette colors for the current dashboard
-	// fallow-ignore-next-line complexity
 	const activePaletteColors = $derived.by(() => {
 		const paletteId = boardStore.activeDashboard?.color_palette_id ?? null;
 		const palette = boardStore.getPaletteForDashboard(paletteId);
@@ -216,7 +209,19 @@
 		}
 	}
 
-	// fallow-ignore-next-line complexity
+	async function pruneWorktrees(issueIds: string[], workingDirectory: string) {
+		for (const issueId of issueIds) {
+			const issue = issueStore.issues.find((i) => i.id === issueId);
+			if (issue?.branch_name != null) {
+				await issueStore.removeWorktree({
+					issue_id: issueId,
+					branch_name: issue.branch_name,
+					working_directory: workingDirectory,
+				});
+			}
+		}
+	}
+
 	async function handlePrune(issueIds: string[]) {
 		const dashboard = boardStore.activeDashboard;
 		if (dashboard?.local_folder == null) {
@@ -224,16 +229,7 @@
 		}
 		pruneRemoving = true;
 		try {
-			for (const issueId of issueIds) {
-				const issue = issueStore.issues.find((i) => i.id === issueId);
-				if (issue?.branch_name != null) {
-					await issueStore.removeWorktree({
-						issue_id: issueId,
-						branch_name: issue.branch_name,
-						working_directory: dashboard.local_folder,
-					});
-				}
-			}
+			await pruneWorktrees(issueIds, dashboard.local_folder);
 			pruneDialogOpen = false;
 		} catch (err) {
 			console.error('Failed to prune worktrees:', err);

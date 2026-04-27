@@ -47,7 +47,6 @@ function createActionsContext() {
 
 	const visibleActions = $derived(actions.filter((action) => action.visible));
 
-	// fallow-ignore-next-line complexity
 	async function fetchAndSetActions(showLoading: boolean) {
 		if (currentDashboardId === null) {
 			return;

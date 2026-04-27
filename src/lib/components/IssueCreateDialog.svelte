@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CreateIssueRequest } from '$lib/modules/issues';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
+	import { syncDialogVisibility, buildCreateIssueRequest } from './dialog-helpers.js';
 
 	interface Props {
 		open: boolean;
@@ -13,21 +14,16 @@
 
 	let { open, dashboardId, paletteColors, defaultColor, onClose, onCreate }: Props = $props();
 
-	// fallow-ignore-next-line code-duplication
 	let name = $state('');
 	let priority = $state<'low' | 'medium' | 'high' | 'top' | ''>('');
 	let color = $state('');
 	let githubIssueUrl = $state('');
 	let dialogElement: HTMLDialogElement | undefined = $state();
 
-	// fallow-ignore-next-line complexity
 	$effect(() => {
-		if (open && dialogElement !== undefined && !dialogElement.open) {
+		syncDialogVisibility(open, dialogElement, () => {
 			color = defaultColor;
-			dialogElement.showModal();
-		} else if (!open && dialogElement?.open === true) {
-			dialogElement.close();
-		}
+		});
 	});
 
 	function resetForm() {
@@ -37,30 +33,12 @@
 		githubIssueUrl = '';
 	}
 
-	// fallow-ignore-next-line complexity
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!name.trim()) {
+		const request = buildCreateIssueRequest(dashboardId, name, color, priority, githubIssueUrl);
+		if (request === null) {
 			return;
 		}
-
-		const request: CreateIssueRequest = {
-			dashboard_id: dashboardId,
-			name: name.trim(),
-			color,
-		};
-
-		if (priority) {
-			request.priority = priority;
-		}
-		if (githubIssueUrl.trim()) {
-			request.github_issue_url = githubIssueUrl.trim();
-			const issueNumberMatch = githubIssueUrl.match(/\/issues\/(\d+)/);
-			if (issueNumberMatch) {
-				request.github_issue_number = parseInt(issueNumberMatch[1], 10);
-			}
-		}
-
 		onCreate(request);
 		resetForm();
 		onClose();

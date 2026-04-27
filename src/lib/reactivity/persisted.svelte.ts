@@ -114,14 +114,12 @@ export class Persisted<T> implements MutableState<T> {
 		this.#update?.();
 	}
 
-	/** @public */
 	setDefaultValue(): void {
 		this.#cached = this.#defaultValue;
 		this.#setToStorage(this.#defaultValue);
 		this.#update?.();
 	}
 
-	/** @public */
 	readonly(): ReadableState<T> {
 		return new ReadonlyState(this);
 	}
