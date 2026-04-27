@@ -30,6 +30,13 @@ export default defineConfig({
 		watch: {
 			ignored: ['**/src-tauri/**'],
 		},
+		warmup: {
+			clientFiles: [
+				'./src/routes/issues/+page.svelte',
+				'./src/routes/sessions/+page.svelte',
+				'./src/routes/settings/+page.svelte',
+			],
+		},
 	},
 	test: {
 		passWithNoTests: true,
