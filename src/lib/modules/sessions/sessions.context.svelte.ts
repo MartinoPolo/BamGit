@@ -9,7 +9,7 @@ import type {
 	DiscoveredSessionsPayload,
 	NotificationEventType,
 } from '$lib/types/generated';
-import { computeSessionEventEffects, type NotificationAction } from './session-events.js';
+import { computeSessionEventEffects, type NotificationAction } from './session_events.js';
 import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Module-internal request types ──────────────────────────────────────────

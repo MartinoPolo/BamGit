@@ -7,7 +7,7 @@ import {
 import type { ColorPalette } from '$lib/types/generated';
 
 describe('findPaletteForDashboard', () => {
-	const DEFAULT_ID = 'palette-vivid';
+	const defaultId = 'palette-vivid';
 	const palettes: ColorPalette[] = [
 		{ id: 'palette-first', name: 'First', colors: [], is_built_in: true },
 		{ id: 'palette-vivid', name: 'Vivid', colors: [], is_built_in: true },
@@ -15,7 +15,7 @@ describe('findPaletteForDashboard', () => {
 	];
 
 	it('returns the default palette when colorPaletteId is null', () => {
-		expect(findPaletteForDashboard(palettes, null, DEFAULT_ID)).toEqual(palettes[1]);
+		expect(findPaletteForDashboard(palettes, null, defaultId)).toEqual(palettes[1]);
 	});
 
 	it('falls back to first palette when default is not found', () => {
@@ -23,17 +23,15 @@ describe('findPaletteForDashboard', () => {
 	});
 
 	it('returns null when list is empty and colorPaletteId is null', () => {
-		expect(findPaletteForDashboard([], null, DEFAULT_ID)).toBeNull();
+		expect(findPaletteForDashboard([], null, defaultId)).toBeNull();
 	});
 
 	it('finds palette by id when colorPaletteId is provided', () => {
-		expect(findPaletteForDashboard(palettes, 'palette-custom', DEFAULT_ID)).toEqual(
-			palettes[2],
-		);
+		expect(findPaletteForDashboard(palettes, 'palette-custom', defaultId)).toEqual(palettes[2]);
 	});
 
 	it('returns null when colorPaletteId is not found', () => {
-		expect(findPaletteForDashboard(palettes, 'missing-id', DEFAULT_ID)).toBeNull();
+		expect(findPaletteForDashboard(palettes, 'missing-id', defaultId)).toBeNull();
 	});
 });
 

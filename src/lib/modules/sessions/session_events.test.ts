@@ -3,7 +3,7 @@ import {
 	computeSessionEventEffects,
 	type SessionEventEffects,
 	type SessionPatch,
-} from './session-events';
+} from './session_events.js';
 import type { SessionEvent } from '$lib/types/generated';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -141,7 +141,7 @@ describe('computeSessionEventEffects — usage_update', () => {
 		const { sessionPatch } = computeEffects(
 			makeEvent({
 				type: 'usage_update',
-				cost_usd: null as any,
+				cost_usd: null as unknown as number,
 				input_tokens: 10,
 				output_tokens: 5,
 			}),
@@ -170,8 +170,8 @@ describe('computeSessionEventEffects — usage_update', () => {
 			makeEvent({
 				type: 'usage_update',
 				cost_usd: 0.01,
-				input_tokens: null as any,
-				output_tokens: null as any,
+				input_tokens: null as unknown as number,
+				output_tokens: null as unknown as number,
 			}),
 			null,
 			null,

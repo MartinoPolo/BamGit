@@ -2,7 +2,7 @@
 	import type { CreateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
-	import { syncDialogVisibility, buildCreateDashboardRequest } from './dialog-helpers.js';
+	import { syncDialogVisibility, buildCreateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
 		open: boolean;

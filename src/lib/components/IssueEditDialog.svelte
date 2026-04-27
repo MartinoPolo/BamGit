@@ -2,7 +2,7 @@
 	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
-	import { syncDialogVisibility, buildUpdateIssueRequest } from './dialog-helpers.js';
+	import { syncDialogVisibility, buildUpdateIssueRequest } from './dialog_helpers.js';
 
 	interface Props {
 		issue: Issue | null;

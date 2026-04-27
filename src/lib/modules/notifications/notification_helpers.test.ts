@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findNotificationDotColor } from './notification-helpers.js';
+import { findNotificationDotColor } from './notification_helpers.js';
 import type { NotificationEventType } from '$lib/types/generated';
 
 describe('findNotificationDotColor', () => {

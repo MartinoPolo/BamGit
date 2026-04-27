@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CreateIssueRequest } from '$lib/modules/issues';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
-	import { syncDialogVisibility, buildCreateIssueRequest } from './dialog-helpers.js';
+	import { syncDialogVisibility, buildCreateIssueRequest } from './dialog_helpers.js';
 
 	interface Props {
 		open: boolean;

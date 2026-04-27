@@ -5,7 +5,7 @@ import {
 	buildUpdateIssueRequest,
 	buildCreateDashboardRequest,
 	buildUpdateDashboardRequest,
-} from './dialog-helpers.js';
+} from './dialog_helpers.js';
 
 describe('extractGitHubIssueNumber', () => {
 	it('extracts issue number from standard GitHub URL', () => {
