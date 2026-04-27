@@ -15,6 +15,7 @@ export default [
 			'node_modules',
 			'scripts',
 			'src-tauri',
+			'src/lib/types/generated',
 			'**/*.config.*',
 			'*.d.ts',
 			'**/*.svelte.ts',

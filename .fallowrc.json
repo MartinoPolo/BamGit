@@ -1,6 +1,7 @@
 {
 	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
 	"entry": ["src/lib/components/ui/*/index.ts", "**/*.stories.svelte"],
+	"ignorePatterns": ["src/lib/types/generated/**"],
 	"ignoreDependencies": [
 		"@typescript-eslint/parser",
 		"vitest-browser-svelte",

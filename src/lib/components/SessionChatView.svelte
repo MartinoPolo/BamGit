@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Session, SessionEventPayload } from '$lib/types/session';
-	import { sendMessage, interruptSession } from '$lib/tauri/session_commands';
+	import type { Session, SessionEventPayload } from '$lib/types/generated';
+	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
 	import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 	import { onMount, onDestroy } from 'svelte';
 
@@ -17,6 +17,8 @@
 	}
 
 	let { session }: Props = $props();
+
+	const sessionStore = useSessions();
 
 	let next_message_id = 0;
 	function create_message(fields: Omit<ChatMessage, 'id'>): ChatMessage {
@@ -135,7 +137,7 @@
 		messages = [...messages, create_message({ role: 'user', content: message })];
 
 		try {
-			await sendMessage(session.id, message);
+			await sessionStore.sendMessage(session.id, message);
 		} catch (err) {
 			messages = [
 				...messages,
@@ -148,7 +150,7 @@
 
 	async function handleInterrupt() {
 		try {
-			await interruptSession(session.id);
+			await sessionStore.interruptSession(session.id);
 		} catch (err) {
 			messages = [
 				...messages,

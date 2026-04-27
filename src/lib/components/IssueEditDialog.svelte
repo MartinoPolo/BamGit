@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Issue, UpdateIssueRequest } from '$lib/types/issue';
-	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
+	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues/index.svelte.js';
+	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board/index.svelte.js';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
 
 	interface Props {

@@ -5,12 +5,14 @@ use std::time::Duration;
 use rusqlite::Connection;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
+use ts_rs::TS;
 
 use super::discovery::{DiscoveredSession, SessionDiscoverer};
 use crate::database::connection::open_actor_connection;
 
 /// Payload emitted when discovered sessions change.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, TS)]
+#[ts(export)]
 pub struct DiscoveredSessionsPayload {
     pub sessions: Vec<DiscoveredSession>,
 }

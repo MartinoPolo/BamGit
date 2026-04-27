@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { GhCliAvailability } from '$lib/types/github';
+	import type { GhCliAvailability } from '$lib/types/generated';
 	import { AlertTriangle } from 'lucide-svelte';
 
 	interface Props {

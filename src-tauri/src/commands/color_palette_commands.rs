@@ -84,7 +84,7 @@ pub fn seed_built_in_palettes_with_connection(
 
 #[tauri::command]
 pub fn get_all_color_palettes(state: State<DatabaseState>) -> Result<Vec<ColorPalette>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let query = format!(
         "SELECT {PALETTE_SELECT_COLUMNS} FROM color_palettes ORDER BY is_built_in DESC, name"
@@ -104,7 +104,7 @@ pub fn get_all_color_palettes(state: State<DatabaseState>) -> Result<Vec<ColorPa
 
 #[tauri::command]
 pub fn get_color_palette(state: State<DatabaseState>, id: String) -> Result<ColorPalette, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let query = format!("SELECT {PALETTE_SELECT_COLUMNS} FROM color_palettes WHERE id = ?1");
     connection
@@ -117,7 +117,7 @@ pub fn create_color_palette(
     state: State<DatabaseState>,
     request: CreateColorPaletteRequest,
 ) -> Result<ColorPalette, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
     let id = Uuid::new_v4().to_string();
 
     let colors_json =
@@ -144,7 +144,7 @@ pub fn update_color_palette(
     state: State<DatabaseState>,
     request: UpdateColorPaletteRequest,
 ) -> Result<ColorPalette, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     let query = format!("SELECT {PALETTE_SELECT_COLUMNS} FROM color_palettes WHERE id = ?1");
     let existing = connection
@@ -177,7 +177,7 @@ pub fn update_color_palette(
 
 #[tauri::command]
 pub fn delete_color_palette(state: State<DatabaseState>, id: String) -> Result<(), String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     // Check if built-in
     let is_built_in: i32 = connection
@@ -225,7 +225,7 @@ pub fn get_next_available_color(
     state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<String, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     // Get dashboard's palette ID
     let palette_id: Option<String> = connection

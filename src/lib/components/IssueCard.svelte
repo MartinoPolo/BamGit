@@ -1,9 +1,7 @@
 <script lang="ts">
-	import type { Issue } from '$lib/types/issue';
-	import type { Action } from '$lib/types/action';
-	import type { GitHubStatusCache } from '$lib/types/github';
-	import type { GitStatusCache } from '$lib/types/git_status';
-	import type { IssueCardCallbacks } from '$lib/types/issue_card_callbacks';
+	import type { Issue } from '$lib/modules/issues/index.svelte.js';
+	import type { Action, GitStatusCache } from '$lib/types/generated';
+	import type { IssueCardCallbacks } from '$lib/modules/issues/index.svelte.js';
 	import PullRequestBadge from './PullRequestBadge.svelte';
 	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
@@ -14,9 +12,8 @@
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
 		actions?: Action[];
-		githubCache?: GitHubStatusCache | null;
+		cache?: GitStatusCache | null;
 		ghAvailable?: boolean;
-		gitStatus?: GitStatusCache | undefined;
 		notificationDotColor?: string | null;
 		indented?: boolean;
 		isLastChild?: boolean;
@@ -28,9 +25,8 @@
 	let {
 		issue,
 		actions = [],
-		githubCache = null,
+		cache = null,
 		ghAvailable = false,
-		gitStatus,
 		notificationDotColor = null,
 		indented = false,
 		isLastChild = false,
@@ -159,9 +155,9 @@
 
 			<!-- GitHub & git badges -->
 			<div class="flex items-center gap-1">
-				{#if githubCache?.github_issue_state}
+				{#if cache?.github_issue_state}
 					<GitHubIssueBadge
-						state={githubCache.github_issue_state}
+						state={cache.github_issue_state}
 						url={issue.github_issue_url}
 						issueNumber={issue.github_issue_number}
 						disabled={!ghAvailable}
@@ -171,16 +167,16 @@
 						#{issue.github_issue_number}
 					</span>
 				{/if}
-				{#if githubCache?.pr_state}
+				{#if cache?.pr_state}
 					<PullRequestBadge
-						state={githubCache.pr_state}
-						url={githubCache.pr_url}
-						prNumber={githubCache.pr_number}
+						state={cache.pr_state}
+						url={cache.pr_url}
+						prNumber={cache.pr_number}
 						disabled={!ghAvailable}
 					/>
 				{/if}
 				{#if issue.branch_name}
-					<GitBadgeGroup branchName={issue.branch_name} {gitStatus} />
+					<GitBadgeGroup branchName={issue.branch_name} gitStatus={cache ?? undefined} />
 				{/if}
 				{#if worktreeBadge}
 					<span
@@ -313,10 +309,10 @@
 							{new Date(issue.created_at).toLocaleDateString()}
 						</div>
 					{/if}
-					{#if githubCache}
+					{#if cache}
 						<div>
 							<span class="text-muted-foreground/60">Synced:</span>
-							<SyncStatusIndicator fetchedAt={githubCache.fetched_at} />
+							<SyncStatusIndicator fetchedAt={cache.fetched_at} />
 						</div>
 					{/if}
 				</div>

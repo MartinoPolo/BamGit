@@ -1,28 +1,19 @@
 <script lang="ts">
-	import { useDashboard } from '$lib/context/dashboard.context.svelte.js';
-	import { useGitStatus } from '$lib/context/git_status.context.svelte.js';
-	import { useIssues } from '$lib/context/issues.context.svelte.js';
-	import { useGithub } from '$lib/context/github.context.svelte.js';
-	import { useActions } from '$lib/context/actions.context.svelte.js';
-	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
-	import { useSessions } from '$lib/context/sessions.context.svelte.js';
-	import { NOTIFICATION_DOT_COLORS } from '$lib/types/notification';
-	import { useColorPalettes } from '$lib/context/color_palettes.context.svelte.js';
-	import { useViewPreference } from '$lib/context/view_preference.context.svelte.js';
-	import { FALLBACK_ISSUE_COLOR } from '$lib/types/color_palette';
+	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board/index.svelte.js';
+	import { useIssues } from '$lib/modules/issues/index.svelte.js';
+	import { useVersionControl } from '$lib/modules/version-control/index.svelte.js';
+	import { useActions } from '$lib/modules/actions/index.svelte.js';
 	import {
-		createIssue,
-		archiveIssue,
-		unarchiveIssue,
-		updateIssue,
-		deleteIssue,
-	} from '$lib/tauri/issue_commands';
-	import { setupWorktree, removeWorktree, getPrunableIssues } from '$lib/tauri/worktree_commands';
-	import { executeAction } from '$lib/tauri/action_commands';
-	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/types/issue';
-	import type { Session } from '$lib/types/session';
-	import { SvelteMap } from 'svelte/reactivity';
-	import type { PrunableIssue } from '$lib/types/worktree';
+		useNotifications,
+		NOTIFICATION_DOT_COLORS,
+	} from '$lib/modules/notifications/index.svelte.js';
+	import { useSessions } from '$lib/modules/sessions/index.svelte.js';
+	import type {
+		Issue,
+		CreateIssueRequest,
+		UpdateIssueRequest,
+	} from '$lib/modules/issues/index.svelte.js';
+	import type { PrunableIssue } from '$lib/types/generated';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
 	import DashboardToolbar from '$lib/components/DashboardToolbar.svelte';
@@ -34,31 +25,12 @@
 	import AssignedIssuesPanel from '$lib/components/AssignedIssuesPanel.svelte';
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 
-	const dashboardStore = useDashboard();
-	const gitStatusStore = useGitStatus();
+	const boardStore = useBoard();
 	const issueStore = useIssues();
-	const githubStore = useGithub();
+	const versionControlStore = useVersionControl();
 	const actionStore = useActions();
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
-	const paletteStore = useColorPalettes();
-	const viewPreferenceStore = useViewPreference();
-
-	const sessionsByIssueId = $derived.by(() => {
-		const map = new SvelteMap<string, Session[]>();
-		for (const session of sessionStore.sessions) {
-			if (session.issue_id === null) {
-				continue;
-			}
-			const existing = map.get(session.issue_id);
-			if (existing !== undefined) {
-				existing.push(session);
-			} else {
-				map.set(session.issue_id, [session]);
-			}
-		}
-		return map;
-	});
 
 	function getNotificationDotColor(issueId: string): string | null {
 		for (const session of sessionStore.sessions) {
@@ -94,14 +66,14 @@
 
 	// Active palette colors for the current dashboard
 	const activePaletteColors = $derived.by(() => {
-		const paletteId = dashboardStore.activeDashboard?.color_palette_id ?? null;
-		const palette = paletteStore.getPaletteForDashboard(paletteId);
+		const paletteId = boardStore.activeDashboard?.color_palette_id ?? null;
+		const palette = boardStore.getPaletteForDashboard(paletteId);
 		return palette?.colors ?? [];
 	});
 
 	// Parse "owner/repo" from dashboard's github_repo field
 	const githubRepoParts = $derived.by(() => {
-		const githubRepo: string | null | undefined = dashboardStore.activeDashboard?.github_repo;
+		const githubRepo: string | null | undefined = boardStore.activeDashboard?.github_repo;
 		if (githubRepo == null) {
 			return null;
 		}
@@ -114,40 +86,39 @@
 
 	// Check gh availability on mount
 	$effect(() => {
-		githubStore.checkAvailability();
+		versionControlStore.checkAvailability();
 	});
 
-	// Load issues and GitHub caches when active dashboard changes
+	// Load issues and version control state when active dashboard changes
 	let lastLoadedDashboardId = $state<string | null>(null);
 
 	$effect(() => {
-		const dashboardId = dashboardStore.activeDashboardId;
+		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId !== null && dashboardId !== lastLoadedDashboardId) {
 			lastLoadedDashboardId = dashboardId;
 			issueStore.loadIssues(dashboardId);
-			githubStore.loadCaches(dashboardId);
-			gitStatusStore.loadStatusesForDashboard(dashboardId);
+			versionControlStore.loadStates(dashboardId);
 			actionStore.loadActions(dashboardId);
 			if (githubRepoParts) {
-				githubStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
+				versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
 			}
 		}
 	});
 
 	async function handleSyncAll() {
-		const dashboardId: string | null = dashboardStore.activeDashboardId;
+		const dashboardId: string | null = boardStore.activeDashboardId;
 		if (dashboardId === null || githubRepoParts === null) {
 			return;
 		}
-		await githubStore.syncAll(dashboardId, githubRepoParts.owner, githubRepoParts.repo);
+		await versionControlStore.syncAll(dashboardId, githubRepoParts.owner, githubRepoParts.repo);
 	}
 
 	async function openCreateDialog() {
 		createDialogOpen = true;
-		const dashboardId = dashboardStore.activeDashboardId;
+		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId !== null) {
 			try {
-				nextAvailableColor = await paletteStore.getNextColor(dashboardId);
+				nextAvailableColor = await boardStore.getNextColor(dashboardId);
 			} catch {
 				nextAvailableColor = activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
 			}
@@ -156,7 +127,7 @@
 
 	async function handleCreateIssue(request: CreateIssueRequest) {
 		try {
-			await createIssue(request);
+			await issueStore.addIssue(request);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to create issue:', err);
@@ -165,7 +136,7 @@
 
 	async function handleArchiveIssue(id: string) {
 		try {
-			await archiveIssue(id);
+			await issueStore.archiveIssue(id);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to archive issue:', err);
@@ -174,7 +145,7 @@
 
 	async function handleUnarchiveIssue(id: string) {
 		try {
-			await unarchiveIssue(id);
+			await issueStore.unarchiveIssue(id);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to unarchive issue:', err);
@@ -183,7 +154,7 @@
 
 	async function handleUpdateIssue(request: UpdateIssueRequest) {
 		try {
-			await updateIssue(request);
+			await issueStore.updateIssue(request);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to update issue:', err);
@@ -192,7 +163,7 @@
 
 	async function handleDeleteIssue(id: string) {
 		try {
-			await deleteIssue(id);
+			await issueStore.removeIssue(id);
 			await issueStore.refresh();
 		} catch (err) {
 			console.error('Failed to delete issue:', err);
@@ -200,7 +171,7 @@
 	}
 
 	async function handleSetupWorktree(issue: Issue) {
-		const dashboard = dashboardStore.activeDashboard;
+		const dashboard = boardStore.activeDashboard;
 		if (dashboard?.local_folder == null) {
 			console.error('Dashboard has no local_folder configured');
 			return;
@@ -210,7 +181,7 @@
 			return;
 		}
 		try {
-			await setupWorktree({
+			await issueStore.setupWorktree({
 				issue_id: issue.id,
 				branch_name: issue.branch_name,
 				color: issue.color,
@@ -223,7 +194,7 @@
 	}
 
 	async function handleRemoveWorktree(issue: Issue) {
-		const dashboard = dashboardStore.activeDashboard;
+		const dashboard = boardStore.activeDashboard;
 		if (dashboard?.local_folder == null) {
 			console.error('Dashboard has no local_folder configured');
 			return;
@@ -233,7 +204,7 @@
 			return;
 		}
 		try {
-			await removeWorktree({
+			await issueStore.removeWorktree({
 				issue_id: issue.id,
 				branch_name: issue.branch_name,
 				working_directory: dashboard.local_folder,
@@ -244,12 +215,12 @@
 	}
 
 	async function handleOpenPruneDialog() {
-		const dashboardId = dashboardStore.activeDashboardId;
+		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId == null) {
 			return;
 		}
 		try {
-			prunableIssues = await getPrunableIssues(dashboardId);
+			prunableIssues = await issueStore.getPrunableIssues(dashboardId);
 			pruneDialogOpen = true;
 		} catch (err) {
 			console.error('Failed to fetch prunable issues:', err);
@@ -257,7 +228,7 @@
 	}
 
 	async function handlePrune(issueIds: string[]) {
-		const dashboard = dashboardStore.activeDashboard;
+		const dashboard = boardStore.activeDashboard;
 		if (dashboard?.local_folder == null) {
 			return;
 		}
@@ -266,7 +237,7 @@
 			for (const issueId of issueIds) {
 				const issue = issueStore.issues.find((i) => i.id === issueId);
 				if (issue?.branch_name != null) {
-					await removeWorktree({
+					await issueStore.removeWorktree({
 						issue_id: issueId,
 						branch_name: issue.branch_name,
 						working_directory: dashboard.local_folder,
@@ -283,36 +254,36 @@
 
 	async function handleExecuteAction(actionId: string, issueId: string) {
 		try {
-			await executeAction(actionId, issueId);
+			await actionStore.executeAction(actionId, issueId);
 		} catch (err) {
 			console.error('Failed to execute action:', err);
 		}
 	}
 </script>
 
-{#if dashboardStore.loading}
+{#if boardStore.loading}
 	<p class="text-muted-foreground">Loading...</p>
-{:else if dashboardStore.dashboards.length === 0}
+{:else if boardStore.dashboards.length === 0}
 	<OnboardingCard
 		onCreateDashboard={() => {
-			dashboardStore.showCreateDialog = true;
+			boardStore.showCreateDialog = true;
 		}}
 	/>
-{:else if dashboardStore.activeDashboard === null}
+{:else if boardStore.activeDashboard === null}
 	<p class="text-muted-foreground">Select a dashboard from the sidebar.</p>
 {:else}
 	<div class="flex flex-col gap-4">
 		<!-- Dashboard header -->
 		<div class="flex items-center gap-2">
-			<h1 class="text-xl font-semibold">{dashboardStore.activeDashboard.name}</h1>
+			<h1 class="text-xl font-semibold">{boardStore.activeDashboard.name}</h1>
 			<span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-				{dashboardStore.activeDashboard.type}
+				{boardStore.activeDashboard.type}
 			</span>
 		</div>
 
 		<!-- gh CLI setup banner -->
-		{#if githubRepoParts && githubStore.availability !== 'available'}
-			<GhSetupBanner availability={githubStore.availability} />
+		{#if githubRepoParts && versionControlStore.ghAvailability !== 'available'}
+			<GhSetupBanner availability={versionControlStore.ghAvailability} />
 		{/if}
 
 		<!-- Toolbar -->
@@ -321,16 +292,16 @@
 			showArchived={issueStore.showArchived}
 			archivedCount={issueStore.archivedIssues.length}
 			{allExpanded}
-			ghAvailable={githubStore.isAvailable}
-			syncing={githubStore.syncing}
+			ghAvailable={versionControlStore.isGhAvailable}
+			syncing={versionControlStore.syncing}
 			onAddIssue={openCreateDialog}
 			onSortChange={(mode) => issueStore.setSortMode(mode)}
 			onToggleArchived={() => issueStore.toggleShowArchived()}
 			onToggleExpandAll={() => (allExpanded = !allExpanded)}
 			onSyncAll={githubRepoParts ? handleSyncAll : undefined}
 			onPruneWorktrees={handleOpenPruneDialog}
-			viewMode={viewPreferenceStore.mode}
-			onViewModeChange={(mode) => (viewPreferenceStore.mode = mode)}
+			viewMode={boardStore.viewMode}
+			onViewModeChange={(mode) => (boardStore.viewMode = mode)}
 		/>
 
 		<!-- Issue list or empty state -->
@@ -340,11 +311,11 @@
 			<p class="text-destructive">Error: {issueStore.error}</p>
 		{:else if issueStore.activeIssues.length === 0 && issueStore.archivedIssues.length === 0}
 			<EmptyIssueState onAddIssue={openCreateDialog} />
-		{:else if viewPreferenceStore.mode === 'forest'}
+		{:else if boardStore.viewMode === 'forest'}
 			<ForestView
 				issues={forestIssues}
-				getGitStatus={(issueId) => gitStatusStore.getStatus(issueId)}
-				getSessionsForIssue={(issueId) => sessionsByIssueId.get(issueId) ?? []}
+				getGitStatus={(issueId) => versionControlStore.getState(issueId)}
+				getSessionsForIssue={(issueId) => sessionStore.sessionsByIssueId.get(issueId) ?? []}
 				onSelectIssue={(issue) => (editingIssue = issue)}
 			/>
 		{:else}
@@ -352,13 +323,12 @@
 				parentIssues={issueStore.parentIssues}
 				archivedIssues={issueStore.archivedIssues}
 				showArchived={issueStore.showArchived}
-				isPortfolio={dashboardStore.activeDashboard.type === 'portfolio'}
+				isPortfolio={boardStore.activeDashboard.type === 'portfolio'}
 				actions={actionStore.visibleActions}
 				forceExpanded={allExpanded ? true : undefined}
-				githubCacheMap={githubStore.cacheMap}
-				ghAvailable={githubStore.isAvailable}
+				cacheMap={versionControlStore.stateMap}
+				ghAvailable={versionControlStore.isGhAvailable}
 				getChildren={issueStore.getChildren}
-				getGitStatus={(issueId) => gitStatusStore.getStatus(issueId)}
 				{getNotificationDotColor}
 				getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
 				onArchive={handleArchiveIssue}
@@ -372,17 +342,17 @@
 		{/if}
 
 		<!-- Assigned issues panel -->
-		{#if githubStore.assignedIssues.length > 0}
+		{#if versionControlStore.assignedIssues.length > 0}
 			<AssignedIssuesPanel
-				issues={githubStore.assignedIssues}
-				disabled={githubStore.isAvailable !== true}
+				issues={versionControlStore.assignedIssues}
+				disabled={versionControlStore.isGhAvailable !== true}
 			/>
 		{/if}
 	</div>
 
 	<IssueCreateDialog
 		open={createDialogOpen}
-		dashboardId={dashboardStore.activeDashboard.id}
+		dashboardId={boardStore.activeDashboard.id}
 		paletteColors={activePaletteColors}
 		defaultColor={nextAvailableColor}
 		onClose={() => (createDialogOpen = false)}

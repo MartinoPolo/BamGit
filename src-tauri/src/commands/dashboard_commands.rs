@@ -36,7 +36,7 @@ pub fn create_dashboard(
     state: State<DatabaseState>,
     request: CreateDashboardRequest,
 ) -> Result<Dashboard, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
     let id = Uuid::new_v4().to_string();
 
     connection
@@ -74,7 +74,7 @@ pub fn create_dashboard(
 
 #[tauri::command]
 pub fn get_dashboards(state: State<DatabaseState>) -> Result<Vec<Dashboard>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let query = format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards");
     let mut statement = connection
@@ -92,7 +92,7 @@ pub fn get_dashboards(state: State<DatabaseState>) -> Result<Vec<Dashboard>, Str
 
 #[tauri::command]
 pub fn get_dashboard(state: State<DatabaseState>, id: String) -> Result<Dashboard, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let query = format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards WHERE id = ?1");
     connection
@@ -107,7 +107,7 @@ pub fn update_dashboard(
     state: State<DatabaseState>,
     request: UpdateDashboardRequest,
 ) -> Result<Dashboard, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     let query = format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards WHERE id = ?1");
     let existing = connection
@@ -159,7 +159,7 @@ pub fn update_dashboard(
 
 #[tauri::command]
 pub fn delete_dashboard(state: State<DatabaseState>, id: String) -> Result<(), String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     let rows_affected = connection
         .execute("DELETE FROM dashboards WHERE id = ?1", [&id])

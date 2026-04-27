@@ -11,7 +11,7 @@ use crate::notification::service::NotificationService;
 pub fn get_notification_configs(
     state: State<DatabaseState>,
 ) -> Result<Vec<NotificationConfig>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let query = format!(
         "SELECT {NOTIFICATION_CONFIG_SELECT_COLUMNS} FROM notification_config ORDER BY event_type"
@@ -34,7 +34,7 @@ pub fn update_notification_config(
     state: State<DatabaseState>,
     request: UpdateNotificationConfigRequest,
 ) -> Result<NotificationConfig, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
 
     let select_query = format!(
         "SELECT {NOTIFICATION_CONFIG_SELECT_COLUMNS} FROM notification_config WHERE event_type = ?1"
@@ -83,7 +83,7 @@ pub fn test_notification_sound(
     event_type: String,
     state: State<DatabaseState>,
 ) -> Result<(), String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let sound_file: Option<String> = connection
         .query_row(

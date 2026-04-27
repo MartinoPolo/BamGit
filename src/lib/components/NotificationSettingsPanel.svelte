@@ -1,10 +1,6 @@
 <script lang="ts">
-	import type { NotificationEventType } from '$lib/types/notification';
-	import {
-		updateNotificationConfig,
-		testNotificationSound,
-	} from '$lib/tauri/notification_commands';
-	import { useNotifications } from '$lib/context/notifications.context.svelte.js';
+	import type { NotificationEventType } from '$lib/types/generated';
+	import { useNotifications } from '$lib/modules/notifications/index.svelte.js';
 	import { onMount } from 'svelte';
 
 	const notificationStore = useNotifications();
@@ -35,7 +31,7 @@
 		value: boolean,
 	) {
 		try {
-			const updated = await updateNotificationConfig({
+			const updated = await notificationStore.updateNotificationConfig({
 				event_type: eventType,
 				[channel]: value,
 			});
@@ -47,7 +43,7 @@
 
 	async function handleTestSound(eventType: NotificationEventType) {
 		try {
-			await testNotificationSound(eventType);
+			await notificationStore.testNotificationSound(eventType);
 		} catch (error) {
 			console.error('Failed to test sound:', error);
 		}

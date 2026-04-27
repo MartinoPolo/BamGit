@@ -5,9 +5,11 @@ use std::time::SystemTime;
 
 use serde::{Deserialize, Serialize};
 use sysinfo::{ProcessRefreshKind, System, UpdateKind};
+use ts_rs::TS;
 
 /// Status of an externally-discovered Claude Code session.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
 #[serde(rename_all = "snake_case")]
 pub enum DiscoveredSessionStatus {
     Working,
@@ -18,7 +20,8 @@ pub enum DiscoveredSessionStatus {
 }
 
 /// An externally-launched Claude Code session detected via process scanning + JSONL.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct DiscoveredSession {
     /// Composite key: "{project_dir_name}/{session_uuid}"
     pub id: String,
@@ -32,6 +35,7 @@ pub struct DiscoveredSession {
     pub git_branch: Option<String>,
     pub message_count: u32,
     pub cost_usd: f64,
+    #[ts(type = "number")]
     pub token_count: u64,
     pub latest_message: Option<String>,
     pub modified_at: Option<String>,

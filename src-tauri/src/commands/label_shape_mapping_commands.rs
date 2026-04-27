@@ -20,7 +20,7 @@ pub fn get_label_shape_mappings(
     state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<Vec<LabelShapeMapping>, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.read();
 
     let mut statement = connection
         .prepare(
@@ -47,7 +47,7 @@ pub fn upsert_label_shape_mapping(
     color: Option<String>,
     priority_order: i32,
 ) -> Result<LabelShapeMapping, String> {
-    let connection = state.0.lock().map_err(|error| error.to_string())?;
+    let connection = state.write();
     let id = uuid::Uuid::new_v4().to_string();
 
     connection

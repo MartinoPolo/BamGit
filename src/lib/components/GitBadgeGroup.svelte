@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { GitStatusCache } from '$lib/types/git_status';
+	import type { BranchStatus, GitStatusCache } from '$lib/types/generated';
 	import BranchStatusBadge from './BranchStatusBadge.svelte';
 	import SyncBadge from './SyncBadge.svelte';
 	import MergeConflictBadge from './MergeConflictBadge.svelte';
@@ -11,7 +11,7 @@
 
 	let { branchName, gitStatus }: Props = $props();
 
-	const branchStatus = $derived(gitStatus?.branch_status ?? 'unknown');
+	const branchStatus = $derived((gitStatus?.branch_status ?? 'unknown') as BranchStatus);
 </script>
 
 <div class="flex items-center gap-1">

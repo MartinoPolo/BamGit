@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ColorPalette } from '$lib/types/color_palette';
+	import type { ColorPalette } from '$lib/types/generated';
 
 	interface Props {
 		palettes: ColorPalette[];

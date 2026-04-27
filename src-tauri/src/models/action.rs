@@ -1,12 +1,15 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct Action {
     pub id: String,
     pub dashboard_id: Option<String>,
     pub name: String,
     pub icon: Option<String>,
     pub command_template: String,
+    #[ts(type = "number")]
     pub sort_order: i64,
     pub visible: bool,
 }

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
 pub struct ColorPalette {
     pub id: String,
     pub name: String,

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
 #[serde(rename_all = "kebab-case")]
 pub enum BranchStatus {
     Active,
