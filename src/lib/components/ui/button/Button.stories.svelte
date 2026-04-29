@@ -12,11 +12,11 @@
 		argTypes: {
 			variant: {
 				control: 'select',
-				options: ['default', 'secondary', 'outline', 'ghost', 'destructive', 'link'],
+				options: ['primary', 'secondary', 'ghost', 'danger'],
 			},
 			size: {
 				control: 'select',
-				options: ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-sm', 'icon-lg'],
+				options: ['sm', 'md', 'lg', 'icon', 'icon-sm'],
 			},
 			disabled: { control: 'boolean' },
 		},
@@ -25,11 +25,17 @@
 
 <script lang="ts">
 	import type { ButtonProps } from './button-variants.js';
+	import {
+		Mail as MailIcon,
+		Plus as PlusIcon,
+		Trash2 as TrashIcon,
+		Settings as SettingsIcon,
+	} from 'lucide-svelte';
 </script>
 
-<Story name="Default" args={{ variant: 'default' }}>
+<Story name="Primary" args={{ variant: 'primary' }}>
 	{#snippet template(args: ButtonProps)}
-		<Button {...args}>Button</Button>
+		<Button {...args}>Primary</Button>
 	{/snippet}
 </Story>
 
@@ -39,45 +45,36 @@
 	{/snippet}
 </Story>
 
-<Story name="Outline">
-	{#snippet template(args: ButtonProps)}
-		<Button variant="outline" {...args}>Outline</Button>
-	{/snippet}
-</Story>
-
 <Story name="Ghost">
 	{#snippet template(args: ButtonProps)}
 		<Button variant="ghost" {...args}>Ghost</Button>
 	{/snippet}
 </Story>
 
-<Story name="Destructive">
+<Story name="Danger">
 	{#snippet template(args: ButtonProps)}
-		<Button variant="destructive" {...args}>Destructive</Button>
-	{/snippet}
-</Story>
-
-<Story name="Link">
-	{#snippet template(args: ButtonProps)}
-		<Button variant="link" {...args}>Link</Button>
+		<Button variant="danger" {...args}>Danger</Button>
 	{/snippet}
 </Story>
 
 <Story name="Disabled">
 	{#snippet template(args: ButtonProps)}
-		<Button disabled {...args}>Disabled</Button>
+		<div class="flex flex-wrap items-center gap-4">
+			<Button variant="primary" disabled {...args}>Primary</Button>
+			<Button variant="secondary" disabled {...args}>Secondary</Button>
+			<Button variant="ghost" disabled {...args}>Ghost</Button>
+			<Button variant="danger" disabled {...args}>Danger</Button>
+		</div>
 	{/snippet}
 </Story>
 
 <Story name="All Variants">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
-			<Button variant="default" {...args}>Default</Button>
+			<Button variant="primary" {...args}>Primary</Button>
 			<Button variant="secondary" {...args}>Secondary</Button>
-			<Button variant="outline" {...args}>Outline</Button>
 			<Button variant="ghost" {...args}>Ghost</Button>
-			<Button variant="destructive" {...args}>Destructive</Button>
-			<Button variant="link" {...args}>Link</Button>
+			<Button variant="danger" {...args}>Danger</Button>
 		</div>
 	{/snippet}
 </Story>
@@ -85,10 +82,51 @@
 <Story name="All Sizes">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
-			<Button size="xs" {...args}>Extra Small</Button>
 			<Button size="sm" {...args}>Small</Button>
-			<Button size="default" {...args}>Default</Button>
+			<Button size="md" {...args}>Medium</Button>
 			<Button size="lg" {...args}>Large</Button>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Icon Only">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex flex-wrap items-center gap-4">
+			<Button variant="primary" size="icon" {...args}><PlusIcon /></Button>
+			<Button variant="secondary" size="icon" {...args}><SettingsIcon /></Button>
+			<Button variant="ghost" size="icon" {...args}><MailIcon /></Button>
+			<Button variant="danger" size="icon" {...args}><TrashIcon /></Button>
+			<Button variant="primary" size="icon-sm" {...args}><PlusIcon /></Button>
+			<Button variant="ghost" size="icon-sm" {...args}><SettingsIcon /></Button>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="With Icons">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex flex-wrap items-center gap-4">
+			<Button variant="primary" {...args}><PlusIcon /> Create</Button>
+			<Button variant="secondary" {...args}><SettingsIcon /> Settings</Button>
+			<Button variant="ghost" {...args}><MailIcon /> Mail</Button>
+			<Button variant="danger" {...args}><TrashIcon /> Delete</Button>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Size x Variant Matrix">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex flex-col gap-6">
+			{#each ['sm', 'md', 'lg'] as const as size (size)}
+				<div>
+					<p class="mb-2 text-sm text-foreground-muted">{size}</p>
+					<div class="flex flex-wrap items-center gap-3">
+						<Button variant="primary" {size} {...args}>Primary</Button>
+						<Button variant="secondary" {size} {...args}>Secondary</Button>
+						<Button variant="ghost" {size} {...args}>Ghost</Button>
+						<Button variant="danger" {size} {...args}>Danger</Button>
+					</div>
+				</div>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

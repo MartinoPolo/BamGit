@@ -50,10 +50,18 @@ export type ViewMode = 'cards' | 'forest';
 /** @public */
 export type ThemeMode = 'dark' | 'light' | 'system';
 
+export const ACCENT_COLORS = ['moss', 'amber', 'bark', 'azure'] as const;
+/** @public */
+export type AccentColor = (typeof ACCENT_COLORS)[number];
+
 // ─── Type guards ──────────────────────────────────────────────────────────
 
 export function isThemeMode(value: unknown): value is ThemeMode {
 	return value === 'dark' || value === 'light' || value === 'system';
+}
+
+export function isAccentColor(value: unknown): value is AccentColor {
+	return typeof value === 'string' && ACCENT_COLORS.includes(value as AccentColor);
 }
 
 export function isViewMode(value: unknown): value is ViewMode {

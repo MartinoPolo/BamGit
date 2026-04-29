@@ -12,4 +12,6 @@ export type {
 	AddRepoToPortfolioRequest,
 	ViewMode,
 	ThemeMode,
+	AccentColor,
 } from './types.js';
+export { ACCENT_COLORS } from './types.js';

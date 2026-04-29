@@ -17,9 +17,11 @@ import type {
 	AddRepoToPortfolioRequest,
 	ViewMode,
 	ThemeMode,
+	AccentColor,
 } from './types.js';
 import {
 	isThemeMode,
+	isAccentColor,
 	isViewMode,
 	findPaletteForDashboard,
 	selectActiveDashboardId,
@@ -77,6 +79,12 @@ function createBoardContext() {
 		defaultValue: 'system',
 	});
 
+	const accentColor = new Persisted<AccentColor>({
+		key: 'grovekeeper_accent_color',
+		serde: stringSerde(isAccentColor),
+		defaultValue: 'moss',
+	});
+
 	const prefersDark = browser ? new MediaQuery('(prefers-color-scheme: dark)') : null;
 
 	const isDark = $derived.by(() => {
@@ -88,7 +96,8 @@ function createBoardContext() {
 
 	$effect.pre(() => {
 		if (browser) {
-			document.documentElement.classList.toggle('dark', isDark);
+			document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+			document.documentElement.dataset.accent = accentColor.current;
 		}
 	});
 
@@ -285,6 +294,12 @@ function createBoardContext() {
 				},
 				get prefersDark() {
 					return prefersDark?.current ?? true;
+				},
+				get accent() {
+					return accentColor.current;
+				},
+				set accent(value: AccentColor) {
+					accentColor.current = value;
 				},
 			};
 		},
