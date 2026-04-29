@@ -53,8 +53,9 @@
 	{/snippet}
 </Story>
 
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <Story name="HelpText Variants">
-	{#snippet template(_args: LabelProps)}
+	{#snippet template(args: LabelProps)}
 		<div class="flex flex-col gap-4">
 			<HelpText>Default help text with additional guidance.</HelpText>
 			<HelpText status="success">Branch is available.</HelpText>

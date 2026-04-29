@@ -77,8 +77,9 @@
 	{/snippet}
 </Story>
 
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <Story name="Custom Open Dropdown">
-	{#snippet template(_args: SelectProps)}
+	{#snippet template(args: SelectProps)}
 		<div class="relative max-w-[280px]">
 			<Label>Provider</Label>
 			<button
@@ -120,11 +121,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: SelectProps)}
+	{#snippet template(args: SelectProps)}
 		<div class="grid max-w-2xl grid-cols-3 gap-4">
 			<div>
 				<Label>Default</Label>
-				<Select>
+				<Select {...args}>
 					<option>Choose provider…</option>
 				</Select>
 			</div>

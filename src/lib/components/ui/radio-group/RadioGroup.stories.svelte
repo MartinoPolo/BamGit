@@ -87,11 +87,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: RadioGroupProps)}
+	{#snippet template(args: RadioGroupProps)}
 		<div class="grid grid-cols-4 gap-6">
 			<div class="flex flex-col items-center gap-2">
 				<span class="text-xs text-foreground-subtle">Rest</span>
-				<RadioGroup>
+				<RadioGroup {...args}>
 					<RadioGroupItem value="x" />
 				</RadioGroup>
 			</div>

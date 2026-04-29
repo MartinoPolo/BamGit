@@ -74,11 +74,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: TextareaProps)}
+	{#snippet template(args: TextareaProps)}
 		<div class="grid max-w-2xl grid-cols-2 gap-4">
 			<div>
 				<Label>Default</Label>
-				<Textarea rows={3} placeholder="Describe the change…" />
+				<Textarea rows={3} placeholder="Describe the change…" {...args} />
 			</div>
 			<div>
 				<Label>Focus (interact)</Label>

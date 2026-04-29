@@ -61,11 +61,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: CheckboxProps)}
+	{#snippet template(args: CheckboxProps)}
 		<div class="grid grid-cols-4 gap-6">
 			<div class="flex flex-col items-center gap-2">
 				<span class="text-xs text-foreground-subtle">Unchecked</span>
-				<Checkbox />
+				<Checkbox {...args} />
 			</div>
 			<div class="flex flex-col items-center gap-2">
 				<span class="text-xs text-foreground-subtle">Checked</span>

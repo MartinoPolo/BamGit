@@ -87,11 +87,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: InputProps)}
+	{#snippet template(args: InputProps)}
 		<div class="grid max-w-2xl grid-cols-3 gap-4">
 			<div>
 				<Label>Default</Label>
-				<Input placeholder="Branch name" />
+				<Input placeholder="Branch name" {...args} />
 			</div>
 			<div>
 				<Label>Filled</Label>

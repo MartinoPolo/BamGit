@@ -27,9 +27,9 @@
 </Story>
 
 <Story name="Typing With Results">
-	{#snippet template(_args: SearchFieldProps)}
+	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
-			<SearchField value="forest">
+			<SearchField value="forest" {...args}>
 				<div
 					class="mt-1.5 max-h-[320px] overflow-auto rounded-[var(--radius-md)] border border-border bg-surface p-1.5 shadow-lg"
 				>
@@ -72,9 +72,9 @@
 </Story>
 
 <Story name="No Results">
-	{#snippet template(_args: SearchFieldProps)}
+	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
-			<SearchField value="qqzzqz">
+			<SearchField value="qqzzqz" {...args}>
 				<div
 					class="mt-1.5 rounded-[var(--radius-md)] border border-border bg-surface p-[18px] text-center shadow-lg"
 				>
@@ -86,11 +86,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: SearchFieldProps)}
+	{#snippet template(args: SearchFieldProps)}
 		<div class="grid max-w-2xl grid-cols-3 items-start gap-4">
 			<div>
 				<span class="mb-2 block text-xs text-foreground-subtle">Rest</span>
-				<SearchField placeholder="Search issues, branches…" />
+				<SearchField placeholder="Search issues, branches…" {...args} />
 			</div>
 			<div>
 				<span class="mb-2 block text-xs text-foreground-subtle">Typing + results</span>

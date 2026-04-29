@@ -57,11 +57,11 @@
 </Story>
 
 <Story name="All States">
-	{#snippet template(_args: SwitchProps)}
+	{#snippet template(args: SwitchProps)}
 		<div class="grid grid-cols-4 gap-6">
 			<div class="flex flex-col items-center gap-2">
 				<span class="text-xs text-foreground-subtle">Off</span>
-				<Switch />
+				<Switch {...args} />
 			</div>
 			<div class="flex flex-col items-center gap-2">
 				<span class="text-xs text-foreground-subtle">On</span>
