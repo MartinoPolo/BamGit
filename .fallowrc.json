@@ -6,7 +6,7 @@
 		"**/*.stories.svelte",
 		"src/lib/reactivity/*.svelte.ts"
 	],
-	"ignorePatterns": ["src/lib/types/generated/**"],
+	"ignorePatterns": ["src/lib/types/generated/**", "claude_design/**"],
 	"ignoreDependencies": [
 		"@typescript-eslint/parser",
 		"vitest-browser-svelte",

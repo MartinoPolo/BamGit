@@ -1,4 +1,6 @@
 <script lang="ts">
+	import '@fontsource/geist';
+	import '@fontsource/geist-mono';
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';

@@ -4,8 +4,8 @@
 
 	let {
 		class: className,
-		variant = 'default',
-		size = 'default',
+		variant = 'primary',
+		size = 'md',
 		ref = $bindable(null),
 		href = undefined,
 		type = 'button',
