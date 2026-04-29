@@ -63,6 +63,7 @@ export default defineConfig({
 						instances: [{ browser: 'chromium', headless: true }],
 						api: {
 							host: '127.0.0.1',
+							port: 5174,
 							strictPort: false,
 						},
 					},
@@ -94,6 +95,7 @@ export default defineConfig({
 						instances: [{ browser: 'chromium' }],
 						api: {
 							host: '127.0.0.1',
+							port: 5175,
 							strictPort: false,
 						},
 					},

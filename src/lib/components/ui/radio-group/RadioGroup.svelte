@@ -5,7 +5,7 @@
 
 	let {
 		ref = $bindable(null),
-		value = $bindable(undefined),
+		value = $bindable(''),
 		class: className,
 		children,
 		...restProps
