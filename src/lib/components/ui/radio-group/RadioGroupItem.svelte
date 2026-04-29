@@ -1,0 +1,23 @@
+<script lang="ts">
+	import { RadioGroup as RadioGroupPrimitive } from 'bits-ui';
+	import { cn } from '$lib/utils.js';
+	import type { RadioGroupItemProps } from './radio-group-variants.js';
+
+	let {
+		ref = $bindable(null),
+		value,
+		class: className,
+		...restProps
+	}: RadioGroupItemProps = $props();
+</script>
+
+<RadioGroupPrimitive.Item
+	bind:ref
+	{value}
+	data-slot="radio-group-item"
+	class={cn(
+		'relative size-4 shrink-0 cursor-pointer rounded-full border-[1.5px] border-border-strong bg-surface outline-none transition-[border-color] duration-[120ms] after:absolute after:inset-[3px] after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity after:duration-[120ms] hover:border-ring focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40 data-checked:border-primary data-checked:after:opacity-100',
+		className,
+	)}
+	{...restProps}
+/>

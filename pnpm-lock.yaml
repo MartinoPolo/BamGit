@@ -41,6 +41,9 @@ importers:
             '@chromatic-com/storybook':
                 specifier: ^5.1.1
                 version: 5.1.1(storybook@10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+            '@lucide/svelte':
+                specifier: ^1.14.0
+                version: 1.14.0(svelte@5.55.0)
             '@playwright/test':
                 specifier: ^1.58.2
                 version: 1.58.2
@@ -1016,6 +1019,14 @@ packages:
             {
                 integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==,
             }
+
+    '@lucide/svelte@1.14.0':
+        resolution:
+            {
+                integrity: sha512-MVuP5VRCBQa2OaIpaRbuEV4k5OV2dy9MyxA6Tf4Sz/IN0v3zzUU72ObHc9r2Zn/wSMXDg6lLrHrczqI7w7gCzQ==,
+            }
+        peerDependencies:
+            svelte: ^5
 
     '@mdx-js/react@3.1.1':
         resolution:
@@ -5197,6 +5208,10 @@ snapshots:
             keyv: 5.6.0
 
     '@keyv/serialize@1.1.1': {}
+
+    '@lucide/svelte@1.14.0(svelte@5.55.0)':
+        dependencies:
+            svelte: 5.55.0
 
     '@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.4)':
         dependencies:
