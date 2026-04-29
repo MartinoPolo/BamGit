@@ -92,6 +92,3 @@ storybook-static/
 .claude/CLAUDE.local.md
 .claude/settings.local.json
 .claude/*.local.*
-
-# Claude design
-claude_design/
