@@ -12,6 +12,7 @@ export default [
 			'.svelte-kit',
 			'.storybook',
 			'build',
+			'claude_design',
 			'node_modules',
 			'scripts',
 			'src-tauri',
