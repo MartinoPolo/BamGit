@@ -88,6 +88,7 @@
 	--duration-3: 160ms;
 	--duration-4: 220ms;
 	--duration-5: 320ms;
+	--animate-shimmer: shimmer 1.4s linear infinite;
 }
 
 :root {
@@ -271,6 +272,15 @@
 	--primary-fg: oklch(0.135 0.02 240);
 	--primary-soft: oklch(0.305 0.055 235);
 	--ring: var(--azure-400);
+}
+
+@keyframes shimmer {
+	from {
+		background-position: 200% 0;
+	}
+	to {
+		background-position: -200% 0;
+	}
 }
 
 @layer base {
