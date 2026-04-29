@@ -1,0 +1,30 @@
+import type { Snippet } from 'svelte';
+import type { WithElementRef } from '$lib/utils.js';
+import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
+import { tv } from 'tailwind-variants';
+
+export const tabsContainerVariants = tv({
+	base: 'inline-flex bg-surface-2 border border-border p-[3px] rounded-[var(--radius-md)] gap-0.5',
+});
+
+export const tabVariants = tv({
+	base: 'px-3 py-[5px] text-xs font-medium rounded-[6px] text-foreground-muted cursor-pointer transition-all duration-[120ms] ease-[ease] border-none bg-transparent hover:text-foreground hover:bg-[color-mix(in_oklch,var(--foreground)_4%,transparent)] focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed',
+	variants: {
+		active: {
+			true: 'bg-surface text-foreground shadow-sm',
+			false: '',
+		},
+	},
+	defaultVariants: {
+		active: false,
+	},
+});
+
+export type TabsContainerProps = WithElementRef<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+	children?: Snippet;
+};
+
+export type TabProps = WithElementRef<HTMLButtonAttributes, HTMLButtonElement> & {
+	active?: boolean;
+	children?: Snippet;
+};
