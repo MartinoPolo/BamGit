@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { AssignedIssue } from '$lib/types/generated';
-	import { CircleDot, CircleCheck } from 'lucide-svelte';
+	import CircleDot from '@lucide/svelte/icons/circle-dot';
+	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { openUrl } from '@tauri-apps/plugin-opener';
 
 	interface Props {

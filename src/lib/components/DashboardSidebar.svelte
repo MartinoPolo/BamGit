@@ -1,110 +1,147 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
-	import type { Dashboard } from '$lib/types/generated';
+	import TreesIcon from '@lucide/svelte/icons/trees';
+	import CodeIcon from '@lucide/svelte/icons/code';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
+	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
+	import BrandMark from './BrandMark.svelte';
+	import SidebarNavItem from './SidebarNavItem.svelte';
+	import WorkspaceSelector from './WorkspaceSelector.svelte';
+	import UserAvatar from './UserAvatar.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	interface Props {
-		dashboards: Dashboard[];
-		activeDashboardId: string | null;
+		workspaceName: string;
+		username: string;
+		userInitials: string;
+		activeSessionCount?: number;
 		collapsed: boolean;
-		onSelectDashboard: (id: string) => void;
 		onToggleSidebar: () => void;
-		onCreateDashboard: () => void;
-		onEditDashboard: (dashboard: Dashboard) => void;
 	}
 
 	let {
-		dashboards,
-		activeDashboardId,
+		workspaceName,
+		username,
+		userInitials,
+		activeSessionCount = 0,
 		collapsed,
-		onSelectDashboard,
 		onToggleSidebar,
-		onCreateDashboard,
-		onEditDashboard,
 	}: Props = $props();
 
 	const navigationItems = [
-		{ href: '/issues' as const, label: 'Issues', icon: '☰' },
-		{ href: '/sessions' as const, label: 'Sessions', icon: '▶' },
-		{ href: '/settings' as const, label: 'Settings', icon: '⚙' },
+		{ href: resolve('/'), icon: TreesIcon, label: 'Dashboard' },
+		{ href: resolve('/sessions'), icon: CodeIcon, label: 'Sessions' },
+		{ href: resolve('/settings'), icon: SettingsIcon, label: 'Settings' },
 	];
+
+	function isActive(itemHref: string): boolean {
+		const pathname = page.url.pathname;
+		if (itemHref === '/' || itemHref === resolve('/')) {
+			return pathname === '/' || pathname === resolve('/');
+		}
+		return pathname === itemHref || pathname.startsWith(itemHref + '/');
+	}
 </script>
 
 <aside
-	class="flex h-full flex-col border-r border-sidebar-border bg-sidebar transition-all {collapsed
-		? 'w-12'
-		: 'w-60'}"
+	class="flex h-full flex-col border-r border-border bg-sidebar transition-all duration-200"
+	style:width={collapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)'}
 >
-	<!-- Header -->
-	<div class="flex items-center justify-between border-b border-sidebar-border px-3 py-2">
-		{#if !collapsed}
-			<span class="text-sm font-bold tracking-wide text-sidebar-foreground">Grovekeeper</span>
+	<!-- Brand row -->
+	<div
+		class="flex items-center px-3.5 py-3.5"
+		class:justify-center={collapsed}
+		class:justify-between={!collapsed}
+	>
+		{#if collapsed}
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					{#snippet child({ props })}
+						<button
+							{...props}
+							onclick={onToggleSidebar}
+							class="group relative flex size-9 items-center justify-center rounded-lg"
+							aria-label="Expand sidebar"
+						>
+							<span class="transition-opacity group-hover:opacity-0">
+								<BrandMark size={22} />
+							</span>
+							<span
+								class="absolute inset-0 flex items-center justify-center rounded-lg bg-surface-2 opacity-0 transition-opacity group-hover:opacity-100"
+							>
+								<ChevronRightIcon size={14} />
+							</span>
+						</button>
+					{/snippet}
+				</Tooltip.Trigger>
+				<Tooltip.Content side="right">Expand sidebar (Ctrl+\)</Tooltip.Content>
+			</Tooltip.Root>
+		{:else}
+			<div class="flex items-center gap-2">
+				<BrandMark size={22} />
+				<span class="text-sm font-semibold tracking-tight">Grovekeeper</span>
+			</div>
+			<button
+				onclick={onToggleSidebar}
+				class="flex size-[22px] items-center justify-center rounded-[5px] text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
+				aria-label="Collapse sidebar"
+				title="Collapse sidebar (Ctrl+\)"
+			>
+				<PanelLeftIcon size={14} />
+			</button>
 		{/if}
-		<button
-			onclick={onToggleSidebar}
-			class="rounded p-1 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-			title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-		>
-			{collapsed ? '▸' : '◂'}
-		</button>
+	</div>
+
+	<!-- Workspace selector -->
+	<div class="mb-3 px-2">
+		{#if !collapsed}
+			<div
+				class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
+			>
+				Workspace
+			</div>
+		{/if}
+		<WorkspaceSelector name={workspaceName} {collapsed} />
 	</div>
 
 	<!-- Navigation -->
-	<nav class="flex flex-col gap-0.5 border-b border-sidebar-border p-2">
-		{#each navigationItems as item (item.href)}
-			<a
-				href={resolve(item.href)}
-				class="flex items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors {page
-					.url.pathname === item.href || page.url.pathname.startsWith(item.href + '/')
-					? 'bg-sidebar-accent text-sidebar-accent-foreground'
-					: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'}"
-				title={collapsed ? item.label : undefined}
+	<nav class="flex flex-col gap-1 px-2" class:items-center={collapsed}>
+		{#if !collapsed}
+			<div
+				class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
 			>
-				<span class="text-xs">{item.icon}</span>
-				{#if !collapsed}
-					<span>{item.label}</span>
-				{/if}
-			</a>
+				Navigate
+			</div>
+		{/if}
+		{#each navigationItems as item (item.href)}
+			<SidebarNavItem
+				icon={item.icon}
+				label={item.label}
+				href={item.href}
+				active={isActive(item.href)}
+				{collapsed}
+			/>
 		{/each}
 	</nav>
 
-	<!-- Dashboard List -->
-	{#if !collapsed}
-		<div class="flex items-center justify-between px-3 pt-3 pb-1">
-			<span class="text-xs font-semibold uppercase tracking-wider text-sidebar-foreground"
-				>Dashboards</span
-			>
-			<button
-				onclick={onCreateDashboard}
-				class="rounded p-0.5 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-				title="Create dashboard"
-			>
-				<span class="text-sm">+</span>
-			</button>
-		</div>
+	<!-- Spacer -->
+	<div class="flex-1"></div>
 
-		<div class="flex-1 overflow-y-auto px-2 pb-2">
-			{#each dashboards as dashboard (dashboard.id)}
-				<button
-					onclick={() => onSelectDashboard(dashboard.id)}
-					ondblclick={() => onEditDashboard(dashboard)}
-					class="group flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors {dashboard.id ===
-					activeDashboardId
-						? 'bg-sidebar-accent text-sidebar-accent-foreground'
-						: 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'}"
-				>
-					<span class="text-xs text-sidebar-foreground" title={dashboard.type}>
-						{dashboard.type === 'repo' ? '◆' : '◇'}
-					</span>
-					<span class="truncate">{dashboard.name}</span>
-				</button>
-			{/each}
-		</div>
-	{/if}
-
-	<!-- Theme Toggle -->
-	<div class="mt-auto border-t border-sidebar-border p-2">
+	<!-- Theme toggle -->
+	<div class="border-t border-border p-2">
 		<ThemeToggle {collapsed} />
+	</div>
+
+	<!-- User section -->
+	<div class="border-t border-border p-2">
+		<UserAvatar
+			{username}
+			initials={userInitials}
+			activeCount={activeSessionCount}
+			{collapsed}
+		/>
 	</div>
 </aside>

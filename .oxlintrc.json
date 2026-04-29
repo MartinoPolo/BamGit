@@ -6,6 +6,7 @@
 	"ignorePatterns": [
 		".svelte-kit",
 		"build",
+		"claude_design",
 		"node_modules",
 		"src-tauri",
 		"src/lib/types/generated"

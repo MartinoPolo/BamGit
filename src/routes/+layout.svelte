@@ -3,9 +3,12 @@
 	import '@fontsource/geist-mono';
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { preloadCode } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/DashboardEditDialog.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import {
 		setBoardContext,
 		type CreateDashboardRequest,
@@ -22,7 +25,7 @@
 
 	const boardStore = setBoardContext();
 	const notificationsCtx = setNotificationsContext();
-	setSessionsContext(notificationsCtx);
+	const sessionStore = setSessionsContext(notificationsCtx);
 	setIssuesContext();
 	setVersionControlContext();
 	setActionsContext();
@@ -32,7 +35,17 @@
 	onMount(() => {
 		boardStore.loadDashboards();
 		boardStore.loadPalettes();
+		void preloadCode(resolve('/'));
+		void preloadCode(resolve('/sessions'));
+		void preloadCode(resolve('/settings'));
 	});
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.ctrlKey && event.key === '\\') {
+			event.preventDefault();
+			boardStore.toggleSidebar();
+		}
+	}
 
 	async function handleCreateDashboard(
 		request: CreateDashboardRequest,
@@ -72,23 +85,34 @@
 			console.error('Failed to delete dashboard:', err);
 		}
 	}
+
+	const workspaceName = $derived(boardStore.activeDashboard?.name ?? 'Grovekeeper');
+	const activeSessionCount = $derived(sessionStore.activeSessions.length);
 </script>
 
-<div class="flex h-screen bg-background text-foreground">
-	<DashboardSidebar
-		dashboards={boardStore.dashboards}
-		activeDashboardId={boardStore.activeDashboardId}
-		collapsed={boardStore.sidebarCollapsed}
-		onSelectDashboard={(id) => boardStore.selectDashboard(id)}
-		onToggleSidebar={() => boardStore.toggleSidebar()}
-		onCreateDashboard={() => (boardStore.showCreateDialog = true)}
-		onEditDashboard={(d) => (editingDashboard = d)}
-	/>
+<svelte:window onkeydown={handleKeydown} />
 
-	<main class="flex-1 overflow-auto p-4">
-		{@render children()}
-	</main>
-</div>
+<Tooltip.Provider>
+	<div
+		class="grid h-screen overflow-hidden bg-background text-foreground"
+		style:grid-template-columns={boardStore.sidebarCollapsed
+			? 'var(--sidebar-width-collapsed) 1fr'
+			: 'var(--sidebar-width) 1fr'}
+	>
+		<DashboardSidebar
+			{workspaceName}
+			username="MartinoPolo"
+			userInitials="MP"
+			{activeSessionCount}
+			collapsed={boardStore.sidebarCollapsed}
+			onToggleSidebar={() => boardStore.toggleSidebar()}
+		/>
+
+		<main class="flex min-w-0 flex-1 flex-col overflow-auto">
+			{@render children()}
+		</main>
+	</div>
+</Tooltip.Provider>
 
 <DashboardCreateDialog
 	open={boardStore.showCreateDialog}

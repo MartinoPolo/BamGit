@@ -46,7 +46,7 @@ export interface AddRepoToPortfolioRequest {
 
 // ─── Frontend-only value types ────────────────────────────────────────────
 
-export type ViewMode = 'cards' | 'forest';
+export type ViewMode = 'list' | 'kanban' | 'forest';
 /** @public */
 export type ThemeMode = 'dark' | 'light' | 'system';
 
@@ -65,7 +65,7 @@ export function isAccentColor(value: unknown): value is AccentColor {
 }
 
 export function isViewMode(value: unknown): value is ViewMode {
-	return value === 'cards' || value === 'forest';
+	return value === 'list' || value === 'kanban' || value === 'forest';
 }
 
 export function findPaletteForDashboard(

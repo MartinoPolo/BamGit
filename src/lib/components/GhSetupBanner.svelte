@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { GhCliAvailability } from '$lib/types/generated';
-	import { AlertTriangle } from 'lucide-svelte';
+	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 
 	interface Props {
 		availability: GhCliAvailability;

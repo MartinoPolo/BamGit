@@ -33,7 +33,7 @@ export default defineConfig({
 		},
 		warmup: {
 			clientFiles: [
-				'./src/routes/issues/+page.svelte',
+				'./src/routes/+page.svelte',
 				'./src/routes/sessions/+page.svelte',
 				'./src/routes/settings/+page.svelte',
 			],
