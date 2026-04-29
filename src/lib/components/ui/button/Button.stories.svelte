@@ -25,12 +25,10 @@
 
 <script lang="ts">
 	import type { ButtonProps } from './button-variants.js';
-	import {
-		Mail as MailIcon,
-		Plus as PlusIcon,
-		Trash2 as TrashIcon,
-		Settings as SettingsIcon,
-	} from 'lucide-svelte';
+	import MailIcon from '@lucide/svelte/icons/mail';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import TrashIcon from '@lucide/svelte/icons/trash-2';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
 </script>
 
 <Story name="Primary" args={{ variant: 'primary' }}>

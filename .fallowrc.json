@@ -2,6 +2,7 @@
 	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
 	"entry": [
 		"src/lib/components/ui/*/index.ts",
+		"src/lib/components/Resizer.svelte",
 		"src/lib/modules/*/index.ts",
 		"**/*.stories.svelte",
 		"src/lib/reactivity/*.svelte.ts"
@@ -12,7 +13,6 @@
 		"vitest-browser-svelte",
 		"@tauri-apps/plugin-opener",
 		"bits-ui",
-		"lucide-svelte",
 		"postcss-html",
 		"@fallow-cli/win32-x64-msvc",
 		"low-poly-2d-trees"

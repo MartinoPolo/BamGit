@@ -1,15 +1,13 @@
 <script lang="ts">
 	import type { PullRequestState } from '$lib/types/generated';
-	import {
-		GitPullRequest,
-		GitPullRequestDraft,
-		GitMerge,
-		GitPullRequestClosed,
-		Eye,
-		MessageSquareWarning,
-		Check,
-		Sparkles,
-	} from 'lucide-svelte';
+	import GitPullRequest from '@lucide/svelte/icons/git-pull-request';
+	import GitPullRequestDraft from '@lucide/svelte/icons/git-pull-request-draft';
+	import GitMerge from '@lucide/svelte/icons/git-merge';
+	import GitPullRequestClosed from '@lucide/svelte/icons/git-pull-request-closed';
+	import Eye from '@lucide/svelte/icons/eye';
+	import MessageSquareWarning from '@lucide/svelte/icons/message-square-warning';
+	import Check from '@lucide/svelte/icons/check';
+	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import GitHubBadge from './GitHubBadge.svelte';
 
 	interface PullRequestStateConfig {

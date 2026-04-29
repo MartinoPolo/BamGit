@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { useBoard } from '$lib/modules/board';
-	import { Sun, Moon, Monitor } from 'lucide-svelte';
+	import Sun from '@lucide/svelte/icons/sun';
+	import Moon from '@lucide/svelte/icons/moon';
+	import Monitor from '@lucide/svelte/icons/monitor';
 
 	interface Props {
 		collapsed?: boolean;

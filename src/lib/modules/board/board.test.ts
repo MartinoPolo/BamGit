@@ -3,6 +3,7 @@ import {
 	findPaletteForDashboard,
 	selectActiveDashboardId,
 	resolveActiveDashboardId,
+	isViewMode,
 } from './types.js';
 import type { ColorPalette } from '$lib/types/generated';
 
@@ -76,5 +77,29 @@ describe('resolveActiveDashboardId', () => {
 
 	it('returns null when dashboards is empty', () => {
 		expect(resolveActiveDashboardId([], 'dash-1')).toBeNull();
+	});
+});
+
+describe('isViewMode', () => {
+	it('accepts list', () => {
+		expect(isViewMode('list')).toBe(true);
+	});
+
+	it('accepts kanban', () => {
+		expect(isViewMode('kanban')).toBe(true);
+	});
+
+	it('accepts forest', () => {
+		expect(isViewMode('forest')).toBe(true);
+	});
+
+	it('rejects the old cards value', () => {
+		expect(isViewMode('cards')).toBe(false);
+	});
+
+	it('rejects non-string values', () => {
+		expect(isViewMode(42)).toBe(false);
+		expect(isViewMode(null)).toBe(false);
+		expect(isViewMode(undefined)).toBe(false);
 	});
 });

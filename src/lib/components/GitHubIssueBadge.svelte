@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { CircleDot, CircleCheck } from 'lucide-svelte';
+	import CircleDot from '@lucide/svelte/icons/circle-dot';
+	import CircleCheck from '@lucide/svelte/icons/circle-check';
 
 	import GitHubBadge from './GitHubBadge.svelte';
 

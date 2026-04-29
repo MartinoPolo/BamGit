@@ -105,7 +105,7 @@ function createBoardContext() {
 	const viewMode = new Persisted<ViewMode>({
 		key: 'grovekeeper_view_mode',
 		serde: stringSerde(isViewMode),
-		defaultValue: 'cards',
+		defaultValue: 'list',
 	});
 
 	// ── Public interface ───────────────────────────────────────────────────
