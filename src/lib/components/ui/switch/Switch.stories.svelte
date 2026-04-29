@@ -29,26 +29,26 @@
 
 <Story name="On">
 	{#snippet template(args: SwitchProps)}
-		<Switch checked {...args} />
+		<Switch {...args} checked />
 	{/snippet}
 </Story>
 
 <Story name="Disabled Off">
 	{#snippet template(args: SwitchProps)}
-		<Switch disabled {...args} />
+		<Switch {...args} disabled />
 	{/snippet}
 </Story>
 
 <Story name="Disabled On">
 	{#snippet template(args: SwitchProps)}
-		<Switch disabled checked {...args} />
+		<Switch {...args} disabled checked />
 	{/snippet}
 </Story>
 
 <Story name="With Label">
 	{#snippet template(args: SwitchProps)}
 		<div class="flex items-center gap-2.5">
-			<Switch id="auto-fetch" checked {...args} />
+			<Switch {...args} id="auto-fetch" checked />
 			<Label for="auto-fetch" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
 				>Auto-fetch</Label
 			>

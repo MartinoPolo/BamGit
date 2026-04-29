@@ -14,9 +14,9 @@ export const buttonVariants = tv({
 			danger: 'bg-transparent text-status-danger border-[color-mix(in_oklch,var(--status-danger)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--status-danger)_12%,transparent)]',
 		},
 		size: {
-			sm: 'h-[var(--size-control-sm)] px-[9px] text-[var(--text-sm)] rounded-[var(--radius-sm)]',
-			md: 'h-[var(--size-control-md)] px-3 text-[var(--text-md)]',
-			lg: 'h-[var(--size-control-lg)] px-4 text-[var(--text-base)]',
+			sm: 'h-[var(--size-control-sm)] px-[9px] text-[length:var(--text-sm)] rounded-[var(--radius-sm)]',
+			md: 'h-[var(--size-control-md)] px-3 text-[length:var(--text-md)]',
+			lg: 'h-[var(--size-control-lg)] px-4 text-[length:var(--text-base)]',
 			icon: 'size-[var(--size-control-md)] p-0',
 			'icon-sm': 'size-[var(--size-control-sm)] p-0',
 		},

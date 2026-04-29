@@ -19,7 +19,7 @@
 
 <Story name="Default">
 	{#snippet template(args: RadioGroupProps)}
-		<RadioGroup value="claude" {...args}>
+		<RadioGroup {...args} value="claude">
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="claude" id="r-claude" />
 				<Label for="r-claude" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
@@ -44,7 +44,7 @@
 
 <Story name="Horizontal">
 	{#snippet template(args: RadioGroupProps)}
-		<RadioGroup value="claude" class="flex flex-row gap-4" {...args}>
+		<RadioGroup {...args} value="claude" class="flex flex-row gap-4">
 			<div class="flex items-center gap-1.5">
 				<RadioGroupItem value="claude" id="rh-claude" />
 				<Label for="rh-claude" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
@@ -69,7 +69,7 @@
 
 <Story name="Disabled">
 	{#snippet template(args: RadioGroupProps)}
-		<RadioGroup value="claude" disabled {...args}>
+		<RadioGroup {...args} value="claude" disabled>
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="claude" id="rd-claude" />
 				<Label for="rd-claude" class="mb-0 text-[length:var(--text-md)] opacity-40"
