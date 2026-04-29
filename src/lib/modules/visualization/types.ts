@@ -17,7 +17,7 @@ export interface LabelShapeMappingEntry {
 	readonly treeShape: TreeShape;
 }
 
-// ─── R12 State Dimensions ───────────────────────────────────────────────────
+// ─── Issue Tree State Dimensions ────────────────────────────────────────────
 
 type ForestWorktreeState = WorktreeState;
 

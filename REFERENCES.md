@@ -46,7 +46,7 @@ Minimal web GUI + CLI for coding agents. Unified WebSocket interface for Claude 
 - **Distributed tracing** (`apps/server/src/observability/`): NDJSON trace files + OTLP export. Spans for RPC, orchestration, provider, git, terminal, SQL operations.
 - **Pairing auth** (`apps/server/src/auth/`): One-time bootstrap tokens, no long-lived secrets. Session-based WebSocket auth.
 
-**Grovekeeper adaptation:** Study provider adapter pattern for designing R3's multi-provider expansion. The Effect system is React-specific, but the adapter contract (session lifecycle + event streaming + approval workflows) maps directly to Grovekeeper's Rust provider trait.
+**Grovekeeper adaptation:** Study provider adapter pattern for session management's multi-provider expansion. The Effect system is React-specific, but the adapter contract (session lifecycle + event streaming + approval workflows) maps directly to Grovekeeper's Rust provider trait.
 
 ---
 
@@ -68,7 +68,7 @@ Agents-as-teammates platform. Full autonomous task lifecycle: enqueue → claim 
 - **Real-time event bus** (`server/internal/realtime/`): WebSocket hub with scope-based authorization. Redis relay for multi-instance sync. Event types: issue/comment/agent/autopilot/chat/task updates.
 - **Workspace isolation**: All data scoped by workspace_id. Multi-user teams with roles (owner/admin/member).
 
-**Grovekeeper adaptation:** Study autopilot pattern for future "automated task execution" feature (GitHub trigger → create issue → spawn session → execute → create PR). The skill system maps to Grovekeeper's R8 action buttons. Daemon architecture is a more sophisticated version of Grovekeeper's session polling.
+**Grovekeeper adaptation:** Study autopilot pattern for future "automated task execution" feature (GitHub trigger → create issue → spawn session → execute → create PR). The skill system maps to Grovekeeper's action buttons (skills). Daemon architecture is a more sophisticated version of Grovekeeper's session polling.
 
 ---
 
@@ -141,7 +141,7 @@ Game character voice notifications for AI coding agents. 165+ sound packs from W
 
 **Grovekeeper adaptation — Future feature: Agent Voices:**
 
-- Integrate CESP event mapping into Grovekeeper's notification system (R9)
+- Integrate CESP event mapping into Grovekeeper's notification system
 - Allow users to assign sound packs per issue/session (like peon-ping's path_rules)
 - Add Czech-language Warcraft character voices as custom pack (e.g., Orc Peon speaking Czech: "Práce, práce.", "Hotovo, pane!", "Jo, šéfe.")
 - Use Grovekeeper's existing notification service as the playback layer
@@ -161,7 +161,21 @@ Tauri 2 + SvelteKit + Svelte 5 real-time monitor for Claude Code sessions. Disco
 
 ### C:\_MP_github_cloned\cline
 
-VS Code extension providing autonomous coding agent with ~40 LLM provider implementations (Anthropic, OpenAI, Gemini, Bedrock, Azure, Ollama, OpenRouter, etc.) behind a unified API abstraction. Rich tool call visualization with inline diffs, permission approval UI, and terminal output streaming. Key patterns: multi-provider API abstraction (`src/core/api/providers/`), layered architecture (extension -> webview -> controller -> task), context window optimization, MCP tool integration, session checkpoint/resume.
+**License: Apache 2.0** | **Stack: TypeScript, React, VS Code Extension API** | **LOC: large** | **Direct code reuse: MEDIUM (patterns, not code — VS Code extension not desktop app)**
+
+VS Code extension providing autonomous coding agent with ~47 LLM provider implementations behind a unified API abstraction. Rich tool call visualization with inline diffs, permission approval UI, and terminal output streaming. **Primary reference for multi-provider API design and tool call UI patterns.**
+
+**Key patterns to study:**
+
+- **Provider factory** (`src/core/api/index.ts`): `ApiHandler` interface with `createMessage()`, `getModel()`, `abort()`. Factory function with cascading switch for 47 providers. Provider options extend `CommonApiHandlerOptions` with per-provider config.
+- **Tool call visualization** (`webview-ui/src/components/chat/.../ToolGroupRenderer.tsx`): Expandable tool groups, low-stakes vs high-stakes filtering, activity text per tool type, deduplication of completed vs active tools.
+- **Permission/auto-approval** (`src/core/task/tools/AutoApprove.ts`): Rule-based permission controller. Path-based glob matching, tool-specific policies (readFile auto-approve, executeCommand manual).
+- **Sub-agent orchestration** (`src/core/task/tools/subagent/SubagentRunner.ts`): Nested agent spawning with isolated task contexts. Usage stats aggregated (tokens, costs, cache reads/writes). Result serialized back to parent.
+- **MCP server hub** (`src/services/mcp/McpHub.ts`): Multi-server management with auto-reconnect, config file watcher for hot-reload, multi-transport support (stdio, SSE, HTTP, websocket).
+- **Context management** (`src/core/context/context-management/ContextManager.ts`): File tracking, deduplication, context window budget enforcement.
+- **Hook system** (`src/core/hooks/hook-executor.ts`): Shell script hooks at lifecycle points, child process execution with env vars, non-blocking failures.
+
+**Grovekeeper adaptation:** The `ApiHandler` interface is the most battle-tested multi-provider abstraction available — study for Grovekeeper's Rust provider trait design. ToolGroupRenderer patterns directly applicable to session chat UI (collapsible tool cards, active/completed grouping). Auto-approval system is a reference for reducing HITL interruptions. McpHub patterns useful for the AI Configuration browser.
 
 ---
 
@@ -169,7 +183,20 @@ VS Code extension providing autonomous coding agent with ~40 LLM provider implem
 
 ### C:\_MP_github_cloned\cline-kanban
 
-CLI + React web-UI kanban board where each task gets its own git worktree and terminal session (xterm.js + node-pty). Features a finite state machine for session states (running/awaiting_review/interrupted/exit), task dependency linking with auto-start chains, and tRPC for type-safe client-server communication. Key patterns: session state machine (`src/terminal/session-state-machine.ts`), task-to-worktree mapping (`src/workspace/task-worktree.ts`), agent CLI wrapping (`src/cline-sdk/cline-session-runtime.ts`), board mutations with dependency ordering.
+**License: MIT** | **Stack: TypeScript, React, Node.js, xterm.js, node-pty, tRPC** | **LOC: ~15,000** | **Direct code reuse: MEDIUM (patterns for session state + worktree mapping)**
+
+CLI + React web-UI kanban board where each task gets its own git worktree and terminal session. **Primary reference for session state machines and task-to-worktree isolation patterns.**
+
+**Key patterns to study:**
+
+- **Session state machine** (`src/terminal/session-state-machine.ts`): Pure reducer function `reduceSessionTransition(summary, event) → SessionTransitionResult`. Events: `hook.to_review`, `hook.to_in_progress`, `agent.prompt-ready`, `process.exit`. States: running, awaiting_review, interrupted, completed.
+- **Task-to-worktree mapping** (`src/workspace/task-worktree.ts`): Create isolated git worktree per task, symlink ignored files (node_modules, vendor) to avoid duplication, file lock management for safe `.git/` access, cleanup on completion.
+- **Hook event ingestion** (`src/trpc/hooks-api.ts`): Hook ingest flow: parse event → validate → apply state transition → capture git checkpoint → broadcast via WebSocket. Metadata enrichment per event.
+- **Task dependency chains** (`web-ui/src/hooks/use-linked-backlog-task-actions.ts`): Tasks linked as dependencies. Completion of task A auto-starts task B. Supports chains (A → B → C) for autonomous workflows.
+- **Diff viewing** (`web-ui/src/components/detail-panels/diff-viewer-panel.tsx`): File-level diffs at git ref checkpoints, git history panel for task worktree commits.
+- **tRPC IPC** (`src/trpc/app-router.ts`): Type-safe RPC between Node.js backend and browser frontend with WebSocket subscriptions for real-time updates.
+
+**Grovekeeper adaptation:** The session state machine reducer is directly portable to Rust (pure function, no side effects). Task-to-worktree mapping validates Grovekeeper's worktree-per-issue approach and adds the symlink optimization for shared dependencies. Hook ingestion pipeline is a reference for integrating Claude Code hooks into Grovekeeper's event system. Dependency chains map to the AFK workflow's sequential execution.
 
 ---
 
@@ -209,7 +236,19 @@ Contains a session-handoff skill (`cli-tool/components/skills/enterprise-communi
 
 ### C:\_MP_github_cloned\claude-code-hooks-multi-agent-observability
 
-Real-time multi-agent monitoring via Claude Code hooks. Hook scripts capture events -> HTTP POST -> Bun server -> SQLite -> WebSocket -> Vue client. Key pattern: hook-based event capture pipeline for live agent orchestration tracking without modifying the agent itself.
+**License: MIT** | **Stack: TypeScript, Bun, SQLite, Vue 3, WebSocket** | **LOC: ~3,000** | **Direct code reuse: MEDIUM (event schema + dashboard patterns)**
+
+Real-time multi-agent monitoring dashboard via Claude Code hooks. Zero-intrusion observability — agents are unmodified. **Primary reference for hook-based event capture, HITL response flow, and multi-agent monitoring UI.**
+
+**Key patterns to study:**
+
+- **Event capture pipeline** (`apps/server/src/index.ts`): HTTP POST `/events` receives hook events → SQLite insert (WAL mode) → WebSocket broadcast to all connected clients. Indexed by `source_app`, `session_id`, `hook_event_type`, `timestamp`.
+- **SQLite event schema** (`apps/server/src/db.ts`): Rich event records with `source_app`, `session_id`, `hook_event_type`, `payload` (JSON), `chat` (conversation snapshot), `summary`, `model_name`, `humanInTheLoop`, `humanInTheLoopStatus`. Dynamic column migration.
+- **HITL response flow** (`apps/server/src/index.ts`): Events include HITL data with WebSocket callback URL to agent. User responds via dashboard → server forwards response → agent resumes. Status tracking: pending → responded → timeout → error.
+- **Swim lane visualization** (`apps/client/src/components/AgentSwimLane.vue`): Timeline per agent showing activities in chronological order. Live event count, connection status indicator, faceted filtering by source/session/event type.
+- **Event timeline** (`apps/client/src/components/EventTimeline.vue`): Scrollable event log with expandable rows, metadata display, real-time auto-population via WebSocket.
+
+**Grovekeeper adaptation:** The SQLite event schema is directly applicable to Grovekeeper's metrics tables (same WAL mode, similar indexes). HITL response flow is a reference for the permission approval pipeline. Swim lane visualization patterns useful for the session dashboard's multi-agent monitoring view.
 
 ### C:\_MP_github_cloned\agent-flow
 
@@ -226,3 +265,46 @@ Example of "many-repos-as-issues" dashboard type. Each issue represents an indep
 ### C:\Users\snapy\OneDrive\Obsidian\ObsidianMP\Finteractive\WorkDashboard.md
 
 Example of "one-repo-many-issues" dashboard type. All issues belong to a single repository (atc-backoffice). Richer worktree metadata on most issues, with dependency chains (e.g., issue based on another feature branch instead of dev). Shows the full worktree lifecycle from creation through archival.
+
+---
+
+## License Compatibility
+
+| Repository               | License             | Can Copy Code | Can Adapt Patterns | Notes                                             |
+| ------------------------ | ------------------- | ------------- | ------------------ | ------------------------------------------------- |
+| CodeBurn                 | MIT                 | YES           | YES                | Highest reuse — same problem domain               |
+| t3code                   | MIT                 | YES           | YES                | Provider adapter contracts                        |
+| vibe-kanban              | Apache 2.0          | YES           | YES                | Same Tauri 2 + Rust stack                         |
+| pixel-agents             | MIT                 | YES           | YES                | Agent visualization patterns                      |
+| peon-ping                | MIT                 | YES           | YES                | Sound packs, CESP standard                        |
+| cline                    | Apache 2.0          | YES           | YES                | Multi-provider API, tool visualization            |
+| cline-kanban             | MIT                 | YES           | YES                | Session state machine, worktree mapping           |
+| OpenCovibe               | MIT                 | YES           | YES                | Session actor, Svelte chat components             |
+| c9watch                  | MIT                 | YES           | YES                | Session monitoring patterns                       |
+| hooks-observability      | MIT                 | YES           | YES                | Event pipeline, HITL response flow                |
+| agent-flow               | MIT                 | YES           | YES                | Agent flow visualization                          |
+| claude-code-templates    | MIT                 | YES           | YES                | Session handoff patterns                          |
+| obsidian-tasks-dashboard | Private             | N/A (own)     | N/A (own)          | Predecessor project, same author                  |
+| mpx-claude-code          | Private             | N/A (own)     | N/A (own)          | Own tooling, invoked via GUI                      |
+| Multica                  | Modified Apache 2.0 | CAUTION       | YES                | No hosted-service redistribution; internal use OK |
+
+## Tech Stack Overlap
+
+| Repository      | Tauri 2       | Rust       | Svelte     | TypeScript | SQLite        | Shared Libs              |
+| --------------- | ------------- | ---------- | ---------- | ---------- | ------------- | ------------------------ |
+| **Grovekeeper** | YES           | YES        | YES (5)    | YES        | YES           | —                        |
+| vibe-kanban     | YES           | YES (Axum) | no (React) | YES        | YES (SQLx)    | Tauri 2, SQLite, libgit2 |
+| OpenCovibe      | YES           | YES        | YES (5)    | YES        | no            | Tauri 2, Svelte 5        |
+| c9watch         | YES           | YES        | YES (5)    | YES        | no            | Tauri 2, SvelteKit       |
+| CodeBurn        | no            | no         | no         | YES        | no            | TypeScript patterns      |
+| t3code          | no (Electron) | no         | no (React) | YES        | YES           | TypeScript contracts     |
+| cline           | no (VS Code)  | no         | no (React) | YES        | no            | Provider abstraction     |
+| cline-kanban    | no            | no         | no (React) | YES        | no            | State machine, worktrees |
+| hooks-obs.      | no            | no         | no (Vue)   | YES        | YES           | SQLite, WebSocket        |
+| pixel-agents    | no (VS Code)  | no         | no (React) | YES        | no            | Canvas, hooks            |
+| Multica         | no (Electron) | no (Go)    | no (React) | YES        | no (Postgres) | shadcn patterns          |
+| peon-ping       | no            | no         | no         | no (Bash)  | no            | CESP standard            |
+
+**Best code-level match:** vibe-kanban (Tauri 2 + Rust crates), OpenCovibe (Tauri 2 + Svelte 5)
+**Best feature-level match:** CodeBurn (evaluation dashboard)
+**Best pattern-level match:** t3code (provider abstraction), cline (multi-provider API), Multica (autopilot system)
