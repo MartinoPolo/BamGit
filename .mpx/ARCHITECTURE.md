@@ -14,7 +14,7 @@ Desktop AI agent orchestration platform. Single process managing multiple worksp
 - **Git:** `git` CLI primary, `git2` crate for performance-critical reads
 - **GitHub:** `gh` CLI primary, `gh api graphql` for bulk sync
 - **Auth:** `gh auth` (no PAT management in app)
-- **i18n:** Paraglide (en + cs, URL strategy)
+- **i18n:** Paraglide JS (en + cs, cookie + baseLocale strategy — no URL rewriting in SPA mode)
 - **Notifications:** rodio (sound), Tauri notification plugin (toast), window attention (flash)
 - **Testing:** Vitest (unit), Playwright (E2E), Storybook (components)
 - **AI Providers:** Claude Code, Cursor, Codex (v1), extensible via Provider trait
@@ -37,8 +37,9 @@ graph TB
         FOREST["Forest View<br/>(default landing)"]
         GH_PAGE["/github<br/>Issues | PRs | Worktrees"]
         SESS["/sessions<br/>Chat UI + detail"]
-        SETT["/settings"]
+        SETT["/settings<br/>+ Keyboard Shortcuts"]
         LAY["+layout.svelte<br/>Context provider"]
+        CMD["Command Palette<br/>(Ctrl+K overlay)"]
     end
 
     subgraph MODULES ["Deep Domain Modules (src/lib/modules/)"]
@@ -71,7 +72,16 @@ graph TB
             METI["useMetrics()<br/>token/cost tracking, achievements"]
         end
         subgraph SMOD ["settings/"]
-            SMODI["useSettings()<br/>AI config browser, shortcuts, export"]
+            SMODI["useSettings()<br/>AI config browser, export"]
+        end
+        subgraph KSM ["keyboard-shortcuts/"]
+            KSMI["useKeyboardShortcuts()<br/>registry, binding, persistence"]
+        end
+        subgraph CPM ["command-palette/"]
+            CPMI["useCommandPalette()<br/>search, actions, navigation"]
+        end
+        subgraph WM ["window/"]
+            WMI["useWindow()<br/>window type, workspace binding"]
         end
     end
 
@@ -95,6 +105,8 @@ graph TB
             RC10["label_shape_mapping_commands"]
             RC11["metrics_commands"]
             RC12["platform_commands"]
+            RC13["keyboard_shortcut_commands"]
+            RC14["window_commands"]
         end
 
         subgraph RSESS ["Session Subsystem"]
@@ -129,11 +141,12 @@ graph TB
     end
 
     W1 & W2 --> LAY
-    LAY --> BM & NM & SM & IM & VCM & AM & WF & MET & SMOD
+    LAY --> BM & NM & SM & IM & VCM & AM & WF & MET & SMOD & KSM & CPM & WM
     FOREST --> IM & VM & VCM
     GH_PAGE --> VCM & IM
     SESS --> SM & IM
-    SETT --> SMOD & NM & BM
+    SETT --> SMOD & NM & BM & KSM
+    CMD --> CPM & AM & IM
 
     MODULES -.->|"invoke()"| RCMD
     SM -.->|"listen()"| RA
@@ -252,12 +265,15 @@ import { useActions } from '$lib/modules/actions';
 import { useWorkflow } from '$lib/modules/workflow';
 import { useMetrics } from '$lib/modules/metrics';
 import { useSettings } from '$lib/modules/settings';
+import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
+import { useCommandPalette } from '$lib/modules/command-palette';
+import { useWindow } from '$lib/modules/window';
 
 // Pure functions (visualization has no reactivity)
 import { computeVisualization, computeForestLayout } from '$lib/modules/visualization';
 
 // i18n
-import { m } from '$lib/paraglide/messages.js';
+import * as m from '$lib/paraglide/messages.js';
 
 // Reactivity primitives (shared)
 import { Persisted } from '$lib/reactivity/persisted.svelte';
@@ -265,18 +281,21 @@ import { Persisted } from '$lib/reactivity/persisted.svelte';
 
 ## Frontend Module Map
 
-| Module             | Context Hook          | Owns                                                                                  |
-| ------------------ | --------------------- | ------------------------------------------------------------------------------------- |
-| `board/`           | `useBoard()`          | Workspace config, palettes, theme, view modes                                         |
-| `issues/`          | `useIssues()`         | Issue CRUD, labels, worktrees, color system, priority, sorting                        |
-| `sessions/`        | `useSessions()`       | Session spawn/monitor/adopt, chat rendering, provider abstraction, sub-agent tracking |
-| `version-control/` | `useVersionControl()` | Git status, GitHub sync, branch badges, PR lifecycle, worktree lifecycle              |
-| `visualization/`   | Pure functions        | Forest layout, tree state computation, dependency graph, overlays                     |
-| `notifications/`   | `useNotifications()`  | CESP event routing, sound playback, window flash, per-event config                    |
-| `actions/`         | `useActions()`        | Action templates, skill invocation, quick actions                                     |
-| `settings/`        | `useSettings()`       | AI config browser, keyboard shortcuts, export/import                                  |
-| `metrics/`         | `useMetrics()`        | Token/cost tracking, statistics, achievements, aggregation                            |
-| `workflow/`        | `useWorkflow()`       | AFK monitoring loop, HITL session orchestration, label management                     |
+| Module                | Context Hook             | Owns                                                                                  |
+| --------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
+| `board/`              | `useBoard()`             | Workspace config, palettes, theme, view modes                                         |
+| `issues/`             | `useIssues()`            | Issue CRUD, labels, worktrees, color system, priority, sorting                        |
+| `sessions/`           | `useSessions()`          | Session spawn/monitor/adopt, chat rendering, provider abstraction, sub-agent tracking |
+| `version-control/`    | `useVersionControl()`    | Git status, GitHub sync, branch badges, PR lifecycle, worktree lifecycle              |
+| `visualization/`      | Pure functions           | Forest layout, tree state computation, dependency graph, overlays                     |
+| `notifications/`      | `useNotifications()`     | CESP event routing, sound playback, window flash, per-event config                    |
+| `actions/`            | `useActions()`           | Action templates, skill invocation, quick actions                                     |
+| `keyboard-shortcuts/` | `useKeyboardShortcuts()` | Shortcut registry, key listener, inline rebinding, SQLite persistence                 |
+| `command-palette/`    | `useCommandPalette()`    | `Ctrl+K` palette, fuzzy search, action/navigation/issue items                         |
+| `window/`             | `useWindow()`            | Window type detection, workspace binding, overview vs workspace mode                  |
+| `settings/`           | `useSettings()`          | AI config browser, export/import                                                      |
+| `metrics/`            | `useMetrics()`           | Token/cost tracking, statistics, achievements, aggregation                            |
+| `workflow/`           | `useWorkflow()`          | AFK monitoring loop, HITL session orchestration, label management                     |
 
 ## Rust Backend Modules
 
@@ -357,21 +376,24 @@ Read commands use `state.read()`, write commands use `state.write()`. Mixed comm
 
 Source of truth: `src-tauri/src/database/schema.rs`
 
-| Table                  | Purpose                                                  |
-| ---------------------- | -------------------------------------------------------- |
-| `dashboards`           | Workspace configuration (repo, folder, settings)         |
-| `issues`               | Core issue records with worktree state, labels, metadata |
-| `sessions`             | Agent session records with state, cost, tokens           |
-| `color_palettes`       | Color palette definitions                                |
-| `actions`              | Configurable action button templates                     |
-| `notification_config`  | Per-event notification preferences                       |
-| `git_status_cache`     | Cached git + GitHub state per issue                      |
-| `label_shape_mappings` | GitHub label → tree shape mapping per dashboard          |
-| `session_metrics`      | Per-session aggregates (tokens, cost, duration, model)   |
-| `turn_metrics`         | Per-turn details with activity classification            |
-| `tool_usage`           | Individual tool usage records                            |
-| `achievements`         | Unlocked achievements with timestamps                    |
-| `import_history`       | Tracking which historical sessions have been imported    |
+| Table                       | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `dashboards`                | Workspace configuration (repo, folder, settings)         |
+| `issues`                    | Core issue records with worktree state, labels, metadata |
+| `sessions`                  | Agent session records with state, cost, tokens           |
+| `color_palettes`            | Color palette definitions                                |
+| `actions`                   | Configurable action button templates                     |
+| `notification_config`       | Per-event notification preferences                       |
+| `git_status_cache`          | Cached git + GitHub state per issue                      |
+| `label_shape_mappings`      | GitHub label → tree shape mapping per dashboard          |
+| `keyboard_shortcuts`        | Custom key bindings per action (overrides defaults)      |
+| `window_workspace_bindings` | Window ↔ workspace mapping with saved geometry           |
+| `app_settings`              | Application-level key-value settings (startup behavior)  |
+| `session_metrics`           | Per-session aggregates (tokens, cost, duration, model)   |
+| `turn_metrics`              | Per-turn details with activity classification            |
+| `tool_usage`                | Individual tool usage records                            |
+| `achievements`              | Unlocked achievements with timestamps                    |
+| `import_history`            | Tracking which historical sessions have been imported    |
 
 ### Type Generation (ts-rs)
 
