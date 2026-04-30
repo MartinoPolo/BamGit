@@ -6,7 +6,7 @@ export const WINDOW_TYPES = {
 export type WindowType = (typeof WINDOW_TYPES)[keyof typeof WINDOW_TYPES];
 
 export const OVERVIEW_LABEL = 'overview';
-export const WORKSPACE_LABEL_PREFIX = 'workspace-';
+const WORKSPACE_LABEL_PREFIX = 'workspace-';
 
 export function parseWindowLabel(label: string): {
 	windowType: WindowType;

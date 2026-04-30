@@ -1,30 +1,14 @@
-use rusqlite::{Connection, Row};
+use rusqlite::Connection;
 use tauri::State;
 
 use crate::database::connection::DatabaseState;
-use crate::models::git_status::GitStatusCache;
+use crate::models::git_status::{
+    row_to_git_status_cache, GitStatusCache, GIT_STATUS_CACHE_SELECT_COLUMNS,
+};
 use crate::models::github::{
     resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, GhCliAvailability,
     GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, SyncAllResult,
 };
-
-const CACHE_SELECT_COLUMNS: &str =
-    "issue_id, branch_status, pr_state, pr_number, pr_url, github_issue_state, \
-     behind_base_count, merge_conflict, fetched_at";
-
-fn row_to_github_status_cache(row: &Row) -> Result<GitStatusCache, rusqlite::Error> {
-    Ok(GitStatusCache {
-        issue_id: row.get(0)?,
-        branch_status: row.get(1)?,
-        pr_state: row.get(2)?,
-        pr_number: row.get(3)?,
-        pr_url: row.get(4)?,
-        github_issue_state: row.get(5)?,
-        behind_base_count: row.get(6)?,
-        merge_conflict: row.get(7)?,
-        fetched_at: row.get(8)?,
-    })
-}
 
 fn upsert_cache(connection: &Connection, cache: &GitStatusCache) -> Result<(), String> {
     connection
@@ -60,8 +44,8 @@ fn read_cache(
     connection: &Connection,
     issue_id: &str,
 ) -> Result<Option<GitStatusCache>, String> {
-    let query = format!("SELECT {CACHE_SELECT_COLUMNS} FROM git_status_cache WHERE issue_id = ?1");
-    match connection.query_row(&query, [issue_id], |row| row_to_github_status_cache(row)) {
+    let query = format!("SELECT {GIT_STATUS_CACHE_SELECT_COLUMNS} FROM git_status_cache WHERE issue_id = ?1");
+    match connection.query_row(&query, [issue_id], |row| row_to_git_status_cache(row)) {
         Ok(cache) => Ok(Some(cache)),
         Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
         Err(error) => Err(format!("Failed to read GitHub status cache: {error}")),
@@ -73,14 +57,14 @@ fn read_all_caches_for_dashboard(
     dashboard_id: &str,
 ) -> Result<Vec<GitStatusCache>, String> {
     let query = format!(
-        "SELECT {CACHE_SELECT_COLUMNS} FROM git_status_cache \
+        "SELECT {GIT_STATUS_CACHE_SELECT_COLUMNS} FROM git_status_cache \
          WHERE issue_id IN (SELECT id FROM issues WHERE dashboard_id = ?1)"
     );
     let mut statement = connection
         .prepare(&query)
         .map_err(|error| format!("Failed to prepare query: {error}"))?;
     let caches = statement
-        .query_map([dashboard_id], |row| row_to_github_status_cache(row))
+        .query_map([dashboard_id], |row| row_to_git_status_cache(row))
         .map_err(|error| format!("Failed to query caches: {error}"))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(|error| format!("Failed to read cache row: {error}"))?;

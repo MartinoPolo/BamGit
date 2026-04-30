@@ -21,11 +21,7 @@ export type {
 
 export { TREE_STAGES, POTTED_PLANT_STAGES, TOOL_TYPES, MIN_SPACING_PX } from './constants.js';
 
-export { computeVisualization } from './tree_computation.js';
+export { computeVisualization, computeTreeVisualization } from './tree_computation.js';
 export { computeForestLayout } from './forest_layout.js';
 
-export {
-	aggregateSessionState,
-	mapIssueToStateDimensions,
-	computeTreeVisualization,
-} from './tree_computation.js';
+export { aggregateSessionState, mapIssueToStateDimensions } from './state_mapping.js';

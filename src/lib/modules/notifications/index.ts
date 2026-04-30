@@ -7,3 +7,4 @@ export type {
 	NotificationConfig,
 	UpdateNotificationConfigRequest,
 } from './notifications.context.svelte.js';
+export { findNotificationDotColor } from './notification_helpers.js';

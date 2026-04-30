@@ -7,10 +7,8 @@
  */
 export { TREE_STAGES, POTTED_PLANT_STAGES, TOOL_TYPES } from './constants.js';
 
-export {
-	aggregateSessionState,
-	mapIssueToStateDimensions,
-	computeTreeVisualization,
-} from './tree_computation.js';
+export { aggregateSessionState, mapIssueToStateDimensions } from './state_mapping.js';
+
+export { computeTreeVisualization } from './tree_computation.js';
 
 export type { StateDimensions } from './types.js';

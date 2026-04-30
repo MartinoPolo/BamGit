@@ -23,56 +23,6 @@ use session::manager::SessionManager;
 use tauri::Manager;
 use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
-fn restore_workspace_windows(app: &tauri::AppHandle, state: &DatabaseState) {
-    let connection = match state.read() {
-        Ok(c) => c,
-        Err(error) => {
-            log::warn!("Failed to read DB for window restore: {error}");
-            return;
-        }
-    };
-
-    let mut statement = match connection.prepare(
-        "SELECT wb.window_label, wb.dashboard_id, wb.window_x, wb.window_y, wb.window_width, wb.window_height, d.name \
-         FROM window_workspace_bindings wb \
-         JOIN dashboards d ON wb.dashboard_id = d.id",
-    ) {
-        Ok(s) => s,
-        Err(error) => {
-            log::warn!("Failed to prepare window restore query: {error}");
-            return;
-        }
-    };
-
-    let bindings: Vec<(String, Option<i32>, Option<i32>, Option<i32>, Option<i32>, String)> = statement
-        .query_map([], |row| {
-            Ok((
-                row.get(0)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-                row.get(5)?,
-                row.get(6)?,
-            ))
-        })
-        .ok()
-        .map(|rows| rows.filter_map(|r| r.ok()).collect())
-        .unwrap_or_default();
-
-    drop(statement);
-    drop(connection);
-
-    for (label, x, y, width, height, name) in bindings {
-        let title = format!("{name} — {APP_NAME}");
-        let w = width.map_or(DEFAULT_WINDOW_WIDTH, |v| v as f64);
-        let h = height.map_or(DEFAULT_WINDOW_HEIGHT, |v| v as f64);
-        if let Err(error) = window_manager::open_or_focus_window_with_position(
-            app, &label, "/", &title, w, h, x, y,
-        ) {
-            log::warn!("Failed to restore window {label}: {error}");
-        }
-    }
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -153,7 +103,7 @@ pub fn run() {
             // Startup behavior: restore last workspace windows or just show overview
             if startup_behavior == STARTUP_BEHAVIOR_LAST_WORKSPACE {
                 let db = app.state::<DatabaseState>();
-                restore_workspace_windows(app.handle(), db.inner());
+                window_commands::restore_workspace_windows(app.handle(), db.inner());
             }
 
             Ok(())

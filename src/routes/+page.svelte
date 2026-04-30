@@ -5,8 +5,11 @@
 	import { useIssues } from '$lib/modules/issues';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { useActions } from '$lib/modules/actions';
-	import { useNotifications, NOTIFICATION_DOT_COLORS } from '$lib/modules/notifications';
-	import { findNotificationDotColor } from '$lib/modules/notifications/notification_helpers.js';
+	import {
+		useNotifications,
+		NOTIFICATION_DOT_COLORS,
+		findNotificationDotColor,
+	} from '$lib/modules/notifications';
 	import { useSessions } from '$lib/modules/sessions';
 	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/modules/issues';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';

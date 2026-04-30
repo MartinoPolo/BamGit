@@ -7,13 +7,9 @@ import type {
 	ToolVisibility,
 } from 'low-poly-2d-trees';
 import type { Issue } from '$lib/modules/issues/index.js';
-import type { GitStatusCache, ExecutionPhase, SessionState } from '$lib/types/generated';
+import type { GitStatusCache } from '$lib/types/generated';
 import type {
 	LabelShapeMappingEntry,
-	AggregateSessionState,
-	ForestBranchStatus,
-	ForestPullRequestState,
-	ForestSyncStatus,
 	StateDimensions,
 	TreeVisualizationTree,
 	TreeVisualizationPottedPlant,
@@ -23,6 +19,7 @@ import type {
 	SessionForMapping,
 } from './types.js';
 import { TREE_STAGES, POTTED_PLANT_STAGES, TOOL_TYPES } from './constants.js';
+import { mapIssueToStateDimensions } from './state_mapping.js';
 
 // ─── Library Constants (local mirrors — avoids barrel Svelte import in Node) ─
 
@@ -148,121 +145,6 @@ const DEFAULT_TREE_CONFIG: TreeConfig = {
 	fruitType: 'none',
 	fruitCount: 3,
 } as const;
-
-// ─── aggregateSessionState — priority-based session state reduction ───────────
-
-const SESSION_PRIORITY: readonly SessionState[] = [
-	'needs-input',
-	'errored',
-	'needs-review',
-	'running',
-	'paused',
-	'finished',
-];
-
-/** @internal Exported for testing only — use `computeVisualization` for production code. */
-export function aggregateSessionState(sessions: readonly SessionState[]): AggregateSessionState {
-	if (sessions.length === 0) {
-		return 'no-session';
-	}
-
-	const stateSet = new Set(sessions);
-
-	for (const state of SESSION_PRIORITY) {
-		if (stateSet.has(state)) {
-			return state;
-		}
-	}
-
-	return 'no-session';
-}
-
-// ─── mapIssueToStateDimensions — maps raw inputs to StateDimensions ───────────
-
-const KNOWN_PR_STATES: ReadonlySet<ForestPullRequestState> = new Set([
-	'draft',
-	'open',
-	'review-requested',
-	'changes-requested',
-	'approved',
-	'ready-to-merge',
-	'merged',
-	'closed',
-]);
-
-const KNOWN_BRANCH_STATUSES: ReadonlySet<string> = new Set([
-	'active',
-	'local',
-	'remote-gone',
-	'deleted',
-	'unknown',
-]);
-
-function mapBranchStatus(
-	issueBranchName: string | null,
-	raw: string | null | undefined,
-): ForestBranchStatus {
-	if (
-		issueBranchName === null ||
-		raw == null ||
-		raw === 'unknown' ||
-		!KNOWN_BRANCH_STATUSES.has(raw)
-	) {
-		return 'no-branch';
-	}
-	if (raw === 'local') {
-		return 'local-only';
-	}
-	return raw as ForestBranchStatus;
-}
-
-function mapPrState(raw: string | null | undefined): ForestPullRequestState {
-	if (raw == null) {
-		return 'no-pr';
-	}
-	if (KNOWN_PR_STATES.has(raw as ForestPullRequestState)) {
-		return raw as ForestPullRequestState;
-	}
-	return 'open';
-}
-
-function mapSyncStatus(gitStatus: GitStatusCache | undefined): ForestSyncStatus {
-	if (gitStatus === undefined) {
-		return { type: 'up-to-date' };
-	}
-	if (gitStatus.merge_conflict === true) {
-		return { type: 'merge-conflict' };
-	}
-	const behind = gitStatus.behind_base_count ?? 0;
-	if (behind > 0) {
-		return { type: 'behind-base', count: behind };
-	}
-	return { type: 'up-to-date' };
-}
-
-function pickExecutionPhase(sessions: readonly SessionForMapping[]): ExecutionPhase {
-	const running = sessions.find((session) => session.state === 'running');
-	return running?.execution_phase ?? 'none';
-}
-
-/** @internal Exported for testing only — use `computeVisualization` for production code. */
-export function mapIssueToStateDimensions(
-	issue: Issue,
-	gitStatus: GitStatusCache | undefined,
-	sessions: readonly SessionForMapping[],
-): StateDimensions {
-	return {
-		labels: issue.labels.map((label) => label.name),
-		worktreeState: issue.worktree_state,
-		aggregateSessionState: aggregateSessionState(sessions.map((session) => session.state)),
-		executionPhase: pickExecutionPhase(sessions),
-		branchStatus: mapBranchStatus(issue.branch_name, gitStatus?.branch_status),
-		pullRequestState: mapPrState(gitStatus?.pr_state),
-		githubIssueState: gitStatus?.github_issue_state === 'closed' ? 'closed' : 'open',
-		syncStatus: mapSyncStatus(gitStatus),
-		grovekeeperStatus: issue.status === 'archived' ? 'archived' : 'active',
-	};
-}
 
 // ─── computeTreeVisualization — maps StateDimensions to TreeVisualization ────
 
