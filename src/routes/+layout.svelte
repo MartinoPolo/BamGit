@@ -3,7 +3,7 @@
 	import '@fontsource/geist-mono';
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { preloadCode } from '$app/navigation';
+	import { preloadCode, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
@@ -19,16 +19,20 @@
 	import { setIssuesContext } from '$lib/modules/issues';
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
+	import { setWindowContext } from '$lib/modules/window';
+	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
 
+	const windowCtx = setWindowContext();
 	const boardStore = setBoardContext();
 	const notificationsCtx = setNotificationsContext();
 	const sessionStore = setSessionsContext(notificationsCtx);
 	setIssuesContext();
 	setVersionControlContext();
 	setActionsContext();
+	const shortcutsCtx = setKeyboardShortcutsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
@@ -36,16 +40,30 @@
 		boardStore.loadDashboards();
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));
+		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
 		void preloadCode(resolve('/settings'));
-	});
+		void shortcutsCtx.loadCustomBindings();
 
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.ctrlKey && event.key === '\\') {
-			event.preventDefault();
-			boardStore.toggleSidebar();
-		}
-	}
+		shortcutsCtx.registerShortcut({
+			id: 'command-palette',
+			label: 'Command Palette',
+			defaultBinding: 'Ctrl+K',
+			callback: () => {},
+		});
+		shortcutsCtx.registerShortcut({
+			id: 'toggle-sidebar',
+			label: 'Toggle Sidebar',
+			defaultBinding: 'Ctrl+\\',
+			callback: () => boardStore.toggleSidebar(),
+		});
+		shortcutsCtx.registerShortcut({
+			id: 'open-settings',
+			label: 'Open Settings',
+			defaultBinding: 'Ctrl+,',
+			callback: () => void goto(resolve('/settings')),
+		});
+	});
 
 	async function handleCreateDashboard(
 		request: CreateDashboardRequest,
@@ -90,28 +108,34 @@
 	const activeSessionCount = $derived(sessionStore.activeSessions.length);
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={(event) => shortcutsCtx.handleKeydown(event)} />
 
 <Tooltip.Provider>
-	<div
-		class="grid h-screen overflow-hidden bg-background text-foreground"
-		style:grid-template-columns={boardStore.sidebarCollapsed
-			? 'var(--sidebar-width-collapsed) 1fr'
-			: 'var(--sidebar-width) 1fr'}
-	>
-		<DashboardSidebar
-			{workspaceName}
-			username="MartinoPolo"
-			userInitials="MP"
-			{activeSessionCount}
-			collapsed={boardStore.sidebarCollapsed}
-			onToggleSidebar={() => boardStore.toggleSidebar()}
-		/>
-
-		<main class="flex min-w-0 flex-1 flex-col overflow-auto">
+	{#if windowCtx.isOverview}
+		<div class="h-screen overflow-auto bg-background text-foreground">
 			{@render children()}
-		</main>
-	</div>
+		</div>
+	{:else}
+		<div
+			class="grid h-screen overflow-hidden bg-background text-foreground"
+			style:grid-template-columns={boardStore.sidebarCollapsed
+				? 'var(--sidebar-width-collapsed) 1fr'
+				: 'var(--sidebar-width) 1fr'}
+		>
+			<DashboardSidebar
+				{workspaceName}
+				username="MartinoPolo"
+				userInitials="MP"
+				{activeSessionCount}
+				collapsed={boardStore.sidebarCollapsed}
+				onToggleSidebar={() => boardStore.toggleSidebar()}
+			/>
+
+			<main class="flex min-w-0 flex-1 flex-col overflow-auto">
+				{@render children()}
+			</main>
+		</div>
+	{/if}
 </Tooltip.Provider>
 
 <DashboardCreateDialog

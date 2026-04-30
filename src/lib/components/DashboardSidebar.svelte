@@ -14,6 +14,7 @@
 	import ThemeToggle from './ThemeToggle.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {
 		workspaceName: string;
@@ -38,6 +39,9 @@
 		sessions: () => m.nav_sessions(),
 		settings: () => m.nav_settings(),
 	} as const;
+
+	const shortcutsCtx = useKeyboardShortcuts();
+	const toggleSidebarBinding = $derived(shortcutsCtx.getBindingForDisplay('toggle-sidebar'));
 
 	const navigationItems = [
 		{ href: resolve('/'), icon: TreesIcon, labelKey: 'dashboard' as const },
@@ -85,7 +89,9 @@
 						</button>
 					{/snippet}
 				</Tooltip.Trigger>
-				<Tooltip.Content side="right">{m.sidebar_expand()}</Tooltip.Content>
+				<Tooltip.Content side="right"
+					>{m.sidebar_expand({ shortcut: toggleSidebarBinding })}</Tooltip.Content
+				>
 			</Tooltip.Root>
 		{:else}
 			<div class="flex items-center gap-2">
@@ -96,7 +102,7 @@
 				onclick={onToggleSidebar}
 				class="flex size-[22px] items-center justify-center rounded-[5px] text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
 				aria-label="Collapse sidebar"
-				title={m.sidebar_collapse()}
+				title={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
 			>
 				<PanelLeftIcon size={14} />
 			</button>

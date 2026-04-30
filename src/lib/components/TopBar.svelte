@@ -12,6 +12,7 @@
 	import KanbanIcon from '@lucide/svelte/icons/kanban';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import type { ViewMode } from '$lib/modules/board';
+	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	type TopBarControl =
 		| 'search'
@@ -52,6 +53,9 @@
 		onSearch,
 		children,
 	}: Props = $props();
+
+	const shortcutsCtx = useKeyboardShortcuts();
+	const searchBinding = $derived(shortcutsCtx.getBindingForDisplay('command-palette'));
 
 	function has(control: TopBarControl): boolean {
 		return controls.includes(control);
@@ -94,7 +98,9 @@
 			<button class="topbar-search" class:topbar-glass={transparent} onclick={onSearch}>
 				<SearchIcon size={12} class="pointer-events-none text-foreground-subtle" />
 				<span class="text-foreground-subtle">{m.topbar_search()}</span>
-				<kbd class="topbar-kbd">{m.topbar_search_shortcut()}</kbd>
+				{#if searchBinding}
+					<kbd class="topbar-kbd">{searchBinding}</kbd>
+				{/if}
 			</button>
 		{/if}
 

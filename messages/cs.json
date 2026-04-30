@@ -1,5 +1,7 @@
 {
 	"app_name": "Grovekeeper",
+	"overview_subtitle": "Your workspaces",
+	"overview_loading": "Loading workspaces...",
 
 	"nav_dashboard": "Dashboard",
 	"nav_sessions": "Sessions",
@@ -7,8 +9,8 @@
 	"nav_workspace": "Workspace",
 	"nav_navigate": "Navigate",
 
-	"sidebar_expand": "Expand sidebar (Ctrl+\\)",
-	"sidebar_collapse": "Collapse sidebar (Ctrl+\\)",
+	"sidebar_expand": "Expand sidebar ({shortcut})",
+	"sidebar_collapse": "Collapse sidebar ({shortcut})",
 
 	"topbar_the_grove": "The Grove",
 	"topbar_search": "Search…",
