@@ -19,10 +19,12 @@
 	import { setIssuesContext } from '$lib/modules/issues';
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
+	import { setWindowContext } from '$lib/modules/window';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
 
+	const windowCtx = setWindowContext();
 	const boardStore = setBoardContext();
 	const notificationsCtx = setNotificationsContext();
 	const sessionStore = setSessionsContext(notificationsCtx);
@@ -36,6 +38,7 @@
 		boardStore.loadDashboards();
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));
+		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
 		void preloadCode(resolve('/settings'));
 	});
@@ -93,25 +96,31 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <Tooltip.Provider>
-	<div
-		class="grid h-screen overflow-hidden bg-background text-foreground"
-		style:grid-template-columns={boardStore.sidebarCollapsed
-			? 'var(--sidebar-width-collapsed) 1fr'
-			: 'var(--sidebar-width) 1fr'}
-	>
-		<DashboardSidebar
-			{workspaceName}
-			username="MartinoPolo"
-			userInitials="MP"
-			{activeSessionCount}
-			collapsed={boardStore.sidebarCollapsed}
-			onToggleSidebar={() => boardStore.toggleSidebar()}
-		/>
-
-		<main class="flex min-w-0 flex-1 flex-col overflow-auto">
+	{#if windowCtx.isOverview}
+		<div class="h-screen overflow-auto bg-background text-foreground">
 			{@render children()}
-		</main>
-	</div>
+		</div>
+	{:else}
+		<div
+			class="grid h-screen overflow-hidden bg-background text-foreground"
+			style:grid-template-columns={boardStore.sidebarCollapsed
+				? 'var(--sidebar-width-collapsed) 1fr'
+				: 'var(--sidebar-width) 1fr'}
+		>
+			<DashboardSidebar
+				{workspaceName}
+				username="MartinoPolo"
+				userInitials="MP"
+				{activeSessionCount}
+				collapsed={boardStore.sidebarCollapsed}
+				onToggleSidebar={() => boardStore.toggleSidebar()}
+			/>
+
+			<main class="flex min-w-0 flex-1 flex-col overflow-auto">
+				{@render children()}
+			</main>
+		</div>
+	{/if}
 </Tooltip.Provider>
 
 <DashboardCreateDialog
