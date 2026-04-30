@@ -2,7 +2,7 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 9;
+pub(crate) const CURRENT_VERSION: i32 = 10;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
@@ -16,6 +16,7 @@ static MIGRATIONS: &[MigrationFunction] = &[
     migrate_v7,
     migrate_v8,
     migrate_v9,
+    migrate_v10,
 ];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
@@ -404,6 +405,15 @@ fn migrate_v9(connection: &Connection) -> Result<(), rusqlite::Error> {
     }
 }
 
+fn migrate_v10(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute_batch(
+        "CREATE TABLE IF NOT EXISTS keyboard_shortcuts (
+            action_id TEXT PRIMARY KEY,
+            binding TEXT NOT NULL
+        );",
+    )
+}
+
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {
     let version: i32 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
     Ok(version)
@@ -640,5 +650,37 @@ mod tests {
 
         // Running v8 again should not fail (INSERT OR IGNORE)
         migrate_v8(&connection).unwrap();
+    }
+
+    #[test]
+    fn migration_v10_creates_keyboard_shortcuts_table() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO keyboard_shortcuts (action_id, binding) VALUES ('action.save', 'Ctrl+S')",
+                [],
+            )
+            .unwrap();
+
+        let (action_id, binding): (String, String) = connection
+            .query_row(
+                "SELECT action_id, binding FROM keyboard_shortcuts WHERE action_id = 'action.save'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap();
+        assert_eq!(action_id, "action.save");
+        assert_eq!(binding, "Ctrl+S");
+    }
+
+    #[test]
+    fn migration_v10_is_idempotent() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        // Running v10 again should not fail (CREATE TABLE IF NOT EXISTS)
+        migrate_v10(&connection).unwrap();
     }
 }
