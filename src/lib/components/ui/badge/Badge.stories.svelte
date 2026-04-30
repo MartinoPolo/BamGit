@@ -24,7 +24,8 @@
 
 <script lang="ts">
 	import type { BadgeProps } from './badge-variants.js';
-	import { CircleCheck as CheckIcon, AlertTriangle as AlertIcon } from 'lucide-svelte';
+	import CheckIcon from '@lucide/svelte/icons/circle-check';
+	import AlertIcon from '@lucide/svelte/icons/triangle-alert';
 </script>
 
 <Story name="Default" args={{ variant: 'default' }}>

@@ -3,7 +3,7 @@
 	import '@fontsource/geist-mono';
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { preloadCode } from '$app/navigation';
+	import { preloadCode, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
@@ -19,6 +19,7 @@
 	import { setIssuesContext } from '$lib/modules/issues';
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
+	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -29,6 +30,7 @@
 	setIssuesContext();
 	setVersionControlContext();
 	setActionsContext();
+	const shortcutsCtx = setKeyboardShortcutsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
@@ -38,14 +40,27 @@
 		void preloadCode(resolve('/'));
 		void preloadCode(resolve('/sessions'));
 		void preloadCode(resolve('/settings'));
-	});
+		void shortcutsCtx.loadCustomBindings();
 
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.ctrlKey && event.key === '\\') {
-			event.preventDefault();
-			boardStore.toggleSidebar();
-		}
-	}
+		shortcutsCtx.registerShortcut({
+			id: 'command-palette',
+			label: 'Command Palette',
+			defaultBinding: 'Ctrl+K',
+			callback: () => {},
+		});
+		shortcutsCtx.registerShortcut({
+			id: 'toggle-sidebar',
+			label: 'Toggle Sidebar',
+			defaultBinding: 'Ctrl+\\',
+			callback: () => boardStore.toggleSidebar(),
+		});
+		shortcutsCtx.registerShortcut({
+			id: 'open-settings',
+			label: 'Open Settings',
+			defaultBinding: 'Ctrl+,',
+			callback: () => void goto(resolve('/settings')),
+		});
+	});
 
 	async function handleCreateDashboard(
 		request: CreateDashboardRequest,
@@ -90,7 +105,7 @@
 	const activeSessionCount = $derived(sessionStore.activeSessions.length);
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={(event) => shortcutsCtx.handleKeydown(event)} />
 
 <Tooltip.Provider>
 	<div
