@@ -9,6 +9,7 @@
 	import GitBadgeGroup from './GitBadgeGroup.svelte';
 	import WorktreeProgressIndicator from './WorktreeProgressIndicator.svelte';
 	import ActionButtonGroup from './ActionButtonGroup.svelte';
+	import { clickOutside } from '$lib/actions/click_outside';
 
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
@@ -214,10 +215,9 @@
 				</button>
 
 				{#if showOverflow}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
 						class="absolute right-0 z-10 mt-1 min-w-35 rounded border border-border bg-popover py-1 shadow-lg"
-						onmouseleave={() => (showOverflow = false)}
+						use:clickOutside={() => (showOverflow = false)}
 					>
 						<button
 							onclick={() => {
