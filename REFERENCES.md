@@ -90,7 +90,7 @@ VS Code extension where each Claude Code agent appears as a pixel art character 
 - **Canvas game loop** (`webview-ui/src/office/engine/gameLoop.ts`): 60 FPS requestAnimationFrame, update all characters → render to canvas (single pass). React handles UI overlays separately. Depth sorting by y-coordinate.
 - **Modular asset system** (`shared/assets/`): Per-folder manifest.json for furniture, PNG→SpriteData conversion, HSB color shifting for palette variety, external asset directories.
 
-**Grovekeeper adaptation:** The agent state detection patterns (hooks + JSONL polling) validate Grovekeeper's existing approach. Sub-agent visualization (parent-child linking, spawn/despawn effects) could enhance Grovekeeper's forest view with companion saplings per sub-agent. Character personality system is reference for the peon-ping integration (agent voices).
+**Grovekeeper adaptation:** The agent state detection patterns (hooks + JSONL polling) validate Grovekeeper's existing approach. Sub-agent visualization (parent-child linking, spawn/despawn effects) informs Grovekeeper's bird system — sub-agents appear as birds in the tree canopy (owl, robin, sparrow, cardinal, hummingbird, parrot) rather than companion saplings. Character personality system is reference for the peon-ping integration (agent voices).
 
 ---
 

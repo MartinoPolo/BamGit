@@ -28,15 +28,15 @@ Last updated: 2026-04-29
 
 ### P0 — Usable App (must-have)
 
-| PRD | Title                          | Blocks        | Status      |
-| --- | ------------------------------ | ------------- | ----------- |
-| #87 | Design System & Infrastructure | All PRDs      | Not started |
-| #89 | Issue Management & Creation    | #88, #90, #91 | Not started |
-| #88 | Forest View & Visualization    | —             | Not started |
-| #90 | Session Management & Chat UI   | #92, #93      | Not started |
-| #91 | Git/GitHub Integration         | #92           | Not started |
-| #95 | Notifications & Sounds         | —             | Not started |
-| #96 | Platform & Settings            | —             | Not started |
+| PRD | Title                          | Blocks        | Status                                    |
+| --- | ------------------------------ | ------------- | ----------------------------------------- |
+| #87 | Design System & Infrastructure | All PRDs      | Not started                               |
+| #89 | Issue Management & Creation    | #88, #90, #91 | Not started                               |
+| #88 | Forest View & Visualization    | —             | State mapping grilled, sub-issues pending |
+| #90 | Session Management & Chat UI   | #92, #93      | Not started                               |
+| #91 | Git/GitHub Integration         | #92           | Not started                               |
+| #95 | Notifications & Sounds         | —             | Not started                               |
+| #96 | Platform & Settings            | —             | Not started                               |
 
 ### P1 — Full Featured (planned, not blocking v1)
 

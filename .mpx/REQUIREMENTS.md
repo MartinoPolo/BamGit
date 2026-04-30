@@ -233,7 +233,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 1. **GitHub Label:** `HITL` or `AFK`. Under a PRD, issues without either label should not exist — display in **error state** if they do (red glow, speech bubble with warning). In repo-wide forest (outside PRD context), unlabeled issues are displayed in a **special way** (distinct visual treatment, TBD — possibly potted plants if no worktree, or a unique badge/dimming for unlabeled trees with worktrees)
 2. **Worktree State:** `none`, `pending`, `active`, `failed`, `removing`, `removed`
 3. **Session State (aggregate):** `no-session`, `running`, `needs-input`, `needs-review`, `paused`, `finished`, `errored`. Priority order for aggregate: needs-input > errored > needs-review > running > paused > finished > no-session
-4. **Execution Phase (derived from stream-JSON):** `none`, `analyzing`, `tdd` (red+green+refactor), `reviewing` (review+check+fix), `verifying` (frontend), `committing` (commit+finalize)
+4. **Execution Phase (derived from stream-JSON):** `none`, `analyzing`, `tdd` (red+green+refactor), `reviewing` (review+check+fix), `testing` (checks+tests), `fixing` (applying fixes), `shipping` (commit+push+PR+CI+merge)
 5. **Branch Status:** `no-branch`, `active`, `local-only`, `remote-gone`, `deleted`
 6. **PR State:** `no-pr`, `draft`, `open`, `review-requested`, `changes-requested`, `approved`, `ready-to-merge`, `merged`, `closed`
 7. **GitHub Issue State:** `open`, `closed`
@@ -242,19 +242,22 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 #### Tree Lifecycle Stages
 
-| Stage          | Visual                     | Primary Trigger                                        |
-| -------------- | -------------------------- | ------------------------------------------------------ |
-| Seed           | Seed on soil               | GH issue exists, worktree=none, no session             |
-| Sprouting      | Sprouting seed             | Worktree pending                                       |
-| Sapling        | Young sapling              | Worktree=active, branch exists, no session run yet     |
-| Growing        | Sapling with supports      | Session running (watering can accessory)               |
-| Leafy tree     | Tree with full canopy      | Session finished, commits exist on branch              |
-| Fruiting tree  | Tree with fruit            | PR opened (draft or open). Fruit count = session count |
-| Flowering tree | Tree with flowers, glowing | PR approved                                            |
-| Seasonal tree  | Orange/red autumn leaves   | PR changes-requested                                   |
-| Bare tree      | Leafless winter tree       | PR merged, GH issue closed                             |
-| Dead tree      | Desaturated, fallen        | Branch deleted upstream                                |
-| Stump          | Tree stump                 | Worktree removed, issue archived                       |
+> Full priority-ordered cascade with all rules: see `.mpx/STATE_MAPPING.md`
+
+| Stage          | Visual                   | Primary Trigger                                          |
+| -------------- | ------------------------ | -------------------------------------------------------- |
+| Seed           | Seed on soil             | GH issue exists, worktree=none, no session               |
+| Sprouting      | Sprouting seed           | Worktree pending or failed                               |
+| Sapling        | Young sapling            | Worktree=active, branch exists, no session run yet       |
+| Growing        | Sapling with growth      | Session active (running, paused, errored, needs-input)   |
+| Leafy tree     | Tree with full canopy    | Draft PR, or commits on branch with no PR                |
+| Flowering tree | Tree with flowers        | PR open or review-requested (blossoming, under review)   |
+| Fruiting tree  | Tree with fruit          | PR approved or ready-to-merge (mature, ready to harvest) |
+| Seasonal tree  | Orange/red autumn leaves | PR changes-requested (autumn setback)                    |
+| Wilting tree   | Faded, drooping canopy   | PR closed without merge (rejected/abandoned)             |
+| Bare tree      | Leafless winter tree     | PR merged (lifecycle complete)                           |
+| Dead tree      | Desaturated, fallen      | Branch deleted or remote-gone                            |
+| Stump          | Tree stump               | Worktree removed, issue archived                         |
 
 #### Tree Shape & Color
 
@@ -266,19 +269,39 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 #### Overlay System (cross-cutting states)
 
-- **Error/damage:** Sick/damaged tree, wilting leaves (worktree failed, session errored) — storm cloud accessory
-- **Merge conflict:** Storm clouds
-- **Behind base:** Wind blowing leaves
-- **Needs-input:** Speech bubble on tree (urgent attention needed)
-- **Changes-requested:** Storm clouds, seasonal palette
-- **Approved:** Flowers blooming, glow effect
-- **PR review-requested:** Woodpecker accessory
+> Full accessory/overlay mapping with priorities: see `.mpx/STATE_MAPPING.md`
 
-#### Session Overlays
+- **Session errored:** Red speech bubble (crownTop). Red pulsing glow (intensity 4)
+- **Needs-input:** Orange speech bubble (crownTop). Orange pulsing glow (intensity 3)
+- **Merge conflict:** Storm cloud (crownTop)
+- **Worktree failed:** Storm cloud (crownTop)
+- **Behind base:** Mushroom/fungi clusters on trunk (binary: present when behind, absent when synced)
+- **Approved:** Green glow (intensity 2). Fruiting stage handles the visual
+- **Ready-to-merge:** Green glow (intensity 5). Fruiting stage handles the visual
+- **Changes-requested:** Seasonal stage (autumn palette). No storm cloud
+- **HITL label:** Grill accessory (static = available, animated = grilling session active)
 
-- **Multiple sessions:** Different fruit types per session (apple, cherry, berry, acorn)
-- **Sub-agents:** Small companion saplings that sprout when sub-agent starts, wilt when it finishes. Labeled with agent type
-- **Tool calls:** Gardening implements animate near tree trunk when used (shovel=Bash, magnifying glass=Grep, watering can=Write, pruning shears=Edit)
+#### Execution Phase Tools
+
+- **Analyzing:** Lantern (infinity-sign path animation)
+- **TDD / Building:** Shovel (digging swing)
+- **Reviewing:** No tool — cardinal birds (reviewer sub-agents) in canopy carry the signal
+- **Checks / Testing:** Pruning shears (snipping motion)
+- **Fixing:** Shovel + robin bird in canopy (builder fixing issues)
+- **Shipping:** Rake (horizontal slide)
+
+#### Session Accessories
+
+- **Running session:** Tree animates (canopySway + animateGrowth). Execution phase tool at trunkBase
+- **Paused session:** Ladder at trunkBase (someone stepped away). Tree is static
+- **Fruit:** Static count (3-5), decorative. Species-matched fruit type per tree shape
+
+#### Sub-Agent Visualization
+
+- **Birds in canopy** at branchTips — 6 types mapped to agent categories:
+    - Owl (analysis), Robin (executor), Sparrow (checker), Cardinal (reviewer), Hummingbird (utility), Parrot (research/docs)
+- Multiple birds of same type for parallel agents (e.g., 3 cardinals for 3 reviewers)
+- Fade out when sub-agent finishes. Tooltip shows agent name. Clickable for output
 
 #### Forest Layout
 
