@@ -222,5 +222,16 @@
 	"notification_toast_errored": "Session errored",
 	"notification_toast_pr_ready": "PR ready",
 
-	"lang_switcher": "Language"
+	"lang_switcher": "Language",
+
+	"command_palette_title": "Příkazová paleta",
+	"command_palette_placeholder": "Zadejte příkaz, hledejte…",
+	"command_palette_actions": "Akce",
+	"command_palette_navigation": "Navigace",
+	"command_palette_issues": "Úkoly",
+	"command_palette_navigate": "navigovat",
+	"command_palette_select": "vybrat",
+	"command_palette_close": "zavřít",
+	"command_palette_results": "{count} výsledků",
+	"command_palette_no_results": "Žádné výsledky"
 }

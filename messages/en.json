@@ -222,5 +222,16 @@
 	"notification_toast_errored": "Session errored",
 	"notification_toast_pr_ready": "PR ready",
 
-	"lang_switcher": "Language"
+	"lang_switcher": "Language",
+
+	"command_palette_title": "Command Palette",
+	"command_palette_placeholder": "Type a command, search…",
+	"command_palette_actions": "Actions",
+	"command_palette_navigation": "Navigation",
+	"command_palette_issues": "Issues",
+	"command_palette_navigate": "navigate",
+	"command_palette_select": "select",
+	"command_palette_close": "close",
+	"command_palette_results": "{count} results",
+	"command_palette_no_results": "No results found"
 }
