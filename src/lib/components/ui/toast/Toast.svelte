@@ -20,8 +20,8 @@
 	bind:this={ref}
 	data-slot="toast"
 	data-tone={tone}
-	role="status"
-	aria-live="polite"
+	role={tone === 'danger' || tone === 'warning' ? 'alert' : 'status'}
+	aria-live={tone === 'danger' || tone === 'warning' ? 'assertive' : 'polite'}
 	class={cn(toastVariants({ tone }), className)}
 	{...restProps}
 >
@@ -42,12 +42,14 @@
 		{@render action()}
 	{/if}
 
-	<button
-		type="button"
-		onclick={onDismiss}
-		aria-label="Dismiss"
-		class="shrink-0 inline-flex size-6 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
-	>
-		<XIcon class="size-3" />
-	</button>
+	{#if onDismiss}
+		<button
+			type="button"
+			onclick={onDismiss}
+			aria-label="Dismiss"
+			class="shrink-0 inline-flex size-6 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
+		>
+			<XIcon class="size-3" />
+		</button>
+	{/if}
 </div>
