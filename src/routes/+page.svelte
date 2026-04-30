@@ -21,6 +21,7 @@
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import type { PrunableIssue } from '$lib/types/generated';
+	import { useCommandPalette } from '$lib/modules/command-palette';
 
 	const boardStore = useBoard();
 	const issueStore = useIssues();
@@ -28,6 +29,7 @@
 	const actionStore = useActions();
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
+	const commandPaletteCtx = useCommandPalette();
 
 	function getNotificationDotColor(issueId: string): string | null {
 		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
@@ -266,6 +268,7 @@
 		onViewModeChange={(mode) => (boardStore.viewMode = mode)}
 		onSync={githubRepoParts ? handleSyncAll : undefined}
 		onPlant={openCreateDialog}
+		onSearch={() => commandPaletteCtx.toggle()}
 	>
 		<button
 			class="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"

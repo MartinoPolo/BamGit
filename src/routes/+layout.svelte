@@ -21,6 +21,8 @@
 	import { setActionsContext } from '$lib/modules/actions';
 	import { setWindowContext, openWorkspaceWindow } from '$lib/modules/window';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
+	import { setCommandPaletteContext } from '$lib/modules/command-palette';
+	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -33,6 +35,7 @@
 	setVersionControlContext();
 	setActionsContext();
 	const shortcutsCtx = setKeyboardShortcutsContext();
+	const commandPaletteCtx = setCommandPaletteContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
@@ -49,7 +52,7 @@
 			id: 'command-palette',
 			label: 'Command Palette',
 			defaultBinding: 'Ctrl+K',
-			callback: () => {},
+			callback: () => commandPaletteCtx.toggle(),
 		});
 		shortcutsCtx.registerShortcut({
 			id: 'toggle-sidebar',
@@ -157,3 +160,5 @@
 	onUpdate={handleUpdateDashboard}
 	onDelete={handleDeleteDashboard}
 />
+
+<CommandPalette />
