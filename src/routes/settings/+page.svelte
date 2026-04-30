@@ -2,7 +2,8 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import ShortcutSettingsPanel from '$lib/components/ShortcutSettingsPanel.svelte';
-	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board';
+	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import type { ColorPalette } from '$lib/types/generated';
 	const boardStore = useBoard();
 
@@ -13,6 +14,8 @@
 	let editName = $state('');
 	let editColorsInput = $state('');
 	let operationError = $state<string | null>(null);
+	let editUsername = $state(boardStore.username);
+	let editInitials = $state(boardStore.userInitials);
 
 	const builtInPalettes = $derived(boardStore.palettes.filter((p) => p.is_built_in === true));
 	const customPalettes = $derived(boardStore.palettes.filter((p) => p.is_built_in === false));
@@ -91,7 +94,71 @@
 
 <div class="space-y-6 p-4">
 	<h1 class="text-xl font-semibold">{m.settings_title()}</h1>
+	<!-- User Profile Section -->
+	<section class="space-y-4">
+		<h2 class="text-lg font-medium">{m.settings_user_title()}</h2>
+		<p class="text-sm text-muted-foreground">
+			{m.settings_user_description()}
+		</p>
+		<div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+			<div class="flex-1 space-y-1">
+				<label for="username-input" class="text-xs text-muted-foreground"
+					>{m.settings_username_label()}</label
+				>
+				<Input
+					id="username-input"
+					bind:value={editUsername}
+					onchange={() => {
+						boardStore.username = editUsername;
+					}}
+				/>
+			</div>
+			<div class="w-24 space-y-1">
+				<label for="initials-input" class="text-xs text-muted-foreground"
+					>{m.settings_initials_label()}</label
+				>
+				<Input
+					id="initials-input"
+					bind:value={editInitials}
+					onchange={() => {
+						boardStore.userInitials = editInitials;
+					}}
+					maxlength={3}
+				/>
+			</div>
+		</div>
+	</section>
+
 	<NotificationSettingsPanel />
+
+	<!-- Accent Color Section -->
+	<section class="space-y-4">
+		<h2 class="text-lg font-medium">{m.settings_accent_title()}</h2>
+		<p class="text-sm text-muted-foreground">
+			{m.settings_accent_description()}
+		</p>
+		<div class="flex flex-wrap gap-3">
+			{#each ACCENT_COLORS as color (color)}
+				<button
+					type="button"
+					onclick={() => {
+						boardStore.theme.accent = color;
+					}}
+					class="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm capitalize transition-all {boardStore
+						.theme.accent === color
+						? 'border-primary bg-surface-2 font-medium'
+						: 'border-border hover:border-border-strong hover:bg-surface-2'}"
+				>
+					<div
+						class="size-4 rounded-full"
+						style:background-color="var(--{color}-500)"
+					></div>
+					{color}
+				</button>
+			{/each}
+		</div>
+	</section>
+
 	<ShortcutSettingsPanel />
 
 	<!-- Color Palettes Section -->

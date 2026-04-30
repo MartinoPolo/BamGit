@@ -1,4 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+vi.mock('$lib/paraglide/messages.js', () => ({
+	time_never_synced: () => 'Never synced',
+	time_just_now: () => 'Just now',
+	time_seconds_ago: ({ count }: { count: string }) => `${count}s ago`,
+	time_minutes_ago: ({ count }: { count: string }) => `${count}m ago`,
+	time_hours_ago: ({ count }: { count: string }) => `${count}h ago`,
+	time_days_ago: ({ count }: { count: string }) => `${count}d ago`,
+}));
+
 import { formatRelativeTime } from './time.js';
 
 describe('formatRelativeTime', () => {

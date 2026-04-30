@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 
@@ -16,7 +17,7 @@
 	>
 		<div class="flex flex-col items-center gap-2 text-muted-foreground">
 			<PlusIcon class="size-6" />
-			<span class="text-sm font-medium">Add workspace</span>
+			<span class="text-sm font-medium">{m.workspace_add()}</span>
 		</div>
 	</Card.Card>
 </button>

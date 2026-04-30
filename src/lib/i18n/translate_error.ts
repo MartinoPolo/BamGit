@@ -11,6 +11,8 @@ const ERROR_KEY_MAP: Record<string, () => string> = {
 	ERR_PORTFOLIO_NOT_FOUND: () => m.err_portfolio_not_found(),
 	ERR_NO_SOUND_FILE: () => m.err_no_sound_file(),
 	ERR_NOTIFICATION_SERVICE_UNAVAILABLE: () => m.err_notification_service_unavailable(),
+	ERR_GIT_BASH_NOT_FOUND: () => m.err_git_bash_not_found(),
+	ERR_SCRIPTS_NOT_FOUND: () => m.err_scripts_not_found(),
 };
 
 export function translateErrorKey(errorKey: string): string {

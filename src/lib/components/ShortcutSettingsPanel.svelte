@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { useKeyboardShortcuts, eventToBinding } from '$lib/modules/keyboard-shortcuts';
 	import type { ShortcutCollision } from '$lib/modules/keyboard-shortcuts';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
@@ -67,13 +68,13 @@
 </script>
 
 <section class="space-y-4">
-	<h2 class="text-lg font-medium">Keyboard Shortcuts</h2>
+	<h2 class="text-lg font-medium">{m.shortcuts_title()}</h2>
 	<p class="text-sm text-muted-foreground">
-		Customize keyboard shortcuts. Click a binding to change it.
+		{m.shortcuts_description()}
 	</p>
 
 	{#if shortcutsCtx.allBindings.length === 0}
-		<p class="text-sm text-muted-foreground italic">No shortcuts registered yet.</p>
+		<p class="text-sm text-muted-foreground italic">{m.shortcuts_empty()}</p>
 	{:else}
 		<div class="space-y-2">
 			{#each shortcutsCtx.allBindings as shortcutBinding (shortcutBinding.actionId)}
@@ -89,7 +90,9 @@
 									<Kbd>{pendingBinding}</Kbd>
 									{#if collision}
 										<span class="text-xs text-destructive">
-											Conflicts with {collision.existingLabel}
+											{m.shortcuts_conflicts_with({
+												label: collision.existingLabel,
+											})}
 										</span>
 									{/if}
 									<button
@@ -98,13 +101,13 @@
 										disabled={collision !== null}
 										class="rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
 									>
-										Confirm
+										{m.shortcuts_confirm()}
 									</button>
 								{:else}
 									<span
 										class="animate-pulse rounded border border-dashed border-ring px-3 py-1 text-xs text-muted-foreground"
 									>
-										Press a key combo…
+										{m.shortcuts_press_key_combo()}
 									</span>
 								{/if}
 								<button
@@ -112,7 +115,7 @@
 									onclick={cancelRebind}
 									class="text-xs text-muted-foreground hover:text-foreground"
 								>
-									Cancel
+									{m.shortcuts_cancel()}
 								</button>
 							</div>
 						{:else}
@@ -120,7 +123,7 @@
 								type="button"
 								onclick={() => startRebind(shortcutBinding.actionId)}
 								class="cursor-pointer transition-opacity hover:opacity-70"
-								title="Click to rebind"
+								title={m.shortcuts_click_to_rebind()}
 							>
 								<Kbd>{shortcutBinding.binding}</Kbd>
 							</button>
@@ -129,9 +132,9 @@
 									type="button"
 									onclick={() => resetToDefault(shortcutBinding.actionId)}
 									class="text-xs text-muted-foreground hover:text-foreground"
-									title="Reset to default"
+									title={m.shortcuts_reset_to_default()}
 								>
-									Reset
+									{m.shortcuts_reset()}
 								</button>
 							{/if}
 						{/if}

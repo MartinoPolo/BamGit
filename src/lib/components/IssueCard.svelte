@@ -216,7 +216,7 @@
 
 				{#if showOverflow}
 					<div
-						class="absolute right-0 z-10 mt-1 min-w-35 rounded border border-border bg-popover py-1 shadow-lg"
+						class="absolute right-0 z-[var(--z-dropdown)] mt-1 min-w-35 rounded border border-border bg-popover py-1 shadow-lg"
 						use:clickOutside={() => (showOverflow = false)}
 					>
 						<button

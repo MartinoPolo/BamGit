@@ -108,7 +108,7 @@ pub fn get_issue(state: State<DatabaseState>, id: String) -> Result<Issue, Strin
     let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
     connection
         .query_row(&query, [&id], |row| row_to_issue(row))
-        .map_err(|error| format!("Issue not found: {error}"))
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())
 }
 
 #[tauri::command]
@@ -121,7 +121,7 @@ pub fn update_issue(
     let select_query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
     let existing = connection
         .query_row(&select_query, [&request.id], |row| row_to_issue(row))
-        .map_err(|error| format!("Issue not found: {error}"))?;
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())?;
 
     let name = request.name.unwrap_or(existing.name);
     let priority = resolve_nullable_field(request.priority, existing.priority);

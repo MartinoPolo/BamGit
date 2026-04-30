@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -22,7 +23,7 @@
 
 	function formatRelativeTime(isoString: string | null): string {
 		if (isoString == null) {
-			return 'No activity';
+			return m.workspace_no_activity();
 		}
 		const date = new Date(isoString);
 		const now = new Date();
@@ -30,20 +31,20 @@
 		const diffMinutes = Math.floor(diffMs / 60000);
 
 		if (diffMinutes < 1) {
-			return 'Just now';
+			return m.time_just_now();
 		}
 		if (diffMinutes < 60) {
-			return `${diffMinutes}m ago`;
+			return m.time_minutes_ago({ count: String(diffMinutes) });
 		}
 		const diffHours = Math.floor(diffMinutes / 60);
 		if (diffHours < 24) {
-			return `${diffHours}h ago`;
+			return m.time_hours_ago({ count: String(diffHours) });
 		}
 		const diffDays = Math.floor(diffHours / 24);
 		if (diffDays === 1) {
-			return 'Yesterday';
+			return m.workspace_yesterday();
 		}
-		return `${diffDays}d ago`;
+		return m.time_days_ago({ count: String(diffDays) });
 	}
 
 	function formatCost(cost: number | null): string {
@@ -110,7 +111,9 @@
 				{#if workspace.active_session_count > 0}
 					<Badge variant="default" class="text-[10px]">
 						<ActivityIcon class="mr-0.5 size-3" />
-						{workspace.active_session_count} active
+						{m.active_count({
+							count: String(workspace.active_session_count),
+						})}
 					</Badge>
 				{/if}
 			</div>

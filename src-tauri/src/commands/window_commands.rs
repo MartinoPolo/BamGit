@@ -94,7 +94,7 @@ pub fn open_workspace_window(
             [&dashboard_id],
             |row| row.get(0),
         )
-        .map_err(|error| format!("Dashboard not found: {error}"))?;
+        .map_err(|_| "ERR_DASHBOARD_NOT_FOUND".to_string())?;
 
     let label = window_manager::workspace_label(&dashboard_id);
     let title = format!("{name} — {APP_NAME}");
@@ -118,7 +118,9 @@ pub fn open_workspace_window(
 
     drop(connection);
 
-    window_manager::open_or_focus_window(&app, &label, "/", &title, width, height)?;
+    let saved_x = saved_binding.as_ref().and_then(|b| b.window_x);
+    let saved_y = saved_binding.as_ref().and_then(|b| b.window_y);
+    window_manager::open_or_focus_window_with_position(&app, &label, "/", &title, width, height, saved_x, saved_y)?;
 
     let connection = state.write()?;
     connection

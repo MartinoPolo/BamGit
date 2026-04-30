@@ -97,7 +97,7 @@ pub fn get_dashboard(state: State<DatabaseState>, id: String) -> Result<Dashboar
     let query = format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards WHERE id = ?1");
     connection
         .query_row(&query, [&id], |row| row_to_dashboard(row))
-        .map_err(|error| format!("Dashboard not found: {error}"))
+        .map_err(|_| "ERR_DASHBOARD_NOT_FOUND".to_string())
 }
 
 use super::shared::resolve_nullable_field;
@@ -112,7 +112,7 @@ pub fn update_dashboard(
     let query = format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards WHERE id = ?1");
     let existing = connection
         .query_row(&query, [&request.id], |row| row_to_dashboard(row))
-        .map_err(|error| format!("Dashboard not found: {error}"))?;
+        .map_err(|_| "ERR_DASHBOARD_NOT_FOUND".to_string())?;
 
     let updated = Dashboard {
         id: existing.id,

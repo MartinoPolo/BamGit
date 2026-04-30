@@ -233,5 +233,41 @@
 	"command_palette_select": "vybrat",
 	"command_palette_close": "zavřít",
 	"command_palette_results": "{count} výsledků",
-	"command_palette_no_results": "Žádné výsledky"
+	"command_palette_no_results": "Žádné výsledky",
+
+	"shortcuts_title": "Keyboard Shortcuts",
+	"shortcuts_description": "Customize keyboard shortcuts. Click a binding to change it.",
+	"shortcuts_empty": "No shortcuts registered yet.",
+	"shortcuts_conflicts_with": "Conflicts with {label}",
+	"shortcuts_confirm": "Confirm",
+	"shortcuts_press_key_combo": "Press a key combo…",
+	"shortcuts_click_to_rebind": "Click to rebind",
+	"shortcuts_reset": "Reset",
+	"shortcuts_reset_to_default": "Reset to default",
+	"shortcuts_cancel": "Cancel",
+
+	"workspace_no_activity": "No activity",
+	"workspace_yesterday": "Yesterday",
+	"workspace_add": "Add workspace",
+
+	"active_count": "{count} active",
+	"user_tooltip": "{username} · {count} active",
+
+	"time_just_now": "Just now",
+	"time_never_synced": "Never synced",
+
+	"err_git_bash_not_found": "Could not find Git Bash. Ensure Git for Windows is installed.",
+	"err_scripts_not_found": "Could not find scripts directory.",
+
+	"gh_not_installed_before_link": "GitHub CLI not found. Install from",
+	"gh_not_installed_after_link": "to enable sync.",
+	"gh_not_authenticated_before_command": "GitHub CLI not authenticated. Run",
+	"gh_not_authenticated_after_command": "to connect.",
+
+	"settings_accent_title": "Accent Color",
+	"settings_accent_description": "Choose the accent color theme.",
+	"settings_user_title": "User Profile",
+	"settings_user_description": "Set your display name and initials.",
+	"settings_username_label": "Display Name",
+	"settings_initials_label": "Initials"
 }

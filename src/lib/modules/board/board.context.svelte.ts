@@ -85,6 +85,18 @@ function createBoardContext() {
 		defaultValue: 'moss',
 	});
 
+	const username = new Persisted<string>({
+		key: 'grovekeeper_username',
+		serde: stringSerde((v): v is string => typeof v === 'string' && v.length > 0),
+		defaultValue: 'User',
+	});
+
+	const userInitials = new Persisted<string>({
+		key: 'grovekeeper_user_initials',
+		serde: stringSerde((v): v is string => typeof v === 'string' && v.length > 0),
+		defaultValue: 'U',
+	});
+
 	const prefersDark = browser ? new MediaQuery('(prefers-color-scheme: dark)') : null;
 
 	const isDark = $derived.by(() => {
@@ -302,6 +314,20 @@ function createBoardContext() {
 					accentColor.current = value;
 				},
 			};
+		},
+
+		// User profile
+		get username() {
+			return username.current;
+		},
+		set username(value: string) {
+			username.current = value;
+		},
+		get userInitials() {
+			return userInitials.current;
+		},
+		set userInitials(value: string) {
+			userInitials.current = value;
 		},
 
 		// View preference

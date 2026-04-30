@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { GhCliAvailability } from '$lib/types/generated';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 
@@ -15,14 +16,14 @@
 	>
 		<AlertTriangle size={14} />
 		<span>
-			GitHub CLI not found. Install from
+			{m.gh_not_installed_before_link()}
 			<a
 				href="https://cli.github.com"
 				class="underline hover:text-yellow-200"
 				target="_blank"
-				rel="noopener noreferrer">cli.github.com</a
+				rel="noopener noreferrer">{m.gh_cli_link()}</a
 			>
-			to enable sync.
+			{m.gh_not_installed_after_link()}
 		</span>
 	</div>
 {:else if availability === 'not-authenticated'}
@@ -31,9 +32,9 @@
 	>
 		<AlertTriangle size={14} />
 		<span>
-			GitHub CLI not authenticated. Run
-			<code class="rounded bg-muted px-1 py-0.5 font-mono">gh auth login</code>
-			to connect.
+			{m.gh_not_authenticated_before_command()}
+			<code class="rounded bg-muted px-1 py-0.5 font-mono">{m.gh_auth_command()}</code>
+			{m.gh_not_authenticated_after_command()}
 		</span>
 	</div>
 {/if}
