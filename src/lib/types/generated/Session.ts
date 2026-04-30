@@ -3,4 +3,4 @@ import type { ExecutionPhase } from "./ExecutionPhase";
 import type { SessionSource } from "./SessionSource";
 import type { SessionState } from "./SessionState";
 
-export type Session = { id: string, issue_id: string | null, provider: string, state: SessionState, pid: number | null, session_file_path: string | null, started_at: string, ended_at: string | null, cost_usd: number | null, token_count: number | null, original_intent: string | null, last_prompt: string | null, last_response_summary: string | null, execution_phase: ExecutionPhase, source: SessionSource, working_directory: string | null, };
+export type Session = { id: string, issue_id: string | null, provider: string, state: SessionState, pid: number | null, cli_session_id: string | null, started_at: string, ended_at: string | null, cost_usd: number | null, token_count: number | null, original_intent: string | null, last_prompt: string | null, last_response_summary: string | null, execution_phase: ExecutionPhase, source: SessionSource, working_directory: string | null, };

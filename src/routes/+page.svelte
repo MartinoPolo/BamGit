@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import { useIssues } from '$lib/modules/issues';
 	import { useVersionControl } from '$lib/modules/version-control';
@@ -82,19 +82,19 @@
 	});
 
 	// Load issues and version control state when active dashboard changes
-	let lastLoadedDashboardId = $state<string | null>(null);
-
 	$effect(() => {
 		const dashboardId = boardStore.activeDashboardId;
-		if (dashboardId !== null && dashboardId !== lastLoadedDashboardId) {
-			lastLoadedDashboardId = dashboardId;
+		if (dashboardId === null) {
+			return;
+		}
+		untrack(() => {
 			issueStore.loadIssues(dashboardId);
 			versionControlStore.loadStates(dashboardId);
 			actionStore.loadActions(dashboardId);
 			if (githubRepoParts) {
 				versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
 			}
-		}
+		});
 	});
 
 	async function handleSyncAll() {

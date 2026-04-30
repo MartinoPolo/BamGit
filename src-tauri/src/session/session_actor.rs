@@ -220,7 +220,7 @@ fn handle_event(
             session_id: cli_session_id,
             ..
         } => {
-            update_session_file_path(session_id, cli_session_id, database_connection);
+            update_cli_session_id(session_id, cli_session_id, database_connection);
         }
         SessionEvent::PermissionPrompt { .. } | SessionEvent::ElicitationPrompt { .. } => {
             if let Some(ref db_state) = resolved_state {
@@ -329,17 +329,17 @@ fn update_last_response_summary(
     }
 }
 
-fn update_session_file_path(
+fn update_cli_session_id(
     session_id: &str,
     cli_session_id: &str,
     connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Ok(conn) = connection.lock() {
         if let Err(e) = conn.execute(
-            "UPDATE sessions SET session_file_path = ?1 WHERE id = ?2",
+            "UPDATE sessions SET cli_session_id = ?1 WHERE id = ?2",
             rusqlite::params![cli_session_id, session_id],
         ) {
-            log::error!("Failed to update session_file_path for {session_id}: {e}");
+            log::error!("Failed to update cli_session_id for {session_id}: {e}");
         }
     }
 }
