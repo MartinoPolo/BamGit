@@ -65,7 +65,7 @@ pub struct Session {
     pub state: SessionState,
     #[ts(type = "number | null")]
     pub pid: Option<i64>,
-    pub session_file_path: Option<String>,
+    pub cli_session_id: Option<String>,
     pub started_at: String,
     pub ended_at: Option<String>,
     pub cost_usd: Option<f64>,

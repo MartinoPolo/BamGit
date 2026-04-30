@@ -15,7 +15,7 @@ use crate::session::manager::SessionManager;
 use crate::session::provider::{ActorCommand, SpawnConfig};
 
 const SESSION_SELECT_COLUMNS: &str =
-    "id, issue_id, provider, state, pid, session_file_path, started_at, ended_at, \
+    "id, issue_id, provider, state, pid, cli_session_id, started_at, ended_at, \
      cost_usd, token_count, original_intent, last_prompt, last_response_summary, \
      execution_phase, source, working_directory";
 
@@ -26,7 +26,7 @@ fn row_to_session(row: &Row) -> Result<Session, rusqlite::Error> {
         provider: row.get(2)?,
         state: row.get(3)?,
         pid: row.get(4)?,
-        session_file_path: row.get(5)?,
+        cli_session_id: row.get(5)?,
         started_at: row.get(6)?,
         ended_at: row.get(7)?,
         cost_usd: row.get(8)?,
@@ -221,7 +221,7 @@ pub async fn adopt_session(
     {
         let conn = state.write()?;
         conn.execute(
-            "INSERT INTO sessions (id, issue_id, provider, state, session_file_path, \
+            "INSERT INTO sessions (id, issue_id, provider, state, cli_session_id, \
              original_intent, cost_usd, token_count, source, working_directory) \
              VALUES (?1, ?2, 'claude-code', 'running', ?3, ?4, ?5, ?6, 'adopted', ?7)",
             rusqlite::params![

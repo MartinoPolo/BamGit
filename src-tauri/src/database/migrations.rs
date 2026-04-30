@@ -2,7 +2,7 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 11;
+pub(crate) const CURRENT_VERSION: i32 = 12;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
@@ -18,7 +18,20 @@ static MIGRATIONS: &[MigrationFunction] = &[
     migrate_v9,
     migrate_v10,
     migrate_v11,
+    migrate_v12,
 ];
+
+fn has_column(connection: &Connection, table: &str, column: &str) -> bool {
+    let mut statement = match connection.prepare(&format!("PRAGMA table_info({table})")) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+    let result = statement
+        .query_map([], |row| row.get::<_, String>(1))
+        .map(|rows| rows.filter_map(|r| r.ok()).any(|name| name == column))
+        .unwrap_or(false);
+    result
+}
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)
@@ -26,9 +39,7 @@ fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
 
 fn migrate_v2(connection: &Connection) -> Result<(), rusqlite::Error> {
     // sort_order may already exist if v1 ran with updated schema — check before adding
-    let has_sort_order: bool = connection
-        .prepare("SELECT sort_order FROM issues LIMIT 0")
-        .is_ok();
+    let has_sort_order = has_column(connection, "issues", "sort_order");
 
     if !has_sort_order {
         connection.execute_batch(
@@ -51,9 +62,7 @@ fn migrate_v2(connection: &Connection) -> Result<(), rusqlite::Error> {
 
 fn migrate_v3(connection: &Connection) -> Result<(), rusqlite::Error> {
     // Add source column (spawned vs adopted) — check first since schema may already include it
-    let has_source: bool = connection
-        .prepare("SELECT source FROM sessions LIMIT 0")
-        .is_ok();
+    let has_source = has_column(connection, "sessions", "source");
 
     if !has_source {
         connection.execute_batch(
@@ -62,9 +71,7 @@ fn migrate_v3(connection: &Connection) -> Result<(), rusqlite::Error> {
         )?;
     }
 
-    let has_working_directory: bool = connection
-        .prepare("SELECT working_directory FROM sessions LIMIT 0")
-        .is_ok();
+    let has_working_directory = has_column(connection, "sessions", "working_directory");
 
     if !has_working_directory {
         connection.execute_batch(
@@ -114,9 +121,7 @@ fn migrate_v5(connection: &Connection) -> Result<(), rusqlite::Error> {
     }
 
     // Add is_built_in column to color_palettes (may already exist if v1 ran with updated schema)
-    let has_is_built_in: bool = connection
-        .prepare("SELECT is_built_in FROM color_palettes LIMIT 0")
-        .is_ok();
+    let has_is_built_in = has_column(connection, "color_palettes", "is_built_in");
 
     if !has_is_built_in {
         connection.execute_batch(
@@ -272,17 +277,13 @@ fn migrate_v7(connection: &Connection) -> Result<(), rusqlite::Error> {
 pub const DEFAULT_TREE_SHAPE: &str = "cherry";
 
 fn migrate_v8(connection: &Connection) -> Result<(), rusqlite::Error> {
-    let has_labels: bool = connection
-        .prepare("SELECT labels FROM issues LIMIT 0")
-        .is_ok();
+    let has_labels = has_column(connection, "issues", "labels");
 
     if !has_labels {
         connection.execute_batch("ALTER TABLE issues ADD COLUMN labels TEXT;")?;
     }
 
-    let has_default_shape: bool = connection
-        .prepare("SELECT default_shape FROM dashboards LIMIT 0")
-        .is_ok();
+    let has_default_shape = has_column(connection, "dashboards", "default_shape");
 
     if !has_default_shape {
         connection.execute_batch(
@@ -433,6 +434,17 @@ fn migrate_v11(connection: &Connection) -> Result<(), rusqlite::Error> {
 
         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');",
     )
+}
+
+fn migrate_v12(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // On fresh installs, migrate_v6 already creates the column as cli_session_id.
+    // Only rename when upgrading from an older schema that still has session_file_path.
+    if has_column(connection, "sessions", "session_file_path") {
+        connection.execute_batch(
+            "ALTER TABLE sessions RENAME COLUMN session_file_path TO cli_session_id;",
+        )?;
+    }
+    Ok(())
 }
 
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {
