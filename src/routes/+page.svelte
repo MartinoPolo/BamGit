@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import { useIssues } from '$lib/modules/issues';
@@ -245,7 +246,7 @@
 </script>
 
 {#if boardStore.loading}
-	<p class="text-muted-foreground">Loading...</p>
+	<p class="text-muted-foreground">{m.loading()}</p>
 {:else if boardStore.dashboards.length === 0}
 	<OnboardingCard
 		onCreateDashboard={() => {
@@ -253,7 +254,7 @@
 		}}
 	/>
 {:else if boardStore.activeDashboard === null}
-	<p class="text-muted-foreground">Select a dashboard from the sidebar.</p>
+	<p class="text-muted-foreground">{m.select_dashboard()}</p>
 {:else}
 	<TopBar
 		title={boardStore.activeDashboard.name}
@@ -268,11 +269,11 @@
 	>
 		<button
 			class="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
-			title="Prune worktrees for fully-closed issues"
+			title={m.topbar_prune_title()}
 			onclick={handleOpenPruneDialog}
 		>
 			<ScissorsIcon size={12} />
-			Prune
+			{m.topbar_prune()}
 		</button>
 	</TopBar>
 
@@ -284,13 +285,13 @@
 
 		<!-- Issue list or empty state -->
 		{#if issueStore.loading}
-			<p class="text-muted-foreground">Loading issues...</p>
+			<p class="text-muted-foreground">{m.loading_issues()}</p>
 		{:else if issueStore.error}
-			<p class="text-destructive">Error: {issueStore.error}</p>
+			<p class="text-destructive">{m.error_prefix({ message: issueStore.error })}</p>
 		{:else if issueStore.activeIssues.length === 0 && issueStore.archivedIssues.length === 0}
 			<EmptyIssueState onAddIssue={openCreateDialog} />
 		{:else if boardStore.viewMode === 'kanban'}
-			<p class="text-muted-foreground">Kanban view coming soon.</p>
+			<p class="text-muted-foreground">{m.kanban_coming_soon()}</p>
 		{:else if boardStore.viewMode === 'forest'}
 			<ForestView
 				issues={forestIssues}

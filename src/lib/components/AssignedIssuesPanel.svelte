@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { AssignedIssue } from '$lib/types/generated';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
@@ -21,7 +22,7 @@
 {#if issues.length > 0}
 	<div class="flex flex-col gap-1">
 		<h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
-			Assigned to me ({issues.length})
+			{m.assigned_title({ count: issues.length })}
 		</h3>
 		<div class="flex flex-col gap-0.5">
 			{#each issues as issue (issue.number)}

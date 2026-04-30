@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, SessionEventPayload } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
 	import { listen, type UnlistenFn } from '$lib/tauri.js';
@@ -58,7 +59,7 @@
 		appendMessage(
 			createMessage({
 				role: 'tool',
-				content: `Running ${event.tool_name as string}...`,
+				content: m.chat_tool_running({ toolName: event.tool_name as string }),
 				tool_name: event.tool_name as string,
 			}),
 		);
@@ -86,8 +87,10 @@
 					role: 'system',
 					content:
 						state === 'failed'
-							? `Session errored: ${(event.error as string) ?? 'unknown'}`
-							: 'Session completed.',
+							? m.chat_session_errored({
+									error: (event.error as string) ?? 'unknown',
+								})
+							: m.chat_session_completed(),
 				}),
 			);
 		}
@@ -97,7 +100,7 @@
 		appendMessage(
 			createMessage({
 				role: 'system',
-				content: `Permission needed: ${event.tool_name as string}`,
+				content: m.chat_permission_needed({ toolName: event.tool_name as string }),
 			}),
 		);
 	}
@@ -211,14 +214,14 @@
 					class="shrink-0 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-500"
 					onclick={handleInterrupt}
 				>
-					Interrupt
+					{m.chat_interrupt()}
 				</button>
 			{/if}
 
 			<input
 				type="text"
 				class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
-				placeholder={isActive ? 'Send a message...' : 'Session ended'}
+				placeholder={isActive ? m.chat_placeholder_active() : m.chat_placeholder_ended()}
 				bind:value={promptInput}
 				onkeydown={handleKeydown}
 				disabled={!isActive}
@@ -229,7 +232,7 @@
 				onclick={handleSend}
 				disabled={!canSend}
 			>
-				Send
+				{m.chat_send()}
 			</button>
 		</div>
 	</div>

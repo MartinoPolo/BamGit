@@ -93,11 +93,11 @@ pub fn test_notification_sound(
         )
         .map_err(|error| format!("Config not found: {error}"))?;
 
-    let sound_file = sound_file.ok_or("No sound file configured for this event type")?;
+    let sound_file = sound_file.ok_or("ERR_NO_SOUND_FILE")?;
 
     let service = app_handle
         .try_state::<NotificationService>()
-        .ok_or("NotificationService not available")?;
+        .ok_or("ERR_NOTIFICATION_SERVICE_UNAVAILABLE")?;
 
     let resource_directory = service.resource_directory().clone();
     drop(connection);

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
@@ -54,10 +55,10 @@
 >
 	{#if issue}
 		<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
-			<h2 class="text-lg font-semibold">Edit Issue</h2>
+			<h2 class="text-lg font-semibold">{m.issue_edit_title()}</h2>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">Name *</span>
+				<span class="text-xs text-muted-foreground">{m.issue_field_name()}</span>
 				<input
 					bind:value={name}
 					required
@@ -66,16 +67,16 @@
 			</label>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">Priority</span>
+				<span class="text-xs text-muted-foreground">{m.issue_field_priority()}</span>
 				<select
 					bind:value={priority}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 				>
-					<option value="">None</option>
-					<option value="low">Low</option>
-					<option value="medium">Medium</option>
-					<option value="high">High</option>
-					<option value="top">Top</option>
+					<option value="">{m.priority_none()}</option>
+					<option value="low">{m.priority_low()}</option>
+					<option value="medium">{m.priority_medium()}</option>
+					<option value="high">{m.priority_high()}</option>
+					<option value="top">{m.priority_top()}</option>
 				</select>
 			</label>
 
@@ -86,7 +87,7 @@
 			/>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">GitHub Issue URL</span>
+				<span class="text-xs text-muted-foreground">{m.issue_field_github_url()}</span>
 				<input
 					bind:value={githubIssueUrl}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
@@ -99,13 +100,13 @@
 					onclick={onClose}
 					class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 				>
-					Cancel
+					{m.btn_cancel()}
 				</button>
 				<button
 					type="submit"
 					class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 				>
-					Save
+					{m.btn_save()}
 				</button>
 			</div>
 		</form>

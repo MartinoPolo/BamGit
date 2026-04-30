@@ -152,7 +152,7 @@ pub fn update_color_palette(
         .map_err(|error| format!("Color palette not found: {error}"))?;
 
     if existing.is_built_in {
-        return Err("Cannot modify built-in palettes".to_string());
+        return Err("ERR_PALETTE_BUILTIN".to_string());
     }
 
     let name = request.name.unwrap_or(existing.name);
@@ -189,7 +189,7 @@ pub fn delete_color_palette(state: State<DatabaseState>, id: String) -> Result<(
         .map_err(|error| format!("Color palette not found: {error}"))?;
 
     if is_built_in != 0 {
-        return Err("Cannot delete built-in palettes".to_string());
+        return Err("ERR_PALETTE_BUILTIN_DELETE".to_string());
     }
 
     // Check if in use by any dashboard
@@ -202,9 +202,7 @@ pub fn delete_color_palette(state: State<DatabaseState>, id: String) -> Result<(
         .map_err(|error| format!("Failed to check palette usage: {error}"))?;
 
     if usage_count > 0 {
-        return Err(format!(
-            "Cannot delete palette: it is used by {usage_count} dashboard(s)"
-        ));
+        return Err(format!("ERR_PALETTE_IN_USE:{usage_count}"));
     }
 
     let rows_affected = connection
@@ -212,7 +210,7 @@ pub fn delete_color_palette(state: State<DatabaseState>, id: String) -> Result<(
         .map_err(|error| format!("Failed to delete palette: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Color palette not found".to_string());
+        return Err("ERR_PALETTE_NOT_FOUND".to_string());
     }
 
     Ok(())
@@ -252,7 +250,7 @@ pub fn get_next_available_color(
         serde_json::from_str(&colors_json).map_err(|error| format!("JSON error: {error}"))?;
 
     if palette_colors.is_empty() {
-        return Err("Palette has no colors".to_string());
+        return Err("ERR_PALETTE_EMPTY".to_string());
     }
 
     // Get colors already used by active issues in this dashboard

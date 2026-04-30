@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { DiscoveredSession, DiscoveredSessionStatus } from '$lib/types/generated';
 
 	interface Props {
@@ -8,15 +9,24 @@
 
 	let { session, onAdopt }: Props = $props();
 
-	const statusConfig: Record<DiscoveredSessionStatus, { label: string; color: string }> = {
-		working: { label: 'Working', color: 'bg-green-500' },
-		needs_attention: { label: 'Needs Attention', color: 'bg-amber-500' },
-		idle: { label: 'Idle', color: 'bg-blue-500' },
-		finished: { label: 'Finished', color: 'bg-neutral-600' },
-		unknown: { label: 'Unknown', color: 'bg-neutral-500' },
+	const STATUS_LABELS: Record<DiscoveredSessionStatus, () => string> = {
+		working: () => m.discovered_status_working(),
+		needs_attention: () => m.discovered_status_needs_attention(),
+		idle: () => m.discovered_status_idle(),
+		finished: () => m.discovered_status_finished(),
+		unknown: () => m.discovered_status_unknown(),
+	};
+
+	const statusConfig: Record<DiscoveredSessionStatus, { color: string }> = {
+		working: { color: 'bg-green-500' },
+		needs_attention: { color: 'bg-amber-500' },
+		idle: { color: 'bg-blue-500' },
+		finished: { color: 'bg-neutral-600' },
+		unknown: { color: 'bg-neutral-500' },
 	};
 
 	const badge = $derived(statusConfig[session.status] ?? statusConfig.unknown);
+	const badgeLabel = $derived(STATUS_LABELS[session.status]?.() ?? m.discovered_status_unknown());
 
 	const formattedCost = $derived(session.cost_usd > 0 ? `$${session.cost_usd.toFixed(3)}` : '');
 </script>
@@ -48,14 +58,14 @@
 				{#if session.status === 'working'}
 					<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span>
 				{/if}
-				{badge.label}
+				{badgeLabel}
 			</span>
 		</div>
 	</div>
 
 	<div class="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-		<span>PID {session.pid}</span>
-		<span>{session.message_count} msgs</span>
+		<span>{m.discovered_pid({ pid: session.pid })}</span>
+		<span>{m.discovered_messages({ count: session.message_count })}</span>
 		{#if formattedCost}
 			<span>{formattedCost}</span>
 		{/if}
@@ -70,7 +80,7 @@
 				onAdopt(session);
 			}}
 		>
-			Adopt
+			{m.discovered_adopt()}
 		</button>
 	</div>
 </div>

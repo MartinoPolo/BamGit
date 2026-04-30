@@ -16,6 +16,7 @@ export default [
 			'node_modules',
 			'scripts',
 			'src-tauri',
+			'src/lib/paraglide',
 			'src/lib/types/generated',
 			'**/*.config.*',
 			'*.d.ts',

@@ -36,6 +36,7 @@ obj/
 .turbo/
 .svelte-kit/
 .fallow/
+src/lib/paraglide/
 .nuxt/
 
 # Svelte / Vite
