@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, SessionState } from '$lib/types/generated';
 	import { NOTIFICATION_DOT_COLORS, useNotifications } from '$lib/modules/notifications';
 
@@ -20,16 +21,26 @@
 		return NOTIFICATION_DOT_COLORS[pendingType];
 	});
 
-	const stateConfig: Record<SessionState, { label: string; color: string }> = {
-		running: { label: 'Running', color: 'bg-green-500' },
-		'needs-input': { label: 'Needs Input', color: 'bg-amber-500' },
-		'needs-review': { label: 'Needs Review', color: 'bg-blue-500' },
-		paused: { label: 'Paused', color: 'bg-neutral-400' },
-		finished: { label: 'Finished', color: 'bg-neutral-600' },
-		errored: { label: 'Errored', color: 'bg-red-500' },
+	const STATE_LABELS: Record<SessionState, () => string> = {
+		running: () => m.session_state_running(),
+		'needs-input': () => m.session_state_needs_input(),
+		'needs-review': () => m.session_state_needs_review(),
+		paused: () => m.session_state_paused(),
+		finished: () => m.session_state_finished(),
+		errored: () => m.session_state_errored(),
+	};
+
+	const stateConfig: Record<SessionState, { color: string }> = {
+		running: { color: 'bg-green-500' },
+		'needs-input': { color: 'bg-amber-500' },
+		'needs-review': { color: 'bg-blue-500' },
+		paused: { color: 'bg-neutral-400' },
+		finished: { color: 'bg-neutral-600' },
+		errored: { color: 'bg-red-500' },
 	};
 
 	const badge = $derived(stateConfig[session.state] ?? stateConfig.running);
+	const badgeLabel = $derived(STATE_LABELS[session.state]?.() ?? m.session_state_running());
 	const isActive = $derived(session.state !== 'finished' && session.state !== 'errored');
 
 	const formattedCost = $derived(
@@ -42,15 +53,15 @@
 		const diffSeconds = Math.floor((now.getTime() - started.getTime()) / 1000);
 
 		if (diffSeconds < 60) {
-			return `${diffSeconds}s ago`;
+			return m.time_seconds_ago({ count: diffSeconds });
 		}
 		if (diffSeconds < 3600) {
-			return `${Math.floor(diffSeconds / 60)}m ago`;
+			return m.time_minutes_ago({ count: Math.floor(diffSeconds / 60) });
 		}
 		if (diffSeconds < 86400) {
-			return `${Math.floor(diffSeconds / 3600)}h ago`;
+			return m.time_hours_ago({ count: Math.floor(diffSeconds / 3600) });
 		}
-		return `${Math.floor(diffSeconds / 86400)}d ago`;
+		return m.time_days_ago({ count: Math.floor(diffSeconds / 86400) });
 	});
 </script>
 
@@ -72,11 +83,11 @@
 				{#if notificationDotColor}
 					<span
 						class="h-2 w-2 shrink-0 animate-pulse rounded-full {notificationDotColor}"
-						title="Pending notification"
+						title={m.issue_card_pending_notification()}
 					></span>
 				{/if}
 				<p class="truncate text-sm font-medium text-foreground">
-					{session.original_intent ?? 'Session'}
+					{session.original_intent ?? m.session_fallback_title()}
 				</p>
 			</div>
 			{#if session.last_response_summary}
@@ -93,7 +104,7 @@
 				{#if session.state === 'running'}
 					<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span>
 				{/if}
-				{badge.label}
+				{badgeLabel}
 			</span>
 		</div>
 	</div>
@@ -116,7 +127,7 @@
 					onTerminate(session.id);
 				}}
 			>
-				Stop
+				{m.session_stop()}
 			</button>
 		{/if}
 	</div>

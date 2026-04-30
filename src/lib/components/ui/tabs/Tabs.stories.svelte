@@ -15,7 +15,7 @@
 <script lang="ts">
 	import { Tab } from './index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Settings as SettingsIcon, User as UserIcon, Bell as BellIcon } from 'lucide-svelte';
+	import { Settings as SettingsIcon, User as UserIcon, Bell as BellIcon } from '@lucide/svelte';
 </script>
 
 <Story name="Default">

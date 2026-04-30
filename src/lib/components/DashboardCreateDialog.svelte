@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { CreateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
@@ -70,7 +71,7 @@
 	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
 >
 	<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
-		<h2 class="text-lg font-semibold">Create Dashboard</h2>
+		<h2 class="text-lg font-semibold">{m.dashboard_create_title()}</h2>
 
 		<!-- Type selector -->
 		<div class="flex gap-2">
@@ -81,7 +82,7 @@
 					? 'bg-primary text-primary-foreground'
 					: 'bg-muted text-muted-foreground hover:text-foreground'}"
 			>
-				◆ Repo
+				◆ {m.dashboard_type_repo()}
 			</button>
 			<button
 				type="button"
@@ -91,18 +92,18 @@
 					? 'bg-primary text-primary-foreground'
 					: 'bg-muted text-muted-foreground hover:text-foreground'}"
 			>
-				◇ Portfolio
+				◇ {m.dashboard_type_portfolio()}
 			</button>
 		</div>
 
 		<!-- Name (always shown) -->
 		<label class="flex flex-col gap-1">
-			<span class="text-xs text-muted-foreground">Name *</span>
+			<span class="text-xs text-muted-foreground">{m.dashboard_field_name()}</span>
 			<input
 				bind:value={name}
 				required
 				class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-				placeholder="My Project"
+				placeholder={m.dashboard_placeholder_name()}
 			/>
 		</label>
 
@@ -117,10 +118,12 @@
 		{#if dashboardType === 'portfolio'}
 			<!-- Portfolio repo picker -->
 			<fieldset class="flex flex-col gap-1">
-				<legend class="text-xs text-muted-foreground">Repo Dashboards</legend>
+				<legend class="text-xs text-muted-foreground"
+					>{m.dashboard_field_repo_dashboards()}</legend
+				>
 				{#if repoDashboards.length === 0}
 					<p class="text-xs text-muted-foreground">
-						No repo dashboards yet. Create one first.
+						{m.dashboard_no_repo_dashboards()}
 					</p>
 				{:else}
 					<div class="flex flex-col gap-1 rounded border border-input bg-muted p-2">
@@ -155,35 +158,40 @@
 			</fieldset>
 		{:else if dashboardType === 'repo'}
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">GitHub Repo</span>
+				<span class="text-xs text-muted-foreground">{m.dashboard_field_github_repo()}</span>
 				<input
 					bind:value={githubRepo}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					placeholder="owner/repo"
+					placeholder={m.dashboard_placeholder_github_repo()}
 				/>
 			</label>
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">Local Folder</span>
+				<span class="text-xs text-muted-foreground">{m.dashboard_field_local_folder()}</span
+				>
 				<input
 					bind:value={localFolder}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					placeholder="C:/projects/my-project"
+					placeholder={m.dashboard_placeholder_local_folder()}
 				/>
 			</label>
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">Default Base Branch</span>
+				<span class="text-xs text-muted-foreground"
+					>{m.dashboard_field_default_base_branch()}</span
+				>
 				<input
 					bind:value={defaultBaseBranch}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					placeholder="main"
+					placeholder={m.dashboard_placeholder_base_branch()}
 				/>
 			</label>
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">Worktree Parent Folder</span>
+				<span class="text-xs text-muted-foreground"
+					>{m.dashboard_field_worktree_parent_folder()}</span
+				>
 				<input
 					bind:value={worktreeParentFolder}
 					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					placeholder="C:/worktrees/my-project"
+					placeholder={m.dashboard_placeholder_worktree_parent()}
 				/>
 			</label>
 		{/if}
@@ -195,13 +203,13 @@
 				onclick={handleCancel}
 				class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 			>
-				Cancel
+				{m.btn_cancel()}
 			</button>
 			<button
 				type="submit"
 				class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 			>
-				Create
+				{m.btn_create()}
 			</button>
 		</div>
 	</form>

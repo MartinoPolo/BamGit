@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import TreesIcon from '@lucide/svelte/icons/trees';
@@ -11,6 +12,7 @@
 	import WorkspaceSelector from './WorkspaceSelector.svelte';
 	import UserAvatar from './UserAvatar.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
+	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	interface Props {
@@ -31,10 +33,16 @@
 		onToggleSidebar,
 	}: Props = $props();
 
+	const NAV_LABELS = {
+		dashboard: () => m.nav_dashboard(),
+		sessions: () => m.nav_sessions(),
+		settings: () => m.nav_settings(),
+	} as const;
+
 	const navigationItems = [
-		{ href: resolve('/'), icon: TreesIcon, label: 'Dashboard' },
-		{ href: resolve('/sessions'), icon: CodeIcon, label: 'Sessions' },
-		{ href: resolve('/settings'), icon: SettingsIcon, label: 'Settings' },
+		{ href: resolve('/'), icon: TreesIcon, labelKey: 'dashboard' as const },
+		{ href: resolve('/sessions'), icon: CodeIcon, labelKey: 'sessions' as const },
+		{ href: resolve('/settings'), icon: SettingsIcon, labelKey: 'settings' as const },
 	];
 
 	function isActive(itemHref: string): boolean {
@@ -77,18 +85,18 @@
 						</button>
 					{/snippet}
 				</Tooltip.Trigger>
-				<Tooltip.Content side="right">Expand sidebar (Ctrl+\)</Tooltip.Content>
+				<Tooltip.Content side="right">{m.sidebar_expand()}</Tooltip.Content>
 			</Tooltip.Root>
 		{:else}
 			<div class="flex items-center gap-2">
 				<BrandMark size={22} />
-				<span class="text-sm font-semibold tracking-tight">Grovekeeper</span>
+				<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
 			</div>
 			<button
 				onclick={onToggleSidebar}
 				class="flex size-[22px] items-center justify-center rounded-[5px] text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
 				aria-label="Collapse sidebar"
-				title="Collapse sidebar (Ctrl+\)"
+				title={m.sidebar_collapse()}
 			>
 				<PanelLeftIcon size={14} />
 			</button>
@@ -101,7 +109,7 @@
 			<div
 				class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
 			>
-				Workspace
+				{m.nav_workspace()}
 			</div>
 		{/if}
 		<WorkspaceSelector name={workspaceName} {collapsed} />
@@ -113,13 +121,13 @@
 			<div
 				class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
 			>
-				Navigate
+				{m.nav_navigate()}
 			</div>
 		{/if}
 		{#each navigationItems as item (item.href)}
 			<SidebarNavItem
 				icon={item.icon}
-				label={item.label}
+				label={NAV_LABELS[item.labelKey]()}
 				href={item.href}
 				active={isActive(item.href)}
 				{collapsed}
@@ -129,6 +137,11 @@
 
 	<!-- Spacer -->
 	<div class="flex-1"></div>
+
+	<!-- Language switcher -->
+	<div class="border-t border-border p-2">
+		<LanguageSwitcher {collapsed} />
+	</div>
 
 	<!-- Theme toggle -->
 	<div class="border-t border-border p-2">

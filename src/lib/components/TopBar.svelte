@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Snippet } from 'svelte';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import FilterIcon from '@lucide/svelte/icons/filter';
@@ -56,10 +57,16 @@
 		return controls.includes(control);
 	}
 
+	const VIEW_LABELS = {
+		list: () => m.view_list(),
+		kanban: () => m.view_kanban(),
+		forest: () => m.view_forest(),
+	} as const;
+
 	const viewTabs = [
-		{ value: 'list' as const, Icon: ListIcon, label: 'List' },
-		{ value: 'kanban' as const, Icon: KanbanIcon, label: 'Kanban' },
-		{ value: 'forest' as const, Icon: TreesIcon, label: 'Forest' },
+		{ value: 'list' as const, Icon: ListIcon, labelKey: 'list' as const },
+		{ value: 'kanban' as const, Icon: KanbanIcon, labelKey: 'kanban' as const },
+		{ value: 'forest' as const, Icon: TreesIcon, labelKey: 'forest' as const },
 	];
 </script>
 
@@ -72,7 +79,7 @@
 	<div class="min-w-0">
 		{#if transparent}
 			<div class="text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle">
-				The Grove
+				{m.topbar_the_grove()}
 			</div>
 		{/if}
 		<h1 class="truncate text-[17px] font-semibold leading-tight">{title}</h1>
@@ -86,22 +93,22 @@
 		{#if has('search')}
 			<button class="topbar-search" class:topbar-glass={transparent} onclick={onSearch}>
 				<SearchIcon size={12} class="pointer-events-none text-foreground-subtle" />
-				<span class="text-foreground-subtle">Search…</span>
-				<kbd class="topbar-kbd">Ctrl+K</kbd>
+				<span class="text-foreground-subtle">{m.topbar_search()}</span>
+				<kbd class="topbar-kbd">{m.topbar_search_shortcut()}</kbd>
 			</button>
 		{/if}
 
 		{#if has('filter')}
-			<button class="topbar-btn" class:topbar-glass={transparent} title="Filter">
+			<button class="topbar-btn" class:topbar-glass={transparent} title={m.topbar_filter()}>
 				<FilterIcon size={12} />
-				<span>Filter</span>
+				<span>{m.topbar_filter()}</span>
 			</button>
 		{/if}
 
 		{#if has('sort')}
-			<button class="topbar-btn" class:topbar-glass={transparent} title="Sort">
+			<button class="topbar-btn" class:topbar-glass={transparent} title={m.topbar_sort()}>
 				<LayersIcon size={12} />
-				<span>Sort</span>
+				<span>{m.topbar_sort()}</span>
 			</button>
 		{/if}
 
@@ -109,7 +116,7 @@
 			<button
 				class="topbar-btn topbar-btn-icon"
 				class:topbar-glass={transparent}
-				title="Sync"
+				title={m.topbar_sync()}
 				disabled={syncing}
 				onclick={onSync}
 			>
@@ -121,7 +128,7 @@
 			<button
 				class="topbar-btn topbar-btn-icon"
 				class:topbar-glass={transparent}
-				title="Legend"
+				title={m.topbar_legend()}
 			>
 				<SparklesIcon size={13} />
 			</button>
@@ -131,7 +138,7 @@
 			<button
 				class="topbar-btn topbar-btn-icon relative"
 				class:topbar-glass={transparent}
-				title="Notifications"
+				title={m.topbar_notifications()}
 			>
 				<BellIcon size={13} />
 				{#if hasNotifications}
@@ -152,20 +159,20 @@
 						class:text-foreground={viewMode === tab.value}
 						class:shadow-sm={viewMode === tab.value}
 						class:text-muted-foreground={viewMode !== tab.value}
-						title={tab.label}
+						title={VIEW_LABELS[tab.labelKey]()}
 						onclick={() => onViewModeChange(tab.value)}
 					>
 						<tab.Icon size={11} />
-						<span>{tab.label}</span>
+						<span>{VIEW_LABELS[tab.labelKey]()}</span>
 					</button>
 				{/each}
 			</div>
 		{/if}
 
 		{#if has('plant')}
-			<button class="topbar-btn-primary" title="Plant a tree" onclick={onPlant}>
+			<button class="topbar-btn-primary" title={m.topbar_plant_title()} onclick={onPlant}>
 				<PlusIcon size={12} />
-				<span>Plant</span>
+				<span>{m.topbar_plant()}</span>
 			</button>
 		{/if}
 

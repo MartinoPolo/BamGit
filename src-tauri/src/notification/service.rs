@@ -91,11 +91,11 @@ impl NotificationService {
 
     fn send_toast(&self, event_type: NotificationEventType, message: &str, app_handle: &AppHandle) {
         let title = match event_type {
-            NotificationEventType::NeedsInput => "Session needs input",
-            NotificationEventType::NeedsReview => "Session ready for review",
-            NotificationEventType::Finished => "Session finished",
-            NotificationEventType::Errored => "Session errored",
-            NotificationEventType::PrReady => "PR ready",
+            NotificationEventType::NeedsInput => "NOTIFICATION_NEEDS_INPUT",
+            NotificationEventType::NeedsReview => "NOTIFICATION_NEEDS_REVIEW",
+            NotificationEventType::Finished => "NOTIFICATION_FINISHED",
+            NotificationEventType::Errored => "NOTIFICATION_ERRORED",
+            NotificationEventType::PrReady => "NOTIFICATION_PR_READY",
         };
 
         if let Err(error) = app_handle

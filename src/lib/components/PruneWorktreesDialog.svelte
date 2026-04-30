@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { PrunableIssue } from '$lib/types/generated';
 
@@ -50,16 +51,15 @@
 			class="relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-xl"
 		>
 			<div class="border-b border-border px-4 py-3">
-				<h2 class="text-sm font-semibold">Prune Worktrees</h2>
+				<h2 class="text-sm font-semibold">{m.prune_title()}</h2>
 				<p class="mt-1 text-xs text-muted-foreground">
-					These issues have merged PRs and closed GitHub issues. Select which worktrees to
-					remove.
+					{m.prune_description()}
 				</p>
 			</div>
 
 			<div class="max-h-64 overflow-y-auto px-4 py-3">
 				{#if prunableIssues.length === 0}
-					<p class="text-sm text-muted-foreground">No prunable worktrees found.</p>
+					<p class="text-sm text-muted-foreground">{m.prune_empty()}</p>
 				{:else}
 					<div class="flex flex-col gap-2">
 						{#each prunableIssues as issue (issue.issue_id)}
@@ -87,12 +87,12 @@
 									<span
 										class="rounded bg-purple-900/40 px-1.5 py-0.5 text-[10px] text-purple-400"
 									>
-										merged
+										{m.prune_badge_merged()}
 									</span>
 									<span
 										class="rounded bg-red-900/40 px-1.5 py-0.5 text-[10px] text-red-400"
 									>
-										closed
+										{m.prune_badge_closed()}
 									</span>
 								</div>
 							</label>
@@ -107,7 +107,7 @@
 					disabled={removing}
 					class="rounded px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground"
 				>
-					Cancel
+					{m.btn_cancel()}
 				</button>
 				<button
 					onclick={handlePrune}
@@ -115,9 +115,11 @@
 					class="rounded bg-destructive px-3 py-1.5 text-sm text-destructive-foreground transition-colors hover:bg-destructive/90 disabled:opacity-40"
 				>
 					{#if removing}
-						Removing...
+						{m.prune_removing()}
 					{:else}
-						Remove {selectedIds.size} worktree{selectedIds.size !== 1 ? 's' : ''}
+						{selectedIds.size !== 1
+							? m.prune_remove_count_plural({ count: selectedIds.size })
+							: m.prune_remove_count({ count: selectedIds.size })}
 					{/if}
 				</button>
 			</div>

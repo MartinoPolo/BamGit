@@ -239,7 +239,7 @@ fn handle_event(
                 fire_notification(
                     session_id,
                     db_state,
-                    "Session is waiting for your input",
+                    "NOTIFICATION_SESSION_WAITING",
                     app_handle,
                     database_connection,
                 );

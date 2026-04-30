@@ -184,7 +184,7 @@ pub fn delete_action(state: State<DatabaseState>, id: String) -> Result<(), Stri
         .map_err(|error| format!("Failed to delete action: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Action not found".to_string());
+        return Err("ERR_ACTION_NOT_FOUND".to_string());
     }
 
     Ok(())

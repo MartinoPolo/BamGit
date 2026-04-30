@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import type { ColorPalette } from '$lib/types/generated';
@@ -25,7 +26,7 @@
 	async function handleCreate() {
 		const colors = parseColors(newPaletteColorsInput);
 		if (!newPaletteName.trim() || colors.length === 0) {
-			operationError = 'Name and at least one valid hex color (#rrggbb) required';
+			operationError = m.palette_validation_error();
 			return;
 		}
 
@@ -59,7 +60,7 @@
 		const colors = parseColors(editColorsInput);
 		const trimmedName = editName.trim();
 		if (!trimmedName || colors.length === 0) {
-			operationError = 'Name and at least one valid hex color required';
+			operationError = m.palette_validation_error_edit();
 			return;
 		}
 		try {
@@ -88,14 +89,14 @@
 </script>
 
 <div class="space-y-6 p-4">
-	<h1 class="text-xl font-semibold">Settings</h1>
+	<h1 class="text-xl font-semibold">{m.settings_title()}</h1>
 	<NotificationSettingsPanel />
 
 	<!-- Color Palettes Section -->
 	<section class="space-y-4">
-		<h2 class="text-lg font-medium">Color Palettes</h2>
+		<h2 class="text-lg font-medium">{m.palette_settings_title()}</h2>
 		<p class="text-sm text-muted-foreground">
-			Manage color palettes for issue visual identity. Built-in palettes cannot be modified.
+			{m.palette_settings_description()}
 		</p>
 
 		{#if operationError}
@@ -110,7 +111,7 @@
 				<div class="mb-2 flex items-center gap-2">
 					<span class="text-sm font-medium">{palette.name}</span>
 					<span class="rounded bg-secondary px-1.5 py-0.5 text-xs text-muted-foreground"
-						>built-in</span
+						>{m.palette_built_in()}</span
 					>
 				</div>
 				<div class="flex flex-wrap gap-1">
@@ -134,13 +135,13 @@
 						<input
 							bind:value={editName}
 							class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
-							placeholder="Palette name"
+							placeholder={m.palette_placeholder_name()}
 						/>
 						<textarea
 							bind:value={editColorsInput}
 							rows="2"
 							class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
-							placeholder="#ff0000, #00ff00, #0000ff"
+							placeholder={m.palette_placeholder_colors()}
 						></textarea>
 						<div class="flex gap-2">
 							<button
@@ -148,7 +149,7 @@
 								onclick={handleSaveEdit}
 								class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
 							>
-								Save
+								{m.btn_save()}
 							</button>
 							<button
 								type="button"
@@ -158,7 +159,7 @@
 								}}
 								class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 							>
-								Cancel
+								{m.btn_cancel()}
 							</button>
 						</div>
 					</div>
@@ -172,14 +173,14 @@
 								onclick={() => startEditing(palette)}
 								class="text-xs text-muted-foreground hover:text-foreground"
 							>
-								Edit
+								{m.issue_card_edit()}
 							</button>
 							<button
 								type="button"
 								onclick={() => handleDelete(palette.id)}
 								class="text-xs text-destructive hover:text-destructive/80"
 							>
-								Delete
+								{m.btn_delete()}
 							</button>
 						</div>
 					</div>
@@ -203,13 +204,13 @@
 					<input
 						bind:value={newPaletteName}
 						class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
-						placeholder="Palette name"
+						placeholder={m.palette_placeholder_name()}
 					/>
 					<textarea
 						bind:value={newPaletteColorsInput}
 						rows="3"
 						class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
-						placeholder="Paste hex colors separated by commas or spaces: #ff0000, #00ff00, #0000ff"
+						placeholder={m.palette_placeholder_colors_long()}
 					></textarea>
 					<div class="flex gap-2">
 						<button
@@ -217,7 +218,7 @@
 							onclick={handleCreate}
 							class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
 						>
-							Create Palette
+							{m.palette_create()}
 						</button>
 						<button
 							type="button"
@@ -227,7 +228,7 @@
 							}}
 							class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 						>
-							Cancel
+							{m.btn_cancel()}
 						</button>
 					</div>
 				</div>
@@ -241,7 +242,7 @@
 				}}
 				class="rounded border border-dashed border-input px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground"
 			>
-				+ Add Custom Palette
+				{m.palette_add_custom()}
 			</button>
 		{/if}
 	</section>
