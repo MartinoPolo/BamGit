@@ -14,6 +14,11 @@ export function syncDialogVisibility(
 	}
 }
 
+function trimOrNull(value: string): string | null {
+	const trimmed = value.trim();
+	return trimmed || null;
+}
+
 export function extractGitHubIssueNumber(url: string): number | null {
 	const match = url.match(/\/issues\/(\d+)/);
 	return match !== null ? parseInt(match[1], 10) : null;
@@ -41,8 +46,8 @@ export function buildCreateIssueRequest(
 		request.priority = priority as IssuePriority;
 	}
 
-	const trimmedUrl = githubIssueUrl.trim();
-	if (trimmedUrl) {
+	const trimmedUrl = trimOrNull(githubIssueUrl);
+	if (trimmedUrl !== null) {
 		request.github_issue_url = trimmedUrl;
 		const issueNumber = extractGitHubIssueNumber(trimmedUrl);
 		if (issueNumber !== null) {
@@ -69,7 +74,7 @@ export function buildUpdateIssueRequest(
 		name: name.trim(),
 		priority: (priority as IssuePriority) || null,
 		color: color || null,
-		github_issue_url: githubIssueUrl.trim() || null,
+		github_issue_url: trimOrNull(githubIssueUrl),
 	};
 }
 
@@ -97,18 +102,10 @@ export function buildCreateDashboardRequest(
 	}
 
 	if (dashboardType === 'repo') {
-		if (githubRepo.trim()) {
-			request.github_repo = githubRepo.trim();
-		}
-		if (localFolder.trim()) {
-			request.local_folder = localFolder.trim();
-		}
-		if (defaultBaseBranch.trim()) {
-			request.default_base_branch = defaultBaseBranch.trim();
-		}
-		if (worktreeParentFolder.trim()) {
-			request.worktree_parent_folder = worktreeParentFolder.trim();
-		}
+		request.github_repo = trimOrNull(githubRepo) ?? undefined;
+		request.local_folder = trimOrNull(localFolder) ?? undefined;
+		request.default_base_branch = trimOrNull(defaultBaseBranch) ?? undefined;
+		request.worktree_parent_folder = trimOrNull(worktreeParentFolder) ?? undefined;
 	}
 
 	return request;
@@ -134,10 +131,10 @@ export function buildUpdateDashboardRequest(
 	};
 
 	if (dashboard.type === 'repo') {
-		request.github_repo = githubRepo.trim() || null;
-		request.local_folder = localFolder.trim() || null;
-		request.default_base_branch = defaultBaseBranch.trim() || null;
-		request.worktree_parent_folder = worktreeParentFolder.trim() || null;
+		request.github_repo = trimOrNull(githubRepo);
+		request.local_folder = trimOrNull(localFolder);
+		request.default_base_branch = trimOrNull(defaultBaseBranch);
+		request.worktree_parent_folder = trimOrNull(worktreeParentFolder);
 	}
 
 	return request;
