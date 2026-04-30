@@ -38,7 +38,7 @@
 {#if open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+		class="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center bg-black/60"
 		onkeydown={(e) => {
 			if (e.key === 'Escape') {
 				onClose();
@@ -48,7 +48,7 @@
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div class="absolute inset-0" onclick={onClose}></div>
 		<div
-			class="relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-xl"
+			class="relative z-[var(--z-raised)] w-full max-w-lg rounded-lg border border-border bg-popover shadow-xl"
 		>
 			<div class="border-b border-border px-4 py-3">
 				<h2 class="text-sm font-semibold">{m.prune_title()}</h2>

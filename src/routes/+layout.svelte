@@ -131,8 +131,8 @@
 		>
 			<DashboardSidebar
 				{workspaceName}
-				username="MartinoPolo"
-				userInitials="MP"
+				username={boardStore.username}
+				userInitials={boardStore.userInitials}
 				{activeSessionCount}
 				collapsed={boardStore.sidebarCollapsed}
 				onToggleSidebar={() => boardStore.toggleSidebar()}

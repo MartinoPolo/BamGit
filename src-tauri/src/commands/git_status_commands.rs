@@ -54,7 +54,7 @@ pub fn refresh_git_status(
             [&issue_id],
             |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
         )
-        .map_err(|error| format!("Issue not found: {error}"))?;
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())?;
 
     let branch_name =
         branch_name.ok_or_else(|| "Issue has no branch_name set".to_string())?;

@@ -94,7 +94,7 @@ async fn detect_bash_path() -> Result<PathBuf, String> {
             }
         }
 
-        Err("Could not find Git Bash. Ensure Git for Windows is installed.".into())
+        Err("ERR_GIT_BASH_NOT_FOUND".into())
     } else {
         Ok(PathBuf::from("/bin/bash"))
     }
@@ -126,11 +126,7 @@ fn resolve_scripts_directory() -> Result<PathBuf, String> {
         }
     }
 
-    Err(
-        "Could not find mpx-claude-code scripts directory. \
-         Set MPX_SCRIPTS_DIR environment variable or ensure scripts exist."
-            .into(),
-    )
+    Err("ERR_SCRIPTS_NOT_FOUND".into())
 }
 
 // ─── DB Helpers ────────────────────────────────────────────────────────────────
@@ -145,7 +141,7 @@ fn get_worktree_state(
             [issue_id],
             |row| row.get::<_, String>(0),
         )
-        .map_err(|error| format!("Issue not found: {error}"))
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())
 }
 
 fn update_worktree_state(
@@ -474,7 +470,7 @@ pub fn refresh_worktree_state(
             [&issue_id],
             |row| Ok((row.get(0)?, row.get(1)?)),
         )
-        .map_err(|error| format!("Issue not found: {error}"))?;
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())?;
 
     // If state is 'active', verify the folder still exists
     if current_state == "active" {

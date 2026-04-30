@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
@@ -30,7 +31,9 @@
 					</div>
 				{/snippet}
 			</Tooltip.Trigger>
-			<Tooltip.Content side="right">{username} · {activeCount} active</Tooltip.Content>
+			<Tooltip.Content side="right"
+				>{m.user_tooltip({ username, count: String(activeCount) })}</Tooltip.Content
+			>
 		</Tooltip.Root>
 	</div>
 {:else}
@@ -45,7 +48,7 @@
 		<div class="min-w-0 flex-1">
 			<div class="text-xs font-medium">{username}</div>
 			<div class="truncate text-[10px] text-foreground-subtle">
-				{activeCount} active
+				{m.active_count({ count: String(activeCount) })}
 			</div>
 		</div>
 		<ChevronUpIcon size={13} class="text-foreground-subtle" />

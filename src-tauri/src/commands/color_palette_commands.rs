@@ -232,7 +232,7 @@ pub fn get_next_available_color(
             [&dashboard_id],
             |row| row.get(0),
         )
-        .map_err(|error| format!("Dashboard not found: {error}"))?;
+        .map_err(|_| "ERR_DASHBOARD_NOT_FOUND".to_string())?;
 
     // Default to vivid if no palette assigned
     let palette_id = palette_id.unwrap_or_else(|| DEFAULT_PALETTE_ID.to_string());

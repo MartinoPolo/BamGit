@@ -13,7 +13,7 @@
 	bind:ref
 	data-slot="dialog-overlay"
 	class={cn(
-		'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-40 bg-[color-mix(in_oklch,oklch(0.10_0.02_150)_50%,transparent)] backdrop-blur-[2px]',
+		'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-[var(--z-overlay)] bg-[color-mix(in_oklch,oklch(0.10_0.02_150)_50%,transparent)] backdrop-blur-[2px]',
 		className,
 	)}
 	{...restProps}

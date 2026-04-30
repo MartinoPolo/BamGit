@@ -1,6 +1,8 @@
+import * as m from '$lib/paraglide/messages.js';
+
 export function formatRelativeTime(dateString: string | null): string {
 	if (dateString === null) {
-		return 'Never synced';
+		return m.time_never_synced();
 	}
 
 	const fetched = new Date(dateString + 'Z'); // SQLite datetime is UTC
@@ -8,16 +10,16 @@ export function formatRelativeTime(dateString: string | null): string {
 	const diffSeconds = Math.floor((now.getTime() - fetched.getTime()) / 1000);
 
 	if (diffSeconds < 60) {
-		return 'Just now';
+		return m.time_just_now();
 	}
 	if (diffSeconds < 3600) {
 		const minutes = Math.floor(diffSeconds / 60);
-		return `${minutes}m ago`;
+		return m.time_minutes_ago({ count: String(minutes) });
 	}
 	if (diffSeconds < 86400) {
 		const hours = Math.floor(diffSeconds / 3600);
-		return `${hours}h ago`;
+		return m.time_hours_ago({ count: String(hours) });
 	}
 	const days = Math.floor(diffSeconds / 86400);
-	return `${days}d ago`;
+	return m.time_days_ago({ count: String(days) });
 }

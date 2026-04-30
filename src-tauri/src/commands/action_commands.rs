@@ -141,7 +141,7 @@ pub fn get_action(state: State<DatabaseState>, id: String) -> Result<Action, Str
     let query = format!("SELECT {ACTION_SELECT_COLUMNS} FROM actions WHERE id = ?1");
     connection
         .query_row(&query, [&id], |row| row_to_action(row))
-        .map_err(|error| format!("Action not found: {error}"))
+        .map_err(|_| "ERR_ACTION_NOT_FOUND".to_string())
 }
 
 #[tauri::command]
@@ -154,7 +154,7 @@ pub fn update_action(
     let select_query = format!("SELECT {ACTION_SELECT_COLUMNS} FROM actions WHERE id = ?1");
     let existing = connection
         .query_row(&select_query, [&request.id], |row| row_to_action(row))
-        .map_err(|error| format!("Action not found: {error}"))?;
+        .map_err(|_| "ERR_ACTION_NOT_FOUND".to_string())?;
 
     let name = request.name.unwrap_or(existing.name);
     let icon = resolve_nullable_field(request.icon, existing.icon);
@@ -242,7 +242,7 @@ pub async fn execute_action(
         let action_query = format!("SELECT {ACTION_SELECT_COLUMNS} FROM actions WHERE id = ?1");
         let action = connection
             .query_row(&action_query, [&action_id], |row| row_to_action(row))
-            .map_err(|error| format!("Action not found: {error}"))?;
+            .map_err(|_| "ERR_ACTION_NOT_FOUND".to_string())?;
 
         // Load issue + dashboard fields for variable substitution
         let context: IssueContext = connection
@@ -266,7 +266,7 @@ pub async fn execute_action(
                     })
                 },
             )
-            .map_err(|error| format!("Issue not found: {error}"))?;
+            .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())?;
 
         let mut variables: HashMap<&str, String> = HashMap::new();
         variables.insert("issue_id", context.issue_id.clone());

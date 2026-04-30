@@ -237,4 +237,32 @@ describe('formatBindingForDisplay', () => {
 	it('returns the binding string as-is on non-macOS platforms', () => {
 		expect(formatBindingForDisplay('Ctrl+K')).toBe('Ctrl+K');
 	});
+
+	it('returns multi-modifier binding as-is on non-macOS', () => {
+		expect(formatBindingForDisplay('Ctrl+Shift+I', false)).toBe('Ctrl+Shift+I');
+	});
+
+	it('converts Ctrl to ⌘ on macOS', () => {
+		expect(formatBindingForDisplay('Ctrl+K', true)).toBe('⌘K');
+	});
+
+	it('converts Ctrl+Shift to ⌘⇧ on macOS', () => {
+		expect(formatBindingForDisplay('Ctrl+Shift+I', true)).toBe('⌘⇧I');
+	});
+
+	it('converts Alt to ⌥ on macOS', () => {
+		expect(formatBindingForDisplay('Alt+F4', true)).toBe('⌥F4');
+	});
+
+	it('converts Meta to ⌘ on macOS', () => {
+		expect(formatBindingForDisplay('Meta+K', true)).toBe('⌘K');
+	});
+
+	it('returns a single key unchanged regardless of platform', () => {
+		expect(formatBindingForDisplay('Escape')).toBe('Escape');
+	});
+
+	it('concatenates macOS symbols without + separator', () => {
+		expect(formatBindingForDisplay('Ctrl+Shift+Alt+K', true)).toBe('⌘⇧⌥K');
+	});
 });

@@ -113,7 +113,11 @@ export default [
 		ignores: ['src/lib/components/ui/**'],
 		plugins: { 'check-file': checkFile },
 		rules: {
-			'check-file/filename-naming-convention': ['error', { '**/*.svelte': 'PASCAL_CASE' }],
+			'check-file/filename-naming-convention': [
+				'error',
+				{ '**/*.svelte': 'PASCAL_CASE' },
+				{ ignoreMiddleExtensions: true },
+			],
 		},
 	},
 	{
