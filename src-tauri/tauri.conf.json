@@ -12,7 +12,9 @@
 	"app": {
 		"windows": [
 			{
+				"label": "overview",
 				"title": "Grovekeeper",
+				"url": "/overview",
 				"width": 1600,
 				"height": 900,
 				"center": true

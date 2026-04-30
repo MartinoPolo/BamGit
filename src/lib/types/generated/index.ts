@@ -2,6 +2,7 @@
 // Re-run `cargo test` in src-tauri/ to regenerate individual files.
 
 export type { Action } from './Action';
+export type { AppSetting } from './AppSetting';
 export type { JsonValue } from './serde_json/JsonValue';
 export type { AssignedIssue } from './AssignedIssue';
 export type { BranchStatus } from './BranchStatus';
@@ -19,6 +20,7 @@ export type { KeyboardShortcut } from './KeyboardShortcut';
 export type { LabelShapeMapping } from './LabelShapeMapping';
 export type { NotificationConfig } from './NotificationConfig';
 export type { NotificationEventType } from './NotificationEventType';
+export type { OverviewWorkspaceData } from './OverviewWorkspaceData';
 export type { PortfolioDashboardPointer } from './PortfolioDashboardPointer';
 export type { PrunableIssue } from './PrunableIssue';
 export type { PullRequestState } from './PullRequestState';
@@ -28,5 +30,6 @@ export type { SessionEventPayload } from './SessionEventPayload';
 export type { SessionSource } from './SessionSource';
 export type { SessionState } from './SessionState';
 export type { SyncAllResult } from './SyncAllResult';
+export type { WindowWorkspaceBinding } from './WindowWorkspaceBinding';
 export type { WorktreeProgressPayload } from './WorktreeProgressPayload';
 export type { WorktreeStateChangePayload } from './WorktreeStateChangePayload';

@@ -123,6 +123,20 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             binding TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS window_workspace_bindings (
+            window_label TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            window_x INTEGER,
+            window_y INTEGER,
+            window_width INTEGER,
+            window_height INTEGER
+        );
+
+        CREATE TABLE IF NOT EXISTS app_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+
         COMMIT;
         ",
     )?;
