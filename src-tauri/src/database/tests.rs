@@ -29,7 +29,7 @@ mod tests {
     // --- Schema tests ---
 
     #[test]
-    fn all_nine_tables_are_created() {
+    fn all_tables_are_created() {
         let connection = setup_test_database();
 
         let expected_tables = [
@@ -42,6 +42,9 @@ mod tests {
             "notification_config",
             "git_status_cache",
             "portfolio_dashboard_pointers",
+            "keyboard_shortcuts",
+            "window_workspace_bindings",
+            "app_settings",
         ];
 
         for table_name in &expected_tables {
@@ -677,30 +680,6 @@ mod tests {
         assert_eq!(count, 0, "Deleting portfolio should cascade to pointers");
     }
 
-    // --- Migration v2 tests ---
-
-    #[test]
-    fn migration_v2_adds_sort_order_and_portfolio_table() {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-        migrations::run_migrations(&connection).unwrap();
-
-        let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, migrations::CURRENT_VERSION);
-
-        // portfolio_dashboard_pointers table exists
-        let exists: bool = connection
-            .query_row(
-                "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='portfolio_dashboard_pointers')",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert!(exists, "portfolio_dashboard_pointers table should exist");
-    }
-
     #[test]
     fn issue_status_defaults_to_active() {
         let connection = setup_test_database();
@@ -898,44 +877,6 @@ mod tests {
             .unwrap();
 
         assert_eq!(ids, vec!["i1"]);
-    }
-
-    // --- Migration v3 tests ---
-
-    #[test]
-    fn migration_v3_adds_session_source_and_working_directory() {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-        migrations::run_migrations(&connection).unwrap();
-
-        // source column exists with default 'spawned'
-        connection
-            .execute(
-                "INSERT INTO sessions (id, state) VALUES ('s1', 'running')",
-                [],
-            )
-            .unwrap();
-
-        let source: String = connection
-            .query_row(
-                "SELECT source FROM sessions WHERE id = 's1'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert_eq!(source, "spawned");
-
-        // working_directory is nullable
-        let working_directory: Option<String> = connection
-            .query_row(
-                "SELECT working_directory FROM sessions WHERE id = 's1'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert_eq!(working_directory, None);
     }
 
     #[test]
@@ -1238,6 +1179,7 @@ mod tests {
             "review-requested",
             "changes-requested",
             "approved",
+            "ready-to-merge",
             "merged",
             "closed",
         ];
@@ -1341,115 +1283,4 @@ mod tests {
         assert!(result.is_err(), "execution_phase 'building' should be rejected");
     }
 
-    // --- Migration v6 tests ---
-
-    #[test]
-    fn migration_v6_preserves_existing_issues() {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-
-        // Migrate to v5
-        migrations::run_migrations(&connection).unwrap();
-
-        // Insert test data at v5
-        connection
-            .execute(
-                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
-                [],
-            )
-            .unwrap();
-        connection
-            .execute(
-                "INSERT INTO issues (id, dashboard_id, name, worktree_state) VALUES ('i1', 'd1', 'Existing Issue', 'active')",
-                [],
-            )
-            .unwrap();
-
-        // Re-run migrations (v6 should run)
-        migrations::run_migrations(&connection).unwrap();
-
-        // Verify data survived
-        let (name, worktree_state): (String, String) = connection
-            .query_row(
-                "SELECT name, worktree_state FROM issues WHERE id = 'i1'",
-                [],
-                |row| Ok((row.get(0)?, row.get(1)?)),
-            )
-            .unwrap();
-
-        assert_eq!(name, "Existing Issue");
-        assert_eq!(worktree_state, "active");
-    }
-
-    #[test]
-    fn migration_v6_preserves_existing_git_status_cache() {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-
-        migrations::run_migrations(&connection).unwrap();
-
-        connection
-            .execute(
-                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
-                [],
-            )
-            .unwrap();
-        connection
-            .execute(
-                "INSERT INTO issues (id, dashboard_id, name) VALUES ('i1', 'd1', 'Feature')",
-                [],
-            )
-            .unwrap();
-        connection
-            .execute(
-                "INSERT INTO git_status_cache (issue_id, pr_state, pr_number) VALUES ('i1', 'open', 42)",
-                [],
-            )
-            .unwrap();
-
-        migrations::run_migrations(&connection).unwrap();
-
-        let (pr_state, pr_number): (Option<String>, Option<i64>) = connection
-            .query_row(
-                "SELECT pr_state, pr_number FROM git_status_cache WHERE issue_id = 'i1'",
-                [],
-                |row| Ok((row.get(0)?, row.get(1)?)),
-            )
-            .unwrap();
-
-        assert_eq!(pr_state.as_deref(), Some("open"));
-        assert_eq!(pr_number, Some(42));
-    }
-
-    #[test]
-    fn migration_v6_adds_execution_phase_to_sessions() {
-        let connection = Connection::open_in_memory().unwrap();
-        connection
-            .execute_batch("PRAGMA foreign_keys = ON;")
-            .unwrap();
-
-        migrations::run_migrations(&connection).unwrap();
-
-        // Insert a session and verify execution_phase defaults to 'none'
-        connection
-            .execute(
-                "INSERT INTO sessions (id, state) VALUES ('s1', 'running')",
-                [],
-            )
-            .unwrap();
-
-        let execution_phase: String = connection
-            .query_row(
-                "SELECT execution_phase FROM sessions WHERE id = 's1'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-
-        assert_eq!(execution_phase, "none");
-    }
 }

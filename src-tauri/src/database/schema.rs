@@ -73,7 +73,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             state TEXT NOT NULL DEFAULT 'running'
                 CHECK (state IN ('running', 'needs-input', 'needs-review', 'paused', 'finished', 'errored')),
             pid INTEGER,
-            session_file_path TEXT,
+            cli_session_id TEXT,
             started_at TEXT NOT NULL DEFAULT (datetime('now')),
             ended_at TEXT,
             cost_usd REAL,
@@ -136,6 +136,9 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
         );
+
+        CREATE INDEX IF NOT EXISTS idx_issues_dashboard_id ON issues(dashboard_id);
+        CREATE INDEX IF NOT EXISTS idx_sessions_issue_id ON sessions(issue_id);
 
         COMMIT;
         ",
