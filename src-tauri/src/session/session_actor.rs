@@ -46,8 +46,6 @@ pub async fn run_actor(
     // stderr is optional — if not available, we just skip it
     let mut stderr_reader = handle.stderr.take().map(|s| BufReader::new(s).lines());
 
-    let mut has_ended = false;
-
     loop {
         tokio::select! {
             line = stdout_reader.next_line() => {
@@ -72,28 +70,22 @@ pub async fn run_actor(
                         }
                     }
                     Ok(None) => {
-                        if !has_ended {
-                            has_ended = true;
-                            let exit_event = SessionEvent::RunState {
-                                state: "finished".into(),
-                                error: None,
-                            };
-                            handle_event(&session_id, &exit_event, &app_handle, &database_connection);
-                            update_session_ended(&session_id, &database_connection);
-                        }
+                        let exit_event = SessionEvent::RunState {
+                            state: "finished".into(),
+                            error: None,
+                        };
+                        handle_event(&session_id, &exit_event, &app_handle, &database_connection);
+                        update_session_ended(&session_id, &database_connection);
                         break;
                     }
                     Err(e) => {
                         log::error!("Stdout read error for session {session_id}: {e}");
-                        if !has_ended {
-                            has_ended = true;
-                            let error_event = SessionEvent::RunState {
-                                state: "errored".into(),
-                                error: Some(e.to_string()),
-                            };
-                            handle_event(&session_id, &error_event, &app_handle, &database_connection);
-                            update_session_ended(&session_id, &database_connection);
-                        }
+                        let error_event = SessionEvent::RunState {
+                            state: "errored".into(),
+                            error: Some(e.to_string()),
+                        };
+                        handle_event(&session_id, &error_event, &app_handle, &database_connection);
+                        update_session_ended(&session_id, &database_connection);
                         break;
                     }
                 }
@@ -142,15 +134,12 @@ pub async fn run_actor(
                         if let Err(e) = provider.terminate(&mut handle).await {
                             log::error!("Failed to terminate session {session_id}: {e}");
                         }
-                        if !has_ended {
-                            has_ended = true;
-                            let term_event = SessionEvent::RunState {
-                                state: "finished".into(),
-                                error: None,
-                            };
-                            handle_event(&session_id, &term_event, &app_handle, &database_connection);
-                            update_session_ended(&session_id, &database_connection);
-                        }
+                        let term_event = SessionEvent::RunState {
+                            state: "finished".into(),
+                            error: None,
+                        };
+                        handle_event(&session_id, &term_event, &app_handle, &database_connection);
+                        update_session_ended(&session_id, &database_connection);
                         break;
                     }
                     None => {

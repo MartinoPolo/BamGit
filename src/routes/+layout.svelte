@@ -19,7 +19,7 @@
 	import { setIssuesContext } from '$lib/modules/issues';
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
-	import { setWindowContext } from '$lib/modules/window';
+	import { setWindowContext, openWorkspaceWindow } from '$lib/modules/window';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import type { Dashboard } from '$lib/types/generated';
 
@@ -80,7 +80,11 @@
 				}
 			}
 			await boardStore.refreshDashboards();
-			boardStore.selectDashboard(created.id);
+			if (windowCtx.isOverview) {
+				await openWorkspaceWindow(created.id);
+			} else {
+				boardStore.selectDashboard(created.id);
+			}
 		} catch (err) {
 			console.error('Failed to create dashboard:', err);
 		}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { onMount } from 'svelte';
 	import { openPath } from '@tauri-apps/plugin-opener';
 	import { useBoard } from '$lib/modules/board';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
@@ -14,14 +13,19 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
-	onMount(async () => {
-		try {
-			workspaces = await getOverviewData();
-		} catch (err) {
-			error = String(err);
-		} finally {
-			loading = false;
-		}
+	$effect(() => {
+		void boardStore.dashboards; // re-run when workspace list changes
+		void (async () => {
+			loading = true;
+			try {
+				workspaces = await getOverviewData();
+				error = null;
+			} catch (err) {
+				error = String(err);
+			} finally {
+				loading = false;
+			}
+		})();
 	});
 
 	async function handleOpenWorkspace(dashboardId: string) {
