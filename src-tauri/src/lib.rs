@@ -10,8 +10,8 @@ mod window_manager;
 
 use commands::{
     action_commands, color_palette_commands, dashboard_commands, git_status_commands,
-    github_commands, issue_commands, label_shape_mapping_commands, notification_commands,
-    portfolio_commands, session_commands, window_commands,
+    github_commands, issue_commands, keyboard_shortcut_commands, label_shape_mapping_commands,
+    notification_commands, portfolio_commands, session_commands, window_commands,
     worktree_commands,
 };
 use database::connection::DatabaseState;
@@ -216,6 +216,9 @@ pub fn run() {
             color_palette_commands::get_next_available_color,
             label_shape_mapping_commands::get_label_shape_mappings,
             label_shape_mapping_commands::upsert_label_shape_mapping,
+            keyboard_shortcut_commands::get_custom_bindings,
+            keyboard_shortcut_commands::upsert_custom_binding,
+            keyboard_shortcut_commands::delete_custom_binding,
             window_commands::open_workspace_window,
             window_commands::close_workspace_window,
             window_commands::get_window_bindings,

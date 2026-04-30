@@ -16,6 +16,7 @@ export type { ExecutionPhase } from './ExecutionPhase';
 export type { GhCliAvailability } from './GhCliAvailability';
 export type { GitStatusCache } from './GitStatusCache';
 export type { Issue } from './Issue';
+export type { KeyboardShortcut } from './KeyboardShortcut';
 export type { LabelShapeMapping } from './LabelShapeMapping';
 export type { NotificationConfig } from './NotificationConfig';
 export type { NotificationEventType } from './NotificationEventType';

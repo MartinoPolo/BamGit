@@ -118,6 +118,11 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             fetched_at TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS keyboard_shortcuts (
+            action_id TEXT PRIMARY KEY,
+            binding TEXT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS window_workspace_bindings (
             window_label TEXT PRIMARY KEY,
             dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,

@@ -2,7 +2,7 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 10;
+pub(crate) const CURRENT_VERSION: i32 = 11;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
@@ -17,6 +17,7 @@ static MIGRATIONS: &[MigrationFunction] = &[
     migrate_v8,
     migrate_v9,
     migrate_v10,
+    migrate_v11,
 ];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
@@ -407,6 +408,15 @@ fn migrate_v9(connection: &Connection) -> Result<(), rusqlite::Error> {
 
 fn migrate_v10(connection: &Connection) -> Result<(), rusqlite::Error> {
     connection.execute_batch(
+        "CREATE TABLE IF NOT EXISTS keyboard_shortcuts (
+            action_id TEXT PRIMARY KEY,
+            binding TEXT NOT NULL
+        );",
+    )
+}
+
+fn migrate_v11(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute_batch(
         "CREATE TABLE IF NOT EXISTS window_workspace_bindings (
             window_label TEXT PRIMARY KEY,
             dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
@@ -664,7 +674,38 @@ mod tests {
     }
 
     #[test]
-    fn migration_v10_creates_window_workspace_bindings_table() {
+    fn migration_v10_creates_keyboard_shortcuts_table() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO keyboard_shortcuts (action_id, binding) VALUES ('action.save', 'Ctrl+S')",
+                [],
+            )
+            .unwrap();
+
+        let (action_id, binding): (String, String) = connection
+            .query_row(
+                "SELECT action_id, binding FROM keyboard_shortcuts WHERE action_id = 'action.save'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap();
+        assert_eq!(action_id, "action.save");
+        assert_eq!(binding, "Ctrl+S");
+    }
+
+    #[test]
+    fn migration_v10_is_idempotent() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        migrate_v10(&connection).unwrap();
+    }
+
+    #[test]
+    fn migration_v11_creates_window_workspace_bindings_table() {
         let connection = fresh_db();
         run_migrations(&connection).unwrap();
 
@@ -697,7 +738,7 @@ mod tests {
     }
 
     #[test]
-    fn migration_v10_creates_app_settings_with_default() {
+    fn migration_v11_creates_app_settings_with_default() {
         let connection = fresh_db();
         run_migrations(&connection).unwrap();
 
@@ -712,7 +753,7 @@ mod tests {
     }
 
     #[test]
-    fn migration_v10_cascades_on_dashboard_delete() {
+    fn migration_v11_cascades_on_dashboard_delete() {
         let connection = fresh_db();
         run_migrations(&connection).unwrap();
 
@@ -744,10 +785,10 @@ mod tests {
     }
 
     #[test]
-    fn migration_v10_is_idempotent() {
+    fn migration_v11_is_idempotent() {
         let connection = fresh_db();
         run_migrations(&connection).unwrap();
-        migrate_v10(&connection).unwrap();
+        migrate_v11(&connection).unwrap();
 
         let count: i64 = connection
             .query_row(
