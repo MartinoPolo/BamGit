@@ -1,5 +1,6 @@
 <script lang="ts">
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
+	import ShortcutSettingsPanel from '$lib/components/ShortcutSettingsPanel.svelte';
 	import { useBoard, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import type { ColorPalette } from '$lib/types/generated';
 	const boardStore = useBoard();
@@ -90,6 +91,7 @@
 <div class="space-y-6 p-4">
 	<h1 class="text-xl font-semibold">Settings</h1>
 	<NotificationSettingsPanel />
+	<ShortcutSettingsPanel />
 
 	<!-- Color Palettes Section -->
 	<section class="space-y-4">
