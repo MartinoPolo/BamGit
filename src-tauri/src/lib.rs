@@ -6,17 +6,73 @@ mod git;
 mod models;
 mod notification;
 mod session;
+mod window_manager;
 
 use commands::{
     action_commands, color_palette_commands, dashboard_commands, git_status_commands,
     github_commands, issue_commands, keyboard_shortcut_commands, label_shape_mapping_commands,
-    notification_commands, portfolio_commands, session_commands, worktree_commands,
+    notification_commands, portfolio_commands, session_commands, window_commands,
+    worktree_commands,
 };
+use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
+use models::app_setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
 use notification::service::NotificationService;
 use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
 use tauri::Manager;
+use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
+
+fn restore_workspace_windows(app: &tauri::AppHandle, state: &DatabaseState) {
+    let connection = match state.read() {
+        Ok(c) => c,
+        Err(error) => {
+            log::warn!("Failed to read DB for window restore: {error}");
+            return;
+        }
+    };
+
+    let mut statement = match connection.prepare(
+        "SELECT wb.window_label, wb.dashboard_id, wb.window_x, wb.window_y, wb.window_width, wb.window_height, d.name \
+         FROM window_workspace_bindings wb \
+         JOIN dashboards d ON wb.dashboard_id = d.id",
+    ) {
+        Ok(s) => s,
+        Err(error) => {
+            log::warn!("Failed to prepare window restore query: {error}");
+            return;
+        }
+    };
+
+    let bindings: Vec<(String, Option<i32>, Option<i32>, Option<i32>, Option<i32>, String)> = statement
+        .query_map([], |row| {
+            Ok((
+                row.get(0)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+                row.get(5)?,
+                row.get(6)?,
+            ))
+        })
+        .ok()
+        .map(|rows| rows.filter_map(|r| r.ok()).collect())
+        .unwrap_or_default();
+
+    drop(statement);
+    drop(connection);
+
+    for (label, x, y, width, height, name) in bindings {
+        let title = format!("{name} — {APP_NAME}");
+        let w = width.map_or(DEFAULT_WINDOW_WIDTH, |v| v as f64);
+        let h = height.map_or(DEFAULT_WINDOW_HEIGHT, |v| v as f64);
+        if let Err(error) = window_manager::open_or_focus_window_with_position(
+            app, &label, "/", &title, w, h, x, y,
+        ) {
+            log::warn!("Failed to restore window {label}: {error}");
+        }
+    }
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -24,6 +80,41 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .setup(|app| {
+            // Register single-instance plugin in setup so we have access to app handle
+            #[cfg(desktop)]
+            {
+                let handle = app.handle().clone();
+                handle.plugin(tauri_plugin_single_instance::init(
+                    |app_handle, args, _cwd| {
+                        // Parse --dashboard-id=<id> from args
+                        let dashboard_id = args.iter().find_map(|arg| {
+                            arg.strip_prefix("--dashboard-id=").map(String::from)
+                        });
+
+                        if let Some(id) = dashboard_id {
+                            let label = window_manager::workspace_label(&id);
+                            let _ = window_manager::open_or_focus_window(
+                                app_handle,
+                                &label,
+                                "/",
+                                APP_NAME,
+                                DEFAULT_WINDOW_WIDTH,
+                                DEFAULT_WINDOW_HEIGHT,
+                            );
+                        } else {
+                            let _ = window_manager::open_or_focus_window(
+                                app_handle,
+                                window_manager::overview_label(),
+                                "/overview",
+                                APP_NAME,
+                                DEFAULT_WINDOW_WIDTH,
+                                DEFAULT_WINDOW_HEIGHT,
+                            );
+                        }
+                    },
+                ))?;
+            }
+
             let app_data_directory = app
                 .path()
                 .app_data_dir()
@@ -37,6 +128,18 @@ pub fn run() {
                 .resource_dir()
                 .expect("Failed to resolve resource directory");
 
+            // Determine startup behavior before managing state
+            let startup_behavior = {
+                let connection = database_state.read().unwrap_or_else(|e| panic!("{e}"));
+                connection
+                    .query_row(
+                        "SELECT value FROM app_settings WHERE key = ?1",
+                        [STARTUP_BEHAVIOR_KEY],
+                        |row| row.get::<_, String>(0),
+                    )
+                    .unwrap_or_else(|_| STARTUP_BEHAVIOR_OVERVIEW.to_string())
+            };
+
             app.manage(database_state);
             app.manage(SessionManager::new());
             app.manage(FetchCoordinator::new());
@@ -46,6 +149,12 @@ pub fn run() {
             // Auto-start discovery polling (3-second interval)
             let poller = app.state::<DiscoveryPoller>();
             poller.start(app.handle().clone(), 3000);
+
+            // Startup behavior: restore last workspace windows or just show overview
+            if startup_behavior == STARTUP_BEHAVIOR_LAST_WORKSPACE {
+                let db = app.state::<DatabaseState>();
+                restore_workspace_windows(app.handle(), db.inner());
+            }
 
             Ok(())
         })
@@ -110,6 +219,13 @@ pub fn run() {
             keyboard_shortcut_commands::get_custom_bindings,
             keyboard_shortcut_commands::upsert_custom_binding,
             keyboard_shortcut_commands::delete_custom_binding,
+            window_commands::open_workspace_window,
+            window_commands::close_workspace_window,
+            window_commands::get_window_bindings,
+            window_commands::save_window_geometry,
+            window_commands::get_overview_data,
+            window_commands::get_app_setting,
+            window_commands::set_app_setting,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

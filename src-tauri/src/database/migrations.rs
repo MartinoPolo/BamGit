@@ -2,7 +2,7 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 10;
+pub(crate) const CURRENT_VERSION: i32 = 11;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
@@ -17,6 +17,7 @@ static MIGRATIONS: &[MigrationFunction] = &[
     migrate_v8,
     migrate_v9,
     migrate_v10,
+    migrate_v11,
 ];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
@@ -414,6 +415,26 @@ fn migrate_v10(connection: &Connection) -> Result<(), rusqlite::Error> {
     )
 }
 
+fn migrate_v11(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute_batch(
+        "CREATE TABLE IF NOT EXISTS window_workspace_bindings (
+            window_label TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            window_x INTEGER,
+            window_y INTEGER,
+            window_width INTEGER,
+            window_height INTEGER
+        );
+
+        CREATE TABLE IF NOT EXISTS app_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+
+        INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');",
+    )
+}
+
 pub fn get_schema_version(connection: &Connection) -> Result<i32, rusqlite::Error> {
     let version: i32 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
     Ok(version)
@@ -680,7 +701,102 @@ mod tests {
         let connection = fresh_db();
         run_migrations(&connection).unwrap();
 
-        // Running v10 again should not fail (CREATE TABLE IF NOT EXISTS)
         migrate_v10(&connection).unwrap();
+    }
+
+    #[test]
+    fn migration_v11_creates_window_workspace_bindings_table() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO window_workspace_bindings (window_label, dashboard_id, window_x, window_y, window_width, window_height) \
+                 VALUES ('workspace-d1', 'd1', 100, 200, 1600, 900)",
+                [],
+            )
+            .unwrap();
+
+        let (label, dashboard_id, x, y): (String, String, i32, i32) = connection
+            .query_row(
+                "SELECT window_label, dashboard_id, window_x, window_y FROM window_workspace_bindings WHERE window_label = 'workspace-d1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            )
+            .unwrap();
+        assert_eq!(label, "workspace-d1");
+        assert_eq!(dashboard_id, "d1");
+        assert_eq!(x, 100);
+        assert_eq!(y, 200);
+    }
+
+    #[test]
+    fn migration_v11_creates_app_settings_with_default() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        let value: String = connection
+            .query_row(
+                "SELECT value FROM app_settings WHERE key = 'startup_behavior'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(value, "overview");
+    }
+
+    #[test]
+    fn migration_v11_cascades_on_dashboard_delete() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO window_workspace_bindings (window_label, dashboard_id) VALUES ('workspace-d1', 'd1')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute("DELETE FROM dashboards WHERE id = 'd1'", [])
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM window_workspace_bindings WHERE dashboard_id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 0);
+    }
+
+    #[test]
+    fn migration_v11_is_idempotent() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+        migrate_v11(&connection).unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM app_settings WHERE key = 'startup_behavior'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 1);
     }
 }
