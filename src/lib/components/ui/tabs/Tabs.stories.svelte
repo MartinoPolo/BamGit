@@ -15,15 +15,27 @@
 <script lang="ts">
 	import { Tab } from './index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Settings as SettingsIcon, User as UserIcon, Bell as BellIcon } from 'lucide-svelte';
+	import { Settings as SettingsIcon, User as UserIcon, Bell as BellIcon } from '@lucide/svelte';
+
+	let defaultActive = $state('Overview');
+	let iconsActive = $state('Profile');
+	let disabledActive = $state('Active');
+	let badgeActive = $state('Inbox');
+	let manyActive = $state('Day');
 </script>
 
 <Story name="Default">
 	{#snippet template()}
 		<Tabs>
-			<Tab active>Overview</Tab>
-			<Tab>Activity</Tab>
-			<Tab>Settings</Tab>
+			<Tab active={defaultActive === 'Overview'} onclick={() => (defaultActive = 'Overview')}
+				>Overview</Tab
+			>
+			<Tab active={defaultActive === 'Activity'} onclick={() => (defaultActive = 'Activity')}
+				>Activity</Tab
+			>
+			<Tab active={defaultActive === 'Settings'} onclick={() => (defaultActive = 'Settings')}
+				>Settings</Tab
+			>
 		</Tabs>
 	{/snippet}
 </Story>
@@ -31,9 +43,17 @@
 <Story name="With Icons">
 	{#snippet template()}
 		<Tabs>
-			<Tab active><UserIcon class="size-3.5" /> Profile</Tab>
-			<Tab><BellIcon class="size-3.5" /> Notifications</Tab>
-			<Tab><SettingsIcon class="size-3.5" /> Settings</Tab>
+			<Tab active={iconsActive === 'Profile'} onclick={() => (iconsActive = 'Profile')}
+				><UserIcon class="size-3.5" /> Profile</Tab
+			>
+			<Tab
+				active={iconsActive === 'Notifications'}
+				onclick={() => (iconsActive = 'Notifications')}
+				><BellIcon class="size-3.5" /> Notifications</Tab
+			>
+			<Tab active={iconsActive === 'Settings'} onclick={() => (iconsActive = 'Settings')}
+				><SettingsIcon class="size-3.5" /> Settings</Tab
+			>
 		</Tabs>
 	{/snippet}
 </Story>
@@ -41,8 +61,12 @@
 <Story name="With Disabled Tab">
 	{#snippet template()}
 		<Tabs>
-			<Tab active>Active</Tab>
-			<Tab>Normal</Tab>
+			<Tab active={disabledActive === 'Active'} onclick={() => (disabledActive = 'Active')}
+				>Active</Tab
+			>
+			<Tab active={disabledActive === 'Normal'} onclick={() => (disabledActive = 'Normal')}
+				>Normal</Tab
+			>
 			<Tab disabled>Disabled</Tab>
 		</Tabs>
 	{/snippet}
@@ -51,9 +75,15 @@
 <Story name="With Badge">
 	{#snippet template()}
 		<Tabs>
-			<Tab active>Inbox <Badge variant="moss" class="ml-1.5">3</Badge></Tab>
-			<Tab>Drafts</Tab>
-			<Tab>Archive</Tab>
+			<Tab active={badgeActive === 'Inbox'} onclick={() => (badgeActive = 'Inbox')}
+				>Inbox <Badge variant="moss" class="ml-1.5">3</Badge></Tab
+			>
+			<Tab active={badgeActive === 'Drafts'} onclick={() => (badgeActive = 'Drafts')}
+				>Drafts</Tab
+			>
+			<Tab active={badgeActive === 'Archive'} onclick={() => (badgeActive = 'Archive')}
+				>Archive</Tab
+			>
 		</Tabs>
 	{/snippet}
 </Story>
@@ -61,11 +91,13 @@
 <Story name="Many Tabs">
 	{#snippet template()}
 		<Tabs>
-			<Tab active>Day</Tab>
-			<Tab>Week</Tab>
-			<Tab>Month</Tab>
-			<Tab>Quarter</Tab>
-			<Tab>Year</Tab>
+			<Tab active={manyActive === 'Day'} onclick={() => (manyActive = 'Day')}>Day</Tab>
+			<Tab active={manyActive === 'Week'} onclick={() => (manyActive = 'Week')}>Week</Tab>
+			<Tab active={manyActive === 'Month'} onclick={() => (manyActive = 'Month')}>Month</Tab>
+			<Tab active={manyActive === 'Quarter'} onclick={() => (manyActive = 'Quarter')}
+				>Quarter</Tab
+			>
+			<Tab active={manyActive === 'Year'} onclick={() => (manyActive = 'Year')}>Year</Tab>
 		</Tabs>
 	{/snippet}
 </Story>
