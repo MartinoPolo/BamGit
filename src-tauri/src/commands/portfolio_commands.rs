@@ -56,7 +56,7 @@ pub fn remove_repo_from_portfolio(
         .map_err(|error| format!("Failed to remove repo from portfolio: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Portfolio pointer not found".to_string());
+        return Err("ERR_PORTFOLIO_NOT_FOUND".to_string());
     }
 
     Ok(())

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, DiscoveredSession } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
 	import { useNotifications } from '$lib/modules/notifications';
@@ -88,10 +89,10 @@
 				class="text-sm text-muted-foreground hover:text-foreground"
 				onclick={handleBack}
 			>
-				&larr; Back
+				{m.session_back()}
 			</button>
 			<h2 class="truncate text-sm font-medium text-foreground">
-				{selectedSession.original_intent ?? 'Session'}
+				{selectedSession.original_intent ?? m.session_fallback_title()}
 			</h2>
 		</div>
 		<div class="flex-1">
@@ -102,23 +103,23 @@
 	<!-- Session list -->
 	<div class="space-y-4 p-4">
 		<div class="flex items-center justify-between">
-			<h1 class="text-xl font-semibold text-foreground">Sessions</h1>
+			<h1 class="text-xl font-semibold text-foreground">{m.session_title()}</h1>
 		</div>
 
 		<!-- Spawn form -->
 		<div class="space-y-2 rounded-lg border border-border bg-muted/50 p-4">
-			<h3 class="text-sm font-medium text-foreground">New Session</h3>
+			<h3 class="text-sm font-medium text-foreground">{m.session_new()}</h3>
 			<input
 				type="text"
 				class="w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
-				placeholder="Working directory (e.g., C:\projects\my-app)"
+				placeholder={m.session_placeholder_working_dir()}
 				bind:value={spawnWorkingDirectory}
 			/>
 			<div class="flex gap-2">
 				<input
 					type="text"
 					class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
-					placeholder="Prompt (e.g., Fix the login bug in auth.ts)"
+					placeholder={m.session_placeholder_prompt()}
 					bind:value={spawnPrompt}
 					onkeydown={(e) => {
 						if (e.key === 'Enter') {
@@ -131,7 +132,7 @@
 					onclick={handleSpawn}
 					disabled={spawning || !spawnPrompt.trim() || !spawnWorkingDirectory.trim()}
 				>
-					{spawning ? 'Spawning...' : 'Spawn'}
+					{spawning ? m.session_spawning() : m.session_spawn()}
 				</button>
 			</div>
 		</div>
@@ -140,7 +141,7 @@
 		{#if store.discoveredSessions.length > 0}
 			<div class="space-y-2">
 				<h3 class="text-sm font-medium text-muted-foreground">
-					External Sessions ({store.discoveredSessions.length})
+					{m.session_external({ count: store.discoveredSessions.length })}
 				</h3>
 				{#each store.discoveredSessions as session (session.id)}
 					<DiscoveredSessionCard {session} onAdopt={handleAdopt} />
@@ -151,7 +152,7 @@
 		<!-- Active sessions -->
 		{#if store.activeSessions.length > 0}
 			<div class="space-y-2">
-				<h3 class="text-sm font-medium text-muted-foreground">Active</h3>
+				<h3 class="text-sm font-medium text-muted-foreground">{m.session_active()}</h3>
 				{#each store.activeSessions as session (session.id)}
 					<SessionCard {session} onClick={handleSelect} onTerminate={handleTerminate} />
 				{/each}
@@ -161,7 +162,7 @@
 		<!-- Finished sessions -->
 		{#if store.finishedSessions.length > 0}
 			<div class="space-y-2">
-				<h3 class="text-sm font-medium text-muted-foreground">Completed</h3>
+				<h3 class="text-sm font-medium text-muted-foreground">{m.session_completed()}</h3>
 				{#each store.finishedSessions as session (session.id)}
 					<SessionCard {session} onClick={handleSelect} onTerminate={handleTerminate} />
 				{/each}
@@ -172,14 +173,14 @@
 		{#if store.loading === false && store.sessions.length === 0 && store.discoveredSessions.length === 0}
 			<div class="py-12 text-center">
 				<p class="text-muted-foreground">
-					No sessions yet. Spawn one above to get started.
+					{m.session_empty()}
 				</p>
 			</div>
 		{/if}
 
 		{#if store.loading}
 			<div class="py-12 text-center">
-				<p class="text-muted-foreground">Loading sessions...</p>
+				<p class="text-muted-foreground">{m.loading_sessions()}</p>
 			</div>
 		{/if}
 	</div>

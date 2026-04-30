@@ -166,7 +166,7 @@ pub fn delete_dashboard(state: State<DatabaseState>, id: String) -> Result<(), S
         .map_err(|error| format!("Failed to delete dashboard: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Dashboard not found".to_string());
+        return Err("ERR_DASHBOARD_NOT_FOUND".to_string());
     }
 
     Ok(())

@@ -174,7 +174,7 @@ pub fn delete_issue(state: State<DatabaseState>, id: String) -> Result<(), Strin
         .map_err(|error| format!("Failed to delete issue: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Issue not found".to_string());
+        return Err("ERR_ISSUE_NOT_FOUND".to_string());
     }
 
     Ok(())
@@ -192,7 +192,7 @@ pub fn archive_issue(state: State<DatabaseState>, id: String) -> Result<Issue, S
         .map_err(|error| format!("Failed to archive issue: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Issue not found".to_string());
+        return Err("ERR_ISSUE_NOT_FOUND".to_string());
     }
 
     let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
@@ -213,7 +213,7 @@ pub fn unarchive_issue(state: State<DatabaseState>, id: String) -> Result<Issue,
         .map_err(|error| format!("Failed to unarchive issue: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("Issue not found".to_string());
+        return Err("ERR_ISSUE_NOT_FOUND".to_string());
     }
 
     let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");

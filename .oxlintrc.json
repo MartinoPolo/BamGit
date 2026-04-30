@@ -9,6 +9,7 @@
 		"claude_design",
 		"node_modules",
 		"src-tauri",
+		"src/lib/paraglide",
 		"src/lib/types/generated"
 	]
 }

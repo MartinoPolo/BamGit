@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { UpdateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
 	import PaletteSelector from './PaletteSelector.svelte';
@@ -75,10 +76,10 @@
 >
 	{#if dashboard}
 		<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
-			<h2 class="text-lg font-semibold">Edit Dashboard</h2>
+			<h2 class="text-lg font-semibold">{m.dashboard_edit_title()}</h2>
 
 			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">Name *</span>
+				<span class="text-xs text-muted-foreground">{m.dashboard_field_name()}</span>
 				<input
 					bind:value={name}
 					required
@@ -95,29 +96,37 @@
 
 			{#if dashboard.type === 'repo'}
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground">GitHub Repo</span>
+					<span class="text-xs text-muted-foreground"
+						>{m.dashboard_field_github_repo()}</span
+					>
 					<input
 						bind:value={githubRepo}
 						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-						placeholder="owner/repo"
+						placeholder={m.dashboard_placeholder_github_repo()}
 					/>
 				</label>
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground">Local Folder</span>
+					<span class="text-xs text-muted-foreground"
+						>{m.dashboard_field_local_folder()}</span
+					>
 					<input
 						bind:value={localFolder}
 						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 					/>
 				</label>
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground">Default Base Branch</span>
+					<span class="text-xs text-muted-foreground"
+						>{m.dashboard_field_default_base_branch()}</span
+					>
 					<input
 						bind:value={defaultBaseBranch}
 						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 					/>
 				</label>
 				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground">Worktree Parent Folder</span>
+					<span class="text-xs text-muted-foreground"
+						>{m.dashboard_field_worktree_parent_folder()}</span
+					>
 					<input
 						bind:value={worktreeParentFolder}
 						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
@@ -133,7 +142,7 @@
 						? 'bg-destructive text-destructive-foreground'
 						: 'text-destructive hover:text-destructive/80'}"
 				>
-					{confirmDelete ? 'Confirm Delete' : 'Delete'}
+					{confirmDelete ? m.btn_confirm_delete() : m.btn_delete()}
 				</button>
 				<div class="flex gap-2">
 					<button
@@ -141,13 +150,13 @@
 						onclick={onClose}
 						class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 					>
-						Cancel
+						{m.btn_cancel()}
 					</button>
 					<button
 						type="submit"
 						class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
 					>
-						Save
+						{m.btn_save()}
 					</button>
 				</div>
 			</div>

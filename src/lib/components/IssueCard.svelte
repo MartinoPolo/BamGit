@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue, IssuePriority } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks } from '$lib/modules/issues';
@@ -55,11 +56,14 @@
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
 			case 'pending':
-				return { label: 'Setting up...', class: 'bg-yellow-900/40 text-yellow-400' };
+				return {
+					label: m.issue_card_setting_up(),
+					class: 'bg-yellow-900/40 text-yellow-400',
+				};
 			case 'active':
-				return { label: 'Worktree', class: 'bg-green-900/40 text-green-400' };
+				return { label: m.issue_card_worktree(), class: 'bg-green-900/40 text-green-400' };
 			case 'failed':
-				return { label: 'WT Failed', class: 'bg-red-900/40 text-red-400' };
+				return { label: m.issue_card_wt_failed(), class: 'bg-red-900/40 text-red-400' };
 			default:
 				return null;
 		}
@@ -100,12 +104,12 @@
 			{#if notificationDotColor}
 				<span
 					class="h-2.5 w-2.5 animate-pulse rounded-full {notificationDotColor}"
-					title="Session needs attention"
+					title={m.issue_card_session_needs_attention()}
 				></span>
 			{:else}
 				<div
 					class="h-2 w-2 rounded-full bg-foreground/30"
-					title="Session state: idle"
+					title={m.issue_card_session_idle()}
 				></div>
 			{/if}
 		</div>
@@ -145,7 +149,9 @@
 			<!-- Child count for parent issues -->
 			{#if childCount > 0}
 				<span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-					{childCount} child{childCount > 1 ? 'ren' : ''}
+					{childCount > 1
+						? m.issue_card_children_count({ count: childCount })
+						: m.issue_card_child_count({ count: childCount })}
 				</span>
 			{/if}
 
@@ -220,7 +226,7 @@
 							}}
 							class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 						>
-							Edit
+							{m.issue_card_edit()}
 						</button>
 						{#if onSetupWorktree && issue.branch_name !== null && (issue.worktree_state === 'none' || issue.worktree_state === 'failed')}
 							<button
@@ -231,8 +237,8 @@
 								class="w-full px-3 py-1.5 text-left text-sm text-green-400 hover:bg-accent"
 							>
 								{issue.worktree_state === 'failed'
-									? 'Retry Worktree'
-									: 'Add Worktree'}
+									? m.issue_card_retry_worktree()
+									: m.issue_card_add_worktree()}
 							</button>
 						{/if}
 						{#if onRemoveWorktree && issue.worktree_state === 'active'}
@@ -243,7 +249,7 @@
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-orange-400 hover:bg-accent"
 							>
-								Remove Worktree
+								{m.issue_card_remove_worktree()}
 							</button>
 						{/if}
 						{#if isArchived}
@@ -254,7 +260,7 @@
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 							>
-								Unarchive
+								{m.issue_card_unarchive()}
 							</button>
 						{:else}
 							<button
@@ -264,7 +270,7 @@
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 							>
-								Archive
+								{m.issue_card_archive()}
 							</button>
 						{/if}
 						<button
@@ -274,7 +280,7 @@
 							}}
 							class="w-full px-3 py-1.5 text-left text-sm text-destructive hover:bg-accent"
 						>
-							Delete
+							{m.issue_card_delete()}
 						</button>
 					</div>
 				{/if}
@@ -286,28 +292,31 @@
 			<div class="border-t border-border px-3 py-3 text-xs text-muted-foreground">
 				<div class="grid grid-cols-2 gap-2">
 					<div>
-						<span class="text-muted-foreground/60">Status:</span>
+						<span class="text-muted-foreground/60">{m.issue_card_status()}</span>
 						{issue.status}
 					</div>
 					<div>
-						<span class="text-muted-foreground/60">Worktree:</span>
+						<span class="text-muted-foreground/60">{m.issue_card_worktree_label()}</span
+						>
 						{issue.worktree_state}
 					</div>
 					{#if issue.priority}
 						<div>
-							<span class="text-muted-foreground/60">Priority:</span>
+							<span class="text-muted-foreground/60"
+								>{m.issue_card_priority_label()}</span
+							>
 							{issue.priority}
 						</div>
 					{/if}
 					{#if issue.created_at}
 						<div>
-							<span class="text-muted-foreground/60">Created:</span>
+							<span class="text-muted-foreground/60">{m.issue_card_created()}</span>
 							{new Date(issue.created_at).toLocaleDateString()}
 						</div>
 					{/if}
 					{#if cache}
 						<div>
-							<span class="text-muted-foreground/60">Synced:</span>
+							<span class="text-muted-foreground/60">{m.issue_card_synced()}</span>
 							<SyncStatusIndicator fetchedAt={cache.fetched_at} />
 						</div>
 					{/if}

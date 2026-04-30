@@ -1,24 +1,25 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { NotificationEventType } from '$lib/types/generated';
 	import { useNotifications } from '$lib/modules/notifications';
 	import { onMount } from 'svelte';
 
 	const notificationStore = useNotifications();
 
-	const EVENT_LABELS: Record<NotificationEventType, string> = {
-		'needs-input': 'Needs Input',
-		'needs-review': 'Ready for Review',
-		finished: 'Finished',
-		errored: 'Errored',
-		'pr-ready': 'PR Ready',
+	const EVENT_LABELS: Record<NotificationEventType, () => string> = {
+		'needs-input': () => m.notification_event_needs_input(),
+		'needs-review': () => m.notification_event_needs_review(),
+		finished: () => m.notification_event_finished(),
+		errored: () => m.notification_event_errored(),
+		'pr-ready': () => m.notification_event_pr_ready(),
 	};
 
-	const EVENT_DESCRIPTIONS: Record<NotificationEventType, string> = {
-		'needs-input': 'Session is waiting for your input (permission or elicitation prompt)',
-		'needs-review': 'Session completed a turn and is idle',
-		finished: 'Session finished or was stopped',
-		errored: 'Session encountered an error',
-		'pr-ready': 'Pull request is ready for review',
+	const EVENT_DESCRIPTIONS: Record<NotificationEventType, () => string> = {
+		'needs-input': () => m.notification_desc_needs_input(),
+		'needs-review': () => m.notification_desc_needs_review(),
+		finished: () => m.notification_desc_finished(),
+		errored: () => m.notification_desc_errored(),
+		'pr-ready': () => m.notification_desc_pr_ready(),
 	};
 
 	onMount(() => {
@@ -52,25 +53,25 @@
 
 <div class="space-y-4">
 	<div>
-		<h2 class="text-lg font-semibold text-foreground">Notifications</h2>
+		<h2 class="text-lg font-semibold text-foreground">{m.notification_title()}</h2>
 		<p class="text-sm text-muted-foreground">
-			Configure how you're notified for each event type.
+			{m.notification_description()}
 		</p>
 	</div>
 
 	{#if notificationStore.loading}
-		<p class="text-muted-foreground">Loading notification settings...</p>
+		<p class="text-muted-foreground">{m.loading_notification_settings()}</p>
 	{:else}
 		<div class="overflow-hidden rounded-lg border border-border">
 			<!-- Header -->
 			<div
 				class="grid grid-cols-[1fr_80px_80px_80px_60px] gap-2 border-b border-border bg-muted/50 px-4 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground"
 			>
-				<span>Event</span>
-				<span class="text-center">Sound</span>
-				<span class="text-center">Toast</span>
-				<span class="text-center">Flash</span>
-				<span class="text-center">Test</span>
+				<span>{m.notification_header_event()}</span>
+				<span class="text-center">{m.notification_header_sound()}</span>
+				<span class="text-center">{m.notification_header_toast()}</span>
+				<span class="text-center">{m.notification_header_flash()}</span>
+				<span class="text-center">{m.notification_header_test()}</span>
 			</div>
 
 			<!-- Rows -->
@@ -81,10 +82,10 @@
 					<!-- Event label and description -->
 					<div>
 						<span class="text-sm font-medium text-foreground">
-							{EVENT_LABELS[config.event_type] ?? config.event_type}
+							{EVENT_LABELS[config.event_type]?.() ?? config.event_type}
 						</span>
 						<p class="text-xs text-muted-foreground">
-							{EVENT_DESCRIPTIONS[config.event_type] ?? ''}
+							{EVENT_DESCRIPTIONS[config.event_type]?.() ?? ''}
 						</p>
 					</div>
 

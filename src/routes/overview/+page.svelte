@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 	import { openPath } from '@tauri-apps/plugin-opener';
 	import { useBoard } from '$lib/modules/board';
@@ -42,14 +43,14 @@
 
 <div class="flex flex-col gap-6 p-8">
 	<div>
-		<h1 class="text-2xl font-bold text-foreground">Grovekeeper</h1>
-		<p class="text-sm text-muted-foreground">Your workspaces</p>
+		<h1 class="text-2xl font-bold text-foreground">{m.app_name()}</h1>
+		<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
 	</div>
 
 	{#if loading}
-		<p class="text-muted-foreground">Loading workspaces...</p>
-	{:else if error}
-		<p class="text-destructive">Error: {error}</p>
+		<p class="text-muted-foreground">{m.overview_loading()}</p>
+	{:else if error !== null}
+		<p class="text-destructive">{m.error_prefix({ message: error })}</p>
 	{:else}
 		<div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
 			{#each workspaces as workspace (workspace.dashboard_id)}
@@ -57,10 +58,10 @@
 					{workspace}
 					palette={boardStore.getPaletteForDashboard(workspace.color_palette_id ?? null)}
 					onclick={() => handleOpenWorkspace(workspace.dashboard_id)}
-					onGithubClick={workspace.github_repo
+					onGithubClick={workspace.github_repo != null
 						? () => handleGithubClick(workspace.github_repo!)
 						: undefined}
-					onFolderClick={workspace.local_folder
+					onFolderClick={workspace.local_folder != null
 						? () => handleFolderClick(workspace.local_folder!)
 						: undefined}
 				/>
