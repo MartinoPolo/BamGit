@@ -142,6 +142,9 @@
 							config={entry.visualization.config}
 							toolVisibility={entry.visualization.toolVisibility}
 							overlayConfig={entry.visualization.overlayConfig}
+							animateCanopySway={entry.visualization.animateCanopySway}
+							animateGrowth={entry.visualization.animateGrowth}
+							animateTools={entry.visualization.animateTools}
 						/>
 					{:else if entry.visualization.kind === 'potted-plant'}
 						<PottedPlant

@@ -19,6 +19,9 @@ import {
 	TREE_STAGES,
 	POTTED_PLANT_STAGES,
 	TOOL_TYPES,
+	GLOW_COLORS,
+	SPEECH_BUBBLE_COLORS,
+	BIRD_TYPE_MAP,
 } from './testing';
 import type { StateDimensions } from './testing';
 import type { Issue } from '$lib/modules/issues';
@@ -608,26 +611,134 @@ describe('computeTreeVisualization — kind determination', () => {
 // ─── Tree Stages ────────────────────────────────────────────────────────
 
 describe('computeTreeVisualization — tree stages', () => {
-	it('seed: labels=["feature"], worktreeState=none, no session', () => {
+	it('rule 1: stump when worktreeState=removed and grovekeeperStatus=archived', () => {
 		const result = computeTreeVisualization(
-			createDimensions({
-				labels: ['feature'],
-				worktreeState: 'none',
-				aggregateSessionState: 'no-session',
-			}),
+			createDimensions({ worktreeState: 'removed', grovekeeperStatus: 'archived' }),
 		) as TreeVisualizationTree;
-		expect(result.kind).toBe('tree');
-		expect(result.config.stage).toBe(TREE_STAGES.seed);
+		expect(result.config.stage).toBe(TREE_STAGES.stump);
 	});
 
-	it('sprouting: worktreeState=pending', () => {
+	it('rule 2: dead when branchStatus=deleted', () => {
 		const result = computeTreeVisualization(
-			createDimensions({ worktreeState: 'pending' }),
+			createDimensions({ branchStatus: 'deleted' }),
 		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.sprouting);
+		expect(result.config.stage).toBe(TREE_STAGES.dead);
 	});
 
-	it('sapling: worktreeState=active, branchStatus=active, no session', () => {
+	it('rule 3: dead when branchStatus=remote-gone and prState!=merged', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ branchStatus: 'remote-gone', pullRequestState: 'open' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.dead);
+	});
+
+	it('rule 4a: bare when prState=merged and githubIssueState=open', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'merged', githubIssueState: 'open' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.bare);
+	});
+
+	it('rule 4b: bare when prState=merged and githubIssueState=closed', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'merged', githubIssueState: 'closed' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.bare);
+	});
+
+	it('rule 5: wilting when prState=closed', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'closed' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.wilting);
+	});
+
+	it('rule 6: fruiting when prState=ready-to-merge', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'ready-to-merge' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.fruiting);
+	});
+
+	it('rule 7: fruiting when prState=approved', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'approved' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.fruiting);
+	});
+
+	it('rule 8: seasonal when prState=changes-requested', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'changes-requested' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.seasonal);
+	});
+
+	it('rule 9a: flowering when prState=open', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'open' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.flowering);
+	});
+
+	it('rule 9b: flowering when prState=review-requested', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'review-requested' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.flowering);
+	});
+
+	it('rule 10: leafy when prState=draft', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'draft' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.leafy);
+	});
+
+	it('rule 11a: growing when aggregateSessionState=running', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.growing);
+	});
+
+	it('rule 11b: growing when aggregateSessionState=needs-input', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'needs-input' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.growing);
+	});
+
+	it('rule 11c: growing when aggregateSessionState=paused', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'paused' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.growing);
+	});
+
+	it('rule 11d: growing when aggregateSessionState=errored', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'errored' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.growing);
+	});
+
+	it('rule 11e: growing when aggregateSessionState=needs-review', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'needs-review' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.growing);
+	});
+
+	it('rule 12: leafy when hasCommitsOnBranch=true and prState=no-pr', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'no-pr' }),
+			createContext({ hasCommitsOnBranch: true }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.leafy);
+	});
+
+	it('rule 13a: sapling when worktreeState=active, branchStatus=active, no session', () => {
 		const result = computeTreeVisualization(
 			createDimensions({
 				worktreeState: 'active',
@@ -638,126 +749,83 @@ describe('computeTreeVisualization — tree stages', () => {
 		expect(result.config.stage).toBe(TREE_STAGES.sapling);
 	});
 
-	it('growing: aggregateSessionState=running, no completed session', () => {
+	it('rule 13b: sapling when worktreeState=active, branchStatus=local-only', () => {
 		const result = computeTreeVisualization(
 			createDimensions({
 				worktreeState: 'active',
-				branchStatus: 'active',
-				aggregateSessionState: 'running',
+				branchStatus: 'local-only',
+				aggregateSessionState: 'no-session',
 			}),
-			createContext({ hasCompletedSession: false }),
 		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.growing);
+		expect(result.config.stage).toBe(TREE_STAGES.sapling);
 	});
 
-	it('growing: aggregateSessionState=running, with completed session (re-execution)', () => {
+	it('rule 14a: sprouting when worktreeState=pending', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ worktreeState: 'pending' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.sprouting);
+	});
+
+	it('rule 14b: sprouting when worktreeState=failed', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ worktreeState: 'failed' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.sprouting);
+	});
+
+	it('rule 15: seed as fallback when no rules match', () => {
 		const result = computeTreeVisualization(
 			createDimensions({
-				worktreeState: 'active',
-				branchStatus: 'active',
-				aggregateSessionState: 'running',
-			}),
-			createContext({ hasCompletedSession: true }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.growing);
-	});
-
-	it('leafy: aggregateSessionState=finished, hasCommitsOnBranch=true', () => {
-		const result = computeTreeVisualization(
-			createDimensions({
-				worktreeState: 'active',
-				branchStatus: 'active',
-				aggregateSessionState: 'finished',
-			}),
-			createContext({ hasCommitsOnBranch: true }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.leafy);
-	});
-
-	it('fruiting: pullRequestState=draft', () => {
-		const result = computeTreeVisualization(
-			createDimensions({
-				worktreeState: 'active',
-				branchStatus: 'active',
-				pullRequestState: 'draft',
+				labels: ['feature'],
+				worktreeState: 'none',
+				aggregateSessionState: 'no-session',
 			}),
 		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.fruiting);
-	});
-
-	it('fruiting: pullRequestState=open', () => {
-		const result = computeTreeVisualization(
-			createDimensions({
-				worktreeState: 'active',
-				branchStatus: 'active',
-				pullRequestState: 'open',
-			}),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.fruiting);
-	});
-
-	it('seasonal: pullRequestState=review-requested', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'review-requested' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.seasonal);
-	});
-
-	it('seasonal: pullRequestState=changes-requested', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'changes-requested' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.seasonal);
-	});
-
-	it('flowering: pullRequestState=approved', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'approved' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.flowering);
-	});
-
-	it('leafy with glow: pullRequestState=ready-to-merge', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'ready-to-merge' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.seasonal);
-		expect(result.overlayConfig.glow.enabled).toBe(true);
-	});
-
-	it('bare: pullRequestState=merged, githubIssueState=closed', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'merged', githubIssueState: 'closed' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.bare);
-	});
-
-	it('dead: branchStatus=deleted', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ branchStatus: 'deleted', worktreeState: 'active' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.dead);
-	});
-
-	it('stump: worktreeState=removed, grovekeeperStatus=archived', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ worktreeState: 'removed', grovekeeperStatus: 'archived' }),
-		) as TreeVisualizationTree;
-		expect(result.config.stage).toBe(TREE_STAGES.stump);
+		expect(result.config.stage).toBe(TREE_STAGES.seed);
 	});
 });
 
 // ─── Tree Stage Priority ────────────────────────────────────────────────
 
 describe('computeTreeVisualization — tree stage priority', () => {
-	it('bare wins over sapling when PR merged and issue closed', () => {
+	it('P1: stump wins over deleted branch', () => {
 		const result = computeTreeVisualization(
 			createDimensions({
-				worktreeState: 'active',
-				branchStatus: 'active',
+				worktreeState: 'removed',
+				grovekeeperStatus: 'archived',
+				branchStatus: 'deleted',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.stump);
+	});
+
+	it('P2: dead branch wins over merged PR', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				branchStatus: 'deleted',
 				pullRequestState: 'merged',
 				githubIssueState: 'closed',
-				aggregateSessionState: 'no-session',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.dead);
+	});
+
+	it('P3: merged PR wins over running session', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				pullRequestState: 'merged',
+				aggregateSessionState: 'running',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.bare);
+	});
+
+	it('P4: merged PR with open issue still yields bare (REQ-11)', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				pullRequestState: 'merged',
+				githubIssueState: 'open',
 			}),
 		) as TreeVisualizationTree;
 		expect(result.config.stage).toBe(TREE_STAGES.bare);
@@ -846,40 +914,121 @@ describe('computeTreeVisualization — oak', () => {
 
 // ─── Tool Visibility ───────────────────────────────────────────────────
 
-describe('computeTreeVisualization — tool visibility', () => {
-	it('stormCloud visible when worktreeState=failed', () => {
+// ─── Execution Phase Tools (REQ-3, REQ-5) ─────────────────────────────
+
+describe('computeTreeVisualization — execution phase tools', () => {
+	it('T1: lantern when running + analyzing', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running', executionPhase: 'analyzing' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.lantern].visible).toBe(true);
+	});
+
+	it('T2: shovel when running + tdd', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running', executionPhase: 'tdd' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.shovel].visible).toBe(true);
+	});
+
+	it('T3: no trunkBase tool when running + reviewing', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running', executionPhase: 'reviewing' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.lantern].visible).toBe(false);
+		expect(result.toolVisibility[TOOL_TYPES.shovel].visible).toBe(false);
+		expect(result.toolVisibility[TOOL_TYPES.pruningShears].visible).toBe(false);
+		expect(result.toolVisibility[TOOL_TYPES.rake].visible).toBe(false);
+		expect(result.toolVisibility[TOOL_TYPES.ladder].visible).toBe(false);
+	});
+
+	it('T4: pruningShears when running + verifying', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running', executionPhase: 'verifying' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.pruningShears].visible).toBe(true);
+	});
+
+	it('T5: rake when running + committing', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running', executionPhase: 'committing' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.rake].visible).toBe(true);
+	});
+
+	it('T6: no execution tool when paused, ladder instead', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'paused', executionPhase: 'tdd' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.shovel].visible).toBe(false);
+		expect(result.toolVisibility[TOOL_TYPES.ladder].visible).toBe(true);
+	});
+});
+
+// ─── State-Driven Accessories (REQ-4) ─────────────────────────────────
+
+describe('computeTreeVisualization — state-driven accessories', () => {
+	it('A1: wateringCan visible when worktreeState=pending', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ worktreeState: 'pending' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.wateringCan].visible).toBe(true);
+	});
+
+	it('A2: ladder visible when aggregateSessionState=paused', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'paused' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.ladder].visible).toBe(true);
+	});
+
+	it('A3: grill visible when labels include HITL and no running session', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				labels: ['task', 'HITL'],
+				aggregateSessionState: 'no-session',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.grill].visible).toBe(true);
+	});
+
+	it('A4: speechBubble visible with red color when errored', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'errored' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.speechBubble].visible).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.speechBubble].color).toBe(SPEECH_BUBBLE_COLORS.red);
+	});
+
+	it('A5: speechBubble visible with orange color when needs-input', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'needs-input' }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.speechBubble].visible).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.speechBubble].color).toBe(
+			SPEECH_BUBBLE_COLORS.orange,
+		);
+	});
+
+	it('A6: stormCloud visible when syncStatus=merge-conflict', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ syncStatus: { type: 'merge-conflict' } }),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.stormCloud].visible).toBe(true);
+	});
+
+	it('A7: stormCloud visible when worktreeState=failed', () => {
 		const result = computeTreeVisualization(
 			createDimensions({ worktreeState: 'failed' }),
 		) as TreeVisualizationTree;
 		expect(result.toolVisibility[TOOL_TYPES.stormCloud].visible).toBe(true);
 	});
 
-	it('stormCloud visible when aggregateSessionState=errored', () => {
+	it('A8: mushrooms visible when syncStatus=behind-base', () => {
 		const result = computeTreeVisualization(
-			createDimensions({ aggregateSessionState: 'errored' }),
+			createDimensions({ syncStatus: { type: 'behind-base', count: 3 } }),
 		) as TreeVisualizationTree;
-		expect(result.toolVisibility[TOOL_TYPES.stormCloud].visible).toBe(true);
-	});
-
-	it('speechBubble visible when aggregateSessionState=needs-input', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ aggregateSessionState: 'needs-input' }),
-		) as TreeVisualizationTree;
-		expect(result.toolVisibility[TOOL_TYPES.speechBubble].visible).toBe(true);
-	});
-
-	it('wateringCan visible when aggregateSessionState=running', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ aggregateSessionState: 'running' }),
-		) as TreeVisualizationTree;
-		expect(result.toolVisibility[TOOL_TYPES.wateringCan].visible).toBe(true);
-	});
-
-	it('woodpecker visible when pullRequestState=review-requested', () => {
-		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'review-requested' }),
-		) as TreeVisualizationTree;
-		expect(result.toolVisibility[TOOL_TYPES.woodpecker].visible).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.mushrooms].visible).toBe(true);
 	});
 
 	it('no tools visible when all clear', () => {
@@ -891,24 +1040,131 @@ describe('computeTreeVisualization — tool visibility', () => {
 	});
 });
 
-// ─── Overlay Config ────────────────────────────────────────────────────
+// ─── trunkBase Priority (REQ-5) ───────────────────────────────────────
 
-describe('computeTreeVisualization — overlay config', () => {
-	it('glow enabled when pullRequestState=approved', () => {
+describe('computeTreeVisualization — trunkBase priority', () => {
+	it('TP1: execution tool wins over HITL grill when running', () => {
 		const result = computeTreeVisualization(
-			createDimensions({ pullRequestState: 'approved' }),
+			createDimensions({
+				labels: ['task', 'HITL'],
+				aggregateSessionState: 'running',
+				executionPhase: 'analyzing',
+			}),
 		) as TreeVisualizationTree;
-		expect(result.overlayConfig.glow.enabled).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.lantern].visible).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.grill].visible).toBe(false);
 	});
 
-	it('glow enabled when pullRequestState=ready-to-merge', () => {
+	it('TP2: ladder wins over grill when paused with HITL label', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				labels: ['task', 'HITL'],
+				aggregateSessionState: 'paused',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.ladder].visible).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.grill].visible).toBe(false);
+	});
+
+	it('TP3: grill wins over wateringCan when HITL label and pending', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				labels: ['task', 'HITL'],
+				worktreeState: 'pending',
+				aggregateSessionState: 'no-session',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.grill].visible).toBe(true);
+		expect(result.toolVisibility[TOOL_TYPES.wateringCan].visible).toBe(false);
+	});
+
+	it('TP4: wateringCan when only pending, no other trunkBase triggers', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				worktreeState: 'pending',
+				aggregateSessionState: 'no-session',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.toolVisibility[TOOL_TYPES.wateringCan].visible).toBe(true);
+	});
+});
+
+// ─── Overlay Config ────────────────────────────────────────────────────
+
+describe('computeTreeVisualization — glow overlay', () => {
+	it('G1: red glow with pulse when errored', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'errored' }),
+		) as TreeVisualizationTree;
+		expect(result.overlayConfig.glow).toEqual({
+			enabled: true,
+			color: GLOW_COLORS.red,
+			intensity: 4,
+			pulse: true,
+		});
+	});
+
+	it('G2: orange glow with pulse when needs-input', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'needs-input' }),
+		) as TreeVisualizationTree;
+		expect(result.overlayConfig.glow).toEqual({
+			enabled: true,
+			color: GLOW_COLORS.orange,
+			intensity: 3,
+			pulse: true,
+		});
+	});
+
+	it('G3: green glow intensity 5 when ready-to-merge', () => {
 		const result = computeTreeVisualization(
 			createDimensions({ pullRequestState: 'ready-to-merge' }),
 		) as TreeVisualizationTree;
-		expect(result.overlayConfig.glow.enabled).toBe(true);
+		expect(result.overlayConfig.glow).toEqual({
+			enabled: true,
+			color: GLOW_COLORS.green,
+			intensity: 5,
+			pulse: false,
+		});
 	});
 
-	it('glow disabled by default', () => {
+	it('G4: green glow intensity 2 when approved', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'approved' }),
+		) as TreeVisualizationTree;
+		expect(result.overlayConfig.glow).toEqual({
+			enabled: true,
+			color: GLOW_COLORS.green,
+			intensity: 2,
+			pulse: false,
+		});
+	});
+
+	it('G5: red glow wins over approved (higher priority)', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				aggregateSessionState: 'errored',
+				pullRequestState: 'approved',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.overlayConfig.glow.color).toBe(GLOW_COLORS.red);
+		expect(result.overlayConfig.glow.intensity).toBe(4);
+		expect(result.overlayConfig.glow.pulse).toBe(true);
+	});
+
+	it('G6: orange glow wins over ready-to-merge (higher priority)', () => {
+		const result = computeTreeVisualization(
+			createDimensions({
+				aggregateSessionState: 'needs-input',
+				pullRequestState: 'ready-to-merge',
+			}),
+		) as TreeVisualizationTree;
+		expect(result.overlayConfig.glow.color).toBe(GLOW_COLORS.orange);
+		expect(result.overlayConfig.glow.intensity).toBe(3);
+		expect(result.overlayConfig.glow.pulse).toBe(true);
+	});
+
+	it('G7: glow disabled when no triggers', () => {
 		const result = computeTreeVisualization(createDimensions()) as TreeVisualizationTree;
 		expect(result.overlayConfig.glow.enabled).toBe(false);
 	});
@@ -978,6 +1234,114 @@ describe('computeTreeVisualization — deterministic seed', () => {
 			createContext({ issueId: 'def-456' }),
 		) as TreeVisualizationTree;
 		expect(result1.config.seed).not.toBe(result2.config.seed);
+	});
+});
+
+// ─── Animation (REQ-8) ────────────────────────────────────────────────
+
+describe('computeTreeVisualization — animation', () => {
+	it('AN1: all animations enabled when running', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'running' }),
+		) as TreeVisualizationTree;
+		expect(result.animateCanopySway).toBe(true);
+		expect(result.animateGrowth).toBe(true);
+		expect(result.animateTools).toBe(true);
+	});
+
+	it('AN2: all animations disabled when paused', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'paused' }),
+		) as TreeVisualizationTree;
+		expect(result.animateCanopySway).toBe(false);
+		expect(result.animateGrowth).toBe(false);
+		expect(result.animateTools).toBe(false);
+	});
+
+	it('AN3: all animations disabled when errored', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'errored' }),
+		) as TreeVisualizationTree;
+		expect(result.animateCanopySway).toBe(false);
+		expect(result.animateGrowth).toBe(false);
+		expect(result.animateTools).toBe(false);
+	});
+
+	it('AN4: all animations disabled when no-session', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ aggregateSessionState: 'no-session' }),
+		) as TreeVisualizationTree;
+		expect(result.animateCanopySway).toBe(false);
+		expect(result.animateGrowth).toBe(false);
+		expect(result.animateTools).toBe(false);
+	});
+});
+
+// ─── Fruit (REQ-9) ────────────────────────────────────────────────────
+
+describe('computeTreeVisualization — fruit', () => {
+	it('F1: fruitCount 3-5 and fruitType matches shape when stage=fruiting', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'approved', labels: ['task'] }),
+			createContext({ issueId: 'fruit-test-1' }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.fruiting);
+		expect(result.config.fruitCount).toBeGreaterThanOrEqual(3);
+		expect(result.config.fruitCount).toBeLessThanOrEqual(5);
+		// task -> pine -> pine_cone
+		expect(result.config.fruitType).toBe('pine_cone');
+	});
+
+	it('F2: fruitType=none when not fruiting stage', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'open', labels: ['task'] }),
+		) as TreeVisualizationTree;
+		expect(result.config.stage).toBe(TREE_STAGES.flowering);
+		expect(result.config.fruitType).toBe('none');
+	});
+
+	it('F3: same issueId gives consistent fruitCount', () => {
+		const result1 = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'approved', labels: ['task'] }),
+			createContext({ issueId: 'deterministic-fruit' }),
+		) as TreeVisualizationTree;
+		const result2 = computeTreeVisualization(
+			createDimensions({ pullRequestState: 'approved', labels: ['task'] }),
+			createContext({ issueId: 'deterministic-fruit' }),
+		) as TreeVisualizationTree;
+		expect(result1.config.fruitCount).toBe(result2.config.fruitCount);
+	});
+});
+
+// ─── Bird Type Mapping (REQ-6) ────────────────────────────────────────
+
+describe('BIRD_TYPE_MAP — sub-agent bird type mapping', () => {
+	it('maps all 6 agent categories to bird types', () => {
+		expect(Object.keys(BIRD_TYPE_MAP)).toHaveLength(6);
+	});
+
+	it('analysis maps to owl', () => {
+		expect(BIRD_TYPE_MAP.analysis).toBe('owl');
+	});
+
+	it('executor maps to robin', () => {
+		expect(BIRD_TYPE_MAP.executor).toBe('robin');
+	});
+
+	it('checker maps to sparrow', () => {
+		expect(BIRD_TYPE_MAP.checker).toBe('sparrow');
+	});
+
+	it('reviewer maps to cardinal', () => {
+		expect(BIRD_TYPE_MAP.reviewer).toBe('cardinal');
+	});
+
+	it('utility maps to hummingbird', () => {
+		expect(BIRD_TYPE_MAP.utility).toBe('hummingbird');
+	});
+
+	it('research maps to parrot', () => {
+		expect(BIRD_TYPE_MAP.research).toBe('parrot');
 	});
 });
 

@@ -68,6 +68,9 @@ export interface TreeVisualizationTree {
 	readonly config: TreeConfig;
 	readonly toolVisibility: ToolVisibility;
 	readonly overlayConfig: OverlayConfig;
+	readonly animateCanopySway: boolean;
+	readonly animateGrowth: boolean;
+	readonly animateTools: boolean;
 }
 
 export interface TreeVisualizationPottedPlant {

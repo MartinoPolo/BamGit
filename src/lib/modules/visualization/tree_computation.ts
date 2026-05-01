@@ -5,9 +5,12 @@ import type {
 	FruitType,
 	TreeConfig,
 	ToolVisibility,
+	GlowConfig,
+	OverlayConfig,
 } from 'low-poly-2d-trees';
 import type { Issue } from '$lib/modules/issues/index.js';
-import type { GitStatusCache } from '$lib/types/generated';
+import type { GitStatusCache, ExecutionPhase } from '$lib/types/generated';
+import type { ToolType } from 'low-poly-2d-trees';
 import type {
 	LabelShapeMappingEntry,
 	StateDimensions,
@@ -18,7 +21,13 @@ import type {
 	TreeComputeContext,
 	SessionForMapping,
 } from './types.js';
-import { TREE_STAGES, POTTED_PLANT_STAGES, TOOL_TYPES } from './constants.js';
+import {
+	TREE_STAGES,
+	POTTED_PLANT_STAGES,
+	TOOL_TYPES,
+	GLOW_COLORS,
+	SPEECH_BUBBLE_COLORS,
+} from './constants.js';
 import { mapIssueToStateDimensions } from './state_mapping.js';
 
 // ─── Library Constants (local mirrors — avoids barrel Svelte import in Node) ─
@@ -39,8 +48,8 @@ const TREE_SHAPES = {
 	custom: 'custom',
 } as const satisfies Record<string, TreeShape>;
 
-const OVERLAY_DEFAULTS = {
-	glow: { enabled: false, color: '#ffd700', intensity: 3, pulse: false },
+const OVERLAY_DEFAULTS: OverlayConfig = {
+	glow: { enabled: false, color: GLOW_COLORS.yellow, intensity: 3, pulse: false },
 } as const;
 
 const SHAPE_FRUIT_MAP: Readonly<Record<Exclude<TreeShape, 'custom'>, FruitType>> = {
@@ -100,8 +109,22 @@ function createDefaultToolVisibility(): ToolVisibility {
 		[TOOL_TYPES.grill]: { visible: false, size: 1 },
 		[TOOL_TYPES.speechBubble]: { visible: false, size: 1, text: '' },
 		[TOOL_TYPES.stormCloud]: { visible: false, size: 1 },
+		[TOOL_TYPES.lantern]: { visible: false, size: 1 },
+		[TOOL_TYPES.pruningShears]: { visible: false, size: 1 },
+		[TOOL_TYPES.mushrooms]: { visible: false, size: 1 },
 	};
 }
+
+// ─── Execution Phase -> Tool Mapping ────────────────────────────────────────
+
+type MappedExecutionPhase = Exclude<ExecutionPhase, 'none' | 'reviewing'>;
+
+const EXECUTION_PHASE_TOOL_MAP = {
+	analyzing: TOOL_TYPES.lantern,
+	tdd: TOOL_TYPES.shovel,
+	verifying: TOOL_TYPES.pruningShears,
+	committing: TOOL_TYPES.rake,
+} as const satisfies Record<MappedExecutionPhase, ToolType>;
 
 // ─── Default Tree Config (subset needed by engine) ───────────────────────────
 
@@ -159,30 +182,55 @@ const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
 	issueId: '',
 };
 
+// ─── Tool Visibility Computation ────────────────────────────────────────────
+
 function computeToolVisibility(dimensions: StateDimensions): ToolVisibility {
 	const tools = createDefaultToolVisibility();
 
-	if (dimensions.worktreeState === 'failed' || dimensions.aggregateSessionState === 'errored') {
-		tools[TOOL_TYPES.stormCloud] = { visible: true, size: 1 };
-	}
-	if (dimensions.aggregateSessionState === 'needs-input') {
-		tools[TOOL_TYPES.speechBubble] = { visible: true, size: 1, text: 'Needs input' };
-	}
+	// ── trunkBase tool (mutually exclusive, highest priority wins) ──
 	if (
-		dimensions.aggregateSessionState === 'running' ||
-		dimensions.aggregateSessionState === 'paused'
+		dimensions.aggregateSessionState === 'running' &&
+		dimensions.executionPhase !== 'none' &&
+		dimensions.executionPhase !== 'reviewing'
 	) {
+		const toolType = EXECUTION_PHASE_TOOL_MAP[dimensions.executionPhase];
+		tools[toolType] = { visible: true, size: 1 };
+	} else if (dimensions.aggregateSessionState === 'paused') {
+		tools[TOOL_TYPES.ladder] = { visible: true, size: 1 };
+	} else if (dimensions.labels.some((label) => label === 'HITL')) {
+		tools[TOOL_TYPES.grill] = { visible: true, size: 1 };
+	} else if (dimensions.worktreeState === 'pending') {
 		tools[TOOL_TYPES.wateringCan] = { visible: true, size: 1 };
 	}
-	if (
-		dimensions.pullRequestState === 'review-requested' ||
-		dimensions.pullRequestState === 'changes-requested'
-	) {
-		tools[TOOL_TYPES.woodpecker] = { visible: true, size: 1 };
+
+	// ── Independent accessories (not trunkBase) ──
+	if (dimensions.aggregateSessionState === 'errored') {
+		tools[TOOL_TYPES.speechBubble] = {
+			visible: true,
+			size: 1,
+			text: 'Error',
+			color: SPEECH_BUBBLE_COLORS.red,
+		};
+	}
+	if (dimensions.aggregateSessionState === 'needs-input') {
+		tools[TOOL_TYPES.speechBubble] = {
+			visible: true,
+			size: 1,
+			text: 'Needs input',
+			color: SPEECH_BUBBLE_COLORS.orange,
+		};
+	}
+	if (dimensions.syncStatus.type === 'merge-conflict' || dimensions.worktreeState === 'failed') {
+		tools[TOOL_TYPES.stormCloud] = { visible: true, size: 1 };
+	}
+	if (dimensions.syncStatus.type === 'behind-base') {
+		tools[TOOL_TYPES.mushrooms] = { visible: true, size: 1 };
 	}
 
 	return tools;
 }
+
+// ─── Tree Stage Rules (priority-ordered cascade, first match wins) ──────────
 
 interface TreeStageRule {
 	readonly condition: (dimensions: StateDimensions, context: TreeComputeContext) => boolean;
@@ -199,41 +247,57 @@ const TREE_STAGE_RULES: readonly TreeStageRule[] = [
 		stage: TREE_STAGES.dead,
 	},
 	{
-		condition: (d) => d.pullRequestState === 'merged' && d.githubIssueState === 'closed',
+		condition: (d) => d.branchStatus === 'remote-gone' && d.pullRequestState !== 'merged',
+		stage: TREE_STAGES.dead,
+	},
+	{
+		condition: (d) => d.pullRequestState === 'merged',
 		stage: TREE_STAGES.bare,
 	},
 	{
-		condition: (d) => d.pullRequestState === 'approved',
-		stage: TREE_STAGES.flowering,
+		condition: (d) => d.pullRequestState === 'closed',
+		stage: TREE_STAGES.wilting,
 	},
 	{
-		condition: (d) =>
-			d.pullRequestState === 'ready-to-merge' ||
-			d.pullRequestState === 'review-requested' ||
-			d.pullRequestState === 'changes-requested',
-		stage: TREE_STAGES.seasonal,
-	},
-	{
-		condition: (d) => d.pullRequestState === 'draft' || d.pullRequestState === 'open',
+		condition: (d) => d.pullRequestState === 'ready-to-merge',
 		stage: TREE_STAGES.fruiting,
 	},
 	{
-		condition: (d, c) => d.aggregateSessionState === 'finished' && c.hasCommitsOnBranch,
+		condition: (d) => d.pullRequestState === 'approved',
+		stage: TREE_STAGES.fruiting,
+	},
+	{
+		condition: (d) => d.pullRequestState === 'changes-requested',
+		stage: TREE_STAGES.seasonal,
+	},
+	{
+		condition: (d) =>
+			d.pullRequestState === 'review-requested' || d.pullRequestState === 'open',
+		stage: TREE_STAGES.flowering,
+	},
+	{
+		condition: (d) => d.pullRequestState === 'draft',
 		stage: TREE_STAGES.leafy,
 	},
 	{
-		condition: (d) => d.aggregateSessionState === 'running',
+		condition: (d) =>
+			['running', 'needs-input', 'needs-review', 'paused', 'errored'].includes(
+				d.aggregateSessionState,
+			),
 		stage: TREE_STAGES.growing,
+	},
+	{
+		condition: (d, c) => c.hasCommitsOnBranch && d.pullRequestState === 'no-pr',
+		stage: TREE_STAGES.leafy,
 	},
 	{
 		condition: (d) =>
 			d.worktreeState === 'active' &&
-			d.branchStatus !== 'no-branch' &&
-			d.aggregateSessionState === 'no-session',
+			(d.branchStatus === 'active' || d.branchStatus === 'local-only'),
 		stage: TREE_STAGES.sapling,
 	},
 	{
-		condition: (d) => d.worktreeState === 'pending',
+		condition: (d) => d.worktreeState === 'pending' || d.worktreeState === 'failed',
 		stage: TREE_STAGES.sprouting,
 	},
 ];
@@ -246,6 +310,8 @@ function computeTreeStage(dimensions: StateDimensions, context: TreeComputeConte
 	}
 	return TREE_STAGES.seed;
 }
+
+// ─── Potted Plant Stage ─────────────────────────────────────────────────────
 
 function computePottedPlantStage(
 	dimensions: StateDimensions,
@@ -267,6 +333,43 @@ function computePottedPlantStage(
 	return POTTED_PLANT_STAGES.potWithSoil;
 }
 
+// ─── Glow Overlay (priority-ordered, highest wins) ──────────────────────────
+
+interface GlowRule {
+	readonly condition: (dimensions: StateDimensions) => boolean;
+	readonly glow: GlowConfig;
+}
+
+const GLOW_RULES: readonly GlowRule[] = [
+	{
+		condition: (d) => d.aggregateSessionState === 'errored',
+		glow: { enabled: true, color: GLOW_COLORS.red, intensity: 4, pulse: true },
+	},
+	{
+		condition: (d) => d.aggregateSessionState === 'needs-input',
+		glow: { enabled: true, color: GLOW_COLORS.orange, intensity: 3, pulse: true },
+	},
+	{
+		condition: (d) => d.pullRequestState === 'ready-to-merge',
+		glow: { enabled: true, color: GLOW_COLORS.green, intensity: 5, pulse: false },
+	},
+	{
+		condition: (d) => d.pullRequestState === 'approved',
+		glow: { enabled: true, color: GLOW_COLORS.green, intensity: 2, pulse: false },
+	},
+];
+
+function computeOverlayConfig(dimensions: StateDimensions): OverlayConfig {
+	for (const rule of GLOW_RULES) {
+		if (rule.condition(dimensions)) {
+			return { glow: rule.glow };
+		}
+	}
+	return OVERLAY_DEFAULTS;
+}
+
+// ─── Seed Computation ───────────────────────────────────────────────────────
+
 function issueIdToSeed(issueId: string): number {
 	let hash = 0;
 	for (let i = 0; i < issueId.length; i++) {
@@ -274,6 +377,25 @@ function issueIdToSeed(issueId: string): number {
 	}
 	return Math.abs(hash);
 }
+
+// ─── Fruit Computation ─────────────────────────────────────────────────────
+
+function computeFruit(
+	stage: TreeStage,
+	shape: TreeShape,
+	seed: number,
+): { fruitType: FruitType; fruitCount: number } {
+	const isFruiting = stage === TREE_STAGES.fruiting;
+	const fruitType = isFruiting
+		? shape in SHAPE_FRUIT_MAP
+			? SHAPE_FRUIT_MAP[shape as keyof typeof SHAPE_FRUIT_MAP]
+			: 'none'
+		: 'none';
+	const fruitCount = isFruiting ? 3 + (seed % 3) : 0;
+	return { fruitType, fruitCount };
+}
+
+// ─── computeTreeVisualization ───────────────────────────────────────────────
 
 /** @internal Exported for testing only — use `computeVisualization` for production code. */
 export function computeTreeVisualization(
@@ -306,11 +428,11 @@ export function computeTreeVisualization(
 	const stage = computeTreeStage(dimensions, resolvedContext);
 	const shape = resolveTreeShape(dimensions.labels, labelMappings, defaultShape);
 	const toolVisibility = computeToolVisibility(dimensions);
+	const overlayConfig = computeOverlayConfig(dimensions);
 
-	const fruitType =
-		shape in SHAPE_FRUIT_MAP
-			? SHAPE_FRUIT_MAP[shape as keyof typeof SHAPE_FRUIT_MAP]
-			: DEFAULT_TREE_CONFIG.fruitType;
+	const { fruitType, fruitCount } = computeFruit(stage, shape, seed);
+
+	const isRunning = dimensions.aggregateSessionState === 'running';
 
 	const config: TreeConfig = {
 		...DEFAULT_TREE_CONFIG,
@@ -318,22 +440,17 @@ export function computeTreeVisualization(
 		shape,
 		seed,
 		fruitType,
-		fruitCount: Math.min(resolvedContext.sessionCount, 7),
+		fruitCount,
 	};
-
-	const glowEnabled =
-		dimensions.pullRequestState === 'approved' ||
-		dimensions.pullRequestState === 'ready-to-merge';
-
-	const overlayConfig = glowEnabled
-		? { glow: { enabled: true, color: '#ffd700', intensity: 3, pulse: false } }
-		: OVERLAY_DEFAULTS;
 
 	return {
 		kind: 'tree',
 		config,
 		toolVisibility,
 		overlayConfig,
+		animateCanopySway: isRunning,
+		animateGrowth: isRunning,
+		animateTools: isRunning,
 	} satisfies TreeVisualizationTree;
 }
 

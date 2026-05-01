@@ -36,6 +36,34 @@ export const TOOL_TYPES = {
 	grill: 'grill',
 	speechBubble: 'speechBubble',
 	stormCloud: 'stormCloud',
+	lantern: 'lantern',
+	pruningShears: 'pruningShears',
+	mushrooms: 'mushrooms',
+} as const;
+
+/** @internal Exported for testing only. */
+export const GLOW_COLORS = {
+	red: '#ff4444',
+	orange: '#ff8c00',
+	green: '#22c55e',
+	yellow: '#ffd700',
+	blue: '#4a9eff',
+} as const;
+
+/** @internal Exported for testing only. */
+export const SPEECH_BUBBLE_COLORS = {
+	red: '#ff4444',
+	orange: '#ff8c00',
+} as const;
+
+/** Sub-agent category to bird type mapping (REQ-6). Rendering deferred to library enhancement. */
+export const BIRD_TYPE_MAP = {
+	analysis: 'owl',
+	executor: 'robin',
+	checker: 'sparrow',
+	reviewer: 'cardinal',
+	utility: 'hummingbird',
+	research: 'parrot',
 } as const;
 
 /** Minimum pixel distance between any two positioned items. */
