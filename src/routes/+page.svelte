@@ -304,6 +304,7 @@
 				getGitStatus={(issueId) => versionControlStore.getState(issueId)}
 				getSessionsForIssue={(issueId) => sessionStore.sessionsByIssueId.get(issueId) ?? []}
 				onSelectIssue={(issue) => (editingIssue = issue)}
+				onAddIssue={openCreateDialog}
 			/>
 		{:else}
 			<IssueCardList
