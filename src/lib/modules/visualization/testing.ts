@@ -5,7 +5,14 @@
  * from `$lib/modules/visualization`. These internal symbols are exposed here
  * solely for unit-test assertions.
  */
-export { TREE_STAGES, POTTED_PLANT_STAGES, TOOL_TYPES } from './constants.js';
+export {
+	TREE_STAGES,
+	POTTED_PLANT_STAGES,
+	TOOL_TYPES,
+	GLOW_COLORS,
+	SPEECH_BUBBLE_COLORS,
+	BIRD_TYPE_MAP,
+} from './constants.js';
 
 export { aggregateSessionState, mapIssueToStateDimensions } from './state_mapping.js';
 
