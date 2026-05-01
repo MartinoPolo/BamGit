@@ -1,5 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { computeForestLayout, MIN_SPACING_PX } from './index';
+import {
+	computeForestLayout,
+	computeDepthRows,
+	MIN_SPACING_PX,
+	MAX_DEPTH_ROWS,
+	TREE_SPACING_FRACTION,
+	ROW_SPACING_Y_FRACTION,
+	ROW_SCALE_FACTOR,
+	ROW_OPACITY_FACTOR,
+	ROW_X_OFFSET_FRACTION,
+	GROUND_Y_FRACTION,
+} from './index';
 import type {
 	TreeVisualizationTree,
 	TreeVisualizationPottedPlant,
@@ -133,6 +144,7 @@ function createTree(
 		stage: 'leafy',
 		priority: 'medium',
 		sortOrder: 0,
+		depthRow: 0,
 		...overrides,
 		kind: 'tree',
 	};
@@ -146,6 +158,7 @@ function createStump(
 		id,
 		priority: null,
 		sortOrder: 0,
+		depthRow: 0,
 		...overrides,
 		kind: 'tree',
 		stage: 'stump',
@@ -161,6 +174,7 @@ function createPottedPlant(
 		stage: 'small-plant',
 		priority: null,
 		sortOrder: 0,
+		depthRow: 0,
 		...overrides,
 		kind: 'potted-plant',
 	};
@@ -982,37 +996,37 @@ describe('computeTreeVisualization — deterministic seed', () => {
 });
 
 // ════════════════════════════════════════════════════════════════════════
-// computeForestLayout
+// computeForestLayout — Row-Based Equidistant Layout
 // ════════════════════════════════════════════════════════════════════════
 
 // ─── Empty Input ────────────────────────────────────────────────────────
 
 describe('computeForestLayout — empty input', () => {
-	it('returns empty result for no items', () => {
-		const result = computeForestLayout([], createViewport());
+	it('returns empty items, null oakPosition, and groundY at GROUND_Y_FRACTION', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const result = computeForestLayout([], viewport);
+
 		expect(result.items).toEqual([]);
 		expect(result.oakPosition).toBeNull();
+		expect(result.groundY).toBeCloseTo(viewport.height * GROUND_Y_FRACTION, 1);
 	});
 });
 
 // ─── Oak Placement ──────────────────────────────────────────────────────
 
 describe('computeForestLayout — oak placement', () => {
-	it('positions oak at center-top of viewport', () => {
+	it('positions oak at horizontal center on groundY with scale=1 opacity=1 rowIndex=0', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
 		const result = computeForestLayout([createOak()], viewport);
 
 		expect(result.oakPosition).not.toBeNull();
 		const oak = result.oakPosition!;
-		expect(oak.x).toBeCloseTo(600, 0); // center x
-		expect(oak.y).toBeLessThan(800 * 0.25); // top 25%
+		expect(oak.x).toBeCloseTo(600, 0);
+		expect(oak.y).toBeCloseTo(viewport.height * GROUND_Y_FRACTION, 1);
 		expect(oak.scale).toBe(1.0);
 		expect(oak.opacity).toBe(1.0);
-	});
-
-	it('returns null oakPosition when no oak provided', () => {
-		const result = computeForestLayout([createTree('t1'), createTree('t2')], createViewport());
-		expect(result.oakPosition).toBeNull();
+		expect(oak.zIndex).toBe(100);
+		expect(oak.rowIndex).toBe(0);
 	});
 
 	it('includes oak in items array', () => {
@@ -1022,44 +1036,90 @@ describe('computeForestLayout — oak placement', () => {
 	});
 });
 
-// ─── Tree Semicircle Arrangement ────────────────────────────────────────
+// ─── Oak Absent ─────────────────────────────────────────────────────────
 
-describe('computeForestLayout — tree semicircle', () => {
-	it('distributes trees with y below oak position', () => {
-		const oak = createOak();
-		const trees = Array.from({ length: 5 }, (_, i) => createTree(`t${i}`));
-		const viewport = createViewport();
-		const result = computeForestLayout([oak, ...trees], viewport);
+describe('computeForestLayout — oak absent', () => {
+	it('returns null oakPosition when no oak provided and trees still positioned', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const result = computeForestLayout([createTree('t1'), createTree('t2')], viewport);
 
-		const oakPos = result.oakPosition!;
-		for (const tree of trees) {
-			const pos = findItem(result.items, tree.id);
-			expect(pos.y).toBeGreaterThan(oakPos.y);
+		expect(result.oakPosition).toBeNull();
+		expect(result.items).toHaveLength(2);
+		// Trees should still be positioned with valid coordinates
+		for (const item of result.items) {
+			expect(item.x).toBeGreaterThan(0);
+			expect(item.y).toBeGreaterThan(0);
 		}
 	});
+});
 
-	it('distributes trees symmetrically around center x', () => {
-		const trees = Array.from({ length: 4 }, (_, i) => createTree(`t${i}`));
-		const viewport = createViewport({ width: 1000, height: 800 });
-		const result = computeForestLayout(trees, viewport);
+// ─── Row 0 Left-Right Alternation ────────────────────────────────────────
 
-		const centerX = 500;
-		const positions = trees.map((t) => findItem(result.items, t.id));
-		const leftCount = positions.filter((p) => p.x < centerX).length;
-		const rightCount = positions.filter((p) => p.x > centerX).length;
-		// Even count should split evenly
-		expect(leftCount).toBe(rightCount);
+describe('computeForestLayout — row 0 left-right alternation', () => {
+	it('alternates trees left-right from center — 4 trees + oak', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const centerX = viewport.width / 2;
+		const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
+
+		const items: ForestLayoutItem[] = [
+			createOak(),
+			createTree('t0', { priority: 'top', sortOrder: 0 }),
+			createTree('t1', { priority: 'high', sortOrder: 0 }),
+			createTree('t2', { priority: 'medium', sortOrder: 0 }),
+			createTree('t3', { priority: 'low', sortOrder: 0 }),
+		];
+		const result = computeForestLayout(items, viewport);
+
+		const t0 = findItem(result.items, 't0');
+		const t1 = findItem(result.items, 't1');
+		const t2 = findItem(result.items, 't2');
+		const t3 = findItem(result.items, 't3');
+
+		// t0 = index 0 → LEFT of center (1 spacing unit)
+		expect(t0.x).toBeCloseTo(centerX - treeSpacing, 0);
+		// t1 = index 1 → RIGHT of center (1 spacing unit)
+		expect(t1.x).toBeCloseTo(centerX + treeSpacing, 0);
+		// t2 = index 2 → LEFT (2 spacing units)
+		expect(t2.x).toBeCloseTo(centerX - 2 * treeSpacing, 0);
+		// t3 = index 3 → RIGHT (2 spacing units)
+		expect(t3.x).toBeCloseTo(centerX + 2 * treeSpacing, 0);
 	});
+});
 
-	it('places single tree centered in tree zone', () => {
-		const viewport = createViewport({ width: 1000, height: 800 });
-		const result = computeForestLayout([createTree('solo')], viewport);
+// ─── Equidistant Spacing ────────────────────────────────────────────────
 
-		const pos = findItem(result.items, 'solo');
-		expect(pos.x).toBeCloseTo(500, 0);
+describe('computeForestLayout — equidistant spacing', () => {
+	it('all row-0 items have equal horizontal spacing between consecutive positions', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
+
+		const items: ForestLayoutItem[] = [
+			createOak(),
+			createTree('t0', { sortOrder: 0 }),
+			createTree('t1', { sortOrder: 1 }),
+			createTree('t2', { sortOrder: 2 }),
+			createTree('t3', { sortOrder: 3 }),
+		];
+		const result = computeForestLayout(items, viewport);
+
+		// Collect all row-0 x positions (oak + trees), sorted
+		const row0Items = result.items.filter((item) => item.rowIndex === 0);
+		const xValues = row0Items.map((item) => item.x).sort((a, b) => a - b);
+
+		// Consecutive x-values should differ by treeSpacing
+		for (let i = 1; i < xValues.length; i++) {
+			expect(xValues[i] - xValues[i - 1]).toBeCloseTo(treeSpacing, 0);
+		}
 	});
+});
 
-	it('orders trees by priority then sort_order — higher priority closer to center', () => {
+// ─── Priority Sorting Within Row ────────────────────────────────────────
+
+describe('computeForestLayout — priority sorting within row', () => {
+	it('higher priority trees placed closer to center', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const centerX = viewport.width / 2;
+
 		const items: ForestLayoutItem[] = [
 			createOak(),
 			createTree('low', { priority: 'low', sortOrder: 0 }),
@@ -1067,84 +1127,111 @@ describe('computeForestLayout — tree semicircle', () => {
 			createTree('med', { priority: 'medium', sortOrder: 0 }),
 			createTree('high', { priority: 'high', sortOrder: 0 }),
 		];
-		const viewport = createViewport();
 		const result = computeForestLayout(items, viewport);
 
-		const oakPos = result.oakPosition!;
 		const topPos = findItem(result.items, 'top');
 		const lowPos = findItem(result.items, 'low');
 
-		// Higher-priority tree should be in inner ring (closer to oak center)
-		const topDistance = euclideanDistance(topPos, oakPos);
-		const lowDistance = euclideanDistance(lowPos, oakPos);
-		expect(topDistance).toBeLessThan(lowDistance);
+		const topDistFromCenter = Math.abs(topPos.x - centerX);
+		const lowDistFromCenter = Math.abs(lowPos.x - centerX);
+		expect(topDistFromCenter).toBeLessThan(lowDistFromCenter);
 	});
 });
 
-// ─── Stump Placement ──────────────────────────────────────────────────
+// ─── Back-Row Perspective — Row 1 ──────────────────────────────────────
 
-describe('computeForestLayout — stumps', () => {
-	it('places stumps with reduced opacity', () => {
-		const items = [createOak(), createStump('s1'), createTree('t1')];
-		const result = computeForestLayout(items, createViewport());
+describe('computeForestLayout — back-row perspective row 1', () => {
+	it('trees with depthRow=1 have reduced scale, opacity, and shifted-up y', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const groundY = viewport.height * GROUND_Y_FRACTION;
 
-		const stump = findItem(result.items, 's1');
-		expect(stump.opacity).toBeLessThanOrEqual(0.5);
-	});
-
-	it('places stumps at periphery — further from center than trees', () => {
-		const items = [createOak(), createTree('t1'), createTree('t2'), createStump('s1')];
-		const viewport = createViewport();
+		const items: ForestLayoutItem[] = [createOak(), createTree('row1', { depthRow: 1 })];
 		const result = computeForestLayout(items, viewport);
 
-		const oakPos = result.oakPosition!;
-		const treeDistances = ['t1', 't2'].map((id) =>
-			euclideanDistance(findItem(result.items, id), oakPos),
-		);
-		const stumpDistance = euclideanDistance(findItem(result.items, 's1'), oakPos);
-		const maxTreeDistance = Math.max(...treeDistances);
-		expect(stumpDistance).toBeGreaterThanOrEqual(maxTreeDistance);
-	});
-
-	it('gives stumps reduced scale', () => {
-		const result = computeForestLayout([createStump('s1')], createViewport());
-		const stump = findItem(result.items, 's1');
-		expect(stump.scale).toBeLessThanOrEqual(0.6);
+		const row1Tree = findItem(result.items, 'row1');
+		expect(row1Tree.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
+		expect(row1Tree.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
+		// Y should be shifted up from groundY
+		expect(row1Tree.y).toBeCloseTo(groundY - 1 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(row1Tree.rowIndex).toBe(1);
 	});
 });
 
-// ─── Potted Plants Shelf ───────────────────────────────────────────────
+// ─── Back-Row Perspective — Row 2 ──────────────────────────────────────
 
-describe('computeForestLayout — potted plants', () => {
-	it('positions potted plants on bottom shelf strip', () => {
-		const viewport = createViewport({ height: 800 });
-		const plants = [createPottedPlant('p1'), createPottedPlant('p2')];
-		const result = computeForestLayout(plants, viewport);
+describe('computeForestLayout — back-row perspective row 2', () => {
+	it('trees with depthRow=2 have cumulative scale/opacity reduction', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const groundY = viewport.height * GROUND_Y_FRACTION;
 
-		for (const plant of plants) {
-			const pos = findItem(result.items, plant.id);
-			expect(pos.y).toBeGreaterThanOrEqual(viewport.height * 0.8);
-		}
+		const items: ForestLayoutItem[] = [createOak(), createTree('row2', { depthRow: 2 })];
+		const result = computeForestLayout(items, viewport);
+
+		const row2Tree = findItem(result.items, 'row2');
+		expect(row2Tree.scale).toBeCloseTo(ROW_SCALE_FACTOR ** 2, 2);
+		expect(row2Tree.opacity).toBeCloseTo(ROW_OPACITY_FACTOR ** 2, 2);
+		expect(row2Tree.y).toBeCloseTo(groundY - 2 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(row2Tree.rowIndex).toBe(2);
 	});
+});
 
-	it('distributes potted plants horizontally across shelf', () => {
-		const viewport = createViewport({ width: 1000 });
-		const plants = Array.from({ length: 3 }, (_, i) => createPottedPlant(`p${i}`));
-		const result = computeForestLayout(plants, viewport);
+// ─── Back-Row X-Offset ─────────────────────────────────────────────────
 
-		const positions = plants.map((p) => findItem(result.items, p.id));
-		const xValues = positions.map((p) => p.x).sort((a, b) => a - b);
+describe('computeForestLayout — back-row x-offset', () => {
+	it('row 1+ trees have center offset by ROW_X_OFFSET_FRACTION', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const centerX = viewport.width / 2;
+		const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
 
-		// Should be spread out, not stacked
-		for (let i = 1; i < xValues.length; i++) {
-			expect(xValues[i] - xValues[i - 1]).toBeGreaterThan(0);
-		}
+		// Single tree in row 1 — should be at offset center (left alternation first)
+		const items: ForestLayoutItem[] = [createOak(), createTree('r1', { depthRow: 1 })];
+		const result = computeForestLayout(items, viewport);
+
+		const r1 = findItem(result.items, 'r1');
+		const expectedRowCenter = centerX + 1 * treeSpacing * ROW_X_OFFSET_FRACTION;
+		// Single item in row goes LEFT of row-center (index 0 → left, 1 unit)
+		expect(r1.x).toBeCloseTo(expectedRowCenter - treeSpacing, 0);
 	});
+});
 
-	it('exposes shelfY coordinate', () => {
-		const viewport = createViewport({ height: 800 });
-		const result = computeForestLayout([createPottedPlant('p1')], viewport);
-		expect(result.shelfY).toBeGreaterThanOrEqual(viewport.height * 0.8);
+// ─── Max Depth Clamp ────────────────────────────────────────────────────
+
+describe('computeForestLayout — max depth clamp', () => {
+	it('clamps depthRow=15 to MAX_DEPTH_ROWS - 1', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const groundY = viewport.height * GROUND_Y_FRACTION;
+		const clampedRow = MAX_DEPTH_ROWS - 1;
+
+		const items: ForestLayoutItem[] = [createTree('deep', { depthRow: 15 })];
+		const result = computeForestLayout(items, viewport);
+
+		const deep = findItem(result.items, 'deep');
+		expect(deep.scale).toBeCloseTo(ROW_SCALE_FACTOR ** clampedRow, 2);
+		expect(deep.opacity).toBeCloseTo(ROW_OPACITY_FACTOR ** clampedRow, 2);
+		expect(deep.y).toBeCloseTo(
+			groundY - clampedRow * viewport.height * ROW_SPACING_Y_FRACTION,
+			1,
+		);
+		expect(deep.rowIndex).toBe(clampedRow);
+	});
+});
+
+// ─── Deterministic ──────────────────────────────────────────────────────
+
+describe('computeForestLayout — deterministic', () => {
+	it('same input twice produces identical output', () => {
+		const items: ForestLayoutItem[] = [
+			createOak(),
+			createTree('t1', { priority: 'high', sortOrder: 1 }),
+			createTree('t2', { priority: 'low', sortOrder: 2, depthRow: 1 }),
+			createPottedPlant('p1', { depthRow: 0 }),
+		];
+		const viewport = createViewport();
+
+		const result1 = computeForestLayout(items, viewport);
+		const result2 = computeForestLayout(items, viewport);
+
+		expect(result1).toEqual(result2);
 	});
 });
 
@@ -1168,103 +1255,410 @@ describe('computeForestLayout — minimum spacing', () => {
 	});
 });
 
+// ─── Many Items Row 0 ──────────────────────────────────────────────────
+
+describe('computeForestLayout — many items row 0', () => {
+	it('15 trees all depthRow=0 are all positioned alternating left-right', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const centerX = viewport.width / 2;
+
+		const items: ForestLayoutItem[] = [
+			createOak(),
+			...Array.from({ length: 15 }, (_, i) =>
+				createTree(`t${i}`, { sortOrder: i, depthRow: 0 }),
+			),
+		];
+		const result = computeForestLayout(items, viewport);
+
+		// All 16 items should be positioned
+		expect(result.items).toHaveLength(16);
+
+		// Non-oak items should alternate: even-indexed (0,2,4,...) left, odd-indexed (1,3,5,...) right
+		const nonOakItems = result.items.filter((item) => item.id !== 'oak-1');
+		const leftItems = nonOakItems.filter((item) => item.x < centerX);
+		const rightItems = nonOakItems.filter((item) => item.x > centerX);
+
+		// With 15 trees: 8 left (indices 0,2,4,6,8,10,12,14), 7 right (indices 1,3,5,7,9,11,13)
+		expect(leftItems.length).toBe(8);
+		expect(rightItems.length).toBe(7);
+	});
+});
+
+// ─── Multiple Rows ─────────────────────────────────────────────────────
+
+describe('computeForestLayout — multiple rows', () => {
+	it('items across rows 0, 1, 2 positioned at correct y per row', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const groundY = viewport.height * GROUND_Y_FRACTION;
+
+		const items: ForestLayoutItem[] = [
+			createOak(),
+			createTree('r0', { depthRow: 0 }),
+			createTree('r1', { depthRow: 1 }),
+			createTree('r2', { depthRow: 2 }),
+		];
+		const result = computeForestLayout(items, viewport);
+
+		const r0 = findItem(result.items, 'r0');
+		const r1 = findItem(result.items, 'r1');
+		const r2 = findItem(result.items, 'r2');
+
+		expect(r0.y).toBeCloseTo(groundY, 1);
+		expect(r1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(r2.y).toBeCloseTo(groundY - 2 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+
+		// Each deeper row should be higher (smaller y)
+		expect(r1.y).toBeLessThan(r0.y);
+		expect(r2.y).toBeLessThan(r1.y);
+	});
+});
+
 // ─── Viewport Responsiveness ───────────────────────────────────────────
 
-describe('computeForestLayout — viewport responsiveness', () => {
-	it('produces different positions for different viewport sizes', () => {
+describe('computeForestLayout — responsive', () => {
+	it('different viewport sizes produce proportionally different positions', () => {
 		const items = [createOak(), createTree('t1'), createTree('t2')];
-		const small = computeForestLayout(items, createViewport({ width: 600, height: 400 }));
-		const large = computeForestLayout(items, createViewport({ width: 1600, height: 1000 }));
-
-		const smallOak = small.oakPosition!;
-		const largeOak = large.oakPosition!;
-		expect(smallOak.x).not.toBeCloseTo(largeOak.x, 0);
-	});
-
-	it('scales positions proportionally to viewport', () => {
-		const items = [createOak(), createTree('t1')];
 		const v1 = createViewport({ width: 1000, height: 800 });
 		const v2 = createViewport({ width: 2000, height: 1600 });
 
 		const r1 = computeForestLayout(items, v1);
 		const r2 = computeForestLayout(items, v2);
 
-		// Positions should roughly double
 		const oak1 = r1.oakPosition!;
 		const oak2 = r2.oakPosition!;
+		// x = width/2, so should double
 		expect(oak2.x / oak1.x).toBeCloseTo(2.0, 0);
+		// y = height * GROUND_Y_FRACTION, so should double
 		expect(oak2.y / oak1.y).toBeCloseTo(2.0, 0);
-	});
-});
-
-// ─── Many Trees Overflow ───────────────────────────────────────────────
-
-describe('computeForestLayout — large item counts', () => {
-	it('handles 30+ trees without crashing', () => {
-		const items: ForestLayoutItem[] = [
-			createOak(),
-			...Array.from({ length: 35 }, (_, i) => createTree(`t${i}`)),
-		];
-		const result = computeForestLayout(items, createViewport());
-		expect(result.items).toHaveLength(36);
-	});
-});
-
-// ─── Mixed Kinds ───────────────────────────────────────────────────────
-
-describe('computeForestLayout — mixed kinds', () => {
-	it('correctly zones all kinds simultaneously', () => {
-		const viewport = createViewport({ width: 1200, height: 800 });
-		const items: ForestLayoutItem[] = [
-			createOak(),
-			createTree('t1'),
-			createTree('t2'),
-			createStump('s1'),
-			createPottedPlant('p1'),
-			createPottedPlant('p2'),
-		];
-		const result = computeForestLayout(items, viewport);
-
-		expect(result.items).toHaveLength(6);
-		expect(result.oakPosition).not.toBeNull();
-
-		const oak = result.oakPosition!;
-		const t1 = findItem(result.items, 't1');
-		const s1 = findItem(result.items, 's1');
-		const p1 = findItem(result.items, 'p1');
-
-		// Oak at top
-		expect(oak.y).toBeLessThan(t1.y);
-		// Trees above shelf
-		expect(t1.y).toBeLessThan(result.shelfY);
-		// Potted plants at/below shelf
-		expect(p1.y).toBeGreaterThanOrEqual(result.shelfY - 10); // small tolerance
-		// Stump reduced opacity
-		expect(s1.opacity).toBeLessThanOrEqual(0.5);
 	});
 });
 
 // ─── zIndex Ordering ───────────────────────────────────────────────────
 
-describe('computeForestLayout — zIndex', () => {
-	it('gives oak the highest zIndex', () => {
+describe('computeForestLayout — zIndex ordering', () => {
+	it('oak has highest zIndex (100)', () => {
 		const items = [createOak(), createTree('t1'), createPottedPlant('p1')];
 		const result = computeForestLayout(items, createViewport());
 
 		const oak = result.oakPosition!;
 		for (const item of result.items) {
 			if (item.id !== oak.id) {
-				expect(oak.zIndex).toBeGreaterThanOrEqual(item.zIndex);
+				expect(oak.zIndex).toBeGreaterThan(item.zIndex);
 			}
 		}
 	});
 
-	it('gives stumps the lowest zIndex', () => {
-		const items = [createTree('t1'), createStump('s1'), createPottedPlant('p1')];
+	it('front row has higher zIndex than back rows', () => {
+		const items: ForestLayoutItem[] = [
+			createTree('front', { depthRow: 0 }),
+			createTree('back', { depthRow: 1 }),
+			createTree('deeper', { depthRow: 2 }),
+		];
 		const result = computeForestLayout(items, createViewport());
 
-		const stump = findItem(result.items, 's1');
-		const tree = findItem(result.items, 't1');
-		expect(stump.zIndex).toBeLessThan(tree.zIndex);
+		const front = findItem(result.items, 'front');
+		const back = findItem(result.items, 'back');
+		const deeper = findItem(result.items, 'deeper');
+
+		expect(front.zIndex).toBeGreaterThan(back.zIndex);
+		expect(back.zIndex).toBeGreaterThan(deeper.zIndex);
+	});
+});
+
+// ─── All Items Have rowIndex ────────────────────────────────────────────
+
+describe('computeForestLayout — all items have rowIndex', () => {
+	it('every positioned item has correct rowIndex matching its depthRow', () => {
+		const items: ForestLayoutItem[] = [
+			createOak(),
+			createTree('r0', { depthRow: 0 }),
+			createTree('r1', { depthRow: 1 }),
+			createTree('r2', { depthRow: 2 }),
+			createPottedPlant('p0', { depthRow: 0 }),
+			createPottedPlant('p1', { depthRow: 1 }),
+		];
+		const result = computeForestLayout(items, createViewport());
+
+		expect(findItem(result.items, 'oak-1').rowIndex).toBe(0);
+		expect(findItem(result.items, 'r0').rowIndex).toBe(0);
+		expect(findItem(result.items, 'r1').rowIndex).toBe(1);
+		expect(findItem(result.items, 'r2').rowIndex).toBe(2);
+		expect(findItem(result.items, 'p0').rowIndex).toBe(0);
+		expect(findItem(result.items, 'p1').rowIndex).toBe(1);
+	});
+});
+
+// ─── Potted Plants in Rows ──────────────────────────────────────────────
+
+describe('computeForestLayout — potted plants in rows', () => {
+	it('potted plants with depthRow follow same row rules as trees', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const groundY = viewport.height * GROUND_Y_FRACTION;
+
+		const items: ForestLayoutItem[] = [
+			createPottedPlant('p0', { depthRow: 0 }),
+			createPottedPlant('p1', { depthRow: 1 }),
+		];
+		const result = computeForestLayout(items, viewport);
+
+		const p0 = findItem(result.items, 'p0');
+		const p1 = findItem(result.items, 'p1');
+
+		expect(p0.y).toBeCloseTo(groundY, 1);
+		expect(p0.scale).toBe(1.0);
+		expect(p0.opacity).toBe(1.0);
+		expect(p0.rowIndex).toBe(0);
+
+		expect(p1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(p1.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
+		expect(p1.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
+		expect(p1.rowIndex).toBe(1);
+	});
+});
+
+// ─── Stumps in Rows ─────────────────────────────────────────────────────
+
+describe('computeForestLayout — stumps in rows', () => {
+	it('stumps with depthRow follow same row rules as trees', () => {
+		const viewport = createViewport({ width: 1200, height: 800 });
+		const groundY = viewport.height * GROUND_Y_FRACTION;
+
+		const items: ForestLayoutItem[] = [
+			createStump('s0', { depthRow: 0 }),
+			createStump('s1', { depthRow: 1 }),
+		];
+		const result = computeForestLayout(items, viewport);
+
+		const s0 = findItem(result.items, 's0');
+		const s1 = findItem(result.items, 's1');
+
+		expect(s0.y).toBeCloseTo(groundY, 1);
+		expect(s0.scale).toBe(1.0);
+		expect(s0.opacity).toBe(1.0);
+		expect(s0.rowIndex).toBe(0);
+
+		expect(s1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(s1.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
+		expect(s1.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
+		expect(s1.rowIndex).toBe(1);
+	});
+});
+
+describe('computeDepthRows', () => {
+	it('assigns all issues to depth 0 when prdIssueId is null', () => {
+		const issueIds = ['issue1', 'issue2', 'issue3'];
+		const parents = new Map<string, string | null>();
+		const result = computeDepthRows(issueIds, parents, null);
+
+		expect(result.size).toBe(3);
+		expect(result.get('issue1')).toBe(0);
+		expect(result.get('issue2')).toBe(0);
+		expect(result.get('issue3')).toBe(0);
+	});
+
+	it('assigns PRD issue direct children to depth 0', () => {
+		const issueIds = ['prd', 'child1', 'child2'];
+		const parents = new Map([
+			['child1', 'prd'],
+			['child2', 'prd'],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('child2')).toBe(0);
+	});
+
+	it('computes correct depths for multi-level hierarchy', () => {
+		const issueIds = ['prd', 'child1', 'child2', 'grandchild1', 'grandchild2'];
+		const parents = new Map([
+			['child1', 'prd'],
+			['child2', 'prd'],
+			['grandchild1', 'child1'],
+			['grandchild2', 'child2'],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('child2')).toBe(0);
+		expect(result.get('grandchild1')).toBe(1);
+		expect(result.get('grandchild2')).toBe(1);
+	});
+
+	it('handles disconnected subtrees by assigning them depth 0', () => {
+		const issueIds = ['prd', 'child1', 'orphan1', 'orphan2'];
+		const parents = new Map([['child1', 'prd']]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('orphan1')).toBe(0);
+		expect(result.get('orphan2')).toBe(0);
+	});
+
+	it('handles missing parent references gracefully', () => {
+		const issueIds = ['prd', 'child1', 'unknown'];
+		const parents = new Map([['child1', 'prd']]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('unknown')).toBe(0);
+	});
+
+	it('does not include PRD issue itself in result', () => {
+		const issueIds = ['prd', 'child1'];
+		const parents = new Map([['child1', 'prd']]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.has('prd')).toBe(false);
+		expect(result.size).toBe(1);
+	});
+
+	it('handles complex deep hierarchy with proper depth assignment', () => {
+		const issueIds = ['prd', 'l1a', 'l1b', 'l2a', 'l2b', 'l3a'];
+		const parents = new Map([
+			['l1a', 'prd'],
+			['l1b', 'prd'],
+			['l2a', 'l1a'],
+			['l2b', 'l1b'],
+			['l3a', 'l2a'],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('l1a')).toBe(0);
+		expect(result.get('l1b')).toBe(0);
+		expect(result.get('l2a')).toBe(1);
+		expect(result.get('l2b')).toBe(1);
+		expect(result.get('l3a')).toBe(2);
+	});
+
+	it('handles single issue with no children', () => {
+		const issueIds = ['prd'];
+		const parents = new Map<string, string | null>();
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.size).toBe(0);
+	});
+
+	it('handles null parent values in the map', () => {
+		const issueIds = ['prd', 'child1', 'child2'];
+		const parents = new Map([
+			['child1', 'prd'],
+			['child2', null],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('child2')).toBe(0);
+	});
+});
+
+describe('computeDepthRows', () => {
+	it('returns empty depth map when issueIds is empty', () => {
+		const result = computeDepthRows([], new Map(), null);
+		expect(result.size).toBe(0);
+	});
+
+	it('assigns all issues to depth 0 when prdIssueId is null', () => {
+		const issueIds = ['issue1', 'issue2', 'issue3'];
+		const parents = new Map<string, string | null>();
+		const result = computeDepthRows(issueIds, parents, null);
+
+		expect(result.size).toBe(3);
+		expect(result.get('issue1')).toBe(0);
+		expect(result.get('issue2')).toBe(0);
+		expect(result.get('issue3')).toBe(0);
+	});
+
+	it('assigns PRD issue direct children to depth 0', () => {
+		const issueIds = ['prd', 'child1', 'child2'];
+		const parents = new Map([
+			['child1', 'prd'],
+			['child2', 'prd'],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('child2')).toBe(0);
+	});
+
+	it('computes correct depths for multi-level hierarchy', () => {
+		const issueIds = ['prd', 'child1', 'child2', 'grandchild1', 'grandchild2'];
+		const parents = new Map([
+			['child1', 'prd'],
+			['child2', 'prd'],
+			['grandchild1', 'child1'],
+			['grandchild2', 'child2'],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('child2')).toBe(0);
+		expect(result.get('grandchild1')).toBe(1);
+		expect(result.get('grandchild2')).toBe(1);
+	});
+
+	it('handles disconnected subtrees by assigning them depth 0', () => {
+		const issueIds = ['prd', 'child1', 'orphan1', 'orphan2'];
+		const parents = new Map([['child1', 'prd']]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('orphan1')).toBe(0);
+		expect(result.get('orphan2')).toBe(0);
+	});
+
+	it('handles missing parent references gracefully', () => {
+		const issueIds = ['prd', 'child1', 'unknown'];
+		const parents = new Map([['child1', 'prd']]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('unknown')).toBe(0);
+	});
+
+	it('does not include PRD issue itself in result', () => {
+		const issueIds = ['prd', 'child1'];
+		const parents = new Map([['child1', 'prd']]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.has('prd')).toBe(false);
+		expect(result.size).toBe(1);
+	});
+
+	it('handles complex deep hierarchy with proper depth assignment', () => {
+		const issueIds = ['prd', 'l1a', 'l1b', 'l2a', 'l2b', 'l3a'];
+		const parents = new Map([
+			['l1a', 'prd'],
+			['l1b', 'prd'],
+			['l2a', 'l1a'],
+			['l2b', 'l1b'],
+			['l3a', 'l2a'],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('l1a')).toBe(0);
+		expect(result.get('l1b')).toBe(0);
+		expect(result.get('l2a')).toBe(1);
+		expect(result.get('l2b')).toBe(1);
+		expect(result.get('l3a')).toBe(2);
+	});
+
+	it('handles single issue with no children', () => {
+		const issueIds = ['prd'];
+		const parents = new Map<string, string | null>();
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.size).toBe(0);
+	});
+
+	it('handles null parent values in the map', () => {
+		const issueIds = ['prd', 'child1', 'child2'];
+		const parents = new Map([
+			['child1', 'prd'],
+			['child2', null],
+		]);
+		const result = computeDepthRows(issueIds, parents, 'prd');
+
+		expect(result.get('child1')).toBe(0);
+		expect(result.get('child2')).toBe(0);
 	});
 });

@@ -1,69 +1,33 @@
-import type { ForestLayoutItem, PositionedForestItem, Viewport } from './types.js';
-import { MIN_SPACING_PX } from './constants.js';
+import type {
+	ForestLayoutItem,
+	ForestLayoutItemOak,
+	PositionedForestItem,
+	Viewport,
+	ForestLayoutResult,
+} from './types.js';
+import {
+	MIN_SPACING_PX,
+	MAX_DEPTH_ROWS,
+	TREE_SPACING_FRACTION,
+	ROW_SPACING_Y_FRACTION,
+	ROW_SCALE_FACTOR,
+	ROW_OPACITY_FACTOR,
+	ROW_X_OFFSET_FRACTION,
+	GROUND_Y_FRACTION,
+} from './constants.js';
 
-// ─── Layout Constants ────────────────────────────────────────────────────────
-
-/** Fraction of viewport height where the oak sits. */
-const OAK_Y_FRACTION = 0.12;
-
-/** Fraction of viewport height where the shelf strip begins. */
-const SHELF_Y_FRACTION = 0.88;
-
-/** Ring radius step as fraction of viewport width. */
-const RING_RADIUS_STEP_FRACTION = 0.12;
-
-/** Base ring radius as fraction of viewport width. */
-const BASE_RING_RADIUS_FRACTION = 0.15;
-
-/** Scale decay per ring for trees. */
-const TREE_SCALE_PER_RING = [0.85, 0.75, 0.65, 0.55, 0.5];
-
-/** Vertical flatten factor for the semicircle arc (1.0 = full circle, <1 = compressed). */
-const SEMICIRCLE_VERTICAL_FLATTEN = 0.6;
-
-/** Max iterative passes for collision relaxation. */
-const MAX_RELAXATION_PASSES = 10;
-
-/** Vertical offset of tree semicircle center below the oak, as fraction of viewport height. */
-const TREE_CENTER_OFFSET_FRACTION = 0.18;
-
-/** Fallback tree center position when oak absent, as fraction of viewport height. */
-const TREE_CENTER_NO_OAK_FRACTION = 0.3;
-
-/** Horizontal margin for the shelf strip, as fraction of viewport width. */
-const SHELF_MARGIN_FRACTION = 0.1;
-
-const STUMP_OPACITY = 0.4;
-const STUMP_SCALE = 0.5;
-const POTTED_PLANT_SCALE = 0.6;
-
-// ─── zIndex Layers ───────────────────────────────────────────────────────────
+// ─── Constants ──────────────────────────────────────────────────────────────
 
 const Z_OAK = 100;
-const Z_TREE_BASE = 50;
-const Z_POTTED_PLANT = 30;
-const Z_STUMP = 10;
+const Z_ROW_BASE = 50;
+const Z_ROW_STEP = 5;
+const MAX_RELAXATION_PASSES = 10;
 
-// ─── Output Type ─────────────────────────────────────────────────────────────
+// ─── Internal Types ─────────────────────────────────────────────────────────
 
-interface ForestLayoutResult {
-	readonly items: readonly PositionedForestItem[];
-	readonly oakPosition: PositionedForestItem | null;
-	readonly shelfY: number;
-}
+type IssuePriority = ForestLayoutItem['priority'];
 
-// ─── Internal Types ───────────────────────────────────────────────────────────
-
-type IssuePriority = 'low' | 'medium' | 'high' | 'top' | null;
-
-interface ClassifiedItems {
-	readonly oak: ForestLayoutItem | null;
-	readonly trees: readonly ForestLayoutItem[];
-	readonly stumps: readonly ForestLayoutItem[];
-	readonly pottedPlants: readonly ForestLayoutItem[];
-}
-
-// ─── Internal Layout Helpers ─────────────────────────────────────────────────
+// ─── Priority Sorting ───────────────────────────────────────────────────────
 
 function priorityRank(priority: IssuePriority): number {
 	switch (priority) {
@@ -90,116 +54,63 @@ function sortByPriorityThenOrder(items: readonly ForestLayoutItem[]): ForestLayo
 	});
 }
 
-function isStump(item: ForestLayoutItem): boolean {
-	return item.kind === 'tree' && item.stage === 'stump';
+// ─── Classification ─────────────────────────────────────────────────────────
+
+function isOak(item: ForestLayoutItem): item is ForestLayoutItemOak {
+	return item.kind === 'oak';
 }
 
-/** Capacity of ring at given index. Progressive: 3, 5, 7, 9, ... */
-function ringCapacityAt(ringIndex: number): number {
-	return 3 + ringIndex * 2;
-}
-
-/** Count rings required to hold `treeCount` items using the progressive capacity formula. */
-function countTreeRings(treeCount: number): number {
-	if (treeCount === 0) {
+function getDepthRow(item: ForestLayoutItem): number {
+	if (item.kind === 'oak') {
 		return 0;
 	}
-	let ringIndex = 0;
-	let remaining = treeCount;
-	while (remaining > 0) {
-		remaining -= ringCapacityAt(ringIndex);
-		ringIndex++;
-	}
-	return ringIndex;
+	return Math.min(item.depthRow, MAX_DEPTH_ROWS - 1);
 }
 
-function classifyItems(items: readonly ForestLayoutItem[]): ClassifiedItems {
-	let oak: ForestLayoutItem | null = null;
-	const trees: ForestLayoutItem[] = [];
-	const stumps: ForestLayoutItem[] = [];
-	const pottedPlants: ForestLayoutItem[] = [];
-
-	for (const item of items) {
-		if (item.kind === 'oak') {
-			oak = item;
-		} else if (item.kind === 'potted-plant') {
-			pottedPlants.push(item);
-		} else if (isStump(item)) {
-			stumps.push(item);
-		} else {
-			trees.push(item);
-		}
-	}
-
-	return { oak, trees: sortByPriorityThenOrder(trees), stumps, pottedPlants };
-}
+// ─── Row Placement ──────────────────────────────────────────────────────────
 
 /**
- * Distribute `count` items evenly along a semicircle arc (PI radians, left to right).
- * Returns angles in radians from PI (left) to 0 (right).
+ * Compute the x-position for an item using left-right alternation from a row center.
+ * Index 0 -> left (1 unit), index 1 -> right (1 unit),
+ * index 2 -> left (2 units), index 3 -> right (2 units), etc.
  */
-function semicircleAngles(count: number): number[] {
-	if (count === 1) {
-		return [Math.PI / 2]; // center
+function computeAlternatingX(itemIndex: number, rowCenterX: number, treeSpacing: number): number {
+	const spacingUnits = Math.ceil((itemIndex + 1) / 2);
+	const isLeft = itemIndex % 2 === 0;
+	if (isLeft) {
+		return rowCenterX - spacingUnits * treeSpacing;
 	}
-	const angles: number[] = [];
-	for (let i = 0; i < count; i++) {
-		angles.push(Math.PI - (i * Math.PI) / (count - 1));
-	}
-	return angles;
+	return rowCenterX + spacingUnits * treeSpacing;
 }
 
-/**
- * Place items on concentric semicircle rings below a center point.
- * Returns positioned items with scale/opacity/zIndex.
- */
-function placeOnSemicircles(
+function placeRowItems(
 	items: readonly ForestLayoutItem[],
-	centerX: number,
-	centerY: number,
-	viewportWidth: number,
+	depthRow: number,
+	viewportCenterX: number,
+	groundY: number,
+	treeSpacing: number,
+	viewportHeight: number,
 ): PositionedForestItem[] {
-	if (items.length === 0) {
-		return [];
-	}
+	const rowCenterX = viewportCenterX + depthRow * treeSpacing * ROW_X_OFFSET_FRACTION;
+	const rowY = groundY - depthRow * viewportHeight * ROW_SPACING_Y_FRACTION;
+	const scale = ROW_SCALE_FACTOR ** depthRow;
+	const opacity = ROW_OPACITY_FACTOR ** depthRow;
+	const zIndex = Z_ROW_BASE - depthRow * Z_ROW_STEP;
 
-	const baseRadius = viewportWidth * BASE_RING_RADIUS_FRACTION;
-	const radiusStep = viewportWidth * RING_RADIUS_STEP_FRACTION;
-	const result: PositionedForestItem[] = [];
-
-	let itemIndex = 0;
-	let ringIndex = 0;
-
-	while (itemIndex < items.length) {
-		const capacity = Math.min(ringCapacityAt(ringIndex), items.length - itemIndex);
-		const ringItems = items.slice(itemIndex, itemIndex + capacity);
-		const radius = baseRadius + ringIndex * radiusStep;
-		const angles = semicircleAngles(ringItems.length);
-		const scale = TREE_SCALE_PER_RING[Math.min(ringIndex, TREE_SCALE_PER_RING.length - 1)];
-
-		for (let i = 0; i < ringItems.length; i++) {
-			const angle = angles[i];
-			result.push({
-				id: ringItems[i].id,
-				x: centerX + radius * Math.cos(angle),
-				y: centerY + radius * Math.sin(angle) * SEMICIRCLE_VERTICAL_FLATTEN,
-				scale,
-				opacity: 1.0,
-				zIndex: Z_TREE_BASE + (TREE_SCALE_PER_RING.length - ringIndex),
-			});
-		}
-
-		itemIndex += capacity;
-		ringIndex++;
-	}
-
-	return result;
+	return items.map((item, index) => ({
+		id: item.id,
+		x: computeAlternatingX(index, rowCenterX, treeSpacing),
+		y: rowY,
+		scale,
+		opacity,
+		zIndex,
+		rowIndex: depthRow,
+	}));
 }
 
-/**
- * Ensure no two items are closer than MIN_SPACING_PX by nudging outward.
- * Iterative relaxation -- bounded by MAX_RELAXATION_PASSES.
- */
+// ─── Collision Avoidance ────────────────────────────────────────────────────
+
+// fallow-ignore-next-line complexity
 function enforceMinimumSpacing(
 	items: PositionedForestItem[],
 	centerX: number,
@@ -232,7 +143,6 @@ function enforceMinimumSpacing(
 					};
 					adjusted = true;
 				} else if (dist === 0) {
-					// Coincident points -- nudge apart along direction from center
 					const angleFromCenter = Math.atan2(
 						positions[i].y - centerY,
 						positions[i].x - centerX,
@@ -260,103 +170,97 @@ function enforceMinimumSpacing(
 	return positions;
 }
 
-// ─── Section Placers ─────────────────────────────────────────────────────────
+// ─── Layout Engine ──────────────────────────────────────────────────────────
 
-function placeOak(oak: ForestLayoutItem, centerX: number, oakY: number): PositionedForestItem {
-	return {
-		id: oak.id,
-		x: centerX,
-		y: oakY,
-		scale: 1.0,
-		opacity: 1.0,
-		zIndex: Z_OAK,
-	};
-}
-
-function placeStumps(
-	stumps: readonly ForestLayoutItem[],
-	treeCount: number,
-	centerX: number,
-	treeCenterY: number,
-	viewportWidth: number,
-): PositionedForestItem[] {
-	if (stumps.length === 0) {
-		return [];
-	}
-
-	const treeRingCount = countTreeRings(treeCount) || 1;
-	const baseRadius = viewportWidth * BASE_RING_RADIUS_FRACTION;
-	const radiusStep = viewportWidth * RING_RADIUS_STEP_FRACTION;
-	const stumpRadius = baseRadius + (treeRingCount + 0.5) * radiusStep;
-	const stumpAngles = semicircleAngles(stumps.length);
-
-	return stumps.map((stump, i) => ({
-		id: stump.id,
-		x: centerX + stumpRadius * Math.cos(stumpAngles[i]),
-		y: treeCenterY + stumpRadius * Math.sin(stumpAngles[i]) * SEMICIRCLE_VERTICAL_FLATTEN,
-		scale: STUMP_SCALE,
-		opacity: STUMP_OPACITY,
-		zIndex: Z_STUMP,
-	}));
-}
-
-function placePottedPlants(
-	pottedPlants: readonly ForestLayoutItem[],
-	centerX: number,
-	shelfY: number,
-	viewportWidth: number,
-): PositionedForestItem[] {
-	if (pottedPlants.length === 0) {
-		return [];
-	}
-
-	const margin = viewportWidth * SHELF_MARGIN_FRACTION;
-	const availableWidth = viewportWidth - 2 * margin;
-	const spacing = pottedPlants.length > 1 ? availableWidth / (pottedPlants.length - 1) : 0;
-	const startX = pottedPlants.length > 1 ? margin : centerX;
-
-	return pottedPlants.map((plant, i) => ({
-		id: plant.id,
-		x: startX + i * spacing,
-		y: shelfY,
-		scale: POTTED_PLANT_SCALE,
-		opacity: 1.0,
-		zIndex: Z_POTTED_PLANT,
-	}));
-}
-
-// ─── Layout Engine ───────────────────────────────────────────────────────────
-
+// fallow-ignore-next-line complexity
 export function computeForestLayout(
 	items: readonly ForestLayoutItem[],
 	viewport: Viewport,
 ): ForestLayoutResult {
+	const groundY = viewport.height * GROUND_Y_FRACTION;
+
 	if (items.length === 0) {
-		return { items: [], oakPosition: null, shelfY: viewport.height * SHELF_Y_FRACTION };
+		return { items: [], oakPosition: null, groundY };
 	}
 
-	const { oak, trees, stumps, pottedPlants } = classifyItems(items);
 	const centerX = viewport.width / 2;
-	const shelfY = viewport.height * SHELF_Y_FRACTION;
-	const oakY = viewport.height * OAK_Y_FRACTION;
+	const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
 
-	const treeCenterY = oak
-		? oakY + viewport.height * TREE_CENTER_OFFSET_FRACTION
-		: viewport.height * TREE_CENTER_NO_OAK_FRACTION;
+	// Separate oak from the rest
+	let oak: ForestLayoutItemOak | null = null;
+	const nonOakItems: ForestLayoutItem[] = [];
 
-	const allPositioned: PositionedForestItem[] = [
-		...(oak ? [placeOak(oak, centerX, oakY)] : []),
-		...placeOnSemicircles(trees, centerX, treeCenterY, viewport.width),
-		...placeStumps(stumps, trees.length, centerX, treeCenterY, viewport.width),
-		...placePottedPlants(pottedPlants, centerX, shelfY, viewport.width),
-	];
+	for (const item of items) {
+		if (isOak(item)) {
+			oak = item;
+		} else {
+			nonOakItems.push(item);
+		}
+	}
 
-	const resolved = enforceMinimumSpacing(allPositioned, centerX, treeCenterY);
-	const resolvedOak = oak ? (resolved.find((item) => item.id === oak.id) ?? null) : null;
+	// Place oak
+	let oakPositioned: PositionedForestItem | null = null;
+	if (oak) {
+		oakPositioned = {
+			id: oak.id,
+			x: centerX,
+			y: groundY,
+			scale: 1.0,
+			opacity: 1.0,
+			zIndex: Z_OAK,
+			rowIndex: 0,
+		};
+	}
+
+	// Group non-oak items by depthRow (clamped)
+	const rowGroups = new Map<number, ForestLayoutItem[]>();
+	for (const item of nonOakItems) {
+		const row = getDepthRow(item);
+		const group = rowGroups.get(row);
+		if (group) {
+			group.push(item);
+		} else {
+			rowGroups.set(row, [item]);
+		}
+	}
+
+	// Sort each row by priority then sortOrder
+	for (const [row, group] of rowGroups) {
+		rowGroups.set(row, sortByPriorityThenOrder(group));
+	}
+
+	// Place items row by row
+	const allPositioned: PositionedForestItem[] = [];
+
+	if (oakPositioned) {
+		allPositioned.push(oakPositioned);
+	}
+
+	// Sort row keys for deterministic processing
+	const sortedRows = [...rowGroups.keys()].sort((a, b) => a - b);
+
+	for (const depthRow of sortedRows) {
+		const rowItems = rowGroups.get(depthRow)!;
+		const positioned = placeRowItems(
+			rowItems,
+			depthRow,
+			centerX,
+			groundY,
+			treeSpacing,
+			viewport.height,
+		);
+		allPositioned.push(...positioned);
+	}
+
+	// Apply collision avoidance
+	const resolved = enforceMinimumSpacing(allPositioned, centerX, groundY);
+
+	// Find oak in resolved results
+	const resolvedOak = oak ? (resolved.find((item) => item.id === oak!.id) ?? null) : null;
 
 	return {
 		items: resolved,
 		oakPosition: resolvedOak,
-		shelfY,
+		groundY,
 	};
 }
