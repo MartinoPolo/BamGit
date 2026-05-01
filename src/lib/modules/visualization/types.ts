@@ -134,6 +134,7 @@ export interface ForestLayoutItemTree {
 	readonly stage: TreeStage;
 	readonly priority: IssuePriority;
 	readonly sortOrder: number;
+	readonly depthRow: number;
 }
 
 export interface ForestLayoutItemPottedPlant {
@@ -142,6 +143,7 @@ export interface ForestLayoutItemPottedPlant {
 	readonly stage: PottedPlantStage;
 	readonly priority: IssuePriority;
 	readonly sortOrder: number;
+	readonly depthRow: number;
 }
 
 export type ForestLayoutItem =
@@ -156,4 +158,11 @@ export interface PositionedForestItem {
 	readonly scale: number;
 	readonly opacity: number;
 	readonly zIndex: number;
+	readonly rowIndex: number;
+}
+
+export interface ForestLayoutResult {
+	readonly items: readonly PositionedForestItem[];
+	readonly oakPosition: PositionedForestItem | null;
+	readonly groundY: number;
 }

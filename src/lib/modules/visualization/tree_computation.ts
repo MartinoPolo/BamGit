@@ -184,6 +184,7 @@ const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
 
 // ─── Tool Visibility Computation ────────────────────────────────────────────
 
+// fallow-ignore-next-line complexity
 function computeToolVisibility(dimensions: StateDimensions): ToolVisibility {
 	const tools = createDefaultToolVisibility();
 

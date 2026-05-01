@@ -205,6 +205,9 @@
 	--sidebar-bg: oklch(0.955 0.01 135);
 	--sidebar-fg: oklch(0.3 0.02 145);
 	--code-bg: oklch(0.955 0.01 135);
+	--sky-top: var(--sky-light-top);
+	--sky-bot: var(--sky-light-bot);
+	--ground-color: oklch(0.55 0.09 135);
 }
 
 [data-theme='dark'] {
@@ -228,6 +231,9 @@
 	--sidebar-bg: oklch(0.18 0.022 150);
 	--sidebar-fg: oklch(0.77 0.02 140);
 	--code-bg: oklch(0.215 0.02 150);
+	--sky-top: var(--sky-dark-top);
+	--sky-bot: var(--sky-dark-bot);
+	--ground-color: oklch(0.3 0.06 140);
 }
 
 /* ── Accent color overrides ─────────────────────────────────────────────── */
