@@ -53,6 +53,7 @@
 
 	let createDialogOpen = $state(false);
 	let nextAvailableColor = $state<string>(FALLBACK_ISSUE_COLOR);
+	let usedColors = $state<string[]>([]);
 	let editingIssue = $state<Issue | null>(null);
 	let allExpanded = $state(false);
 	let pruneDialogOpen = $state(false);
@@ -115,12 +116,28 @@
 		await versionControlStore.syncAll(dashboardId, githubRepoParts.owner, githubRepoParts.repo);
 	}
 
+	async function loadUsedColors(): Promise<void> {
+		usedColors = [];
+		const dashboardId = boardStore.activeDashboardId;
+		if (dashboardId !== null) {
+			try {
+				usedColors = await boardStore.getUsedColors(dashboardId);
+			} catch {
+				usedColors = [];
+			}
+		}
+	}
+
 	async function openCreateDialog() {
 		createDialogOpen = true;
 		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId !== null) {
 			try {
-				nextAvailableColor = await boardStore.getNextColor(dashboardId);
+				const [color] = await Promise.all([
+					boardStore.getNextColor(dashboardId),
+					loadUsedColors(),
+				]);
+				nextAvailableColor = color;
 			} catch {
 				nextAvailableColor = activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
 			}
@@ -361,7 +378,10 @@
 				getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
 				onArchive={handleArchiveIssue}
 				onUnarchive={handleUnarchiveIssue}
-				onEdit={(issue) => (editingIssue = issue)}
+				onEdit={async (issue) => {
+					await loadUsedColors();
+					editingIssue = issue;
+				}}
 				onDelete={handleDeleteIssue}
 				onSetupWorktree={handleSetupWorktree}
 				onRemoveWorktree={handleRemoveWorktree}
@@ -382,6 +402,8 @@
 		dashboardId={boardStore.activeDashboard.id}
 		paletteColors={activePaletteColors}
 		defaultColor={nextAvailableColor}
+		{usedColors}
+		isDarkMode={boardStore.theme.isDark}
 		onClose={() => (createDialogOpen = false)}
 		onCreate={handleCreateIssue}
 	/>
@@ -389,6 +411,8 @@
 	<IssueEditDialog
 		issue={editingIssue}
 		paletteColors={activePaletteColors}
+		{usedColors}
+		isDarkMode={boardStore.theme.isDark}
 		onClose={() => (editingIssue = null)}
 		onUpdate={handleUpdateIssue}
 	/>

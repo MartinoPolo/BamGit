@@ -11,5 +11,6 @@ pub mod portfolio_commands;
 pub mod seed_commands;
 pub mod session_commands;
 pub mod shared;
+pub mod terminal_commands;
 pub mod window_commands;
 pub mod worktree_commands;
