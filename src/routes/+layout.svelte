@@ -11,6 +11,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import {
 		setBoardContext,
+		setSelectionContext,
 		type CreateDashboardRequest,
 		type UpdateDashboardRequest,
 	} from '$lib/modules/board';
@@ -29,6 +30,7 @@
 
 	const windowCtx = setWindowContext();
 	const boardStore = setBoardContext();
+	setSelectionContext();
 	const notificationsCtx = setNotificationsContext();
 	const sessionStore = setSessionsContext(notificationsCtx);
 	setIssuesContext();

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount, untrack } from 'svelte';
-	import { useBoard, FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
+	import { useBoard, useSelection, FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
 	import { useIssues } from '$lib/modules/issues';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { useActions } from '$lib/modules/actions';
@@ -17,6 +17,10 @@
 	import TopBar from '$lib/components/TopBar.svelte';
 	import IssueCardList from '$lib/components/IssueCardList.svelte';
 	import ForestView from '$lib/components/ForestView.svelte';
+	import WorkspaceDashboardLayout from '$lib/components/WorkspaceDashboardLayout.svelte';
+	import WorkspaceBottomPanel from '$lib/components/WorkspaceBottomPanel.svelte';
+	import { computeVisualization } from '$lib/modules/visualization';
+	import type { TreeVisualization } from '$lib/modules/visualization';
 	import IssueCreateDialog from '$lib/components/IssueCreateDialog.svelte';
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
 	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
@@ -33,6 +37,7 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 	const commandPaletteCtx = useCommandPalette();
+	const selection = useSelection();
 
 	function getNotificationDotColor(issueId: string): string | null {
 		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
@@ -248,7 +253,27 @@
 			pruneRemoving = false;
 		}
 	}
+
+	function getVisualization(issueId: string): TreeVisualization | undefined {
+		const issue = forestIssues.find((i) => i.id === issueId);
+		if (issue === undefined) {
+			return undefined;
+		}
+		return computeVisualization(
+			issue,
+			versionControlStore.getState(issueId),
+			sessionStore.sessionsByIssueId.get(issueId) ?? [],
+		);
+	}
+
+	function handlePageKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && boardStore.viewMode === 'forest') {
+			selection.deselect();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handlePageKeydown} />
 
 {#if boardStore.loading}
 	<p class="text-muted-foreground">{m.loading()}</p>
@@ -283,30 +308,45 @@
 		</button>
 	</TopBar>
 
-	<div class="flex flex-col gap-4 p-5">
-		<!-- gh CLI setup banner -->
-		{#if githubRepoParts && versionControlStore.ghAvailability !== 'available'}
-			<GhSetupBanner availability={versionControlStore.ghAvailability} />
-		{/if}
-
-		<!-- Issue list or empty state -->
-		{#if issueStore.loading}
+	{#if issueStore.loading}
+		<div class="p-5">
 			<p class="text-muted-foreground">{m.loading_issues()}</p>
-		{:else if issueStore.error}
+		</div>
+	{:else if issueStore.error}
+		<div class="p-5">
 			<p class="text-destructive">{m.error_prefix({ message: issueStore.error })}</p>
-		{:else if issueStore.activeIssues.length === 0 && issueStore.archivedIssues.length === 0}
+		</div>
+	{:else if issueStore.activeIssues.length === 0 && issueStore.archivedIssues.length === 0}
+		<div class="p-5">
 			<EmptyIssueState onAddIssue={openCreateDialog} />
-		{:else if boardStore.viewMode === 'kanban'}
+		</div>
+	{:else if boardStore.viewMode === 'kanban'}
+		<div class="p-5">
 			<p class="text-muted-foreground">{m.kanban_coming_soon()}</p>
-		{:else if boardStore.viewMode === 'forest'}
-			<ForestView
-				issues={forestIssues}
-				getGitStatus={(issueId) => versionControlStore.getState(issueId)}
-				getSessionsForIssue={(issueId) => sessionStore.sessionsByIssueId.get(issueId) ?? []}
-				onSelectIssue={(issue) => (editingIssue = issue)}
-				onAddIssue={openCreateDialog}
-			/>
-		{:else}
+		</div>
+	{:else if boardStore.viewMode === 'forest'}
+		<div class="flex-1 overflow-hidden">
+			<WorkspaceDashboardLayout>
+				{#snippet forestPanel()}
+					<ForestView
+						issues={forestIssues}
+						getGitStatus={(issueId) => versionControlStore.getState(issueId)}
+						getSessionsForIssue={(issueId) =>
+							sessionStore.sessionsByIssueId.get(issueId) ?? []}
+						onAddIssue={openCreateDialog}
+					/>
+				{/snippet}
+				{#snippet bottomPanel()}
+					<WorkspaceBottomPanel issues={forestIssues} {getVisualization} />
+				{/snippet}
+			</WorkspaceDashboardLayout>
+		</div>
+	{:else}
+		<div class="flex flex-col gap-4 p-5">
+			{#if githubRepoParts && versionControlStore.ghAvailability !== 'available'}
+				<GhSetupBanner availability={versionControlStore.ghAvailability} />
+			{/if}
+
 			<IssueCardList
 				parentIssues={issueStore.parentIssues}
 				archivedIssues={issueStore.archivedIssues}
@@ -327,16 +367,15 @@
 				onRemoveWorktree={handleRemoveWorktree}
 				onExecuteAction={handleExecuteAction}
 			/>
-		{/if}
 
-		<!-- Assigned issues panel -->
-		{#if versionControlStore.assignedIssues.length > 0}
-			<AssignedIssuesPanel
-				issues={versionControlStore.assignedIssues}
-				disabled={versionControlStore.isGhAvailable !== true}
-			/>
-		{/if}
-	</div>
+			{#if versionControlStore.assignedIssues.length > 0}
+				<AssignedIssuesPanel
+					issues={versionControlStore.assignedIssues}
+					disabled={versionControlStore.isGhAvailable !== true}
+				/>
+			{/if}
+		</div>
+	{/if}
 
 	<IssueCreateDialog
 		open={createDialogOpen}

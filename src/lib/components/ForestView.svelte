@@ -25,17 +25,16 @@
 	import SproutIcon from '@lucide/svelte/icons/sprout';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
 	import ForestContextMenu from './ForestContextMenu.svelte';
-	import { setForestInteractionContext } from '$lib/modules/visualization';
+	import { useSelection } from '$lib/modules/board';
 
 	interface Props {
 		issues: readonly Issue[];
 		getGitStatus: (issueId: string) => GitStatusCache | undefined;
 		getSessionsForIssue: (issueId: string) => readonly SessionForMapping[];
-		onSelectIssue?: (issue: Issue) => void;
 		onAddIssue?: () => void;
 	}
 
-	let { issues, getGitStatus, getSessionsForIssue, onSelectIssue, onAddIssue }: Props = $props();
+	let { issues, getGitStatus, getSessionsForIssue, onAddIssue }: Props = $props();
 
 	const TREE_NATURAL_WIDTH = 100;
 	const TREE_NATURAL_HEIGHT = 100;
@@ -47,7 +46,7 @@
 	let viewportWidth = $state(0);
 	let viewportHeight = $state(0);
 
-	const interaction = setForestInteractionContext();
+	const interaction = useSelection();
 
 	let contextMenu = $state<{ x: number; y: number; issueId: string } | null>(null);
 
@@ -96,6 +95,11 @@
 			map.set(entry.issue.id, entry);
 		}
 		return map;
+	});
+
+	$effect(() => {
+		const oakEntry = entries.find((entry) => entry.visualization.kind === 'oak');
+		interaction.setPrdIssueId(oakEntry?.issue.id ?? null);
 	});
 
 	const layoutResult = $derived(
@@ -178,11 +182,7 @@
 	}
 
 	function handleTreeClick(entry: IssueEntry) {
-		const wasSelected = interaction.selectedIssueId === entry.issue.id;
 		interaction.selectIssue(entry.issue.id);
-		if (!wasSelected) {
-			onSelectIssue?.(entry.issue);
-		}
 	}
 
 	function handleContextMenu(event: MouseEvent, entry: IssueEntry) {
@@ -221,7 +221,7 @@
 	bind:clientWidth={viewportWidth}
 	bind:clientHeight={viewportHeight}
 	style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
-	style:min-height="300px"
+	style:min-height="0"
 	onkeydown={handleKeydown}
 	tabindex="0"
 >
