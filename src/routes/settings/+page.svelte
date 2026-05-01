@@ -5,7 +5,25 @@
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import type { ColorPalette } from '$lib/types/generated';
+	import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
+	import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
 	const boardStore = useBoard();
+
+	function isHexColor(value: unknown): value is string {
+		return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
+	}
+
+	const hoverGlowColor = new Persisted<string>({
+		key: 'grovekeeper_hover_glow_color',
+		serde: stringSerde(isHexColor),
+		defaultValue: GLOW_COLORS.yellow,
+	});
+
+	const selectedGlowColor = new Persisted<string>({
+		key: 'grovekeeper_selected_glow_color',
+		serde: stringSerde(isHexColor),
+		defaultValue: GLOW_COLORS.blue,
+	});
 
 	let creating = $state(false);
 	let newPaletteName = $state('');
@@ -156,6 +174,54 @@
 					{color}
 				</button>
 			{/each}
+		</div>
+	</section>
+
+	<!-- Forest Glow Colors Section -->
+	<section class="space-y-4">
+		<h2 class="text-lg font-medium">Forest Glow Colors</h2>
+		<p class="text-sm text-muted-foreground">
+			Customize the glow colors for tree hover and selection in the forest view.
+		</p>
+		<div class="flex flex-wrap gap-6">
+			<div class="space-y-1">
+				<label for="hover-glow-color" class="text-xs text-muted-foreground"
+					>Hover Glow</label
+				>
+				<div class="flex items-center gap-2">
+					<input
+						id="hover-glow-color"
+						type="color"
+						value={hoverGlowColor.current}
+						onchange={(e) => {
+							hoverGlowColor.current = e.currentTarget.value;
+						}}
+						class="h-8 w-12 cursor-pointer rounded border border-input bg-transparent"
+					/>
+					<span class="font-mono text-xs text-muted-foreground"
+						>{hoverGlowColor.current}</span
+					>
+				</div>
+			</div>
+			<div class="space-y-1">
+				<label for="selected-glow-color" class="text-xs text-muted-foreground"
+					>Selected Glow</label
+				>
+				<div class="flex items-center gap-2">
+					<input
+						id="selected-glow-color"
+						type="color"
+						value={selectedGlowColor.current}
+						onchange={(e) => {
+							selectedGlowColor.current = e.currentTarget.value;
+						}}
+						class="h-8 w-12 cursor-pointer rounded border border-input bg-transparent"
+					/>
+					<span class="font-mono text-xs text-muted-foreground"
+						>{selectedGlowColor.current}</span
+					>
+				</div>
+			</div>
 		</div>
 	</section>
 
