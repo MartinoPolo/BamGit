@@ -259,6 +259,14 @@ function createBoardContext() {
 			return invoke('get_next_available_color', { dashboardId });
 		},
 
+		async getUsedColors(dashboardId: string): Promise<string[]> {
+			return invoke('get_used_colors_for_dashboard', { dashboardId });
+		},
+
+		async openTerminal(folderPath: string, tabColor?: string): Promise<void> {
+			return invoke('open_terminal', { folderPath, tabColor: tabColor ?? null });
+		},
+
 		async createPalette(request: CreateColorPaletteRequest): Promise<ColorPalette> {
 			return invoke('create_color_palette', { request });
 		},

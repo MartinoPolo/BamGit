@@ -84,8 +84,9 @@
 
 <div
 	class="group flex rounded border border-l-[3px] border-border transition-colors {priorityBorderClass} {isArchived
-		? 'opacity-50'
+		? ''
 		: 'hover:border-input'}"
+	style={isArchived ? 'filter: grayscale(0.8) opacity(0.7)' : undefined}
 	class:ml-6={indented}
 >
 	<!-- Tree connector for nested children -->

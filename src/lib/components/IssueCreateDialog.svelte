@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Select } from '$lib/components/ui/select/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import PaletteColorPicker from './PaletteColorPicker.svelte';
+	import { ColorPicker } from './color-picker/index.js';
 	import { buildCreateIssueRequest } from './dialog_helpers.js';
 
 	interface Props {
@@ -14,11 +14,22 @@
 		dashboardId: string;
 		paletteColors: string[];
 		defaultColor: string;
+		usedColors?: string[];
+		isDarkMode?: boolean;
 		onClose: () => void;
 		onCreate: (request: CreateIssueRequest) => void;
 	}
 
-	let { open, dashboardId, paletteColors, defaultColor, onClose, onCreate }: Props = $props();
+	let {
+		open,
+		dashboardId,
+		paletteColors,
+		defaultColor,
+		usedColors = [],
+		isDarkMode = false,
+		onClose,
+		onCreate,
+	}: Props = $props();
 
 	let name = $state('');
 	let priority = $state<'low' | 'medium' | 'high' | 'top' | ''>('');
@@ -90,10 +101,19 @@
 					</Select>
 				</div>
 
-				<PaletteColorPicker
+				<ColorPicker
+					variant="palette-hex-native"
 					colors={paletteColors}
 					selectedColor={color}
-					onSelect={(c) => (color = c)}
+					{usedColors}
+					{isDarkMode}
+					onSelect={(c) => {
+						if (c === '') {
+							color = defaultColor;
+						} else {
+							color = c;
+						}
+					}}
 				/>
 
 				<div class="flex flex-col gap-1.5">
