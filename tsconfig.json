@@ -11,7 +11,8 @@
 		"rewriteRelativeImportExtensions": true,
 		"strict": true,
 		"moduleResolution": "bundler"
-	}
+	},
+	"exclude": ["../../low-poly-2d-trees/dist/**"]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	// except $lib which is handled by https://kit.svelte.dev/docs/configuration#files
 	//
