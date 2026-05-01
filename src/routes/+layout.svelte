@@ -40,7 +40,7 @@
 	let editingDashboard = $state<Dashboard | null>(null);
 
 	onMount(() => {
-		boardStore.loadDashboards();
+		boardStore.loadDashboards(windowCtx.isWorkspace ? windowCtx.boundDashboardId : null);
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));
 		void preloadCode(resolve('/overview'));

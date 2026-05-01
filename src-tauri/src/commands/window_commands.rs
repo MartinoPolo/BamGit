@@ -1,5 +1,5 @@
 use rusqlite::Row;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 
 use crate::database::connection::DatabaseState;
 use crate::models::app_setting::AppSetting;
@@ -54,7 +54,7 @@ pub fn restore_workspace_windows(app: &AppHandle, state: &DatabaseState) {
         if let Err(error) = window_manager::open_or_focus_window_with_position(
             app,
             &binding.window_label,
-            "/",
+            "index.html",
             &title,
             width,
             height,
@@ -81,18 +81,18 @@ fn binding_from_row(row: &Row) -> Result<WindowWorkspaceBinding, rusqlite::Error
 }
 
 #[tauri::command]
-pub fn open_workspace_window(
+pub async fn open_workspace_window(
     app: AppHandle,
-    state: State<DatabaseState>,
     dashboard_id: String,
 ) -> Result<(), String> {
+    let state = app.state::<DatabaseState>();
     let connection = state.read()?;
 
     let name: String = connection
         .query_row(
             "SELECT name FROM dashboards WHERE id = ?1",
             [&dashboard_id],
-            |row| row.get(0),
+            |row: &Row| row.get(0),
         )
         .map_err(|_| "ERR_DASHBOARD_NOT_FOUND".to_string())?;
 
@@ -120,7 +120,7 @@ pub fn open_workspace_window(
 
     let saved_x = saved_binding.as_ref().and_then(|b| b.window_x);
     let saved_y = saved_binding.as_ref().and_then(|b| b.window_y);
-    window_manager::open_or_focus_window_with_position(&app, &label, "/", &title, width, height, saved_x, saved_y)?;
+    window_manager::open_or_focus_window_with_position(&app, &label, "index.html", &title, width, height, saved_x, saved_y)?;
 
     let connection = state.write()?;
     connection
@@ -135,13 +135,13 @@ pub fn open_workspace_window(
 }
 
 #[tauri::command]
-pub fn close_workspace_window(
+pub async fn close_workspace_window(
     app: AppHandle,
-    state: State<DatabaseState>,
     window_label: String,
 ) -> Result<(), String> {
     window_manager::close_window(&app, &window_label)?;
 
+    let state = app.state::<DatabaseState>();
     let connection = state.write()?;
     connection
         .execute(

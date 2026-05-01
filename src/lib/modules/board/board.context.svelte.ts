@@ -154,7 +154,7 @@ function createBoardContext() {
 			showCreateDialog = value;
 		},
 
-		async loadDashboards() {
+		async loadDashboards(preferredDashboardId?: string | null) {
 			try {
 				loading = true;
 				dashboards = await invoke<Dashboard[]>('get_dashboards');
@@ -162,7 +162,7 @@ function createBoardContext() {
 
 				activeDashboardId = selectActiveDashboardId(
 					dashboards,
-					localStorage.getItem(LAST_VIEWED_KEY),
+					preferredDashboardId ?? localStorage.getItem(LAST_VIEWED_KEY),
 				);
 			} catch (err) {
 				error = String(err);

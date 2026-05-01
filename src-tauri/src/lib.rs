@@ -46,7 +46,7 @@ pub fn run() {
                             let _ = window_manager::open_or_focus_window(
                                 app_handle,
                                 &label,
-                                "/",
+                                "index.html",
                                 APP_NAME,
                                 DEFAULT_WINDOW_WIDTH,
                                 DEFAULT_WINDOW_HEIGHT,
