@@ -10,6 +10,8 @@ use crate::models::github::{
     GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, SyncAllResult,
 };
 
+use super::dependency_commands;
+
 fn upsert_cache(connection: &Connection, cache: &GitStatusCache) -> Result<(), String> {
     connection
         .execute(
@@ -122,7 +124,7 @@ fn build_bulk_sync_graphql_query(
 
     for (index, &number) in issue_numbers.iter().enumerate() {
         fragments.push(format!(
-            "issue_{index}: issue(number: {number}) {{ state url labels(first: 20) {{ nodes {{ name color }} }} }}"
+            "issue_{index}: issue(number: {number}) {{ state url body labels(first: 20) {{ nodes {{ name color }} }} }}"
         ));
     }
 
@@ -143,6 +145,27 @@ fn build_bulk_sync_graphql_query(
         "query {{ repository(owner: \"{safe_owner}\", name: \"{safe_repo}\") {{ {fragments} }} }}",
         fragments = fragments.join(" ")
     )
+}
+
+/// Parse blocking relationship patterns from a GitHub issue body.
+/// Returns GitHub issue numbers that this issue is blocked by.
+/// Recognized patterns: "Blocked by #N", "Depends on #N", "- Blocked by #N (...)"
+fn parse_blocked_by_numbers(body: &str) -> Vec<i64> {
+    let mut results = Vec::new();
+    for line in body.lines() {
+        let trimmed = line.trim().trim_start_matches("- ");
+        let lower = trimmed.to_lowercase();
+        for prefix in &["blocked by #", "depends on #"] {
+            if let Some(rest) = lower.strip_prefix(prefix) {
+                if let Some(number_str) = rest.split(|c: char| !c.is_ascii_digit()).next() {
+                    if let Ok(number) = number_str.parse::<i64>() {
+                        results.push(number);
+                    }
+                }
+            }
+        }
+    }
+    results
 }
 
 // --- Tauri commands ---
@@ -367,9 +390,16 @@ pub async fn sync_all_github_state(
         .and_then(|d| d.get("repository"))
         .ok_or("GraphQL response missing data.repository")?;
 
+    // Build github_number → issue_id lookup for dependency resolution
+    let number_to_issue_id: std::collections::HashMap<i64, String> = issues_data
+        .iter()
+        .filter_map(|(id, number, _)| number.map(|n| (n, id.clone())))
+        .collect();
+
     // Parse all results first (no DB lock needed)
     let mut caches_to_write = Vec::with_capacity(syncable.len());
     let mut labels_to_write: Vec<(String, Option<String>)> = Vec::with_capacity(syncable.len());
+    let mut dependency_edges: Vec<(String, String)> = Vec::new();
 
     for (index, (issue_id, _, _)) in syncable.iter().enumerate() {
         let mut github_issue_state = None;
@@ -391,6 +421,16 @@ pub async fn sync_all_github_state(
                 .and_then(|n| n.as_array())
             {
                 labels_json = Some(parse_label_nodes_to_json(label_nodes));
+            }
+
+            if let Some(body) = issue_data.get("body").and_then(|b| b.as_str()) {
+                let blocked_by_numbers = parse_blocked_by_numbers(body);
+                let blocked_issue_id = issue_id;
+                for blocker_number in blocked_by_numbers {
+                    if let Some(blocker_id) = number_to_issue_id.get(&blocker_number) {
+                        dependency_edges.push((blocker_id.clone(), blocked_issue_id.clone()));
+                    }
+                }
             }
         }
 
@@ -483,6 +523,12 @@ pub async fn sync_all_github_state(
                     errors.push(format!("Failed to update labels for {issue_id}: {error}"));
                 }
             }
+        }
+
+        if let Err(error) =
+            dependency_commands::replace_dependencies_for_dashboard(&connection, &dashboard_id, &dependency_edges)
+        {
+            errors.push(format!("Failed to sync dependencies: {error}"));
         }
     }
 
@@ -939,5 +985,61 @@ mod tests {
         let label_nodes: Vec<serde_json::Value> = vec![];
         let json = parse_label_nodes_to_json(&label_nodes);
         assert_eq!(json, "[]");
+    }
+
+    // --- Blocking relationship parser tests ---
+
+    #[test]
+    fn parse_blocked_by_single() {
+        let body = "## Blocking Relationships\n- Blocked by #122 (panel shell)";
+        let numbers = parse_blocked_by_numbers(body);
+        assert_eq!(numbers, vec![122]);
+    }
+
+    #[test]
+    fn parse_blocked_by_multiple() {
+        let body = "- Blocked by #122 (panel shell)\n- Blocked by #89 (issue data)";
+        let numbers = parse_blocked_by_numbers(body);
+        assert_eq!(numbers, vec![122, 89]);
+    }
+
+    #[test]
+    fn parse_depends_on() {
+        let body = "Depends on #42";
+        let numbers = parse_blocked_by_numbers(body);
+        assert_eq!(numbers, vec![42]);
+    }
+
+    #[test]
+    fn parse_blocked_by_case_insensitive() {
+        let body = "blocked by #10\nBLOCKED BY #20";
+        let numbers = parse_blocked_by_numbers(body);
+        assert_eq!(numbers, vec![10, 20]);
+    }
+
+    #[test]
+    fn parse_blocked_by_ignores_unrelated_lines() {
+        let body = "## Description\nThis implements #123\n\n## Blocking Relationships\n- Blocked by #89";
+        let numbers = parse_blocked_by_numbers(body);
+        assert_eq!(numbers, vec![89]);
+    }
+
+    #[test]
+    fn parse_blocked_by_empty_body() {
+        let numbers = parse_blocked_by_numbers("");
+        assert!(numbers.is_empty());
+    }
+
+    #[test]
+    fn parse_blocked_by_no_matches() {
+        let body = "This issue has no blocking relationships.";
+        let numbers = parse_blocked_by_numbers(body);
+        assert!(numbers.is_empty());
+    }
+
+    #[test]
+    fn graphql_query_includes_body_field() {
+        let query = build_bulk_sync_graphql_query("owner", "repo", &[1], &[None]);
+        assert!(query.contains("body"), "GraphQL query should fetch issue body for dependency parsing");
     }
 }
