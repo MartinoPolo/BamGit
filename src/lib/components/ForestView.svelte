@@ -11,9 +11,7 @@
 	import type {
 		TreeVisualization,
 		ForestLayoutItem,
-		PositionedForestItem,
 		SessionForMapping,
-		TreeContextMenuAction,
 	} from '$lib/modules/visualization';
 	import { SvelteMap } from 'svelte/reactivity';
 	import {
@@ -206,9 +204,7 @@
 		}
 	}
 
-	function handleContextMenuAction(_action: TreeContextMenuAction) {
-		// Placeholder — handlers wired in #89/#90/#91
-	}
+	function handleContextMenuAction() {}
 
 	const emptyStateTreeConfig: TreeConfig = {
 		...DEFAULT_TREE_CONFIG,
