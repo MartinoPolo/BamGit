@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input/index.js';
+
 	interface Props {
 		colors: string[];
 		selectedColor: string;
@@ -52,11 +54,10 @@
 				}}
 				class="h-8 w-8 cursor-pointer rounded border border-border bg-muted"
 			/>
-			<input
-				type="text"
+			<Input
 				bind:value={customColorInput}
 				placeholder="#ff0000"
-				class="w-24 rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
+				class="w-24 text-xs"
 				onkeydown={(event) => {
 					if (event.key === 'Enter') {
 						event.preventDefault();

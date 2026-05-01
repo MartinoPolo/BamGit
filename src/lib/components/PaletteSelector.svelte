@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { ColorPalette } from '$lib/types/generated';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Select } from '$lib/components/ui/select/index.js';
 
 	interface Props {
 		palettes: ColorPalette[];
@@ -15,15 +17,15 @@
 	);
 </script>
 
-<label class="flex flex-col gap-1">
-	<span class="text-xs text-muted-foreground">{m.palette_color_palette()}</span>
-	<select
+<div class="flex flex-col gap-1.5">
+	<Label for="palette-select">{m.palette_color_palette()}</Label>
+	<Select
+		id="palette-select"
 		value={selectedPaletteId ?? ''}
 		onchange={(event) => {
 			const value = event.currentTarget.value;
-			onSelect(value || null);
+			onSelect(value !== '' ? value : null);
 		}}
-		class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
 	>
 		<option value="">{m.palette_default({ name: defaultPaletteLabel })}</option>
 		{#each palettes as palette (palette.id)}
@@ -31,5 +33,5 @@
 				{palette.name}{palette.is_built_in === true ? '' : ` ${m.palette_custom()}`}
 			</option>
 		{/each}
-	</select>
-</label>
+	</Select>
+</div>

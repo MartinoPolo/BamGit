@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		username: string;
@@ -37,9 +38,7 @@
 		</Tooltip.Root>
 	</div>
 {:else}
-	<button
-		class="flex w-full items-center gap-2 rounded-lg p-2.5 transition-colors hover:bg-surface-2"
-	>
+	<Button variant="ghost" class="w-full justify-start gap-2 p-2.5">
 		<div
 			class="flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
 		>
@@ -52,5 +51,5 @@
 			</div>
 		</div>
 		<ChevronUpIcon size={13} class="text-foreground-subtle" />
-	</button>
+	</Button>
 {/if}

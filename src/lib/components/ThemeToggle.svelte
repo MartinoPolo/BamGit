@@ -4,6 +4,8 @@
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Monitor from '@lucide/svelte/icons/monitor';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
 
 	interface Props {
 		collapsed?: boolean;
@@ -35,28 +37,27 @@
 </script>
 
 {#if collapsed}
-	<button
+	<Button
+		variant="ghost"
+		size="icon"
+		class="w-full"
 		onclick={cycleMode}
-		class="flex w-full items-center justify-center rounded p-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
 		aria-label="{MODE_LABELS[currentMode.labelKey]()} theme"
 		title="{MODE_LABELS[currentMode.labelKey]()} mode"
 	>
 		<currentMode.Icon class="size-4" />
-	</button>
+	</Button>
 {:else}
-	<div class="flex items-center gap-1 rounded-md bg-secondary p-1">
+	<Tabs>
 		{#each modes as { value, Icon, labelKey } (value)}
-			<button
+			<Tab
+				active={theme.mode === value}
 				onclick={() => (theme.mode = value)}
-				class="flex flex-1 items-center justify-center gap-1.5 rounded px-2 py-1 text-xs transition-colors {theme.mode ===
-				value
-					? 'bg-background text-foreground shadow-sm'
-					: 'text-muted-foreground hover:text-foreground'}"
 				title="{MODE_LABELS[labelKey]()} mode"
 			>
 				<Icon class="size-3.5" />
 				<span>{MODE_LABELS[labelKey]()}</span>
-			</button>
+			</Tab>
 		{/each}
-	</div>
+	</Tabs>
 {/if}

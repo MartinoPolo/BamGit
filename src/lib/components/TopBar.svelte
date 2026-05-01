@@ -13,6 +13,8 @@
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import type { ViewMode } from '$lib/modules/board';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
 
 	type TopBarControl =
 		| 'search'
@@ -72,6 +74,12 @@
 		{ value: 'kanban' as const, Icon: KanbanIcon, labelKey: 'kanban' as const },
 		{ value: 'forest' as const, Icon: TreesIcon, labelKey: 'forest' as const },
 	];
+
+	const glassClass = $derived(
+		transparent
+			? 'backdrop-blur-sm bg-[color-mix(in_oklch,var(--surface)_60%,transparent)]'
+			: '',
+	);
 </script>
 
 <div
@@ -95,91 +103,87 @@
 	<!-- Right: controls -->
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if has('search')}
-			<button class="topbar-search" class:topbar-glass={transparent} onclick={onSearch}>
+			<Button
+				variant="ghost"
+				size="sm"
+				class="w-[200px] justify-start {glassClass}"
+				onclick={onSearch}
+			>
 				<SearchIcon size={12} class="pointer-events-none text-foreground-subtle" />
 				<span class="text-foreground-subtle">{m.topbar_search()}</span>
 				{#if searchBinding}
 					<kbd class="topbar-kbd">{searchBinding}</kbd>
 				{/if}
-			</button>
+			</Button>
 		{/if}
 
 		{#if has('filter')}
-			<button class="topbar-btn" class:topbar-glass={transparent} title={m.topbar_filter()}>
+			<Button variant="ghost" size="sm" class={glassClass} title={m.topbar_filter()}>
 				<FilterIcon size={12} />
 				<span>{m.topbar_filter()}</span>
-			</button>
+			</Button>
 		{/if}
 
 		{#if has('sort')}
-			<button class="topbar-btn" class:topbar-glass={transparent} title={m.topbar_sort()}>
+			<Button variant="ghost" size="sm" class={glassClass} title={m.topbar_sort()}>
 				<LayersIcon size={12} />
 				<span>{m.topbar_sort()}</span>
-			</button>
+			</Button>
 		{/if}
 
 		{#if has('sync')}
-			<button
-				class="topbar-btn topbar-btn-icon"
-				class:topbar-glass={transparent}
+			<Button
+				variant="ghost"
+				size="icon-sm"
+				class={glassClass}
 				title={m.topbar_sync()}
 				disabled={syncing}
 				onclick={onSync}
 			>
 				<RefreshCwIcon size={13} class={syncing ? 'animate-spin' : ''} />
-			</button>
+			</Button>
 		{/if}
 
 		{#if has('legend')}
-			<button
-				class="topbar-btn topbar-btn-icon"
-				class:topbar-glass={transparent}
-				title={m.topbar_legend()}
-			>
+			<Button variant="ghost" size="icon-sm" class={glassClass} title={m.topbar_legend()}>
 				<SparklesIcon size={13} />
-			</button>
+			</Button>
 		{/if}
 
 		{#if has('notifications')}
-			<button
-				class="topbar-btn topbar-btn-icon relative"
-				class:topbar-glass={transparent}
+			<Button
+				variant="ghost"
+				size="icon-sm"
+				class="relative {glassClass}"
 				title={m.topbar_notifications()}
 			>
 				<BellIcon size={13} />
 				{#if hasNotifications}
 					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
 				{/if}
-			</button>
+			</Button>
 		{/if}
 
 		{#if has('view') && viewMode !== undefined && onViewModeChange}
-			<div
-				class="flex items-center gap-0.5 rounded-md border border-border bg-muted/40 p-0.5"
-				class:topbar-glass={transparent}
-			>
+			<Tabs class={glassClass}>
 				{#each viewTabs as tab (tab.value)}
-					<button
-						class="inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors"
-						class:bg-background={viewMode === tab.value}
-						class:text-foreground={viewMode === tab.value}
-						class:shadow-sm={viewMode === tab.value}
-						class:text-muted-foreground={viewMode !== tab.value}
+					<Tab
+						active={viewMode === tab.value}
 						title={VIEW_LABELS[tab.labelKey]()}
 						onclick={() => onViewModeChange(tab.value)}
 					>
 						<tab.Icon size={11} />
 						<span>{VIEW_LABELS[tab.labelKey]()}</span>
-					</button>
+					</Tab>
 				{/each}
-			</div>
+			</Tabs>
 		{/if}
 
 		{#if has('plant')}
-			<button class="topbar-btn-primary" title={m.topbar_plant_title()} onclick={onPlant}>
+			<Button variant="primary" size="sm" title={m.topbar_plant_title()} onclick={onPlant}>
 				<PlusIcon size={12} />
 				<span>{m.topbar_plant()}</span>
-			</button>
+			</Button>
 		{/if}
 
 		{#if children}
@@ -205,27 +209,6 @@
 		backdrop-filter: blur(8px);
 	}
 
-	.topbar-search {
-		position: relative;
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		width: 200px;
-		height: 30px;
-		padding: 0 8px;
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		background: transparent;
-		font-size: 12.5px;
-		font-family: inherit;
-		cursor: pointer;
-		transition: border-color 120ms;
-	}
-
-	.topbar-search:hover {
-		border-color: var(--border-strong);
-	}
-
 	.topbar-kbd {
 		margin-left: auto;
 		padding: 1px 5px;
@@ -234,60 +217,5 @@
 		border-radius: 4px;
 		background: var(--surface-2);
 		color: var(--foreground-subtle);
-	}
-
-	.topbar-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		padding: 5px 10px;
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		background: transparent;
-		font-size: 12px;
-		font-family: inherit;
-		color: var(--foreground-muted);
-		cursor: pointer;
-		transition:
-			border-color 120ms,
-			color 120ms;
-	}
-
-	.topbar-btn:hover {
-		border-color: var(--border-strong);
-		color: var(--foreground);
-	}
-
-	.topbar-btn:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.topbar-btn-icon {
-		padding: 5px 6px;
-	}
-
-	.topbar-btn-primary {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		padding: 5px 12px;
-		border: none;
-		border-radius: var(--radius);
-		background: var(--primary);
-		color: var(--primary-foreground);
-		font-size: 12px;
-		font-family: inherit;
-		cursor: pointer;
-		transition: opacity 120ms;
-	}
-
-	.topbar-btn-primary:hover {
-		opacity: 0.9;
-	}
-
-	.topbar-glass {
-		background: color-mix(in oklch, var(--surface) 60%, transparent);
-		backdrop-filter: blur(8px);
 	}
 </style>

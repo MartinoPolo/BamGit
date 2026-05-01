@@ -3,7 +3,10 @@
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import ShortcutSettingsPanel from '$lib/components/ShortcutSettingsPanel.svelte';
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import type { ColorPalette } from '$lib/types/generated';
 	import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
 	import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
@@ -147,9 +150,7 @@
 		</p>
 		<div class="flex flex-col gap-3 sm:flex-row sm:items-end">
 			<div class="flex-1 space-y-1">
-				<label for="username-input" class="text-xs text-muted-foreground"
-					>{m.settings_username_label()}</label
-				>
+				<Label for="username-input">{m.settings_username_label()}</Label>
 				<Input
 					id="username-input"
 					bind:value={editUsername}
@@ -159,9 +160,7 @@
 				/>
 			</div>
 			<div class="w-24 space-y-1">
-				<label for="initials-input" class="text-xs text-muted-foreground"
-					>{m.settings_initials_label()}</label
-				>
+				<Label for="initials-input">{m.settings_initials_label()}</Label>
 				<Input
 					id="initials-input"
 					bind:value={editInitials}
@@ -184,22 +183,22 @@
 		</p>
 		<div class="flex flex-wrap gap-3">
 			{#each ACCENT_COLORS as color (color)}
-				<button
-					type="button"
+				<Button
+					variant="secondary"
+					size="sm"
 					onclick={() => {
 						boardStore.theme.accent = color;
 					}}
-					class="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm capitalize transition-all {boardStore
-						.theme.accent === color
+					class="capitalize {boardStore.theme.accent === color
 						? 'border-primary bg-surface-2 font-medium'
-						: 'border-border hover:border-border-strong hover:bg-surface-2'}"
+						: ''}"
 				>
 					<div
 						class="size-4 rounded-full"
 						style:background-color="var(--{color}-500)"
 					></div>
 					{color}
-				</button>
+				</Button>
 			{/each}
 		</div>
 	</section>
@@ -212,9 +211,7 @@
 		</p>
 		<div class="flex flex-wrap gap-6">
 			<div class="space-y-1">
-				<label for="hover-glow-color" class="text-xs text-muted-foreground"
-					>Hover Glow</label
-				>
+				<Label for="hover-glow-color">Hover Glow</Label>
 				<div class="flex items-center gap-2">
 					<input
 						id="hover-glow-color"
@@ -231,9 +228,7 @@
 				</div>
 			</div>
 			<div class="space-y-1">
-				<label for="selected-glow-color" class="text-xs text-muted-foreground"
-					>Selected Glow</label
-				>
+				<Label for="selected-glow-color">Selected Glow</Label>
 				<div class="flex items-center gap-2">
 					<input
 						id="selected-glow-color"
@@ -294,35 +289,27 @@
 				{#if editingPaletteId === palette.id}
 					<!-- Edit mode -->
 					<div class="space-y-2">
-						<input
-							bind:value={editName}
-							class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
-							placeholder={m.palette_placeholder_name()}
-						/>
-						<textarea
+						<Input bind:value={editName} placeholder={m.palette_placeholder_name()} />
+						<Textarea
 							bind:value={editColorsInput}
-							rows="2"
-							class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
+							rows={2}
+							class="text-xs"
 							placeholder={m.palette_placeholder_colors()}
-						></textarea>
+						/>
 						<div class="flex gap-2">
-							<button
-								type="button"
-								onclick={handleSaveEdit}
-								class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
-							>
+							<Button size="sm" onclick={handleSaveEdit}>
 								{m.btn_save()}
-							</button>
-							<button
-								type="button"
+							</Button>
+							<Button
+								variant="ghost"
+								size="sm"
 								onclick={() => {
 									editingPaletteId = null;
 									operationError = null;
 								}}
-								class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 							>
 								{m.btn_cancel()}
-							</button>
+							</Button>
 						</div>
 					</div>
 				{:else}
@@ -330,20 +317,16 @@
 					<div class="mb-2 flex items-center justify-between">
 						<span class="text-sm font-medium">{palette.name}</span>
 						<div class="flex gap-2">
-							<button
-								type="button"
-								onclick={() => startEditing(palette)}
-								class="text-xs text-muted-foreground hover:text-foreground"
-							>
+							<Button variant="ghost" size="sm" onclick={() => startEditing(palette)}>
 								{m.issue_card_edit()}
-							</button>
-							<button
-								type="button"
+							</Button>
+							<Button
+								variant="danger"
+								size="sm"
 								onclick={() => handleDelete(palette.id)}
-								class="text-xs text-destructive hover:text-destructive/80"
 							>
 								{m.btn_delete()}
-							</button>
+							</Button>
 						</div>
 					</div>
 					<div class="flex flex-wrap gap-1">
@@ -363,49 +346,40 @@
 		{#if creating}
 			<div class="rounded border border-dashed border-input p-3">
 				<div class="space-y-2">
-					<input
-						bind:value={newPaletteName}
-						class="w-full rounded border border-input bg-muted px-2 py-1 text-sm text-foreground outline-none focus:border-ring"
-						placeholder={m.palette_placeholder_name()}
-					/>
-					<textarea
+					<Input bind:value={newPaletteName} placeholder={m.palette_placeholder_name()} />
+					<Textarea
 						bind:value={newPaletteColorsInput}
-						rows="3"
-						class="w-full rounded border border-input bg-muted px-2 py-1 text-xs text-foreground outline-none focus:border-ring"
+						rows={3}
+						class="text-xs"
 						placeholder={m.palette_placeholder_colors_long()}
-					></textarea>
+					/>
 					<div class="flex gap-2">
-						<button
-							type="button"
-							onclick={handleCreate}
-							class="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
-						>
+						<Button size="sm" onclick={handleCreate}>
 							{m.palette_create()}
-						</button>
-						<button
-							type="button"
+						</Button>
+						<Button
+							variant="ghost"
+							size="sm"
 							onclick={() => {
 								creating = false;
 								operationError = null;
 							}}
-							class="rounded px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
 						>
 							{m.btn_cancel()}
-						</button>
+						</Button>
 					</div>
 				</div>
 			</div>
 		{:else}
-			<button
-				type="button"
+			<Button
+				variant="secondary"
 				onclick={() => {
 					creating = true;
 					operationError = null;
 				}}
-				class="rounded border border-dashed border-input px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground"
 			>
 				{m.palette_add_custom()}
-			</button>
+			</Button>
 		{/if}
 	</section>
 
@@ -429,22 +403,20 @@
 			{/if}
 
 			<div class="flex flex-wrap gap-3">
-				<button
-					type="button"
+				<Button
+					variant="secondary"
 					disabled={seedStatus !== 'idle'}
 					onclick={handleSeedDemo}
-					class="rounded border border-border bg-surface-2 px-4 py-2 text-sm transition-colors hover:bg-surface-3 disabled:opacity-50"
 				>
 					{seedStatus === 'seeding' ? 'Seeding...' : 'Seed Demo Workspace'}
-				</button>
-				<button
-					type="button"
+				</Button>
+				<Button
+					variant="danger"
 					disabled={seedStatus !== 'idle'}
 					onclick={handleDeleteDemo}
-					class="rounded border border-destructive/50 px-4 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
 				>
 					{seedStatus === 'deleting' ? 'Deleting...' : 'Delete Demo Workspace'}
-				</button>
+				</Button>
 			</div>
 		</section>
 	{/if}

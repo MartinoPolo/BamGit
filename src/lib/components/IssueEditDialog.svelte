@@ -2,8 +2,13 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Select } from '$lib/components/ui/select/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import PaletteColorPicker from './PaletteColorPicker.svelte';
-	import { syncDialogVisibility, buildUpdateIssueRequest } from './dialog_helpers.js';
+	import { buildUpdateIssueRequest } from './dialog_helpers.js';
 
 	interface Props {
 		issue: Issue | null;
@@ -18,17 +23,16 @@
 	let priority = $state<string>('');
 	let color = $state('');
 	let githubIssueUrl = $state('');
-	let dialogElement: HTMLDialogElement | undefined = $state();
+
+	const open = $derived(issue !== null);
 
 	$effect(() => {
-		syncDialogVisibility(issue !== null, dialogElement, () => {
-			if (issue !== null) {
-				name = issue.name;
-				priority = issue.priority ?? '';
-				color = issue.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
-				githubIssueUrl = issue.github_issue_url ?? '';
-			}
-		});
+		if (issue !== null) {
+			name = issue.name;
+			priority = issue.priority ?? '';
+			color = issue.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
+			githubIssueUrl = issue.github_issue_url ?? '';
+		}
 	});
 
 	function handleSubmit(event: SubmitEvent) {
@@ -46,69 +50,60 @@
 		onUpdate(request);
 		onClose();
 	}
+
+	function handleOpenChange(isOpen: boolean) {
+		if (!isOpen) {
+			onClose();
+		}
+	}
 </script>
 
-<dialog
-	bind:this={dialogElement}
-	onclose={onClose}
-	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
->
-	{#if issue}
-		<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
-			<h2 class="text-lg font-semibold">{m.issue_edit_title()}</h2>
+<Dialog.Root {open} onOpenChange={handleOpenChange}>
+	<Dialog.Content class="max-w-md">
+		{#if issue}
+			<form onsubmit={handleSubmit} class="flex flex-col gap-4">
+				<Dialog.Header>
+					<Dialog.Title>{m.issue_edit_title()}</Dialog.Title>
+				</Dialog.Header>
 
-			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">{m.issue_field_name()}</span>
-				<input
-					bind:value={name}
-					required
-					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-				/>
-			</label>
+				<Dialog.Body class="flex flex-col gap-4">
+					<div class="flex flex-col gap-1.5">
+						<Label for="edit-issue-name">{m.issue_field_name()}</Label>
+						<Input id="edit-issue-name" bind:value={name} required />
+					</div>
 
-			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">{m.issue_field_priority()}</span>
-				<select
-					bind:value={priority}
-					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-				>
-					<option value="">{m.priority_none()}</option>
-					<option value="low">{m.priority_low()}</option>
-					<option value="medium">{m.priority_medium()}</option>
-					<option value="high">{m.priority_high()}</option>
-					<option value="top">{m.priority_top()}</option>
-				</select>
-			</label>
+					<div class="flex flex-col gap-1.5">
+						<Label for="edit-issue-priority">{m.issue_field_priority()}</Label>
+						<Select id="edit-issue-priority" bind:value={priority}>
+							<option value="">{m.priority_none()}</option>
+							<option value="low">{m.priority_low()}</option>
+							<option value="medium">{m.priority_medium()}</option>
+							<option value="high">{m.priority_high()}</option>
+							<option value="top">{m.priority_top()}</option>
+						</Select>
+					</div>
 
-			<PaletteColorPicker
-				colors={paletteColors}
-				selectedColor={color}
-				onSelect={(c) => (color = c)}
-			/>
+					<PaletteColorPicker
+						colors={paletteColors}
+						selectedColor={color}
+						onSelect={(c) => (color = c)}
+					/>
 
-			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">{m.issue_field_github_url()}</span>
-				<input
-					bind:value={githubIssueUrl}
-					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-				/>
-			</label>
+					<div class="flex flex-col gap-1.5">
+						<Label for="edit-issue-github-url">{m.issue_field_github_url()}</Label>
+						<Input id="edit-issue-github-url" bind:value={githubIssueUrl} />
+					</div>
+				</Dialog.Body>
 
-			<div class="flex justify-end gap-2 pt-2">
-				<button
-					type="button"
-					onclick={onClose}
-					class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-				>
-					{m.btn_cancel()}
-				</button>
-				<button
-					type="submit"
-					class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
-				>
-					{m.btn_save()}
-				</button>
-			</div>
-		</form>
-	{/if}
-</dialog>
+				<Dialog.Footer>
+					<Button variant="ghost" type="button" onclick={onClose}>
+						{m.btn_cancel()}
+					</Button>
+					<Button type="submit">
+						{m.btn_save()}
+					</Button>
+				</Dialog.Footer>
+			</form>
+		{/if}
+	</Dialog.Content>
+</Dialog.Root>

@@ -7,6 +7,8 @@
 	import SessionCard from '$lib/components/SessionCard.svelte';
 	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';
 	import SessionChatView from '$lib/components/SessionChatView.svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 
 	const store = useSessions();
 	const notificationStore = useNotifications();
@@ -16,7 +18,6 @@
 	let spawnWorkingDirectory = $state('');
 	let spawning = $state(false);
 
-	// Derive live session from store so state updates are always reflected
 	const selectedSession = $derived(
 		selectedSessionId !== null
 			? (store.sessions.find((s) => s.id === selectedSessionId) ?? null)
@@ -85,12 +86,9 @@
 	<!-- Chat view for selected session -->
 	<div class="flex h-full flex-col">
 		<div class="flex items-center gap-3 border-b border-border px-4 py-3">
-			<button
-				class="text-sm text-muted-foreground hover:text-foreground"
-				onclick={handleBack}
-			>
+			<Button variant="ghost" size="sm" onclick={handleBack}>
 				{m.session_back()}
-			</button>
+			</Button>
 			<h2 class="truncate text-sm font-medium text-foreground">
 				{selectedSession.original_intent ?? m.session_fallback_title()}
 			</h2>
@@ -109,16 +107,13 @@
 		<!-- Spawn form -->
 		<div class="space-y-2 rounded-lg border border-border bg-muted/50 p-4">
 			<h3 class="text-sm font-medium text-foreground">{m.session_new()}</h3>
-			<input
-				type="text"
-				class="w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
+			<Input
 				placeholder={m.session_placeholder_working_dir()}
 				bind:value={spawnWorkingDirectory}
 			/>
 			<div class="flex gap-2">
-				<input
-					type="text"
-					class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
+				<Input
+					class="flex-1"
 					placeholder={m.session_placeholder_prompt()}
 					bind:value={spawnPrompt}
 					onkeydown={(e) => {
@@ -127,13 +122,13 @@
 						}
 					}}
 				/>
-				<button
-					class="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+				<Button
+					class="shrink-0"
 					onclick={handleSpawn}
 					disabled={spawning || !spawnPrompt.trim() || !spawnWorkingDirectory.trim()}
 				>
 					{spawning ? m.session_spawning() : m.session_spawn()}
-				</button>
+				</Button>
 			</div>
 		</div>
 
