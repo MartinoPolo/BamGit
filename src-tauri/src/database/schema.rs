@@ -137,8 +137,17 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             value TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS issue_dependencies (
+            id TEXT PRIMARY KEY,
+            blocker_issue_id TEXT NOT NULL REFERENCES issues(id) ON DELETE CASCADE,
+            blocked_issue_id TEXT NOT NULL REFERENCES issues(id) ON DELETE CASCADE,
+            UNIQUE(blocker_issue_id, blocked_issue_id)
+        );
+
         CREATE INDEX IF NOT EXISTS idx_issues_dashboard_id ON issues(dashboard_id);
         CREATE INDEX IF NOT EXISTS idx_sessions_issue_id ON sessions(issue_id);
+        CREATE INDEX IF NOT EXISTS idx_issue_dependencies_blocker ON issue_dependencies(blocker_issue_id);
+        CREATE INDEX IF NOT EXISTS idx_issue_dependencies_blocked ON issue_dependencies(blocked_issue_id);
 
         COMMIT;
         ",

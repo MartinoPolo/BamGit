@@ -3,6 +3,7 @@ import { invoke, listen, type UnlistenFn } from '$lib/tauri.js';
 import { SvelteMap } from 'svelte/reactivity';
 import type {
 	Issue as GeneratedIssue,
+	IssueDependency,
 	WorktreeProgressPayload,
 	WorktreeStateChangePayload,
 	PrunableIssue,
@@ -36,6 +37,7 @@ export function setIssuesContext() {
 
 function createIssuesContext() {
 	let issues = $state<Issue[]>([]);
+	let dependencies = $state<IssueDependency[]>([]);
 	let sortMode = $state<SortMode>('date');
 	let showArchived = $state(false);
 	let loading = $state(false);
@@ -149,6 +151,10 @@ function createIssuesContext() {
 		return rawIssues.map(toIssue);
 	}
 
+	async function fetchDependencies(dashboardId: string): Promise<IssueDependency[]> {
+		return invoke<IssueDependency[]>('get_issue_dependencies', { dashboardId });
+	}
+
 	// ─── Public interface ──────────────────────────────────────────────────
 
 	return {
@@ -176,6 +182,9 @@ function createIssuesContext() {
 		get error() {
 			return error;
 		},
+		get dependencies() {
+			return dependencies;
+		},
 
 		getChildren,
 		getProgressLines,
@@ -184,7 +193,10 @@ function createIssuesContext() {
 			try {
 				loading = true;
 				currentDashboardId = dashboardId;
-				issues = await fetchIssues(dashboardId);
+				[issues, dependencies] = await Promise.all([
+					fetchIssues(dashboardId),
+					fetchDependencies(dashboardId),
+				]);
 				error = null;
 				await startWorktreeListeners();
 			} catch (err) {
@@ -197,7 +209,10 @@ function createIssuesContext() {
 		async refresh() {
 			if (currentDashboardId != null) {
 				try {
-					issues = await fetchIssues(currentDashboardId);
+					[issues, dependencies] = await Promise.all([
+						fetchIssues(currentDashboardId),
+						fetchDependencies(currentDashboardId),
+					]);
 					error = null;
 				} catch (err) {
 					error = String(err);

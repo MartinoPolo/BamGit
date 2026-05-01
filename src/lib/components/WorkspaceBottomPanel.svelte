@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Issue } from '$lib/modules/issues';
+	import type { IssueDependency } from '$lib/types/generated';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import {
 		useSelection,
@@ -10,13 +11,15 @@
 	import type { BottomPanelTab } from '$lib/modules/board';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import PrdOverview from './PrdOverview.svelte';
+	import DependencyGraphView from './DependencyGraphView.svelte';
 
 	interface Props {
 		issues: readonly Issue[];
+		dependencies: readonly IssueDependency[];
 		getVisualization: (issueId: string) => TreeVisualization | undefined;
 	}
 
-	let { issues, getVisualization }: Props = $props();
+	let { issues, dependencies, getVisualization }: Props = $props();
 
 	const selection = useSelection();
 
@@ -102,9 +105,7 @@
 				{/if}
 			</div>
 		{:else if selection.activeTab === BOTTOM_PANEL_TABS.dependencies}
-			<div class="p-4">
-				<p class="text-sm text-muted-foreground">Dependencies view coming soon</p>
-			</div>
+			<DependencyGraphView {issues} {dependencies} {getVisualization} />
 		{:else if selection.activeTab === BOTTOM_PANEL_TABS.activity}
 			<div class="p-4">
 				<p class="text-sm text-muted-foreground">Activity feed coming soon</p>

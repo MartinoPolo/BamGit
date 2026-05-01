@@ -354,7 +354,11 @@
 					/>
 				{/snippet}
 				{#snippet bottomPanel()}
-					<WorkspaceBottomPanel issues={forestIssues} {getVisualization} />
+					<WorkspaceBottomPanel
+						issues={forestIssues}
+						dependencies={issueStore.dependencies}
+						{getVisualization}
+					/>
 				{/snippet}
 			</WorkspaceDashboardLayout>
 		</div>

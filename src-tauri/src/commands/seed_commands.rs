@@ -26,6 +26,11 @@ struct DemoGitCache {
     merge_conflict: bool,
 }
 
+struct DemoDependency {
+    blocker_index: u32,
+    blocked_index: u32,
+}
+
 struct DemoSession {
     index: u32,
     issue_index: u32,
@@ -55,6 +60,21 @@ const DEMO_ISSUES: &[DemoIssue] = &[
     DemoIssue { index: 18, name: "Dead: Branch deleted", worktree_state: "active", branch_name: Some("18-dead-deleted"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"task","color":"#22c55e"}]"##, status: "active" },
     DemoIssue { index: 19, name: "Dead: Remote gone", worktree_state: "active", branch_name: Some("19-dead-remote-gone"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"refactor","color":"#8b5cf6"}]"##, status: "active" },
     DemoIssue { index: 20, name: "Stump: Archived", worktree_state: "removed", branch_name: Some("20-stump-archived"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"task","color":"#22c55e"}]"##, status: "archived" },
+];
+
+const DEMO_DEPENDENCIES: &[DemoDependency] = &[
+    DemoDependency { blocker_index: 1, blocked_index: 2 },
+    DemoDependency { blocker_index: 1, blocked_index: 3 },
+    DemoDependency { blocker_index: 2, blocked_index: 4 },
+    DemoDependency { blocker_index: 3, blocked_index: 4 },
+    DemoDependency { blocker_index: 4, blocked_index: 5 },
+    DemoDependency { blocker_index: 5, blocked_index: 9 },
+    DemoDependency { blocker_index: 5, blocked_index: 10 },
+    DemoDependency { blocker_index: 5, blocked_index: 11 },
+    DemoDependency { blocker_index: 6, blocked_index: 7 },
+    DemoDependency { blocker_index: 6, blocked_index: 8 },
+    DemoDependency { blocker_index: 11, blocked_index: 14 },
+    DemoDependency { blocker_index: 14, blocked_index: 15 },
 ];
 
 const DEMO_GIT_CACHES: &[DemoGitCache] = &[
@@ -199,6 +219,29 @@ fn seed_demo_data(connection: &mut Connection) -> Result<String, String> {
                 params![session_id, issue_id, session.state, session.execution_phase],
             )
             .map_err(|error| format!("Failed to insert session {}: {error}", session.index))?;
+    }
+
+    // Insert dependency edges
+    for dependency in DEMO_DEPENDENCIES {
+        let id = format!(
+            "demo-dep-{}-{}",
+            dependency.blocker_index, dependency.blocked_index
+        );
+        let blocker_id = format!("demo-issue-{}", dependency.blocker_index);
+        let blocked_id = format!("demo-issue-{}", dependency.blocked_index);
+
+        transaction
+            .execute(
+                "INSERT INTO issue_dependencies (id, blocker_issue_id, blocked_issue_id) \
+                 VALUES (?1, ?2, ?3)",
+                params![id, blocker_id, blocked_id],
+            )
+            .map_err(|error| {
+                format!(
+                    "Failed to insert dependency {}->{}: {error}",
+                    dependency.blocker_index, dependency.blocked_index
+                )
+            })?;
     }
 
     // Seed label shape mappings
@@ -438,6 +481,33 @@ mod tests {
     }
 
     #[test]
+    fn seed_creates_dependency_edges() {
+        let mut connection = setup_test_database();
+        seed_demo_data(&mut connection).unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM issue_dependencies d \
+                 JOIN issues i ON d.blocker_issue_id = i.id \
+                 WHERE i.dashboard_id = ?1",
+                [DEMO_DASHBOARD_ID],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 12);
+
+        // Spot-check: issue-1 blocks issue-2
+        let blocker: String = connection
+            .query_row(
+                "SELECT blocker_issue_id FROM issue_dependencies WHERE blocked_issue_id = 'demo-issue-2'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(blocker, "demo-issue-1");
+    }
+
+    #[test]
     fn seed_is_idempotent() {
         let mut connection = setup_test_database();
         seed_demo_data(&mut connection).unwrap();
@@ -474,6 +544,17 @@ mod tests {
             )
             .unwrap();
         assert_eq!(git_cache_count, 17);
+
+        let dependency_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM issue_dependencies d \
+                 JOIN issues i ON d.blocker_issue_id = i.id \
+                 WHERE i.dashboard_id = ?1",
+                [DEMO_DASHBOARD_ID],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(dependency_count, 12);
 
         let mapping_count: i64 = connection
             .query_row(

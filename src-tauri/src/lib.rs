@@ -9,10 +9,10 @@ mod session;
 mod window_manager;
 
 use commands::{
-    action_commands, color_palette_commands, dashboard_commands, git_status_commands,
-    github_commands, issue_commands, keyboard_shortcut_commands, label_shape_mapping_commands,
-    notification_commands, portfolio_commands, seed_commands, session_commands, terminal_commands,
-    window_commands, worktree_commands,
+    action_commands, color_palette_commands, dashboard_commands, dependency_commands,
+    git_status_commands, github_commands, issue_commands, keyboard_shortcut_commands,
+    label_shape_mapping_commands, notification_commands, portfolio_commands, seed_commands,
+    session_commands, terminal_commands, window_commands, worktree_commands,
 };
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
@@ -178,6 +178,7 @@ pub fn run() {
             window_commands::get_overview_data,
             window_commands::get_app_setting,
             window_commands::set_app_setting,
+            dependency_commands::get_issue_dependencies,
             seed_commands::seed_demo_workspace,
             seed_commands::delete_demo_workspace,
         ])
