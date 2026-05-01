@@ -8,6 +8,7 @@ pub mod keyboard_shortcut_commands;
 pub mod label_shape_mapping_commands;
 pub mod notification_commands;
 pub mod portfolio_commands;
+pub mod seed_commands;
 pub mod session_commands;
 pub mod shared;
 pub mod window_commands;

@@ -7,6 +7,7 @@
 	import type { ColorPalette } from '$lib/types/generated';
 	import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
 	import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
+	import { invoke } from '@tauri-apps/api/core';
 	const boardStore = useBoard();
 
 	function isHexColor(value: unknown): value is string {
@@ -34,6 +35,32 @@
 	let operationError = $state<string | null>(null);
 	let editUsername = $state(boardStore.username);
 	let editInitials = $state(boardStore.userInitials);
+	let seedStatus = $state<'idle' | 'seeding' | 'deleting'>('idle');
+	let seedMessage = $state<{ type: 'success' | 'error'; text: string } | null>(null);
+
+	async function handleSeedDemo() {
+		seedStatus = 'seeding';
+		seedMessage = null;
+		try {
+			await invoke('seed_demo_workspace');
+			seedMessage = { type: 'success', text: 'Demo workspace created successfully.' };
+		} catch (err) {
+			seedMessage = { type: 'error', text: String(err) };
+		}
+		seedStatus = 'idle';
+	}
+
+	async function handleDeleteDemo() {
+		seedStatus = 'deleting';
+		seedMessage = null;
+		try {
+			await invoke('delete_demo_workspace');
+			seedMessage = { type: 'success', text: 'Demo workspace deleted.' };
+		} catch (err) {
+			seedMessage = { type: 'error', text: String(err) };
+		}
+		seedStatus = 'idle';
+	}
 
 	const builtInPalettes = $derived(boardStore.palettes.filter((p) => p.is_built_in === true));
 	const customPalettes = $derived(boardStore.palettes.filter((p) => p.is_built_in === false));
@@ -381,4 +408,44 @@
 			</button>
 		{/if}
 	</section>
+
+	<!-- Developer Tools Section (dev builds only) -->
+	{#if import.meta.env.DEV}
+		<section class="space-y-4 border-t border-border pt-6">
+			<h2 class="text-lg font-medium">Developer Tools</h2>
+			<p class="text-sm text-muted-foreground">
+				Seed a demo workspace with test data covering every tree stage, accessory, and
+				blocking relationship. For development and visual testing only.
+			</p>
+
+			{#if seedMessage}
+				<p
+					class="rounded px-3 py-2 text-sm {seedMessage.type === 'success'
+						? 'bg-green-500/20 text-green-400'
+						: 'bg-destructive/20 text-destructive'}"
+				>
+					{seedMessage.text}
+				</p>
+			{/if}
+
+			<div class="flex flex-wrap gap-3">
+				<button
+					type="button"
+					disabled={seedStatus !== 'idle'}
+					onclick={handleSeedDemo}
+					class="rounded border border-border bg-surface-2 px-4 py-2 text-sm transition-colors hover:bg-surface-3 disabled:opacity-50"
+				>
+					{seedStatus === 'seeding' ? 'Seeding...' : 'Seed Demo Workspace'}
+				</button>
+				<button
+					type="button"
+					disabled={seedStatus !== 'idle'}
+					onclick={handleDeleteDemo}
+					class="rounded border border-destructive/50 px-4 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+				>
+					{seedStatus === 'deleting' ? 'Deleting...' : 'Delete Demo Workspace'}
+				</button>
+			</div>
+		</section>
+	{/if}
 </div>
