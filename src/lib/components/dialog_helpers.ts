@@ -1,19 +1,6 @@
 import type { CreateIssueRequest, UpdateIssueRequest, IssuePriority } from '$lib/modules/issues';
 import type { CreateDashboardRequest, UpdateDashboardRequest } from '$lib/modules/board';
 
-export function syncDialogVisibility(
-	triggerOpen: boolean,
-	dialogElement: HTMLDialogElement | undefined,
-	onOpen?: () => void,
-): void {
-	if (triggerOpen && dialogElement !== undefined && !dialogElement.open) {
-		onOpen?.();
-		dialogElement.showModal();
-	} else if (!triggerOpen && dialogElement?.open === true) {
-		dialogElement.close();
-	}
-}
-
 function trimOrNull(value: string): string | null {
 	const trimmed = value.trim();
 	return trimmed || null;

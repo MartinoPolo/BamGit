@@ -14,6 +14,7 @@
 	import ThemeToggle from './ThemeToggle.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {
@@ -72,10 +73,12 @@
 			<Tooltip.Root>
 				<Tooltip.Trigger>
 					{#snippet child({ props })}
-						<button
+						<Button
 							{...props}
+							variant="ghost"
+							size="icon"
 							onclick={onToggleSidebar}
-							class="group relative flex size-9 items-center justify-center rounded-lg"
+							class="group relative"
 							aria-label="Expand sidebar"
 						>
 							<span class="transition-opacity group-hover:opacity-0">
@@ -86,7 +89,7 @@
 							>
 								<ChevronRightIcon size={14} />
 							</span>
-						</button>
+						</Button>
 					{/snippet}
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right"
@@ -98,14 +101,15 @@
 				<BrandMark size={22} />
 				<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
 			</div>
-			<button
+			<Button
+				variant="ghost"
+				size="icon-sm"
 				onclick={onToggleSidebar}
-				class="flex size-[22px] items-center justify-center rounded-[5px] text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
 				aria-label="Collapse sidebar"
 				title={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
 			>
 				<PanelLeftIcon size={14} />
-			</button>
+			</Button>
 		{/if}
 	</div>
 

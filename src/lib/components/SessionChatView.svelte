@@ -4,6 +4,8 @@
 	import { useSessions } from '$lib/modules/sessions';
 	import { listen, type UnlistenFn } from '$lib/tauri.js';
 	import { onMount, onDestroy } from 'svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 
 	interface Props {
 		session: Session;
@@ -210,30 +212,27 @@
 	<div class="border-t border-border p-3">
 		<div class="flex items-center gap-2">
 			{#if session.state === 'running'}
-				<button
-					class="shrink-0 rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-500"
+				<Button
+					variant="secondary"
+					size="sm"
+					class="shrink-0 bg-amber-600 text-white hover:bg-amber-500"
 					onclick={handleInterrupt}
 				>
 					{m.chat_interrupt()}
-				</button>
+				</Button>
 			{/if}
 
-			<input
-				type="text"
-				class="flex-1 rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-ring focus:outline-none"
+			<Input
+				class="flex-1"
 				placeholder={isActive ? m.chat_placeholder_active() : m.chat_placeholder_ended()}
 				bind:value={promptInput}
 				onkeydown={handleKeydown}
 				disabled={!isActive}
 			/>
 
-			<button
-				class="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-				onclick={handleSend}
-				disabled={!canSend}
-			>
+			<Button class="shrink-0" onclick={handleSend} disabled={!canSend}>
 				{m.chat_send()}
-			</button>
+			</Button>
 		</div>
 	</div>
 </div>

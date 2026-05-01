@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import {
@@ -53,10 +54,9 @@
 		<!-- Search row -->
 		<div class="flex items-center gap-2.5 border-b border-border px-3.5 py-3">
 			<SearchIcon size={14} class="shrink-0 text-foreground-subtle" />
-			<input
-				bind:this={searchInputElement}
-				type="text"
-				class="h-6 flex-1 border-none bg-transparent p-0 text-sm text-foreground shadow-none outline-none placeholder:text-foreground-subtle"
+			<Input
+				bind:ref={searchInputElement}
+				class="h-6 flex-1 border-none bg-transparent p-0 text-sm shadow-none outline-none placeholder:text-foreground-subtle"
 				placeholder={m.command_palette_placeholder()}
 				value={paletteCtx.query}
 				oninput={(event) => {

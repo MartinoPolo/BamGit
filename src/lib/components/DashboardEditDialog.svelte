@@ -2,8 +2,12 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { UpdateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard, ColorPalette } from '$lib/types/generated';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import PaletteSelector from './PaletteSelector.svelte';
-	import { syncDialogVisibility, buildUpdateDashboardRequest } from './dialog_helpers.js';
+	import { buildUpdateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
 		dashboard: Dashboard | null;
@@ -22,20 +26,19 @@
 	let worktreeParentFolder = $state('');
 	let colorPaletteId = $state<string | null>(null);
 	let confirmDelete = $state(false);
-	let dialogElement: HTMLDialogElement | undefined = $state();
+
+	const open = $derived(dashboard !== null);
 
 	$effect(() => {
-		syncDialogVisibility(dashboard !== null, dialogElement, () => {
-			if (dashboard !== null) {
-				name = dashboard.name;
-				githubRepo = dashboard.github_repo ?? '';
-				localFolder = dashboard.local_folder ?? '';
-				defaultBaseBranch = dashboard.default_base_branch ?? '';
-				worktreeParentFolder = dashboard.worktree_parent_folder ?? '';
-				colorPaletteId = dashboard.color_palette_id ?? null;
-				confirmDelete = false;
-			}
-		});
+		if (dashboard !== null) {
+			name = dashboard.name;
+			githubRepo = dashboard.github_repo ?? '';
+			localFolder = dashboard.local_folder ?? '';
+			defaultBaseBranch = dashboard.default_base_branch ?? '';
+			worktreeParentFolder = dashboard.worktree_parent_folder ?? '';
+			colorPaletteId = dashboard.color_palette_id ?? null;
+			confirmDelete = false;
+		}
 	});
 
 	function handleSubmit(event: SubmitEvent) {
@@ -67,99 +70,80 @@
 		onDelete(dashboard.id);
 		onClose();
 	}
+
+	function handleOpenChange(isOpen: boolean) {
+		if (!isOpen) {
+			onClose();
+		}
+	}
 </script>
 
-<dialog
-	bind:this={dialogElement}
-	onclose={onClose}
-	class="w-full max-w-md rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-xl backdrop:bg-black/50"
->
-	{#if dashboard}
-		<form onsubmit={handleSubmit} class="flex flex-col gap-4 p-6">
-			<h2 class="text-lg font-semibold">{m.dashboard_edit_title()}</h2>
+<Dialog.Root {open} onOpenChange={handleOpenChange}>
+	<Dialog.Content class="max-w-md">
+		{#if dashboard}
+			<form onsubmit={handleSubmit} class="flex flex-col gap-4">
+				<Dialog.Header>
+					<Dialog.Title>{m.dashboard_edit_title()}</Dialog.Title>
+				</Dialog.Header>
 
-			<label class="flex flex-col gap-1">
-				<span class="text-xs text-muted-foreground">{m.dashboard_field_name()}</span>
-				<input
-					bind:value={name}
-					required
-					class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-				/>
-			</label>
+				<Dialog.Body class="flex flex-col gap-4">
+					<div class="flex flex-col gap-1.5">
+						<Label for="edit-dashboard-name">{m.dashboard_field_name()}</Label>
+						<Input id="edit-dashboard-name" bind:value={name} required />
+					</div>
 
-			<!-- Color palette -->
-			<PaletteSelector
-				palettes={colorPalettes}
-				selectedPaletteId={colorPaletteId}
-				onSelect={(id) => (colorPaletteId = id)}
-			/>
+					<PaletteSelector
+						palettes={colorPalettes}
+						selectedPaletteId={colorPaletteId}
+						onSelect={(id) => (colorPaletteId = id)}
+					/>
 
-			{#if dashboard.type === 'repo'}
-				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground"
-						>{m.dashboard_field_github_repo()}</span
-					>
-					<input
-						bind:value={githubRepo}
-						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-						placeholder={m.dashboard_placeholder_github_repo()}
-					/>
-				</label>
-				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground"
-						>{m.dashboard_field_local_folder()}</span
-					>
-					<input
-						bind:value={localFolder}
-						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					/>
-				</label>
-				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground"
-						>{m.dashboard_field_default_base_branch()}</span
-					>
-					<input
-						bind:value={defaultBaseBranch}
-						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					/>
-				</label>
-				<label class="flex flex-col gap-1">
-					<span class="text-xs text-muted-foreground"
-						>{m.dashboard_field_worktree_parent_folder()}</span
-					>
-					<input
-						bind:value={worktreeParentFolder}
-						class="rounded border border-input bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-ring"
-					/>
-				</label>
-			{/if}
+					{#if dashboard.type === 'repo'}
+						<div class="flex flex-col gap-1.5">
+							<Label for="edit-dashboard-github-repo"
+								>{m.dashboard_field_github_repo()}</Label
+							>
+							<Input
+								id="edit-dashboard-github-repo"
+								bind:value={githubRepo}
+								placeholder={m.dashboard_placeholder_github_repo()}
+							/>
+						</div>
+						<div class="flex flex-col gap-1.5">
+							<Label for="edit-dashboard-local-folder"
+								>{m.dashboard_field_local_folder()}</Label
+							>
+							<Input id="edit-dashboard-local-folder" bind:value={localFolder} />
+						</div>
+						<div class="flex flex-col gap-1.5">
+							<Label for="edit-dashboard-base-branch"
+								>{m.dashboard_field_default_base_branch()}</Label
+							>
+							<Input id="edit-dashboard-base-branch" bind:value={defaultBaseBranch} />
+						</div>
+						<div class="flex flex-col gap-1.5">
+							<Label for="edit-dashboard-worktree"
+								>{m.dashboard_field_worktree_parent_folder()}</Label
+							>
+							<Input id="edit-dashboard-worktree" bind:value={worktreeParentFolder} />
+						</div>
+					{/if}
+				</Dialog.Body>
 
-			<div class="flex items-center justify-between pt-2">
-				<button
-					type="button"
-					onclick={handleDelete}
-					class="rounded px-3 py-2 text-sm transition-colors {confirmDelete
-						? 'bg-destructive text-destructive-foreground'
-						: 'text-destructive hover:text-destructive/80'}"
-				>
-					{confirmDelete ? m.btn_confirm_delete() : m.btn_delete()}
-				</button>
-				<div class="flex gap-2">
-					<button
-						type="button"
-						onclick={onClose}
-						class="rounded px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-					>
-						{m.btn_cancel()}
-					</button>
-					<button
-						type="submit"
-						class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
-					>
-						{m.btn_save()}
-					</button>
-				</div>
-			</div>
-		</form>
-	{/if}
-</dialog>
+				<Dialog.Footer class="justify-between">
+					<Button variant="danger" type="button" size="sm" onclick={handleDelete}>
+						{confirmDelete ? m.btn_confirm_delete() : m.btn_delete()}
+					</Button>
+					<div class="flex gap-2">
+						<Button variant="ghost" type="button" onclick={onClose}>
+							{m.btn_cancel()}
+						</Button>
+						<Button type="submit">
+							{m.btn_save()}
+						</Button>
+					</div>
+				</Dialog.Footer>
+			</form>
+		{/if}
+	</Dialog.Content>
+</Dialog.Root>
