@@ -15,3 +15,14 @@ export type {
 	AccentColor,
 } from './types.js';
 export { ACCENT_COLORS } from './types.js';
+
+export { setSelectionContext, useSelection } from './selection.context.svelte.js';
+export {
+	BOTTOM_PANEL_TABS,
+	TAB_BEHAVIOR_MAP,
+	BOTTOM_PANEL_TAB_LABELS,
+	shouldShowPrdOverview,
+	computeStageCounts,
+	isBottomPanelTab,
+} from './selection.js';
+export type { BottomPanelTab, TabBehavior, StageCounts } from './selection.js';

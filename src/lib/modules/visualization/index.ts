@@ -45,8 +45,3 @@ export type { TreeContextMenuAction } from './types.js';
 export { TREE_CONTEXT_MENU_ACTIONS } from './types.js';
 export { resolveGlowOverlay } from './forest_interaction.js';
 export type { ResolveGlowOverlayParams } from './forest_interaction.js';
-
-export {
-	setForestInteractionContext,
-	useForestInteraction,
-} from './forest_interaction.context.svelte.js';
