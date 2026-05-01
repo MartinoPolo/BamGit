@@ -7,17 +7,26 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Select } from '$lib/components/ui/select/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import PaletteColorPicker from './PaletteColorPicker.svelte';
+	import { ColorPicker } from './color-picker/index.js';
 	import { buildUpdateIssueRequest } from './dialog_helpers.js';
 
 	interface Props {
 		issue: Issue | null;
 		paletteColors: string[];
+		usedColors?: string[];
+		isDarkMode?: boolean;
 		onClose: () => void;
 		onUpdate: (request: UpdateIssueRequest) => void;
 	}
 
-	let { issue, paletteColors, onClose, onUpdate }: Props = $props();
+	let {
+		issue,
+		paletteColors,
+		usedColors = [],
+		isDarkMode = false,
+		onClose,
+		onUpdate,
+	}: Props = $props();
 
 	let name = $state('');
 	let priority = $state<string>('');
@@ -25,6 +34,12 @@
 	let githubIssueUrl = $state('');
 
 	const open = $derived(issue !== null);
+
+	const editUsedColors = $derived(
+		issue?.color != null
+			? usedColors.filter((c) => c.toLowerCase() !== issue!.color!.toLowerCase())
+			: usedColors,
+	);
 
 	$effect(() => {
 		if (issue !== null) {
@@ -83,10 +98,19 @@
 						</Select>
 					</div>
 
-					<PaletteColorPicker
+					<ColorPicker
+						variant="palette-hex-native"
 						colors={paletteColors}
 						selectedColor={color}
-						onSelect={(c) => (color = c)}
+						usedColors={editUsedColors}
+						{isDarkMode}
+						onSelect={(c) => {
+							if (c === '') {
+								color = issue?.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
+							} else {
+								color = c;
+							}
+						}}
 					/>
 
 					<div class="flex flex-col gap-1.5">

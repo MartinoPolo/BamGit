@@ -216,6 +216,36 @@ pub fn delete_color_palette(state: State<DatabaseState>, id: String) -> Result<(
     Ok(())
 }
 
+/// Queries colors assigned to active issues in a dashboard.
+fn query_used_colors_for_dashboard(
+    connection: &rusqlite::Connection,
+    dashboard_id: &str,
+) -> Result<Vec<String>, String> {
+    let mut statement = connection
+        .prepare(
+            "SELECT color FROM issues WHERE dashboard_id = ?1 AND status = 'active' AND color IS NOT NULL",
+        )
+        .map_err(|error| format!("Failed to prepare query: {error}"))?;
+
+    let rows = statement
+        .query_map([dashboard_id], |row| row.get(0))
+        .map_err(|error| format!("Failed to query used colors: {error}"))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| format!("Failed to read color row: {error}"))?;
+
+    Ok(rows)
+}
+
+/// Returns all colors currently assigned to active issues in the given dashboard.
+#[tauri::command]
+pub fn get_used_colors_for_dashboard(
+    state: State<DatabaseState>,
+    dashboard_id: String,
+) -> Result<Vec<String>, String> {
+    let connection = state.read()?;
+    query_used_colors_for_dashboard(&connection, &dashboard_id)
+}
+
 /// Returns the next available color from the dashboard's palette that isn't already
 /// assigned to an active issue. Wraps around if all colors are used.
 #[tauri::command]
@@ -254,17 +284,7 @@ pub fn get_next_available_color(
     }
 
     // Get colors already used by active issues in this dashboard
-    let mut statement = connection
-        .prepare(
-            "SELECT color FROM issues WHERE dashboard_id = ?1 AND status = 'active' AND color IS NOT NULL",
-        )
-        .map_err(|error| format!("Failed to prepare query: {error}"))?;
-
-    let used_colors: Vec<String> = statement
-        .query_map([&dashboard_id], |row| row.get(0))
-        .map_err(|error| format!("Failed to query used colors: {error}"))?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|error| format!("Failed to read color row: {error}"))?;
+    let used_colors = query_used_colors_for_dashboard(&connection, &dashboard_id)?;
 
     // Find first palette color not in use
     for color in &palette_colors {
