@@ -13,6 +13,7 @@ export interface ShortcutAction {
 	label: string;
 	defaultBinding: string;
 	callback: () => void;
+	allowFromEditable?: boolean;
 }
 
 export interface ShortcutBinding {

@@ -23,7 +23,9 @@
 	import { setWindowContext, openWorkspaceWindow } from '$lib/modules/window';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
+	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
+	import RawRequirementsModal from '$lib/components/RawRequirementsModal.svelte';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -38,6 +40,7 @@
 	setActionsContext();
 	const shortcutsCtx = setKeyboardShortcutsContext();
 	const commandPaletteCtx = setCommandPaletteContext();
+	const rawRequirementsCtx = setRawRequirementsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
@@ -67,6 +70,13 @@
 			label: 'Open Settings',
 			defaultBinding: 'Ctrl+,',
 			callback: () => void goto(resolve('/settings')),
+		});
+		shortcutsCtx.registerShortcut({
+			id: 'quick-ideas',
+			label: 'Quick Ideas',
+			defaultBinding: 'Ctrl+Shift+I',
+			allowFromEditable: true,
+			callback: () => void rawRequirementsCtx.toggle(),
 		});
 	});
 
@@ -164,3 +174,4 @@
 />
 
 <CommandPalette />
+<RawRequirementsModal />

@@ -116,11 +116,12 @@ function createKeyboardShortcutsContext() {
 		},
 
 		handleKeydown(event: KeyboardEvent): void {
-			if (isEditableElement(event.target)) {
-				return;
-			}
+			const isEditable = isEditableElement(event.target);
 
 			for (const [, action] of registeredActions) {
+				if (isEditable && action.allowFromEditable !== true) {
+					continue;
+				}
 				const effectiveBinding = customBindings.get(action.id) ?? action.defaultBinding;
 				const combo = parseBinding(effectiveBinding);
 				if (matchesKeyEvent(combo, event)) {
