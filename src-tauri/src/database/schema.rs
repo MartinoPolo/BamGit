@@ -28,7 +28,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             id TEXT PRIMARY KEY,
             dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
             name TEXT NOT NULL,
-            priority TEXT CHECK (priority IN ('low', 'medium', 'high', 'top')),
+            priority TEXT CHECK (priority IN ('lowest', 'low', 'medium', 'high', 'top')),
             color TEXT,
             status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
             github_issue_url TEXT,

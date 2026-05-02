@@ -2,11 +2,11 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 1;
+pub(crate) const CURRENT_VERSION: i32 = 2;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
-static MIGRATIONS: &[MigrationFunction] = &[migrate_v1];
+static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)?;
@@ -39,6 +39,51 @@ fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
         "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');",
     )?;
 
+    Ok(())
+}
+
+fn migrate_v2(connection: &Connection) -> Result<(), rusqlite::Error> {
+    // SQLite cannot ALTER CHECK constraints, so we recreate the issues table
+    // with the updated priority constraint that includes 'lowest'.
+    connection.execute_batch("PRAGMA foreign_keys=OFF;")?;
+    connection.execute_batch(
+        "
+        BEGIN;
+
+        CREATE TABLE issues_new (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            priority TEXT CHECK (priority IN ('lowest', 'low', 'medium', 'high', 'top')),
+            color TEXT,
+            status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+            github_issue_url TEXT,
+            github_issue_number INTEGER,
+            branch_name TEXT,
+            base_branch TEXT,
+            worktree_folder TEXT,
+            worktree_state TEXT DEFAULT 'none' CHECK (worktree_state IN ('none', 'pending', 'active', 'failed', 'removing', 'removed')),
+            parent_issue_id TEXT REFERENCES issues_new(id) ON DELETE SET NULL,
+            editor_folder TEXT,
+            dev_server_command TEXT,
+            dev_server_port INTEGER,
+            dev_server_pid INTEGER,
+            browser_url TEXT,
+            labels TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        INSERT INTO issues_new SELECT * FROM issues;
+        DROP TABLE issues;
+        ALTER TABLE issues_new RENAME TO issues;
+
+        CREATE INDEX IF NOT EXISTS idx_issues_dashboard_id ON issues(dashboard_id);
+
+        COMMIT;
+        ",
+    )?;
+    connection.execute_batch("PRAGMA foreign_keys=ON;")?;
     Ok(())
 }
 
@@ -165,6 +210,71 @@ mod tests {
             )
             .unwrap();
         assert_eq!(value, "overview");
+    }
+
+    #[test]
+    fn migration_v2_allows_lowest_priority() {
+        let connection = fresh_db();
+        run_migrations(&connection).unwrap();
+
+        // Create dashboard first (FK requirement)
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+
+        // Insert issue with 'lowest' priority — should succeed after migration
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, priority) VALUES ('i1', 'd1', 'Test Issue', 'lowest')",
+                [],
+            )
+            .unwrap();
+
+        let priority: String = connection
+            .query_row("SELECT priority FROM issues WHERE id = 'i1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(priority, "lowest");
+    }
+
+    #[test]
+    fn migration_v2_preserves_existing_issues() {
+        let connection = fresh_db();
+        // Run v1 only
+        migrate_v1(&connection).unwrap();
+        set_schema_version(&connection, 1).unwrap();
+
+        // Create dashboard and issue with old priority
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, priority) VALUES ('i1', 'd1', 'Old Issue', 'high')",
+                [],
+            )
+            .unwrap();
+
+        // Now run v2
+        run_migrations(&connection).unwrap();
+
+        // Verify the issue survived
+        let (name, priority): (String, String) = connection
+            .query_row(
+                "SELECT name, priority FROM issues WHERE id = 'i1'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .unwrap();
+        assert_eq!(name, "Old Issue");
+        assert_eq!(priority, "high");
     }
 
     #[test]

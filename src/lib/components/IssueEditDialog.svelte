@@ -91,6 +91,7 @@
 						<Label for="edit-issue-priority">{m.issue_field_priority()}</Label>
 						<Select id="edit-issue-priority" bind:value={priority}>
 							<option value="">{m.priority_none()}</option>
+							<option value="lowest">{m.priority_lowest()}</option>
 							<option value="low">{m.priority_low()}</option>
 							<option value="medium">{m.priority_medium()}</option>
 							<option value="high">{m.priority_high()}</option>

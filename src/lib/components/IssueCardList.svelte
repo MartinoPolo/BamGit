@@ -34,6 +34,8 @@
 		onUnarchive,
 		onEdit,
 		onDelete,
+		onChangePriority,
+		onRename,
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
@@ -57,12 +59,13 @@
 			{onUnarchive}
 			{onEdit}
 			{onDelete}
+			{onChangePriority}
+			{onRename}
 			{onSetupWorktree}
 			{onRemoveWorktree}
 			{onExecuteAction}
 		/>
 
-		<!-- Nested children for portfolio dashboards -->
 		{#if isPortfolio && children.length > 0}
 			{#each children as child, index (child.id)}
 				<IssueCard
@@ -79,6 +82,8 @@
 					{onUnarchive}
 					{onEdit}
 					{onDelete}
+					{onChangePriority}
+					{onRename}
 					{onSetupWorktree}
 					{onRemoveWorktree}
 					{onExecuteAction}
@@ -87,7 +92,6 @@
 		{/if}
 	{/each}
 
-	<!-- Archived section -->
 	{#if showArchived && archivedIssues.length > 0}
 		<div class="mt-4 border-t border-border pt-4">
 			<h3
@@ -105,6 +109,7 @@
 						{onUnarchive}
 						{onEdit}
 						{onDelete}
+						{onChangePriority}
 					/>
 				{/each}
 			</div>

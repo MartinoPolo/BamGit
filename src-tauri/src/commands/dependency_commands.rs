@@ -34,6 +34,7 @@ pub fn get_dependencies_for_dashboard_with_connection(
     Ok(results)
 }
 
+#[cfg(test)]
 pub fn upsert_dependency(
     connection: &Connection,
     blocker_issue_id: &str,
