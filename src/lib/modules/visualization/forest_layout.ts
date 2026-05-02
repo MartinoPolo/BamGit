@@ -69,29 +69,23 @@ function getDepthRow(item: ForestLayoutItem): number {
 
 // ─── Row Placement ──────────────────────────────────────────────────────────
 
-/**
- * Compute the x-position for an item using left-right alternation from a row center.
- * Index 0 -> left (1 unit), index 1 -> right (1 unit),
- * index 2 -> left (2 units), index 3 -> right (2 units), etc.
- */
-function computeAlternatingX(itemIndex: number, rowCenterX: number, treeSpacing: number): number {
-	const spacingUnits = Math.ceil((itemIndex + 1) / 2);
-	const isLeft = itemIndex % 2 === 0;
-	if (isLeft) {
-		return rowCenterX - spacingUnits * treeSpacing;
-	}
-	return rowCenterX + spacingUnits * treeSpacing;
+function computeEquidistantX(
+	itemIndex: number,
+	itemCount: number,
+	viewportWidth: number,
+	rowOffsetX: number,
+): number {
+	return rowOffsetX + (viewportWidth * (itemIndex + 1)) / (itemCount + 1);
 }
 
 function placeRowItems(
 	items: readonly ForestLayoutItem[],
 	depthRow: number,
-	viewportCenterX: number,
 	groundY: number,
-	treeSpacing: number,
+	viewportWidth: number,
 	viewportHeight: number,
 ): PositionedForestItem[] {
-	const rowCenterX = viewportCenterX + depthRow * treeSpacing * ROW_X_OFFSET_FRACTION;
+	const rowOffsetX = depthRow * viewportWidth * TREE_SPACING_FRACTION * ROW_X_OFFSET_FRACTION;
 	const rowY = groundY - depthRow * viewportHeight * ROW_SPACING_Y_FRACTION;
 	const scale = ROW_SCALE_FACTOR ** depthRow;
 	const opacity = ROW_OPACITY_FACTOR ** depthRow;
@@ -99,7 +93,7 @@ function placeRowItems(
 
 	return items.map((item, index) => ({
 		id: item.id,
-		x: computeAlternatingX(index, rowCenterX, treeSpacing),
+		x: computeEquidistantX(index, items.length, viewportWidth, rowOffsetX),
 		y: rowY,
 		scale,
 		opacity,
@@ -184,7 +178,6 @@ export function computeForestLayout(
 	}
 
 	const centerX = viewport.width / 2;
-	const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
 
 	// Separate oak from the rest
 	let oak: ForestLayoutItemOak | null = null;
@@ -244,9 +237,8 @@ export function computeForestLayout(
 		const positioned = placeRowItems(
 			rowItems,
 			depthRow,
-			centerX,
 			groundY,
-			treeSpacing,
+			viewport.width,
 			viewport.height,
 		);
 		allPositioned.push(...positioned);

@@ -9,18 +9,28 @@ import {
 } from './selection.js';
 
 describe('BOTTOM_PANEL_TABS', () => {
-	it('has exactly 4 entries with correct values', () => {
+	it('has exactly 6 entries with correct values', () => {
 		expect(BOTTOM_PANEL_TABS).toEqual({
+			issues: 'issues',
+			kanban: 'kanban',
 			issueDetail: 'issue-detail',
 			dependencies: 'dependencies',
 			activity: 'activity',
 			session: 'session',
 		});
-		expect(Object.keys(BOTTOM_PANEL_TABS)).toHaveLength(4);
+		expect(Object.keys(BOTTOM_PANEL_TABS)).toHaveLength(6);
 	});
 });
 
 describe('TAB_BEHAVIOR_MAP', () => {
+	it('maps issues to replace', () => {
+		expect(TAB_BEHAVIOR_MAP['issues']).toBe('replace');
+	});
+
+	it('maps kanban to replace', () => {
+		expect(TAB_BEHAVIOR_MAP['kanban']).toBe('replace');
+	});
+
 	it('maps issue-detail to replace', () => {
 		expect(TAB_BEHAVIOR_MAP['issue-detail']).toBe('replace');
 	});
@@ -71,6 +81,8 @@ describe('shouldShowPrdOverview', () => {
 
 describe('BOTTOM_PANEL_TAB_LABELS', () => {
 	it('maps each tab to correct display label', () => {
+		expect(BOTTOM_PANEL_TAB_LABELS['issues']).toBe('Issues');
+		expect(BOTTOM_PANEL_TAB_LABELS['kanban']).toBe('Kanban');
 		expect(BOTTOM_PANEL_TAB_LABELS['issue-detail']).toBe('Issue Detail');
 		expect(BOTTOM_PANEL_TAB_LABELS['dependencies']).toBe('Dependencies');
 		expect(BOTTOM_PANEL_TAB_LABELS['activity']).toBe('Activity');
@@ -133,6 +145,8 @@ describe('computeStageCounts', () => {
 
 describe('isBottomPanelTab', () => {
 	it('returns true for valid tab values', () => {
+		expect(isBottomPanelTab('issues')).toBe(true);
+		expect(isBottomPanelTab('kanban')).toBe(true);
 		expect(isBottomPanelTab('issue-detail')).toBe(true);
 		expect(isBottomPanelTab('dependencies')).toBe(true);
 		expect(isBottomPanelTab('activity')).toBe(true);

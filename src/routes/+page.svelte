@@ -15,7 +15,6 @@
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
-	import IssueCardList from '$lib/components/IssueCardList.svelte';
 	import ForestView from '$lib/components/ForestView.svelte';
 	import WorkspaceDashboardLayout from '$lib/components/WorkspaceDashboardLayout.svelte';
 	import WorkspaceBottomPanel from '$lib/components/WorkspaceBottomPanel.svelte';
@@ -23,20 +22,14 @@
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import IssueCreateDialog from '$lib/components/IssueCreateDialog.svelte';
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
-	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
-	import AssignedIssuesPanel from '$lib/components/AssignedIssuesPanel.svelte';
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
-	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import type { PrunableIssue } from '$lib/types/generated';
-	import { useCommandPalette } from '$lib/modules/command-palette';
-
 	const boardStore = useBoard();
 	const issueStore = useIssues();
 	const versionControlStore = useVersionControl();
 	const actionStore = useActions();
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
-	const commandPaletteCtx = useCommandPalette();
 	const selection = useSelection();
 
 	function getNotificationDotColor(issueId: string): string | null {
@@ -60,8 +53,6 @@
 	let prunableIssues = $state<PrunableIssue[]>([]);
 	let pruneRemoving = $state(false);
 
-	// Forest view combines active issues (always) with archived issues when showArchived toggled.
-	// Archived issues render as stumps via tree state engine.
 	const forestIssues = $derived.by(() =>
 		issueStore.showArchived
 			? [...issueStore.activeIssues, ...issueStore.archivedIssues]
@@ -74,7 +65,6 @@
 		return palette?.colors ?? [];
 	});
 
-	// Parse "owner/repo" from dashboard's github_repo field
 	const githubRepoParts = $derived.by(() => {
 		const githubRepo: string | null | undefined = boardStore.activeDashboard?.github_repo;
 		if (githubRepo == null) {
@@ -87,12 +77,10 @@
 		return { owner: parts[0], repo: parts[1] };
 	});
 
-	// Check gh availability on mount
 	onMount(() => {
 		versionControlStore.checkAvailability();
 	});
 
-	// Load issues and version control state when active dashboard changes
 	$effect(() => {
 		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId === null) {
@@ -284,7 +272,7 @@
 	}
 
 	function handlePageKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape' && boardStore.viewMode === 'forest') {
+		if (event.key === 'Escape') {
 			selection.deselect();
 		}
 	}
@@ -306,24 +294,12 @@
 	<TopBar
 		title={boardStore.activeDashboard.name}
 		subtitle="{boardStore.activeDashboard.type} · {issueStore.activeIssues.length} issues"
-		controls={['search', 'filter', 'sort', 'sync', 'notifications', 'view', 'plant']}
-		transparent={boardStore.viewMode === 'forest'}
-		viewMode={boardStore.viewMode}
+		forestCollapsed={selection.forestCollapsed}
 		syncing={versionControlStore.syncing}
-		onViewModeChange={(mode) => (boardStore.viewMode = mode)}
 		onSync={githubRepoParts ? handleSyncAll : undefined}
 		onPlant={openCreateDialog}
-		onSearch={() => commandPaletteCtx.toggle()}
-	>
-		<button
-			class="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
-			title={m.topbar_prune_title()}
-			onclick={handleOpenPruneDialog}
-		>
-			<ScissorsIcon size={12} />
-			{m.topbar_prune()}
-		</button>
-	</TopBar>
+		onToggleForest={() => selection.toggleForestCollapsed()}
+	/>
 
 	{#if issueStore.loading}
 		<div class="p-5">
@@ -337,11 +313,7 @@
 		<div class="p-5">
 			<EmptyIssueState onAddIssue={openCreateDialog} />
 		</div>
-	{:else if boardStore.viewMode === 'kanban'}
-		<div class="p-5">
-			<p class="text-muted-foreground">{m.kanban_coming_soon()}</p>
-		</div>
-	{:else if boardStore.viewMode === 'forest'}
+	{:else}
 		<div class="flex-1 overflow-hidden">
 			<WorkspaceDashboardLayout>
 				{#snippet forestPanel()}
@@ -356,48 +328,38 @@
 				{#snippet bottomPanel()}
 					<WorkspaceBottomPanel
 						issues={forestIssues}
+						parentIssues={issueStore.parentIssues}
+						archivedIssues={issueStore.archivedIssues}
+						showArchived={issueStore.showArchived}
+						isPortfolio={boardStore.activeDashboard?.type === 'portfolio'}
+						actions={actionStore.visibleActions}
+						forceExpanded={allExpanded ? true : undefined}
+						cacheMap={versionControlStore.stateMap}
+						ghAvailable={versionControlStore.isGhAvailable}
 						dependencies={issueStore.dependencies}
+						ghSetupBanner={githubRepoParts !== null &&
+							versionControlStore.ghAvailability !== 'available'}
+						ghAvailability={versionControlStore.ghAvailability}
+						assignedIssues={versionControlStore.assignedIssues}
+						isGhAvailable={versionControlStore.isGhAvailable}
 						{getVisualization}
+						getChildren={issueStore.getChildren}
+						{getNotificationDotColor}
+						getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
+						onArchive={handleArchiveIssue}
+						onUnarchive={handleUnarchiveIssue}
+						onEdit={async (issue) => {
+							await loadUsedColors();
+							editingIssue = issue;
+						}}
+						onDelete={handleDeleteIssue}
+						onSetupWorktree={handleSetupWorktree}
+						onRemoveWorktree={handleRemoveWorktree}
+						onExecuteAction={handleExecuteAction}
+						onPrune={handleOpenPruneDialog}
 					/>
 				{/snippet}
 			</WorkspaceDashboardLayout>
-		</div>
-	{:else}
-		<div class="flex flex-col gap-4 p-5">
-			{#if githubRepoParts && versionControlStore.ghAvailability !== 'available'}
-				<GhSetupBanner availability={versionControlStore.ghAvailability} />
-			{/if}
-
-			<IssueCardList
-				parentIssues={issueStore.parentIssues}
-				archivedIssues={issueStore.archivedIssues}
-				showArchived={issueStore.showArchived}
-				isPortfolio={boardStore.activeDashboard.type === 'portfolio'}
-				actions={actionStore.visibleActions}
-				forceExpanded={allExpanded ? true : undefined}
-				cacheMap={versionControlStore.stateMap}
-				ghAvailable={versionControlStore.isGhAvailable}
-				getChildren={issueStore.getChildren}
-				{getNotificationDotColor}
-				getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
-				onArchive={handleArchiveIssue}
-				onUnarchive={handleUnarchiveIssue}
-				onEdit={async (issue) => {
-					await loadUsedColors();
-					editingIssue = issue;
-				}}
-				onDelete={handleDeleteIssue}
-				onSetupWorktree={handleSetupWorktree}
-				onRemoveWorktree={handleRemoveWorktree}
-				onExecuteAction={handleExecuteAction}
-			/>
-
-			{#if versionControlStore.assignedIssues.length > 0}
-				<AssignedIssuesPanel
-					issues={versionControlStore.assignedIssues}
-					disabled={versionControlStore.isGhAvailable !== true}
-				/>
-			{/if}
 		</div>
 	{/if}
 

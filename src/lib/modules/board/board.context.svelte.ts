@@ -15,14 +15,12 @@ import type {
 	CreateColorPaletteRequest,
 	UpdateColorPaletteRequest,
 	AddRepoToPortfolioRequest,
-	ViewMode,
 	ThemeMode,
 	AccentColor,
 } from './types.js';
 import {
 	isThemeMode,
 	isAccentColor,
-	isViewMode,
 	findPaletteForDashboard,
 	selectActiveDashboardId,
 	resolveActiveDashboardId,
@@ -111,13 +109,6 @@ function createBoardContext() {
 			document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
 			document.documentElement.dataset.accent = accentColor.current;
 		}
-	});
-
-	// ── View preference state ──────────────────────────────────────────────
-	const viewMode = new Persisted<ViewMode>({
-		key: 'grovekeeper_view_mode',
-		serde: stringSerde(isViewMode),
-		defaultValue: 'list',
 	});
 
 	// ── Public interface ───────────────────────────────────────────────────
@@ -336,14 +327,6 @@ function createBoardContext() {
 		},
 		set userInitials(value: string) {
 			userInitials.current = value;
-		},
-
-		// View preference
-		get viewMode() {
-			return viewMode.current;
-		},
-		set viewMode(value: ViewMode) {
-			viewMode.current = value;
 		},
 	};
 }

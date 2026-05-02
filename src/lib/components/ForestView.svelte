@@ -36,12 +36,12 @@
 
 	let { issues, getGitStatus, getSessionsForIssue, onAddIssue }: Props = $props();
 
-	const TREE_NATURAL_WIDTH = 100;
-	const TREE_NATURAL_HEIGHT = 100;
-	const OAK_NATURAL_WIDTH = 140;
-	const OAK_NATURAL_HEIGHT = 140;
-	const POTTED_NATURAL_WIDTH = 60;
-	const POTTED_NATURAL_HEIGHT = 90;
+	const TREE_NATURAL_WIDTH = 320;
+	const TREE_NATURAL_HEIGHT = 320;
+	const OAK_NATURAL_WIDTH = 448;
+	const OAK_NATURAL_HEIGHT = 448;
+	const POTTED_NATURAL_WIDTH = 192;
+	const POTTED_NATURAL_HEIGHT = 288;
 
 	let viewportWidth = $state(0);
 	let viewportHeight = $state(0);
@@ -303,9 +303,9 @@
 	{/if}
 	<button
 		type="button"
-		class="absolute bottom-0 left-0 right-0 cursor-default border-0 p-0"
+		class="absolute inset-x-0 bottom-0 cursor-default border-0 p-0"
 		style:height="{groundStripHeight}px"
-		style:background="var(--ground-color)"
+		style:background="linear-gradient(to top, var(--ground-dark), var(--ground-color))"
 		style:z-index="1"
 		onclick={handleGroundClick}
 		tabindex="-1"

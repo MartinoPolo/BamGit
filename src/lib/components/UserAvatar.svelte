@@ -1,8 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		username: string;
@@ -38,7 +36,7 @@
 		</Tooltip.Root>
 	</div>
 {:else}
-	<Button variant="ghost" class="w-full justify-start gap-2 p-2.5">
+	<div class="flex w-full items-center gap-2 p-2.5">
 		<div
 			class="flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
 		>
@@ -50,6 +48,5 @@
 				{m.active_count({ count: String(activeCount) })}
 			</div>
 		</div>
-		<ChevronUpIcon size={13} class="text-foreground-subtle" />
-	</Button>
+	</div>
 {/if}

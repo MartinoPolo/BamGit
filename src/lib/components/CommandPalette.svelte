@@ -56,7 +56,7 @@
 			<SearchIcon size={14} class="shrink-0 text-foreground-subtle" />
 			<Input
 				bind:ref={searchInputElement}
-				class="h-6 flex-1 border-none bg-transparent p-0 text-sm shadow-none outline-none placeholder:text-foreground-subtle"
+				class="h-6 flex-1 border-none bg-transparent py-0 pl-1 text-sm shadow-none outline-none placeholder:text-foreground-subtle"
 				placeholder={m.command_palette_placeholder()}
 				value={paletteCtx.query}
 				oninput={(event) => {

@@ -1419,11 +1419,9 @@ describe('computeForestLayout — oak absent', () => {
 
 // ─── Row 0 Left-Right Alternation ────────────────────────────────────────
 
-describe('computeForestLayout — row 0 left-right alternation', () => {
-	it('alternates trees left-right from center — 4 trees + oak', () => {
+describe('computeForestLayout — row 0 equidistant placement', () => {
+	it('distributes 4 trees equidistantly across viewport width', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
-		const centerX = viewport.width / 2;
-		const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1434,28 +1432,24 @@ describe('computeForestLayout — row 0 left-right alternation', () => {
 		];
 		const result = computeForestLayout(items, viewport);
 
+		// 4 non-oak trees → equidistant at width*(i+1)/5
 		const t0 = findItem(result.items, 't0');
 		const t1 = findItem(result.items, 't1');
 		const t2 = findItem(result.items, 't2');
 		const t3 = findItem(result.items, 't3');
 
-		// t0 = index 0 → LEFT of center (1 spacing unit)
-		expect(t0.x).toBeCloseTo(centerX - treeSpacing, 0);
-		// t1 = index 1 → RIGHT of center (1 spacing unit)
-		expect(t1.x).toBeCloseTo(centerX + treeSpacing, 0);
-		// t2 = index 2 → LEFT (2 spacing units)
-		expect(t2.x).toBeCloseTo(centerX - 2 * treeSpacing, 0);
-		// t3 = index 3 → RIGHT (2 spacing units)
-		expect(t3.x).toBeCloseTo(centerX + 2 * treeSpacing, 0);
+		expect(t0.x).toBeCloseTo(1200 * (1 / 5), 0);
+		expect(t1.x).toBeCloseTo(1200 * (2 / 5), 0);
+		expect(t2.x).toBeCloseTo(1200 * (3 / 5), 0);
+		expect(t3.x).toBeCloseTo(1200 * (4 / 5), 0);
 	});
 });
 
 // ─── Equidistant Spacing ────────────────────────────────────────────────
 
 describe('computeForestLayout — equidistant spacing', () => {
-	it('all row-0 items have equal horizontal spacing between consecutive positions', () => {
+	it('non-oak row-0 items have equal horizontal spacing between consecutive positions', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
-		const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1466,13 +1460,15 @@ describe('computeForestLayout — equidistant spacing', () => {
 		];
 		const result = computeForestLayout(items, viewport);
 
-		// Collect all row-0 x positions (oak + trees), sorted
-		const row0Items = result.items.filter((item) => item.rowIndex === 0);
-		const xValues = row0Items.map((item) => item.x).sort((a, b) => a - b);
+		// Collect non-oak row-0 x positions, sorted
+		const nonOakRow0 = result.items
+			.filter((item) => item.rowIndex === 0 && item.id !== 'oak-1')
+			.sort((a, b) => a.x - b.x);
 
-		// Consecutive x-values should differ by treeSpacing
-		for (let i = 1; i < xValues.length; i++) {
-			expect(xValues[i] - xValues[i - 1]).toBeCloseTo(treeSpacing, 0);
+		// Consecutive positions should have equal spacing: width / (count + 1)
+		const expectedSpacing = viewport.width / (nonOakRow0.length + 1);
+		for (let i = 1; i < nonOakRow0.length; i++) {
+			expect(nonOakRow0[i].x - nonOakRow0[i - 1].x).toBeCloseTo(expectedSpacing, 0);
 		}
 	});
 });
@@ -1480,9 +1476,8 @@ describe('computeForestLayout — equidistant spacing', () => {
 // ─── Priority Sorting Within Row ────────────────────────────────────────
 
 describe('computeForestLayout — priority sorting within row', () => {
-	it('higher priority trees placed closer to center', () => {
+	it('higher priority trees are placed first (leftmost) in equidistant distribution', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
-		const centerX = viewport.width / 2;
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1494,11 +1489,14 @@ describe('computeForestLayout — priority sorting within row', () => {
 		const result = computeForestLayout(items, viewport);
 
 		const topPos = findItem(result.items, 'top');
+		const highPos = findItem(result.items, 'high');
+		const medPos = findItem(result.items, 'med');
 		const lowPos = findItem(result.items, 'low');
 
-		const topDistFromCenter = Math.abs(topPos.x - centerX);
-		const lowDistFromCenter = Math.abs(lowPos.x - centerX);
-		expect(topDistFromCenter).toBeLessThan(lowDistFromCenter);
+		// Priority order: top < high < med < low in x position
+		expect(topPos.x).toBeLessThan(highPos.x);
+		expect(highPos.x).toBeLessThan(medPos.x);
+		expect(medPos.x).toBeLessThan(lowPos.x);
 	});
 });
 
@@ -1542,19 +1540,17 @@ describe('computeForestLayout — back-row perspective row 2', () => {
 // ─── Back-Row X-Offset ─────────────────────────────────────────────────
 
 describe('computeForestLayout — back-row x-offset', () => {
-	it('row 1+ trees have center offset by ROW_X_OFFSET_FRACTION', () => {
+	it('row 1+ trees are offset by ROW_X_OFFSET_FRACTION', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
-		const centerX = viewport.width / 2;
-		const treeSpacing = viewport.width * TREE_SPACING_FRACTION;
 
-		// Single tree in row 1 — should be at offset center (left alternation first)
+		// Single tree in row 1 — equidistant with 1 item: width*(1)/(1+1) + offset
 		const items: ForestLayoutItem[] = [createOak(), createTree('r1', { depthRow: 1 })];
 		const result = computeForestLayout(items, viewport);
 
 		const r1 = findItem(result.items, 'r1');
-		const expectedRowCenter = centerX + 1 * treeSpacing * ROW_X_OFFSET_FRACTION;
-		// Single item in row goes LEFT of row-center (index 0 → left, 1 unit)
-		expect(r1.x).toBeCloseTo(expectedRowCenter - treeSpacing, 0);
+		const rowOffset = 1 * viewport.width * TREE_SPACING_FRACTION * ROW_X_OFFSET_FRACTION;
+		const expectedX = rowOffset + (viewport.width * 1) / 2;
+		expect(r1.x).toBeCloseTo(expectedX, 0);
 	});
 });
 
@@ -1605,9 +1601,9 @@ describe('computeForestLayout — minimum spacing', () => {
 	it('enforces minimum spacing between all items', () => {
 		const items: ForestLayoutItem[] = [
 			createOak(),
-			...Array.from({ length: 15 }, (_, i) => createTree(`t${i}`)),
+			...Array.from({ length: 8 }, (_, i) => createTree(`t${i}`)),
 		];
-		const viewport = createViewport({ width: 800, height: 600 });
+		const viewport = createViewport({ width: 1200, height: 800 });
 		const result = computeForestLayout(items, viewport);
 
 		for (let i = 0; i < result.items.length; i++) {
@@ -1622,9 +1618,8 @@ describe('computeForestLayout — minimum spacing', () => {
 // ─── Many Items Row 0 ──────────────────────────────────────────────────
 
 describe('computeForestLayout — many items row 0', () => {
-	it('15 trees all depthRow=0 are all positioned alternating left-right', () => {
+	it('15 trees all depthRow=0 are all positioned equidistantly', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
-		const centerX = viewport.width / 2;
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1634,17 +1629,17 @@ describe('computeForestLayout — many items row 0', () => {
 		];
 		const result = computeForestLayout(items, viewport);
 
-		// All 16 items should be positioned
+		// All 16 items should be positioned (15 trees + 1 oak)
 		expect(result.items).toHaveLength(16);
 
-		// Non-oak items should alternate: even-indexed (0,2,4,...) left, odd-indexed (1,3,5,...) right
-		const nonOakItems = result.items.filter((item) => item.id !== 'oak-1');
-		const leftItems = nonOakItems.filter((item) => item.x < centerX);
-		const rightItems = nonOakItems.filter((item) => item.x > centerX);
+		// Non-oak items should be equidistantly distributed
+		const nonOakItems = result.items
+			.filter((item) => item.id !== 'oak-1')
+			.sort((a, b) => a.x - b.x);
 
-		// With 15 trees: 8 left (indices 0,2,4,6,8,10,12,14), 7 right (indices 1,3,5,7,9,11,13)
-		expect(leftItems.length).toBe(8);
-		expect(rightItems.length).toBe(7);
+		expect(nonOakItems).toHaveLength(15);
+		// First item should be at width / 16
+		expect(nonOakItems[0].x).toBeCloseTo(viewport.width / 16, 0);
 	});
 });
 

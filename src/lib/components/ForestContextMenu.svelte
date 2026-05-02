@@ -9,6 +9,7 @@
 	import PlayIcon from '@lucide/svelte/icons/play';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
+	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 
 	interface Props {
 		x: number;
@@ -35,6 +36,11 @@
 		{ action: TREE_CONTEXT_MENU_ACTIONS.startSession, label: 'Start Session', icon: PlayIcon },
 		{ action: TREE_CONTEXT_MENU_ACTIONS.archive, label: 'Archive', icon: ArchiveIcon },
 		{ action: TREE_CONTEXT_MENU_ACTIONS.changeColor, label: 'Change Color', icon: PaletteIcon },
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.pruneWorktree,
+			label: 'Prune Worktree',
+			icon: ScissorsIcon,
+		},
 	];
 
 	function handleItemClick(action: TreeContextMenuAction) {

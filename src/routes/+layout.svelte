@@ -138,6 +138,9 @@
 				{activeSessionCount}
 				collapsed={boardStore.sidebarCollapsed}
 				onToggleSidebar={() => boardStore.toggleSidebar()}
+				onEditWorkspace={() => {
+					editingDashboard = boardStore.activeDashboard ?? null;
+				}}
 			/>
 
 			<main class="flex min-w-0 flex-1 flex-col overflow-auto">
