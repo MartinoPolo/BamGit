@@ -38,7 +38,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - **Bottom panel toolbar** (Issues tab): Sort | Filter | Prune All Terminal
 - **Legend**: floating button inside the forest panel, not in the main toolbar
 - "Assigned Issues" panel accessible from dashboard (sidebar widget or collapsible section, quick-access) showing GitHub issues assigned to user (via `gh`) for quick import
-- Dashboard-level color palette configuration (vivid, pastel, etc. — 30 colors, 6 hues × 5 shades)
+- Dashboard-level color palette configuration (vivid, pastel, etc. — 24 colors, 6 hues × 4 rows)
 
 ### Issue Creation
 
@@ -46,7 +46,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
     1. GitHub issue search (live, number-aware, arrow-key navigation)
     2. Issue name entry (pre-filled from GitHub if selected)
     3. Worktree yes/no (conditional)
-    4. Color selection (30-color palette, auto-rotation, custom input)
+    4. Color selection (24-color palette, auto-rotation, custom input)
     5. Worktree creation progress (if yes)
     - Enter confirms, Escape cancels, Back navigates
 - **Quick add (no worktree):** One-click from assigned GitHub issue. Auto-fills name, GitHub link, assigns next color.
@@ -67,11 +67,11 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 #### Color System
 
-- 30-color palette (6 hues × 5 shades), no gray colors (reserved for disabled states)
+- 24-color palette (6 hue columns × 4 rows: normal, darker, lighter, specials), no gray colors in main palette (reserved for disabled states). Row 4 specials: black, white, gray, 3 bonus hues
 - Theme-aware orientation: darker shades at top in dark mode, lighter in light mode
 - Auto-preselect next available color (rotate from last-used position)
-- Already-assigned colors disabled (rendered gray)
-- Custom color input with letter "A" preview for text readability
+- Already-assigned colors disabled (rendered gray) — blocking is implicit via `usedColors` prop, omit for non-blocking pickers (e.g. settings glow)
+- Color picker UI: single swatch trigger (32px) opens a Popover dropdown with preset grid + hex input + native picker. Optional `displayText` prop (e.g. "A") for text readability preview on swatches — omit for pure color pickers
 - Single main color drives visual identity: VS Code Peacock, terminal tab, tree visualization
 - Release color on archive, delete, or color change
 - Closed issue appearance: CSS overlay `filter: grayscale(0.8) opacity(0.7)` — preserves stored color for reopening
