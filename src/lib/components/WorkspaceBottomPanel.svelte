@@ -70,6 +70,8 @@
 		onUnarchive,
 		onEdit,
 		onDelete,
+		onChangePriority,
+		onRename,
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
@@ -184,6 +186,8 @@
 					{onUnarchive}
 					{onEdit}
 					{onDelete}
+					{onChangePriority}
+					{onRename}
 					{onSetupWorktree}
 					{onRemoveWorktree}
 					{onExecuteAction}

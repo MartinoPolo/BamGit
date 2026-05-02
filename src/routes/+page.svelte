@@ -11,7 +11,12 @@
 		findNotificationDotColor,
 	} from '$lib/modules/notifications';
 	import { useSessions } from '$lib/modules/sessions';
-	import type { Issue, CreateIssueRequest, UpdateIssueRequest } from '$lib/modules/issues';
+	import type {
+		Issue,
+		IssuePriority,
+		CreateIssueRequest,
+		UpdateIssueRequest,
+	} from '$lib/modules/issues';
 	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
 	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
@@ -22,8 +27,12 @@
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import IssueCreateDialog from '$lib/components/IssueCreateDialog.svelte';
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
+	import ArchiveConfirmDialog from '$lib/components/ArchiveConfirmDialog.svelte';
+	import DeleteConfirmDialog from '$lib/components/DeleteConfirmDialog.svelte';
+	import IssueRenameDialog from '$lib/components/IssueRenameDialog.svelte';
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 	import type { PrunableIssue } from '$lib/types/generated';
+
 	const boardStore = useBoard();
 	const issueStore = useIssues();
 	const versionControlStore = useVersionControl();
@@ -52,6 +61,33 @@
 	let pruneDialogOpen = $state(false);
 	let prunableIssues = $state<PrunableIssue[]>([]);
 	let pruneRemoving = $state(false);
+
+	let archiveTargetIssue = $state<Issue | null>(null);
+	let deleteTargetIssue = $state<Issue | null>(null);
+	let renameTargetIssue = $state<Issue | null>(null);
+
+	const archiveUnfinishedSessionCount = $derived.by(() => {
+		if (archiveTargetIssue === null) {
+			return 0;
+		}
+		const sessions = sessionStore.sessionsByIssueId.get(archiveTargetIssue.id);
+		if (sessions === undefined) {
+			return 0;
+		}
+		return sessions.filter((s) => s.state !== 'finished' && s.state !== 'errored').length;
+	});
+
+	const archiveOpenPrCount = $derived.by(() => {
+		if (archiveTargetIssue === null) {
+			return 0;
+		}
+		const gitState = versionControlStore.getState(archiveTargetIssue.id);
+		if (gitState?.pr_state == null) {
+			return 0;
+		}
+		const closedStates = ['merged', 'closed'];
+		return closedStates.includes(gitState.pr_state) ? 0 : 1;
+	});
 
 	const forestIssues = $derived.by(() =>
 		issueStore.showArchived
@@ -151,10 +187,6 @@
 		await handleAction('create issue', () => issueStore.addIssue(request));
 	}
 
-	async function handleArchiveIssue(id: string) {
-		await handleAction('archive issue', () => issueStore.archiveIssue(id));
-	}
-
 	async function handleUnarchiveIssue(id: string) {
 		await handleAction('unarchive issue', () => issueStore.unarchiveIssue(id));
 	}
@@ -163,8 +195,55 @@
 		await handleAction('update issue', () => issueStore.updateIssue(request));
 	}
 
-	async function handleDeleteIssue(id: string) {
-		await handleAction('delete issue', () => issueStore.removeIssue(id));
+	async function handleChangePriority(id: string, priority: IssuePriority | null) {
+		await handleAction('change priority', () => issueStore.updateIssue({ id, priority }));
+	}
+
+	async function handleArchiveConfirm(removeWorktree: boolean) {
+		const issue = archiveTargetIssue;
+		if (issue === null) {
+			return;
+		}
+		archiveTargetIssue = null;
+
+		if (removeWorktree) {
+			await handleRemoveWorktreeForIssue(issue);
+		}
+		await handleAction('archive issue', () => issueStore.archiveIssue(issue.id));
+	}
+
+	async function handleDeleteConfirm(removeWorktree: boolean) {
+		const issue = deleteTargetIssue;
+		if (issue === null) {
+			return;
+		}
+		deleteTargetIssue = null;
+
+		if (removeWorktree) {
+			await handleRemoveWorktreeForIssue(issue);
+		}
+		await handleAction('delete issue', () => issueStore.removeIssue(issue.id));
+	}
+
+	async function handleRename(id: string, name: string) {
+		await handleAction('rename issue', () => issueStore.updateIssue({ id, name }));
+	}
+
+	async function handleRemoveWorktreeForIssue(issue: Issue) {
+		const dashboard = boardStore.activeDashboard;
+		if (dashboard?.local_folder == null || issue.branch_name == null) {
+			return;
+		}
+		await handleAction(
+			'remove worktree',
+			() =>
+				issueStore.removeWorktree({
+					issue_id: issue.id,
+					branch_name: issue.branch_name!,
+					working_directory: dashboard.local_folder!,
+				}),
+			false,
+		);
 	}
 
 	async function handleSetupWorktree(issue: Issue) {
@@ -346,13 +425,15 @@
 						getChildren={issueStore.getChildren}
 						{getNotificationDotColor}
 						getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
-						onArchive={handleArchiveIssue}
+						onArchive={(issue) => (archiveTargetIssue = issue)}
 						onUnarchive={handleUnarchiveIssue}
 						onEdit={async (issue) => {
 							await loadUsedColors();
 							editingIssue = issue;
 						}}
-						onDelete={handleDeleteIssue}
+						onDelete={(issue) => (deleteTargetIssue = issue)}
+						onChangePriority={handleChangePriority}
+						onRename={(issue) => (renameTargetIssue = issue)}
 						onSetupWorktree={handleSetupWorktree}
 						onRemoveWorktree={handleRemoveWorktree}
 						onExecuteAction={handleExecuteAction}
@@ -381,6 +462,28 @@
 		isDarkMode={boardStore.theme.isDark}
 		onClose={() => (editingIssue = null)}
 		onUpdate={handleUpdateIssue}
+	/>
+
+	<ArchiveConfirmDialog
+		issue={archiveTargetIssue}
+		unfinishedSessionCount={archiveUnfinishedSessionCount}
+		openPrCount={archiveOpenPrCount}
+		hasActiveWorktree={archiveTargetIssue?.worktree_state === 'active'}
+		onClose={() => (archiveTargetIssue = null)}
+		onConfirm={handleArchiveConfirm}
+	/>
+
+	<DeleteConfirmDialog
+		issue={deleteTargetIssue}
+		hasActiveWorktree={deleteTargetIssue?.worktree_state === 'active'}
+		onClose={() => (deleteTargetIssue = null)}
+		onConfirm={handleDeleteConfirm}
+	/>
+
+	<IssueRenameDialog
+		issue={renameTargetIssue}
+		onClose={() => (renameTargetIssue = null)}
+		onRename={handleRename}
 	/>
 
 	<PruneWorktreesDialog

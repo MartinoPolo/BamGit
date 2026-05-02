@@ -5,7 +5,7 @@ export type WorktreeState = 'none' | 'pending' | 'active' | 'failed' | 'removing
 export type SortMode = 'priority' | 'name' | 'date';
 
 /** @public */
-export type IssuePriority = 'low' | 'medium' | 'high' | 'top';
+export type IssuePriority = 'lowest' | 'low' | 'medium' | 'high' | 'top';
 
 /** @public */
 export type IssueStatus = 'active' | 'archived';
@@ -30,7 +30,7 @@ export interface Issue extends Omit<
 export interface CreateIssueRequest {
 	dashboard_id: string;
 	name: string;
-	priority?: 'low' | 'medium' | 'high' | 'top' | null;
+	priority?: IssuePriority | null;
 	color?: string | null;
 	github_issue_url?: string | null;
 	github_issue_number?: number | null;
@@ -41,7 +41,7 @@ export interface CreateIssueRequest {
 export interface UpdateIssueRequest {
 	id: string;
 	name?: string;
-	priority?: 'low' | 'medium' | 'high' | 'top' | null;
+	priority?: IssuePriority | null;
 	color?: string | null;
 	github_issue_url?: string | null;
 	github_issue_number?: number | null;
@@ -71,10 +71,12 @@ export interface RemoveWorktreeRequest {
 }
 
 export interface IssueCardCallbacks {
-	onArchive: (id: string) => void;
+	onArchive: (issue: Issue) => void;
 	onUnarchive: (id: string) => void;
 	onEdit: (issue: Issue) => void;
-	onDelete: (id: string) => void;
+	onDelete: (issue: Issue) => void;
+	onChangePriority: (id: string, priority: IssuePriority | null) => void;
+	onRename?: (issue: Issue) => void;
 	onSetupWorktree?: (issue: Issue) => void;
 	onRemoveWorktree?: (issue: Issue) => void;
 	onExecuteAction?: (actionId: string, issueId: string) => void;

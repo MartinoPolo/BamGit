@@ -83,6 +83,7 @@
 	"issue_placeholder_github_url": "https://github.com/owner/repo/issues/42",
 
 	"priority_none": "None",
+	"priority_lowest": "Lowest",
 	"priority_low": "Low",
 	"priority_medium": "Medium",
 	"priority_high": "High",
@@ -169,6 +170,8 @@
 	"issue_card_archive": "Archive",
 	"issue_card_unarchive": "Unarchive",
 	"issue_card_delete": "Delete",
+	"issue_card_rename": "Rename",
+	"issue_card_priority": "Priority",
 	"issue_card_status": "Status:",
 	"issue_card_worktree_label": "Worktree:",
 	"issue_card_priority_label": "Priority:",
@@ -179,6 +182,19 @@
 	"issue_card_pending_notification": "Pending notification",
 	"issue_card_child_count": "{count} child",
 	"issue_card_children_count": "{count} children",
+
+	"archive_confirm_title": "Archive Issue",
+	"archive_confirm_body": "Are you sure you want to archive \"{name}\"?",
+	"archive_unfinished_sessions": "{count} unfinished session(s)",
+	"archive_open_prs": "{count} open PR(s)",
+	"archive_remove_worktree": "Also remove worktree",
+
+	"delete_confirm_title": "Delete Issue",
+	"delete_confirm_body": "This will permanently delete \"{name}\". This action cannot be undone.",
+	"delete_remove_worktree": "Also remove worktree",
+
+	"rename_title": "Rename Issue",
+	"rename_field_name": "Name",
 
 	"prune_title": "Prune Worktrees",
 	"prune_description": "These issues have merged PRs and closed GitHub issues. Select which worktrees to remove.",

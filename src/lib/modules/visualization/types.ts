@@ -7,7 +7,7 @@ import type {
 	TreeStage,
 } from 'low-poly-2d-trees';
 import type { ExecutionPhase, SessionState } from '$lib/types/generated';
-import type { WorktreeState } from '$lib/modules/issues/index.js';
+import type { WorktreeState, IssuePriority } from '$lib/modules/issues/index.js';
 
 // ─── GitHub Label -> Tree Shape Mapping ─────────────────────────────────────
 
@@ -114,8 +114,6 @@ export interface SessionForMapping {
 
 // ─── Forest Layout Types ─────────────────────────────────────────────────────
 
-type IssuePriority = 'low' | 'medium' | 'high' | 'top' | null;
-
 export interface Viewport {
 	readonly width: number;
 	readonly height: number;
@@ -124,7 +122,7 @@ export interface Viewport {
 export interface ForestLayoutItemOak {
 	readonly id: string;
 	readonly kind: 'oak';
-	readonly priority: IssuePriority;
+	readonly priority: IssuePriority | null;
 	readonly sortOrder: number;
 }
 
@@ -132,7 +130,7 @@ export interface ForestLayoutItemTree {
 	readonly id: string;
 	readonly kind: 'tree';
 	readonly stage: TreeStage;
-	readonly priority: IssuePriority;
+	readonly priority: IssuePriority | null;
 	readonly sortOrder: number;
 	readonly depthRow: number;
 }
@@ -141,7 +139,7 @@ export interface ForestLayoutItemPottedPlant {
 	readonly id: string;
 	readonly kind: 'potted-plant';
 	readonly stage: PottedPlantStage;
-	readonly priority: IssuePriority;
+	readonly priority: IssuePriority | null;
 	readonly sortOrder: number;
 	readonly depthRow: number;
 }

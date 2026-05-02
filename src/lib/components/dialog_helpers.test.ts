@@ -54,6 +54,11 @@ describe('buildCreateIssueRequest', () => {
 		expect(result?.github_issue_number).toBe(7);
 	});
 
+	it('includes lowest priority when provided', () => {
+		const result = buildCreateIssueRequest('dash-1', 'Fix bug', '#ff0000', 'lowest', '');
+		expect(result?.priority).toBe('lowest');
+	});
+
 	it('returns null for empty name', () => {
 		expect(buildCreateIssueRequest('dash-1', '  ', '#ff0000', '', '')).toBeNull();
 	});

@@ -15,6 +15,7 @@ import {
 	ROW_X_OFFSET_FRACTION,
 	GROUND_Y_FRACTION,
 } from './constants.js';
+import { priorityRank } from '$lib/modules/issues/priority.js';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -22,27 +23,6 @@ const Z_OAK = 100;
 const Z_ROW_BASE = 50;
 const Z_ROW_STEP = 5;
 const MAX_RELAXATION_PASSES = 10;
-
-// ─── Internal Types ─────────────────────────────────────────────────────────
-
-type IssuePriority = ForestLayoutItem['priority'];
-
-// ─── Priority Sorting ───────────────────────────────────────────────────────
-
-function priorityRank(priority: IssuePriority): number {
-	switch (priority) {
-		case 'top':
-			return 0;
-		case 'high':
-			return 1;
-		case 'medium':
-			return 2;
-		case 'low':
-			return 3;
-		case null:
-			return 4;
-	}
-}
 
 function sortByPriorityThenOrder(items: readonly ForestLayoutItem[]): ForestLayoutItem[] {
 	return [...items].sort((a, b) => {
