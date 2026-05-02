@@ -269,5 +269,15 @@
 	"settings_user_title": "User Profile",
 	"settings_user_description": "Set your display name and initials.",
 	"settings_username_label": "Display Name",
-	"settings_initials_label": "Initials"
+	"settings_initials_label": "Initials",
+
+	"raw_requirements_title": "Rychlé nápady",
+	"raw_requirements_placeholder": "Zachyťte nový nápad nebo požadavek…",
+	"raw_requirements_save": "Uložit",
+	"raw_requirements_edit": "Upravit",
+	"raw_requirements_cancel_edit": "Zrušit",
+	"raw_requirements_save_edit": "Uložit",
+	"raw_requirements_process": "Zpracovat požadavky",
+	"raw_requirements_empty": "Zatím žádné nápady. Začněte psát níže.",
+	"raw_requirements_processed": "zpracováno"
 }

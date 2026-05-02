@@ -285,5 +285,15 @@
 	"settings_user_title": "User Profile",
 	"settings_user_description": "Set your display name and initials.",
 	"settings_username_label": "Display Name",
-	"settings_initials_label": "Initials"
+	"settings_initials_label": "Initials",
+
+	"raw_requirements_title": "Quick Ideas",
+	"raw_requirements_placeholder": "Capture a new idea or requirement…",
+	"raw_requirements_save": "Save",
+	"raw_requirements_edit": "Edit",
+	"raw_requirements_cancel_edit": "Cancel",
+	"raw_requirements_save_edit": "Save",
+	"raw_requirements_process": "Process Requirements",
+	"raw_requirements_empty": "No ideas captured yet. Start typing below.",
+	"raw_requirements_processed": "processed"
 }
