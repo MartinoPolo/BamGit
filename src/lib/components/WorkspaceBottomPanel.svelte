@@ -35,6 +35,10 @@
 		forceExpanded?: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
+		prioritiesEnabled?: boolean;
+		paletteColors?: string[];
+		usedColors?: string[];
+		isDarkMode?: boolean;
 		dependencies: readonly IssueDependency[];
 		ghSetupBanner?: boolean;
 		ghAvailability?: GhCliAvailability;
@@ -57,6 +61,10 @@
 		forceExpanded,
 		cacheMap = new Map(),
 		ghAvailable = false,
+		prioritiesEnabled = true,
+		paletteColors = [],
+		usedColors = [],
+		isDarkMode = false,
 		dependencies,
 		ghSetupBanner = false,
 		ghAvailability,
@@ -75,6 +83,7 @@
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
+		onChangeColor,
 		onPrune,
 	}: Props = $props();
 
@@ -179,6 +188,10 @@
 					{forceExpanded}
 					{cacheMap}
 					{ghAvailable}
+					{prioritiesEnabled}
+					{paletteColors}
+					{usedColors}
+					{isDarkMode}
 					{getChildren}
 					{getNotificationDotColor}
 					{getProgressLines}
@@ -191,6 +204,7 @@
 					{onSetupWorktree}
 					{onRemoveWorktree}
 					{onExecuteAction}
+					{onChangeColor}
 				/>
 
 				{#if assignedIssues.length > 0}

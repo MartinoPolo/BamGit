@@ -80,4 +80,5 @@ export interface IssueCardCallbacks {
 	onSetupWorktree?: (issue: Issue) => void;
 	onRemoveWorktree?: (issue: Issue) => void;
 	onExecuteAction?: (actionId: string, issueId: string) => void;
+	onChangeColor?: (issueId: string, newColor: string) => void;
 }

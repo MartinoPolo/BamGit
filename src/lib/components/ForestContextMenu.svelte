@@ -1,8 +1,10 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import {
 		TREE_CONTEXT_MENU_ACTIONS,
 		type TreeContextMenuAction,
 	} from '$lib/modules/visualization';
+	import { isContextMenuActionEnabled } from './forest_context_menu_utils.js';
 	import { clickOutside } from '$lib/actions/click_outside.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
@@ -22,23 +24,39 @@
 
 	interface MenuItem {
 		readonly action: TreeContextMenuAction;
-		readonly label: string;
+		readonly label: () => string;
 		readonly icon: typeof GlobeIcon;
 	}
 
 	const menuItems: readonly MenuItem[] = [
-		{ action: TREE_CONTEXT_MENU_ACTIONS.openGithub, label: 'Open GitHub', icon: GlobeIcon },
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.openGithub,
+			label: () => m.forest_menu_open_github(),
+			icon: GlobeIcon,
+		},
 		{
 			action: TREE_CONTEXT_MENU_ACTIONS.openWorktree,
-			label: 'Open Worktree',
+			label: () => m.forest_menu_open_worktree(),
 			icon: GitBranchIcon,
 		},
-		{ action: TREE_CONTEXT_MENU_ACTIONS.startSession, label: 'Start Session', icon: PlayIcon },
-		{ action: TREE_CONTEXT_MENU_ACTIONS.archive, label: 'Archive', icon: ArchiveIcon },
-		{ action: TREE_CONTEXT_MENU_ACTIONS.changeColor, label: 'Change Color', icon: PaletteIcon },
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.startSession,
+			label: () => m.forest_menu_start_session(),
+			icon: PlayIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.archive,
+			label: () => m.forest_menu_archive(),
+			icon: ArchiveIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.changeColor,
+			label: () => m.forest_menu_change_color(),
+			icon: PaletteIcon,
+		},
 		{
 			action: TREE_CONTEXT_MENU_ACTIONS.pruneWorktree,
-			label: 'Prune Worktree',
+			label: () => m.forest_menu_prune_worktree(),
 			icon: ScissorsIcon,
 		},
 	];
@@ -61,11 +79,11 @@
 			type="button"
 			class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
 			role="menuitem"
-			disabled
+			disabled={!isContextMenuActionEnabled(item.action)}
 			onclick={() => handleItemClick(item.action)}
 		>
 			<item.icon class="size-4" />
-			{item.label}
+			{item.label()}
 		</button>
 	{/each}
 </div>
