@@ -131,6 +131,7 @@
 			if (githubRepoParts) {
 				versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
 			}
+			versionControlStore.loadDeletedAssignedIssueNumbers(dashboardId);
 		});
 	});
 
@@ -230,44 +231,73 @@
 		});
 	}
 
-	async function handleQuickAdd(assignedIssue: AssignedIssue) {
+	async function handleWizardOpenWithIssue(assignedIssue: AssignedIssue) {
 		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId === null) {
 			return;
 		}
+		const nextColor = await fetchNextColor(dashboardId);
+		wizardStore.openWizardWithPreselectedIssue(
+			buildWizardDependencies(dashboardId, nextColor),
+			assignedIssue,
+		);
+	}
 
-		let nextColor = activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
-		try {
-			nextColor = await boardStore.getNextColor(dashboardId);
-		} catch {
-			// keep default
-		}
-
+	async function quickCreateFromAssigned(dashboardId: string, assignedIssue: AssignedIssue) {
+		const nextColor = await fetchNextColor(dashboardId);
 		const { generateIssueName, generateBranchName } =
 			await import('$lib/modules/creation-wizard');
-		const name = generateIssueName(assignedIssue.number, assignedIssue.title);
-		const branchName = generateBranchName(assignedIssue.number, assignedIssue.title);
 
-		const request: CreateIssueRequest = {
+		const issue = await issueStore.addIssue({
 			dashboard_id: dashboardId,
-			name,
+			name: generateIssueName(assignedIssue.number, assignedIssue.title),
 			color: nextColor,
 			priority: 'medium',
 			github_issue_url: assignedIssue.url,
 			github_issue_number: assignedIssue.number,
-		};
+		});
 
-		try {
-			const issue = await issueStore.addIssue(request);
-			await issueStore.updateIssue({
-				id: issue.id,
-				branch_name: branchName,
-				base_branch: boardStore.activeDashboard?.default_base_branch ?? null,
-			});
-			await issueStore.refresh();
-		} catch (error) {
-			console.error('Quick add failed:', error);
+		const branchName = generateBranchName(assignedIssue.number, assignedIssue.title);
+		await issueStore.updateIssue({
+			id: issue.id,
+			branch_name: branchName,
+			base_branch: boardStore.activeDashboard?.default_base_branch ?? null,
+		});
+		await issueStore.refresh();
+		return { issue, branchName };
+	}
+
+	async function handleQuickAddWithWorktree(assignedIssue: AssignedIssue) {
+		const dashboardId = boardStore.activeDashboardId;
+		if (dashboardId === null) {
+			return;
 		}
+		try {
+			const { issue, branchName } = await quickCreateFromAssigned(dashboardId, assignedIssue);
+			const localFolder = boardStore.activeDashboard?.local_folder;
+			if (localFolder != null) {
+				await issueStore.setupWorktree({
+					issue_id: issue.id,
+					branch_name: branchName,
+					color: issue.color,
+					working_directory: localFolder,
+					base_branch:
+						issue.base_branch ?? boardStore.activeDashboard?.default_base_branch,
+				});
+			}
+		} catch (error) {
+			console.error('Quick add with worktree failed:', error);
+		}
+	}
+
+	function handleLoadMoreAssignedIssues() {
+		if (githubRepoParts === null) {
+			return;
+		}
+		void versionControlStore.loadMoreAssignedIssues(
+			githubRepoParts.owner,
+			githubRepoParts.repo,
+		);
 	}
 
 	async function handleUnarchiveIssue(id: string) {
@@ -522,6 +552,8 @@
 							versionControlStore.ghAvailability !== 'available'}
 						ghAvailability={versionControlStore.ghAvailability}
 						assignedIssues={versionControlStore.assignedIssues}
+						assignedIssuesHasMore={versionControlStore.assignedIssuesHasMore}
+						deletedAssignedIssueNumbers={versionControlStore.deletedAssignedIssueNumbers}
 						isGhAvailable={versionControlStore.isGhAvailable}
 						{getVisualization}
 						getChildren={issueStore.getChildren}
@@ -541,7 +573,9 @@
 						onExecuteAction={handleExecuteAction}
 						onChangeColor={handleChangeColor}
 						onPrune={handleOpenPruneDialog}
-						onQuickAdd={handleQuickAdd}
+						onWizardOpen={handleWizardOpenWithIssue}
+						onQuickAddWithWorktree={handleQuickAddWithWorktree}
+						onLoadMoreAssignedIssues={handleLoadMoreAssignedIssues}
 					/>
 				{/snippet}
 			</WorkspaceDashboardLayout>

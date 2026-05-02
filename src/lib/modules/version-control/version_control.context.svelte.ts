@@ -3,6 +3,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import { invoke } from '$lib/tauri.js';
 import type {
 	AssignedIssue,
+	AssignedIssuesResult,
 	GhCliAvailability,
 	GitStatusCache,
 	SyncAllResult,
@@ -42,6 +43,9 @@ function createVersionControlContext() {
 	let syncing = $state(false);
 	let syncError = $state<string | null>(null);
 	let assignedIssues = $state<AssignedIssue[]>([]);
+	let assignedIssuesHasMore = $state(false);
+	let assignedIssuesLimit = $state(10);
+	let deletedAssignedIssueNumbers = $state<number[]>([]);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -65,6 +69,12 @@ function createVersionControlContext() {
 		},
 		get assignedIssues() {
 			return assignedIssues;
+		},
+		get assignedIssuesHasMore() {
+			return assignedIssuesHasMore;
+		},
+		get deletedAssignedIssueNumbers() {
+			return deletedAssignedIssueNumbers;
 		},
 		get loading() {
 			return loading;
@@ -170,13 +180,44 @@ function createVersionControlContext() {
 
 		async loadAssignedIssues(owner: string, repo: string) {
 			try {
-				assignedIssues = await invoke<AssignedIssue[]>('fetch_assigned_issues', {
+				assignedIssuesLimit = 10;
+				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
 					owner,
 					repo,
+					limit: assignedIssuesLimit,
 				});
+				assignedIssues = result.issues;
+				assignedIssuesHasMore = result.has_more;
 			} catch (err) {
 				error = String(err);
 				console.error('Failed to load assigned issues:', err);
+			}
+		},
+
+		async loadMoreAssignedIssues(owner: string, repo: string) {
+			try {
+				assignedIssuesLimit += 10;
+				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
+					owner,
+					repo,
+					limit: assignedIssuesLimit,
+				});
+				assignedIssues = result.issues;
+				assignedIssuesHasMore = result.has_more;
+			} catch (err) {
+				error = String(err);
+				console.error('Failed to load more assigned issues:', err);
+			}
+		},
+
+		async loadDeletedAssignedIssueNumbers(dashboardId: string) {
+			try {
+				deletedAssignedIssueNumbers = await invoke<number[]>(
+					'get_deleted_assigned_issue_numbers',
+					{ dashboardId },
+				);
+			} catch (err) {
+				console.error('Failed to load deleted assigned issue numbers:', err);
 			}
 		},
 

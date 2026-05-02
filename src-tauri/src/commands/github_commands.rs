@@ -6,9 +6,9 @@ use crate::models::git_status::{
     row_to_git_status_cache, GitStatusCache, GIT_STATUS_CACHE_SELECT_COLUMNS,
 };
 use crate::models::github::{
-    resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, GhCliAvailability,
-    GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, SearchedGithubIssue,
-    SyncAllResult,
+    resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, AssignedIssuesResult,
+    GhCliAvailability, GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest,
+    SearchedGithubIssue, SyncAllResult,
 };
 
 use super::dependency_commands;
@@ -312,7 +312,11 @@ pub async fn fetch_pr_for_branch(
 pub async fn fetch_assigned_issues(
     owner: String,
     repo: String,
-) -> Result<Vec<AssignedIssue>, String> {
+    limit: Option<i64>,
+) -> Result<AssignedIssuesResult, String> {
+    let effective_limit = limit.unwrap_or(10);
+    let fetch_limit = (effective_limit + 1).to_string();
+
     let stdout = run_gh_command(&[
         "issue",
         "list",
@@ -321,14 +325,58 @@ pub async fn fetch_assigned_issues(
         "--repo",
         &format!("{owner}/{repo}"),
         "--json",
-        "number,title,state,url",
+        "number,title,state,url,labels",
+        "--limit",
+        &fetch_limit,
     ])
     .await?;
 
-    let issues: Vec<AssignedIssue> =
+    let mut issues: Vec<AssignedIssue> =
         serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
 
-    Ok(issues)
+    let has_more = issues.len() as i64 > effective_limit;
+    if has_more {
+        issues.truncate(effective_limit as usize);
+    }
+
+    Ok(AssignedIssuesResult { issues, has_more })
+}
+
+#[tauri::command]
+pub fn record_deleted_assigned_issue(
+    state: State<DatabaseState>,
+    dashboard_id: String,
+    github_issue_number: i64,
+) -> Result<(), String> {
+    let connection = state.write()?;
+    let id = uuid::Uuid::new_v4().to_string();
+    connection
+        .execute(
+            "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) \
+             VALUES (?1, ?2, ?3)",
+            rusqlite::params![id, dashboard_id, github_issue_number],
+        )
+        .map_err(|error| format!("Failed to record deleted assigned issue: {error}"))?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_deleted_assigned_issue_numbers(
+    state: State<DatabaseState>,
+    dashboard_id: String,
+) -> Result<Vec<i64>, String> {
+    let connection = state.read()?;
+    let mut statement = connection
+        .prepare(
+            "SELECT github_issue_number FROM deleted_assigned_issues WHERE dashboard_id = ?1",
+        )
+        .map_err(|error| format!("Failed to prepare query: {error}"))?;
+    let numbers = statement
+        .query_map([&dashboard_id], |row| row.get(0))
+        .map_err(|error| format!("Failed to query deleted issues: {error}"))?
+        .collect::<Result<Vec<i64>, _>>()
+        .map_err(|error| format!("Failed to read row: {error}"))?;
+    Ok(numbers)
 }
 
 #[tauri::command]
@@ -849,11 +897,99 @@ mod tests {
 
     #[test]
     fn parse_gh_assigned_issues_output() {
-        let json = r#"[{"number":1,"title":"Bug fix","state":"OPEN","url":"https://github.com/o/r/issues/1"},{"number":2,"title":"Feature","state":"CLOSED","url":"https://github.com/o/r/issues/2"}]"#;
+        let json = r#"[{"number":1,"title":"Bug fix","state":"OPEN","url":"https://github.com/o/r/issues/1","labels":[{"name":"bug","color":"d73a4a"}]},{"number":2,"title":"Feature","state":"CLOSED","url":"https://github.com/o/r/issues/2","labels":[]}]"#;
         let parsed: Vec<AssignedIssue> = serde_json::from_str(json).unwrap();
         assert_eq!(parsed.len(), 2);
         assert_eq!(parsed[0].number, 1);
+        assert_eq!(parsed[0].labels.len(), 1);
+        assert_eq!(parsed[0].labels[0].name, "bug");
+        assert_eq!(parsed[0].labels[0].color, "d73a4a");
         assert_eq!(parsed[1].state, "CLOSED");
+        assert!(parsed[1].labels.is_empty());
+    }
+
+    #[test]
+    fn parse_assigned_issues_without_labels_field() {
+        let json = r#"[{"number":1,"title":"Bug fix","state":"OPEN","url":"https://github.com/o/r/issues/1"}]"#;
+        let parsed: Vec<AssignedIssue> = serde_json::from_str(json).unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert!(parsed[0].labels.is_empty(), "labels should default to empty vec");
+    }
+
+    #[test]
+    fn record_and_get_deleted_assigned_issue_numbers() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+        insert_dashboard(&connection, "d2");
+
+        let id1 = uuid::Uuid::new_v4().to_string();
+        connection
+            .execute(
+                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id1, "d1", 42],
+            )
+            .unwrap();
+
+        let id2 = uuid::Uuid::new_v4().to_string();
+        connection
+            .execute(
+                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id2, "d1", 99],
+            )
+            .unwrap();
+
+        let id3 = uuid::Uuid::new_v4().to_string();
+        connection
+            .execute(
+                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id3, "d2", 50],
+            )
+            .unwrap();
+
+        // Query d1
+        let mut stmt = connection
+            .prepare("SELECT github_issue_number FROM deleted_assigned_issues WHERE dashboard_id = ?1")
+            .unwrap();
+        let d1_numbers: Vec<i64> = stmt.query_map(["d1"], |row| row.get(0)).unwrap().collect::<Result<Vec<_>, _>>().unwrap();
+        assert_eq!(d1_numbers.len(), 2);
+        assert!(d1_numbers.contains(&42));
+        assert!(d1_numbers.contains(&99));
+
+        // Query d2
+        let d2_numbers: Vec<i64> = stmt.query_map(["d2"], |row| row.get(0)).unwrap().collect::<Result<Vec<_>, _>>().unwrap();
+        assert_eq!(d2_numbers.len(), 1);
+        assert!(d2_numbers.contains(&50));
+    }
+
+    #[test]
+    fn deleted_assigned_issue_duplicate_is_ignored() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+
+        let id1 = uuid::Uuid::new_v4().to_string();
+        connection
+            .execute(
+                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id1, "d1", 42],
+            )
+            .unwrap();
+
+        let id2 = uuid::Uuid::new_v4().to_string();
+        connection
+            .execute(
+                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
+                rusqlite::params![id2, "d1", 42],
+            )
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM deleted_assigned_issues WHERE dashboard_id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 1, "duplicate insert should be ignored");
     }
 
     // --- GraphQL query builder tests ---

@@ -5,6 +5,8 @@ export type { Action } from './Action';
 export type { AppSetting } from './AppSetting';
 export type { JsonValue } from './serde_json/JsonValue';
 export type { AssignedIssue } from './AssignedIssue';
+export type { AssignedIssueLabel } from './AssignedIssueLabel';
+export type { AssignedIssuesResult } from './AssignedIssuesResult';
 export type { BranchStatus } from './BranchStatus';
 export type { ColorPalette } from './ColorPalette';
 export type { Dashboard } from './Dashboard';

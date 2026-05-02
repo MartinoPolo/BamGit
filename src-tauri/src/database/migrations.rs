@@ -2,11 +2,11 @@ use rusqlite::Connection;
 
 use super::schema;
 
-pub(crate) const CURRENT_VERSION: i32 = 2;
+pub(crate) const CURRENT_VERSION: i32 = 3;
 
 type MigrationFunction = fn(&Connection) -> Result<(), rusqlite::Error>;
 
-static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2];
+static MIGRATIONS: &[MigrationFunction] = &[migrate_v1, migrate_v2, migrate_v3];
 
 fn migrate_v1(connection: &Connection) -> Result<(), rusqlite::Error> {
     schema::create_tables(connection)?;
@@ -84,6 +84,21 @@ fn migrate_v2(connection: &Connection) -> Result<(), rusqlite::Error> {
         ",
     )?;
     connection.execute_batch("PRAGMA foreign_keys=ON;")?;
+    Ok(())
+}
+
+fn migrate_v3(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute_batch(
+        "CREATE TABLE IF NOT EXISTS deleted_assigned_issues (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            github_issue_number INTEGER NOT NULL,
+            deleted_at TEXT NOT NULL DEFAULT (datetime('now')),
+            UNIQUE(dashboard_id, github_issue_number)
+        );
+        CREATE INDEX IF NOT EXISTS idx_deleted_assigned_issues_dashboard
+            ON deleted_assigned_issues(dashboard_id);",
+    )?;
     Ok(())
 }
 

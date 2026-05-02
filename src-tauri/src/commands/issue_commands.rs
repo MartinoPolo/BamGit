@@ -169,6 +169,24 @@ pub fn update_issue(
 pub fn delete_issue(state: State<DatabaseState>, id: String) -> Result<(), String> {
     let connection = state.write()?;
 
+    // Record deletion history for issues linked to GitHub
+    let deletion_info: Option<(String, i64)> = connection
+        .query_row(
+            "SELECT dashboard_id, github_issue_number FROM issues WHERE id = ?1 AND github_issue_number IS NOT NULL",
+            [&id],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .ok();
+
+    if let Some((dashboard_id, github_issue_number)) = deletion_info {
+        let deletion_id = uuid::Uuid::new_v4().to_string();
+        let _ = connection.execute(
+            "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) \
+             VALUES (?1, ?2, ?3)",
+            rusqlite::params![deletion_id, dashboard_id, github_issue_number],
+        );
+    }
+
     let rows_affected = connection
         .execute("DELETE FROM issues WHERE id = ?1", [&id])
         .map_err(|error| format!("Failed to delete issue: {error}"))?;
@@ -220,4 +238,99 @@ pub fn unarchive_issue(state: State<DatabaseState>, id: String) -> Result<Issue,
     connection
         .query_row(&query, [&id], |row| row_to_issue(row))
         .map_err(|error| format!("Failed to read unarchived issue: {error}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::database::test_helpers::setup_test_database;
+    use rusqlite::Connection;
+
+    fn insert_dashboard(connection: &Connection, id: &str) {
+        connection
+            .execute(
+                "INSERT INTO dashboards (id, name, type, github_repo) VALUES (?1, 'Test', 'repo', 'owner/repo')",
+                [id],
+            )
+            .unwrap();
+    }
+
+    fn insert_issue_with_github(
+        connection: &Connection,
+        id: &str,
+        dashboard_id: &str,
+        github_issue_number: Option<i64>,
+    ) {
+        connection
+            .execute(
+                "INSERT INTO issues (id, dashboard_id, name, github_issue_number) VALUES (?1, ?2, 'Test Issue', ?3)",
+                rusqlite::params![id, dashboard_id, github_issue_number],
+            )
+            .unwrap();
+    }
+
+    #[test]
+    fn delete_issue_with_github_number_records_deletion_history() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+        insert_issue_with_github(&connection, "i1", "d1", Some(42));
+
+        // Simulate delete_issue logic (can't call Tauri command directly in tests)
+        let deletion_info: Option<(String, i64)> = connection
+            .query_row(
+                "SELECT dashboard_id, github_issue_number FROM issues WHERE id = ?1 AND github_issue_number IS NOT NULL",
+                ["i1"],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .ok();
+
+        if let Some((dashboard_id, github_issue_number)) = deletion_info {
+            let deletion_id = uuid::Uuid::new_v4().to_string();
+            connection
+                .execute(
+                    "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
+                    rusqlite::params![deletion_id, dashboard_id, github_issue_number],
+                )
+                .unwrap();
+        }
+
+        connection.execute("DELETE FROM issues WHERE id = 'i1'", []).unwrap();
+
+        let count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM deleted_assigned_issues WHERE dashboard_id = 'd1'", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(count, 1);
+
+        let recorded_number: i64 = connection
+            .query_row(
+                "SELECT github_issue_number FROM deleted_assigned_issues WHERE dashboard_id = 'd1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(recorded_number, 42);
+    }
+
+    #[test]
+    fn delete_issue_without_github_number_does_not_record() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+        insert_issue_with_github(&connection, "i1", "d1", None);
+
+        let deletion_info: Option<(String, i64)> = connection
+            .query_row(
+                "SELECT dashboard_id, github_issue_number FROM issues WHERE id = ?1 AND github_issue_number IS NOT NULL",
+                ["i1"],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .ok();
+
+        assert!(deletion_info.is_none(), "should not find github_issue_number");
+
+        connection.execute("DELETE FROM issues WHERE id = 'i1'", []).unwrap();
+
+        let count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM deleted_assigned_issues", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(count, 0);
+    }
 }

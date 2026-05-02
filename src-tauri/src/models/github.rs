@@ -37,6 +37,14 @@ pub enum GhCliAvailability {
     NotAuthenticated,
 }
 
+/// A label on a GitHub issue (name + hex color).
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct AssignedIssueLabel {
+    pub name: String,
+    pub color: String,
+}
+
 /// A GitHub issue assigned to the current user, returned by `gh issue list --assignee @me`.
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
@@ -46,6 +54,16 @@ pub struct AssignedIssue {
     pub title: String,
     pub state: String,
     pub url: String,
+    #[serde(default)]
+    pub labels: Vec<AssignedIssueLabel>,
+}
+
+/// Paginated result from fetch_assigned_issues.
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct AssignedIssuesResult {
+    pub issues: Vec<AssignedIssue>,
+    pub has_more: bool,
 }
 
 /// A GitHub issue returned by search, used in the creation wizard.
