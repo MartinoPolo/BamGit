@@ -24,6 +24,7 @@
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
+	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import RawRequirementsModal from '$lib/components/RawRequirementsModal.svelte';
 	import type { Dashboard } from '$lib/types/generated';
@@ -41,6 +42,7 @@
 	const shortcutsCtx = setKeyboardShortcutsContext();
 	const commandPaletteCtx = setCommandPaletteContext();
 	const rawRequirementsCtx = setRawRequirementsContext();
+	setCreationWizardContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 

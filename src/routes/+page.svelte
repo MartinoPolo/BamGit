@@ -25,14 +25,15 @@
 	import WorkspaceBottomPanel from '$lib/components/WorkspaceBottomPanel.svelte';
 	import { computeVisualization } from '$lib/modules/visualization';
 	import type { TreeVisualization } from '$lib/modules/visualization';
-	import IssueCreateDialog from '$lib/components/IssueCreateDialog.svelte';
+	import { CreationWizard } from '$lib/components/creation-wizard/index.js';
+	import { useCreationWizard, type WizardDependencies } from '$lib/modules/creation-wizard';
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
 	import ArchiveConfirmDialog from '$lib/components/ArchiveConfirmDialog.svelte';
 	import DeleteConfirmDialog from '$lib/components/DeleteConfirmDialog.svelte';
 	import IssueRenameDialog from '$lib/components/IssueRenameDialog.svelte';
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 	import ColorChangeDialog from '$lib/components/ColorChangeDialog.svelte';
-	import type { PrunableIssue } from '$lib/types/generated';
+	import type { AssignedIssue, PrunableIssue } from '$lib/types/generated';
 
 	const boardStore = useBoard();
 	const issueStore = useIssues();
@@ -41,6 +42,7 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 	const selection = useSelection();
+	const wizardStore = useCreationWizard();
 
 	function getNotificationDotColor(issueId: string): string | null {
 		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
@@ -54,8 +56,6 @@
 		);
 	}
 
-	let createDialogOpen = $state(false);
-	let nextAvailableColor = $state<string>(FALLBACK_ISSUE_COLOR);
 	let usedColors = $state<string[]>([]);
 	let editingIssue = $state<Issue | null>(null);
 	let allExpanded = $state(false);
@@ -154,20 +154,39 @@
 		}
 	}
 
-	async function openCreateDialog() {
-		createDialogOpen = true;
-		const dashboardId = boardStore.activeDashboardId;
-		if (dashboardId !== null) {
-			try {
-				const [color] = await Promise.all([
-					boardStore.getNextColor(dashboardId),
-					loadUsedColors(),
-				]);
-				nextAvailableColor = color;
-			} catch {
-				nextAvailableColor = activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
-			}
+	async function fetchNextColor(dashboardId: string): Promise<string> {
+		try {
+			const [color] = await Promise.all([
+				boardStore.getNextColor(dashboardId),
+				loadUsedColors(),
+			]);
+			return color;
+		} catch {
+			return activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
 		}
+	}
+
+	function buildWizardDependencies(dashboardId: string, nextColor: string): WizardDependencies {
+		return {
+			dashboardId,
+			paletteColors: activePaletteColors,
+			usedColors,
+			nextAvailableColor: nextColor,
+			isDarkMode: boardStore.theme.isDark,
+			localFolder: boardStore.activeDashboard?.local_folder ?? null,
+			defaultBaseBranch: boardStore.activeDashboard?.default_base_branch ?? null,
+			githubRepo: githubRepoParts,
+			assignedIssues: versionControlStore.assignedIssues,
+		};
+	}
+
+	async function openCreateDialog() {
+		const dashboardId = boardStore.activeDashboardId;
+		if (dashboardId === null) {
+			return;
+		}
+		const nextColor = await fetchNextColor(dashboardId);
+		wizardStore.openWizard(buildWizardDependencies(dashboardId, nextColor));
 	}
 
 	async function handleAction(
@@ -185,8 +204,70 @@
 		}
 	}
 
-	async function handleCreateIssue(request: CreateIssueRequest) {
-		await handleAction('create issue', () => issueStore.addIssue(request));
+	async function handleWizardCreate(request: CreateIssueRequest): Promise<Issue> {
+		const issue = await issueStore.addIssue(request);
+		await issueStore.refresh();
+		return issue;
+	}
+
+	async function handleWizardUpdate(request: UpdateIssueRequest): Promise<Issue> {
+		const issue = await issueStore.updateIssue(request);
+		await issueStore.refresh();
+		return issue;
+	}
+
+	async function handleWizardSetupWorktree(issue: Issue): Promise<void> {
+		const dashboard = boardStore.activeDashboard;
+		if (dashboard?.local_folder == null || issue.branch_name == null) {
+			return;
+		}
+		await issueStore.setupWorktree({
+			issue_id: issue.id,
+			branch_name: issue.branch_name,
+			color: issue.color,
+			working_directory: dashboard.local_folder,
+			base_branch: issue.base_branch ?? dashboard.default_base_branch,
+		});
+	}
+
+	async function handleQuickAdd(assignedIssue: AssignedIssue) {
+		const dashboardId = boardStore.activeDashboardId;
+		if (dashboardId === null) {
+			return;
+		}
+
+		let nextColor = activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
+		try {
+			nextColor = await boardStore.getNextColor(dashboardId);
+		} catch {
+			// keep default
+		}
+
+		const { generateIssueName, generateBranchName } =
+			await import('$lib/modules/creation-wizard');
+		const name = generateIssueName(assignedIssue.number, assignedIssue.title);
+		const branchName = generateBranchName(assignedIssue.number, assignedIssue.title);
+
+		const request: CreateIssueRequest = {
+			dashboard_id: dashboardId,
+			name,
+			color: nextColor,
+			priority: 'medium',
+			github_issue_url: assignedIssue.url,
+			github_issue_number: assignedIssue.number,
+		};
+
+		try {
+			const issue = await issueStore.addIssue(request);
+			await issueStore.updateIssue({
+				id: issue.id,
+				branch_name: branchName,
+				base_branch: boardStore.activeDashboard?.default_base_branch ?? null,
+			});
+			await issueStore.refresh();
+		} catch (error) {
+			console.error('Quick add failed:', error);
+		}
 	}
 
 	async function handleUnarchiveIssue(id: string) {
@@ -460,21 +541,18 @@
 						onExecuteAction={handleExecuteAction}
 						onChangeColor={handleChangeColor}
 						onPrune={handleOpenPruneDialog}
+						onQuickAdd={handleQuickAdd}
 					/>
 				{/snippet}
 			</WorkspaceDashboardLayout>
 		</div>
 	{/if}
 
-	<IssueCreateDialog
-		open={createDialogOpen}
-		dashboardId={boardStore.activeDashboard.id}
-		paletteColors={activePaletteColors}
-		defaultColor={nextAvailableColor}
-		{usedColors}
-		isDarkMode={boardStore.theme.isDark}
-		onClose={() => (createDialogOpen = false)}
-		onCreate={handleCreateIssue}
+	<CreationWizard
+		assignedIssues={versionControlStore.assignedIssues}
+		onCreate={handleWizardCreate}
+		onUpdate={handleWizardUpdate}
+		onSetupWorktree={handleWizardSetupWorktree}
 	/>
 
 	<IssueEditDialog

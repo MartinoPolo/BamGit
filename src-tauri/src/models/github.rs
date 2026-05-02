@@ -48,6 +48,17 @@ pub struct AssignedIssue {
     pub url: String,
 }
 
+/// A GitHub issue returned by search, used in the creation wizard.
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct SearchedGithubIssue {
+    #[ts(type = "number")]
+    pub number: i64,
+    pub title: String,
+    pub state: String,
+    pub url: String,
+}
+
 /// Result of a bulk sync operation.
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
