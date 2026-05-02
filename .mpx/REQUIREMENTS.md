@@ -25,15 +25,18 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 ### Workspace Dashboard
 
 - The workspace dashboard is the root page for each workspace window
-- **Primary view: Forest View** — collapsible panel, open by default. Can be slid upward to hide via a handle with a forest icon. Clicking the handle brings it back. Forest occupies the top portion; the bottom portion hosts detail content (issue cards, PRD overview, dependency graph)
-- **Issue cards** appear in the bottom panel and in secondary views (not as the primary dashboard element). Each card shows: name, color identifier, status badges, tree thumbnail (92px)
-- The default/primary view is configurable in settings (forest open by default, or collapsed by default, multiple bottom section views, tabs etc.)
+- **Primary view: Forest View** — persistent collapsible panel, open by default. Renders below the dashboard header (never overlays header or sidebar). Collapse/expand via a forest-icon toggle button in the main toolbar. Forest occupies the top portion; the bottom portion hosts tabbed detail content
+- **Bottom panel tabs**: `Issues | Kanban | Dependencies | Activity | Session`. Issue Detail replaces tab content contextually when a tree/card is selected (per PRD #122 REQ-18 auto-promote logic). Filter-type tabs filter to selected issue, Highlight-type tabs highlight the node
+- **Issue cards** appear in the bottom panel Issues tab (not as the primary dashboard element). Each card shows: name, color identifier, status badges, tree thumbnail (92px)
+- The default/primary view is configurable in settings (forest open by default, or collapsed by default)
 - Badges on cards: branch status (active/local/remote-gone/deleted), PR state (open/draft/review-requested/merged/closed/ready-to-merge), GitHub issue state (open/closed), sync status (behind base count), merge conflict indicator
 - Badges are interactive: clicking PR/issue badge opens GitHub URL
 - Badges are responsive: collapse to icon-only when header space is insufficient
 - One workspace = one dashboard = one GitHub repo
 - **Overview dashboard** (separate window/page): shows all configured workspaces as cards with health indicators (active sessions, open PRs, pending HITL issues)
-- Toolbar: Add Issue, Add Worktree Issue, Sync All, Sort, Filter, Collapse/Expand, Settings
+- **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle (icon button) | Plant (split-button: Add Issue / Add Worktree Issue, persists last-used action)
+- **Bottom panel toolbar** (Issues tab): Sort | Filter | Prune All Terminal
+- **Legend**: floating button inside the forest panel, not in the main toolbar
 - "Assigned Issues" panel accessible from dashboard (sidebar widget or collapsible section, quick-access) showing GitHub issues assigned to user (via `gh`) for quick import
 - Dashboard-level color palette configuration (vivid, pastel, etc. — 30 colors, 6 hues × 5 shades)
 
@@ -141,7 +144,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Setup script handles: git worktree creation, IDE config copy, Peacock color, .env files, Claude Code settings, dependency installation
 - Auto-assign worktree folder after setup succeeds
 - Retry modal on failure: list active worktrees for direct assignment + option to create new
-- Prune fully-closed worktrees (merged PR + deleted branch + closed issue) — batch removal supported
+- Prune fully-closed worktrees (merged PR + deleted branch + closed issue) — batch removal supported. Prune actions available via: issue card context menu (promoted to primary action in terminal states), forest tree right-click context menu, and "Prune All Terminal" batch button in bottom panel Issues tab toolbar
 - Per-project worktree folder: `{parent}/{project-name}-worktrees/` (configurable in settings)
 - Auto-detect existing worktrees in configured folder on first setup
 - Path change dialog: move worktrees / redetect in new folder / delete all originals
@@ -222,7 +225,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 ### Issue Tree Visualization (Forest View)
 
-- Forest panel in top portion of workspace dashboard — collapsible (slide up to hide, click handle to restore)
+- Forest panel in top portion of workspace dashboard — persistent collapsible panel, renders below the dashboard header (never overlays header or sidebar). Collapse/expand via forest-icon toggle button in the main toolbar
 - Open by default; configurable in settings whether forest starts open or collapsed
 - Each issue = a tree whose shape/stage reflects lifecycle progress
 - PRD/epic issues = large oak tree (central), with stone nameplate showing PRD title
@@ -311,14 +314,20 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Back rows: trunk y-shifted slightly up for perspective, x-offset so not fully hidden, smaller, can be visually disabled
 - Deterministic layout — no manual dragging
 - Forest occupies top portion of screen (~4:1 aspect ratio), resizable bottom border
-- Sky gradient background, ground strip with grass elements
+- Tree base size: 320px width (matching low-poly-2d-trees library), scaled by depth row. Overlap on narrow screens is acceptable — prefer taller visible trees over tiny non-overlapping ones
+- Tree spacing: equidistant `100% / (treeCount + 1)` across viewport width (matching library approach)
+- Background: import library's `SceneBackground` component directly (sky gradient + brown-to-green ground). Ground height fixed at 18%
 
 #### Bottom Detail Panel
 
-- Default: PRD/repository overview
-- On tree click: issue detail (metadata, badges, actions)
+- Tabbed panel: `Issues | Kanban | Dependencies | Activity | Session`
+- Default content (no selection): PRD/repository overview in Issues tab
+- On tree click: Issue Detail replaces current tab content contextually (auto-promote per #122 REQ-18)
 - On PRD tree click: return to PRD overview
-- Dependency graph tab: DAG visualization with AFK/HITL labels, quick-start HITL button, click-to-navigate
+- Tab behavior types: Replace (Issue Detail, Session), Filter (Activity), Highlight (Dependencies) — all tabs react simultaneously to selection via their behavior type
+- Issues tab has its own toolbar: Sort | Filter | Prune All Terminal
+- Kanban tab: board view of the same issues (column-based by stage)
+- Dependencies tab: DAG visualization with AFK/HITL labels, quick-start HITL button, click-to-navigate
 
 #### Technology
 
