@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
 	import type { Issue } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks } from '$lib/modules/issues';
@@ -80,7 +79,6 @@
 
 	let showOverflow = $state(false);
 	let showPrioritySubmenu = $state(false);
-	let showColorPopover = $state(false);
 
 	const color = $derived(issue.color ?? '#525252');
 	const isArchived = $derived(issue.status === 'archived');
@@ -112,9 +110,6 @@
 	);
 
 	function closeOverflow() {
-		if (showColorPopover) {
-			return;
-		}
 		showOverflow = false;
 		showPrioritySubmenu = false;
 	}
@@ -123,7 +118,6 @@
 		if (onChangeColor && newColor) {
 			onChangeColor(issue.id, newColor);
 		}
-		showColorPopover = false;
 	}
 </script>
 
@@ -279,28 +273,20 @@
 
 							<!-- Change Color -->
 							{#if !isArchived && onChangeColor}
-								<Popover.Root bind:open={showColorPopover}>
-									<Popover.Trigger>
-										{#snippet child({ props })}
-											<button
-												{...props}
-												class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
-											>
-												{m.issue_card_change_color()}
-											</button>
-										{/snippet}
-									</Popover.Trigger>
-									<Popover.Content side="left" sideOffset={8}>
-										<ColorPicker
-											variant="palette-hex-native"
-											colors={paletteColors}
-											selectedColor={issue.color ?? ''}
-											{usedColors}
-											{isDarkMode}
-											onSelect={handleColorSelect}
-										/>
-									</Popover.Content>
-								</Popover.Root>
+								<div class="flex items-center gap-2 px-3 py-1.5">
+									<span class="text-sm text-popover-foreground"
+										>{m.issue_card_change_color()}</span
+									>
+									<ColorPicker
+										selectedColor={issue.color ?? ''}
+										colors={paletteColors}
+										{usedColors}
+										{isDarkMode}
+										displayText="A"
+										side="left"
+										onSelect={handleColorSelect}
+									/>
+								</div>
 							{/if}
 
 							{#if onSetupWorktree && issue.branch_name !== null && (issue.worktree_state === 'none' || issue.worktree_state === 'failed')}

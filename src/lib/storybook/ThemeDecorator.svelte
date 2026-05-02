@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { setBoardContext, useBoard, ACCENT_COLORS } from '$lib/modules/board';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
@@ -56,7 +57,9 @@
 			{/each}
 		</div>
 	</div>
-	<div class="rounded-lg bg-background p-6 text-foreground">
-		{@render children()}
-	</div>
+	<Tooltip.Provider>
+		<div class="rounded-lg bg-background p-6 text-foreground">
+			{@render children()}
+		</div>
+	</Tooltip.Provider>
 </div>

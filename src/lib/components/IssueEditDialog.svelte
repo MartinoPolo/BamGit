@@ -100,17 +100,13 @@
 					</div>
 
 					<ColorPicker
-						variant="palette-hex-native"
 						colors={paletteColors}
 						selectedColor={color}
 						usedColors={editUsedColors}
 						{isDarkMode}
+						displayText="A"
 						onSelect={(c) => {
-							if (c === '') {
-								color = issue?.color ?? paletteColors[0] ?? FALLBACK_ISSUE_COLOR;
-							} else {
-								color = c;
-							}
+							color = c;
 						}}
 					/>
 

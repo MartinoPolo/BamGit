@@ -2,7 +2,7 @@ use rusqlite::{params, Connection};
 use tauri::State;
 
 use crate::database::connection::DatabaseState;
-use crate::database::migrations::seed_label_shape_mappings_for_dashboard;
+use crate::database::defaults::seed_label_shape_mappings_for_dashboard;
 
 const DEMO_DASHBOARD_ID: &str = "demo-forest-workspace";
 

@@ -2,29 +2,7 @@
 mod tests {
     use rusqlite::Connection;
 
-    use crate::database::migrations;
     use crate::database::test_helpers::setup_test_database;
-
-    // --- Migration tests ---
-
-    #[test]
-    fn migration_sets_schema_version_to_current() {
-        let connection = Connection::open_in_memory().unwrap();
-        migrations::run_migrations(&connection).unwrap();
-
-        let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, migrations::CURRENT_VERSION);
-    }
-
-    #[test]
-    fn migration_is_idempotent() {
-        let connection = Connection::open_in_memory().unwrap();
-        migrations::run_migrations(&connection).unwrap();
-        migrations::run_migrations(&connection).unwrap();
-
-        let version = migrations::get_schema_version(&connection).unwrap();
-        assert_eq!(version, migrations::CURRENT_VERSION);
-    }
 
     // --- Schema tests ---
 
@@ -36,6 +14,7 @@ mod tests {
             "color_palettes",
             "dashboards",
             "issues",
+            "issue_dependencies",
             "label_shape_mappings",
             "sessions",
             "actions",

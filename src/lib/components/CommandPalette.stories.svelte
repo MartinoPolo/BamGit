@@ -14,6 +14,8 @@
 
 <Story name="Open">
 	{#snippet template()}
-		<div class="h-[500px] w-full"></div>
+		<CommandPaletteStoryWrapper>
+			<div class="h-[400px] w-full"></div>
+		</CommandPaletteStoryWrapper>
 	{/snippet}
 </Story>

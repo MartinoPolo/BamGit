@@ -4,6 +4,7 @@ import {
 	relativeLuminance,
 	sortColorsByLuminance,
 	getContrastTextColor,
+	DEFAULT_COLOR_PALETTE,
 } from './color_utils.js';
 
 describe('isValidHexColor', () => {
@@ -84,5 +85,22 @@ describe('getContrastTextColor', () => {
 
 	it('returns dark text on yellow background', () => {
 		expect(getContrastTextColor('#ffff00')).toBe('#000000');
+	});
+});
+
+describe('DEFAULT_COLOR_PALETTE', () => {
+	it('has exactly 24 colors', () => {
+		expect(DEFAULT_COLOR_PALETTE).toHaveLength(24);
+	});
+
+	it('contains only valid hex colors', () => {
+		for (const color of DEFAULT_COLOR_PALETTE) {
+			expect(isValidHexColor(color), `${color} should be valid hex`).toBe(true);
+		}
+	});
+
+	it('contains no duplicates', () => {
+		const unique = new Set(DEFAULT_COLOR_PALETTE.map((c) => c.toLowerCase()));
+		expect(unique.size).toBe(DEFAULT_COLOR_PALETTE.length);
 	});
 });

@@ -5,7 +5,8 @@ use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::Connection;
 
-use super::migrations;
+use super::defaults;
+use super::schema;
 
 pub struct DatabaseState {
     pub read_pool: Pool<SqliteConnectionManager>,
@@ -40,8 +41,11 @@ pub fn initialize_database(app_data_directory: PathBuf) -> Result<DatabaseState,
         .execute_batch("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;")
         .map_err(|error| format!("Failed to set database pragmas: {error}"))?;
 
-    migrations::run_migrations(&connection)
-        .map_err(|error| format!("Failed to run migrations: {error}"))?;
+    schema::create_tables(&connection)
+        .map_err(|error| format!("Failed to create tables: {error}"))?;
+
+    defaults::seed_defaults(&connection)
+        .map_err(|error| format!("Failed to seed defaults: {error}"))?;
 
     // Read pool: 4 concurrent reader connections, each configured with WAL + foreign keys
     let manager = SqliteConnectionManager::file(&database_path)

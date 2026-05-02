@@ -26,6 +26,7 @@ Vitest + Playwright
 `pnpm check:all` -- full check suite (format + lint + fallow + typecheck + eslint)
 `pnpm test` -- unit tests
 `pnpm test:e2e` -- E2E tests
+`pnpm db:reset` -- delete SQLite database (app recreates it on next launch)
 
 ## Architecture
 
@@ -33,6 +34,16 @@ Vitest + Playwright
 - Rust backend handles commands, SQLite, native APIs
 - Frontend calls Rust via `invoke()` from `@tauri-apps/api/core`
 - Vite dev server on port 1420 (Tauri requirement)
+
+## Database (SQLite — no migrations, dev-only)
+
+No versioned migrations. Pre-production, no user data to preserve.
+On startup: `schema::create_tables()` (IF NOT EXISTS) then `defaults::seed_defaults()` (INSERT OR IGNORE).
+
+- New table: add to `schema.rs`, add demo data to `seed_commands.rs` if needed
+- Modify existing table: edit `schema.rs` directly, run `pnpm db:reset`, update `seed_commands.rs` if affected
+- New app default: update `defaults.rs::seed_defaults()`
+- Before production: switch to versioned migrations (PRAGMA user_version)
 
 ## Testing
 

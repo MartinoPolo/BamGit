@@ -48,11 +48,11 @@
 
 			<Dialog.Body>
 				<ColorPicker
-					variant="palette-hex-native"
 					colors={paletteColors}
 					selectedColor={issue.color ?? ''}
 					{usedColors}
 					{isDarkMode}
+					displayText="A"
 					onSelect={handleSelect}
 				/>
 			</Dialog.Body>

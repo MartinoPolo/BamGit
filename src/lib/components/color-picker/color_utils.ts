@@ -1,3 +1,41 @@
+/**
+ * 24-color palette organized as 6 hue columns x 4 rows.
+ * Row 1: normal hues (red, orange, yellow, green, blue, purple)
+ * Row 2: darker variants
+ * Row 3: lighter variants
+ * Row 4: specials (black, white, gray, teal, pink, brown)
+ */
+export const DEFAULT_COLOR_PALETTE: string[] = [
+	// Row 1: normal hues
+	'#e53e3e',
+	'#dd6b20',
+	'#d69e2e',
+	'#38a169',
+	'#3182ce',
+	'#805ad5',
+	// Row 2: darker variants
+	'#9b2c2c',
+	'#9c4221',
+	'#975a16',
+	'#276749',
+	'#2c5282',
+	'#553c9a',
+	// Row 3: lighter variants
+	'#fc8181',
+	'#f6ad55',
+	'#f6e05e',
+	'#68d391',
+	'#63b3ed',
+	'#b794f4',
+	// Row 4: specials (black, white, gray, teal, pink, brown)
+	'#1a202c',
+	'#ffffff',
+	'#a0aec0',
+	'#319795',
+	'#ed64a6',
+	'#8b5e3c',
+];
+
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 /**

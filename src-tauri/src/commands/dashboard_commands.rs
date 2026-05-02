@@ -3,7 +3,7 @@ use tauri::State;
 use uuid::Uuid;
 
 use crate::database::connection::DatabaseState;
-use crate::database::migrations::{seed_label_shape_mappings_for_dashboard, DEFAULT_TREE_SHAPE};
+use crate::database::defaults::{seed_label_shape_mappings_for_dashboard, DEFAULT_TREE_SHAPE};
 use crate::models::dashboard::{
     CreateDashboardRequest, Dashboard, DashboardType, UpdateDashboardRequest,
 };
