@@ -144,6 +144,7 @@ pub fn run() {
             github_commands::fetch_issue_state,
             github_commands::fetch_pr_for_branch,
             github_commands::fetch_assigned_issues,
+            github_commands::search_github_issues,
             github_commands::sync_all_github_state,
             worktree_commands::setup_worktree,
             worktree_commands::remove_worktree,

@@ -44,6 +44,7 @@
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
+		onQuickAdd?: (issue: AssignedIssue) => void;
 		onPrune?: () => void;
 	}
 
@@ -75,6 +76,7 @@
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
+		onQuickAdd,
 		onPrune,
 	}: Props = $props();
 
@@ -197,6 +199,7 @@
 					<AssignedIssuesPanel
 						issues={assignedIssues}
 						disabled={isGhAvailable !== true}
+						{onQuickAdd}
 					/>
 				{/if}
 			</div>

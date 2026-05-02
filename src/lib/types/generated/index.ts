@@ -25,6 +25,7 @@ export type { OverviewWorkspaceData } from './OverviewWorkspaceData';
 export type { PortfolioDashboardPointer } from './PortfolioDashboardPointer';
 export type { PrunableIssue } from './PrunableIssue';
 export type { PullRequestState } from './PullRequestState';
+export type { SearchedGithubIssue } from './SearchedGithubIssue';
 export type { Session } from './Session';
 export type { SessionEvent } from './SessionEvent';
 export type { SessionEventPayload } from './SessionEventPayload';

@@ -7,7 +7,8 @@ use crate::models::git_status::{
 };
 use crate::models::github::{
     resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, GhCliAvailability,
-    GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, SyncAllResult,
+    GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest, SearchedGithubIssue,
+    SyncAllResult,
 };
 
 use super::dependency_commands;
@@ -326,6 +327,50 @@ pub async fn fetch_assigned_issues(
 
     let issues: Vec<AssignedIssue> =
         serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
+
+    Ok(issues)
+}
+
+#[tauri::command]
+pub async fn search_github_issues(
+    owner: String,
+    repo: String,
+    query: String,
+) -> Result<Vec<SearchedGithubIssue>, String> {
+    let trimmed = query.trim();
+    if trimmed.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let repo_arg = format!("{owner}/{repo}");
+
+    // If query looks like a number (with or without #), try exact lookup first
+    let number_query = trimmed.trim_start_matches('#');
+    if number_query.chars().all(|c| c.is_ascii_digit()) && !number_query.is_empty() {
+        match run_gh_command(&[
+            "issue", "view", number_query,
+            "--repo", &repo_arg,
+            "--json", "number,title,state,url",
+        ]).await {
+            Ok(stdout) => {
+                if let Ok(issue) = serde_json::from_str::<SearchedGithubIssue>(&stdout) {
+                    return Ok(vec![issue]);
+                }
+            }
+            Err(_) => {} // Fall through to search
+        }
+    }
+
+    let stdout = run_gh_command(&[
+        "issue", "list",
+        "--search", trimmed,
+        "--repo", &repo_arg,
+        "--json", "number,title,state,url",
+        "--limit", "20",
+    ]).await?;
+
+    let issues: Vec<SearchedGithubIssue> = serde_json::from_str(&stdout)
+        .map_err(|error| format!("Failed to parse gh search output: {error}"))?;
 
     Ok(issues)
 }
