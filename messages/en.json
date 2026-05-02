@@ -221,6 +221,19 @@
 	"prune_remove_count_plural": "Remove {count} worktrees",
 
 	"assigned_title": "Assigned to me ({count})",
+	"assigned_load_more": "Load more",
+	"assigned_linked_heading": "Already in dashboard",
+	"assigned_deleted_heading": "Previously removed",
+	"assigned_wizard_open": "Add to dashboard",
+	"assigned_quick_worktree": "Quick add with worktree",
+
+	"issue_detail_no_selection": "Select an issue to view details",
+	"issue_detail_no_priority": "No priority",
+	"issue_detail_worktree": "Worktree",
+	"issue_detail_branch": "Branch",
+	"issue_detail_github_issue": "GitHub Issue",
+	"issue_detail_pull_request": "Pull Request",
+	"issue_detail_sub_issues": "{completed}/{total} sub-issues",
 
 	"btn_save": "Save",
 	"btn_cancel": "Cancel",

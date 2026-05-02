@@ -3,10 +3,10 @@
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
 	import type {
 		Action,
+		AssignedIssue,
 		GitStatusCache,
 		IssueDependency,
 		GhCliAvailability,
-		AssignedIssue,
 	} from '$lib/types/generated';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import {
@@ -20,6 +20,7 @@
 	import PrdOverview from './PrdOverview.svelte';
 	import DependencyGraphView from './DependencyGraphView.svelte';
 	import IssueCardList from './IssueCardList.svelte';
+	import IssueDetail from './IssueDetail.svelte';
 	import GhSetupBanner from './GhSetupBanner.svelte';
 	import AssignedIssuesPanel from './AssignedIssuesPanel.svelte';
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
@@ -43,12 +44,16 @@
 		ghSetupBanner?: boolean;
 		ghAvailability?: GhCliAvailability;
 		assignedIssues?: AssignedIssue[];
+		assignedIssuesHasMore?: boolean;
+		deletedAssignedIssueNumbers?: readonly number[];
 		isGhAvailable?: boolean;
 		getVisualization: (issueId: string) => TreeVisualization | undefined;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
-		onQuickAdd?: (issue: AssignedIssue) => void;
+		onWizardOpen?: (issue: AssignedIssue) => void;
+		onQuickAddWithWorktree?: (issue: AssignedIssue) => void;
+		onLoadMoreAssignedIssues?: () => void;
 		onPrune?: () => void;
 	}
 
@@ -70,6 +75,8 @@
 		ghSetupBanner = false,
 		ghAvailability,
 		assignedIssues = [],
+		assignedIssuesHasMore = false,
+		deletedAssignedIssueNumbers = [],
 		isGhAvailable = false,
 		getVisualization,
 		getChildren,
@@ -84,8 +91,10 @@
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
-		onQuickAdd,
 		onChangeColor,
+		onWizardOpen,
+		onQuickAddWithWorktree,
+		onLoadMoreAssignedIssues,
 		onPrune,
 	}: Props = $props();
 
@@ -212,8 +221,13 @@
 				{#if assignedIssues.length > 0}
 					<AssignedIssuesPanel
 						issues={assignedIssues}
+						dashboardIssues={issues}
+						deletedIssueNumbers={deletedAssignedIssueNumbers}
+						hasMore={assignedIssuesHasMore}
 						disabled={isGhAvailable !== true}
-						{onQuickAdd}
+						{onWizardOpen}
+						{onQuickAddWithWorktree}
+						onLoadMore={onLoadMoreAssignedIssues}
 					/>
 				{/if}
 			</div>
@@ -222,19 +236,29 @@
 				<p class="text-sm text-muted-foreground">{m.kanban_coming_soon()}</p>
 			</div>
 		{:else if defaultTab === BOTTOM_PANEL_TABS.issueDetail}
-			<div class="p-4">
-				{#if selectedIssue}
-					<div class="flex flex-col gap-2">
-						<h3 class="text-sm font-semibold text-foreground">{selectedIssue.name}</h3>
-						<p class="text-xs text-muted-foreground">
-							Status: {selectedIssue.status} · Priority: {selectedIssue.priority ??
-								'none'}
-						</p>
-					</div>
-				{:else}
-					<p class="text-sm text-muted-foreground">Select an issue to view details</p>
-				{/if}
-			</div>
+			{#if selectedIssue}
+				<IssueDetail
+					issue={selectedIssue}
+					cache={cacheMap.get(selectedIssue.id)}
+					{ghAvailable}
+					{paletteColors}
+					{usedColors}
+					{isDarkMode}
+					{onArchive}
+					{onUnarchive}
+					{onEdit}
+					{onDelete}
+					{onChangePriority}
+					{onRename}
+					{onSetupWorktree}
+					{onRemoveWorktree}
+					{onChangeColor}
+				/>
+			{:else}
+				<div class="p-4">
+					<p class="text-sm text-muted-foreground">{m.issue_detail_no_selection()}</p>
+				</div>
+			{/if}
 		{:else if defaultTab === BOTTOM_PANEL_TABS.dependencies}
 			<DependencyGraphView {issues} {dependencies} {getVisualization} />
 		{:else if defaultTab === BOTTOM_PANEL_TABS.activity}

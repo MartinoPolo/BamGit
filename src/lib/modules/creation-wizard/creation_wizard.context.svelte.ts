@@ -1,5 +1,6 @@
 import { createContext } from 'svelte';
 import { invoke } from '$lib/tauri.js';
+import type { AssignedIssue } from '$lib/types/generated';
 import { generateBranchName, generateIssueName } from './smart_naming.js';
 import {
 	WIZARD_STEPS,
@@ -182,6 +183,25 @@ function createCreationWizardContext() {
 
 		openWizard(dependencies: WizardDependencies) {
 			reset(dependencies);
+			open = true;
+		},
+
+		openWizardWithPreselectedIssue(
+			dependencies: WizardDependencies,
+			assignedIssue: AssignedIssue,
+		) {
+			reset(dependencies);
+			formData.selectedGithubIssue = {
+				number: assignedIssue.number,
+				title: assignedIssue.title,
+				state: assignedIssue.state,
+				url: assignedIssue.url,
+			};
+			formData.githubIssueUrl = assignedIssue.url;
+			formData.githubIssueNumber = assignedIssue.number;
+			formData.issueName = generateIssueName(assignedIssue.number, assignedIssue.title);
+			formData.branchName = generateBranchName(assignedIssue.number, assignedIssue.title);
+			currentStep = WIZARD_STEPS.ISSUE_NAME;
 			open = true;
 		},
 
