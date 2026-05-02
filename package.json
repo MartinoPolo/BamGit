@@ -23,6 +23,7 @@
 		"test:e2e": "playwright test --pass-with-no-tests",
 		"postinstall": "node scripts/fix-worktree-links.js",
 		"prepare": "husky",
+		"db:reset": "node scripts/reset-database.js",
 		"tauri": "tauri",
 		"storybook": "svelte-kit sync && storybook dev -p 6006",
 		"build:storybook": "svelte-kit sync && storybook build"
