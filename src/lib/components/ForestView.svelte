@@ -25,6 +25,8 @@
 	import SproutIcon from '@lucide/svelte/icons/sprout';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
 	import ForestContextMenu from './ForestContextMenu.svelte';
+	import { TREE_CONTEXT_MENU_ACTIONS } from '$lib/modules/visualization';
+	import type { TreeContextMenuAction } from '$lib/modules/visualization';
 	import { useSelection } from '$lib/modules/board';
 
 	interface Props {
@@ -32,9 +34,18 @@
 		getGitStatus: (issueId: string) => GitStatusCache | undefined;
 		getSessionsForIssue: (issueId: string) => readonly SessionForMapping[];
 		onAddIssue?: () => void;
+		onArchiveIssue?: (issue: Issue) => void;
+		onChangeIssueColor?: (issueId: string) => void;
 	}
 
-	let { issues, getGitStatus, getSessionsForIssue, onAddIssue }: Props = $props();
+	let {
+		issues,
+		getGitStatus,
+		getSessionsForIssue,
+		onAddIssue,
+		onArchiveIssue,
+		onChangeIssueColor,
+	}: Props = $props();
 
 	const TREE_NATURAL_WIDTH = 320;
 	const TREE_NATURAL_HEIGHT = 320;
@@ -204,7 +215,22 @@
 		}
 	}
 
-	function handleContextMenuAction() {}
+	function handleContextMenuAction(action: TreeContextMenuAction) {
+		const menu = contextMenu;
+		if (menu === null) {
+			return;
+		}
+		const entry = entryById.get(menu.issueId);
+		if (entry === undefined) {
+			return;
+		}
+		const issue = entry.issue;
+		if (action === TREE_CONTEXT_MENU_ACTIONS.archive && onArchiveIssue) {
+			onArchiveIssue(issue);
+		} else if (action === TREE_CONTEXT_MENU_ACTIONS.changeColor && onChangeIssueColor) {
+			onChangeIssueColor(issue.id);
+		}
+	}
 
 	const emptyStateTreeConfig: TreeConfig = {
 		...DEFAULT_TREE_CONFIG,

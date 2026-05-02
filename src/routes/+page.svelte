@@ -31,6 +31,7 @@
 	import DeleteConfirmDialog from '$lib/components/DeleteConfirmDialog.svelte';
 	import IssueRenameDialog from '$lib/components/IssueRenameDialog.svelte';
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
+	import ColorChangeDialog from '$lib/components/ColorChangeDialog.svelte';
 	import type { PrunableIssue } from '$lib/types/generated';
 
 	const boardStore = useBoard();
@@ -65,6 +66,7 @@
 	let archiveTargetIssue = $state<Issue | null>(null);
 	let deleteTargetIssue = $state<Issue | null>(null);
 	let renameTargetIssue = $state<Issue | null>(null);
+	let colorChangeTargetIssue = $state<Issue | null>(null);
 
 	const archiveUnfinishedSessionCount = $derived.by(() => {
 		if (archiveTargetIssue === null) {
@@ -300,6 +302,13 @@
 		);
 	}
 
+	async function handleChangeColor(issueId: string, newColor: string) {
+		await handleAction('change color', async () => {
+			await issueStore.updateIssue({ id: issueId, color: newColor });
+			await loadUsedColors();
+		});
+	}
+
 	async function handleOpenPruneDialog() {
 		const dashboardId = boardStore.activeDashboardId;
 		if (dashboardId == null) {
@@ -402,6 +411,14 @@
 						getSessionsForIssue={(issueId) =>
 							sessionStore.sessionsByIssueId.get(issueId) ?? []}
 						onAddIssue={openCreateDialog}
+						onArchiveIssue={(issue) => (archiveTargetIssue = issue)}
+						onChangeIssueColor={async (issueId) => {
+							const issue = issueStore.issues.find((i) => i.id === issueId);
+							if (issue) {
+								await loadUsedColors();
+								colorChangeTargetIssue = issue;
+							}
+						}}
 					/>
 				{/snippet}
 				{#snippet bottomPanel()}
@@ -415,6 +432,10 @@
 						forceExpanded={allExpanded ? true : undefined}
 						cacheMap={versionControlStore.stateMap}
 						ghAvailable={versionControlStore.isGhAvailable}
+						prioritiesEnabled={true}
+						paletteColors={activePaletteColors}
+						{usedColors}
+						isDarkMode={boardStore.theme.isDark}
 						dependencies={issueStore.dependencies}
 						ghSetupBanner={githubRepoParts !== null &&
 							versionControlStore.ghAvailability !== 'available'}
@@ -437,6 +458,7 @@
 						onSetupWorktree={handleSetupWorktree}
 						onRemoveWorktree={handleRemoveWorktree}
 						onExecuteAction={handleExecuteAction}
+						onChangeColor={handleChangeColor}
 						onPrune={handleOpenPruneDialog}
 					/>
 				{/snippet}
@@ -492,5 +514,14 @@
 		removing={pruneRemoving}
 		onClose={() => (pruneDialogOpen = false)}
 		onPrune={handlePrune}
+	/>
+
+	<ColorChangeDialog
+		issue={colorChangeTargetIssue}
+		paletteColors={activePaletteColors}
+		{usedColors}
+		isDarkMode={boardStore.theme.isDark}
+		onClose={() => (colorChangeTargetIssue = null)}
+		onChangeColor={handleChangeColor}
 	/>
 {/if}
