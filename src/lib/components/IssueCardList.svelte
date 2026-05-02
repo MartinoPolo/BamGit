@@ -13,6 +13,10 @@
 		forceExpanded?: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
+		prioritiesEnabled?: boolean;
+		paletteColors?: string[];
+		usedColors?: string[];
+		isDarkMode?: boolean;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
@@ -27,6 +31,10 @@
 		forceExpanded,
 		cacheMap = new Map(),
 		ghAvailable = false,
+		prioritiesEnabled = true,
+		paletteColors = [],
+		usedColors = [],
+		isDarkMode = false,
 		getChildren,
 		getNotificationDotColor,
 		getProgressLines,
@@ -39,6 +47,7 @@
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
+		onChangeColor,
 	}: Props = $props();
 </script>
 
@@ -55,6 +64,10 @@
 			childCount={children.length}
 			{forceExpanded}
 			progressLines={getProgressLines?.(issue.id) ?? []}
+			{prioritiesEnabled}
+			{paletteColors}
+			{usedColors}
+			{isDarkMode}
 			{onArchive}
 			{onUnarchive}
 			{onEdit}
@@ -64,6 +77,7 @@
 			{onSetupWorktree}
 			{onRemoveWorktree}
 			{onExecuteAction}
+			{onChangeColor}
 		/>
 
 		{#if isPortfolio && children.length > 0}
@@ -78,6 +92,10 @@
 					isLastChild={index === children.length - 1}
 					{forceExpanded}
 					progressLines={getProgressLines?.(child.id) ?? []}
+					{prioritiesEnabled}
+					{paletteColors}
+					{usedColors}
+					{isDarkMode}
 					{onArchive}
 					{onUnarchive}
 					{onEdit}
@@ -87,6 +105,7 @@
 					{onSetupWorktree}
 					{onRemoveWorktree}
 					{onExecuteAction}
+					{onChangeColor}
 				/>
 			{/each}
 		{/if}
