@@ -9,17 +9,13 @@
 
 <div class="flex flex-col gap-3">
 	<ColorPicker
-		variant="palette-hex-native"
 		colors={deps.paletteColors}
 		selectedColor={wizard.formData.selectedColor}
 		usedColors={deps.usedColors}
 		isDarkMode={deps.isDarkMode}
+		displayText="A"
 		onSelect={(color) => {
-			if (color === '') {
-				wizard.selectColor(deps.nextAvailableColor);
-			} else {
-				wizard.selectColor(color);
-			}
+			wizard.selectColor(color);
 		}}
 	/>
 </div>
