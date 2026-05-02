@@ -39,25 +39,30 @@
 		inputElement?.focus();
 	});
 
+	function moveSelection(delta: number) {
+		if (displayItems.length > 0) {
+			selectedIndex = (selectedIndex + delta + displayItems.length) % displayItems.length;
+		}
+	}
+
+	function confirmSelection() {
+		if (displayItems.length > 0 && selectedIndex < displayItems.length) {
+			wizard.selectGithubIssue(displayItems[selectedIndex] as SearchedGithubIssue);
+		} else {
+			wizard.skipGithubSearch();
+		}
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			if (displayItems.length > 0) {
-				selectedIndex = (selectedIndex + 1) % displayItems.length;
-			}
+			moveSelection(1);
 		} else if (event.key === 'ArrowUp') {
 			event.preventDefault();
-			if (displayItems.length > 0) {
-				selectedIndex = (selectedIndex - 1 + displayItems.length) % displayItems.length;
-			}
+			moveSelection(-1);
 		} else if (event.key === 'Enter') {
 			event.preventDefault();
-			if (displayItems.length > 0 && selectedIndex < displayItems.length) {
-				const item = displayItems[selectedIndex];
-				wizard.selectGithubIssue(item as SearchedGithubIssue);
-			} else {
-				wizard.skipGithubSearch();
-			}
+			confirmSelection();
 		}
 	}
 

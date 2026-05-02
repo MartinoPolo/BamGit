@@ -37,6 +37,26 @@
 		}
 	}
 
+	function isEmptyInputFocused(): boolean {
+		const el = document.activeElement;
+		const isInput = el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA';
+		return isInput && (el as HTMLInputElement).value === '';
+	}
+
+	function handleBackspace(event: KeyboardEvent) {
+		const isInput =
+			document.activeElement?.tagName === 'INPUT' ||
+			document.activeElement?.tagName === 'TEXTAREA';
+
+		if (
+			!isInput ||
+			(isEmptyInputFocused() && wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH)
+		) {
+			event.preventDefault();
+			wizard.goBack();
+		}
+	}
+
 	function handleGlobalKeydown(event: KeyboardEvent) {
 		if (!wizard.open) {
 			return;
@@ -46,26 +66,8 @@
 			event.preventDefault();
 			event.stopPropagation();
 			wizard.closeWizard();
-			return;
-		}
-
-		const isInputFocused =
-			document.activeElement?.tagName === 'INPUT' ||
-			document.activeElement?.tagName === 'TEXTAREA';
-
-		if (event.key === 'Backspace' && !isInputFocused) {
-			event.preventDefault();
-			wizard.goBack();
-		}
-
-		if (
-			event.key === 'Backspace' &&
-			isInputFocused &&
-			(document.activeElement as HTMLInputElement).value === '' &&
-			wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH
-		) {
-			event.preventDefault();
-			wizard.goBack();
+		} else if (event.key === 'Backspace') {
+			handleBackspace(event);
 		}
 	}
 
@@ -73,6 +75,16 @@
 		if (wizard.open && event.button === 3) {
 			event.preventDefault();
 			wizard.goBack();
+		}
+	}
+
+	async function startWorktreeSetup(issue: Issue) {
+		worktreeProgressState = 'pending';
+		try {
+			await onSetupWorktree(issue);
+			worktreeProgressState = 'active';
+		} catch {
+			worktreeProgressState = 'failed';
 		}
 	}
 
@@ -105,14 +117,7 @@
 			}
 
 			if (data.createWorktree && issue.branch_name !== null) {
-				worktreeProgressState = 'pending';
-				wizard.selectColor(data.selectedColor);
-				try {
-					await onSetupWorktree(issue);
-					worktreeProgressState = 'active';
-				} catch {
-					worktreeProgressState = 'failed';
-				}
+				await startWorktreeSetup(issue);
 			} else {
 				wizard.closeWizard();
 			}

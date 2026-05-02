@@ -152,24 +152,20 @@
 		}
 	}
 
-	async function openCreateDialog() {
-		const dashboardId = boardStore.activeDashboardId;
-		if (dashboardId === null) {
-			return;
-		}
-
-		let nextColor = activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
+	async function fetchNextColor(dashboardId: string): Promise<string> {
 		try {
 			const [color] = await Promise.all([
 				boardStore.getNextColor(dashboardId),
 				loadUsedColors(),
 			]);
-			nextColor = color;
+			return color;
 		} catch {
-			// keep default
+			return activePaletteColors[0] ?? FALLBACK_ISSUE_COLOR;
 		}
+	}
 
-		const dependencies: WizardDependencies = {
+	function buildWizardDependencies(dashboardId: string, nextColor: string): WizardDependencies {
+		return {
 			dashboardId,
 			paletteColors: activePaletteColors,
 			usedColors,
@@ -180,7 +176,15 @@
 			githubRepo: githubRepoParts,
 			assignedIssues: versionControlStore.assignedIssues,
 		};
-		wizardStore.openWizard(dependencies);
+	}
+
+	async function openCreateDialog() {
+		const dashboardId = boardStore.activeDashboardId;
+		if (dashboardId === null) {
+			return;
+		}
+		const nextColor = await fetchNextColor(dashboardId);
+		wizardStore.openWizard(buildWizardDependencies(dashboardId, nextColor));
 	}
 
 	async function handleAction(
