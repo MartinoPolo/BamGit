@@ -17,6 +17,7 @@ import type {
 	SetupWorktreeRequest,
 	RemoveWorktreeRequest,
 } from './types.js';
+import { PRIORITY_ORDER, PRIORITY_ORDER_NONE } from './priority.js';
 import { serializeLabels, toIssue } from './serialization.js';
 
 // ─── Context ───────────────────────────────────────────────────────────────
@@ -45,16 +46,14 @@ function createIssuesContext() {
 	let currentDashboardId = $state<string | null>(null);
 	const worktreeProgress = new SvelteMap<string, string[]>();
 
-	const priorityOrder: Record<string, number> = { top: 0, high: 1, medium: 2, low: 3 };
-
 	const sortedIssues = $derived.by(() => {
 		const list = [...issues];
 		switch (sortMode) {
 			case 'priority':
 				return list.sort(
 					(a, b) =>
-						(priorityOrder[a.priority ?? 'low'] ?? 4) -
-						(priorityOrder[b.priority ?? 'low'] ?? 4),
+						(a.priority !== null ? PRIORITY_ORDER[a.priority] : PRIORITY_ORDER_NONE) -
+						(b.priority !== null ? PRIORITY_ORDER[b.priority] : PRIORITY_ORDER_NONE),
 				);
 			case 'name':
 				return list.sort((a, b) => a.name.localeCompare(b.name));

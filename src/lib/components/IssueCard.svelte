@@ -11,6 +11,30 @@
 	import ActionButtonGroup from './ActionButtonGroup.svelte';
 	import { clickOutside } from '$lib/actions/click_outside';
 
+	const PRIORITY_OPTIONS: { value: IssuePriority | null; label: () => string }[] = [
+		{ value: 'top', label: () => m.priority_top() },
+		{ value: 'high', label: () => m.priority_high() },
+		{ value: 'medium', label: () => m.priority_medium() },
+		{ value: 'low', label: () => m.priority_low() },
+		{ value: 'lowest', label: () => m.priority_lowest() },
+		{ value: null, label: () => m.priority_none() },
+	];
+
+	const PRIORITY_BORDER_CLASSES = {
+		top: 'border-l-red-500',
+		high: 'border-l-orange-400',
+		medium: 'border-l-yellow-400',
+		low: 'border-l-blue-400',
+		lowest: 'border-l-gray-400',
+	} as const satisfies Record<IssuePriority, string>;
+
+	const PRIORITY_BADGE_CLASSES: Partial<Record<IssuePriority, string>> = {
+		top: 'bg-red-900/40 text-red-400',
+		high: 'bg-orange-900/40 text-orange-400',
+		low: 'bg-blue-900/40 text-blue-400',
+		lowest: 'bg-gray-800/40 text-gray-400',
+	};
+
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
 		actions?: Action[];
@@ -39,20 +63,23 @@
 		onUnarchive,
 		onEdit,
 		onDelete,
+		onChangePriority,
+		onRename,
 		onSetupWorktree,
 		onRemoveWorktree,
 		onExecuteAction,
 	}: Props = $props();
 
 	let localExpanded = $state(false);
-	// Auto-expand when worktree is being set up so progress is visible
 	const expanded = $derived(
 		forceExpanded ?? (issue.worktree_state === 'pending' || localExpanded),
 	);
 	let showOverflow = $state(false);
+	let showPrioritySubmenu = $state(false);
 
 	const color = $derived(issue.color ?? '#525252');
 	const isArchived = $derived(issue.status === 'archived');
+	const isStandalone = $derived(issue.github_issue_url === null);
 
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
@@ -70,16 +97,18 @@
 		}
 	});
 
-	const PRIORITY_BORDER_CLASSES = {
-		top: 'border-l-red-500',
-		high: 'border-l-orange-400',
-		medium: 'border-l-yellow-400',
-		low: 'border-l-blue-400',
-	} as const satisfies Record<IssuePriority, string>;
-
 	const priorityBorderClass = $derived(
 		issue.priority !== null ? PRIORITY_BORDER_CLASSES[issue.priority] : 'border-l-transparent',
 	);
+
+	const priorityBadgeClass = $derived(
+		issue.priority !== null ? (PRIORITY_BADGE_CLASSES[issue.priority] ?? null) : null,
+	);
+
+	function closeOverflow() {
+		showOverflow = false;
+		showPrioritySubmenu = false;
+	}
 </script>
 
 <div
@@ -89,7 +118,6 @@
 	style={isArchived ? 'filter: grayscale(0.8) opacity(0.7)' : undefined}
 	class:ml-6={indented}
 >
-	<!-- Tree connector for nested children -->
 	{#if indented}
 		<div class="relative -ml-6 w-6 shrink-0">
 			<div
@@ -100,7 +128,6 @@
 		</div>
 	{/if}
 
-	<!-- Color identity strip -->
 	<div class="w-10 shrink-0 rounded-l" style="background-color: {color}">
 		<div class="flex h-full items-start justify-center pt-3">
 			{#if notificationDotColor}
@@ -117,9 +144,7 @@
 		</div>
 	</div>
 
-	<!-- Content area -->
 	<div class="flex min-w-0 flex-1 flex-col">
-		<!-- Header -->
 		<div class="flex items-center gap-2 px-3 py-2">
 			<button
 				onclick={() => (localExpanded = !localExpanded)}
@@ -132,7 +157,16 @@
 			</button>
 
 			<div class="min-w-0 flex-1">
-				<span class="truncate text-sm font-medium">{issue.name}</span>
+				<div class="flex items-center gap-1.5">
+					<span class="truncate text-sm font-medium">{issue.name}</span>
+					{#if priorityBadgeClass}
+						<span
+							class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium leading-3 {priorityBadgeClass}"
+						>
+							{issue.priority}
+						</span>
+					{/if}
+				</div>
 				{#if issue.labels.length > 0}
 					<div class="mt-0.5 flex flex-wrap gap-1">
 						{#each issue.labels as label (label.name)}
@@ -148,7 +182,6 @@
 				{/if}
 			</div>
 
-			<!-- Child count for parent issues -->
 			{#if childCount > 0}
 				<span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
 					{childCount > 1
@@ -157,7 +190,6 @@
 				</span>
 			{/if}
 
-			<!-- GitHub & git badges -->
 			<div class="flex items-center gap-1">
 				{#if cache?.github_issue_state}
 					<GitHubIssueBadge
@@ -196,7 +228,6 @@
 				{/if}
 			</div>
 
-			<!-- Action buttons -->
 			{#if actions.length > 0 && onExecuteAction && !isArchived}
 				<div class="opacity-0 transition-opacity group-hover:opacity-100">
 					<ActionButtonGroup
@@ -218,22 +249,67 @@
 				{#if showOverflow}
 					<div
 						class="absolute right-0 z-[var(--z-dropdown)] mt-1 min-w-35 rounded border border-border bg-popover py-1 shadow-lg"
-						use:clickOutside={() => (showOverflow = false)}
+						use:clickOutside={closeOverflow}
 					>
 						<button
 							onclick={() => {
 								onEdit(issue);
-								showOverflow = false;
+								closeOverflow();
 							}}
 							class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 						>
 							{m.issue_card_edit()}
 						</button>
+						{#if isStandalone && onRename}
+							<button
+								onclick={() => {
+									onRename(issue);
+									closeOverflow();
+								}}
+								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
+							>
+								{m.issue_card_rename()}
+							</button>
+						{/if}
+
+						<!-- Priority submenu -->
+						{#if !isArchived}
+							<div class="relative">
+								<button
+									onclick={() => (showPrioritySubmenu = !showPrioritySubmenu)}
+									class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
+								>
+									{m.issue_card_priority()}
+									<span class="text-xs text-muted-foreground">▸</span>
+								</button>
+								{#if showPrioritySubmenu}
+									<div
+										class="absolute top-0 left-full z-[var(--z-dropdown)] ml-1 min-w-28 rounded border border-border bg-popover py-1 shadow-lg"
+									>
+										{#each PRIORITY_OPTIONS as option (option.value)}
+											<button
+												onclick={() => {
+													onChangePriority(issue.id, option.value);
+													closeOverflow();
+												}}
+												class="w-full px-3 py-1.5 text-left text-sm hover:bg-accent {issue.priority ===
+												option.value
+													? 'text-foreground font-medium'
+													: 'text-popover-foreground'}"
+											>
+												{option.label()}
+											</button>
+										{/each}
+									</div>
+								{/if}
+							</div>
+						{/if}
+
 						{#if onSetupWorktree && issue.branch_name !== null && (issue.worktree_state === 'none' || issue.worktree_state === 'failed')}
 							<button
 								onclick={() => {
 									onSetupWorktree(issue);
-									showOverflow = false;
+									closeOverflow();
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-green-400 hover:bg-accent"
 							>
@@ -246,7 +322,7 @@
 							<button
 								onclick={() => {
 									onRemoveWorktree(issue);
-									showOverflow = false;
+									closeOverflow();
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-orange-400 hover:bg-accent"
 							>
@@ -257,7 +333,7 @@
 							<button
 								onclick={() => {
 									onUnarchive(issue.id);
-									showOverflow = false;
+									closeOverflow();
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 							>
@@ -266,8 +342,8 @@
 						{:else}
 							<button
 								onclick={() => {
-									onArchive(issue.id);
-									showOverflow = false;
+									onArchive(issue);
+									closeOverflow();
 								}}
 								class="w-full px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent"
 							>
@@ -276,8 +352,8 @@
 						{/if}
 						<button
 							onclick={() => {
-								onDelete(issue.id);
-								showOverflow = false;
+								onDelete(issue);
+								closeOverflow();
 							}}
 							class="w-full px-3 py-1.5 text-left text-sm text-destructive hover:bg-accent"
 						>
@@ -288,7 +364,6 @@
 			</div>
 		</div>
 
-		<!-- Expanded section -->
 		{#if expanded}
 			<div class="border-t border-border px-3 py-3 text-xs text-muted-foreground">
 				<div class="grid grid-cols-2 gap-2">

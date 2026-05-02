@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import type { CreateIssueRequest } from '$lib/modules/issues';
+	import type { CreateIssueRequest, IssuePriority } from '$lib/modules/issues';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -32,7 +32,7 @@
 	}: Props = $props();
 
 	let name = $state('');
-	let priority = $state<'low' | 'medium' | 'high' | 'top' | ''>('');
+	let priority = $state<IssuePriority | ''>('');
 	let color = $state('');
 	let githubIssueUrl = $state('');
 
@@ -94,6 +94,7 @@
 					<Label for="issue-priority">{m.issue_field_priority()}</Label>
 					<Select id="issue-priority" bind:value={priority}>
 						<option value="">{m.priority_none()}</option>
+						<option value="lowest">{m.priority_lowest()}</option>
 						<option value="low">{m.priority_low()}</option>
 						<option value="medium">{m.priority_medium()}</option>
 						<option value="high">{m.priority_high()}</option>
