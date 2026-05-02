@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import ShortcutSettingsPanel from '$lib/components/ShortcutSettingsPanel.svelte';
+	import { ColorPicker } from '$lib/components/color-picker/index.js';
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -211,16 +212,13 @@
 		</p>
 		<div class="flex flex-wrap gap-6">
 			<div class="space-y-1">
-				<Label for="hover-glow-color">Hover Glow</Label>
+				<Label>Hover Glow</Label>
 				<div class="flex items-center gap-2">
-					<input
-						id="hover-glow-color"
-						type="color"
-						value={hoverGlowColor.current}
-						onchange={(e) => {
-							hoverGlowColor.current = e.currentTarget.value;
+					<ColorPicker
+						selectedColor={hoverGlowColor.current}
+						onSelect={(c) => {
+							hoverGlowColor.current = c;
 						}}
-						class="h-8 w-12 cursor-pointer rounded border border-input bg-transparent"
 					/>
 					<span class="font-mono text-xs text-muted-foreground"
 						>{hoverGlowColor.current}</span
@@ -228,16 +226,13 @@
 				</div>
 			</div>
 			<div class="space-y-1">
-				<Label for="selected-glow-color">Selected Glow</Label>
+				<Label>Selected Glow</Label>
 				<div class="flex items-center gap-2">
-					<input
-						id="selected-glow-color"
-						type="color"
-						value={selectedGlowColor.current}
-						onchange={(e) => {
-							selectedGlowColor.current = e.currentTarget.value;
+					<ColorPicker
+						selectedColor={selectedGlowColor.current}
+						onSelect={(c) => {
+							selectedGlowColor.current = c;
 						}}
-						class="h-8 w-12 cursor-pointer rounded border border-input bg-transparent"
 					/>
 					<span class="font-mono text-xs text-muted-foreground"
 						>{selectedGlowColor.current}</span

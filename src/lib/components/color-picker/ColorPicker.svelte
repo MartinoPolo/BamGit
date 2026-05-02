@@ -1,126 +1,111 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import type { ColorPickerProps } from './color_picker_types.js';
-	import { isValidHexColor, sortColorsByLuminance, getContrastTextColor } from './color_utils.js';
+	import { DEFAULT_COLOR_PALETTE, getContrastTextColor, isValidHexColor } from './color_utils.js';
 
 	let {
-		variant = 'palette-hex-native',
-		colors = [],
 		selectedColor,
-		usedColors = [],
-		isDarkMode = false,
 		onSelect,
+		colors = DEFAULT_COLOR_PALETTE,
+		usedColors = [],
+		displayText,
+		side = 'bottom',
+		align = 'start',
 	}: ColorPickerProps = $props();
 
-	let hexInput = $derived(selectedColor ?? '');
+	let open = $state(false);
 
-	const showPalette = $derived(variant !== 'hex');
-	const showHexInput = $derived(variant !== 'palette');
-	const showNativePicker = $derived(variant === 'palette-hex-native');
+	let effectiveColor = $derived(selectedColor || colors[0] || '#000000');
 
-	const sortedColors = $derived(sortColorsByLuminance(colors, isDarkMode));
-
-	const usedColorSet = $derived(new Set(usedColors.map((c) => c.toLowerCase())));
-
-	const hexInputValid = $derived(hexInput.trim() === '' || isValidHexColor(hexInput.trim()));
-
-	function isUsed(color: string): boolean {
-		return usedColorSet.has(color.toLowerCase());
+	function handlePresetClick(color: string) {
+		onSelect(color);
+		open = false;
 	}
 
-	function isSelected(color: string): boolean {
-		return (selectedColor ?? '').toLowerCase() === color.toLowerCase();
-	}
-
-	function handleSwatchClick(color: string) {
-		if (isUsed(color) && !isSelected(color)) {
-			return;
-		}
-		if (isSelected(color)) {
-			onSelect('');
-		} else {
-			onSelect(color);
-		}
-	}
-
-	function handleHexKeydown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			const trimmed = hexInput.trim();
-			if (isValidHexColor(trimmed)) {
-				onSelect(trimmed);
-			}
-		}
-	}
-
-	function handleNativePickerInput(event: Event) {
+	function handleHexInput(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
-		hexInput = target.value;
+		const hex = target.value;
+		if (isValidHexColor(hex)) {
+			onSelect(hex);
+		}
+	}
+
+	function handleNativeInput(event: Event) {
+		const target = event.currentTarget as HTMLInputElement;
 		onSelect(target.value);
 	}
-
-	const previewColor = $derived(
-		selectedColor && isValidHexColor(selectedColor) ? selectedColor : '#525252',
-	);
-
-	const previewTextColor = $derived(getContrastTextColor(previewColor));
 </script>
 
-<fieldset class="flex flex-col gap-2">
-	<legend class="text-xs text-muted-foreground">Color</legend>
+<Popover.Root bind:open>
+	<Popover.Trigger>
+		{#snippet child({ props })}
+			<button
+				type="button"
+				{...props}
+				class="h-8 w-8 rounded-md border border-border hover:border-border-strong"
+				style="background-color: {effectiveColor}"
+				aria-label="Color: {effectiveColor}"
+			>
+			</button>
+		{/snippet}
+	</Popover.Trigger>
 
-	{#if showPalette}
-		<div class="flex flex-wrap gap-1.5">
-			{#each sortedColors as swatch (swatch)}
-				{@const used = isUsed(swatch)}
-				{@const selected = isSelected(swatch)}
-				{@const textColor = getContrastTextColor(swatch)}
+	<Popover.Content {side} {align} class="w-[232px] p-3">
+		<div class="grid grid-cols-6 gap-1.5">
+			{#each colors as color (color)}
+				{@const isUsed = usedColors.includes(color) && color !== effectiveColor}
 				<button
 					type="button"
-					onclick={() => handleSwatchClick(swatch)}
-					disabled={used && !selected}
-					class="relative flex h-7 w-7 items-center justify-center rounded-sm text-xs font-bold transition-transform
-						{selected
-						? 'scale-125 ring-2 ring-foreground ring-offset-1 ring-offset-background'
-						: used
-							? 'cursor-not-allowed opacity-40 grayscale'
-							: 'hover:scale-110'}"
-					style="background-color: {swatch}"
-					title={used && !selected ? `${swatch} (in use)` : swatch}
+					class="flex h-7 w-7 items-center justify-center rounded-sm border border-border transition-transform
+						focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background
+						{color === effectiveColor ? 'scale-110 ring-2 ring-ring ring-inset' : ''}
+						{isUsed ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105'}"
+					style="background-color: {color}"
+					disabled={isUsed}
+					onclick={() => handlePresetClick(color)}
+					aria-label={color}
 				>
-					<span style="color: {textColor}">A</span>
+					{#if displayText}
+						<span
+							style="color: {getContrastTextColor(color)}"
+							class="text-xs font-medium"
+						>
+							{displayText}
+						</span>
+					{/if}
 				</button>
 			{/each}
 		</div>
-	{/if}
 
-	{#if showHexInput || showNativePicker}
+		<div class="my-2 border-t border-border"></div>
+
 		<div class="flex items-center gap-2">
-			{#if showNativePicker}
-				<input
-					type="color"
-					value={previewColor}
-					oninput={handleNativePickerInput}
-					class="h-8 w-8 cursor-pointer rounded border border-border bg-muted"
-				/>
-			{/if}
-
-			{#if showHexInput}
-				<div class="flex items-center gap-2">
-					<Input
-						bind:value={hexInput}
-						placeholder="#ff0000"
-						class="w-24 text-xs {hexInputValid ? '' : 'border-destructive'}"
-						onkeydown={handleHexKeydown}
-					/>
-					<div
-						class="flex h-8 w-8 items-center justify-center rounded border border-border text-sm font-bold"
-						style="background-color: {previewColor}; color: {previewTextColor}"
+			{#if displayText}
+				<div
+					class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border"
+					style="background-color: {effectiveColor}"
+				>
+					<span
+						style="color: {getContrastTextColor(effectiveColor)}"
+						class="text-xs font-medium"
 					>
-						A
-					</div>
+						{displayText}
+					</span>
 				</div>
 			{/if}
+			<input
+				type="text"
+				value={effectiveColor}
+				onchange={handleHexInput}
+				class="h-8 flex-1 rounded-md border border-border bg-background px-2 text-sm"
+				placeholder="#000000"
+			/>
+			<input
+				type="color"
+				value={effectiveColor}
+				oninput={handleNativeInput}
+				class="h-8 w-8 cursor-pointer rounded border border-border"
+			/>
 		</div>
-	{/if}
-</fieldset>
+	</Popover.Content>
+</Popover.Root>

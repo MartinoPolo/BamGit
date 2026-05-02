@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import { PRIORITY_OPTIONS, PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
@@ -16,7 +15,6 @@
 	import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 	import GitBranch from '@lucide/svelte/icons/git-branch';
 	import GitBranchPlus from '@lucide/svelte/icons/git-branch-plus';
-	import Palette from '@lucide/svelte/icons/palette';
 
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
@@ -66,13 +64,10 @@
 			: 'bg-muted text-muted-foreground',
 	);
 
-	let showColorPopover = $state(false);
-
 	function handleColorSelect(newColor: string) {
 		if (onChangeColor) {
 			onChangeColor(issue.id, newColor);
 		}
-		showColorPopover = false;
 	}
 </script>
 
@@ -181,30 +176,15 @@
 		{/if}
 
 		{#if !isArchived}
-			<Popover.Root bind:open={showColorPopover}>
-				<Popover.Trigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							variant="ghost"
-							size="sm"
-							title={m.issue_card_change_color()}
-						>
-							<Palette size={14} />
-						</Button>
-					{/snippet}
-				</Popover.Trigger>
-				<Popover.Content side="top" sideOffset={8}>
-					<ColorPicker
-						variant="palette-hex-native"
-						colors={paletteColors}
-						selectedColor={issue.color ?? ''}
-						{usedColors}
-						{isDarkMode}
-						onSelect={handleColorSelect}
-					/>
-				</Popover.Content>
-			</Popover.Root>
+			<ColorPicker
+				selectedColor={issue.color ?? ''}
+				colors={paletteColors}
+				{usedColors}
+				{isDarkMode}
+				displayText="A"
+				side="top"
+				onSelect={handleColorSelect}
+			/>
 		{/if}
 
 		{#if canSetupWorktree && onSetupWorktree}

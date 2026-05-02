@@ -1,10 +1,10 @@
-type ColorPickerVariant = 'palette' | 'palette-hex' | 'palette-hex-native' | 'hex';
-
 export interface ColorPickerProps {
-	variant?: ColorPickerVariant;
-	colors?: string[];
 	selectedColor: string;
+	onSelect: (color: string) => void;
+	colors?: string[];
 	usedColors?: string[];
 	isDarkMode?: boolean;
-	onSelect: (color: string) => void;
+	displayText?: string;
+	side?: 'top' | 'bottom' | 'left' | 'right';
+	align?: 'start' | 'center' | 'end';
 }
