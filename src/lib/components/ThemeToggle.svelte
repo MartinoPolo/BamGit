@@ -48,7 +48,7 @@
 		<currentMode.Icon class="size-4" />
 	</Button>
 {:else}
-	<Tabs>
+	<Tabs class="w-full">
 		{#each modes as { value, Icon, labelKey } (value)}
 			<Tab
 				active={theme.mode === value}

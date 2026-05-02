@@ -10,7 +10,6 @@ export type {
 	CreateColorPaletteRequest,
 	UpdateColorPaletteRequest,
 	AddRepoToPortfolioRequest,
-	ViewMode,
 	ThemeMode,
 	AccentColor,
 } from './types.js';

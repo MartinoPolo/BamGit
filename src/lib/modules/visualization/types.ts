@@ -173,6 +173,7 @@ export const TREE_CONTEXT_MENU_ACTIONS = {
 	startSession: 'start-session',
 	archive: 'archive',
 	changeColor: 'change-color',
+	pruneWorktree: 'prune-worktree',
 } as const;
 
 export type TreeContextMenuAction =

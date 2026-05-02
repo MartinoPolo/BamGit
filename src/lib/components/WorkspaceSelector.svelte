@@ -7,9 +7,10 @@
 	interface Props {
 		name: string;
 		collapsed?: boolean;
+		onclick?: () => void;
 	}
 
-	let { name, collapsed = false }: Props = $props();
+	let { name, collapsed = false, onclick }: Props = $props();
 </script>
 
 {#if collapsed}
@@ -26,7 +27,11 @@
 		</Tooltip.Root>
 	</div>
 {:else}
-	<Button variant="ghost" class="w-full justify-start gap-2 bg-surface-2 hover:bg-surface-3">
+	<Button
+		variant="ghost"
+		class="w-full justify-start gap-2 bg-surface-2 hover:bg-surface-3"
+		{onclick}
+	>
 		<FolderIcon size={13} class="text-primary" />
 		<span class="flex-1 truncate text-[12.5px] font-medium">{name}</span>
 		<ChevronDownIcon size={12} class="text-foreground-subtle" />

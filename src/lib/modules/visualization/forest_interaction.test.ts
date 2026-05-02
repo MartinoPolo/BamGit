@@ -38,8 +38,8 @@ function createParams(overrides: Partial<ResolveGlowOverlayParams> = {}): Resolv
 // ════════════════════════════════════════════════════════════════════════
 
 describe('TREE_CONTEXT_MENU_ACTIONS', () => {
-	it('has exactly 5 entries', () => {
-		expect(Object.keys(TREE_CONTEXT_MENU_ACTIONS)).toHaveLength(5);
+	it('has exactly 6 entries', () => {
+		expect(Object.keys(TREE_CONTEXT_MENU_ACTIONS)).toHaveLength(6);
 	});
 
 	it('contains all expected keys', () => {
@@ -48,6 +48,7 @@ describe('TREE_CONTEXT_MENU_ACTIONS', () => {
 		expect(TREE_CONTEXT_MENU_ACTIONS.startSession).toBe('start-session');
 		expect(TREE_CONTEXT_MENU_ACTIONS.archive).toBe('archive');
 		expect(TREE_CONTEXT_MENU_ACTIONS.changeColor).toBe('change-color');
+		expect(TREE_CONTEXT_MENU_ACTIONS.pruneWorktree).toBe('prune-worktree');
 	});
 
 	it('type can be assigned from constant values', () => {

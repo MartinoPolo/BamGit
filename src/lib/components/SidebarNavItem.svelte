@@ -85,7 +85,7 @@
 	}
 
 	.sb-item:hover {
-		background: var(--surface-2);
+		background: var(--surface-hover);
 	}
 
 	.sb-item.is-active {
@@ -140,7 +140,7 @@
 	}
 
 	.sb-item-collapsed:hover {
-		background: var(--surface-2);
+		background: var(--surface-hover);
 	}
 
 	.sb-item-collapsed.is-active {

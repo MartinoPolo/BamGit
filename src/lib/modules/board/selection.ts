@@ -1,6 +1,8 @@
 // ─── Bottom Panel Tab Constants ──────────────────────────────────────────
 
 export const BOTTOM_PANEL_TABS = {
+	issues: 'issues',
+	kanban: 'kanban',
 	issueDetail: 'issue-detail',
 	dependencies: 'dependencies',
 	activity: 'activity',
@@ -14,6 +16,8 @@ export type BottomPanelTab = (typeof BOTTOM_PANEL_TABS)[keyof typeof BOTTOM_PANE
 export type TabBehavior = 'replace' | 'filter' | 'highlight';
 
 export const TAB_BEHAVIOR_MAP = {
+	issues: 'replace',
+	kanban: 'replace',
 	'issue-detail': 'replace',
 	dependencies: 'highlight',
 	activity: 'filter',
@@ -23,6 +27,8 @@ export const TAB_BEHAVIOR_MAP = {
 // ─── Tab Labels ──────────────────────────────────────────────────────────
 
 export const BOTTOM_PANEL_TAB_LABELS = {
+	issues: 'Issues',
+	kanban: 'Kanban',
 	'issue-detail': 'Issue Detail',
 	dependencies: 'Dependencies',
 	activity: 'Activity',

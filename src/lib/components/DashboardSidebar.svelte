@@ -24,6 +24,7 @@
 		activeSessionCount?: number;
 		collapsed: boolean;
 		onToggleSidebar: () => void;
+		onEditWorkspace?: () => void;
 	}
 
 	let {
@@ -33,6 +34,7 @@
 		activeSessionCount = 0,
 		collapsed,
 		onToggleSidebar,
+		onEditWorkspace,
 	}: Props = $props();
 
 	const NAV_LABELS = {
@@ -122,7 +124,7 @@
 				{m.nav_workspace()}
 			</div>
 		{/if}
-		<WorkspaceSelector name={workspaceName} {collapsed} />
+		<WorkspaceSelector name={workspaceName} {collapsed} onclick={onEditWorkspace} />
 	</div>
 
 	<!-- Navigation -->

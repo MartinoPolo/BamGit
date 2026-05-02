@@ -36,7 +36,7 @@
 		<GlobeIcon class="size-4" />
 	</Button>
 {:else}
-	<Tabs>
+	<Tabs class="w-full">
 		{#each locales as locale (locale)}
 			<Tab
 				active={getLocale() === locale}
