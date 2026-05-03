@@ -12,7 +12,8 @@ export async function invoke<T>(
 	options?: InvokeOptions,
 ): Promise<T> {
 	if (!isTauri()) {
-		throw new Error('Tauri not available');
+		const { mockInvoke } = await import('./tauri_mock.js');
+		return mockInvoke<T>(command, args as Record<string, unknown>);
 	}
 	return tauriInvoke<T>(command, args, options);
 }
