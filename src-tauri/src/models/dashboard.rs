@@ -41,6 +41,7 @@ pub struct Dashboard {
     pub worktree_parent_folder: Option<String>,
     pub color_palette_id: Option<String>,
     pub default_shape: String,
+    pub priorities_enabled: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -73,6 +74,7 @@ pub struct UpdateDashboardRequest {
     #[serde(default, deserialize_with = "deserialize_optional_nullable")]
     pub color_palette_id: Option<Option<String>>,
     pub default_shape: Option<String>,
+    pub priorities_enabled: Option<bool>,
 }
 
 fn deserialize_optional_nullable<'de, D>(deserializer: D) -> Result<Option<Option<String>>, D::Error>

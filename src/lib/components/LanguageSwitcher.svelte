@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';

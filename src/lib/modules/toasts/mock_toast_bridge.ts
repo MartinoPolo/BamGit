@@ -20,6 +20,7 @@ const COMMAND_BODIES: Record<string, string> = {
 	sync_all_github_state: 'GitHub sync requires the desktop app',
 	execute_action: 'Running actions requires the desktop app',
 	open_workspace_window: 'Opening workspace windows requires the desktop app',
+	update_peacock_color: 'Peacock color sync requires the desktop app',
 };
 
 // ─── Dedup ───────────────────────────────────────────────────────────────────

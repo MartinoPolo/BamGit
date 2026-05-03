@@ -8,6 +8,7 @@ use tokio::process::Command;
 use tauri::async_runtime::JoinHandle;
 
 use crate::database::connection::DatabaseState;
+use super::shared::validate_hex_color;
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -548,4 +549,135 @@ pub fn get_prunable_issues(
         .map_err(|error| format!("Failed to read prunable issue row: {error}"))?;
 
     Ok(issues)
+}
+
+// ─── Peacock Color Sync ───────────────────────────────────────────────────────
+
+#[tauri::command]
+pub fn update_peacock_color(worktree_folder: String, color: String) -> Result<(), String> {
+    validate_hex_color(&color)?;
+
+    let vscode_dir = Path::new(&worktree_folder).join(".vscode");
+    std::fs::create_dir_all(&vscode_dir)
+        .map_err(|e| format!("Failed to create .vscode dir: {e}"))?;
+
+    let settings_path = vscode_dir.join("settings.json");
+
+    let mut settings: serde_json::Value = if settings_path.exists() {
+        let content = std::fs::read_to_string(&settings_path)
+            .map_err(|e| format!("Failed to read settings.json: {e}"))?;
+        serde_json::from_str(&content)
+            .map_err(|e| format!("Failed to parse settings.json: {e}"))?
+    } else {
+        serde_json::json!({})
+    };
+
+    let obj = settings
+        .as_object_mut()
+        .ok_or_else(|| "settings.json root is not an object".to_string())?;
+
+    obj.insert(
+        "peacock.color".to_string(),
+        serde_json::Value::String(color.clone()),
+    );
+
+    let foreground = compute_foreground(&color);
+    let customizations = serde_json::json!({
+        "titleBar.activeBackground": color,
+        "titleBar.activeForeground": foreground,
+        "activityBar.background": color,
+        "activityBar.foreground": foreground,
+        "statusBar.background": color,
+        "statusBar.foreground": foreground,
+    });
+    obj.insert(
+        "workbench.colorCustomizations".to_string(),
+        customizations,
+    );
+
+    let output = serde_json::to_string_pretty(&settings)
+        .map_err(|e| format!("Failed to serialize settings.json: {e}"))?;
+    std::fs::write(&settings_path, output)
+        .map_err(|e| format!("Failed to write settings.json: {e}"))?;
+
+    Ok(())
+}
+
+fn compute_foreground(hex_color: &str) -> &'static str {
+    let r = u8::from_str_radix(&hex_color[1..3], 16).unwrap_or(0);
+    let g = u8::from_str_radix(&hex_color[3..5], 16).unwrap_or(0);
+    let b = u8::from_str_radix(&hex_color[5..7], 16).unwrap_or(0);
+    let luminance = (0.299 * r as f64 + 0.587 * g as f64 + 0.114 * b as f64) / 255.0;
+    if luminance > 0.5 {
+        "#15202b"
+    } else {
+        "#e7e7e7"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    #[test]
+    fn update_peacock_color_creates_settings_file() {
+        let tmp = TempDir::new().unwrap();
+        let worktree_folder = tmp.path().to_string_lossy().to_string();
+
+        update_peacock_color(worktree_folder.clone(), "#ff0000".to_string()).unwrap();
+
+        let settings_path = tmp.path().join(".vscode/settings.json");
+        assert!(settings_path.exists());
+
+        let content = fs::read_to_string(&settings_path).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(parsed["peacock.color"], "#ff0000");
+        assert_eq!(
+            parsed["workbench.colorCustomizations"]["titleBar.activeBackground"],
+            "#ff0000"
+        );
+    }
+
+    #[test]
+    fn update_peacock_color_preserves_existing_settings() {
+        let tmp = TempDir::new().unwrap();
+        let vscode_dir = tmp.path().join(".vscode");
+        fs::create_dir_all(&vscode_dir).unwrap();
+        fs::write(
+            vscode_dir.join("settings.json"),
+            r#"{"editor.fontSize": 14}"#,
+        )
+        .unwrap();
+
+        let worktree_folder = tmp.path().to_string_lossy().to_string();
+        update_peacock_color(worktree_folder, "#00ff00".to_string()).unwrap();
+
+        let content = fs::read_to_string(vscode_dir.join("settings.json")).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(parsed["editor.fontSize"], 14);
+        assert_eq!(parsed["peacock.color"], "#00ff00");
+    }
+
+    #[test]
+    fn update_peacock_color_rejects_invalid_color() {
+        let tmp = TempDir::new().unwrap();
+        let worktree_folder = tmp.path().to_string_lossy().to_string();
+
+        let result = update_peacock_color(worktree_folder, "not-a-color".to_string());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn compute_foreground_returns_dark_for_light_colors() {
+        assert_eq!(compute_foreground("#ffffff"), "#15202b");
+        assert_eq!(compute_foreground("#ffff00"), "#15202b");
+    }
+
+    #[test]
+    fn compute_foreground_returns_light_for_dark_colors() {
+        assert_eq!(compute_foreground("#000000"), "#e7e7e7");
+        assert_eq!(compute_foreground("#1a1a2e"), "#e7e7e7");
+    }
 }

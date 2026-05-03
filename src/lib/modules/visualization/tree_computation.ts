@@ -169,6 +169,91 @@ const DEFAULT_TREE_CONFIG: TreeConfig = {
 	fruitCount: 3,
 } as const;
 
+// ─── Canopy Color Derivation ────────────────────────────────────────────────
+
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+	const r = parseInt(hex.slice(1, 3), 16) / 255;
+	const g = parseInt(hex.slice(3, 5), 16) / 255;
+	const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+	const l = (max + min) / 2;
+
+	if (max === min) {
+		return { h: 0, s: 0, l: l * 100 };
+	}
+
+	const d = max - min;
+	const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+	let h: number;
+	if (max === r) {
+		h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+	} else if (max === g) {
+		h = ((b - r) / d + 2) * 60;
+	} else {
+		h = ((r - g) / d + 4) * 60;
+	}
+
+	return { h, s: s * 100, l: l * 100 };
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+	const sNorm = s / 100;
+	const lNorm = l / 100;
+
+	const c = (1 - Math.abs(2 * lNorm - 1)) * sNorm;
+	const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+	const m = lNorm - c / 2;
+
+	let r: number, g: number, b: number;
+	if (h < 60) {
+		r = c;
+		g = x;
+		b = 0;
+	} else if (h < 120) {
+		r = x;
+		g = c;
+		b = 0;
+	} else if (h < 180) {
+		r = 0;
+		g = c;
+		b = x;
+	} else if (h < 240) {
+		r = 0;
+		g = x;
+		b = c;
+	} else if (h < 300) {
+		r = x;
+		g = 0;
+		b = c;
+	} else {
+		r = c;
+		g = 0;
+		b = x;
+	}
+
+	const toHex = (v: number) =>
+		Math.round((v + m) * 255)
+			.toString(16)
+			.padStart(2, '0');
+	return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+export function deriveCanopyColors(
+	hex: string,
+): { canopyLightColor: string; canopyDarkColor: string } | null {
+	const { h, s } = hexToHsl(hex);
+	if (s < 5) {
+		return null;
+	}
+	const adaptedHue = h + (120 - h) * 0.5;
+	const canopyLightColor = hslToHex(adaptedHue, 60, 60);
+	const canopyDarkColor = hslToHex(adaptedHue, 45, 20);
+	return { canopyLightColor, canopyDarkColor };
+}
+
 // ─── computeTreeVisualization — maps StateDimensions to TreeVisualization ────
 
 const DEFAULT_COMPUTE_CONTEXT: TreeComputeContext = {
@@ -404,6 +489,7 @@ export function computeTreeVisualization(
 	context?: TreeComputeContext,
 	labelMappings?: readonly LabelShapeMappingEntry[],
 	defaultShape?: TreeShape,
+	issueColor?: string | null,
 ): TreeVisualization {
 	const resolvedContext = context ?? DEFAULT_COMPUTE_CONTEXT;
 	const seed = issueIdToSeed(resolvedContext.issueId);
@@ -433,6 +519,9 @@ export function computeTreeVisualization(
 
 	const { fruitType, fruitCount } = computeFruit(stage, shape, seed);
 
+	const canopyColors =
+		issueColor != null && issueColor.length > 0 ? deriveCanopyColors(issueColor) : null;
+
 	const isRunning = dimensions.aggregateSessionState === 'running';
 
 	const config: TreeConfig = {
@@ -442,6 +531,7 @@ export function computeTreeVisualization(
 		seed,
 		fruitType,
 		fruitCount,
+		...(canopyColors != null ? canopyColors : undefined),
 	};
 
 	return {
@@ -466,5 +556,5 @@ export function computeVisualization(
 	defaultShape?: TreeShape,
 ): TreeVisualization {
 	const dimensions = mapIssueToStateDimensions(issue, gitStatus, sessions);
-	return computeTreeVisualization(dimensions, context, labelMappings, defaultShape);
+	return computeTreeVisualization(dimensions, context, labelMappings, defaultShape, issue.color);
 }

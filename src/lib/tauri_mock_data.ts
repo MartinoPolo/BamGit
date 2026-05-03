@@ -44,6 +44,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		worktree_parent_folder: 'C:/_MP_projects/worktrees',
 		color_palette_id: PALETTE_VIVID,
 		default_shape: 'oak',
+		priorities_enabled: true,
 	},
 	{
 		id: DASHBOARD_PORTFOLIO,
@@ -55,6 +56,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		worktree_parent_folder: null,
 		color_palette_id: null,
 		default_shape: 'pine',
+		priorities_enabled: true,
 	},
 ];
 
