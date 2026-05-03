@@ -1,4 +1,4 @@
-import { showMockToast, TAURI_ONLY_COMMANDS } from '$lib/modules/toasts/mock_toast_bridge.js';
+import { showMockToast } from '$lib/modules/toasts/mock_toast_bridge.js';
 import {
 	MOCK_ACTIONS,
 	MOCK_ASSIGNED_ISSUES_RESULT,
@@ -18,6 +18,20 @@ import {
 } from './tauri_mock_data.js';
 
 type MockHandler = (args: Record<string, unknown>) => unknown;
+
+const TAURI_ONLY_COMMANDS = new Set([
+	'setup_worktree',
+	'remove_worktree',
+	'open_terminal',
+	'terminate_session',
+	'interrupt_session',
+	'send_message',
+	'adopt_session',
+	'spawn_session',
+	'sync_all_github_state',
+	'execute_action',
+	'open_workspace_window',
+]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	// ─── Board / Dashboard reads ──────────────────────────────────────────────

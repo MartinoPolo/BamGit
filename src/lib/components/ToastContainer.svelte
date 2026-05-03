@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { useToasts } from '$lib/modules/toasts';
-	import { Toast } from '$lib/components/ui/toast/index.js';
+	import Toast from '$lib/components/ui/toast/Toast.svelte';
+	import { useToasts } from '$lib/modules/toasts/index.js';
 
-	const toastsCtx = useToasts();
+	const ctx = useToasts();
 </script>
 
-{#if toastsCtx.toasts.length > 0}
-	<div class="fixed right-4 bottom-4 z-[var(--z-toast)] flex flex-col gap-2">
-		{#each toastsCtx.toasts as toast (toast.id)}
-			<div transition:fly={{ y: 20, duration: 200 }}>
+{#if ctx.toasts.current.length > 0}
+	<div class="fixed right-4 bottom-4 flex flex-col-reverse gap-2" style:z-index="var(--z-toast)">
+		{#each ctx.toasts.current as toast (toast.id)}
+			<div transition:fly={{ y: 16, duration: 200 }}>
 				<Toast
 					tone={toast.tone}
 					title={toast.title}
 					body={toast.body}
-					onDismiss={() => toastsCtx.dismiss(toast.id)}
+					onDismiss={() => ctx.dismiss(toast.id)}
 				/>
 			</div>
 		{/each}

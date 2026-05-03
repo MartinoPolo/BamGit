@@ -46,11 +46,11 @@
 	const rawRequirementsCtx = setRawRequirementsContext();
 	setCreationWizardContext();
 	const toastsCtx = setToastsContext();
-	registerMockToastBridge((item) => toastsCtx.show(item));
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
 	onMount(() => {
+		registerMockToastBridge((title, body) => toastsCtx.show({ tone: 'warning', title, body }));
 		boardStore.loadDashboards(windowCtx.isWorkspace ? windowCtx.boundDashboardId : null);
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));

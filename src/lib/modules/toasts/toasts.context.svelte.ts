@@ -1,16 +1,13 @@
 import { createContext } from 'svelte';
-import { SvelteMap } from 'svelte/reactivity';
-import type { ToastTone } from '$lib/components/ui/toast/index.js';
+import { StateRaw } from '$lib/reactivity/state.svelte.js';
 
+/** @public */
 export interface ToastItem {
 	id: string;
-	tone: ToastTone;
+	tone: 'info' | 'success' | 'warning' | 'danger';
 	title: string;
 	body?: string;
 }
-
-const MAX_VISIBLE = 3;
-const AUTO_DISMISS_MS = 4000;
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -27,44 +24,24 @@ export function setToastsContext() {
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
 
+const MAX_VISIBLE = 3;
+const DEFAULT_DURATION_MS = 4000;
+
 function createToastsContext() {
-	let toasts = $state<ToastItem[]>([]);
-	const timers = new SvelteMap<string, ReturnType<typeof setTimeout>>();
+	const toasts = new StateRaw<ToastItem[]>([]);
 
-	function show(item: Omit<ToastItem, 'id'>) {
+	function show(item: Omit<ToastItem, 'id'>, durationMs = DEFAULT_DURATION_MS): string {
 		const id = crypto.randomUUID();
-		toasts = [...toasts, { ...item, id }];
+		const next = [...toasts.current, { id, ...item }];
+		toasts.current = next.length > MAX_VISIBLE ? next.slice(next.length - MAX_VISIBLE) : next;
 
-		if (toasts.length > MAX_VISIBLE) {
-			const removed = toasts[0];
-			toasts = toasts.slice(1);
-			clearTimer(removed.id);
-		}
-
-		timers.set(
-			id,
-			setTimeout(() => dismiss(id), AUTO_DISMISS_MS),
-		);
+		setTimeout(() => dismiss(id), durationMs);
+		return id;
 	}
 
-	function dismiss(id: string) {
-		toasts = toasts.filter((t) => t.id !== id);
-		clearTimer(id);
+	function dismiss(id: string): void {
+		toasts.current = toasts.current.filter((t) => t.id !== id);
 	}
 
-	function clearTimer(id: string) {
-		const timer = timers.get(id);
-		if (timer !== undefined) {
-			clearTimeout(timer);
-			timers.delete(id);
-		}
-	}
-
-	return {
-		get toasts(): readonly ToastItem[] {
-			return toasts;
-		},
-		show,
-		dismiss,
-	};
+	return { toasts, show, dismiss };
 }
