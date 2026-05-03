@@ -5,7 +5,7 @@ import ColorPicker from './ColorPicker.svelte';
 import { DEFAULT_COLOR_PALETTE } from './color_utils.js';
 
 describe('ColorPicker', () => {
-	it('trigger renders at 32x32px with correct background color', async () => {
+	it('trigger renders with correct background color', async () => {
 		const selectedColor = '#e53e3e';
 		const screen = await render(ColorPicker, {
 			props: { selectedColor, onSelect: () => {} },
@@ -13,7 +13,7 @@ describe('ColorPicker', () => {
 
 		const trigger = screen.getByRole('button', { name: `Color: ${selectedColor}` });
 		await expect.element(trigger).toBeVisible();
-		await expect.element(trigger).toHaveClass('h-8 w-8');
+		await expect.element(trigger).toHaveClass('h-7 w-7');
 		await expect.element(trigger).toHaveStyle({ backgroundColor: 'rgb(229, 62, 62)' });
 	});
 

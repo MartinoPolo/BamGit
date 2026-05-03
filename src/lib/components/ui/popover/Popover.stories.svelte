@@ -164,3 +164,46 @@
 		</div>
 	{/snippet}
 </Story>
+
+<Story name="Open by Default">
+	{#snippet template()}
+		<div class="flex items-start gap-4 p-4 pb-72">
+			<Popover.Root open={true}>
+				<Popover.Trigger>
+					{#snippet child({ props })}
+						<Button variant="secondary" {...props}>
+							<FilterIcon class="size-3.5" />
+							Filter
+						</Button>
+					{/snippet}
+				</Popover.Trigger>
+				<Popover.Content class="w-[240px]" portalProps={{ disabled: true }}>
+					<Popover.Label>Status</Popover.Label>
+					<label
+						class="flex min-h-[28px] cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-[length:var(--text-sm)] hover:bg-surface-2"
+					>
+						<Checkbox checked />
+						Running
+					</label>
+					<label
+						class="flex min-h-[28px] cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-[length:var(--text-sm)] hover:bg-surface-2"
+					>
+						<Checkbox checked />
+						PR draft
+					</label>
+					<label
+						class="flex min-h-[28px] cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-[length:var(--text-sm)] hover:bg-surface-2"
+					>
+						<Checkbox />
+						Approved
+					</label>
+					<Popover.Divider />
+					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
+						<Button variant="ghost" size="sm" class="flex-1">Reset</Button>
+						<Button variant="primary" size="sm" class="flex-1">Apply</Button>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+		</div>
+	{/snippet}
+</Story>
