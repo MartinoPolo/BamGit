@@ -15,9 +15,11 @@ export function setWindowContext() {
 	return ctx;
 }
 
+const BROWSER_MOCK_LABEL = 'workspace-browser-mock';
+
 function resolveWindowLabel(): string {
 	if (!isTauri()) {
-		return OVERVIEW_LABEL;
+		return BROWSER_MOCK_LABEL;
 	}
 	try {
 		return getCurrentWebviewWindow().label;
