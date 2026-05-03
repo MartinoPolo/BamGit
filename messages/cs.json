@@ -333,5 +333,18 @@
 	"wizard_hint_escape": "Esc pro zrušení",
 	"wizard_hint_back": "Backspace pro návrat",
 	"wizard_quick_add": "Rychle přidat",
-	"wizard_quick_add_worktree": "Rychle přidat + worktree"
+	"wizard_quick_add_worktree": "Rychle přidat + worktree",
+
+	"mock_action_title": "Vyžaduje desktopovou aplikaci",
+	"mock_action_setup_worktree": "Nastavení worktree je simulováno v režimu prohlížeče",
+	"mock_action_remove_worktree": "Odebrání worktree je simulováno v režimu prohlížeče",
+	"mock_action_open_terminal": "Otevření terminálu vyžaduje desktopovou aplikaci",
+	"mock_action_terminate_session": "Ukončení relace je simulováno v režimu prohlížeče",
+	"mock_action_interrupt_session": "Přerušení relace je simulováno v režimu prohlížeče",
+	"mock_action_send_message": "Odesílání zpráv vyžaduje desktopovou aplikaci",
+	"mock_action_adopt_session": "Převzetí relace je simulováno v režimu prohlížeče",
+	"mock_action_spawn_session": "Spuštění relace vyžaduje desktopovou aplikaci",
+	"mock_action_sync_all_github_state": "Synchronizace GitHub vyžaduje desktopovou aplikaci",
+	"mock_action_execute_action": "Spuštění akce vyžaduje desktopovou aplikaci",
+	"mock_action_open_workspace_window": "Otevření okna workspace vyžaduje desktopovou aplikaci"
 }

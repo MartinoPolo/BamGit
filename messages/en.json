@@ -349,5 +349,18 @@
 	"wizard_hint_escape": "Esc to cancel",
 	"wizard_hint_back": "Backspace to go back",
 	"wizard_quick_add": "Quick add",
-	"wizard_quick_add_worktree": "Quick add + worktree"
+	"wizard_quick_add_worktree": "Quick add + worktree",
+
+	"mock_action_title": "Desktop app required",
+	"mock_action_setup_worktree": "Worktree setup is simulated in browser mode",
+	"mock_action_remove_worktree": "Worktree removal is simulated in browser mode",
+	"mock_action_open_terminal": "Opening a terminal requires the desktop app",
+	"mock_action_terminate_session": "Session termination is simulated in browser mode",
+	"mock_action_interrupt_session": "Session interrupt is simulated in browser mode",
+	"mock_action_send_message": "Sending messages requires the desktop app",
+	"mock_action_adopt_session": "Session adoption is simulated in browser mode",
+	"mock_action_spawn_session": "Spawning sessions requires the desktop app",
+	"mock_action_sync_all_github_state": "GitHub sync requires the desktop app",
+	"mock_action_execute_action": "Running actions requires the desktop app",
+	"mock_action_open_workspace_window": "Opening workspace windows requires the desktop app"
 }
