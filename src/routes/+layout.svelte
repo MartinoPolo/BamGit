@@ -25,8 +25,10 @@
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
 	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
+	import { setToastsContext, registerMockToastBridge } from '$lib/modules/toasts';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import RawRequirementsModal from '$lib/components/RawRequirementsModal.svelte';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -43,6 +45,8 @@
 	const commandPaletteCtx = setCommandPaletteContext();
 	const rawRequirementsCtx = setRawRequirementsContext();
 	setCreationWizardContext();
+	const toastsCtx = setToastsContext();
+	registerMockToastBridge((item) => toastsCtx.show(item));
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
@@ -180,3 +184,4 @@
 
 <CommandPalette />
 <RawRequirementsModal />
+<ToastContainer />

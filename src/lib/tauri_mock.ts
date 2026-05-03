@@ -1,3 +1,4 @@
+import { showMockToast, TAURI_ONLY_COMMANDS } from '$lib/modules/toasts/mock_toast_bridge.js';
 import {
 	MOCK_ACTIONS,
 	MOCK_ASSIGNED_ISSUES_RESULT,
@@ -166,5 +167,9 @@ export async function mockInvoke<T>(command: string, args?: Record<string, unkno
 		console.warn(`[tauri-mock] Unhandled command: "${command}"`, args);
 		return undefined as T;
 	}
-	return handler(args ?? {}) as T;
+	const result = handler(args ?? {}) as T;
+	if (TAURI_ONLY_COMMANDS.has(command)) {
+		showMockToast(command);
+	}
+	return result;
 }
