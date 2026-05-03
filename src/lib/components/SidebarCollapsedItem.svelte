@@ -2,7 +2,7 @@
 	import type { Component } from 'svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
-	import { sidebarCollapsedItemVariants } from './sidebar-collapsed-item-variants.js';
+	import { sidebarCollapsedItemVariants } from './sidebar_collapsed_item_variants.js';
 
 	interface Props {
 		icon: Component<{ size?: number; class?: string }>;
