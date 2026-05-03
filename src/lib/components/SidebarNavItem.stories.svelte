@@ -73,7 +73,7 @@
 
 <Story name="Collapsed" args={{ icon: HomeIcon, label: 'Dashboard', href: '#', collapsed: true }}>
 	{#snippet template(args: NavItemProps)}
-		<div class="w-fit rounded-lg bg-sidebar p-2">
+		<div class="flex w-14 flex-col items-center rounded-lg bg-sidebar px-2">
 			<SidebarNavItem {...args} />
 		</div>
 	{/snippet}
@@ -84,7 +84,7 @@
 	args={{ icon: HomeIcon, label: 'Dashboard', href: '#', collapsed: true, active: true }}
 >
 	{#snippet template(args: NavItemProps)}
-		<div class="w-fit rounded-lg bg-sidebar p-2">
+		<div class="flex w-14 flex-col items-center rounded-lg bg-sidebar px-2">
 			<SidebarNavItem {...args} />
 		</div>
 	{/snippet}
@@ -95,7 +95,7 @@
 	args={{ icon: InboxIcon, label: 'Inbox', href: '#', collapsed: true, badge: 5 }}
 >
 	{#snippet template(args: NavItemProps)}
-		<div class="w-fit rounded-lg bg-sidebar p-2">
+		<div class="flex w-14 flex-col items-center rounded-lg bg-sidebar px-2">
 			<SidebarNavItem {...args} />
 		</div>
 	{/snippet}

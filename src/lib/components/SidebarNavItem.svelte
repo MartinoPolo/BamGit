@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 
 	interface Props {
 		icon: Component<{ size?: number; class?: string }>;
@@ -25,29 +25,10 @@
 	}: Props = $props();
 </script>
 
-<!-- eslint-disable svelte/no-navigation-without-resolve -- href is pre-resolved by parent -->
 {#if collapsed}
-	<Tooltip.Root>
-		<Tooltip.Trigger>
-			{#snippet child({ props })}
-				<a
-					{...props}
-					{href}
-					class="sb-item-collapsed"
-					class:is-active={active}
-					aria-disabled={disabled || undefined}
-					aria-current={active ? 'page' : undefined}
-				>
-					<Icon size={15} class={active ? 'text-primary' : ''} />
-					{#if badge !== null}
-						<span class="sb-badge-dot"></span>
-					{/if}
-				</a>
-			{/snippet}
-		</Tooltip.Trigger>
-		<Tooltip.Content side="right">{label}</Tooltip.Content>
-	</Tooltip.Root>
+	<SidebarCollapsedItem icon={Icon} {label} {href} {active} {disabled} {badge} />
 {:else}
+	<!-- eslint-disable svelte/no-navigation-without-resolve -- href is pre-resolved by parent -->
 	<a
 		{href}
 		class="sb-item"
@@ -68,10 +49,10 @@
 	.sb-item {
 		display: flex;
 		align-items: center;
-		gap: 9px;
-		height: 33px;
-		padding: 7px 10px;
-		border-radius: 7px;
+		gap: var(--space-4);
+		height: var(--size-control-md);
+		padding: 7px 10px 7px 13px;
+		border-radius: var(--radius-md);
 		font-size: 12.5px;
 		color: var(--sidebar-fg);
 		text-decoration: none;
@@ -122,49 +103,5 @@
 		border-radius: 999px;
 		background: var(--primary-soft);
 		color: var(--primary);
-	}
-
-	.sb-item-collapsed {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 33px;
-		border-radius: 8px;
-		color: var(--sidebar-fg);
-		text-decoration: none;
-		cursor: pointer;
-		position: relative;
-		transition:
-			background 120ms,
-			color 120ms;
-	}
-
-	.sb-item-collapsed:hover {
-		background: var(--surface-hover);
-	}
-
-	.sb-item-collapsed.is-active {
-		background: var(--primary-soft);
-		color: var(--primary);
-	}
-
-	.sb-item-collapsed:focus-visible {
-		outline: 2px solid var(--ring);
-	}
-
-	.sb-item-collapsed[aria-disabled] {
-		opacity: 0.4;
-		pointer-events: none;
-	}
-
-	.sb-badge-dot {
-		position: absolute;
-		top: 5px;
-		right: 5px;
-		width: 6px;
-		height: 6px;
-		border-radius: 999px;
-		background: var(--primary);
 	}
 </style>

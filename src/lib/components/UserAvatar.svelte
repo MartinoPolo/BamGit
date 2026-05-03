@@ -13,13 +13,13 @@
 </script>
 
 {#if collapsed}
-	<div class="flex justify-center">
+	<div class="flex w-full items-center justify-center py-3">
 		<Tooltip.Root>
 			<Tooltip.Trigger>
 				{#snippet child({ props })}
 					<div
 						{...props}
-						class="relative flex size-8 items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
+						class="relative flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
 					>
 						{initials}
 						{#if activeCount > 0}
@@ -36,11 +36,13 @@
 		</Tooltip.Root>
 	</div>
 {:else}
-	<div class="flex w-full items-center gap-2 p-2.5">
-		<div
-			class="flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
-		>
-			{initials}
+	<div class="flex w-full items-center gap-2 py-2.5">
+		<div class="flex w-10 shrink-0 items-center justify-center">
+			<div
+				class="flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
+			>
+				{initials}
+			</div>
 		</div>
 		<div class="min-w-0 flex-1">
 			<div class="text-xs font-medium">{username}</div>

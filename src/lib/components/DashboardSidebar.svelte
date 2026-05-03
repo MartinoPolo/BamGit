@@ -62,111 +62,135 @@
 </script>
 
 <aside
-	class="flex h-full flex-col border-r border-border bg-sidebar transition-all duration-200"
+	class="h-full overflow-hidden border-r border-border bg-sidebar transition-[width] duration-200"
 	style:width={collapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)'}
 >
-	<!-- Brand row -->
 	<div
-		class="flex items-center px-3.5 py-3.5"
-		class:justify-center={collapsed}
-		class:justify-between={!collapsed}
+		class="flex h-full shrink-0 flex-col"
+		style:width={collapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)'}
 	>
-		{#if collapsed}
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							variant="ghost"
-							size="icon"
-							onclick={onToggleSidebar}
-							class="group relative"
-							aria-label="Expand sidebar"
-						>
-							<span class="transition-opacity group-hover:opacity-0">
-								<BrandMark size={22} />
-							</span>
-							<span
-								class="absolute inset-0 flex items-center justify-center rounded-lg bg-surface-2 opacity-0 transition-opacity group-hover:opacity-100"
+		<!-- Brand row -->
+		<div
+			class="flex items-center px-2 py-3.5"
+			class:justify-between={!collapsed}
+			class:justify-center={collapsed}
+		>
+			{#if collapsed}
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						{#snippet child({ props })}
+							<Button
+								{...props}
+								variant="ghost"
+								size="icon-sm"
+								onclick={onToggleSidebar}
+								class="group relative hover:!bg-surface-hover"
+								aria-label="Expand sidebar"
 							>
-								<ChevronRightIcon size={14} />
-							</span>
-						</Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Content side="right"
-					>{m.sidebar_expand({ shortcut: toggleSidebarBinding })}</Tooltip.Content
+								<span class="transition-opacity group-hover:opacity-0">
+									<BrandMark size={22} />
+								</span>
+								<span
+									class="absolute inset-0 flex items-center justify-center rounded-lg bg-surface-hover opacity-0 transition-opacity group-hover:opacity-100"
+								>
+									<ChevronRightIcon size={14} />
+								</span>
+							</Button>
+						{/snippet}
+					</Tooltip.Trigger>
+					<Tooltip.Content side="right"
+						>{m.sidebar_expand({ shortcut: toggleSidebarBinding })}</Tooltip.Content
+					>
+				</Tooltip.Root>
+			{:else}
+				<div class="flex items-center">
+					<div class="flex w-10 shrink-0 items-center justify-center">
+						<BrandMark size={22} />
+					</div>
+					<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
+				</div>
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					onclick={onToggleSidebar}
+					aria-label="Collapse sidebar"
+					title={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
 				>
-			</Tooltip.Root>
-		{:else}
-			<div class="flex items-center gap-2">
-				<BrandMark size={22} />
-				<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
-			</div>
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				onclick={onToggleSidebar}
-				aria-label="Collapse sidebar"
-				title={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
-			>
-				<PanelLeftIcon size={14} />
-			</Button>
-		{/if}
-	</div>
+					<PanelLeftIcon size={14} />
+				</Button>
+			{/if}
+		</div>
 
-	<!-- Workspace selector -->
-	<div class="mb-3 px-2">
-		{#if !collapsed}
-			<div
-				class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
-			>
-				{m.nav_workspace()}
-			</div>
-		{/if}
-		<WorkspaceSelector name={workspaceName} {collapsed} onclick={onEditWorkspace} />
-	</div>
+		<!-- Workspace selector -->
+		<div
+			class="mb-3 px-2"
+			class:flex={collapsed}
+			class:items-center={collapsed}
+			class:justify-center={collapsed}
+		>
+			{#if !collapsed}
+				<div
+					class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
+				>
+					{m.nav_workspace()}
+				</div>
+			{/if}
+			<WorkspaceSelector name={workspaceName} {collapsed} onclick={onEditWorkspace} />
+		</div>
 
-	<!-- Navigation -->
-	<nav class="flex flex-col gap-1 px-2" class:items-center={collapsed}>
-		{#if !collapsed}
-			<div
-				class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
-			>
-				{m.nav_navigate()}
-			</div>
-		{/if}
-		{#each navigationItems as item (item.href)}
-			<SidebarNavItem
-				icon={item.icon}
-				label={NAV_LABELS[item.labelKey]()}
-				href={item.href}
-				active={isActive(item.href)}
+		<!-- Navigation -->
+		<nav class="flex flex-col gap-1 px-2" class:items-center={collapsed}>
+			{#if !collapsed}
+				<div
+					class="mb-1.5 px-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle"
+				>
+					{m.nav_navigate()}
+				</div>
+			{/if}
+			{#each navigationItems as item (item.href)}
+				<SidebarNavItem
+					icon={item.icon}
+					label={NAV_LABELS[item.labelKey]()}
+					href={item.href}
+					active={isActive(item.href)}
+					{collapsed}
+				/>
+			{/each}
+		</nav>
+
+		<!-- Spacer -->
+		<div class="flex-1"></div>
+
+		<!-- Language switcher -->
+		<div
+			class="border-t border-border p-2"
+			class:flex={collapsed}
+			class:justify-center={collapsed}
+		>
+			<LanguageSwitcher {collapsed} />
+		</div>
+
+		<!-- Theme toggle -->
+		<div
+			class="border-t border-border p-2"
+			class:flex={collapsed}
+			class:justify-center={collapsed}
+		>
+			<ThemeToggle {collapsed} />
+		</div>
+
+		<!-- User section -->
+		<div
+			class="border-t border-border p-2"
+			class:flex={collapsed}
+			class:justify-center={collapsed}
+		>
+			<UserAvatar
+				{username}
+				initials={userInitials}
+				activeCount={activeSessionCount}
 				{collapsed}
 			/>
-		{/each}
-	</nav>
-
-	<!-- Spacer -->
-	<div class="flex-1"></div>
-
-	<!-- Language switcher -->
-	<div class="border-t border-border p-2">
-		<LanguageSwitcher {collapsed} />
-	</div>
-
-	<!-- Theme toggle -->
-	<div class="border-t border-border p-2">
-		<ThemeToggle {collapsed} />
-	</div>
-
-	<!-- User section -->
-	<div class="border-t border-border p-2">
-		<UserAvatar
-			{username}
-			initials={userInitials}
-			activeCount={activeSessionCount}
-			{collapsed}
-		/>
+		</div>
 	</div>
 </aside>
