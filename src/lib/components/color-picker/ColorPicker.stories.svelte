@@ -75,3 +75,34 @@
 		</div>
 	{/snippet}
 </Story>
+
+<Story name="Color Palettes">
+	{#snippet template(args: ColorPickerProps)}
+		<div class="flex gap-72 pb-72">
+			<div>
+				<p class="mb-2 text-sm font-medium text-muted-foreground">Light</p>
+				<div data-theme="light" class="rounded-lg bg-background p-4">
+					<ColorPicker
+						{...args}
+						{selectedColor}
+						onSelect={handleSelect}
+						open={true}
+						portalDisabled={true}
+					/>
+				</div>
+			</div>
+			<div>
+				<p class="mb-2 text-sm font-medium text-muted-foreground">Dark</p>
+				<div data-theme="dark" class="rounded-lg bg-background p-4">
+					<ColorPicker
+						{...args}
+						{selectedColor}
+						onSelect={handleSelect}
+						open={true}
+						portalDisabled={true}
+					/>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>

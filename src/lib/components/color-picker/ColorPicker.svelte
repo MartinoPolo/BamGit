@@ -14,9 +14,9 @@
 		displayText,
 		side = 'bottom',
 		align = 'start',
+		open = $bindable(false),
+		portalDisabled = false,
 	}: ColorPickerProps = $props();
-
-	let open = $state(false);
 	let focusedIndex = $state(0);
 	let swatchElements: HTMLButtonElement[] = [];
 
@@ -108,7 +108,12 @@
 		{/snippet}
 	</Popover.Trigger>
 
-	<Popover.Content {side} {align} class="w-58 p-3">
+	<Popover.Content
+		{side}
+		{align}
+		class="w-58 p-3"
+		portalProps={portalDisabled ? { disabled: true } : undefined}
+	>
 		<div class="grid grid-cols-6 gap-1.5">
 			{#each colors as color, index (color)}
 				{@const isUsed = isSwatchDisabled(color)}
@@ -142,7 +147,7 @@
 
 		<div class="flex items-center gap-2">
 			<label
-				class="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border transition-transform hover:scale-105"
+				class="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border shadow-sm transition-transform hover:scale-105"
 				style="background-color: {effectiveColor}"
 			>
 				{#if displayText}

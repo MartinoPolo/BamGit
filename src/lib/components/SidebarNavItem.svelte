@@ -69,6 +69,7 @@
 		display: flex;
 		align-items: center;
 		gap: 9px;
+		height: 33px;
 		padding: 7px 10px;
 		border-radius: 7px;
 		font-size: 12.5px;
@@ -128,7 +129,7 @@
 		align-items: center;
 		justify-content: center;
 		width: 36px;
-		height: 36px;
+		height: 33px;
 		border-radius: 8px;
 		color: var(--sidebar-fg);
 		text-decoration: none;

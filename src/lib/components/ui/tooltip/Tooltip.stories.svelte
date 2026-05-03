@@ -1,6 +1,8 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import * as Tooltip from './index.js';
+	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import { formatBindingForDisplay } from '$lib/modules/keyboard-shortcuts/index.js';
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 
@@ -48,12 +50,7 @@
 					</Tooltip.Trigger>
 					<Tooltip.Content side="bottom" portalProps={{ disabled: true }}>
 						Plant a tree
-						<kbd
-							data-slot="kbd"
-							class="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] border border-border bg-surface-2 px-[5px] font-mono text-[10.5px] text-foreground-muted"
-						>
-							⌘N
-						</kbd>
+						<Kbd>{formatBindingForDisplay('Ctrl+N')}</Kbd>
 					</Tooltip.Content>
 				</Tooltip.Root>
 			</div>
@@ -117,12 +114,7 @@
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}>
 						Start a new agent session
-						<kbd
-							data-slot="kbd"
-							class="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] border border-border bg-surface-2 px-[5px] font-mono text-[10.5px] text-foreground-muted"
-						>
-							⌘N
-						</kbd>
+						<Kbd>{formatBindingForDisplay('Ctrl+N')}</Kbd>
 					</Tooltip.Content>
 				</Tooltip.Root>
 			</div>
