@@ -1,7 +1,7 @@
 <script lang="ts">
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
@@ -14,18 +14,7 @@
 </script>
 
 {#if collapsed}
-	<div class="flex justify-center">
-		<Tooltip.Root>
-			<Tooltip.Trigger>
-				{#snippet child({ props })}
-					<Button {...props} variant="ghost" size="icon">
-						<FolderIcon size={14} class="text-primary" />
-					</Button>
-				{/snippet}
-			</Tooltip.Trigger>
-			<Tooltip.Content side="right">{name}</Tooltip.Content>
-		</Tooltip.Root>
-	</div>
+	<SidebarCollapsedItem icon={FolderIcon} label={name} {onclick} iconClass="text-primary" />
 {:else}
 	<Button
 		variant="ghost"

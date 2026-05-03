@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import type { ColorPickerProps } from './color_picker_types.js';
 	import { DEFAULT_COLOR_PALETTE, getContrastTextColor, isValidHexColor } from './color_utils.js';
 
@@ -165,11 +166,11 @@
 					class="absolute inset-0 cursor-pointer opacity-0"
 				/>
 			</label>
-			<input
+			<Input
 				type="text"
 				value={effectiveColor}
 				onchange={handleHexInput}
-				class="h-8 flex-1 rounded-md border border-border bg-background px-2 text-sm"
+				class="min-w-0 flex-1"
 				placeholder="#000000"
 			/>
 		</div>

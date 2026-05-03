@@ -6,7 +6,7 @@
 	let { size = 22 }: Props = $props();
 </script>
 
-<svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+<svg style:width="{size}px" style:height="{size}px" viewBox="0 0 40 40" aria-hidden="true">
 	<circle cx="20" cy="20" r="19" fill="var(--moss-700)" />
 	<g transform="translate(20 26)">
 		<rect x="-1.5" y="-4" width="3" height="6" fill="#7a4f2c" />

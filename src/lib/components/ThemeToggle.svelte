@@ -4,7 +4,7 @@
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Monitor from '@lucide/svelte/icons/monitor';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
 
 	interface Props {
@@ -37,18 +37,13 @@
 </script>
 
 {#if collapsed}
-	<Button
-		variant="ghost"
-		size="icon"
-		class="w-full"
+	<SidebarCollapsedItem
+		icon={currentMode.Icon}
+		label="{MODE_LABELS[currentMode.labelKey]()} mode"
 		onclick={cycleMode}
-		aria-label="{MODE_LABELS[currentMode.labelKey]()} theme"
-		title="{MODE_LABELS[currentMode.labelKey]()} mode"
-	>
-		<currentMode.Icon class="size-4" />
-	</Button>
+	/>
 {:else}
-	<Tabs class="w-full">
+	<Tabs class="w-full [&>*]:flex-1 [&>*]:justify-center">
 		{#each modes as { value, Icon, labelKey } (value)}
 			<Tab
 				active={theme.mode === value}

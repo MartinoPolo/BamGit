@@ -2,7 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
 
 	interface Props {
@@ -25,18 +25,13 @@
 </script>
 
 {#if collapsed}
-	<Button
-		variant="ghost"
-		size="icon"
-		class="w-full"
+	<SidebarCollapsedItem
+		icon={GlobeIcon}
+		label={LOCALE_LABELS[getLocale()] ?? getLocale()}
 		onclick={cycleLocale}
-		aria-label={m.lang_switcher()}
-		title={LOCALE_LABELS[getLocale()] ?? getLocale()}
-	>
-		<GlobeIcon class="size-4" />
-	</Button>
+	/>
 {:else}
-	<Tabs class="w-full">
+	<Tabs class="w-full [&>*]:flex-1 [&>*]:justify-center">
 		{#each locales as locale (locale)}
 			<Tab
 				active={getLocale() === locale}
