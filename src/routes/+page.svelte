@@ -34,6 +34,7 @@
 	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
 	import ColorChangeDialog from '$lib/components/ColorChangeDialog.svelte';
 	import type { AssignedIssue, PrunableIssue } from '$lib/types/generated';
+	import { invoke } from '$lib/tauri.js';
 
 	const boardStore = useBoard();
 	const issueStore = useIssues();
@@ -415,8 +416,14 @@
 
 	async function handleChangeColor(issueId: string, newColor: string) {
 		await handleAction('change color', async () => {
-			await issueStore.updateIssue({ id: issueId, color: newColor });
+			const updatedIssue = await issueStore.updateIssue({ id: issueId, color: newColor });
 			await loadUsedColors();
+			if (updatedIssue.worktree_folder != null && updatedIssue.worktree_state === 'active') {
+				await invoke('update_peacock_color', {
+					worktreeFolder: updatedIssue.worktree_folder,
+					color: newColor,
+				});
+			}
 		});
 	}
 
@@ -543,7 +550,7 @@
 						forceExpanded={allExpanded ? true : undefined}
 						cacheMap={versionControlStore.stateMap}
 						ghAvailable={versionControlStore.isGhAvailable}
-						prioritiesEnabled={true}
+						prioritiesEnabled={boardStore.activeDashboard?.priorities_enabled ?? true}
 						paletteColors={activePaletteColors}
 						{usedColors}
 						isDarkMode={boardStore.theme.isDark}

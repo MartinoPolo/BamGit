@@ -2021,3 +2021,48 @@ describe('computeDepthRows', () => {
 		expect(result.get('child2')).toBe(0);
 	});
 });
+
+// ════════════════════════════════════════════════════════════════════════
+// computeTreeVisualization — issue color canopy override
+// ════════════════════════════════════════════════════════════════════════
+
+describe('computeTreeVisualization — issue color canopy override', () => {
+	it('uses derived canopy colors when issueColor is chromatic', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ labels: ['task'] }),
+			createContext(),
+			undefined,
+			undefined,
+			'#ff0000',
+		) as TreeVisualizationTree;
+
+		expect(result.config.canopyLightColor).not.toBe('#a8d84e');
+		expect(result.config.canopyDarkColor).not.toBe('#1a472a');
+	});
+
+	it('uses default canopy colors when issueColor is undefined', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ labels: ['task'] }),
+			createContext(),
+			undefined,
+			undefined,
+			undefined,
+		) as TreeVisualizationTree;
+
+		expect(result.config.canopyLightColor).toBe('#a8d84e');
+		expect(result.config.canopyDarkColor).toBe('#1a472a');
+	});
+
+	it('uses default canopy colors when issueColor is null', () => {
+		const result = computeTreeVisualization(
+			createDimensions({ labels: ['task'] }),
+			createContext(),
+			undefined,
+			undefined,
+			null,
+		) as TreeVisualizationTree;
+
+		expect(result.config.canopyLightColor).toBe('#a8d84e');
+		expect(result.config.canopyDarkColor).toBe('#1a472a');
+	});
+});

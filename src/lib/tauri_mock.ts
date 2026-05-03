@@ -31,6 +31,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'sync_all_github_state',
 	'execute_action',
 	'open_workspace_window',
+	'update_peacock_color',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
@@ -170,6 +171,7 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	save_window_geometry: () => null,
 	set_app_setting: () => null,
 	open_terminal: () => null,
+	update_peacock_color: () => null,
 	write_raw_requirements: () => null,
 	seed_demo_workspace: () => null,
 	delete_demo_workspace: () => null,

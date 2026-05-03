@@ -61,10 +61,52 @@
 		},
 	];
 
+	let focusedIndex = $state(0);
+	let containerElement: HTMLDivElement | undefined = $state();
+
+	function findNextEnabledIndex(currentIndex: number, direction: 1 | -1): number {
+		const count = menuItems.length;
+		let index = currentIndex;
+		for (let i = 0; i < count; i++) {
+			index = (index + direction + count) % count;
+			if (isContextMenuActionEnabled(menuItems[index].action)) {
+				return index;
+			}
+		}
+		return currentIndex;
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		switch (event.key) {
+			case 'ArrowDown':
+				event.preventDefault();
+				focusedIndex = findNextEnabledIndex(focusedIndex, 1);
+				break;
+			case 'ArrowUp':
+				event.preventDefault();
+				focusedIndex = findNextEnabledIndex(focusedIndex, -1);
+				break;
+			case 'Enter':
+				event.preventDefault();
+				if (isContextMenuActionEnabled(menuItems[focusedIndex].action)) {
+					handleItemClick(menuItems[focusedIndex].action);
+				}
+				break;
+			case 'Escape':
+				event.preventDefault();
+				ondismiss();
+				break;
+		}
+	}
+
 	function handleItemClick(action: TreeContextMenuAction) {
 		onaction(action);
 		ondismiss();
 	}
+
+	$effect(() => {
+		containerElement?.focus();
+	});
 </script>
 
 <div
@@ -73,14 +115,19 @@
 	style:top="{y}px"
 	use:clickOutside={ondismiss}
 	role="menu"
+	tabindex="-1"
+	bind:this={containerElement}
+	onkeydown={handleKeydown}
 >
-	{#each menuItems as item (item.action)}
+	{#each menuItems as item, i (item.action)}
 		<button
 			type="button"
-			class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+			class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[focused]:bg-accent data-[focused]:text-accent-foreground"
 			role="menuitem"
 			disabled={!isContextMenuActionEnabled(item.action)}
 			onclick={() => handleItemClick(item.action)}
+			onmouseenter={() => (focusedIndex = i)}
+			data-focused={focusedIndex === i ? '' : undefined}
 		>
 			<item.icon class="size-4" />
 			{item.label()}

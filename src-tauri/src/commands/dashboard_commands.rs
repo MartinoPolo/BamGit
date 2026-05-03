@@ -9,7 +9,7 @@ use crate::models::dashboard::{
 };
 
 const DASHBOARD_SELECT_COLUMNS: &str =
-    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, default_shape";
+    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, default_shape, priorities_enabled";
 
 fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
     let dashboard_type_string: String = row.get(2)?;
@@ -28,6 +28,7 @@ fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
         worktree_parent_folder: row.get(6)?,
         color_palette_id: row.get(7)?,
         default_shape: row.get(8)?,
+        priorities_enabled: row.get(9)?,
     })
 }
 
@@ -69,6 +70,7 @@ pub fn create_dashboard(
         worktree_parent_folder: request.worktree_parent_folder,
         color_palette_id: request.color_palette_id,
         default_shape: DEFAULT_TREE_SHAPE.to_string(),
+        priorities_enabled: true,
     })
 }
 
@@ -133,13 +135,14 @@ pub fn update_dashboard(
             existing.color_palette_id,
         ),
         default_shape: request.default_shape.unwrap_or(existing.default_shape),
+        priorities_enabled: request.priorities_enabled.unwrap_or(existing.priorities_enabled),
     };
 
     connection
         .execute(
             "UPDATE dashboards SET name = ?1, type = ?2, github_repo = ?3, local_folder = ?4, \
              default_base_branch = ?5, worktree_parent_folder = ?6, color_palette_id = ?7, \
-             default_shape = ?8 WHERE id = ?9",
+             default_shape = ?8, priorities_enabled = ?9 WHERE id = ?10",
             rusqlite::params![
                 updated.name,
                 updated.dashboard_type.to_string(),
@@ -149,6 +152,7 @@ pub fn update_dashboard(
                 updated.worktree_parent_folder,
                 updated.color_palette_id,
                 updated.default_shape,
+                updated.priorities_enabled,
                 updated.id,
             ],
         )

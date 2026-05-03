@@ -152,6 +152,7 @@ pub fn run() {
             worktree_commands::remove_worktree,
             worktree_commands::refresh_worktree_state,
             worktree_commands::get_prunable_issues,
+            worktree_commands::update_peacock_color,
             action_commands::create_action,
             action_commands::get_actions_for_dashboard,
             action_commands::get_action,

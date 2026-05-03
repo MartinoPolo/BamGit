@@ -16,6 +16,6 @@ export {
 
 export { aggregateSessionState, mapIssueToStateDimensions } from './state_mapping.js';
 
-export { computeTreeVisualization } from './tree_computation.js';
+export { computeTreeVisualization, deriveCanopyColors } from './tree_computation.js';
 
 export type { StateDimensions } from './types.js';
