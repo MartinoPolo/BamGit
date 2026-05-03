@@ -38,7 +38,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		id: DASHBOARD_GROVEKEEPER,
 		name: 'Grovekeeper',
 		type: 'repo',
-		github_repo: 'https://github.com/MartinoPolo/Grovekeeper',
+		github_repo: 'MartinoPolo/Grovekeeper',
 		local_folder: 'C:/_MP_projects/Grovekeeper',
 		default_base_branch: 'dev',
 		worktree_parent_folder: 'C:/_MP_projects/worktrees',
@@ -485,7 +485,7 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 	{
 		dashboard_id: DASHBOARD_GROVEKEEPER,
 		name: 'Grovekeeper',
-		github_repo: 'https://github.com/MartinoPolo/Grovekeeper',
+		github_repo: 'MartinoPolo/Grovekeeper',
 		local_folder: 'C:/_MP_projects/Grovekeeper',
 		color_palette_id: PALETTE_VIVID,
 		open_issue_count: 5,

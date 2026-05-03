@@ -45,6 +45,10 @@ On startup: `schema::create_tables()` (IF NOT EXISTS) then `defaults::seed_defau
 - New app default: update `defaults.rs::seed_defaults()`
 - Before production: switch to versioned migrations (PRAGMA user_version)
 
+## Browser Mock Mode
+
+`pnpm dev` renders the full app in a browser without Tauri — `src/lib/tauri_mock.ts` intercepts all `invoke()` calls and returns fixture data from `src/lib/tauri_mock_data.ts`. When adding a new Tauri command, always add a corresponding mock handler in `tauri_mock.ts`; if the command requires the native backend (worktree, terminal, session, git ops), also add it to `TAURI_ONLY_COMMANDS` in `src/lib/modules/toasts/mock_toast_bridge.ts` so a warning toast fires in browser mode. Navigation, theming, issue display, and layout work fully; write operations return mock responses but don't persist; native ops (worktree setup, session spawn, terminal, git sync) are no-ops that show "Desktop app required" toasts.
+
 ## Testing
 
 - TDD: write tests first, then implement.

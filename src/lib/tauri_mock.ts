@@ -1,3 +1,4 @@
+import { showMockToast } from '$lib/modules/toasts/mock_toast_bridge.js';
 import {
 	MOCK_ACTIONS,
 	MOCK_ASSIGNED_ISSUES_RESULT,
@@ -17,6 +18,20 @@ import {
 } from './tauri_mock_data.js';
 
 type MockHandler = (args: Record<string, unknown>) => unknown;
+
+const TAURI_ONLY_COMMANDS = new Set([
+	'setup_worktree',
+	'remove_worktree',
+	'open_terminal',
+	'terminate_session',
+	'interrupt_session',
+	'send_message',
+	'adopt_session',
+	'spawn_session',
+	'sync_all_github_state',
+	'execute_action',
+	'open_workspace_window',
+]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	// ─── Board / Dashboard reads ──────────────────────────────────────────────
@@ -166,5 +181,9 @@ export async function mockInvoke<T>(command: string, args?: Record<string, unkno
 		console.warn(`[tauri-mock] Unhandled command: "${command}"`, args);
 		return undefined as T;
 	}
-	return handler(args ?? {}) as T;
+	const result = handler(args ?? {}) as T;
+	if (TAURI_ONLY_COMMANDS.has(command)) {
+		showMockToast(command);
+	}
+	return result;
 }
