@@ -29,6 +29,9 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
+	import DeleteIcon from '@lucide/svelte/icons/delete';
+	import { Kbd } from '$lib/components/ui/kbd/index.js';
 </script>
 
 <Story name="Primary" args={{ variant: 'primary' }}>
@@ -125,6 +128,59 @@
 					</div>
 				</div>
 			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="With Keyboard Shortcuts">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex flex-col gap-6">
+			<div>
+				<p class="mb-2 text-sm text-foreground-muted">Primary with Enter shortcut</p>
+				<Button variant="primary" {...args}>
+					Create
+					<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+				</Button>
+			</div>
+			<div>
+				<p class="mb-2 text-sm text-foreground-muted">Ghost with Esc shortcut</p>
+				<Button variant="ghost" {...args}>
+					Cancel
+					<Kbd>Esc</Kbd>
+				</Button>
+			</div>
+			<div>
+				<p class="mb-2 text-sm text-foreground-muted">Ghost with Backspace shortcut</p>
+				<Button variant="ghost" {...args}>
+					Back
+					<Kbd><DeleteIcon /></Kbd>
+				</Button>
+			</div>
+			<div>
+				<p class="mb-2 text-sm text-foreground-muted">Secondary with Enter shortcut</p>
+				<Button variant="secondary" {...args}>
+					Confirm
+					<Kbd><CornerDownLeftIcon /></Kbd>
+				</Button>
+			</div>
+			<div>
+				<p class="mb-2 text-sm text-foreground-muted">Wizard footer example</p>
+				<div class="flex items-center gap-2">
+					<Button variant="ghost" size="sm" {...args}>
+						Back
+						<Kbd><DeleteIcon /></Kbd>
+					</Button>
+					<div class="flex-1"></div>
+					<Button variant="ghost" size="sm" {...args}>
+						Cancel
+						<Kbd>Esc</Kbd>
+					</Button>
+					<Button variant="primary" size="sm" {...args}>
+						Create
+						<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+					</Button>
+				</div>
+			</div>
 		</div>
 	{/snippet}
 </Story>

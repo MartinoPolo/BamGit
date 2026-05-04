@@ -14,6 +14,8 @@
 
 <script lang="ts">
 	import type { KbdProps } from './kbd-variants.js';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
+	import DeleteIcon from '@lucide/svelte/icons/delete';
 </script>
 
 <Story name="Single Key">
@@ -70,6 +72,26 @@
 			<Kbd {...args}>Tab</Kbd>
 			<Kbd {...args}>Enter</Kbd>
 			<Kbd {...args}>Space</Kbd>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="With Icons">
+	{#snippet template(args: KbdProps)}
+		<div class="flex items-center gap-2">
+			<Kbd {...args}><CornerDownLeftIcon /></Kbd>
+			<Kbd {...args}><DeleteIcon /></Kbd>
+			<Kbd {...args}>⌫</Kbd>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Inverted (for primary buttons)">
+	{#snippet template(args: KbdProps)}
+		<div class="flex items-center gap-2 rounded-md bg-primary p-4">
+			<Kbd variant="inverted" {...args}>Esc</Kbd>
+			<Kbd variant="inverted" {...args}><CornerDownLeftIcon /></Kbd>
+			<Kbd variant="inverted" {...args}><DeleteIcon /></Kbd>
 		</div>
 	{/snippet}
 </Story>

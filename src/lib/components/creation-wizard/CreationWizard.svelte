@@ -2,6 +2,9 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
+	import DeleteIcon from '@lucide/svelte/icons/delete';
 	import { useCreationWizard, WIZARD_STEPS } from '$lib/modules/creation-wizard';
 	import type {
 		CreateIssueRequest,
@@ -30,30 +33,65 @@
 
 	let worktreeProgressState = $state<WorktreeState>('none');
 	let createdIssue = $state<Issue | null>(null);
+	let isSubmitting = $state(false);
+	let issueNameRef: ReturnType<typeof StepIssueName> | undefined = $state();
+	let worktreeChoiceRef: ReturnType<typeof StepWorktreeChoice> | undefined = $state();
 
 	function handleOpenChange(isOpen: boolean) {
 		if (!isOpen) {
+			worktreeProgressState = 'none';
+			createdIssue = null;
 			wizard.closeWizard();
 		}
 	}
 
-	function isEmptyInputFocused(): boolean {
+	function isTextInputFocused(): boolean {
+		const el = document.activeElement;
+		return el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA';
+	}
+
+	function isTextInputNonEmpty(): boolean {
 		const el = document.activeElement;
 		const isInput = el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA';
-		return isInput && (el as HTMLInputElement).value === '';
+		return isInput && (el as HTMLInputElement).value !== '';
 	}
 
 	function handleBackspace(event: KeyboardEvent) {
-		const isInput =
-			document.activeElement?.tagName === 'INPUT' ||
-			document.activeElement?.tagName === 'TEXTAREA';
+		if (isTextInputFocused()) {
+			return;
+		}
 
-		if (
-			!isInput ||
-			(isEmptyInputFocused() && wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH)
-		) {
+		if (wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH) {
 			event.preventDefault();
 			wizard.goBack();
+		}
+	}
+
+	function handleEscape(event: KeyboardEvent) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		if (wizard.currentStep === WIZARD_STEPS.ISSUE_NAME) {
+			wizard.goBack();
+		} else {
+			wizard.closeWizard();
+		}
+	}
+
+	function handleEnter(event: KeyboardEvent) {
+		switch (wizard.currentStep) {
+			case WIZARD_STEPS.ISSUE_NAME:
+				event.preventDefault();
+				issueNameRef?.confirm();
+				break;
+			case WIZARD_STEPS.WORKTREE_CHOICE:
+				event.preventDefault();
+				worktreeChoiceRef?.confirm();
+				break;
+			case WIZARD_STEPS.COLOR_SELECTION:
+				event.preventDefault();
+				handleConfirmColor();
+				break;
 		}
 	}
 
@@ -63,11 +101,11 @@
 		}
 
 		if (event.key === 'Escape') {
-			event.preventDefault();
-			event.stopPropagation();
-			wizard.closeWizard();
+			handleEscape(event);
 		} else if (event.key === 'Backspace') {
 			handleBackspace(event);
+		} else if (event.key === 'Enter' && !isTextInputNonEmpty()) {
+			handleEnter(event);
 		}
 	}
 
@@ -88,7 +126,13 @@
 		}
 	}
 
+	// fallow-ignore-next-line complexity
 	async function handleConfirmColor() {
+		if (isSubmitting) {
+			return;
+		}
+		isSubmitting = true;
+
 		const data = wizard.formData;
 		const deps = wizard.dependencies;
 
@@ -101,6 +145,7 @@
 		);
 
 		if (request === null) {
+			isSubmitting = false;
 			return;
 		}
 
@@ -123,6 +168,7 @@
 			}
 		} catch (error) {
 			console.error('Failed to create issue:', error);
+			isSubmitting = false;
 		}
 	}
 
@@ -145,6 +191,20 @@
 		wizard.closeWizard();
 	}
 
+	function handleNextClick() {
+		switch (wizard.currentStep) {
+			case WIZARD_STEPS.ISSUE_NAME:
+				issueNameRef?.confirm();
+				break;
+			case WIZARD_STEPS.WORKTREE_CHOICE:
+				worktreeChoiceRef?.confirm();
+				break;
+			case WIZARD_STEPS.COLOR_SELECTION:
+				handleConfirmColor();
+				break;
+		}
+	}
+
 	const stepLabel = $derived.by(() => {
 		switch (wizard.currentStep) {
 			case WIZARD_STEPS.GITHUB_SEARCH:
@@ -162,9 +222,19 @@
 		}
 	});
 
-	const showConfirmButton = $derived(wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION);
+	const isFirstStep = $derived(wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH);
+	const isIssueNameStep = $derived(wizard.currentStep === WIZARD_STEPS.ISSUE_NAME);
+	const isFinalStep = $derived(wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION);
+	const showBackButton = $derived(!isFirstStep && !isIssueNameStep);
+	const showNextButton = $derived(
+		wizard.currentStep === WIZARD_STEPS.ISSUE_NAME ||
+			wizard.currentStep === WIZARD_STEPS.WORKTREE_CHOICE,
+	);
 	const showWorktreeProgress = $derived(
 		wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION && worktreeProgressState !== 'none',
+	);
+	const showFooter = $derived(
+		!showWorktreeProgress && wizard.currentStep !== WIZARD_STEPS.WORKTREE_PROGRESS,
 	);
 </script>
 
@@ -173,7 +243,7 @@
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
 	<Dialog.Content class="top-[15%] -translate-y-0 max-w-lg">
 		<Dialog.Header>
-			<Dialog.Title class="text-sm font-medium text-muted-foreground">
+			<Dialog.Title class="text-base font-semibold text-foreground">
 				{stepLabel}
 			</Dialog.Title>
 		</Dialog.Header>
@@ -188,33 +258,50 @@
 			{:else if wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH}
 				<StepGithubSearch {assignedIssues} />
 			{:else if wizard.currentStep === WIZARD_STEPS.ISSUE_NAME}
-				<StepIssueName />
+				<StepIssueName bind:this={issueNameRef} />
 			{:else if wizard.currentStep === WIZARD_STEPS.WORKTREE_CHOICE}
-				<StepWorktreeChoice />
+				<StepWorktreeChoice bind:this={worktreeChoiceRef} />
 			{:else if wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION}
 				<StepColorSelection />
 			{/if}
 		</Dialog.Body>
 
-		{#if showConfirmButton && !showWorktreeProgress}
-			<Dialog.Footer>
-				<Button variant="ghost" type="button" onclick={() => wizard.closeWizard()}>
-					{m.btn_cancel()}
+		{#if showFooter}
+			<Dialog.Footer class="flex items-center">
+				{#if showBackButton}
+					<Button variant="ghost" type="button" onclick={() => wizard.goBack()}>
+						{m.wizard_back()}
+						<Kbd><DeleteIcon /></Kbd>
+					</Button>
+				{/if}
+				<div class="flex-1"></div>
+				<Button
+					variant="ghost"
+					type="button"
+					onclick={() => {
+						if (isIssueNameStep) {
+							wizard.goBack();
+						} else {
+							wizard.closeWizard();
+						}
+					}}
+				>
+					{isIssueNameStep ? m.wizard_back() : m.btn_cancel()}
+					<Kbd>Esc</Kbd>
 				</Button>
-				<Button type="button" onclick={handleConfirmColor}>
-					{m.wizard_confirm()}
-				</Button>
+				{#if showNextButton}
+					<Button type="button" onclick={handleNextClick}>
+						{m.wizard_next()}
+						<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+					</Button>
+				{/if}
+				{#if isFinalStep}
+					<Button type="button" onclick={handleConfirmColor} disabled={isSubmitting}>
+						{m.wizard_confirm()}
+						<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+					</Button>
+				{/if}
 			</Dialog.Footer>
 		{/if}
-
-		<div
-			class="flex items-center justify-center gap-4 border-t border-border px-4 py-2 text-xs text-muted-foreground/50"
-		>
-			<span>{m.wizard_hint_enter()}</span>
-			<span>{m.wizard_hint_escape()}</span>
-			{#if wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH}
-				<span>{m.wizard_hint_back()}</span>
-			{/if}
-		</div>
 	</Dialog.Content>
 </Dialog.Root>
