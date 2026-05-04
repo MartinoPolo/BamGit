@@ -34,6 +34,7 @@
 	let worktreeProgressState = $state<WorktreeState>('none');
 	let createdIssue = $state<Issue | null>(null);
 	let isSubmitting = $state(false);
+	let githubSearchRef: ReturnType<typeof StepGithubSearch> | undefined = $state();
 	let issueNameRef: ReturnType<typeof StepIssueName> | undefined = $state();
 	let worktreeChoiceRef: ReturnType<typeof StepWorktreeChoice> | undefined = $state();
 
@@ -71,7 +72,7 @@
 		event.preventDefault();
 		event.stopPropagation();
 
-		if (wizard.currentStep === WIZARD_STEPS.ISSUE_NAME) {
+		if (wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH && isTextInputFocused()) {
 			wizard.goBack();
 		} else {
 			wizard.closeWizard();
@@ -80,6 +81,8 @@
 
 	function handleEnter(event: KeyboardEvent) {
 		switch (wizard.currentStep) {
+			case WIZARD_STEPS.GITHUB_SEARCH:
+				break;
 			case WIZARD_STEPS.ISSUE_NAME:
 				event.preventDefault();
 				issueNameRef?.confirm();
@@ -92,7 +95,6 @@
 				event.preventDefault();
 				handleConfirmColor();
 				break;
-			case WIZARD_STEPS.GITHUB_SEARCH:
 			case WIZARD_STEPS.WORKTREE_PROGRESS:
 				break;
 		}
@@ -196,6 +198,9 @@
 
 	function handleNextClick() {
 		switch (wizard.currentStep) {
+			case WIZARD_STEPS.GITHUB_SEARCH:
+				githubSearchRef?.confirm();
+				break;
 			case WIZARD_STEPS.ISSUE_NAME:
 				issueNameRef?.confirm();
 				break;
@@ -205,7 +210,6 @@
 			case WIZARD_STEPS.COLOR_SELECTION:
 				handleConfirmColor();
 				break;
-			case WIZARD_STEPS.GITHUB_SEARCH:
 			case WIZARD_STEPS.WORKTREE_PROGRESS:
 				break;
 		}
@@ -243,7 +247,8 @@
 	const isFinalStep = $derived(wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION);
 	const showBackButton = $derived(!isFirstStep && !isIssueNameStep);
 	const showNextButton = $derived(
-		wizard.currentStep === WIZARD_STEPS.ISSUE_NAME ||
+		wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH ||
+			wizard.currentStep === WIZARD_STEPS.ISSUE_NAME ||
 			wizard.currentStep === WIZARD_STEPS.WORKTREE_CHOICE,
 	);
 	const showWorktreeProgress = $derived(
@@ -286,7 +291,7 @@
 					onClose={handleProgressClose}
 				/>
 			{:else if wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH}
-				<StepGithubSearch {assignedIssues} />
+				<StepGithubSearch bind:this={githubSearchRef} {assignedIssues} />
 			{:else if wizard.currentStep === WIZARD_STEPS.ISSUE_NAME}
 				<StepIssueName bind:this={issueNameRef} />
 			{:else if wizard.currentStep === WIZARD_STEPS.WORKTREE_CHOICE}

@@ -41,9 +41,6 @@
 </script>
 
 <div class="flex flex-col gap-3">
-	<label for="wizard-issue-name" class="text-sm font-medium text-foreground">
-		{m.wizard_step_name()}
-	</label>
 	<Input
 		id="wizard-issue-name"
 		bind:ref={inputElement}

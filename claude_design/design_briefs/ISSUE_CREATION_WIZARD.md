@@ -27,6 +27,8 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 **Content**:
 - Search input with magnifying glass icon, auto-focused on step entry
 - Below: scrollable list of issues (assigned issues by default, search results when typing)
+- Loads up to 20 issues by default. 10 visible without scrolling, remaining accessible via scroll
+- Arrow key navigation scrolls the selected issue into view
 - Each issue row shows: state icon (green circle-dot for OPEN, purple circle-check for CLOSED), `#number title`
 - "Skip — create without GitHub issue" link at the bottom
 
@@ -35,7 +37,7 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 - Enter: select highlighted issue and advance
 - Typing: filters the list
 
-**Footer buttons**: Cancel [Esc]. No Back button (this is the first step). No Confirm button (Enter selects from the list).
+**Footer buttons**: Cancel [Esc], Next [Enter]. No Back button (this is the first step). Next confirms the highlighted issue selection (or skips if no results).
 
 **Decision (grilled 2026-05-04)**: The selected/highlighted issue row uses `bg-primary-soft` — a subtle green-tinted highlight from the Forest Moss palette (light: `oklch(0.92 0.03 135)` sage green, dark: `oklch(0.305 0.045 145)` deep forest green). Replaces the previous orange `bg-accent` highlight. Designer should verify text contrast on this background in both light and dark modes.
 
@@ -45,22 +47,27 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 
 **Content**:
 - Text input with the issue name, auto-focused with cursor at end
+- No duplicate label — the dialog header already displays the step name
 - Below: branch name preview in muted monospace (e.g., `Branch: 163-build-session-history-browsing`)
 
 **Keyboard**:
 - Enter: confirms the name and advances
 - All typing goes to the input (Backspace deletes text, not navigate back)
+- Escape: goes back one step (does NOT close the wizard) — because text input captures Backspace
 
-**Footer buttons**: Cancel [Esc]. No Back button — Backspace must edit text, not navigate. The Escape key goes back one step from this screen (does NOT close the wizard). Add a visible Confirm/Next button with Enter [kbd] hint so users know how to proceed.
+**Footer buttons**: Back [Esc], Next [Enter]. No Backspace Back button — Backspace must edit text, not navigate.
 
-**Decision**: Escape behavior in this step is "go back" (not "close wizard") because the text input captures Backspace. This is the only step where Escape means "back" instead of "close".
+**Decision**: Wherever a text input is focused, Escape means "go back" instead of "close wizard". This applies to Step 2 and any other step with focused text input (except Step 1, where Escape closes since there's nowhere to go back).
 
 ### Step 3: Create Worktree?
 
 **Purpose**: Choose whether to set up a git worktree for this issue.
 
 **Content**:
-- Two large choice cards side by side: Yes (tree-pine icon) and No (X icon)
+- Two equal-sized square choice cards (`size-24`) side by side: Yes (tree-pine icon) and No (X icon)
+- No duplicate title in the body — the dialog header already displays "Create Worktree?"
+- Button labels: "Yes" and "No" (short, no extra text)
+- Clicking a card selects it but does NOT advance — user must press Next/Enter to proceed
 - **Decision (grilled 2026-05-04)**: Three visual states per card:
   - **Unselected**: `border-border`, `bg-transparent`
   - **Hover**: `border-border`, `bg-surface-hover`
@@ -70,9 +77,9 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 **Keyboard**:
 - Left/Right arrows: toggle between Yes and No
 - Enter: confirms the selected choice and advances
-- **Yes should be pre-selected by default** (currently nothing is selected, which is confusing)
+- Yes is pre-selected by default
 
-**Footer buttons**: Back [kbd], Cancel [Esc]. Consider adding a Confirm/Next button with Enter [kbd] hint for discoverability.
+**Footer buttons**: Back [⌫], Cancel [Esc], Next [Enter].
 
 ### Step 4: Pick a Color
 
@@ -122,7 +129,7 @@ Layout: `[Back ⌫]  ———spacer———  [Cancel Esc] [Create ↵]`
 
 ### Keyboard Shortcut Routing
 
-- **Escape**: Closes the wizard on all steps EXCEPT Step 2 (Issue Name), where it goes back one step (because Backspace edits the input text)
+- **Escape**: Closes the wizard UNLESS a text input is focused on a non-first step, in which case it goes back one step (because Backspace edits the input text). This applies to Step 2 (name input) and any future step with text input. Step 1 always closes on Escape (nowhere to go back)
 - **Backspace**: Goes back one step on all steps EXCEPT when a text input is focused and non-empty (the keypress edits the text instead). This applies to Step 1 (search input), Step 2 (name input), and Step 4 (hex input)
 - **Enter**: Handled per-step (selects issue, confirms name, confirms worktree choice, creates issue)
 - **Arrow keys**: Handled per-step (navigate issue list, toggle worktree choice, navigate color grid)
@@ -170,6 +177,12 @@ Layout: `[Back ⌫]  ———spacer———  [Cancel Esc] [Create ↵]`
 - Color grid is 6 columns x 4 rows
 - Issue list highlight: `bg-primary-soft` (sage green / deep forest green)
 - Worktree card states: unselected (transparent), hover (`bg-surface-hover`), selected Yes (green fill), selected No (red fill)
+- Worktree cards: equal-sized squares (`size-24`), labels "Yes"/"No" only, clicking selects but does not advance
+- Step body must NOT duplicate the dialog header title text
+- Step 1 loads 20 issues by default, 10 visible without scrolling
+- Arrow navigation in issue list scrolls selected item into view
+- Next button visible on Steps 1, 2, and 3
+- Escape goes back (not close) when text input is focused on any non-first step
 - Color grid gaps must be equal in both axes (fix gap uniformity before adjusting modal width)
 
 ## Grilled Decisions (2026-05-04)
@@ -187,7 +200,7 @@ The following items were resolved during grilling and are now **set in stone**:
 - **Color grid swatch sizing**: Swatches are currently 28px (`h-7 w-7`) with `gap-1.5`. Designer may adjust swatch size and gap to achieve uniform spacing within the modal, but gaps must be equal in both axes
 - **Overall modal width**: Currently `max-w-lg`. May increase to `max-w-xl` (576px) only if uniform grid gaps require it — not as a first resort
 - **Step transition**: Currently instant swap. Could add a subtle crossfade or slide if it improves perceived flow (not required)
-- **Progress indicators**: Step dots, progress bar, or breadcrumb to show wizard position (optional — may add clutter for a 4-step flow)
+- ~~**Progress indicators**: Step dots implemented in header top-right. Active step = wider pill, completed = primary/50 circles, inactive = border-strong~~ ✅ Done
 
 ## Not Included in This Design
 
