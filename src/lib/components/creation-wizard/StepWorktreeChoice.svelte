@@ -25,14 +25,11 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="flex flex-col gap-4" onkeydown={handleKeydown}>
-	<p class="text-center text-sm font-medium text-foreground">
-		{m.wizard_step_worktree()}
-	</p>
 	<div class="flex items-center justify-center gap-4">
 		<button
 			type="button"
-			onclick={() => wizard.selectWorktreeChoice(true)}
-			class="flex flex-col items-center gap-2 rounded-lg border-2 px-6 py-4 transition-colors
+			onclick={() => (selectedChoice = true)}
+			class="flex size-24 flex-col items-center justify-center gap-2 rounded-lg border-2 transition-colors
 				{selectedChoice === true
 				? 'border-green-500 bg-green-500/10 text-green-400'
 				: 'border-border bg-transparent text-muted-foreground hover:bg-surface-hover'}"
@@ -42,8 +39,8 @@
 		</button>
 		<button
 			type="button"
-			onclick={() => wizard.selectWorktreeChoice(false)}
-			class="flex flex-col items-center gap-2 rounded-lg border-2 px-6 py-4 transition-colors
+			onclick={() => (selectedChoice = false)}
+			class="flex size-24 flex-col items-center justify-center gap-2 rounded-lg border-2 transition-colors
 				{selectedChoice === false
 				? 'border-red-500 bg-red-500/10 text-red-400'
 				: 'border-border bg-transparent text-muted-foreground hover:bg-surface-hover'}"

@@ -46,7 +46,7 @@ function createVersionControlContext() {
 	let syncError = $state<string | null>(null);
 	let assignedIssues = $state<AssignedIssue[]>([]);
 	let assignedIssuesHasMore = $state(false);
-	let assignedIssuesLimit = $state(10);
+	let assignedIssuesLimit = $state(20);
 	let deletedAssignedIssueNumbers = $state<number[]>([]);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
@@ -182,7 +182,7 @@ function createVersionControlContext() {
 
 		async loadAssignedIssues(owner: string, repo: string) {
 			try {
-				assignedIssuesLimit = 10;
+				assignedIssuesLimit = 20;
 				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
 					owner,
 					repo,

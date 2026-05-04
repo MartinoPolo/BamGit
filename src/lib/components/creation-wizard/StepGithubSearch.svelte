@@ -19,6 +19,7 @@
 
 	let selectedIndex = $state(0);
 	let inputElement = $state<HTMLInputElement | null>(null);
+	let listElement = $state<HTMLDivElement | null>(null);
 
 	const displayItems = $derived.by(() => {
 		if (wizard.searchQuery.trim() !== '') {
@@ -32,6 +33,16 @@
 		untrack(() => {
 			selectedIndex = 0;
 		});
+	});
+
+	$effect(() => {
+		const index = selectedIndex;
+		if (listElement) {
+			const child = listElement.querySelector(
+				`[data-index="${index}"]`,
+			) as HTMLElement | null;
+			child?.scrollIntoView({ block: 'nearest' });
+		}
 	});
 
 	onMount(() => {
@@ -59,6 +70,10 @@
 		} else {
 			wizard.skipGithubSearch();
 		}
+	}
+
+	export function confirm() {
+		confirmSelection();
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -109,7 +124,7 @@
 			<p>{m.wizard_search_empty()}</p>
 		</div>
 	{:else if displayItems.length > 0}
-		<div class="flex max-h-60 flex-col gap-0.5 overflow-y-auto">
+		<div bind:this={listElement} class="flex max-h-[360px] flex-col gap-0.5 overflow-y-auto">
 			{#if wizard.searchQuery.trim() === '' && assignedIssues.length > 0}
 				<p
 					class="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60"
@@ -120,6 +135,7 @@
 			{#each displayItems as item, index (item.number)}
 				<button
 					type="button"
+					data-index={index}
 					onclick={() => wizard.selectGithubIssue(toSearchedIssue(item))}
 					class="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors
 						{index === selectedIndex
