@@ -16,11 +16,14 @@
 
 	let { open, prunableIssues, removing, onClose, onPrune }: Props = $props();
 
-	let selectedIds = $state(new SvelteSet<string>());
+	const selectedIds = new SvelteSet<string>();
 
 	$effect(() => {
 		if (open) {
-			selectedIds = new SvelteSet(prunableIssues.map((issue) => issue.issue_id));
+			selectedIds.clear();
+			for (const issue of prunableIssues) {
+				selectedIds.add(issue.issue_id);
+			}
 		}
 	});
 
