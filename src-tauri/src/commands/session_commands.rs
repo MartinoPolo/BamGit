@@ -12,7 +12,9 @@ use crate::models::session::{Session, SpawnSessionRequest};
 use crate::session::discovery::DiscoveredSession;
 use crate::session::discovery_polling::DiscoveryPoller;
 use crate::session::manager::SessionManager;
-use crate::session::provider::{ActorCommand, SpawnConfig};
+use serde_json::Value;
+
+use crate::session::provider::{ActorCommand, ApprovalDecision, SpawnConfig};
 
 const SESSION_SELECT_COLUMNS: &str =
     "id, issue_id, provider, state, pid, cli_session_id, started_at, ended_at, \
@@ -120,6 +122,36 @@ pub async fn terminate_session(
 ) -> Result<(), String> {
     manager
         .send_command(&session_id, ActorCommand::Terminate)
+        .await
+}
+
+#[tauri::command]
+pub async fn respond_to_request(
+    manager: State<'_, SessionManager>,
+    session_id: String,
+    request_id: String,
+    decision: ApprovalDecision,
+) -> Result<(), String> {
+    manager
+        .send_command(
+            &session_id,
+            ActorCommand::RespondToRequest { request_id, decision },
+        )
+        .await
+}
+
+#[tauri::command]
+pub async fn respond_to_user_input(
+    manager: State<'_, SessionManager>,
+    session_id: String,
+    request_id: String,
+    answers: Value,
+) -> Result<(), String> {
+    manager
+        .send_command(
+            &session_id,
+            ActorCommand::RespondToUserInput { request_id, answers },
+        )
         .await
 }
 

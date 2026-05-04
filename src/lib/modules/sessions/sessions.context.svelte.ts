@@ -2,6 +2,7 @@ import { createContext } from 'svelte';
 import { onMount, onDestroy } from 'svelte';
 import { invoke, listen, type UnlistenFn } from '$lib/tauri.js';
 import type {
+	ApprovalDecision,
 	Session,
 	SessionEventPayload,
 	DiscoveredSession,
@@ -232,6 +233,22 @@ function createSessionsContext(notifications: NotificationsApi) {
 
 		async sendMessage(sessionId: string, message: string): Promise<void> {
 			return invoke('send_message', { sessionId, message });
+		},
+
+		async respondToRequest(
+			sessionId: string,
+			requestId: string,
+			decision: ApprovalDecision,
+		): Promise<void> {
+			return invoke('respond_to_request', { sessionId, requestId, decision });
+		},
+
+		async respondToUserInput(
+			sessionId: string,
+			requestId: string,
+			answers: Record<string, unknown>,
+		): Promise<void> {
+			return invoke('respond_to_user_input', { sessionId, requestId, answers });
 		},
 
 		async adoptSession(request: AdoptSessionRequest): Promise<string> {

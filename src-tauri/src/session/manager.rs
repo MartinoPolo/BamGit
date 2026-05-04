@@ -6,7 +6,7 @@ use tauri::AppHandle;
 use tokio::sync::{mpsc, Mutex};
 
 use super::claude_code_provider::ClaudeCodeProvider;
-use super::provider::{ActorCommand, SessionProvider, SpawnConfig};
+use super::provider::{ActorCommand, ProviderAdapter, SpawnConfig};
 use super::session_actor;
 
 /// Registry of active session actors. Managed as Tauri state.

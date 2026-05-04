@@ -129,6 +129,8 @@ pub fn run() {
             session_commands::send_message,
             session_commands::interrupt_session,
             session_commands::terminate_session,
+            session_commands::respond_to_request,
+            session_commands::respond_to_user_input,
             session_commands::get_sessions,
             session_commands::get_session,
             session_commands::discover_external_sessions,
