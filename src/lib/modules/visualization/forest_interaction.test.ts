@@ -9,6 +9,7 @@ import type { TreeContextMenuAction, ResolveGlowOverlayParams } from './index';
 
 const HOVER_COLOR = '#ffd700';
 const SELECT_COLOR = '#4a9eff';
+const BATCH_SELECTED_COLOR = '#ec4899';
 
 const STATE_ERRORED: OverlayConfig = {
 	glow: { enabled: true, color: '#ff4444', intensity: 4, pulse: true },
@@ -29,6 +30,8 @@ function createParams(overrides: Partial<ResolveGlowOverlayParams> = {}): Resolv
 		selectedIssueId: null,
 		hoverGlowColor: HOVER_COLOR,
 		selectedGlowColor: SELECT_COLOR,
+		batchSelectedIssueIds: new Set<string>(),
+		batchSelectedGlowColor: BATCH_SELECTED_COLOR,
 		...overrides,
 	};
 }
@@ -145,5 +148,73 @@ describe('resolveGlowOverlay', () => {
 		);
 		expect(result.glow.enabled).toBe(false);
 		expect(result).toEqual(STATE_DISABLED);
+	});
+
+	it('returns batch-selected glow when issueId is in batchSelectedIssueIds', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				issueId: 'issue-1',
+				hoveredIssueId: null,
+				selectedIssueId: null,
+				batchSelectedIssueIds: new Set(['issue-1', 'issue-2']),
+			}),
+		);
+		expect(result.glow).toEqual({
+			enabled: true,
+			color: BATCH_SELECTED_COLOR,
+			intensity: 3,
+			pulse: false,
+		});
+	});
+
+	it('hover takes priority over batch-selected', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				issueId: 'issue-1',
+				hoveredIssueId: 'issue-1',
+				selectedIssueId: null,
+				batchSelectedIssueIds: new Set(['issue-1']),
+			}),
+		);
+		expect(result.glow.color).toBe(HOVER_COLOR);
+	});
+
+	it('selected takes priority over batch-selected', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				issueId: 'issue-1',
+				hoveredIssueId: null,
+				selectedIssueId: 'issue-1',
+				batchSelectedIssueIds: new Set(['issue-1']),
+			}),
+		);
+		expect(result.glow.color).toBe(SELECT_COLOR);
+	});
+
+	it('batch-selected takes priority over state-driven overlay', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				stateOverlay: STATE_ERRORED,
+				issueId: 'issue-1',
+				hoveredIssueId: null,
+				selectedIssueId: null,
+				batchSelectedIssueIds: new Set(['issue-1']),
+			}),
+		);
+		expect(result.glow.color).toBe(BATCH_SELECTED_COLOR);
+		expect(result.glow.pulse).toBe(false);
+	});
+
+	it('returns state-driven when not hovered, not selected, not batch-selected', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				stateOverlay: STATE_ERRORED,
+				issueId: 'issue-1',
+				hoveredIssueId: null,
+				selectedIssueId: null,
+				batchSelectedIssueIds: new Set(['issue-99']),
+			}),
+		);
+		expect(result).toEqual(STATE_ERRORED);
 	});
 });

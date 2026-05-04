@@ -18,7 +18,8 @@
 		"@fallow-cli/win32-x64-msvc",
 		"low-poly-2d-trees",
 		"lucide-svelte",
-		"@inlang/paraglide-js"
+		"@inlang/paraglide-js",
+		"@internationalized/date"
 	],
 	"health": {
 		"maxCrap": 60

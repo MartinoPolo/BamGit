@@ -28,6 +28,7 @@
 	import { TREE_CONTEXT_MENU_ACTIONS } from '$lib/modules/visualization';
 	import type { TreeContextMenuAction } from '$lib/modules/visualization';
 	import { useSelection } from '$lib/modules/board';
+	import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
 
 	interface Props {
 		issues: readonly Issue[];
@@ -208,8 +209,10 @@
 			issueId: entry.issue.id,
 			hoveredIssueId: interaction.hoveredIssueId,
 			selectedIssueId: interaction.selectedIssueId,
+			batchSelectedIssueIds: interaction.batchSelectedIssueIds,
 			hoverGlowColor: interaction.hoverGlowColor,
 			selectedGlowColor: interaction.selectedGlowColor,
+			batchSelectedGlowColor: GLOW_COLORS.pink,
 		});
 	}
 
