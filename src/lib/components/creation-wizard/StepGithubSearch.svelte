@@ -123,8 +123,8 @@
 					onclick={() => wizard.selectGithubIssue(toSearchedIssue(item))}
 					class="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors
 						{index === selectedIndex
-						? 'bg-accent text-accent-foreground'
-						: 'text-foreground hover:bg-accent/50'}"
+						? 'bg-primary-soft text-foreground'
+						: 'text-foreground hover:bg-surface-hover'}"
 				>
 					{#if item.state === 'OPEN'}
 						<CircleDot size={14} class="shrink-0 text-green-400" />
