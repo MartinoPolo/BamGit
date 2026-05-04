@@ -561,7 +561,6 @@
 						assignedIssues={versionControlStore.assignedIssues}
 						assignedIssuesHasMore={versionControlStore.assignedIssuesHasMore}
 						deletedAssignedIssueNumbers={versionControlStore.deletedAssignedIssueNumbers}
-						isGhAvailable={versionControlStore.isGhAvailable}
 						{getVisualization}
 						getChildren={issueStore.getChildren}
 						{getNotificationDotColor}
