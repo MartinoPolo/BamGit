@@ -3,8 +3,11 @@ import sveltePlugin from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
 import storybook from 'eslint-plugin-storybook';
 import globals from 'globals';
-import svelteConfig from './svelte.config.js';
 import checkFile from 'eslint-plugin-check-file';
+
+const eslintSvelteConfig = {
+	compilerOptions: { runes: true },
+};
 
 export default [
 	{
@@ -79,7 +82,7 @@ export default [
 				parser: '@typescript-eslint/parser',
 				extraFileExtensions: ['.svelte'],
 				projectService: true,
-				svelteConfig,
+				svelteConfig: eslintSvelteConfig,
 				svelteFeatures: {
 					experimentalGenerics: true,
 				},

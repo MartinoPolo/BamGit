@@ -83,6 +83,9 @@ debug/
 .nyc_output/
 jest-cache/
 
+# Lint cache
+.eslintcache
+
 # Storybook
 storybook-static/
 
