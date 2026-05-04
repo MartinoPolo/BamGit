@@ -53,11 +53,28 @@ The issue card is the atomic unit of the dashboard. It represents a single track
 - Badges are interactive: clicking PR/issue badge opens GitHub URL
 - Badges are responsive: collapse to icon-only when card width is narrow
 
+### Context Menu (right-click)
+
+Built with bits-ui `ContextMenu` (WAI-ARIA menu pattern, focus trapping, submenus, separators). Two trigger mechanisms: right-click on card, or click the overflow (⋯) button (same component, programmatic open).
+
+**Menu structure:**
+1. **Select / Deselect** — top item, separator below (mode-switching action)
+2. Edit
+3. Rename (standalone issues only)
+4. Priority ▸ (submenu: lowest, low, medium, high, highest)
+5. Change Color (inline ColorPicker)
+6. Separator
+7. Setup Worktree / Remove Worktree (conditional on worktree state)
+8. Archive / Unarchive (conditional on archived state)
+9. Delete (destructive, red text)
+
+**Batch context menu** (right-clicking a batch-selected card): shows batch actions — "Archive N selected", "Delete N selected", etc. Right-clicking an unselected card clears the batch selection, activates that card, and shows single-card actions (file manager pattern: Windows Explorer, macOS Finder, VS Code).
+
 ### Action Buttons (hover-revealed)
 
 - Appear on hover over the card (opacity transition)
 - Default set: Execute, Review, Check & Fix (configurable per-workspace)
-- Overflow menu (three dots) with: Edit, Rename, Priority submenu, Change Color (inline ColorPicker), Setup/Remove Worktree, Archive/Unarchive, Delete
+- Overflow (⋯) button opens the same bits-ui context menu programmatically (single menu implementation, two triggers — right-click for desktop power users, button for touch/accessibility)
 
 ### Notification Indicator
 
@@ -113,11 +130,11 @@ Issue cards support multi-selection for batch operations. The selection system i
 
 ### Selection Triggers
 
-- **Right-click context menu** (desktop): adds "Select" option to existing context menu
-- **Long press** (mobile/touch, 500ms): enters selection mode
+- **Right-click context menu**: "Select" as first item in the new bits-ui context menu (see Context Menu section above)
+- **Long press** (mobile/touch, 500ms): enters selection mode (Android planned via Tauri v2)
 - **Ctrl+click**: toggle individual card selection
-- **Shift+click**: range select (all cards between last-selected and clicked)
-- **Ctrl+A**: select all visible cards
+- **Shift+click**: range select — flat visual order, crosses parent/child boundaries
+- **Ctrl+A**: select all available issues regardless of scroll position
 - **Escape**: deselect all
 
 ### Selection Visual States
@@ -142,9 +159,9 @@ Unavailable actions (no selected issues support it) are disabled with a tooltip.
 
 ### Selection Lifecycle
 
-- Clears on tab change (Issues → Kanban)
+- Clears on any tab change (not just Issues → Kanban)
 - Clears on Escape
-- Does NOT clear after batch action completes
+- Does NOT clear after batch action completes (deleted/archived items are removed from the selection set, remaining selection persists)
 - Normal click (no modifier) clears batch selection and activates the clicked card
 
 ## States to Explore in Variants
@@ -162,6 +179,8 @@ For the initial three variants, show a list of 4-5 cards in the collapsed state 
 - Active session state (notification dot pulsing)
 - Error state (red indicators)
 - Narrow width (badges collapsed to icons)
+- Context menu open state (single-card actions)
+- Context menu open state (batch actions — "Archive 3 selected", etc.)
 
 ## Visual References
 
@@ -179,5 +198,4 @@ For the initial three variants, show a list of 4-5 cards in the collapsed state 
 - Kanban board layout (separate design brief)
 - Issue creation wizard
 - Issue detail/edit modal
-- Context menu styling (reuses existing `ForestContextMenu` patterns)
 - Color picker component (already designed and implemented)

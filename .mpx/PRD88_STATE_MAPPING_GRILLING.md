@@ -10,12 +10,12 @@
 
 ### Layout & Scene
 
-| Decision         | Resolution                                                                                                                                                 |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Layout algorithm | Replace semicircle rings with row-based equidistant layout (PRD tree centered, unblocked trees alternate L/R in row 1, blocked trees in depth rows behind) |
-| Aspect ratio     | Responsive — no fixed ratio. Forest fills window width, height controlled by resizer. No mobile consideration (desktop app)                                |
-| Empty state      | Sky gradient + ground strip + centered seed illustration + "Plant your first tree" CTA                                                                     |
-| Performance      | Animations only on row 1 trees. Rows 2+ are static. Desktop SVG handles 50+ trees fine (tested with 100 in web)                                            |
+| Decision         | Resolution                                                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Layout algorithm | Replace semicircle rings with row-based equidistant layout (PRD tree centered, unblocked trees alternate L/R in row 1, blocked trees in depth rows behind)    |
+| Aspect ratio     | Responsive — no fixed ratio. Forest fills window width, height controlled by resizer. Mobile planned (Android via Tauri v2) — layout should remain responsive |
+| Empty state      | Sky gradient + ground strip + centered seed illustration + "Plant your first tree" CTA                                                                        |
+| Performance      | Animations only on row 1 trees. Rows 2+ are static. Desktop SVG handles 50+ trees fine (tested with 100 in web)                                               |
 
 ### Bottom Panel Interaction
 
