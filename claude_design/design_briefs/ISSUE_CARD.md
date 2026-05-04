@@ -33,10 +33,28 @@ The issue card is the atomic unit of the dashboard. It represents a single track
 - Background behind the tree: explore options — could be the issue color, a surface gradient, or transparent
 - The tree thumbnail from `artboards-issue.jsx` (92×92, `translateY(20px)`, `showGround={false}`) is the starting reference
 
-### Metadata (right side of card)
+### Header Layout
 
-- **Issue name**: primary text, truncated with ellipsis if too long
-- **GitHub issue number**: `#123` in monospace, small
+The header band uses the issue color as background with WCAG-contrast text.
+
+- **Left side**: `#123` issue number (monospace) + issue name (truncated with ellipsis). The issue name is a clickable link to the corresponding GitHub issue when linked (opens in browser). Unlinked issues show the name as plain text
+- **Right side (fixed, always visible)**: Priority badge + child count chip + **quick-action buttons**
+- Priority badge and child count chip are positioned first (leftmost in right group), quick-action buttons last (rightmost, flush to header edge)
+
+### Quick-Action Buttons (header-right)
+
+Three icon buttons in the header for quick access to the issue environment. Always visible (not hover-revealed), fixed position on the right side of the header. They do NOT shift or move other header elements.
+
+1. **Open Folder** — folder icon, opens issue worktree folder in file explorer
+2. **Open Terminal** — terminal/command-line icon, opens terminal at worktree path
+3. **Open Editor** — VS Code icon, opens editor at worktree path
+
+**Disabled state**: When no folder/worktree is assigned, all three buttons are visually disabled (reduced opacity, no pointer events, muted color). The buttons remain in place to prevent layout shift.
+
+Button style: small icon-only buttons (~18-20px), subtle background matching the header color treatment (semi-transparent backdrop like the priority chip). On dark-text headers use `rgba(0,0,0,0.12)`, on light-text headers use `rgba(255,255,255,0.15)`.
+
+### Metadata (right side of card body)
+
 - **Branch name**: monospace, muted, small — may be absent (no worktree yet)
 - **Priority badge**: color-coded text badge (Critical/red, High/orange, Medium/hidden, Low/blue, None/hidden). Visibility controlled by a per-workspace setting
 - **Child count chip**: small badge showing number of sub-issues (e.g., "3 sub")
@@ -113,10 +131,10 @@ The card should have two states:
 
 ## Layout Constraints
 
-- Grid layout: tree thumbnail (92px) | metadata (1fr) — or explore alternatives
+- Grid layout: tree thumbnail (72px) | metadata (1fr)
 - Card must work at widths from ~320px (narrow panel) to ~600px (wide panel)
-- Multiple cards stack vertically with 4-8px gap
-- Left border accent: 3px colored left border using priority color (optional — may conflict with the new color header approach, explore whether both are needed)
+- **Two-column layout**: Cards display in a 2-column CSS grid (`grid-template-columns: repeat(2, 1fr)`) with 8px gap
+- **Row-major ordering**: Items flow left→right, then next row (1,2 / 3,4 / 5,6). This is CSS Grid's default `grid-auto-flow: row`. Matches file manager conventions (Windows Explorer, macOS Finder) and ensures sort order reads naturally. Shift+click range selection follows this visual order
 - Dark theme primary (light theme support later)
 
 ## Batch Selection State
@@ -139,9 +157,24 @@ Issue cards support multi-selection for batch operations. The selection system i
 
 ### Selection Visual States
 
-- **Selection-ready hover** (Ctrl/Shift held + hovering): visible border change and shadow — clearly distinct from normal hover. Uses violet (`#c084fc`) glow on the corresponding forest tree. Cursor remains `pointer`. When Ctrl/Shift is held, card-level hover effects suppress element-level interactions (e.g., Shift+click on a PR badge selects the card, not the badge).
-- **Selected** (batch-selected): checkbox appears on left edge of card, card has a distinct highlight treatment. Uses hot pink (`#ec4899`) glow on the corresponding forest tree. Selection state is visually distinct from the blue "active" glow.
+All interactive states must be **clearly distinguishable from each other** at a glance. No checkboxes on cards — selection is indicated entirely through border/shadow/glow treatment.
+
+**Visual hierarchy (from least to most prominent):**
+
+1. **Default (resting)**: 1px border `var(--border)`, subtle shadow. No special treatment
+2. **Hover**: border tints toward issue color, shadow lifts to `shadow-md`, **background subtly brightens** (e.g., `color-mix(in oklch, var(--ic) 6%, var(--surface))`). Must be clearly visible — not just a minor border tweak
+3. **Active** (single-click inspect, one at a time): **glow shadow** using `var(--ring)` color (blue). Ring: `0 0 0 3px` + outer glow `0 0 12px` at 25% opacity. Clearly distinct from hover — the glow is the differentiator
+4. **Selected** (batch-selected, multiple): primary-color ring `0 0 0 3px` using `var(--primary)` (moss green) + subtle body tint. NO checkbox — border+ring is the sole indicator. Distinct from active by color (green vs blue)
+5. **Selection-ready hover** (Ctrl/Shift held + hovering): violet (`#c084fc`) border + shadow treatment. Clearly distinct from normal hover. Cursor remains `pointer`. Card-level hover suppresses element-level interactions (Shift+click on PR badge selects card, not badge)
+
+**Key distinction rules:**
+- Hover = shadow lift + background brighten (no ring)
+- Active = blue glow ring + outer glow halo
+- Selected = green/primary ring + body tint (no outer glow halo — different shape from active)
+- The active glow halo (blurred, extends outward) vs selected ring (sharp, tight) creates a clear visual distinction even without color perception
+
 - **Select All checkbox**: tri-state checkbox at top of card list (all checked / some checked / none). Same row as the action toolbar. Replaces dedicated Select All / Deselect All buttons.
+- Uses hot pink (`#ec4899`) glow on the corresponding forest tree. Selection state is visually distinct from the blue "active" glow.
 
 ### Batch Action Toolbar
 
@@ -164,23 +197,25 @@ Unavailable actions (no selected issues support it) are disabled with a tooltip.
 - Does NOT clear after batch action completes (deleted/archived items are removed from the selection set, remaining selection persists)
 - Normal click (no modifier) clears batch selection and activates the clicked card
 
-## States to Explore in Variants
+## States to Show on Design Page
 
-For the initial three variants, show a list of 4-5 cards in the collapsed state with different issue colors (red, blue, green, purple, amber) to demonstrate color distinction. After variant selection, we will design:
+The design page must show all of these states:
 
-- Collapsed state (default, multiple cards visible)
-- Expanded state (single card opened)
-- Hover state (action buttons revealed)
-- Selection-ready hover state (Ctrl/Shift held, border/shadow change)
-- Selected state (checkbox visible, highlight treatment)
+- Default resting state (two-column grid, multiple cards)
+- Hover state (visible background brighten + shadow lift + action buttons revealed)
+- Active state (blue glow ring + outer glow halo)
+- Selected/multi-selected state (green/primary ring + body tint, NO checkbox)
+- Selection-ready hover (violet border/shadow, Ctrl/Shift held)
+- Dragging state (rotation + lifted shadow)
+- Loading state (shimmer overlay)
 - Archived state (grayscale overlay)
-- Child/indented state (with connector lines)
-- No-worktree state (seed stage — minimal metadata)
-- Active session state (notification dot pulsing)
 - Error state (red indicators)
-- Narrow width (badges collapsed to icons)
-- Context menu open state (single-card actions)
+- Disabled state (faded, no pointer events)
+- No-worktree state (quick-action buttons disabled, seed stage tree)
+- Context menu open state (single-card actions — full menu rendered inline on page)
 - Context menu open state (batch actions — "Archive 3 selected", etc.)
+- Multi-selection with action bar (NO checkboxes on cards)
+- Mixed light + dark header colors in two-column grid
 
 ## Visual References
 
