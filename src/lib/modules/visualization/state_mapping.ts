@@ -62,13 +62,11 @@ function mapBranchStatus(
 	issueBranchName: string | null,
 	raw: string | null | undefined,
 ): ForestBranchStatus {
-	if (
-		issueBranchName === null ||
-		raw == null ||
-		raw === 'unknown' ||
-		!KNOWN_BRANCH_STATUSES.has(raw)
-	) {
+	if (issueBranchName === null) {
 		return 'no-branch';
+	}
+	if (raw == null || raw === 'unknown' || !KNOWN_BRANCH_STATUSES.has(raw)) {
+		return 'active';
 	}
 	if (raw === 'local') {
 		return 'local-only';

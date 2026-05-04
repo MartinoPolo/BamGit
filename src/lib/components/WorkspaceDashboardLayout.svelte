@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
+	import { PaneGroup, Pane } from 'paneforge';
+	import StyledPaneResizer from './StyledPaneResizer.svelte';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 
 	interface Props {
@@ -31,7 +32,7 @@
 		onCollapse={() => (collapsed = true)}
 		onExpand={() => (collapsed = false)}
 	>
-		<div class="h-full overflow-hidden">
+		<div class="flex h-full flex-col overflow-hidden">
 			{@render forestPanel()}
 		</div>
 	</Pane>
@@ -43,11 +44,7 @@
 	>
 		<TreesIcon class="size-3.5" />
 	</button>
-	<PaneResizer
-		class="relative flex h-1 cursor-row-resize items-center justify-center bg-transparent transition-colors hover:bg-border data-[active]:bg-border"
-	>
-		<div class="absolute h-[3px] w-8 rounded-full bg-border transition-colors"></div>
-	</PaneResizer>
+	<StyledPaneResizer />
 	<Pane minSize={20}>
 		<div class="flex h-full flex-col overflow-hidden">
 			{@render bottomPanel()}

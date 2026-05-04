@@ -22,8 +22,8 @@
 	"topbar_notifications": "Notifications",
 	"topbar_plant": "Plant",
 	"topbar_plant_title": "Plant a tree",
-	"topbar_prune": "Prune",
-	"topbar_prune_title": "Prune worktrees for fully-closed issues",
+	"topbar_prune": "Clean up worktrees",
+	"topbar_prune_title": "Remove worktrees for fully-closed issues",
 
 	"view_list": "List",
 	"view_kanban": "Kanban",

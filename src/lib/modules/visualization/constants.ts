@@ -48,6 +48,8 @@ export const GLOW_COLORS = {
 	green: '#22c55e',
 	yellow: '#ffd700',
 	blue: '#4a9eff',
+	violet: '#c084fc',
+	pink: '#ec4899',
 } as const;
 
 /** @internal Exported for testing only. */
@@ -94,3 +96,9 @@ export const GROUND_Y_FRACTION = 0.82;
 
 /** Fraction of viewport height for the ground strip height. */
 export const GROUND_STRIP_HEIGHT_FRACTION = 0.08;
+
+/** Special label strings used for tool/badge rendering logic. */
+export const SPECIAL_LABELS = {
+	hitl: 'HITL',
+	afk: 'AFK',
+} as const;

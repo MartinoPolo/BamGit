@@ -35,7 +35,10 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - One workspace = one dashboard = one GitHub repo
 - **Overview dashboard** (separate window/page): shows all configured workspaces as cards with health indicators (active sessions, open PRs, pending HITL issues)
 - **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle (icon button) | Plant (split-button: Add Issue / Add Worktree Issue, persists last-used action)
-- **Bottom panel toolbar** (Issues tab): Sort | Filter | Prune All Terminal
+- **Bottom panel toolbar** (Issues tab): Sort | Filter | Select All checkbox (tri-state) | "N selected" count | Batch action buttons (Archive, Unarchive, Delete, Change Priority, Prune Selected Worktrees) | Clean Up Worktrees
+- **Batch selection**: Multi-select issue cards/trees for bulk operations. Triggers: right-click context menu "Select" (desktop), long press 500ms (mobile/touch), Ctrl+click (toggle individual), Shift+click (range select), Ctrl+A (select all), Escape (deselect all). Selection clears on tab change and Escape; does NOT clear after batch action. Normal click (no modifier) clears batch selection and activates clicked card. Batch actions: Archive, Unarchive (context-aware — both show if mixed), Delete, Change Priority. NOT batch: Change Color. Unavailable actions disabled with tooltip; partially applicable actions enabled with info tooltip ("affects 2 of 5")
+- **Active vs Selected terminology**: "Active" = single-click inspect (one at a time, shows bottom panel detail, blue glow `#4a9eff`). "Selected" = batch selection (multiple, for bulk ops, hot pink glow `#ec4899`). Activation clears batch selection. Selection-ready hover (Ctrl/Shift + hover) uses violet glow `#c084fc` on trees and visible border/shadow on cards
+- **Forest ↔ card two-way binding**: Selection state syncs between forest trees and issue cards. Hovering/selecting a tree highlights its card and vice versa. Glow colors match across both surfaces
 - **Legend**: floating button inside the forest panel, not in the main toolbar
 - "Assigned Issues" panel accessible from dashboard (sidebar widget or collapsible section, quick-access) showing GitHub issues assigned to user (via `gh`) for quick import
 - Dashboard-level color palette configuration (vivid, pastel, etc. — 24 colors, 6 hues × 4 rows)
@@ -144,7 +147,8 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Setup script handles: git worktree creation, IDE config copy, Peacock color, .env files, Claude Code settings, dependency installation
 - Auto-assign worktree folder after setup succeeds
 - Retry modal on failure: list active worktrees for direct assignment + option to create new
-- Prune fully-closed worktrees (merged PR + deleted branch + closed issue) — batch removal supported. Prune actions available via: issue card context menu (promoted to primary action in terminal states), forest tree right-click context menu, and "Prune All Terminal" batch button in bottom panel Issues tab toolbar
+- Prune fully-closed worktrees (merged PR + deleted branch + closed issue) — batch removal supported. Prune actions available via: issue card context menu (promoted to primary action in terminal states), forest tree right-click context menu, and "Clean Up Worktrees" button in bottom panel Issues tab toolbar. When batch selection is active, button changes to "Prune Selected Worktrees" and opens prune dialog filtered to selected issues
+- **Prune safety categorization** (shown in prune dialog): Safe (PR merged + issue closed + branch gone, pre-checked green), Risky (PR merged but issue open or branch still active, unchecked amber warning), Dangerous (PR open/draft/review-requested/approved or active session, unchecked red warning with reason), No worktree (grayed out, skipped). Risky/dangerous worktrees listed but not pre-selected; user can opt-in
 - Per-project worktree folder: `{parent}/{project-name}-worktrees/` (configurable in settings)
 - Auto-detect existing worktrees in configured folder on first setup
 - Path change dialog: move worktrees / redetect in new folder / delete all originals
@@ -283,6 +287,8 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - **Ready-to-merge:** Green glow (intensity 5). Fruiting stage handles the visual
 - **Changes-requested:** Seasonal stage (autumn palette). No storm cloud
 - **HITL label:** Grill accessory (static = available, animated = grilling session active)
+- **Batch-selected:** Hot pink glow (`#ec4899`, intensity 3). Two-way bound with issue card selection state
+- **Selection-ready hover** (Ctrl/Shift + hover): Violet glow (`#c084fc`, intensity 3). Distinct from normal hover yellow glow. Tree supports same selection triggers as cards: Ctrl+click (toggle), Shift+click (range), right-click context menu "Select"
 
 #### Execution Phase Tools
 
