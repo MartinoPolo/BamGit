@@ -92,6 +92,9 @@
 				event.preventDefault();
 				handleConfirmColor();
 				break;
+			case WIZARD_STEPS.GITHUB_SEARCH:
+			case WIZARD_STEPS.WORKTREE_PROGRESS:
+				break;
 		}
 	}
 
@@ -201,6 +204,9 @@
 				break;
 			case WIZARD_STEPS.COLOR_SELECTION:
 				handleConfirmColor();
+				break;
+			case WIZARD_STEPS.GITHUB_SEARCH:
+			case WIZARD_STEPS.WORKTREE_PROGRESS:
 				break;
 		}
 	}
