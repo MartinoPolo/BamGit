@@ -6,15 +6,19 @@
 
 	const wizard = useCreationWizard();
 
-	let selectedChoice = $state<boolean | null>(null);
+	let selectedChoice = $state<boolean>(true);
+
+	export function confirm() {
+		wizard.selectWorktreeChoice(selectedChoice);
+	}
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
 			event.preventDefault();
-			selectedChoice = selectedChoice === true ? false : true;
-		} else if (event.key === 'Enter' && selectedChoice !== null) {
+			selectedChoice = !selectedChoice;
+		} else if (event.key === 'Enter') {
 			event.preventDefault();
-			wizard.selectWorktreeChoice(selectedChoice);
+			confirm();
 		}
 	}
 </script>

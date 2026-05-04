@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { onMount } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import { generateBranchName } from '$lib/modules/creation-wizard';
 
@@ -16,21 +17,25 @@
 		return '';
 	});
 
-	$effect(() => {
-		inputElement?.focus();
+	onMount(() => {
 		if (inputElement) {
+			inputElement.focus();
 			inputElement.selectionStart = inputElement.value.length;
 			inputElement.selectionEnd = inputElement.value.length;
 		}
 	});
 
+	export function confirm() {
+		const trimmed = nameValue.trim();
+		if (trimmed) {
+			wizard.confirmIssueName(trimmed, branchPreview);
+		}
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			event.preventDefault();
-			const trimmed = nameValue.trim();
-			if (trimmed) {
-				wizard.confirmIssueName(trimmed, branchPreview);
-			}
+			confirm();
 		}
 	}
 </script>
