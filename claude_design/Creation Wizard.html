@@ -398,7 +398,7 @@ function WizardApp() {
   const isFinal = step === 'color-selection';
   const isProgress = step === 'worktree-progress';
   const showBack = !isFirst && !isNameStep && !isProgress;
-  const showNext = isNameStep || step === 'worktree-choice';
+  const showNext = step === 'github-search' || isNameStep || step === 'worktree-choice';
   const showFooter = !isProgress;
 
   const handleNext = () => {

@@ -97,9 +97,9 @@ function IssueCard({
   color = '#525252', name, num, branch, state = 'open', stage = 'leafy',
   pr, priority, labels = [], childCount = 0, behind = 0,
   branchStatus, conflict, notify, fruitCount = 0, season = 'summer', glow = false,
-  seed = 1,
+  seed = 1, noWorktree = false,
   /* ── State overrides ── */
-  cardState = null,       // null | 'hover' | 'selected' | 'active' | 'multi-selected' | 'dragging' | 'loading' | 'archived' | 'error'
+  cardState = null,       // null | 'hover' | 'selected' | 'active' | 'multi-selected' | 'selection-ready' | 'dragging' | 'loading' | 'archived' | 'error' | 'disabled'
   showActions = false,    // force-show actions (e.g. for hover state showcase)
 }) {
   const fg = icContrastText(color);
@@ -108,6 +108,10 @@ function IssueCard({
 
   const cls = ['ic-card'];
   if (cardState) cls.push(`is-${cardState}`);
+
+  const hasWorktree = !noWorktree && !!branch;
+  const qaDisabledStyle = { opacity: 0.35, pointerEvents: 'none' };
+  const qaStyle = hasWorktree ? {} : qaDisabledStyle;
 
   return (
     React.createElement('div', {
@@ -120,7 +124,7 @@ function IssueCard({
       React.createElement('div', { className: 'ic-header' },
         React.createElement('div', { className: 'ic-header-left' },
           React.createElement('span', { className: 'ic-num' }, `#${num}`),
-          React.createElement('span', { className: 'ic-name' }, name),
+          React.createElement('a', { className: 'ic-name', href: `https://github.com/org/repo/issues/${num}`, onClick: e => e.preventDefault() }, name),
         ),
         React.createElement('div', { className: 'ic-header-right' },
           childCount > 0 && React.createElement('span', { className: 'ic-child-chip' },
@@ -129,6 +133,15 @@ function IssueCard({
           ),
           priority && priority !== 'medium' && priority !== 'none' &&
             React.createElement('span', { className: 'ic-pri-chip' }, priority),
+          /* Quick-action buttons */
+          React.createElement('div', { className: 'ic-qa-group' },
+            React.createElement('button', { className: 'ic-qa-btn', style: qaStyle, title: 'Open Folder' },
+              React.createElement(I.Folder, { size: 12, sw: 1.8 })),
+            React.createElement('button', { className: 'ic-qa-btn', style: qaStyle, title: 'Open Terminal' },
+              React.createElement(I.Terminal, { size: 12, sw: 1.8 })),
+            React.createElement('button', { className: 'ic-qa-btn', style: qaStyle, title: 'Open Editor' },
+              React.createElement(I.Code, { size: 12, sw: 1.8 })),
+          ),
         ),
       ),
 
@@ -171,12 +184,6 @@ function IssueCard({
         React.createElement('button', { className: 'ic-action-btn is-icon' },
           React.createElement(I.More, { size: 10 })),
       ),
-
-      /* Selection check */
-      (cardState === 'selected' || cardState === 'multi-selected') &&
-        React.createElement('div', { className: 'ic-check-mark' },
-          React.createElement(I.Check, { size: 12, sw: 2.5 }),
-        ),
     )
   );
 }

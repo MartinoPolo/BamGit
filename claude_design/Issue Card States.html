@@ -106,7 +106,8 @@
   }
   .ic-header-left { display: flex; align-items: baseline; gap: 7px; min-width: 0; flex: 1; }
   .ic-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; opacity: 0.72; letter-spacing: 0.01em; flex-shrink: 0; }
-  .ic-name { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .ic-name { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; text-decoration: none; color: inherit; cursor: pointer; }
+  .ic-name:hover { text-decoration: underline; text-underline-offset: 2px; }
   .ic-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .ic-pri-chip {
     display: inline-flex; align-items: center; gap: 3px;
@@ -117,6 +118,18 @@
   }
   .ic-card[data-text-color="dark"] .ic-pri-chip { background: rgba(255,255,255,0.22); color: rgba(0,0,0,0.8); }
   .ic-child-chip { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-mono); font-size: 10px; opacity: 0.72; }
+
+  /* Quick-action buttons */
+  .ic-qa-group { display: flex; align-items: center; gap: 3px; margin-left: 2px; }
+  .ic-qa-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 4px; border: none;
+    background: transparent; color: inherit; cursor: pointer;
+    transition: background 120ms, opacity 120ms;
+    padding: 0; line-height: 0; opacity: 0.6;
+  }
+  .ic-qa-btn:hover { opacity: 1; background: rgba(255,255,255,0.12); }
+  .ic-card[data-text-color="dark"] .ic-qa-btn:hover { background: rgba(0,0,0,0.10); }
 
   /* Body */
   .ic-body {
@@ -168,45 +181,45 @@
   .ic-action-btn.is-primary:hover { background: var(--moss-600); }
   .ic-action-btn.is-icon { width: 22px; padding: 0; color: var(--foreground-muted); }
 
-  /* Selection checkmark */
-  .ic-check-mark {
-    position: absolute; top: 8px; right: 8px;
-    width: 20px; height: 20px; border-radius: 5px;
-    background: var(--primary);
-    color: var(--primary-fg);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: var(--shadow-sm);
-    z-index: 2;
-  }
+
 
   /* ── CARD STATES ─────────────────────────────────────────── */
 
-  /* Hover */
+  /* Hover — background brightens, shadow lifts, border tints toward issue color */
   .ic-card:hover, .ic-card.is-hover {
     border-color: color-mix(in oklch, var(--ic) 35%, var(--border-strong));
     box-shadow: var(--shadow-md);
+    background: color-mix(in oklch, var(--ic) 6%, var(--surface));
   }
 
-  /* Selected (single click) */
-  .ic-card.is-selected {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 28%, transparent), var(--shadow-sm);
-  }
-
-  /* Active (currently focused / keyboard-navigated) */
+  /* Active (single-click inspect) — blue glow ring + outer glow halo */
   .ic-card.is-active {
     border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 35%, transparent), 0 0 12px color-mix(in oklch, var(--ring) 25%, transparent);
   }
 
-  /* Multi-selected (batch operations) */
+  /* Selected (batch) — primary sharp ring + body tint, NO halo */
+  .ic-card.is-selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 40%, transparent);
+    background: color-mix(in oklch, var(--primary) 4%, var(--surface));
+  }
+
+  /* Multi-selected — same as selected */
   .ic-card.is-multi-selected {
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 28%, transparent), var(--shadow-sm);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 40%, transparent);
     background: color-mix(in oklch, var(--primary) 4%, var(--surface));
   }
   .ic-card.is-multi-selected .ic-body {
     background: color-mix(in oklch, var(--primary) 3%, transparent);
+  }
+
+  /* Selection-ready hover (Ctrl/Shift held) — violet */
+  .ic-card.is-selection-ready {
+    border-color: #c084fc;
+    box-shadow: 0 0 0 2px color-mix(in oklch, oklch(0.700 0.200 300) 30%, transparent), var(--shadow-md);
+    background: color-mix(in oklch, oklch(0.700 0.200 300) 4%, var(--surface));
   }
 
   /* Dragging */
@@ -227,7 +240,7 @@
   @keyframes ic-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
   /* Archived */
-  .ic-card.is-archived { opacity: 0.50; filter: saturate(0.5); }
+  .ic-card.is-archived { opacity: 0.70; filter: grayscale(0.8); }
   .ic-card.is-archived .ic-header { filter: grayscale(0.4); }
 
   /* Error */
@@ -257,6 +270,28 @@
     letter-spacing: 0.06em; text-transform: uppercase; margin: 12px 0 6px;
   }
   .palette-row-label:first-child { margin-top: 0; }
+
+  /* ── Context menu ── */
+  .ctx-menu {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 8px 0; min-width: 200px;
+    box-shadow: var(--shadow-lg);
+  }
+  .ctx-menu-title {
+    font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle);
+    letter-spacing: 0.04em; text-transform: lowercase; padding: 0 8px; margin-bottom: 6px;
+  }
+  .ctx-menu-item {
+    display: flex; align-items: center; gap: 8px;
+    height: 28px; padding: 0 12px; font-size: 13px; color: var(--foreground);
+    cursor: default; border-radius: 0;
+  }
+  .ctx-menu-item:hover { background: var(--surface-hover); }
+  .ctx-menu-item.is-danger { color: var(--status-danger); }
+  .ctx-menu-item.is-danger:hover { background: color-mix(in oklch, var(--status-danger) 10%, transparent); }
+  .ctx-menu-item .ctx-sub { margin-left: auto; color: var(--foreground-subtle); font-size: 11px; }
+  .ctx-menu-item .ctx-icon { width: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ctx-divider { height: 1px; background: var(--border); margin: 4px 0; }
 
   /* ── Multi-select bar ── */
   .multi-bar {
@@ -305,6 +340,28 @@ const LIGHT_ISSUES = [
   { color: '#ffffff', num: 207, name: 'Update README contributing guide', branch: null, stage: 'seed', labels: [{ name: 'docs', color: '#a0aec0' }], seed: 56 },
   { color: '#a0aec0', num: 208, name: 'Refactor test harness for CI', branch: 'chore/ci-tests', stage: 'sapling', labels: [{ name: 'chore', color: '#8b5e3c' }], branchStatus: 'active', seed: 57 },
 ];
+
+/* ─── Context menu panel (inline showcase) ─────────────────── */
+function ContextMenuPanel({ title, items }) {
+  return (
+    <div>
+      <div className="ctx-menu-title">{title}</div>
+      <div className="ctx-menu">
+        {items.map((item, i) => {
+          if (item.divider) return <div key={i} className="ctx-divider" />;
+          return (
+            <div key={i} className={`ctx-menu-item ${item.danger ? 'is-danger' : ''}`}>
+              {item.icon && <span className="ctx-icon"><I.Check size={13} sw={2} /></span>}
+              {!item.icon && <span className="ctx-icon" />}
+              {item.label}
+              {item.submenu && <span className="ctx-sub">▸</span>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 /* ─── Page ─────────────────────────────────────────────────── */
 function Page() {
@@ -394,25 +451,25 @@ function Page() {
           <IssueCard {...SAMPLE_ISSUES[1]} />
         </div>
 
-        <div className="state-label">hover — border tints toward issue color, shadow lifts</div>
+        <div className="state-label">hover — background brightens, shadow lifts, border tints toward issue color</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[0]} cardState="hover" showActions />
           <IssueCard {...LIGHT_ISSUES[2]} cardState="hover" showActions />
         </div>
 
-        <div className="state-label">selected — primary ring, checkmark top-right</div>
+        <div className="state-label">selected — primary (green) ring, body tint, NO checkbox</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[2]} cardState="selected" />
           <IssueCard {...LIGHT_ISSUES[0]} cardState="selected" />
         </div>
 
-        <div className="state-label">active (keyboard focus) — ring outline</div>
+        <div className="state-label">active — blue glow ring + outer glow halo</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[3]} cardState="active" />
           <IssueCard {...LIGHT_ISSUES[4]} cardState="active" />
         </div>
 
-        <div className="state-label">multi-selected — primary ring + subtle tint on body + checkmark</div>
+        <div className="state-label">multi-selected — primary ring + body tint, NO checkbox</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[0]} cardState="multi-selected" />
           <IssueCard {...SAMPLE_ISSUES[1]} cardState="multi-selected" />
@@ -447,9 +504,54 @@ function Page() {
           <IssueCard {...SAMPLE_ISSUES[1]} cardState="disabled" />
           <IssueCard {...LIGHT_ISSUES[7]} cardState="disabled" />
         </div>
+
+        <div className="state-label">selection-ready hover — violet border/shadow (Ctrl/Shift held)</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[0]} cardState="selection-ready" />
+          <IssueCard {...LIGHT_ISSUES[2]} cardState="selection-ready" />
+        </div>
+
+        <div className="state-label">no-worktree — quick-action buttons disabled, seed stage tree</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[4]} noWorktree />
+          <IssueCard color="#a0aec0" num={220} name="Setup CI pipeline" stage="seed" seed={99} noWorktree />
+        </div>
       </section>
 
-      {/* ═══ 5. Multi-selection context bar ═══ */}
+      {/* ═══ 5. Context menus ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">Pattern</span>
+          <span className="section-name">Context menus</span>
+        </div>
+        <p className="section-desc">
+          Right-click context menu rendered inline. Single-card actions on the left, batch actions on the right.
+        </p>
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+          <ContextMenuPanel title="Single-card actions" items={[
+            { label: 'Select', icon: 'Check', shortcut: null },
+            { divider: true },
+            { label: 'Edit', icon: null },
+            { label: 'Rename', icon: null },
+            { label: 'Priority', icon: null, submenu: true },
+            { label: 'Change Color', icon: null },
+            { divider: true },
+            { label: 'Setup Worktree', icon: null },
+            { label: 'Archive', icon: null },
+            { label: 'Delete', icon: null, danger: true },
+          ]} />
+          <ContextMenuPanel title="Batch actions (3 selected)" items={[
+            { label: 'Archive 3 selected', icon: null },
+            { label: 'Delete 3 selected', icon: null, danger: true },
+            { label: 'Change Priority', icon: null, submenu: true },
+            { label: 'Prune 2 worktrees', icon: null },
+            { divider: true },
+            { label: 'Deselect all', icon: null },
+          ]} />
+        </div>
+      </section>
+
+      {/* ═══ 6. Multi-selection context bar ═══ */}
       <section className="section">
         <div className="section-head">
           <span className="section-tag">Pattern</span>
