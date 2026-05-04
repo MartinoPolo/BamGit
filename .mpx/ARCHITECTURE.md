@@ -510,7 +510,7 @@ Source of truth: `claude_design/tokens.css`
 
 ## Reference Repositories
 
-See `REFERENCES.md` for detailed descriptions and license compatibility. The table below maps Grovekeeper features to which repos agents should explore during implementation.
+See `.mpx/REFERENCES.md` for detailed descriptions and license compatibility. The table below maps Grovekeeper features to which repos agents should explore during implementation.
 
 | Feature Area               | Primary Reference                    | Secondary             | What to Study                                 |
 | -------------------------- | ------------------------------------ | --------------------- | --------------------------------------------- |

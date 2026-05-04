@@ -6,11 +6,11 @@ Large-scale architecture and requirements discussion for Grovekeeper. Clarify wh
 
 Explore current state thoroughly. Fetch open GitHub issues, `@.mpx/REQUIREMENTS.md`, `@.mpx/VOCABULARY.md`, `@.mpx/ARCHITECTURE.md` (note deep modules convention: `C:\_MP_projects\mpx-claude-code\skills\mp-execute\deep-modules.md`), `@README.md`, `@AGENTS.md`, `@package.json`.
 
-For future plans and inspiration: `@.mpx/ROADMAP.md`, `@CAREER_RECOMMENDATIONS.md`, `@REFERENCES.md`. All referenced open-source projects live in `C:\_MP_github_cloned`.
+For future plans and inspiration: `@.mpx/ROADMAP.md`, `@.mpx/CAREER_RECOMMENDATIONS.md`, `@.mpx/REFERENCES.md`. All referenced open-source projects live in `C:\_MP_github_cloned`.
 
 Explore config, linting, formatting rules, and source code to understand what's actually built. Much is implemented but not wired to UI — app is currently unusable. Not a problem; we're clarifying future steps.
 
-Use subagents for all exploration to keep main context clean. Use as many as practical. Go deeper into `C:\_MP_github_cloned` projects for technical details and implementation strategies beyond the shallow overview in `REFERENCES.md`.
+Use subagents for all exploration to keep main context clean. Use as many as practical. Go deeper into `C:\_MP_github_cloned` projects for technical details and implementation strategies beyond the shallow overview in `.mpx/REFERENCES.md`.
 
 # Rewrite of Previous Project
 

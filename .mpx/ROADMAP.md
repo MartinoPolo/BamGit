@@ -94,7 +94,7 @@ These features are designed in but not part of the current PRD plan:
 | Model Comparison Engine | P3              | CodeBurn                | Same task on multiple providers, side-by-side results   |
 | Dev Server Management   | —               | —                       | Deterministic port assignment, embedded browser preview |
 
-See `REFERENCES.md` for license compatibility, tech stack overlap, and detailed repo descriptions. See `ARCHITECTURE.md` for the feature→reference mapping table.
+See `.mpx/REFERENCES.md` for license compatibility, tech stack overlap, and detailed repo descriptions. See `.mpx/ARCHITECTURE.md` for the feature→reference mapping table.
 
 ---
 
@@ -106,7 +106,7 @@ See `REFERENCES.md` for license compatibility, tech stack overlap, and detailed 
 - **PRDs** — one GitHub issue per phase, labeled `prd`
 - **Sub-issues** — vertical slices under each PRD, created via `/mp-prd-to-issues`
 - **This ROADMAP.md** — high-level plan and phase sequencing (update as phases complete)
-- **CAREER_RECOMMENDATIONS.md** — career context and priority reasoning (don't duplicate here)
+- **`.mpx/CAREER_RECOMMENDATIONS.md`** — career context and priority reasoning (don't duplicate here)
 
 ### Labeling convention
 
