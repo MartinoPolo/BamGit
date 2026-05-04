@@ -1,573 +1,279 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>Grovekeeper — Design Exploration</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
-			rel="stylesheet"
-		/>
-		<link rel="stylesheet" href="tokens.css" />
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grovekeeper — Design Exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
 
-		<script
-			src="https://unpkg.com/react@18.3.1/umd/react.development.js"
-			integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
-			integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
-			integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
-			crossorigin="anonymous"
-		></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-		<style>
-			html,
-			body,
-			#root {
-				margin: 0;
-				padding: 0;
-				height: 100%;
-			}
-			body {
-				font-family: var(--font-sans);
-				background: #f0eee9;
-				-webkit-font-smoothing: antialiased;
-			}
-			.font-mono {
-				font-family: var(--font-mono);
-			}
-			/* Hide scrollbars on artboard inner content */
-			.ab-scroll::-webkit-scrollbar {
-				display: none;
-			}
-			.ab-scroll {
-				scrollbar-width: none;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="root"></div>
+<style>
+  html, body, #root { margin: 0; padding: 0; height: 100%; }
+  body { font-family: var(--font-sans); background: #f0eee9; -webkit-font-smoothing: antialiased; }
+  .font-mono { font-family: var(--font-mono); }
+  /* Hide scrollbars on artboard inner content */
+  .ab-scroll::-webkit-scrollbar { display: none; }
+  .ab-scroll { scrollbar-width: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
 
-		<script type="text/babel" src="icons.jsx"></script>
-		<script type="text/babel" src="tree.jsx"></script>
-		<script type="text/babel" src="design-canvas.jsx"></script>
-		<script type="text/babel" src="tweaks-panel.jsx"></script>
-		<script type="text/babel" src="artboards-foundations.jsx"></script>
-		<script type="text/babel" src="artboards-components.jsx"></script>
-		<script type="text/babel" src="artboards-issue.jsx"></script>
-		<script type="text/babel" src="artboards-app1.jsx"></script>
-		<script type="text/babel" src="artboards-forest.jsx"></script>
-		<script type="text/babel" src="artboards-app2.jsx"></script>
-		<script type="text/babel" src="artboards-states.jsx"></script>
-		<script type="text/babel" src="artboards-overlays.jsx"></script>
-		<script type="text/babel" src="artboards-light.jsx"></script>
-		<script type="text/babel" src="artboards-color.jsx"></script>
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="tree.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="artboards-foundations.jsx"></script>
+<script type="text/babel" src="artboards-components.jsx"></script>
+<script type="text/babel" src="artboards-issue.jsx"></script>
+<script type="text/babel" src="artboards-app1.jsx"></script>
+<script type="text/babel" src="artboards-forest.jsx"></script>
+<script type="text/babel" src="artboards-app2.jsx"></script>
+<script type="text/babel" src="artboards-states.jsx"></script>
+<script type="text/babel" src="artboards-overlays.jsx"></script>
+<script type="text/babel" src="artboards-light.jsx"></script>
+<script type="text/babel" src="artboards-color.jsx"></script>
 
-		<script type="text/babel" data-presets="env,react">
-			const { useState, useEffect } = React;
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect } = React;
 
-			const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/ {
-				theme: 'dark',
-				accent: 'moss',
-				density: 'comfortable',
-				showGrid: true,
-			}; /*EDITMODE-END*/
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "dark",
+  "accent": "moss",
+  "density": "comfortable",
+  "showGrid": true
+}/*EDITMODE-END*/;
 
-			function App() {
-				const [tweaks, setTweaks] = useTweaks(TWEAK_DEFAULTS);
-				const themeCls = tweaks.theme === 'light' ? 'theme-light' : 'theme-dark';
+function App() {
+  const [tweaks, setTweaks] = useTweaks(TWEAK_DEFAULTS);
+  const themeCls = tweaks.theme === 'light' ? 'theme-light' : 'theme-dark';
 
-				// Map accent to CSS var override
-				const accentMap = {
-					moss: { primary: 'oklch(0.480 0.082 138)', accent: 'oklch(0.690 0.165 55)' },
-					amber: { primary: 'oklch(0.690 0.165 55)', accent: 'oklch(0.480 0.082 138)' },
-					bark: { primary: 'oklch(0.500 0.075 55)', accent: 'oklch(0.690 0.165 55)' },
-					azure: { primary: 'oklch(0.55 0.13 230)', accent: 'oklch(0.690 0.165 55)' },
-				};
-				const accentStyle = {
-					'--primary': accentMap[tweaks.accent].primary,
-					'--accent': accentMap[tweaks.accent].accent,
-				};
+  // Map accent to CSS var override
+  const accentMap = {
+    moss:   { primary: 'oklch(0.480 0.082 138)', accent: 'oklch(0.690 0.165 55)' },
+    amber:  { primary: 'oklch(0.690 0.165 55)',  accent: 'oklch(0.480 0.082 138)' },
+    bark:   { primary: 'oklch(0.500 0.075 55)',  accent: 'oklch(0.690 0.165 55)' },
+    azure:  { primary: 'oklch(0.55 0.13 230)',   accent: 'oklch(0.690 0.165 55)' },
+  };
+  const accentStyle = {
+    '--primary': accentMap[tweaks.accent].primary,
+    '--accent': accentMap[tweaks.accent].accent,
+  };
 
-				// Density spacing
-				const densityScale =
-					tweaks.density === 'compact' ? 0.92 : tweaks.density === 'spacious' ? 1.08 : 1;
+  // Density spacing
+  const densityScale = tweaks.density === 'compact' ? 0.92 : tweaks.density === 'spacious' ? 1.08 : 1;
 
-				return (
-					<div className={themeCls} style={{ ...accentStyle, height: '100%' }}>
-						<DesignCanvas>
-							<DCSection
-								id="overview"
-								title="Grovekeeper"
-								subtitle="A garden for parallel coding-agent sessions. Each issue is a tree."
-							>
-								<DCArtboard id="hero" label="The pitch" width={760} height={520}>
-									<HeroArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="legend"
-									label="Tree state legend"
-									width={760}
-									height={760}
-								>
-									<LegendArtboard />
-								</DCArtboard>
-							</DCSection>
+  return (
+    <div className={themeCls} style={{ ...accentStyle, height: '100%' }}>
+      <DesignCanvas>
+        <DCSection id="overview" title="Grovekeeper" subtitle="A garden for parallel coding-agent sessions. Each issue is a tree.">
+          <DCArtboard id="hero" label="The pitch" width={760} height={520}>
+            <HeroArtboard />
+          </DCArtboard>
+          <DCArtboard id="legend" label="Tree state legend" width={760} height={760}>
+            <LegendArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="foundations"
-								title="Foundations"
-								subtitle="The full design token palette — color, type, spacing, radius, elevation, motion, sizing."
-							>
-								<DCArtboard
-									id="brand"
-									label="Brand & voice"
-									width={1100}
-									height={760}
-								>
-									<BrandArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="color-light"
-									label="Color tokens · light mode"
-									width={1100}
-									height={3280}
-								>
-									<ColorTokensLightArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="color-dark"
-									label="Color tokens · dark mode"
-									width={1100}
-									height={3280}
-								>
-									<ColorTokensDarkArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="type"
-									label="Typography scale"
-									width={1200}
-									height={1100}
-								>
-									<TypeArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="spacing"
-									label="Spacing · 4-px scale"
-									width={1100}
-									height={920}
-								>
-									<SpacingArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="radius"
-									label="Radius · borders · focus"
-									width={1100}
-									height={780}
-								>
-									<RadiusArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="elevation"
-									label="Elevation · z · motion"
-									width={1280}
-									height={1080}
-								>
-									<ElevationArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="sizing"
-									label="Sizing · controls · sidebar"
-									width={1280}
-									height={760}
-								>
-									<SizingArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="foundations" title="Foundations" subtitle="The full design token palette — color, type, spacing, radius, elevation, motion, sizing.">
+          <DCArtboard id="brand" label="Brand & voice" width={1100} height={760}>
+            <BrandArtboard />
+          </DCArtboard>
+          <DCArtboard id="color-light" label="Color tokens · light mode" width={1100} height={3280}>
+            <ColorTokensLightArtboard />
+          </DCArtboard>
+          <DCArtboard id="color-dark" label="Color tokens · dark mode" width={1100} height={3280}>
+            <ColorTokensDarkArtboard />
+          </DCArtboard>
+          <DCArtboard id="type" label="Typography scale" width={1200} height={1100}>
+            <TypeArtboard />
+          </DCArtboard>
+          <DCArtboard id="spacing" label="Spacing · 4-px scale" width={1100} height={920}>
+            <SpacingArtboard />
+          </DCArtboard>
+          <DCArtboard id="radius" label="Radius · borders · focus" width={1100} height={780}>
+            <RadiusArtboard />
+          </DCArtboard>
+          <DCArtboard id="elevation" label="Elevation · z · motion" width={1280} height={1080}>
+            <ElevationArtboard />
+          </DCArtboard>
+          <DCArtboard id="sizing" label="Sizing · controls · sidebar" width={1280} height={760}>
+            <SizingArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="components"
-								title="Components"
-								subtitle="Buttons, badges, inputs, cards."
-							>
-								<DCArtboard id="ui" label="UI library" width={920} height={1200}>
-									<ComponentsArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="cards"
-									label="Issue card states"
-									width={760}
-									height={780}
-								>
-									<IssueCardArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="components" title="Components" subtitle="Buttons, badges, inputs, cards.">
+          <DCArtboard id="ui" label="UI library" width={920} height={1200}>
+            <ComponentsArtboard />
+          </DCArtboard>
+          <DCArtboard id="cards" label="Issue card states" width={760} height={780}>
+            <IssueCardArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="states"
-								title="Component states"
-								subtitle="Every primitive frozen in every meaningful state — rest, hover, focus, selected, disabled, loading, error, success, read-only."
-							>
-								<DCArtboard
-									id="btn-states"
-									label="Buttons — full state matrix"
-									width={1280}
-									height={1080}
-								>
-									<ButtonStatesArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="input-states"
-									label="Inputs · select · textarea · search"
-									width={1280}
-									height={1480}
-								>
-									<InputStatesArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="selection-states"
-									label="Checkbox · radio · toggle"
-									width={1100}
-									height={920}
-								>
-									<SelectionStatesArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="tabs-states"
-									label="Tabs & segmented control"
-									width={1100}
-									height={780}
-								>
-									<TabsStatesArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="card-states"
-									label="Issue card — states & sizes"
-									width={1280}
-									height={1340}
-								>
-									<IssueCardStatesArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="tree-states"
-									label="Tree component"
-									width={1280}
-									height={1280}
-								>
-									<TreeStatesArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="sidebar-states"
-									label="Sidebar nav item"
-									width={1100}
-									height={820}
-								>
-									<SidebarItemStatesArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="states" title="Component states" subtitle="Every primitive frozen in every meaningful state — rest, hover, focus, selected, disabled, loading, error, success, read-only.">
+          <DCArtboard id="btn-states" label="Buttons — full state matrix" width={1280} height={1080}>
+            <ButtonStatesArtboard />
+          </DCArtboard>
+          <DCArtboard id="input-states" label="Inputs · select · textarea · search" width={1280} height={1480}>
+            <InputStatesArtboard />
+          </DCArtboard>
+          <DCArtboard id="selection-states" label="Checkbox · radio · toggle" width={1100} height={920}>
+            <SelectionStatesArtboard />
+          </DCArtboard>
+          <DCArtboard id="tabs-states" label="Tabs & segmented control" width={1100} height={780}>
+            <TabsStatesArtboard />
+          </DCArtboard>
+          <DCArtboard id="card-states" label="Issue card — states & sizes" width={1280} height={1340}>
+            <IssueCardStatesArtboard />
+          </DCArtboard>
+          <DCArtboard id="tree-states" label="Tree component" width={1280} height={1280}>
+            <TreeStatesArtboard />
+          </DCArtboard>
+          <DCArtboard id="sidebar-states" label="Sidebar nav item" width={1100} height={820}>
+            <SidebarItemStatesArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="overlays"
-								title="Overlays"
-								subtitle="Tooltips, popovers, modals, toasts, command palette, account — split across artboards so nothing overlaps."
-							>
-								<DCArtboard
-									id="ov-tooltips"
-									label="Tooltips"
-									width={760}
-									height={620}
-								>
-									<TooltipsArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="ov-popovers"
-									label="Popovers · filter / sort / legend"
-									width={1100}
-									height={620}
-								>
-									<PopoversArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="ov-account"
-									label="Account & notifications"
-									width={920}
-									height={680}
-								>
-									<AccountMenusArtboard />
-								</DCArtboard>
-								<DCArtboard id="ov-toasts" label="Toasts" width={760} height={620}>
-									<ToastsArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="ov-modal-plant"
-									label="Modal · plant a tree"
-									width={760}
-									height={680}
-								>
-									<PlantModalArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="ov-modal-confirm"
-									label="Modal · destructive confirm"
-									width={760}
-									height={680}
-								>
-									<ConfirmModalArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="ov-cmdk"
-									label="Command palette · ⌘K"
-									width={920}
-									height={620}
-								>
-									<CommandPaletteArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="overlays" title="Overlays" subtitle="Tooltips, popovers, modals, toasts, command palette, account — split across artboards so nothing overlaps.">
+          <DCArtboard id="ov-tooltips" label="Tooltips" width={760} height={620}>
+            <TooltipsArtboard />
+          </DCArtboard>
+          <DCArtboard id="ov-popovers" label="Popovers · filter / sort / legend" width={1100} height={620}>
+            <PopoversArtboard />
+          </DCArtboard>
+          <DCArtboard id="ov-account" label="Account & notifications" width={920} height={680}>
+            <AccountMenusArtboard />
+          </DCArtboard>
+          <DCArtboard id="ov-toasts" label="Toasts" width={760} height={620}>
+            <ToastsArtboard />
+          </DCArtboard>
+          <DCArtboard id="ov-modal-plant" label="Modal · plant a tree" width={760} height={680}>
+            <PlantModalArtboard />
+          </DCArtboard>
+          <DCArtboard id="ov-modal-confirm" label="Modal · destructive confirm" width={760} height={680}>
+            <ConfirmModalArtboard />
+          </DCArtboard>
+          <DCArtboard id="ov-cmdk" label="Command palette · ⌘K" width={920} height={620}>
+            <CommandPaletteArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="screens"
-								title="Application"
-								subtitle="The full app — three views of the same issues."
-							>
-								<DCArtboard
-									id="dashboard"
-									label="Issues · list view"
-									width={1280}
-									height={820}
-								>
-									<DashboardArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="kanban"
-									label="Issues · kanban"
-									width={1280}
-									height={820}
-								>
-									<KanbanArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="forest"
-									label="Issues · forest"
-									width={1280}
-									height={820}
-								>
-									<ForestArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="screens" title="Application" subtitle="The full app — three views of the same issues.">
+          <DCArtboard id="dashboard" label="Issues · list view" width={1280} height={820}>
+            <DashboardArtboard />
+          </DCArtboard>
+          <DCArtboard id="kanban" label="Issues · kanban" width={1280} height={820}>
+            <KanbanArtboard />
+          </DCArtboard>
+          <DCArtboard id="forest" label="Issues · forest" width={1280} height={820}>
+            <ForestArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="detail"
-								title="Inside an issue"
-								subtitle="Session, usage, settings."
-							>
-								<DCArtboard
-									id="session"
-									label="Session — agent at work"
-									width={1280}
-									height={820}
-								>
-									<SessionArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="usage"
-									label="Usage & evals"
-									width={1280}
-									height={820}
-								>
-									<UsageArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="settings"
-									label="Settings"
-									width={1280}
-									height={820}
-								>
-									<SettingsArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="detail" title="Inside an issue" subtitle="Session, usage, settings.">
+          <DCArtboard id="session" label="Session — agent at work" width={1280} height={820}>
+            <SessionArtboard />
+          </DCArtboard>
+          <DCArtboard id="usage" label="Usage & evals" width={1280} height={820}>
+            <UsageArtboard />
+          </DCArtboard>
+          <DCArtboard id="settings" label="Settings" width={1280} height={820}>
+            <SettingsArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCSection
-								id="light"
-								title="Light mode"
-								subtitle="A taste of the same system in light theme — buttons & cards, plus a full dashboard."
-							>
-								<DCArtboard
-									id="light-bits"
-									label="Buttons & cards · light"
-									width={920}
-									height={680}
-								>
-									<LightButtonsCardsArtboard />
-								</DCArtboard>
-								<DCArtboard
-									id="light-dashboard"
-									label="Issues list · light"
-									width={1280}
-									height={820}
-								>
-									<LightDashboardArtboard />
-								</DCArtboard>
-							</DCSection>
+        <DCSection id="light" title="Light mode" subtitle="A taste of the same system in light theme — buttons & cards, plus a full dashboard.">
+          <DCArtboard id="light-bits" label="Buttons & cards · light" width={920} height={680}>
+            <LightButtonsCardsArtboard />
+          </DCArtboard>
+          <DCArtboard id="light-dashboard" label="Issues list · light" width={1280} height={820}>
+            <LightDashboardArtboard />
+          </DCArtboard>
+        </DCSection>
 
-							<DCPostIt top={140} left={40}>
-								The forest metaphor is the differentiator. It only works if the
-								trees feel alive — subtle motion, real seasons, and a tree that{' '}
-								<i>changes</i> as work progresses. No two trees in the same garden
-								look identical.
-							</DCPostIt>
-							<DCPostIt top={420} right={60} rotate={3}>
-								Open question: do we let users <i>choose</i> a tree shape per issue,
-								or auto-assign by repo / label? Auto feels right — visual variety =
-								signal, not decoration.
-							</DCPostIt>
-						</DesignCanvas>
+        <DCPostIt top={140} left={40}>
+          The forest metaphor is the differentiator. It only works if the trees feel alive — subtle motion, real seasons, and a tree that <i>changes</i> as work progresses. No two trees in the same garden look identical.
+        </DCPostIt>
+        <DCPostIt top={420} right={60} rotate={3}>
+          Open question: do we let users <i>choose</i> a tree shape per issue, or auto-assign by repo / label? Auto feels right — visual variety = signal, not decoration.
+        </DCPostIt>
+      </DesignCanvas>
 
-						<TweaksPanel title="Tweaks">
-							<TweakSection title="Theme">
-								<TweakRadio
-									value={tweaks.theme}
-									onChange={(v) => setTweaks({ theme: v })}
-									options={[
-										{ value: 'light', label: 'Light' },
-										{ value: 'dark', label: 'Dark' },
-									]}
-								/>
-							</TweakSection>
-							<TweakSection title="Accent">
-								<TweakRadio
-									value={tweaks.accent}
-									onChange={(v) => setTweaks({ accent: v })}
-									options={[
-										{ value: 'moss', label: 'Moss' },
-										{ value: 'amber', label: 'Amber' },
-										{ value: 'bark', label: 'Bark' },
-										{ value: 'azure', label: 'Azure' },
-									]}
-								/>
-							</TweakSection>
-							<TweakSection title="Density">
-								<TweakRadio
-									value={tweaks.density}
-									onChange={(v) => setTweaks({ density: v })}
-									options={[
-										{ value: 'compact', label: 'Compact' },
-										{ value: 'comfortable', label: 'Comfortable' },
-										{ value: 'spacious', label: 'Spacious' },
-									]}
-								/>
-							</TweakSection>
-						</TweaksPanel>
-					</div>
-				);
-			}
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Theme">
+          <TweakRadio
+            value={tweaks.theme}
+            onChange={(v) => setTweaks({ theme: v })}
+            options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]}
+          />
+        </TweakSection>
+        <TweakSection title="Accent">
+          <TweakRadio
+            value={tweaks.accent}
+            onChange={(v) => setTweaks({ accent: v })}
+            options={[
+              { value: 'moss', label: 'Moss' },
+              { value: 'amber', label: 'Amber' },
+              { value: 'bark', label: 'Bark' },
+              { value: 'azure', label: 'Azure' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection title="Density">
+          <TweakRadio
+            value={tweaks.density}
+            onChange={(v) => setTweaks({ density: v })}
+            options={[
+              { value: 'compact', label: 'Compact' },
+              { value: 'comfortable', label: 'Comfortable' },
+              { value: 'spacious', label: 'Spacious' },
+            ]}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
 
-			// --- Hero artboard ---
-			function HeroArtboard() {
-				return (
-					<div
-						className="gk-root theme-dark"
-						style={{
-							padding: 40,
-							height: '100%',
-							background:
-								'linear-gradient(180deg, oklch(0.225 0.028 240) 0%, oklch(0.180 0.030 150) 100%)',
-							position: 'relative',
-							overflow: 'hidden',
-						}}
-					>
-						<div
-							className="gk-eyebrow"
-							style={{ marginBottom: 8, color: 'var(--moss-300)' }}
-						>
-							Grovekeeper · v0.1
-						</div>
-						<div
-							style={{
-								fontSize: 44,
-								fontWeight: 600,
-								letterSpacing: '-0.025em',
-								lineHeight: 1.05,
-								marginBottom: 16,
-								maxWidth: 540,
-							}}
-						>
-							A garden for your
-							<br />
-							<span style={{ color: 'var(--moss-300)' }}>coding agents.</span>
-						</div>
-						<div
-							style={{
-								fontSize: 15,
-								lineHeight: 1.55,
-								color: 'var(--foreground-muted)',
-								maxWidth: 460,
-								marginBottom: 32,
-							}}
-						>
-							Spin up Claude, Codex, or any provider on a GitHub issue. Each gets its
-							own worktree and branch. Each shows up as a tree in your grove — its
-							state visible at a glance.
-						</div>
-						<div style={{ display: 'flex', gap: 8 }}>
-							<button className="gk-btn gk-btn-primary">Plant a tree →</button>
-							<button className="gk-btn gk-btn-secondary">Tour the grove</button>
-						</div>
+// --- Hero artboard ---
+function HeroArtboard() {
+  return (
+    <div className="gk-root theme-dark" style={{ padding: 40, height: '100%', background: 'linear-gradient(180deg, oklch(0.225 0.028 240) 0%, oklch(0.180 0.030 150) 100%)', position: 'relative', overflow: 'hidden' }}>
+      <div className="gk-eyebrow" style={{ marginBottom: 8, color: 'var(--moss-300)' }}>Grovekeeper · v0.1</div>
+      <div style={{ fontSize: 44, fontWeight: 600, letterSpacing: '-0.025em', lineHeight: 1.05, marginBottom: 16, maxWidth: 540 }}>
+        A garden for your<br/>
+        <span style={{ color: 'var(--moss-300)' }}>coding agents.</span>
+      </div>
+      <div style={{ fontSize: 15, lineHeight: 1.55, color: 'var(--foreground-muted)', maxWidth: 460, marginBottom: 32 }}>
+        Spin up Claude, Codex, or any provider on a GitHub issue. Each gets its own worktree and branch. Each shows up as a tree in your grove — its state visible at a glance.
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button className="gk-btn gk-btn-primary">Plant a tree →</button>
+        <button className="gk-btn gk-btn-secondary">Tour the grove</button>
+      </div>
 
-						{/* Decorative tree row */}
-						<div
-							style={{
-								position: 'absolute',
-								bottom: 0,
-								left: 0,
-								right: 0,
-								display: 'flex',
-								alignItems: 'flex-end',
-								justifyContent: 'space-around',
-								padding: '0 30px',
-								paddingBottom: 20,
-								opacity: 0.95,
-							}}
-						>
-							<Tree stage="growing" shape="oak" size={120} seed={1} />
-							<Tree
-								stage="fruiting"
-								shape="maple"
-								fruitCount={3}
-								fruitType="apple"
-								size={140}
-								seed={2}
-							/>
-							<Tree stage="flowering" shape="oak" glow size={130} seed={3} />
-							<Tree
-								stage="seasonal"
-								shape="maple"
-								season="autumn"
-								size={120}
-								seed={4}
-							/>
-							<Tree stage="leafy" shape="birch" size={130} seed={5} />
-							<Tree
-								stage="growing"
-								shape="fir"
-								evergreen
-								season="winter"
-								size={140}
-								seed={6}
-							/>
-						</div>
-					</div>
-				);
-			}
+      {/* Decorative tree row */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '0 30px', paddingBottom: 20, opacity: 0.95 }}>
+        <Tree stage="growing" shape="oak" size={120} seed={1} />
+        <Tree stage="fruiting" shape="maple" fruitCount={3} fruitType="apple" size={140} seed={2} />
+        <Tree stage="flowering" shape="oak" glow size={130} seed={3} />
+        <Tree stage="seasonal" shape="maple" season="autumn" size={120} seed={4} />
+        <Tree stage="leafy" shape="birch" size={130} seed={5} />
+        <Tree stage="growing" shape="fir" evergreen season="winter" size={140} seed={6} />
+      </div>
+    </div>
+  );
+}
 
-			ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-		</script>
-	</body>
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body>
 </html>

@@ -37,7 +37,7 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 
 **Footer buttons**: Cancel [Esc]. No Back button (this is the first step). No Confirm button (Enter selects from the list).
 
-**UI freedom**: The selected/highlighted issue row needs a new highlight style. The current orange background does not fit the Forest Moss palette. Use `bg-accent` / `text-accent-foreground` or a subtle green-tinted highlight that matches the app's design tokens. Designer should choose an appropriate selection highlight.
+**Decision (grilled 2026-05-04)**: The selected/highlighted issue row uses `bg-primary-soft` — a subtle green-tinted highlight from the Forest Moss palette (light: `oklch(0.92 0.03 135)` sage green, dark: `oklch(0.305 0.045 145)` deep forest green). Replaces the previous orange `bg-accent` highlight. Designer should verify text contrast on this background in both light and dark modes.
 
 ### Step 2: Issue Name
 
@@ -61,8 +61,11 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 
 **Content**:
 - Two large choice cards side by side: Yes (tree-pine icon) and No (X icon)
-- Yes card: green-tinted border/background when selected
-- No card: red-tinted border/background when selected
+- **Decision (grilled 2026-05-04)**: Three visual states per card:
+  - **Unselected**: `border-border`, `bg-transparent`
+  - **Hover**: `border-border`, `bg-surface-hover`
+  - **Selected Yes**: `border-green-500` + `bg-green-500/10` (green-tinted fill)
+  - **Selected No**: `border-red-500` + `bg-red-500/10` (red-tinted fill)
 
 **Keyboard**:
 - Left/Right arrows: toggle between Yes and No
@@ -95,7 +98,7 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 
 **Preselection**: The `nextAvailableColor` (first unused color in the palette) is pre-selected and focused when this step loads.
 
-**Footer buttons**: Back [kbd], Cancel [Esc], Create [Enter kbd]. The Create button is the primary action button for the entire wizard. Use the `md` or `lg` button size — the current `sm` size feels too small for the final action.
+**Footer buttons**: Back [kbd], Cancel [Esc], Create [Enter kbd]. The Create button is the primary action button for the entire wizard. **Decision (grilled 2026-05-04)**: All footer buttons use `default` (md) size — not just Create. Consistent sizing across Back, Cancel, and Create/Next buttons in all steps.
 
 ### Step 5: Worktree Progress (terminal state)
 
@@ -158,21 +161,31 @@ Layout: `[Back ⌫]  ———spacer———  [Cancel Esc] [Create ↵]`
 - The 5-step linear flow (search → name → worktree → color → progress)
 - The 24-color palette (`DEFAULT_COLOR_PALETTE` in `color_utils.ts`)
 - Footer button pattern: `Label [Kbd]` with badge on right, consistent across all buttons
+- Footer button size: `default` (md) for all buttons in all steps
 - Keyboard shortcut behavior (Enter, Escape, Backspace, arrows) as described above
 - ColorPickerContent is shared between wizard and standalone popover — changes affect both
 - The wizard is a modal dialog (`Dialog.Root` from shadcn)
 - Display text "A" on color swatches
 - Used colors are dimmed and disabled
 - Color grid is 6 columns x 4 rows
+- Issue list highlight: `bg-primary-soft` (sage green / deep forest green)
+- Worktree card states: unselected (transparent), hover (`bg-surface-hover`), selected Yes (green fill), selected No (red fill)
+- Color grid gaps must be equal in both axes (fix gap uniformity before adjusting modal width)
+
+## Grilled Decisions (2026-05-04)
+
+The following items were resolved during grilling and are now **set in stone**:
+
+- **Issue list highlight color**: `bg-primary-soft` — soft sage green (light: `oklch(0.92 0.03 135)`, dark: `oklch(0.305 0.045 145)`). Replaces the orange `bg-accent`
+- **Button sizes in footer**: All footer buttons (Back, Cancel, Next/Create) use `default` (md) size. Kbd badges scale proportionally
+- **Worktree choice cards**: Three states — unselected (`border-border`, transparent), hover (`bg-surface-hover`), selected Yes (`border-green-500` + `bg-green-500/10`), selected No (`border-red-500` + `bg-red-500/10`)
+- **Color grid priority**: Fix gap uniformity first (equal horizontal and vertical spacing). The grid was too spread out — tighten swatch gaps rather than widening the modal. Only adjust modal width if uniform gaps still don't fit within `max-w-lg`
 
 ## UI Freedom (designer should explore)
 
-- **Issue list highlight color**: Replace the current orange with something from the Forest Moss palette. `bg-accent` with `text-accent-foreground`, a subtle green tint, or a muted highlight — designer's choice
 - **Step header styling**: Font size, weight, color. Should clearly indicate the current step without dominating. Current `text-sm font-medium text-muted-foreground` is too subtle
-- **Button sizes in footer**: Current `sm` feels too small for the Create button. Explore `md` or `lg`. The Kbd badges inside buttons should scale proportionally
-- **Color grid swatch sizing and spacing**: Swatches are currently 28px (`h-7 w-7`) with `gap-1.5`. The grid should be horizontally centered with uniform gaps. Designer may adjust swatch size and gap to achieve visual balance within the modal width
-- **Worktree choice cards**: Current styling works but could be more polished. The cards use colored borders on selection — designer may refine the hover/selected states
-- **Overall modal width**: Currently `max-w-lg`. May need adjustment to accommodate the centered color grid nicely
+- **Color grid swatch sizing**: Swatches are currently 28px (`h-7 w-7`) with `gap-1.5`. Designer may adjust swatch size and gap to achieve uniform spacing within the modal, but gaps must be equal in both axes
+- **Overall modal width**: Currently `max-w-lg`. May increase to `max-w-xl` (576px) only if uniform grid gaps require it — not as a first resort
 - **Step transition**: Currently instant swap. Could add a subtle crossfade or slide if it improves perceived flow (not required)
 - **Progress indicators**: Step dots, progress bar, or breadcrumb to show wizard position (optional — may add clutter for a 4-step flow)
 
@@ -187,11 +200,11 @@ Layout: `[Back ⌫]  ———spacer———  [Cancel Esc] [Create ↵]`
 ## Known Bugs to Fix During Implementation
 
 1. Color grid shows fewer than 24 colors — all 24 must render in a 6x4 grid
-2. Worktree step has no default selection — Yes should be pre-selected
-3. Issue Name step has no visible Confirm button
-4. GitHub Search step has no visible Confirm button  
-5. Worktree step has no Create/Confirm button
-6. Keyboard navigation in color grid should update the hex input and native picker in real-time
-7. Backspace in text inputs (search, name, hex) must not propagate to wizard navigation
-8. Escape in Issue Name step should go back (not close wizard) since Backspace edits text
-9. Step header text is not vertically centered and is too small
+2. ~~Worktree step has no default selection — Yes should be pre-selected~~ ✅ Fixed on dev
+3. ~~Issue Name step has no visible Confirm button~~ ✅ Fixed on dev
+4. ~~GitHub Search step has no visible Confirm button~~ ✅ Fixed on dev
+5. ~~Worktree step has no Create/Confirm button~~ ✅ Fixed on dev
+6. ~~Keyboard navigation in color grid should update the hex input and native picker in real-time~~ ✅ Fixed on dev
+7. ~~Backspace in text inputs (search, name, hex) must not propagate to wizard navigation~~ ✅ Fixed on dev
+8. ~~Escape in Issue Name step should go back (not close wizard) since Backspace edits text~~ ✅ Fixed on dev
+9. ~~Step header text is not vertically centered and is too small~~ ✅ Fixed on dev

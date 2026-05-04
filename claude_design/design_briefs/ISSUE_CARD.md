@@ -6,9 +6,9 @@ Design spec for the primary issue representation used throughout Grovekeeper. Is
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Chosen Variant: Banner
 
-Please generate three visual variants for the issue card. Each variant should take a different approach to color prominence, layout density, and tree thumbnail treatment. All variants must include every required element, but may position, group, and visually treat them differently. After I choose one, we will fully design all states, expanded/collapsed views, and edge cases.
+The Banner variant was chosen — vivid color header band with WCAG-contrast text, tree thumbnail in the body, metadata to the right. All states, expanded/collapsed views, and edge cases are now fully specified below.
 
 ## Card Purpose
 

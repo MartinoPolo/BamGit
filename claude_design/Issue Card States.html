@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grovekeeper — Issue Card States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<style>
+  html, body, #root { margin: 0; padding: 0; min-height: 100%; }
+  body { font-family: var(--font-sans); background: oklch(0.135 0.020 150); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+
+  /* ── Page chrome ── */
+  .page { max-width: 1380px; margin: 0 auto; padding: 48px 40px 80px; }
+  .pg-eyebrow { font-family: var(--font-mono); font-size: 11px; color: var(--moss-300); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .pg-title { font-size: 28px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 8px; }
+  .pg-lead { font-size: 14px; color: var(--foreground-muted); max-width: 720px; margin: 0 0 32px; line-height: 1.55; }
+  .section { margin-top: 48px; }
+  .section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); }
+  .section-tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--moss-300); padding: 3px 8px; border: 1px solid color-mix(in oklch, var(--moss-400) 30%, transparent); border-radius: 4px; background: color-mix(in oklch, var(--moss-500) 8%, transparent); }
+  .section-name { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+  .section-desc { font-size: 13px; color: var(--foreground-muted); margin-bottom: 20px; max-width: 720px; line-height: 1.55; }
+
+  .two-col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .one-col { display: flex; flex-direction: column; gap: 8px; max-width: 620px; }
+
+  .state-label {
+    font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle);
+    letter-spacing: 0.04em; text-transform: lowercase; margin-bottom: 4px; margin-top: 12px;
+  }
+  .state-label:first-child { margin-top: 0; }
+
+  /* ── Shared badge primitives ── */
+  .ic-dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; flex-shrink: 0; }
+  .ic-mini-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 18px; padding: 0 6px;
+    font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+    border-radius: 4px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--foreground-muted);
+    white-space: nowrap; line-height: 1; cursor: default;
+  }
+  .ic-mini-badge.is-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
+  .ic-mini-badge.is-warn    { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 65%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+  .ic-mini-badge.is-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
+  .ic-mini-badge.is-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
+  .ic-mini-badge.is-purple  { background: color-mix(in oklch, oklch(0.660 0.180 320) 16%, transparent); color: oklch(0.760 0.180 320); border-color: color-mix(in oklch, oklch(0.660 0.180 320) 32%, transparent); }
+  .ic-mini-badge.is-amber   { background: color-mix(in oklch, var(--accent) 16%, transparent); color: color-mix(in oklch, var(--accent) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--accent) 32%, transparent); }
+  .ic-mini-badge.is-moss    { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+
+  .ic-label-pill {
+    display: inline-flex; align-items: center;
+    height: 18px; padding: 0 7px;
+    font-family: var(--font-sans); font-size: 10.5px; font-weight: 500;
+    border-radius: 999px; line-height: 1;
+    background: color-mix(in oklch, var(--lbl) 14%, transparent);
+    color: color-mix(in oklch, var(--lbl) 75%, var(--foreground));
+    border: 1px solid color-mix(in oklch, var(--lbl) 30%, transparent);
+  }
+
+  .ic-priority {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; line-height: 1;
+  }
+  .ic-priority::before { content: ""; width: 2px; height: 9px; background: currentColor; border-radius: 1px; }
+  .ic-priority.p-critical { color: var(--status-danger); }
+  .ic-priority.p-high     { color: oklch(0.770 0.155 65); }
+  .ic-priority.p-low      { color: var(--status-info); }
+
+  @keyframes ic-pulse-ring {
+    0%   { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 60%, transparent); }
+    70%  { box-shadow: 0 0 0 5px color-mix(in oklch, currentColor 0%, transparent); }
+    100% { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 0%, transparent); }
+  }
+
+  /* ════════════════════════════════════════════════════════
+     ISSUE CARD — BANNER
+     ════════════════════════════════════════════════════════ */
+  .ic-card {
+    --ic: #525252;
+    --ic-soft: color-mix(in oklch, var(--ic) 8%, transparent);
+    position: relative;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 160ms, box-shadow 160ms, transform 160ms var(--ease-out), opacity 160ms;
+  }
+
+  /* Header band */
+  .ic-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 12px;
+    background: var(--ic);
+    color: var(--ic-fg, #fff);
+    gap: 10px; min-height: 32px;
+  }
+  .ic-header-left { display: flex; align-items: baseline; gap: 7px; min-width: 0; flex: 1; }
+  .ic-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; opacity: 0.72; letter-spacing: 0.01em; flex-shrink: 0; }
+  .ic-name { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .ic-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .ic-pri-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    height: 18px; padding: 0 6px; border-radius: 4px;
+    background: rgba(0,0,0,0.18);
+    font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .ic-card[data-text-color="dark"] .ic-pri-chip { background: rgba(255,255,255,0.22); color: rgba(0,0,0,0.8); }
+  .ic-child-chip { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-mono); font-size: 10px; opacity: 0.72; }
+
+  /* Body */
+  .ic-body {
+    display: grid; grid-template-columns: 72px 1fr; gap: 10px;
+    padding: 10px 12px 10px 10px; align-items: start;
+  }
+  .ic-tree {
+    width: 72px; height: 72px; border-radius: 7px;
+    background: linear-gradient(180deg, color-mix(in oklch, var(--ic) 18%, var(--surface-2)) 0%, color-mix(in oklch, var(--ic) 5%, var(--surface-3)) 100%);
+    border: 1px solid color-mix(in oklch, var(--ic) 20%, var(--border));
+    display: flex; align-items: flex-end; justify-content: center;
+    overflow: hidden; position: relative; flex-shrink: 0;
+  }
+  .ic-tree-inner { transform: translateY(16px); }
+  .ic-notify {
+    position: absolute; top: 5px; right: 5px;
+    width: 7px; height: 7px; border-radius: 999px;
+    animation: ic-pulse-ring 1.6s ease-out infinite;
+  }
+  .ic-notify.is-success { background: var(--status-success); color: var(--status-success); }
+  .ic-notify.is-amber   { background: var(--accent); color: var(--accent); }
+  .ic-notify.is-danger  { background: var(--status-danger); color: var(--status-danger); }
+
+  .ic-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .ic-branch-row { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle); min-width: 0; }
+  .ic-branch { color: var(--foreground-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+  .ic-no-branch { opacity: 0.55; }
+  .ic-state-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .ic-labels-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+
+  /* Hover actions */
+  .ic-actions {
+    display: flex; gap: 3px; align-items: center;
+    position: absolute; bottom: 8px; right: 10px;
+    opacity: 0; transition: opacity 140ms; pointer-events: none;
+  }
+  .ic-card:hover .ic-actions, .ic-actions.is-forced { opacity: 1; pointer-events: auto; }
+
+  .ic-action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 22px; padding: 0 7px; gap: 4px;
+    font-family: var(--font-sans); font-size: 11px; font-weight: 500;
+    border-radius: 5px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--foreground);
+    cursor: pointer; transition: background 120ms, border-color 120ms;
+  }
+  .ic-action-btn:hover { background: var(--surface-3); border-color: var(--border-strong); }
+  .ic-action-btn.is-primary { background: var(--moss-700); border-color: var(--moss-600); color: var(--moss-50); }
+  .ic-action-btn.is-primary:hover { background: var(--moss-600); }
+  .ic-action-btn.is-icon { width: 22px; padding: 0; color: var(--foreground-muted); }
+
+  /* Selection checkmark */
+  .ic-check-mark {
+    position: absolute; top: 8px; right: 8px;
+    width: 20px; height: 20px; border-radius: 5px;
+    background: var(--primary);
+    color: var(--primary-fg);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-sm);
+    z-index: 2;
+  }
+
+  /* ── CARD STATES ─────────────────────────────────────────── */
+
+  /* Hover */
+  .ic-card:hover, .ic-card.is-hover {
+    border-color: color-mix(in oklch, var(--ic) 35%, var(--border-strong));
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Selected (single click) */
+  .ic-card.is-selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 28%, transparent), var(--shadow-sm);
+  }
+
+  /* Active (currently focused / keyboard-navigated) */
+  .ic-card.is-active {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+  }
+
+  /* Multi-selected (batch operations) */
+  .ic-card.is-multi-selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 28%, transparent), var(--shadow-sm);
+    background: color-mix(in oklch, var(--primary) 4%, var(--surface));
+  }
+  .ic-card.is-multi-selected .ic-body {
+    background: color-mix(in oklch, var(--primary) 3%, transparent);
+  }
+
+  /* Dragging */
+  .ic-card.is-dragging {
+    transform: rotate(-1.5deg) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    opacity: 0.92;
+    cursor: grabbing;
+  }
+
+  /* Loading (shimmer) */
+  .ic-card.is-loading { position: relative; overflow: hidden; pointer-events: none; }
+  .ic-card.is-loading::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--primary) 8%, transparent), transparent);
+    background-size: 200% 100%; animation: ic-shimmer 1.6s linear infinite; pointer-events: none;
+  }
+  @keyframes ic-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+  /* Archived */
+  .ic-card.is-archived { opacity: 0.50; filter: saturate(0.5); }
+  .ic-card.is-archived .ic-header { filter: grayscale(0.4); }
+
+  /* Error */
+  .ic-card.is-error {
+    border-color: color-mix(in oklch, var(--status-danger) 50%, var(--border));
+    border-left-width: 3px; border-left-color: var(--status-danger);
+  }
+
+  /* Disabled / read-only */
+  .ic-card.is-disabled { opacity: 0.42; pointer-events: none; }
+
+  /* ── Palette swatch grid ──────────────────────────────────── */
+  .palette-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; max-width: 520px; }
+  .palette-swatch {
+    aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+    transition: transform 120ms;
+    cursor: default;
+  }
+  .palette-swatch:hover { transform: scale(1.08); }
+  .palette-swatch .sw-hex { opacity: 0.82; letter-spacing: 0.02em; }
+  .palette-swatch .sw-mode { font-size: 8px; opacity: 0.6; text-transform: uppercase; }
+  .palette-row-label {
+    font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle);
+    letter-spacing: 0.06em; text-transform: uppercase; margin: 12px 0 6px;
+  }
+  .palette-row-label:first-child { margin-top: 0; }
+
+  /* ── Multi-select bar ── */
+  .multi-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 14px; margin-bottom: 12px;
+    background: color-mix(in oklch, var(--primary) 10%, var(--surface));
+    border: 1px solid color-mix(in oklch, var(--primary) 30%, var(--border));
+    border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 500;
+  }
+  .multi-bar-count {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--primary); color: var(--primary-fg);
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .multi-bar-actions { margin-left: auto; display: flex; gap: 6px; }
+</style>
+</head>
+<body class="theme-dark gk-root">
+<div id="root"></div>
+
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="tree.jsx"></script>
+<script type="text/babel" src="issue-card.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+
+/* ─── Sample issues spanning the full palette ──────────────── */
+const SAMPLE_ISSUES = [
+  { color: '#e53e3e', num: 142, name: 'Add usage tracking dashboard', branch: 'feat/usage-dashboard', stage: 'growing', pr: 'draft', priority: 'critical', labels: [{ name: 'feature', color: '#22c55e' }, { name: 'P0', color: '#ef4444' }], childCount: 3, branchStatus: 'active', notify: 'success', seed: 31 },
+  { color: '#3182ce', num: 128, name: 'Build kanban drag-and-drop', branch: 'feat/kanban-dnd', stage: 'fruiting', pr: 'open', priority: 'high', fruitCount: 2, labels: [{ name: 'feature', color: '#22c55e' }], behind: 2, branchStatus: 'active', seed: 24 },
+  { color: '#38a169', num: 91, name: 'Provider trait expansion', branch: 'feat/provider-trait', stage: 'flowering', pr: 'approved', glow: true, labels: [{ name: 'arch', color: '#a855f7' }], childCount: 5, branchStatus: 'active', seed: 18 },
+  { color: '#805ad5', num: 103, name: 'Fix cost calc for cache hits', branch: 'fix/cost-cache', stage: 'seasonal', pr: 'review-requested', priority: 'high', season: 'autumn', labels: [{ name: 'bug', color: '#ef4444' }, { name: 'perf', color: '#f59e0b' }], behind: 1, branchStatus: 'active', conflict: true, notify: 'danger', seed: 12 },
+  { color: '#d69e2e', num: 136, name: 'Add Czech translation file', branch: null, stage: 'seed', priority: 'low', labels: [{ name: 'i18n', color: '#0ea5e9' }], seed: 7 },
+  { color: '#dd6b20', num: 155, name: 'Worktree auto-detection on launch', branch: 'fix/worktree-detect', stage: 'sapling', labels: [{ name: 'infra', color: '#a0aec0' }], branchStatus: 'active', seed: 42 },
+];
+
+/* Light-header issues (row 3 + white) */
+const LIGHT_ISSUES = [
+  { color: '#fc8181', num: 201, name: 'Paginate session list endpoint', branch: 'feat/paginate', stage: 'leafy', pr: 'open', labels: [{ name: 'api', color: '#3182ce' }], branchStatus: 'active', seed: 50 },
+  { color: '#f6ad55', num: 202, name: 'Add warmup timeout config', branch: 'feat/warmup', stage: 'growing', labels: [{ name: 'config', color: '#805ad5' }], branchStatus: 'active', seed: 51, notify: 'success' },
+  { color: '#f6e05e', num: 203, name: 'Highlight search terms in terminal', branch: 'feat/search-hl', stage: 'fruiting', pr: 'draft', fruitCount: 1, labels: [{ name: 'ux', color: '#ed64a6' }], branchStatus: 'active', seed: 52 },
+  { color: '#68d391', num: 204, name: 'Cache branch metadata locally', branch: 'perf/branch-cache', stage: 'sapling', labels: [{ name: 'perf', color: '#f59e0b' }], branchStatus: 'active', seed: 53 },
+  { color: '#63b3ed', num: 205, name: 'Streaming output for long tasks', branch: 'feat/streaming', stage: 'leafy', pr: 'review-requested', labels: [{ name: 'feature', color: '#22c55e' }], branchStatus: 'active', seed: 54 },
+  { color: '#b794f4', num: 206, name: 'Add dark mode toggle animation', branch: 'ui/dark-toggle', stage: 'growing', labels: [{ name: 'ui', color: '#319795' }], branchStatus: 'active', seed: 55 },
+  { color: '#ffffff', num: 207, name: 'Update README contributing guide', branch: null, stage: 'seed', labels: [{ name: 'docs', color: '#a0aec0' }], seed: 56 },
+  { color: '#a0aec0', num: 208, name: 'Refactor test harness for CI', branch: 'chore/ci-tests', stage: 'sapling', labels: [{ name: 'chore', color: '#8b5e3c' }], branchStatus: 'active', seed: 57 },
+];
+
+/* ─── Page ─────────────────────────────────────────────────── */
+function Page() {
+  return (
+    <div className="page">
+      <div className="pg-eyebrow">Component spec / Issue Card — states &amp; palette</div>
+      <h1 className="pg-title">Issue Card — Banner variant: all states</h1>
+      <p className="pg-lead">
+        Comprehensive state showcase for the chosen Banner variant. Cards are shown in two-column
+        layout at realistic widths. The full 24-color palette is exercised — light-background
+        headers automatically flip to dark text via the WCAG luminance threshold from color_utils.ts.
+      </p>
+
+      {/* ═══ 1. Color palette reference ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">Palette</span>
+          <span className="section-name">24 issue colors</span>
+        </div>
+        <p className="section-desc">
+          The palette from DEFAULT_COLOR_PALETTE (6×4 grid). Row 3 and specials include light colors
+          that require dark text on the header band. The contrast threshold is set at luminance 0.2126
+          — matching the codebase — so saturated reds still get white text.
+        </p>
+        {PALETTE_ROWS.map(row => (
+          <React.Fragment key={row.label}>
+            <div className="palette-row-label">{row.label}</div>
+            <div className="palette-grid">
+              {row.colors.map(c => {
+                const fg = icContrastText(c);
+                const mode = icTextMode(c);
+                return (
+                  <div key={c} className="palette-swatch" style={{ background: c, color: fg, borderColor: c === '#ffffff' ? 'var(--border-strong)' : undefined }}>
+                    <span className="sw-hex">{c}</span>
+                    <span className="sw-mode">{mode} text</span>
+                  </div>
+                );
+              })}
+            </div>
+          </React.Fragment>
+        ))}
+      </section>
+
+      {/* ═══ 2. Two-column default ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">Layout</span>
+          <span className="section-name">Two-column — dark header colors</span>
+        </div>
+        <p className="section-desc">
+          Default resting state in a two-column grid. These use the normal + dark palette rows
+          (white text headers).
+        </p>
+        <div className="two-col">
+          {SAMPLE_ISSUES.map(iss => <IssueCard key={iss.num} {...iss} />)}
+        </div>
+      </section>
+
+      {/* ═══ 3. Light header colors ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">Layout</span>
+          <span className="section-name">Two-column — light header colors</span>
+        </div>
+        <p className="section-desc">
+          Cards using the lighter palette row + white + gray. Headers automatically switch to
+          dark text. The priority chip inverts its backdrop accordingly.
+        </p>
+        <div className="two-col">
+          {LIGHT_ISSUES.map(iss => <IssueCard key={iss.num} {...iss} />)}
+        </div>
+      </section>
+
+      {/* ═══ 4. Interactive states ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">States</span>
+          <span className="section-name">Card interaction states</span>
+        </div>
+        <p className="section-desc">
+          Each card pinned to a specific visual state. Hover and actions are force-shown.
+        </p>
+
+        <div className="state-label">default (resting)</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[0]} />
+          <IssueCard {...SAMPLE_ISSUES[1]} />
+        </div>
+
+        <div className="state-label">hover — border tints toward issue color, shadow lifts</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[0]} cardState="hover" showActions />
+          <IssueCard {...LIGHT_ISSUES[2]} cardState="hover" showActions />
+        </div>
+
+        <div className="state-label">selected — primary ring, checkmark top-right</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[2]} cardState="selected" />
+          <IssueCard {...LIGHT_ISSUES[0]} cardState="selected" />
+        </div>
+
+        <div className="state-label">active (keyboard focus) — ring outline</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[3]} cardState="active" />
+          <IssueCard {...LIGHT_ISSUES[4]} cardState="active" />
+        </div>
+
+        <div className="state-label">multi-selected — primary ring + subtle tint on body + checkmark</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[0]} cardState="multi-selected" />
+          <IssueCard {...SAMPLE_ISSUES[1]} cardState="multi-selected" />
+        </div>
+
+        <div className="state-label">dragging — slight rotation, lifted shadow</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[4]} cardState="dragging" />
+          <IssueCard {...LIGHT_ISSUES[5]} cardState="dragging" />
+        </div>
+
+        <div className="state-label">loading — shimmer overlay, no pointer events</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[5]} cardState="loading" />
+          <IssueCard {...LIGHT_ISSUES[3]} cardState="loading" />
+        </div>
+
+        <div className="state-label">archived — desaturated, reduced opacity</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[2]} cardState="archived" />
+          <IssueCard {...LIGHT_ISSUES[1]} cardState="archived" />
+        </div>
+
+        <div className="state-label">error — danger left border accent</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[3]} cardState="error" />
+          <IssueCard {...LIGHT_ISSUES[6]} cardState="error" />
+        </div>
+
+        <div className="state-label">disabled — faded, no pointer events</div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[1]} cardState="disabled" />
+          <IssueCard {...LIGHT_ISSUES[7]} cardState="disabled" />
+        </div>
+      </section>
+
+      {/* ═══ 5. Multi-selection context bar ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">Pattern</span>
+          <span className="section-name">Multi-selection with action bar</span>
+        </div>
+        <p className="section-desc">
+          When 2+ cards are multi-selected, a context bar appears above the list with a count
+          badge and batch actions.
+        </p>
+        <div className="multi-bar">
+          <span className="multi-bar-count">3</span>
+          <span>issues selected</span>
+          <div className="multi-bar-actions">
+            <button className="ic-action-btn"><I.Play size={10} sw={2} />Run all</button>
+            <button className="ic-action-btn"><I.GitBranch size={10} sw={1.8} />Create worktrees</button>
+            <button className="ic-action-btn"><I.Trash size={10} sw={1.8} />Archive</button>
+            <button className="ic-action-btn is-icon"><I.X size={10} /></button>
+          </div>
+        </div>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[0]} cardState="multi-selected" />
+          <IssueCard {...SAMPLE_ISSUES[1]} />
+          <IssueCard {...SAMPLE_ISSUES[2]} cardState="multi-selected" />
+          <IssueCard {...SAMPLE_ISSUES[3]} />
+          <IssueCard {...SAMPLE_ISSUES[4]} cardState="multi-selected" />
+          <IssueCard {...SAMPLE_ISSUES[5]} />
+        </div>
+      </section>
+
+      {/* ═══ 6. Mixed palette in two-column ═══ */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-tag">Mix</span>
+          <span className="section-name">Mixed light + dark headers in two-column</span>
+        </div>
+        <p className="section-desc">
+          Realistic scenario: a dashboard with issues using colors from all four palette rows.
+          Verifies that light and dark header cards look cohesive side-by-side.
+        </p>
+        <div className="two-col">
+          <IssueCard {...SAMPLE_ISSUES[0]} />
+          <IssueCard {...LIGHT_ISSUES[2]} />
+          <IssueCard {...SAMPLE_ISSUES[3]} />
+          <IssueCard {...LIGHT_ISSUES[0]} />
+          <IssueCard color="#1a202c" num={210} name="Refactor global error boundary" branch="fix/error-boundary" stage="sapling" labels={[{name:'dx',color:'#805ad5'}]} branchStatus="active" seed={60} />
+          <IssueCard color="#ed64a6" num={211} name="Add onboarding tooltip flow" branch="feat/onboarding" stage="growing" pr="draft" labels={[{name:'ux',color:'#38a169'}]} branchStatus="active" seed={61} notify="success" />
+          <IssueCard {...LIGHT_ISSUES[6]} />
+          <IssueCard color="#8b5e3c" num={212} name="Migrate to Bun test runner" branch="chore/bun-test" stage="leafy" pr="open" labels={[{name:'chore',color:'#a0aec0'}]} branchStatus="active" seed={62} />
+        </div>
+      </section>
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Page />);
+</script>
+</body>
+</html>

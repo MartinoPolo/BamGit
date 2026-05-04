@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grovekeeper — Workspace Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<style>
+  html, body, #root { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background: oklch(0.135 0.020 150);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ==== Workspace Card ==================================== */
+  .ws-card {
+    --ws-accent: var(--moss-500);
+    --ws-accent-soft: color-mix(in oklch, var(--ws-accent) 22%, transparent);
+    --ws-accent-tint: color-mix(in oklch, var(--ws-accent) 8%, transparent);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    min-height: 196px;
+    padding: 14px 14px 12px;
+    background:
+      linear-gradient(180deg, var(--ws-accent-tint) 0%, transparent 60%),
+      var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+    isolation: isolate;
+  }
+  .ws-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--ws-accent);
+    opacity: 0.85;
+  }
+  .ws-card:hover,
+  .ws-card[data-state="hover"] {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--ws-accent) 50%, var(--border));
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 1px color-mix(in oklch, var(--ws-accent) 22%, transparent),
+      0 8px 28px -10px color-mix(in oklch, var(--ws-accent) 50%, transparent);
+  }
+  .ws-card:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Variants */
+  .ws-card[data-variant="active"]::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: inset 0 0 24px color-mix(in oklch, var(--ws-accent) 18%, transparent);
+    animation: ws-breathe 3.6s ease-in-out infinite;
+  }
+  @keyframes ws-breathe {
+    0%, 100% { opacity: 0.7; }
+    50%      { opacity: 1; }
+  }
+
+  .ws-card[data-variant="urgent"] {
+    --ws-accent: oklch(0.620 0.205 25);
+  }
+  .ws-card[data-variant="needs-attention"] {
+    --ws-accent: oklch(0.770 0.155 75);
+  }
+  .ws-card[data-variant="dormant"] {
+    opacity: 0.72;
+    filter: saturate(0.7);
+  }
+
+  /* Header row */
+  .ws-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .ws-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background:
+      linear-gradient(140deg, color-mix(in oklch, var(--ws-accent) 35%, var(--surface-2)) 0%, color-mix(in oklch, var(--ws-accent) 12%, var(--surface-3)) 100%);
+    border: 1px solid color-mix(in oklch, var(--ws-accent) 30%, var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ws-accent);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .ws-thumb-placeholder {
+    background:
+      repeating-linear-gradient(
+        45deg,
+        color-mix(in oklch, var(--foreground) 6%, transparent) 0 4px,
+        transparent 4px 8px
+      ),
+      var(--surface-2);
+    color: var(--foreground-subtle);
+    border-style: dashed;
+  }
+  .ws-title-block { flex: 1; min-width: 0; }
+  .ws-name {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ws-sub {
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--foreground-subtle);
+    line-height: 1;
+  }
+  .ws-sub-dot {
+    width: 3px; height: 3px; border-radius: 999px;
+    background: var(--foreground-subtle);
+    flex-shrink: 0;
+  }
+
+  /* Quick-access icon button row */
+  .ws-quick { display: flex; gap: 2px; flex-shrink: 0; }
+  .ws-icon-btn {
+    width: 26px; height: 26px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--foreground-subtle);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 120ms, color 120ms;
+  }
+  .ws-icon-btn:hover { background: var(--surface-2); color: var(--foreground); }
+  .ws-icon-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+
+  /* Health row */
+  .ws-health {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .ws-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 7px 8px 7px 8px;
+    background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-width: 0;
+  }
+  .ws-stat-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--foreground-subtle);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .ws-stat-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--foreground);
+    line-height: 1;
+  }
+  .ws-stat[data-tone="zero"] .ws-stat-num { color: var(--foreground-subtle); font-weight: 500; }
+  .ws-stat[data-tone="warn"] {
+    background: color-mix(in oklch, var(--status-warning) 12%, transparent);
+    border-color: color-mix(in oklch, var(--status-warning) 35%, transparent);
+  }
+  .ws-stat[data-tone="warn"] .ws-stat-num { color: var(--status-warning); }
+  .ws-stat[data-tone="warn"] .ws-stat-label { color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground)); }
+
+  .ws-stat[data-tone="danger"] {
+    background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+    border-color: color-mix(in oklch, var(--status-danger) 40%, transparent);
+  }
+  .ws-stat[data-tone="danger"] .ws-stat-num { color: var(--status-danger); }
+  .ws-stat[data-tone="danger"] .ws-stat-label { color: color-mix(in oklch, var(--status-danger) 75%, var(--foreground)); }
+
+  .ws-stat .ws-pulse-dot {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 0 0 0 currentColor;
+    animation: ws-pulse-ring 1.6s ease-out infinite;
+  }
+  @keyframes ws-pulse-ring {
+    0%   { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 60%, transparent); }
+    70%  { box-shadow: 0 0 0 6px color-mix(in oklch, currentColor 0%, transparent); }
+    100% { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 0%, transparent); }
+  }
+
+  /* AFK row */
+  .ws-afk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+  }
+  .ws-afk-led {
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    background: var(--foreground-subtle);
+    flex-shrink: 0;
+  }
+  .ws-afk[data-on="true"] {
+    background: color-mix(in oklch, var(--moss-500) 10%, var(--surface-2));
+    border-color: color-mix(in oklch, var(--moss-500) 32%, var(--border));
+  }
+  .ws-afk[data-on="true"] .ws-afk-led {
+    background: var(--moss-400);
+    box-shadow: 0 0 8px color-mix(in oklch, var(--moss-400) 70%, transparent);
+    animation: ws-led 2s ease-in-out infinite;
+  }
+  @keyframes ws-led {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.55; transform: scale(0.9); }
+  }
+  .ws-afk-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground);
+    letter-spacing: -0.005em;
+  }
+  .ws-afk[data-on="false"] .ws-afk-label { color: var(--foreground-muted); }
+  .ws-afk-meta {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--foreground-subtle);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Footer (cost + activity) */
+  .ws-foot {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--foreground-subtle);
+    line-height: 1;
+  }
+  .ws-cost { font-variant-numeric: tabular-nums; color: var(--foreground-muted); }
+  .ws-cost-label { color: var(--foreground-subtle); margin-right: 6px; }
+  .ws-activity {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Add card */
+  .ws-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 320px;
+    min-height: 196px;
+    padding: 14px;
+    background: transparent;
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--foreground-muted);
+    cursor: pointer;
+    transition: border-color 160ms, color 160ms, background 160ms, transform 160ms;
+  }
+  .ws-add:hover {
+    border-color: var(--moss-400);
+    color: var(--moss-300);
+    background: color-mix(in oklch, var(--moss-500) 6%, transparent);
+    transform: translateY(-2px);
+  }
+  .ws-add-plus {
+    width: 36px; height: 36px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    transition: inherit;
+  }
+  .ws-add:hover .ws-add-plus {
+    background: color-mix(in oklch, var(--moss-500) 14%, var(--surface-2));
+    border-color: color-mix(in oklch, var(--moss-500) 40%, var(--border));
+  }
+  .ws-add-label { font-size: 13px; font-weight: 500; }
+  .ws-add-hint { font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle); }
+
+  /* Page chrome */
+  .page {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 56px 40px 80px;
+  }
+  .page-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--moss-300);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--foreground);
+    margin: 0 0 8px;
+  }
+  .page-lead {
+    font-size: 14px;
+    color: var(--foreground-muted);
+    max-width: 620px;
+    margin: 0 0 36px;
+    line-height: 1.55;
+  }
+  .section {
+    margin-top: 40px;
+  }
+  .section-head {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .section-title {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--foreground-muted);
+  }
+  .section-sub {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--foreground-subtle);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .state-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px 16px;
+  }
+  .state-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .state-cell .state-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--foreground-subtle);
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+  }
+</style>
+</head>
+<body class="theme-dark gk-root">
+<div id="root"></div>
+
+<script type="text/babel" src="icons.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState } = React;
+
+/* ─── Sub-pieces ──────────────────────────────────────────── */
+
+function Stat({ label, value, tone = "neutral", pulse = false, icon: Ico }) {
+  const numTone = value === 0 ? "zero" : tone;
+  return (
+    <div className="ws-stat" data-tone={numTone}>
+      <div className="ws-stat-label">
+        {Ico ? <Ico size={10} sw={1.8} /> : null}
+        {label}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span className="ws-stat-num">{value}</span>
+        {pulse && value > 0 ? <span className="ws-pulse-dot" /> : null}
+      </div>
+    </div>
+  );
+}
+
+function AFKRow({ on, sessions, lastActivity }) {
+  return (
+    <div className="ws-afk" data-on={String(on)}>
+      <span className="ws-afk-led" />
+      <span className="ws-afk-label">
+        {on ? "AFK loop running" : "AFK loop off"}
+      </span>
+      <span className="ws-afk-meta">
+        {on
+          ? (sessions ? `${sessions} session${sessions === 1 ? '' : 's'}` : 'idle')
+          : `last ${lastActivity}`}
+      </span>
+    </div>
+  );
+}
+
+/* ─── Main card ──────────────────────────────────────────── */
+
+function WorkspaceCard({
+  name = "grovekeeper",
+  initials,
+  accent = "var(--moss-500)",
+  variant = "default",         // default | active | needs-attention | urgent | dormant | empty
+  branch = "main",
+  prs = 0,
+  prsAttention = 0,
+  issues = 0,
+  hitl = 0,
+  afk = false,
+  sessions = 0,
+  lastActivity = "2m ago",
+  cost = "$1.24",
+  costLabel = "today",
+  hasThumb = false,
+  state = null,                // hover | focus
+  empty = false,
+}) {
+  const style = { '--ws-accent': accent };
+  const initialsText = initials ?? name.slice(0, 2).toUpperCase();
+  const isEmpty = variant === "empty" || empty;
+
+  return (
+    <div
+      className="ws-card"
+      data-variant={variant}
+      data-state={state || undefined}
+      tabIndex={0}
+      style={style}
+    >
+      {/* Header */}
+      <div className="ws-head">
+        {hasThumb ? (
+          <div className="ws-thumb">
+            <I.Leaf size={18} sw={1.6} />
+          </div>
+        ) : (
+          <div className="ws-thumb ws-thumb-placeholder">
+            {initialsText}
+          </div>
+        )}
+        <div className="ws-title-block">
+          <div className="ws-name">{name}</div>
+          <div className="ws-sub">
+            <I.GitBranch size={10} sw={1.8} />
+            <span>{branch}</span>
+            <span className="ws-sub-dot" />
+            <span>{isEmpty ? "no issues yet" : `${issues + prs} tracked`}</span>
+          </div>
+        </div>
+        <div className="ws-quick" onClick={(e) => e.stopPropagation()}>
+          <button className="ws-icon-btn" title="Open on GitHub" aria-label="Open on GitHub">
+            <I.Github size={14} sw={1.7} />
+          </button>
+          <button className="ws-icon-btn" title="Open in file explorer" aria-label="Open folder">
+            <I.Folder size={14} sw={1.7} />
+          </button>
+        </div>
+      </div>
+
+      {/* Health */}
+      {isEmpty ? (
+        <div style={{
+          padding: '14px 12px',
+          background: 'color-mix(in oklch, var(--surface-2) 60%, transparent)',
+          border: '1px dashed var(--border)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 12,
+          color: 'var(--foreground-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 10,
+        }}>
+          <I.Sparkles size={14} sw={1.6} style={{ color: 'var(--moss-400)' }} />
+          <span>Newly planted — open to track issues</span>
+        </div>
+      ) : (
+        <div className="ws-health">
+          <Stat label="PRs" value={prs} icon={I.GitPull} />
+          <Stat
+            label="Attn"
+            value={prsAttention}
+            tone={prsAttention > 0 ? "danger" : "neutral"}
+            icon={I.AlertTriangle}
+            pulse={prsAttention > 0}
+          />
+          <Stat label="Issues" value={issues} icon={I.Bug} />
+          <Stat
+            label="HITL"
+            value={hitl}
+            tone={hitl > 0 ? "warn" : "neutral"}
+            icon={I.User}
+            pulse={hitl > 0}
+          />
+        </div>
+      )}
+
+      {/* AFK */}
+      <AFKRow on={afk} sessions={sessions} lastActivity={lastActivity} />
+
+      {/* Footer */}
+      <div className="ws-foot">
+        <span className="ws-cost">
+          <span className="ws-cost-label">{costLabel}</span>
+          <span>{cost}</span>
+        </span>
+        <span className="ws-activity">
+          <I.Clock size={10} sw={1.8} />
+          <span>{lastActivity}</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function AddWorkspaceCard() {
+  return (
+    <button className="ws-add" type="button">
+      <span className="ws-add-plus"><I.Plus size={18} sw={1.8} /></span>
+      <span className="ws-add-label">Add workspace</span>
+      <span className="ws-add-hint">connect a GitHub repo</span>
+    </button>
+  );
+}
+
+/* ─── Page ────────────────────────────────────────────────── */
+
+const ACCENTS = {
+  moss:    'oklch(0.580 0.096 134)',
+  amber:   'oklch(0.690 0.165 55)',
+  azure:   'oklch(0.620 0.130 230)',
+  bark:    'oklch(0.500 0.075 55)',
+  plum:    'oklch(0.560 0.150 320)',
+  teal:    'oklch(0.620 0.110 195)',
+  rose:    'oklch(0.640 0.155 15)',
+};
+
+function App() {
+  return (
+    <div className="page">
+      <div className="page-eyebrow">Grovekeeper · Component spec</div>
+      <h1 className="page-title">Workspace card</h1>
+      <p className="page-lead">
+        A living dashboard widget for the Overview window. One card per configured workspace —
+        click to focus its window. Each card surfaces health (PRs, issues, HITL), activity (AFK loop
+        + last seen), and quick-access shortcuts (GitHub, local folder).
+      </p>
+
+      {/* Live grid — what the actual Overview window shows */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-title">Overview grid</span>
+          <span className="section-sub">7 workspaces · responsive · 320px columns</span>
+        </div>
+        <div className="grid">
+          <WorkspaceCard
+            name="grovekeeper"
+            accent={ACCENTS.moss}
+            variant="active"
+            branch="main"
+            prs={2} prsAttention={0} issues={11} hitl={0}
+            afk={true} sessions={3}
+            lastActivity="just now"
+            cost="$4.82" costLabel="today"
+            hasThumb={true}
+          />
+          <WorkspaceCard
+            name="codeburn"
+            accent={ACCENTS.amber}
+            variant="needs-attention"
+            branch="develop"
+            prs={4} prsAttention={1} issues={23} hitl={2}
+            afk={true} sessions={1}
+            lastActivity="3m ago"
+            cost="$12.40" costLabel="today"
+          />
+          <WorkspaceCard
+            name="orchard-api"
+            accent={ACCENTS.azure}
+            variant="urgent"
+            branch="release/v2"
+            prs={6} prsAttention={3} issues={8} hitl={0}
+            afk={false}
+            lastActivity="14m ago"
+            cost="$0.00" costLabel="today"
+          />
+          <WorkspaceCard
+            name="moss-cli"
+            accent={ACCENTS.teal}
+            variant="default"
+            branch="main"
+            prs={1} prsAttention={0} issues={4} hitl={0}
+            afk={false}
+            lastActivity="1h ago"
+            cost="$0.42" costLabel="today"
+          />
+          <WorkspaceCard
+            name="fern-ui"
+            accent={ACCENTS.plum}
+            variant="default"
+            branch="design-tokens"
+            prs={0} prsAttention={0} issues={2} hitl={0}
+            afk={false}
+            lastActivity="5h ago"
+            cost="$0.18" costLabel="today"
+          />
+          <WorkspaceCard
+            name="acorn-deploy"
+            accent={ACCENTS.bark}
+            variant="dormant"
+            branch="main"
+            prs={0} prsAttention={0} issues={0} hitl={0}
+            afk={false}
+            lastActivity="3d ago"
+            cost="$0.00" costLabel="today"
+          />
+          <WorkspaceCard
+            name="sapling"
+            accent={ACCENTS.rose}
+            variant="empty"
+            empty
+            branch="main"
+            lastActivity="never"
+            cost="$0.00" costLabel="today"
+          />
+          <AddWorkspaceCard />
+        </div>
+      </section>
+
+      {/* States — every state called out in the spec */}
+      <section className="section">
+        <div className="section-head">
+          <span className="section-title">States</span>
+          <span className="section-sub">eight states · spec § "States to Design"</span>
+        </div>
+        <div className="state-grid">
+          <div className="state-cell">
+            <div className="state-label">default — healthy, AFK off</div>
+            <WorkspaceCard
+              name="moss-cli" accent={ACCENTS.teal}
+              prs={1} issues={4} prsAttention={0} hitl={0}
+              afk={false} lastActivity="1h ago" cost="$0.42"
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">active — AFK on, sessions running</div>
+            <WorkspaceCard
+              name="grovekeeper" accent={ACCENTS.moss} variant="active"
+              prs={2} issues={11} prsAttention={0} hitl={0}
+              afk={true} sessions={3} lastActivity="just now" cost="$4.82"
+              hasThumb
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">needs attention — HITL pending</div>
+            <WorkspaceCard
+              name="codeburn" accent={ACCENTS.amber} variant="needs-attention"
+              prs={4} issues={23} prsAttention={0} hitl={2}
+              afk={true} sessions={1} lastActivity="3m ago" cost="$12.40"
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">urgent — merge conflicts / behind base</div>
+            <WorkspaceCard
+              name="orchard-api" accent={ACCENTS.azure} variant="urgent"
+              prs={6} issues={8} prsAttention={3} hitl={0}
+              afk={false} lastActivity="14m ago" cost="$0.00"
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">dormant — no activity &gt; 24h</div>
+            <WorkspaceCard
+              name="acorn-deploy" accent={ACCENTS.bark} variant="dormant"
+              prs={0} issues={0} prsAttention={0} hitl={0}
+              afk={false} lastActivity="3d ago" cost="$0.00"
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">empty — newly created</div>
+            <WorkspaceCard
+              name="sapling" accent={ACCENTS.rose} variant="empty" empty
+              lastActivity="never" cost="$0.00"
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">hover — interactive lift</div>
+            <WorkspaceCard
+              name="fern-ui" accent={ACCENTS.plum} state="hover"
+              prs={1} issues={3} prsAttention={0} hitl={0}
+              afk={false} lastActivity="22m ago" cost="$0.66"
+            />
+          </div>
+
+          <div className="state-cell">
+            <div className="state-label">add workspace — placeholder</div>
+            <AddWorkspaceCard />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

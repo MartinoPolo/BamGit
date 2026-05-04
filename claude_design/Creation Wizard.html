@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grovekeeper — Creation Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<style>
+html, body, #root { margin:0; padding:0; height:100%; }
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01","cv11";
+}
+
+/* ─── Backdrop ─── */
+.wiz-backdrop {
+  position: fixed; inset: 0;
+  background: color-mix(in oklch, oklch(0.10 0.02 150) 55%, transparent);
+  backdrop-filter: blur(3px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 14vh;
+  z-index: 50;
+  animation: wiz-fade-in 180ms ease-out;
+}
+@keyframes wiz-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ─── Modal ─── */
+.wiz-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column;
+  animation: wiz-slide-up 220ms var(--ease-out);
+  overflow: hidden;
+}
+@keyframes wiz-slide-up {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Header ─── */
+.wiz-header {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.wiz-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+  letter-spacing: var(--tracking-snug);
+}
+.wiz-step-dots {
+  margin-left: auto;
+  display: flex; gap: 5px; align-items: center;
+}
+.wiz-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border-strong);
+  transition: all 180ms ease;
+}
+.wiz-dot.is-active { background: var(--primary); width: 16px; border-radius: 3px; }
+.wiz-dot.is-done { background: var(--primary); opacity: 0.5; }
+
+/* ─── Body ─── */
+.wiz-body {
+  padding: 14px 20px 16px;
+  min-height: 120px;
+  position: relative;
+}
+.wiz-step { display: flex; flex-direction: column; gap: 10px; }
+.wiz-step-center { align-items: center; }
+
+/* ─── Footer ─── */
+.wiz-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface-2);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+.wiz-footer-spacer { flex: 1; }
+
+/* ─── Kbd badge ─── */
+.wiz-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 4px; font-family: var(--font-mono);
+  font-size: 10px; color: var(--foreground-muted);
+  line-height: 1;
+}
+.wiz-kbd-inv {
+  background: color-mix(in oklch, var(--primary-fg) 20%, transparent);
+  border-color: color-mix(in oklch, var(--primary-fg) 15%, transparent);
+  color: var(--primary-fg);
+}
+
+/* ─── Step 1: Search ─── */
+.wiz-search-wrap {
+  position: relative;
+}
+.wiz-search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--foreground-subtle); display: flex;
+}
+.wiz-search-input { padding-left: 32px !important; }
+.wiz-list-heading {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--foreground-subtle);
+  padding: 2px 2px 0;
+}
+.wiz-issue-list {
+  display: flex; flex-direction: column; gap: 1px;
+  max-height: 240px; overflow-y: auto;
+  margin: 0 -4px; padding: 0 4px;
+}
+.wiz-issue-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 8px; border-radius: var(--radius-sm);
+  font-size: 13px; color: var(--foreground);
+  background: transparent; border: none; cursor: pointer;
+  text-align: left; width: 100%;
+  font-family: var(--font-sans);
+  transition: background 80ms ease;
+}
+.wiz-issue-row:hover { background: var(--surface-hover); }
+.wiz-issue-row.is-selected { background: var(--primary-soft); }
+.wiz-issue-state { display: flex; flex-shrink: 0; }
+.wiz-issue-state.is-open { color: oklch(0.660 0.135 145); }
+.wiz-issue-state.is-closed { color: oklch(0.660 0.180 320); }
+.wiz-issue-text {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.wiz-skip-link {
+  font-size: 12px; color: var(--foreground-subtle);
+  background: none; border: none; cursor: pointer;
+  text-decoration-line: underline; text-underline-offset: 2px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 120ms;
+  font-family: var(--font-sans);
+  padding: 2px 0;
+}
+.wiz-skip-link:hover { text-decoration-color: currentColor; }
+.wiz-empty {
+  text-align: center; padding: 24px 0; font-size: 13px; color: var(--foreground-muted);
+}
+
+/* ─── Step 2: Issue Name ─── */
+.wiz-branch-preview {
+  font-size: 12px; color: var(--foreground-muted); margin: 0;
+}
+.wiz-branch-preview code {
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--foreground-subtle);
+  background: var(--surface-2); padding: 2px 5px; border-radius: 3px;
+}
+
+/* ─── Step 3: Worktree ─── */
+.wiz-wt-row {
+  display: flex; gap: 14px; justify-content: center; padding: 8px 0;
+}
+.wiz-wt-card {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 20px 32px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 160ms ease;
+}
+.wiz-wt-card:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+.wiz-wt-card.wiz-wt-yes {
+  border-color: oklch(0.660 0.135 145);
+  background: color-mix(in oklch, oklch(0.660 0.135 145) 10%, transparent);
+  color: oklch(0.660 0.135 145);
+}
+.wiz-wt-card.wiz-wt-no {
+  border-color: oklch(0.620 0.205 25);
+  background: color-mix(in oklch, oklch(0.620 0.205 25) 10%, transparent);
+  color: oklch(0.620 0.205 25);
+}
+.wiz-wt-label { font-size: 12px; font-weight: 600; }
+
+/* ─── Step 4: Color ─── */
+.wiz-color-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  justify-items: center;
+  max-width: 264px;
+  margin: 0 auto;
+}
+.wiz-swatch {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 13px; font-weight: 600;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  outline: none;
+  position: relative;
+}
+.wiz-swatch:hover:not(.is-used) { transform: scale(1.12); }
+.wiz-swatch:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.wiz-swatch.is-sel {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ring);
+}
+.wiz-swatch.is-used { opacity: 0.25; cursor: not-allowed; }
+.wiz-hex-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.wiz-native-swatch {
+  position: relative;
+  width: 32px; height: 32px; flex-shrink: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  transition: transform 120ms;
+  overflow: hidden;
+}
+.wiz-native-swatch:hover { transform: scale(1.06); }
+
+/* ─── Step 5: Progress ─── */
+.wiz-progress {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 20px 0; color: var(--foreground-muted); font-size: 13px;
+}
+.wiz-progress.is-success { color: oklch(0.660 0.135 145); }
+.wiz-progress.is-fail { color: oklch(0.620 0.205 25); }
+@keyframes wiz-spin { to { transform: rotate(360deg); } }
+.wiz-spin { animation: wiz-spin 0.8s linear infinite; }
+
+/* ─── Dashboard hint behind modal ─── */
+.dash-hint {
+  position: fixed; inset: 0;
+  background: var(--background);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--foreground-subtle);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+.dash-hint kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 6px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 4px; font-family: var(--font-mono); font-size: 11px;
+  margin: 0 3px;
+}
+
+/* ─── Step transitions ─── */
+.wiz-step-enter { animation: wiz-step-in 160ms ease-out; }
+@keyframes wiz-step-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+</style>
+</head>
+<body class="theme-dark gk-root" data-theme="dark">
+
+<div id="root"></div>
+
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "dark",
+  "showDots": true,
+  "swatchSize": 36
+}/*EDITMODE-END*/;
+</script>
+
+<script type="text/babel" src="wizard-components.jsx"></script>
+<script type="text/babel" src="wizard-steps.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useMemo } = React;
+
+const STEPS = ['github-search','issue-name','worktree-choice','color-selection','worktree-progress'];
+const STEP_LABELS = {
+  'github-search': 'Search GitHub Issues',
+  'issue-name': 'Issue Name',
+  'worktree-choice': 'Create Worktree?',
+  'color-selection': 'Pick a Color',
+  'worktree-progress': 'Setting Up…',
+};
+
+function WizardApp() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [step, setStep] = useState('github-search');
+  const [formData, setFormData] = useState({
+    issue: null, name: '', branch: '', createWorktree: true, color: '',
+  });
+  const [open, setOpen] = useState(true);
+
+  // Apply theme
+  useEffect(() => {
+    const t = tweaks.theme;
+    document.body.className = 'gk-root ' + (t === 'dark' ? 'theme-dark' : 'theme-light');
+    document.body.setAttribute('data-theme', t);
+  }, [tweaks.theme]);
+
+  const stepIdx = STEPS.indexOf(step);
+
+  const goBack = useCallback(() => {
+    const i = STEPS.indexOf(step);
+    if (i > 0) setStep(STEPS[i - 1]);
+  }, [step]);
+
+  const reset = () => {
+    setFormData({ issue: null, name: '', branch: '', createWorktree: true, color: '' });
+    setStep('github-search');
+    setOpen(true);
+  };
+
+  // Global keyboard
+  useEffect(() => {
+    const handler = (e) => {
+      if (!open) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (step === 'issue-name') goBack();
+        else setOpen(false);
+      }
+      if (e.key === 'Backspace') {
+        const el = document.activeElement;
+        const isInput = el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA';
+        if (isInput) return;
+        if (step !== 'github-search') { e.preventDefault(); goBack(); }
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open, step, goBack]);
+
+  // Step content
+  const renderStep = () => {
+    const wrap = (child) => React.createElement('div', { className: 'wiz-step-enter', key: step }, child);
+
+    switch (step) {
+      case 'github-search':
+        return wrap(React.createElement(StepGithubSearch, {
+          onSelect: (issue) => {
+            setFormData(d => ({ ...d, issue, name: issue.title }));
+            setStep('issue-name');
+          },
+          onSkip: () => {
+            setFormData(d => ({ ...d, issue: null, name: '' }));
+            setStep('issue-name');
+          },
+        }));
+      case 'issue-name':
+        return wrap(React.createElement(StepIssueName, {
+          initial: formData.name,
+          issueNumber: formData.issue?.number || null,
+          onConfirm: (name, branch) => {
+            setFormData(d => ({ ...d, name, branch }));
+            setStep('worktree-choice');
+          },
+        }));
+      case 'worktree-choice':
+        return wrap(React.createElement(StepWorktreeChoice, {
+          onConfirm: (val) => {
+            setFormData(d => ({ ...d, createWorktree: val }));
+            setStep('color-selection');
+          },
+        }));
+      case 'color-selection':
+        return wrap(React.createElement(StepColorSelection, {
+          initial: formData.color,
+          onSelect: (c) => setFormData(d => ({ ...d, color: c })),
+        }));
+      case 'worktree-progress':
+        return wrap(React.createElement(StepWorktreeProgress, {
+          onClose: () => setOpen(false),
+        }));
+      default: return null;
+    }
+  };
+
+  const isFirst = step === 'github-search';
+  const isNameStep = step === 'issue-name';
+  const isFinal = step === 'color-selection';
+  const isProgress = step === 'worktree-progress';
+  const showBack = !isFirst && !isNameStep && !isProgress;
+  const showNext = isNameStep || step === 'worktree-choice';
+  const showFooter = !isProgress;
+
+  const handleNext = () => {
+    // Trigger enter on current step's input
+    const input = document.querySelector('.wiz-body input');
+    if (input) {
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    }
+  };
+
+  const handleCreate = () => {
+    if (formData.createWorktree) {
+      setStep('worktree-progress');
+    } else {
+      setOpen(false);
+    }
+  };
+
+  return React.createElement(React.Fragment, null,
+    /* Dashboard hint background */
+    React.createElement('div', { className: 'dash-hint' },
+      !open && React.createElement(React.Fragment, null,
+        'Press ', React.createElement('kbd', null, 'Ctrl'), '+', React.createElement('kbd', null, 'N'),
+        ' or ',
+        React.createElement('button', {
+          className: 'gk-btn gk-btn-primary gk-btn-sm',
+          onClick: reset,
+          style: { marginLeft: 8 },
+        }, '+ New Issue'),
+      ),
+    ),
+
+    /* Modal */
+    open && React.createElement('div', { className: 'wiz-backdrop', onClick: (e) => { if (e.target === e.currentTarget) setOpen(false); } },
+      React.createElement('div', { className: 'wiz-modal' },
+        /* Header */
+        React.createElement('div', { className: 'wiz-header' },
+          React.createElement('span', { className: 'wiz-title' }, STEP_LABELS[step]),
+          tweaks.showDots && React.createElement('div', { className: 'wiz-step-dots' },
+            STEPS.slice(0, 4).map((s, i) =>
+              React.createElement('div', {
+                key: s,
+                className: 'wiz-dot' + (i === stepIdx ? ' is-active' : i < stepIdx ? ' is-done' : ''),
+              })
+            )
+          ),
+        ),
+
+        /* Body */
+        React.createElement('div', { className: 'wiz-body' }, renderStep()),
+
+        /* Footer */
+        showFooter && React.createElement('div', { className: 'wiz-footer' },
+          showBack && React.createElement('button', {
+            className: 'gk-btn gk-btn-ghost',
+            onClick: goBack,
+          }, 'Back ', React.createElement(Kbd, null, React.createElement(IconDelete, { size: 11 }))),
+
+          React.createElement('div', { className: 'wiz-footer-spacer' }),
+
+          React.createElement('button', {
+            className: 'gk-btn gk-btn-ghost',
+            onClick: () => {
+              if (isNameStep) goBack();
+              else setOpen(false);
+            },
+          },
+            isNameStep ? 'Back ' : 'Cancel ',
+            React.createElement(Kbd, null, 'Esc'),
+          ),
+
+          showNext && React.createElement('button', {
+            className: 'gk-btn gk-btn-primary',
+            onClick: handleNext,
+          }, 'Next ', React.createElement(Kbd, { inverted: true }, React.createElement(IconCornerDownLeft, { size: 11 }))),
+
+          isFinal && React.createElement('button', {
+            className: 'gk-btn gk-btn-primary',
+            onClick: handleCreate,
+          }, 'Create ', React.createElement(Kbd, { inverted: true }, React.createElement(IconCornerDownLeft, { size: 11 }))),
+        ),
+      ),
+    ),
+
+    /* Tweaks */
+    React.createElement(TweaksPanel, null,
+      React.createElement(TweakSection, { title: 'Appearance' },
+        React.createElement(TweakRadio, {
+          label: 'Theme', value: tweaks.theme,
+          options: [{ value: 'dark', label: 'Dark' }, { value: 'light', label: 'Light' }],
+          onChange: v => setTweak('theme', v),
+        }),
+        React.createElement(TweakToggle, {
+          label: 'Step dots', value: tweaks.showDots,
+          onChange: v => setTweak('showDots', v),
+        }),
+      ),
+    ),
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(WizardApp));
+</script>
+</body>
+</html>
