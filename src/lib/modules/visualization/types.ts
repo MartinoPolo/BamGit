@@ -19,8 +19,6 @@ export interface LabelShapeMappingEntry {
 
 // ─── Issue Tree State Dimensions ────────────────────────────────────────────
 
-type ForestWorktreeState = WorktreeState;
-
 /** @internal Exported for testing only. */
 export type AggregateSessionState = SessionState | 'no-session';
 
@@ -51,7 +49,7 @@ type ForestGrovekeeperStatus = 'active' | 'archived';
 /** @internal Exported for testing only. */
 export interface StateDimensions {
 	readonly labels: readonly string[];
-	readonly worktreeState: ForestWorktreeState;
+	readonly worktreeState: WorktreeState;
 	readonly aggregateSessionState: AggregateSessionState;
 	readonly executionPhase: ExecutionPhase;
 	readonly branchStatus: ForestBranchStatus;

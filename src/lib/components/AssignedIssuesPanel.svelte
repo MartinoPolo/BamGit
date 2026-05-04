@@ -50,7 +50,11 @@
 
 	async function handleClick(url: string) {
 		if (!disabled) {
-			await openUrl(url);
+			try {
+				await openUrl(url);
+			} catch {
+				// Fails silently in browser mock mode
+			}
 		}
 	}
 </script>
@@ -77,13 +81,7 @@
 					{#each issue.labels as label (label.name)}
 						<span
 							class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none"
-							style="background-color: {label.color.startsWith('#')
-								? label.color
-								: `#${label.color}`}20; color: {label.color.startsWith('#')
-								? label.color
-								: `#${label.color}`}; border: 1px solid {label.color.startsWith('#')
-								? label.color
-								: `#${label.color}`}40;"
+							style="background-color: {label.color}20; color: {label.color}; border: 1px solid {label.color}40;"
 						>
 							{label.name}
 						</span>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { onMount, untrack } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import type { AssignedIssue, SearchedGithubIssue } from '$lib/types/generated';
 	import SearchIcon from '@lucide/svelte/icons/search';
@@ -26,18 +27,25 @@
 		return assignedIssues;
 	});
 
-	let previousDisplayLength = 0;
 	$effect(() => {
-		const currentLength = displayItems.length;
-		if (currentLength !== previousDisplayLength) {
-			previousDisplayLength = currentLength;
+		void displayItems.length;
+		untrack(() => {
 			selectedIndex = 0;
-		}
+		});
 	});
 
-	$effect(() => {
+	onMount(() => {
 		inputElement?.focus();
 	});
+
+	function toSearchedIssue(item: AssignedIssue | SearchedGithubIssue): SearchedGithubIssue {
+		return {
+			number: item.number,
+			title: item.title,
+			state: item.state,
+			url: item.url,
+		};
+	}
 
 	function moveSelection(delta: number) {
 		if (displayItems.length > 0) {
@@ -47,7 +55,7 @@
 
 	function confirmSelection() {
 		if (displayItems.length > 0 && selectedIndex < displayItems.length) {
-			wizard.selectGithubIssue(displayItems[selectedIndex] as SearchedGithubIssue);
+			wizard.selectGithubIssue(toSearchedIssue(displayItems[selectedIndex]));
 		} else {
 			wizard.skipGithubSearch();
 		}
@@ -112,7 +120,7 @@
 			{#each displayItems as item, index (item.number)}
 				<button
 					type="button"
-					onclick={() => wizard.selectGithubIssue(item as SearchedGithubIssue)}
+					onclick={() => wizard.selectGithubIssue(toSearchedIssue(item))}
 					class="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors
 						{index === selectedIndex
 						? 'bg-accent text-accent-foreground'

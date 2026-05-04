@@ -27,6 +27,7 @@ import {
 	TOOL_TYPES,
 	GLOW_COLORS,
 	SPEECH_BUBBLE_COLORS,
+	SPECIAL_LABELS,
 } from './constants.js';
 import { mapIssueToStateDimensions } from './state_mapping.js';
 
@@ -283,7 +284,7 @@ function computeToolVisibility(dimensions: StateDimensions): ToolVisibility {
 		tools[toolType] = { visible: true, size: 1 };
 	} else if (dimensions.aggregateSessionState === 'paused') {
 		tools[TOOL_TYPES.ladder] = { visible: true, size: 1 };
-	} else if (dimensions.labels.some((label) => label === 'HITL')) {
+	} else if (dimensions.labels.some((label) => label === SPECIAL_LABELS.hitl)) {
 		tools[TOOL_TYPES.grill] = { visible: true, size: 1 };
 	} else if (dimensions.worktreeState === 'pending') {
 		tools[TOOL_TYPES.wateringCan] = { visible: true, size: 1 };

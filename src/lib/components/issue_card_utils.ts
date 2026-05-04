@@ -12,12 +12,13 @@ export const PRIORITY_BORDER_CLASSES = {
 	lowest: 'border-l-gray-400',
 } as const satisfies Record<IssuePriority, string>;
 
-export const PRIORITY_BADGE_CLASSES: Partial<Record<IssuePriority, string>> = {
+export const PRIORITY_BADGE_CLASSES = {
 	top: 'bg-red-900/40 text-red-400',
 	high: 'bg-orange-900/40 text-orange-400',
+	medium: 'bg-yellow-900/40 text-yellow-400',
 	low: 'bg-blue-900/40 text-blue-400',
 	lowest: 'bg-gray-800/40 text-gray-400',
-};
+} as const satisfies Record<IssuePriority, string>;
 
 export const PRIORITY_OPTIONS: { value: IssuePriority | null; label: () => string }[] = [
 	{ value: 'top', label: () => m.priority_top() },

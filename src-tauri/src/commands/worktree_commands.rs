@@ -223,6 +223,28 @@ fn stream_output(
     })
 }
 
+// ─── Validation ───────────────────────────────────────────────────────────────
+
+fn validate_branch_name(name: &str) -> Result<(), String> {
+    if name.is_empty() || name.len() > 100 {
+        return Err("Branch name must be 1-100 characters".to_string());
+    }
+    let valid = name
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || matches!(c, '/' | '_' | '.' | '-'));
+    if !valid {
+        return Err(format!("Branch name contains invalid characters: {name}"));
+    }
+    if name.starts_with('-') || name.starts_with('.') || name.ends_with('.') || name.ends_with('/')
+    {
+        return Err(format!("Branch name has invalid prefix/suffix: {name}"));
+    }
+    if name.contains("..") || name.contains("//") {
+        return Err(format!("Branch name contains invalid sequence: {name}"));
+    }
+    Ok(())
+}
+
 // ─── Commands ──────────────────────────────────────────────────────────────────
 
 #[tauri::command]
@@ -231,6 +253,8 @@ pub async fn setup_worktree(
     app_handle: AppHandle,
     request: SetupWorktreeRequest,
 ) -> Result<String, String> {
+    validate_branch_name(&request.branch_name)?;
+
     let bash_path = detect_bash_path().await?;
     let scripts_dir = resolve_scripts_directory()?;
     let setup_script = scripts_dir.join("setup-worktree.sh");
@@ -360,6 +384,8 @@ pub async fn remove_worktree(
     app_handle: AppHandle,
     request: RemoveWorktreeRequest,
 ) -> Result<(), String> {
+    validate_branch_name(&request.branch_name)?;
+
     let bash_path = detect_bash_path().await?;
     let scripts_dir = resolve_scripts_directory()?;
     let remove_script = scripts_dir.join("remove-worktree.sh");
@@ -679,5 +705,23 @@ mod tests {
     fn compute_foreground_returns_light_for_dark_colors() {
         assert_eq!(compute_foreground("#000000"), "#e7e7e7");
         assert_eq!(compute_foreground("#1a1a2e"), "#e7e7e7");
+    }
+
+    #[test]
+    fn valid_branch_names() {
+        assert!(validate_branch_name("feature/my-branch").is_ok());
+        assert!(validate_branch_name("fix_123").is_ok());
+        assert!(validate_branch_name("main").is_ok());
+        assert!(validate_branch_name("123-some-issue").is_ok());
+    }
+
+    #[test]
+    fn invalid_branch_names() {
+        assert!(validate_branch_name("").is_err());
+        assert!(validate_branch_name(&"a".repeat(101)).is_err());
+        assert!(validate_branch_name("branch;rm -rf /").is_err());
+        assert!(validate_branch_name("../escape").is_err());
+        assert!(validate_branch_name("-leading-dash").is_err());
+        assert!(validate_branch_name("trailing.").is_err());
     }
 }

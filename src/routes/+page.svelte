@@ -24,7 +24,7 @@
 	import WorkspaceDashboardLayout from '$lib/components/WorkspaceDashboardLayout.svelte';
 	import WorkspaceBottomPanel from '$lib/components/WorkspaceBottomPanel.svelte';
 	import { computeVisualization } from '$lib/modules/visualization';
-	import type { TreeVisualization } from '$lib/modules/visualization';
+	import type { TreeVisualization, SessionForMapping } from '$lib/modules/visualization';
 	import { CreationWizard } from '$lib/components/creation-wizard/index.js';
 	import { useCreationWizard, type WizardDependencies } from '$lib/modules/creation-wizard';
 	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
@@ -477,6 +477,14 @@
 		);
 	}
 
+	function getGitStatusForForest(issueId: string) {
+		return versionControlStore.getState(issueId);
+	}
+
+	function getSessionsForForest(issueId: string): readonly SessionForMapping[] {
+		return sessionStore.sessionsByIssueId.get(issueId) ?? [];
+	}
+
 	function handlePageKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			selection.deselect();
@@ -525,9 +533,8 @@
 				{#snippet forestPanel()}
 					<ForestView
 						issues={forestIssues}
-						getGitStatus={(issueId) => versionControlStore.getState(issueId)}
-						getSessionsForIssue={(issueId) =>
-							sessionStore.sessionsByIssueId.get(issueId) ?? []}
+						getGitStatus={getGitStatusForForest}
+						getSessionsForIssue={getSessionsForForest}
 						onAddIssue={openCreateDialog}
 						onArchiveIssue={(issue) => (archiveTargetIssue = issue)}
 						onChangeIssueColor={async (issueId) => {

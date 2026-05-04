@@ -11,14 +11,13 @@ import type {
 import type {
 	Issue,
 	SortMode,
-	WorktreeState,
 	CreateIssueRequest,
 	UpdateIssueRequest,
 	SetupWorktreeRequest,
 	RemoveWorktreeRequest,
 } from './types.js';
 import { PRIORITY_ORDER, PRIORITY_ORDER_NONE } from './priority.js';
-import { serializeLabels, toIssue } from './serialization.js';
+import { serializeLabels, toIssue, validateWorktreeState } from './serialization.js';
 
 // ─── Context ───────────────────────────────────────────────────────────────
 
@@ -92,19 +91,24 @@ function createIssuesContext() {
 
 	let unlistenProgress: UnlistenFn | null = null;
 	let unlistenStateChange: UnlistenFn | null = null;
+	let listenerGeneration = 0;
 
 	async function startWorktreeListeners() {
 		stopWorktreeListeners();
+		const generation = ++listenerGeneration;
 
-		unlistenProgress = await listen<WorktreeProgressPayload>('worktree-progress', (event) => {
-			const { issue_id: issueId, line } = event.payload;
-			const existing = worktreeProgress.get(issueId) ?? [];
-			worktreeProgress.set(issueId, [...existing, line]);
-		});
-
-		unlistenStateChange = await listen<WorktreeStateChangePayload>(
-			'worktree-state-change',
-			(event) => {
+		const [progressUnlisten, stateChangeUnlisten] = await Promise.all([
+			listen<WorktreeProgressPayload>('worktree-progress', (event) => {
+				const { issue_id: issueId, line } = event.payload;
+				const existing = worktreeProgress.get(issueId);
+				if (existing !== undefined) {
+					existing.push(line);
+					worktreeProgress.set(issueId, existing);
+				} else {
+					worktreeProgress.set(issueId, [line]);
+				}
+			}),
+			listen<WorktreeStateChangePayload>('worktree-state-change', (event) => {
 				const {
 					issue_id: issueId,
 					new_state: newState,
@@ -116,7 +120,7 @@ function createIssuesContext() {
 					}
 					return {
 						...issue,
-						worktree_state: newState as WorktreeState,
+						worktree_state: validateWorktreeState(newState),
 						worktree_folder:
 							newState === 'none' ? null : (worktreeFolder ?? issue.worktree_folder),
 					};
@@ -125,8 +129,17 @@ function createIssuesContext() {
 				if (newState !== 'pending') {
 					worktreeProgress.delete(issueId);
 				}
-			},
-		);
+			}),
+		]);
+
+		if (generation !== listenerGeneration) {
+			progressUnlisten();
+			stateChangeUnlisten();
+			return;
+		}
+
+		unlistenProgress = progressUnlisten;
+		unlistenStateChange = stateChangeUnlisten;
 	}
 
 	function stopWorktreeListeners() {

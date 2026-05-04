@@ -41,6 +41,12 @@ export const TOOL_TYPES = {
 	mushrooms: 'mushrooms',
 } as const;
 
+/** Special GitHub issue labels that trigger visualization behavior. */
+export const SPECIAL_LABELS = {
+	hitl: 'HITL',
+	afk: 'AFK',
+} as const;
+
 /** @internal Exported for testing only. */
 export const GLOW_COLORS = {
 	red: '#ff4444',

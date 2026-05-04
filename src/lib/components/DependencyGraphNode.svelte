@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Issue } from '$lib/modules/issues';
 	import type { TreeVisualization } from '$lib/modules/visualization';
+	import { SPECIAL_LABELS } from '$lib/modules/visualization';
 	import { LowPolyTree, PottedPlant, DEFAULT_TREE_CONFIG } from 'low-poly-2d-trees';
 	import type { TreeConfig } from 'low-poly-2d-trees';
 	import PlayIcon from '@lucide/svelte/icons/play';
@@ -15,8 +16,8 @@
 
 	let { issue, visualization, selected, onselect, onhitlquickstart }: Props = $props();
 
-	const hasHitlLabel = $derived(issue.labels.some((label) => label.name === 'HITL'));
-	const hasAfkLabel = $derived(issue.labels.some((label) => label.name === 'AFK'));
+	const hasHitlLabel = $derived(issue.labels.some((label) => label.name === SPECIAL_LABELS.hitl));
+	const hasAfkLabel = $derived(issue.labels.some((label) => label.name === SPECIAL_LABELS.afk));
 
 	const oakConfig: TreeConfig = {
 		...DEFAULT_TREE_CONFIG,

@@ -29,6 +29,7 @@ function createRawRequirementsContext() {
 	const open = new StateRaw(false);
 	const loading = new StateRaw(false);
 	const editingIndex = new StateRaw<number | null>(null);
+	const saveError = new StateRaw<string | null>(null);
 
 	function getLocalFolder(): string | null {
 		return boardStore.activeDashboard?.local_folder ?? null;
@@ -40,6 +41,7 @@ function createRawRequirementsContext() {
 			notes.current = [];
 			return;
 		}
+		saveError.current = null;
 		try {
 			loading.current = true;
 			const content = await invoke<string>('read_raw_requirements', {
@@ -62,8 +64,10 @@ function createRawRequirementsContext() {
 		try {
 			const content = serializeRawRequirements(notes.current);
 			await invoke('write_raw_requirements', { localFolder, content });
+			saveError.current = null;
 		} catch (error) {
 			console.error('Failed to save raw requirements:', error);
+			saveError.current = String(error);
 		}
 	}
 
@@ -145,6 +149,9 @@ function createRawRequirementsContext() {
 		},
 		get hasNotes() {
 			return notes.current.length > 0;
+		},
+		get saveError() {
+			return saveError.current;
 		},
 
 		toggle,

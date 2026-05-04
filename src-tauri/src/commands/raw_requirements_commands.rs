@@ -1,29 +1,45 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-fn raw_requirements_path(local_folder: &str) -> PathBuf {
-    PathBuf::from(local_folder)
-        .join(".mpx")
-        .join("RAW_REQUIREMENTS.md")
+fn validate_local_folder(local_folder: &str) -> Result<PathBuf, String> {
+    let path = PathBuf::from(local_folder);
+    let canonical = path
+        .canonicalize()
+        .map_err(|e| format!("Invalid local folder path: {e}"))?;
+    if !canonical.is_dir() {
+        return Err(format!(
+            "Local folder is not a directory: {}",
+            canonical.display()
+        ));
+    }
+    Ok(canonical)
+}
+
+fn raw_requirements_path(validated_folder: &Path) -> PathBuf {
+    validated_folder.join(".mpx").join("RAW_REQUIREMENTS.md")
 }
 
 #[tauri::command]
 pub fn read_raw_requirements(local_folder: String) -> Result<String, String> {
-    let path = raw_requirements_path(&local_folder);
+    let folder = validate_local_folder(&local_folder)?;
+    let path = raw_requirements_path(&folder);
     if !path.exists() {
         return Ok(String::new());
     }
-    fs::read_to_string(&path).map_err(|error| format!("Failed to read RAW_REQUIREMENTS.md: {error}"))
+    fs::read_to_string(&path)
+        .map_err(|error| format!("Failed to read RAW_REQUIREMENTS.md: {error}"))
 }
 
 #[tauri::command]
 pub fn write_raw_requirements(local_folder: String, content: String) -> Result<(), String> {
-    let path = raw_requirements_path(&local_folder);
+    let folder = validate_local_folder(&local_folder)?;
+    let path = raw_requirements_path(&folder);
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)
             .map_err(|error| format!("Failed to create .mpx directory: {error}"))?;
     }
-    fs::write(&path, content).map_err(|error| format!("Failed to write RAW_REQUIREMENTS.md: {error}"))
+    fs::write(&path, content)
+        .map_err(|error| format!("Failed to write RAW_REQUIREMENTS.md: {error}"))
 }
 
 #[cfg(test)]
@@ -83,5 +99,18 @@ mod tests {
         let result = read_raw_requirements(dir.to_string_lossy().to_string()).unwrap();
         assert_eq!(result, "new");
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn rejects_nonexistent_folder() {
+        let result = read_raw_requirements("/nonexistent/path/xyz".to_string());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn rejects_nonexistent_folder_for_write() {
+        let result =
+            write_raw_requirements("/nonexistent/path/xyz".to_string(), "test".to_string());
+        assert!(result.is_err());
     }
 }

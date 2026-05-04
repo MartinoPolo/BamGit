@@ -21,6 +21,41 @@ function deserializeLabels(raw: string | null): IssueLabel[] {
 	}
 }
 
+const VALID_PRIORITIES: ReadonlySet<string> = new Set(['lowest', 'low', 'medium', 'high', 'top']);
+const VALID_STATUSES: ReadonlySet<string> = new Set(['active', 'archived']);
+const VALID_WORKTREE_STATES: ReadonlySet<string> = new Set([
+	'none',
+	'pending',
+	'active',
+	'failed',
+	'removing',
+	'removed',
+]);
+
+function validatePriority(value: string | null): IssuePriority | null {
+	if (value === null) {
+		return null;
+	}
+	if (VALID_PRIORITIES.has(value)) {
+		return value as IssuePriority;
+	}
+	return null;
+}
+
+function validateStatus(value: string): IssueStatus {
+	if (VALID_STATUSES.has(value)) {
+		return value as IssueStatus;
+	}
+	return 'active';
+}
+
+export function validateWorktreeState(value: string): WorktreeState {
+	if (VALID_WORKTREE_STATES.has(value)) {
+		return value as WorktreeState;
+	}
+	return 'none';
+}
+
 export function serializeLabels(labels: IssueLabel[] | undefined): string | null | undefined {
 	if (labels === undefined) {
 		return undefined;
@@ -32,8 +67,8 @@ export function toIssue(raw: GeneratedIssue): Issue {
 	return {
 		...raw,
 		labels: deserializeLabels(raw.labels),
-		priority: raw.priority as IssuePriority | null,
-		status: raw.status as IssueStatus,
-		worktree_state: raw.worktree_state as WorktreeState,
+		priority: validatePriority(raw.priority),
+		status: validateStatus(raw.status),
+		worktree_state: validateWorktreeState(raw.worktree_state),
 	};
 }
