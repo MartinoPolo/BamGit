@@ -54,8 +54,28 @@
 	const POTTED_NATURAL_WIDTH = 192;
 	const POTTED_NATURAL_HEIGHT = 288;
 
-	let viewportWidth = $state(0);
-	let viewportHeight = $state(0);
+	let rawViewportWidth = $state(0);
+	let rawViewportHeight = $state(0);
+
+	let debouncedViewportWidth = $state(0);
+	let debouncedViewportHeight = $state(0);
+	let hasInitialDimensions = $state(false);
+
+	$effect(() => {
+		const w = rawViewportWidth;
+		const h = rawViewportHeight;
+		if (!hasInitialDimensions && w > 0 && h > 0) {
+			hasInitialDimensions = true;
+			debouncedViewportWidth = w;
+			debouncedViewportHeight = h;
+			return;
+		}
+		const timeout = setTimeout(() => {
+			debouncedViewportWidth = w;
+			debouncedViewportHeight = h;
+		}, 100);
+		return () => clearTimeout(timeout);
+	});
 
 	const interaction = useSelection();
 
@@ -113,14 +133,15 @@
 		interaction.setPrdIssueId(oakEntry?.issue.id ?? null);
 	});
 
+	const layoutItems = $derived(entries.map((entry) => entry.layoutItem));
 	const layoutResult = $derived(
-		computeForestLayout(
-			entries.map((entry) => entry.layoutItem),
-			{ width: viewportWidth, height: viewportHeight },
-		),
+		computeForestLayout(layoutItems, {
+			width: debouncedViewportWidth,
+			height: debouncedViewportHeight,
+		}),
 	);
 
-	const groundStripHeight = $derived(viewportHeight * (1 - GROUND_Y_FRACTION));
+	const groundStripHeight = $derived(debouncedViewportHeight * (1 - GROUND_Y_FRACTION));
 
 	function buildLayoutItem(
 		issue: Issue,
@@ -215,6 +236,7 @@
 		}
 	}
 
+	// fallow-ignore-next-line complexity
 	function handleContextMenuAction(action: TreeContextMenuAction) {
 		const menu = contextMenu;
 		if (menu === null) {
@@ -225,10 +247,18 @@
 			return;
 		}
 		const issue = entry.issue;
-		if (action === TREE_CONTEXT_MENU_ACTIONS.archive && onArchiveIssue) {
-			onArchiveIssue(issue);
-		} else if (action === TREE_CONTEXT_MENU_ACTIONS.changeColor && onChangeIssueColor) {
-			onChangeIssueColor(issue.id);
+		switch (action) {
+			case TREE_CONTEXT_MENU_ACTIONS.archive:
+				onArchiveIssue?.(issue);
+				break;
+			case TREE_CONTEXT_MENU_ACTIONS.changeColor:
+				onChangeIssueColor?.(issue.id);
+				break;
+			case TREE_CONTEXT_MENU_ACTIONS.openGithub:
+			case TREE_CONTEXT_MENU_ACTIONS.openWorktree:
+			case TREE_CONTEXT_MENU_ACTIONS.startSession:
+			case TREE_CONTEXT_MENU_ACTIONS.pruneWorktree:
+				break;
 		}
 	}
 
@@ -244,8 +274,8 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="relative w-full flex-1 overflow-hidden rounded-md outline-none"
-	bind:clientWidth={viewportWidth}
-	bind:clientHeight={viewportHeight}
+	bind:clientWidth={rawViewportWidth}
+	bind:clientHeight={rawViewportHeight}
 	style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
 	style:min-height="0"
 	onkeydown={handleKeydown}

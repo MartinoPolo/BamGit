@@ -48,6 +48,8 @@ export const GLOW_COLORS = {
 	green: '#22c55e',
 	yellow: '#ffd700',
 	blue: '#4a9eff',
+	violet: '#c084fc',
+	pink: '#ec4899',
 } as const;
 
 /** @internal Exported for testing only. */

@@ -354,31 +354,31 @@ describe('mapIssueToStateDimensions — branchStatus', () => {
 		expect(dimensions.branchStatus).toBe('no-branch');
 	});
 
-	it('returns no-branch when git_status is missing', () => {
+	it('defaults to active when git_status is missing but branch_name exists', () => {
 		const dimensions = mapIssueToStateDimensions(
 			createIssue({ branch_name: 'feat/x' }),
 			undefined,
 			[],
 		);
-		expect(dimensions.branchStatus).toBe('no-branch');
+		expect(dimensions.branchStatus).toBe('active');
 	});
 
-	it('returns no-branch when branch_status is null', () => {
+	it('defaults to active when branch_status is null but branch_name exists', () => {
 		const dimensions = mapIssueToStateDimensions(
 			createIssue({ branch_name: 'feat/x' }),
 			createGitStatus({ branch_status: null }),
 			[],
 		);
-		expect(dimensions.branchStatus).toBe('no-branch');
+		expect(dimensions.branchStatus).toBe('active');
 	});
 
-	it('returns no-branch when branch_status is unknown', () => {
+	it('defaults to active when branch_status is unknown but branch_name exists', () => {
 		const dimensions = mapIssueToStateDimensions(
 			createIssue({ branch_name: 'feat/x' }),
 			createGitStatus({ branch_status: 'unknown' }),
 			[],
 		);
-		expect(dimensions.branchStatus).toBe('no-branch');
+		expect(dimensions.branchStatus).toBe('active');
 	});
 
 	it('maps active -> active', () => {

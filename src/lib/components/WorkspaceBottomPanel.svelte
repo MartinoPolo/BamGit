@@ -26,6 +26,7 @@
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import { Button } from '$lib/components/ui/button/index.js';
 
+	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
 		issues: readonly Issue[];
 		parentIssues: Issue[];
@@ -46,7 +47,6 @@
 		assignedIssues?: AssignedIssue[];
 		assignedIssuesHasMore?: boolean;
 		deletedAssignedIssueNumbers?: readonly number[];
-		isGhAvailable?: boolean;
 		getVisualization: (issueId: string) => TreeVisualization | undefined;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
@@ -77,7 +77,6 @@
 		assignedIssues = [],
 		assignedIssuesHasMore = false,
 		deletedAssignedIssueNumbers = [],
-		isGhAvailable = false,
 		getVisualization,
 		getChildren,
 		getNotificationDotColor,
@@ -148,10 +147,16 @@
 	);
 
 	const defaultTab = $derived(selection.activeTab ?? BOTTOM_PANEL_TABS.issues);
+
+	const shouldShowPrdOverview = $derived(
+		selection.showPrdOverview &&
+			defaultTab !== BOTTOM_PANEL_TABS.issues &&
+			defaultTab !== BOTTOM_PANEL_TABS.kanban,
+	);
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="shrink-0 border-b border-border px-2 pt-1">
+	<div class="shrink-0 px-2 pt-1">
 		<Tabs.Root>
 			{#each tabValues as tab (tab)}
 				<Tabs.Tab active={defaultTab === tab} onclick={() => handleTabClick(tab)}>
@@ -162,7 +167,7 @@
 	</div>
 
 	<div class="flex-1 overflow-auto">
-		{#if selection.showPrdOverview && defaultTab !== BOTTOM_PANEL_TABS.issues && defaultTab !== BOTTOM_PANEL_TABS.kanban}
+		{#if shouldShowPrdOverview}
 			<PrdOverview
 				title={prdIssue?.name ?? 'Workspace'}
 				completionRatio={prdVisualization?.completionRatio ?? 0}
@@ -224,7 +229,7 @@
 						dashboardIssues={issues}
 						deletedIssueNumbers={deletedAssignedIssueNumbers}
 						hasMore={assignedIssuesHasMore}
-						disabled={isGhAvailable !== true}
+						disabled={!ghAvailable}
 						{onWizardOpen}
 						{onQuickAddWithWorktree}
 						onLoadMore={onLoadMoreAssignedIssues}
@@ -269,13 +274,6 @@
 			<div class="p-4">
 				<p class="text-sm text-muted-foreground">Session view coming soon</p>
 			</div>
-		{:else}
-			<PrdOverview
-				title={prdIssue?.name ?? 'Workspace'}
-				completionRatio={prdVisualization?.completionRatio ?? 0}
-				issueCount={prdVisualization?.issueCount ?? issues.length}
-				{stageCounts}
-			/>
 		{/if}
 	</div>
 </div>
