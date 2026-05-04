@@ -35,7 +35,7 @@
 			class="flex flex-col items-center gap-2 rounded-lg border-2 px-6 py-4 transition-colors
 				{selectedChoice === true
 				? 'border-green-500 bg-green-500/10 text-green-400'
-				: 'border-border text-muted-foreground hover:border-green-500/50 hover:text-green-400'}"
+				: 'border-border bg-transparent text-muted-foreground hover:bg-surface-hover'}"
 		>
 			<TreePine size={24} />
 			<span class="text-xs font-medium">{m.wizard_worktree_yes()}</span>
@@ -46,7 +46,7 @@
 			class="flex flex-col items-center gap-2 rounded-lg border-2 px-6 py-4 transition-colors
 				{selectedChoice === false
 				? 'border-red-500 bg-red-500/10 text-red-400'
-				: 'border-border text-muted-foreground hover:border-red-500/50 hover:text-red-400'}"
+				: 'border-border bg-transparent text-muted-foreground hover:bg-surface-hover'}"
 		>
 			<X size={24} />
 			<span class="text-xs font-medium">{m.wizard_worktree_no()}</span>

@@ -228,6 +228,16 @@
 		}
 	});
 
+	const navigableSteps = $derived.by(() => {
+		const steps: string[] = [WIZARD_STEPS.GITHUB_SEARCH, WIZARD_STEPS.ISSUE_NAME];
+		if (wizard.worktreeAvailable) {
+			steps.push(WIZARD_STEPS.WORKTREE_CHOICE);
+		}
+		steps.push(WIZARD_STEPS.COLOR_SELECTION);
+		return steps;
+	});
+	const currentStepIndex = $derived(navigableSteps.indexOf(wizard.currentStep));
+
 	const isFirstStep = $derived(wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH);
 	const isIssueNameStep = $derived(wizard.currentStep === WIZARD_STEPS.ISSUE_NAME);
 	const isFinalStep = $derived(wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION);
@@ -248,10 +258,24 @@
 
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
 	<Dialog.Content class="top-[15%] -translate-y-0 max-w-lg">
-		<Dialog.Header>
+		<Dialog.Header class="flex items-center">
 			<Dialog.Title class="text-base font-semibold text-foreground">
 				{stepLabel}
 			</Dialog.Title>
+			{#if !showWorktreeProgress}
+				<div class="ml-auto flex items-center gap-[5px]">
+					{#each navigableSteps as step, index (step)}
+						<div
+							class="h-1.5 transition-all duration-200
+								{index === currentStepIndex
+								? 'w-4 rounded-sm bg-primary'
+								: index < currentStepIndex
+									? 'w-1.5 rounded-full bg-primary/50'
+									: 'w-1.5 rounded-full bg-border-strong'}"
+						></div>
+					{/each}
+				</div>
+			{/if}
 		</Dialog.Header>
 
 		<Dialog.Body class="flex flex-col gap-3 py-2">
