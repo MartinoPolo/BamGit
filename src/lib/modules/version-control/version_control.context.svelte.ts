@@ -29,16 +29,18 @@ export function setVersionControlContext() {
 
 // ─── Factory ────────────────────────────────────────────────────────────────
 
-function buildStateMap(caches: readonly GitStatusCache[]): SvelteMap<string, GitStatusCache> {
-	const map = new SvelteMap<string, GitStatusCache>();
+function replaceStateMap(
+	map: SvelteMap<string, GitStatusCache>,
+	caches: readonly GitStatusCache[],
+): void {
+	map.clear();
 	for (const cache of caches) {
 		map.set(cache.issue_id, cache);
 	}
-	return map;
 }
 
 function createVersionControlContext() {
-	let stateMap = $state(new SvelteMap<string, GitStatusCache>());
+	const stateMap = new SvelteMap<string, GitStatusCache>();
 	let ghAvailability = $state<GhCliAvailability>('not-installed');
 	let syncing = $state(false);
 	let syncError = $state<string | null>(null);
@@ -94,7 +96,7 @@ function createVersionControlContext() {
 					'get_all_git_statuses_for_dashboard',
 					{ dashboardId },
 				);
-				stateMap = buildStateMap(statuses);
+				replaceStateMap(stateMap, statuses);
 				error = null;
 			} catch (err) {
 				error = String(err);
@@ -121,7 +123,7 @@ function createVersionControlContext() {
 					'get_all_git_statuses_for_dashboard',
 					{ dashboardId },
 				);
-				stateMap = buildStateMap(statuses);
+				replaceStateMap(stateMap, statuses);
 
 				if (result.errors.length > 0) {
 					syncError = result.errors.join('; ');
@@ -161,7 +163,7 @@ function createVersionControlContext() {
 					}).catch(() => status),
 				);
 				const refreshed = await Promise.all(refreshPromises);
-				stateMap = buildStateMap(refreshed);
+				replaceStateMap(stateMap, refreshed);
 				error = null;
 			} catch (err) {
 				error = String(err);
