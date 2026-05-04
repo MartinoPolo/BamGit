@@ -8,7 +8,7 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
-use super::provider::{ActorCommand, SessionEvent, SessionHandle, SessionProvider};
+use super::provider::{ActorCommand, ProviderAdapter, SessionEvent, SessionHandle};
 use crate::models::session::SessionState;
 use crate::notification::service::{session_state_to_event_type, NotificationService};
 
@@ -26,7 +26,7 @@ pub struct SessionEventPayload {
 pub async fn run_actor(
     session_id: String,
     mut handle: SessionHandle,
-    provider: Box<dyn SessionProvider>,
+    provider: Box<dyn ProviderAdapter>,
     app_handle: AppHandle,
     database_connection: std::sync::Arc<StdMutex<Connection>>,
     mut command_receiver: mpsc::Receiver<ActorCommand>,
@@ -112,8 +112,18 @@ pub async fn run_actor(
                     Some(ActorCommand::SendMessage { message }) => {
                         update_last_prompt(&session_id, &message, &database_connection);
 
-                        if let Err(e) = provider.send_message(&mut handle, &message).await {
+                        if let Err(e) = provider.send_turn(&mut handle, &message).await {
                             log::error!("Failed to send message to session {session_id}: {e}");
+                        }
+                    }
+                    Some(ActorCommand::RespondToRequest { request_id, decision }) => {
+                        if let Err(e) = provider.respond_to_request(&mut handle, &request_id, &decision).await {
+                            log::error!("Failed to respond to request for session {session_id}: {e}");
+                        }
+                    }
+                    Some(ActorCommand::RespondToUserInput { request_id, answers }) => {
+                        if let Err(e) = provider.respond_to_user_input(&mut handle, &request_id, &answers).await {
+                            log::error!("Failed to respond to user input for session {session_id}: {e}");
                         }
                     }
                     Some(ActorCommand::Interrupt) => {

@@ -7,6 +7,41 @@ use serde_json::Value;
 use ts_rs::TS;
 use tokio::process::{Child, ChildStderr, ChildStdin, ChildStdout};
 
+/// Decision for responding to a tool-use permission prompt.
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+#[serde(rename_all = "snake_case")]
+pub enum ApprovalDecision {
+    Allow,
+    Deny,
+    AllowForSession,
+}
+
+impl ApprovalDecision {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Allow => "allow",
+            Self::Deny => "deny",
+            Self::AllowForSession => "allow_for_session",
+        }
+    }
+}
+
+/// Capabilities a provider advertises to the frontend.
+/// Not yet consumed by a Tauri command — will be wired when the
+/// frontend settings panel queries provider capabilities.
+#[allow(dead_code)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct ProviderCapabilities {
+    pub supports_spawn: bool,
+    pub supports_discovery: bool,
+    pub supports_mid_session_mode_switch: bool,
+    pub supports_mid_session_model_switch: bool,
+    pub supported_image_types: Vec<String>,
+    pub available_permission_modes: Vec<String>,
+}
+
 /// Configuration for spawning a new CLI session.
 #[derive(Debug, Clone)]
 pub struct SpawnConfig {
@@ -109,6 +144,8 @@ pub enum SessionEvent {
 #[derive(Debug)]
 pub enum ActorCommand {
     SendMessage { message: String },
+    RespondToRequest { request_id: String, decision: ApprovalDecision },
+    RespondToUserInput { request_id: String, answers: Value },
     Interrupt,
     Terminate,
 }
@@ -126,16 +163,36 @@ pub enum ProviderError {
     NotRunning,
 }
 
-/// A provider is an agent CLI backend (Claude Code, Codex, etc.).
-/// Each provider knows how to spawn, communicate with, and control its CLI.
+/// A provider adapter is an agent CLI backend (Claude Code, Codex, etc.).
+/// Each adapter knows how to spawn, communicate with, and control its CLI.
 #[async_trait]
-pub trait SessionProvider: Send + Sync {
+pub trait ProviderAdapter: Send + Sync {
     /// Spawn a new CLI process and return a handle for communication.
     async fn spawn(&self, config: SpawnConfig) -> Result<SessionHandle, ProviderError>;
 
-    /// Send a text message (prompt) to a running session via stdin.
-    async fn send_message(&self, handle: &mut SessionHandle, message: &str)
+    /// Send a user turn (prompt) to a running session via stdin.
+    async fn send_turn(&self, handle: &mut SessionHandle, message: &str)
         -> Result<(), ProviderError>;
+
+    /// Respond to a tool-use permission prompt with an approval decision.
+    async fn respond_to_request(
+        &self,
+        handle: &mut SessionHandle,
+        request_id: &str,
+        decision: &ApprovalDecision,
+    ) -> Result<(), ProviderError>;
+
+    /// Respond to an elicitation prompt with user-provided answers.
+    async fn respond_to_user_input(
+        &self,
+        handle: &mut SessionHandle,
+        request_id: &str,
+        answers: &Value,
+    ) -> Result<(), ProviderError>;
+
+    /// Advertise what this provider supports.
+    #[allow(dead_code)]
+    fn capabilities(&self) -> ProviderCapabilities;
 
     /// Gracefully interrupt the current turn.
     async fn interrupt(&self, handle: &mut SessionHandle) -> Result<(), ProviderError>;
