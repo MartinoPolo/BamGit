@@ -48,12 +48,15 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 ### Issue Creation
 
 - **Manual create:** Multi-step keyboard-driven wizard (modal at top of screen):
-    1. GitHub issue search (live, number-aware, arrow-key navigation)
-    2. Issue name entry (pre-filled from GitHub if selected)
-    3. Worktree yes/no (conditional)
-    4. Color selection (24-color palette, auto-rotation, custom input)
+    1. GitHub issue search (live, number-aware, arrow-key navigation). No preselection on open — Enter with no selection = Skip. Arrow nav fills search bar with selected issue title (display only, no search trigger). Clicking an issue = select + advance
+    2. Issue name entry (pre-filled from GitHub if selected). Name excludes issue number (displayed separately on card). Trailing special characters stripped
+    3. Worktree yes/no (conditional). Clicking Yes/No = select + advance
+    4. Color selection (24-color palette, auto-rotation, custom input). Clicking a swatch = select + advance (creates issue on last step)
     5. Worktree creation progress (if yes)
-    - Enter confirms, Escape cancels, Back navigates
+    - **Click-to-advance:** Clicking any selectable item confirms + advances to next step across all steps
+    - **Dynamic footer:** Back/Cancel buttons swap keyboard hints based on text input focus. Back shows Esc when input focused, Backspace when not. Cancel shows Esc only when no Back button or input not focused. Navigation hint (arrow Kbd labels + "Navigate" text) shown per step: ↑↓ on step 1, hidden on step 2, ←→ on step 3, ↑↓←→ on step 4
+    - **Arrow nav from any focus:** Arrow keys navigate items when any element in the modal is focused (not just text input). Exception: text input focused = arrows control cursor
+    - **Keyboard routing:** Enter confirms current step. Escape goes back when text input focused on non-first step, closes wizard otherwise. Backspace goes back when no text input focused
 - **Quick add (no worktree):** One-click from assigned GitHub issue. Auto-fills name, GitHub link, assigns next color.
 - **Quick add (with worktree):** One-click from assigned issue or GitHub trigger. Auto-fills everything, auto-detects base branch, runs setup-worktree.sh.
 - **From raw requirements:** Quick ideas widget appends to `.mpx/RAW_REQUIREMENTS.md`. Processing trigger runs `/mp-grill-requirements` to refine → create GitHub issue.
