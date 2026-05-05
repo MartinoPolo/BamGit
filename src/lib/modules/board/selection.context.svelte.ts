@@ -53,6 +53,13 @@ function createSelectionContext() {
 		hoveredIssueId.current = null;
 	}
 
+	function clearBatchSelection() {
+		batchSelectedIssueIds.clear();
+		individuallySelectedIds.clear();
+		rangeSelectedIds.clear();
+		batchAnchorId.current = null;
+	}
+
 	function activateIssue(issueId: string) {
 		if (activeIssueId.current === issueId) {
 			if (activeTab.current !== BOTTOM_PANEL_TABS.issueDetail) {
@@ -64,10 +71,7 @@ function createSelectionContext() {
 		if (activeTab.current === null && !shouldShowPrdOverview(issueId, prdIssueId.current)) {
 			activeTab.current = BOTTOM_PANEL_TABS.issueDetail;
 		}
-		batchSelectedIssueIds.clear();
-		individuallySelectedIds.clear();
-		rangeSelectedIds.clear();
-		batchAnchorId.current = null;
+		clearBatchSelection();
 	}
 
 	function deactivate() {
@@ -75,12 +79,15 @@ function createSelectionContext() {
 		activeTab.current = null;
 	}
 
+	function restoreFromUrl(issueId: string | null, tab: BottomPanelTab | null) {
+		activeIssueId.current = issueId;
+		activeTab.current = tab;
+		clearBatchSelection();
+	}
+
 	function setActiveTab(tab: BottomPanelTab | null) {
 		activeTab.current = tab;
-		batchSelectedIssueIds.clear();
-		individuallySelectedIds.clear();
-		rangeSelectedIds.clear();
-		batchAnchorId.current = null;
+		clearBatchSelection();
 	}
 
 	function toggleBatchSelect(issueId: string) {
@@ -125,10 +132,7 @@ function createSelectionContext() {
 	}
 
 	function batchDeselectAll() {
-		batchSelectedIssueIds.clear();
-		individuallySelectedIds.clear();
-		rangeSelectedIds.clear();
-		batchAnchorId.current = null;
+		clearBatchSelection();
 	}
 
 	function removeBatchItems(ids: readonly string[]) {
@@ -189,6 +193,7 @@ function createSelectionContext() {
 		unhover,
 		activateIssue,
 		deactivate,
+		restoreFromUrl,
 		setActiveTab,
 		setPrdIssueId,
 		toggleForestCollapsed,
