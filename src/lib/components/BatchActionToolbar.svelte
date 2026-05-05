@@ -2,7 +2,6 @@
 	import type { Issue, IssuePriority } from '$lib/modules/issues';
 	import { PRIORITY_OPTIONS } from '$lib/components/issue_card_utils.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import Checkbox from '$lib/components/ui/checkbox/Checkbox.svelte';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
@@ -15,8 +14,7 @@
 	interface Props {
 		selectedCount: number;
 		selectedIssues: Issue[];
-		selectAllCheckboxState: 'all' | 'some' | 'none';
-		onSelectAll: () => void;
+		isModifierHeld?: boolean;
 		onDeselectAll: () => void;
 		onBatchArchive: () => void;
 		onBatchUnarchive: () => void;
@@ -28,8 +26,7 @@
 	let {
 		selectedCount,
 		selectedIssues,
-		selectAllCheckboxState,
-		onSelectAll,
+		isModifierHeld = false,
 		onDeselectAll,
 		onBatchArchive,
 		onBatchUnarchive,
@@ -43,18 +40,27 @@
 	const hasActiveWorktrees = $derived(selectedIssues.some((i) => i.worktree_state === 'active'));
 	const hasBatchSelection = $derived(selectedCount > 0);
 
-	const checkboxChecked = $derived(selectAllCheckboxState === 'all');
-	const checkboxIndeterminate = $derived(selectAllCheckboxState === 'some');
+	const toolbarBackground = $derived.by(() => {
+		if (hasBatchSelection) {
+			return 'color-mix(in oklch, var(--primary) 10%, var(--surface))';
+		}
+		if (isModifierHeld) {
+			return 'color-mix(in oklch, var(--primary) 8%, var(--surface))';
+		}
+		return 'transparent';
+	});
+
+	const toolbarBorderColor = $derived.by(() => {
+		if (hasBatchSelection) {
+			return 'color-mix(in oklch, var(--primary) 30%, var(--border))';
+		}
+		if (isModifierHeld) {
+			return 'color-mix(in oklch, var(--primary) 22%, var(--border))';
+		}
+		return 'transparent';
+	});
 
 	let priorityPopoverOpen = $state(false);
-
-	function handleCheckboxClick() {
-		if (selectAllCheckboxState === 'all') {
-			onDeselectAll();
-		} else {
-			onSelectAll();
-		}
-	}
 
 	function handlePrioritySelect(priority: IssuePriority | null) {
 		priorityPopoverOpen = false;
@@ -65,21 +71,9 @@
 <Tooltip.Provider>
 	<div
 		class="flex min-h-[42px] items-center gap-3 rounded-[var(--radius-md)] border px-[14px] py-2 text-[13px] font-medium"
-		style="background: color-mix(in oklch, var(--primary) {hasBatchSelection
-			? '10%'
-			: '4%'}, var(--surface)); border-color: color-mix(in oklch, var(--primary) {hasBatchSelection
-			? '30%'
-			: '15%'}, var(--border));"
+		style="background: {toolbarBackground}; border-color: {toolbarBorderColor};"
 	>
 		{#if hasBatchSelection}
-			<!-- Select-all checkbox -->
-			<Checkbox
-				checked={checkboxChecked}
-				indeterminate={checkboxIndeterminate}
-				onclick={handleCheckboxClick}
-				aria-label="Select all issues"
-			/>
-
 			<!-- Count badge + label -->
 			<div class="flex items-center gap-2">
 				<span
@@ -216,14 +210,8 @@
 				</Button>
 			</div>
 		{:else}
-			<!-- Default state: Clean Up Worktrees button -->
-			<div class="flex flex-1 items-center justify-between">
-				<span class="text-muted-foreground">
-					Hold <kbd class="rounded border border-border px-1 py-0.5 text-[10px]">Ctrl</kbd
-					>
-					or <kbd class="rounded border border-border px-1 py-0.5 text-[10px]">Shift</kbd>
-					to select multiple issues
-				</span>
+			<!-- Default state: Clean Up Worktrees button only -->
+			<div class="flex flex-1 items-center justify-end">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}

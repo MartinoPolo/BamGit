@@ -46,7 +46,6 @@ export function computeSelectAllCheckboxState(
 export const CARD_STATE_CLASSES = {
 	active: 'ring-2 ring-[#22c55e] dark:ring-[#4ade80]',
 	selected: 'ring-2 ring-[#4a9eff] dark:ring-[#3b82f6]',
-	selectionReady: 'ring-1 ring-[#4a9eff]/60 dark:ring-[#3b82f6]/60',
 	dragging: 'rotate-[-1.5deg] scale-[1.02] shadow-lg opacity-92',
 	loading: 'pointer-events-none',
 	archived: 'opacity-70 grayscale-[0.8]',
