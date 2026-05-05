@@ -47,16 +47,16 @@ Three icon buttons in the header for quick access to the issue environment. Alwa
 
 1. **Open Folder** — folder icon, opens issue worktree folder in file explorer
 2. **Open Terminal** — terminal/command-line icon, opens terminal at worktree path
-3. **Open Editor** — VS Code icon, opens editor at worktree path
+3. **Open Editor** — editor icon (VS Code by default, changes based on user's configured editor setting)
 
-**Disabled state**: When no folder/worktree is assigned, all three buttons are visually disabled (reduced opacity, no pointer events, muted color). The buttons remain in place to prevent layout shift.
+**No-folder state**: When no folder/worktree is assigned, buttons have ghost appearance (reduced opacity, muted color) but remain **clickable** — left-click opens native file picker to assign a folder. Right-click on any button (at any time, even when folder IS assigned) opens native file picker to reassign the folder (silent replacement, no confirmation). Tooltips: "Open [path]" / "Open terminal [path]" / "Open editor [path]" when assigned; "Assign folder" when unassigned.
 
 Button style: small icon-only buttons (~18-20px), subtle background matching the header color treatment (semi-transparent backdrop like the priority chip). On dark-text headers use `rgba(0,0,0,0.12)`, on light-text headers use `rgba(255,255,255,0.15)`.
 
 ### Metadata (right side of card body)
 
 - **Branch name**: monospace, muted, small — may be absent (no worktree yet)
-- **Priority badge**: color-coded text badge (Critical/red, High/orange, Medium/hidden, Low/blue, None/hidden). Visibility controlled by a per-workspace setting
+- **Priority badge**: color-coded text badge (Top/red, High/orange, Medium/hidden, Low/blue, Lowest/gray). No "none" option — medium is the default. Priority badge in the header is **clickable** — spawns priority change menu inline. Visibility controlled by a per-workspace setting
 - **Child count chip**: small badge showing number of sub-issues (e.g., "3 sub")
 
 ### Status Badges (compact row)
@@ -71,6 +71,29 @@ Button style: small icon-only buttons (~18-20px), subtle background matching the
 - Badges are interactive: clicking PR/issue badge opens GitHub URL
 - Badges are responsive: collapse to icon-only when card width is narrow
 
+### Badge Styling (must match design HTML)
+
+Three badge variants, all matching `Issue Card States.html` exactly:
+
+**Mini badge** (`ic-mini-badge`): For status indicators (PR state, issue state, branch status, sync, conflict)
+- Height: 18px, padding: 0 6px, border-radius: 4px
+- Font: `var(--font-mono)`, 10.5px, weight 500
+- Border: 1px solid, background + color via `color-mix(in oklch, ...)` per status variant
+- Status variants: success (green), warn (amber), danger (red), info (blue), purple, amber, moss
+
+**Label pill** (`ic-label-pill`): For GitHub labels
+- Height: 18px, padding: 0 7px, border-radius: 999px (fully rounded)
+- Font: `var(--font-sans)`, 10.5px, weight 500
+- Background: `color-mix(in oklch, var(--lbl) 14%, transparent)`
+- Color: `color-mix(in oklch, var(--lbl) 75%, var(--foreground))`
+- Border: `1px solid color-mix(in oklch, var(--lbl) 30%, transparent)`
+
+**Priority chip** (`ic-pri-chip`): For priority indicator in header
+- Height: 18px, padding: 0 6px, border-radius: 4px
+- Font: `var(--font-mono)`, 9px, weight 700, uppercase, letter-spacing 0.06em
+- Background: `rgba(0,0,0,0.18)` on light-text headers, `rgba(255,255,255,0.22)` on dark-text headers
+- Clickable — spawns priority change menu
+
 ### Context Menu (right-click)
 
 Built with bits-ui `ContextMenu` (WAI-ARIA menu pattern, focus trapping, submenus, separators). Two trigger mechanisms: right-click on card, or click the overflow (⋯) button (same component, programmatic open).
@@ -79,8 +102,8 @@ Built with bits-ui `ContextMenu` (WAI-ARIA menu pattern, focus trapping, submenu
 1. **Select / Deselect** — top item, separator below (mode-switching action)
 2. Edit
 3. Rename (standalone issues only)
-4. Priority ▸ (submenu: lowest, low, medium, high, highest)
-5. Change Color (inline ColorPicker)
+4. Priority ▸ (submenu: lowest, low, medium, high, top — no "none" option)
+5. Change Color (opens color picker on click — no inline swatch preview in the menu item)
 6. Separator
 7. Setup Worktree / Remove Worktree (conditional on worktree state)
 8. Archive / Unarchive (conditional on archived state)
@@ -88,16 +111,23 @@ Built with bits-ui `ContextMenu` (WAI-ARIA menu pattern, focus trapping, submenu
 
 **Batch context menu** (right-clicking a batch-selected card): shows batch actions — "Archive N selected", "Delete N selected", etc. Right-clicking an unselected card clears the batch selection, activates that card, and shows single-card actions (file manager pattern: Windows Explorer, macOS Finder, VS Code).
 
-### Action Buttons (hover-revealed)
+### Action Buttons (always-visible, bottom-right of card body)
 
-- Appear on hover over the card (opacity transition)
-- Default set: Execute, Review, Check & Fix (configurable per-workspace)
+- **Always visible** (not hover-revealed) — critical for mobile/touch where hovering is not possible
+- Contextual "suggested actions" based on issue state (e.g., Setup Worktree, Execute, Review, Commit, Push, Create PR). Max 2 visible; additional actions behind overflow (⋯) menu
+- Styled with `ic-action-btn` classes from design HTML: 22px height, 5px radius, 1px border, 11px sans font
+- Primary action variant: moss green background for the recommended next step
 - Overflow (⋯) button opens the same bits-ui context menu programmatically (single menu implementation, two triggers — right-click for desktop power users, button for touch/accessibility)
+- Full contextual action state mapping deferred to separate issue
 
-### Notification Indicator
+### Session State Chip (header)
 
-- Optional pulsing dot in the tree thumbnail area
-- Color indicates type: session running (green pulse), needs input (amber pulse), errored (red pulse)
+- Small status chip in the header, positioned next to the priority chip
+- Uses same contrast technique as priority chip: `bg-black/18` on dark headers, `bg-white/22` on light headers — avoids color collision with any header background
+- Mono font, 9px, bold, uppercase (same `ic-pri-chip` styling as priority)
+- States: EXECUTING (running), HITL (needs-input), REVIEW (needs-review), ERROR (errored), PAUSED (paused), DONE (finished). No chip shown for no-session
+- Complemented by tree preview glow: pulsing glow for attention states (needs-input, errored), steady glow for running
+- Replaces the old notification dot entirely
 
 ## Collapsed vs. Expanded States
 
@@ -132,10 +162,11 @@ The card should have two states:
 ## Layout Constraints
 
 - Grid layout: tree thumbnail (72px) | metadata (1fr)
-- Card must work at widths from ~320px (narrow panel) to ~600px (wide panel)
-- **Two-column layout**: Cards display in a 2-column CSS grid (`grid-template-columns: repeat(2, 1fr)`) with 8px gap
+- Card must work at widths from ~320px (single-column narrow) to ~600px (wide panel)
+- **Responsive two-column layout**: `grid-template-columns: repeat(auto-fill, minmax(450px, 1fr))`. Cards have 450px minimum width; grid automatically drops to one column when viewport cannot fit two. In single-column mode, min-width does not apply — cards stretch to fill. All badges and buttons must remain visible and clickable at narrow widths
 - **Row-major ordering**: Items flow left→right, then next row (1,2 / 3,4 / 5,6). This is CSS Grid's default `grid-auto-flow: row`. Matches file manager conventions (Windows Explorer, macOS Finder) and ensures sort order reads naturally. Shift+click range selection follows this visual order
-- Dark theme primary (light theme support later)
+- **Badge layout**: Branch name + state badges share one row (left-aligned branch, right-aligned state badges). When card is too narrow and elements would collide, right-aligned badges wrap to a second line (still right-aligned), expanding card height. Never overlap
+- Dark theme primary, light theme supported (ring colors adjust per mode)
 
 ## Batch Selection State
 
@@ -157,34 +188,39 @@ Issue cards support multi-selection for batch operations. The selection system i
 
 ### Selection Visual States
 
-All interactive states must be **clearly distinguishable from each other** at a glance. No checkboxes on cards — selection is indicated entirely through border/shadow/glow treatment.
+All interactive states must be **clearly distinguishable from each other** at a glance. No checkboxes on cards — selection is indicated entirely through ring/glow treatment. All states use **uniform `ring-2` thickness** (except selection-ready `ring-1`), differentiated by **color alone**. No halo shadows. Ring colors match forest glow colors exactly for two-way visual consistency.
 
 **Visual hierarchy (from least to most prominent):**
 
-1. **Default (resting)**: 1px border `var(--border)`, subtle shadow. No special treatment
-2. **Hover**: border tints toward issue color, shadow lifts to `shadow-md`, **background subtly brightens** (e.g., `color-mix(in oklch, var(--ic) 6%, var(--surface))`). Must be clearly visible — not just a minor border tweak
-3. **Active** (single-click inspect, one at a time): **glow shadow** using `var(--ring)` color (blue). Ring: `0 0 0 3px` + outer glow `0 0 12px` at 25% opacity. Clearly distinct from hover — the glow is the differentiator
-4. **Selected** (batch-selected, multiple): primary-color ring `0 0 0 3px` using `var(--primary)` (moss green) + subtle body tint. NO checkbox — border+ring is the sole indicator. Distinct from active by color (green vs blue)
-5. **Selection-ready hover** (Ctrl/Shift held + hovering): violet (`#c084fc`) border + shadow treatment. Clearly distinct from normal hover. Cursor remains `pointer`. Card-level hover suppresses element-level interactions (Shift+click on PR badge selects card, not badge)
+1. **Default (resting)**: 1px border `var(--border)`, subtle shadow. No ring
+2. **Hover**: `ring-2` yellow `#ffd700` (dark mode) / amber `#d4a017` (light mode). Background subtly brightens (`color-mix(in oklch, var(--ic) 6%, var(--surface))`). Forest glow: yellow `#ffd700`
+3. **Active** (single-click inspect, one at a time): `ring-2` green `#22c55e` (dark mode) / lighter green `#4ade80` (light mode). Forest glow: green `#22c55e`
+4. **Selected** (batch-selected, multiple): `ring-2` blue `#4a9eff` (dark mode) / mid blue `#3b82f6` (light mode) + subtle body tint. NO checkbox — ring is the sole indicator. Forest glow: blue `#4a9eff`
+5. **Selection-ready** (Ctrl/Shift held): `ring-1` blue `#4a9eff` — same color as selected but thinner ring, less intense glow. Cursor remains `pointer`. Card-level hover suppresses element-level interactions (Shift+click on PR badge selects card, not badge). Forest glow: blue `#4a9eff` at reduced intensity
 
 **Key distinction rules:**
-- Hover = shadow lift + background brighten (no ring)
-- Active = blue glow ring + outer glow halo
-- Selected = green/primary ring + body tint (no outer glow halo — different shape from active)
-- The active glow halo (blurred, extends outward) vs selected ring (sharp, tight) creates a clear visual distinction even without color perception
+- All states distinguished by color alone — no halo vs ring shape differences needed
+- Hover = yellow ring (warm, attention-drawing)
+- Active = green ring (nature/growth metaphor, "inspecting this one")
+- Selected = blue ring (cool, systematic, "batch operation")
+- Selection-ready = blue ring but thinner (preview of selected state)
 
-- **Select All checkbox**: tri-state checkbox at top of card list (all checked / some checked / none). Same row as the action toolbar. Replaces dedicated Select All / Deselect All buttons.
-- Uses hot pink (`#ec4899`) glow on the corresponding forest tree. Selection state is visually distinct from the blue "active" glow.
+- **Select All checkbox**: tri-state checkbox at top of card list (all checked / some checked / none). Same row as the persistent action toolbar
+- **Shift-deselect**: Windows Explorer pattern — range vs individually-selected items tracked separately. Shift+clicking to a shorter range deselects items outside the new range while preserving Ctrl+clicked items
 
-### Batch Action Toolbar
+### Batch Action Toolbar (always-visible persistent bar)
 
-When items are selected, additional action buttons appear in the persistent toolbar (same row as the "Clean up worktrees" button):
+The toolbar is **always visible** with consistent height — no layout shift between states.
 
-- **"N selected"** label showing count
+**Default state (no selection):** Sort | Filter | Clean Up Worktrees
+
+**Selected state:** Select All checkbox (tri-state) | "N selected" count | batch actions | Deselect All (×)
+
+Batch actions:
 - **Archive** / **Unarchive** — context-aware: if both active and archived issues are selected, both buttons show. Archive only affects active issues, Unarchive only affects archived.
 - **Delete** — with confirmation
 - **Change Priority** — submenu
-- **"Prune selected worktrees"** — replaces "Clean up worktrees" label when selection active. Opens prune dialog filtered to selected issues with safety categorization.
+- **"Clean Selected Worktrees"** — replaces "Clean Up Worktrees" label when selection active. Opens prune dialog filtered to selected issues with safety categorization. All worktree cleanup actions show a confirmation dialog.
 
 Unavailable actions (no selected issues support it) are disabled with a tooltip. Partially applicable actions show an info tooltip ("affects 2 of 5 selected").
 
@@ -194,17 +230,20 @@ Unavailable actions (no selected issues support it) are disabled with a tooltip.
 
 - Clears on any tab change (not just Issues → Kanban)
 - Clears on Escape
+- Clears when clicking empty space in the grid (deactivates active card too)
 - Does NOT clear after batch action completes (deleted/archived items are removed from the selection set, remaining selection persists)
 - Normal click (no modifier) clears batch selection and activates the clicked card
+- Clicking an already-active card does NOT deactivate it (no toggle-off) — still navigates to Issue Detail
+- Clicking an active card when already on the Issue Detail tab is a no-op
 
 ## States to Show on Design Page
 
 The design page must show all of these states:
 
 - Default resting state (two-column grid, multiple cards)
-- Hover state (visible background brighten + shadow lift + action buttons revealed)
-- Active state (blue glow ring + outer glow halo)
-- Selected/multi-selected state (green/primary ring + body tint, NO checkbox)
+- Hover state (yellow ring + background brighten)
+- Active state (green ring)
+- Selected/multi-selected state (blue ring + body tint, NO checkbox)
 - Selection-ready hover (violet border/shadow, Ctrl/Shift held)
 - Dragging state (rotation + lifted shadow)
 - Loading state (shimmer overlay)
