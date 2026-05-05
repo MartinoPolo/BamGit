@@ -318,6 +318,7 @@
 	"wizard_assigned_heading": "Přiřazené vám",
 	"wizard_step_name": "Název úkolu",
 	"wizard_name_placeholder": "Název úkolu",
+	"wizard_name_required": "Název issue je povinný",
 	"wizard_branch_preview": "Větev: {branch}",
 	"wizard_step_worktree": "Vytvořit worktree?",
 	"wizard_worktree_yes": "Ano",

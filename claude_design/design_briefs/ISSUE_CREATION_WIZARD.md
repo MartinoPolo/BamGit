@@ -40,7 +40,7 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 - Enter: select highlighted issue and advance (or Skip if no selection)
 - Typing: filters the list
 
-**Footer buttons**: Cancel [Esc], Next [Enter]. No Back button (this is the first step). Cancel always shows Esc hint (since no Back button competes for Escape). Navigation hint ↑↓ visible when navigation is active.
+**Footer buttons**: Cancel [Esc], Next [Enter]. No Back button (this is the first step). Cancel always shows Esc hint (since no Back button competes for Escape). Navigation hint ↑↓ always visible (even when search input is focused, since arrow nav works from the input).
 
 **Decision (grilled 2026-05-04)**: The selected/highlighted issue row uses `bg-primary-soft` — a subtle green-tinted highlight from the Forest Moss palette (light: `oklch(0.92 0.03 135)` sage green, dark: `oklch(0.305 0.045 145)` deep forest green). Replaces the previous orange `bg-accent` highlight. Designer should verify text contrast on this background in both light and dark modes.
 
@@ -55,9 +55,11 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
 - Below: branch name preview in muted monospace (e.g., `Branch: 163-build-session-history-browsing`)
 
 **Keyboard**:
-- Enter: confirms the name and advances
+- Enter: confirms the name and advances. Works from **any focus within the modal** (global handler routes to confirm). If name is empty, shows inline error instead of advancing
 - All typing goes to the input (Backspace deletes text, not navigate back)
 - Escape: goes back one step (does NOT close the wizard) — because text input captures Backspace
+
+**Validation**: Empty name is rejected with inline error text "Issue name is required" (`text-destructive`) below the input. Error clears when user types any character.
 
 **Footer buttons (dynamic based on focus)**:
 - Input focused: Back [Esc], Cancel (no hint), Next [Enter]. No navigation hint
@@ -81,9 +83,11 @@ The wizard is opened via `Ctrl+N` or the "+" button on the dashboard.
   - **Selected No**: `border-red-500` + `bg-red-500/10` (red-tinted fill)
 
 **Keyboard**:
-- Left/Right arrows: toggle between Yes and No. Works from **any focus within the modal** (not just the cards)
-- Enter: confirms the selected choice and advances
+- Left/Right arrows: toggle between Yes and No. Works from **any focus within the modal** (not just the cards). Handled by the global keyboard router only (step component does not duplicate arrow handling)
+- Enter: confirms the selected choice and advances. Works from **any focus within the modal** (global handler routes to confirm)
 - Yes is pre-selected by default
+
+**Focus on step entry**: No element is focused when entering this step — `activeElement` is blurred on mount (via `requestAnimationFrame` to run after Dialog's focus trap). This prevents the Back button or Yes card from showing a focus outline. Tab cycles through Yes → No → footer buttons normally.
 
 **Footer buttons**: Back [⌫], Cancel [Esc], Next [Enter]. Navigation hint ←→ visible.
 
@@ -140,11 +144,11 @@ All footer buttons follow the same visual pattern: `Label [Kbd badge]` with the 
   - Other steps, text input focused: `Cancel` with **no Kbd hint** (Escape is claimed by Back)
   - Other steps, text input not focused: `Cancel [Esc]`
 - **Create/Confirm** button: primary variant, right-aligned. `Create [↵]` where ↵ is the Lucide `corner-down-left` icon inside a Kbd pill with `variant="inverted"` (semi-transparent white on primary background)
-- **Navigation hint**: ghost-style non-clickable label, centered in footer. Shows Kbd arrow icons + "Navigate" text. Visibility and arrows per step:
-  - Step 1: `↑↓` — visible when navigation is active
+- **Navigation hint**: ghost-style non-clickable label, centered in footer. Shows "Navigate" text followed by separate Kbd badges with individual arrow icons on the **right**. Uses `ArrowUpIcon`, `ArrowDownIcon`, `ArrowLeftIcon`, `ArrowRightIcon` (separate per direction). Visibility and arrows per step:
+  - Step 1: `Navigate [↑] [↓]` — **always visible** (even when search input is focused, since arrow nav works from the input)
   - Step 2: **never visible** (no navigable items)
-  - Step 3: `←→` — always visible
-  - Step 4: `↑↓←→` — hidden when hex text input is focused
+  - Step 3: `Navigate [←] [→]` — always visible
+  - Step 4: `Navigate [↑] [↓] [←] [→]` — hidden when hex text input is focused
 
 Layout: `[Back ⌫]  ———[Navigate ↑↓]———  [Cancel Esc] [Create ↵]`
 
@@ -185,7 +189,7 @@ Layout: `[Back ⌫]  ———[Navigate ↑↓]———  [Cancel Esc] [Create �
 - `Button` (shadcn) — footer buttons, all variants
 - `Kbd` (shadcn) — keyboard shortcut badges inside buttons. Supports `variant="default"` (for ghost/secondary buttons) and `variant="inverted"` (for primary buttons)
 - `Input` (shadcn) — search input, name input, hex input
-- Lucide icons: `corner-down-left` (Enter), `delete` (Backspace), `search`, `circle-dot`, `circle-check`, `loader-2`, `tree-pine`, `x`
+- Lucide icons: `corner-down-left` (Enter), `delete` (Backspace), `search`, `circle-dot`, `circle-check`, `loader-2`, `tree-pine`, `x`, `arrow-up`, `arrow-down`, `arrow-left`, `arrow-right` (nav hint arrows)
 
 ## What Is Set in Stone
 
@@ -208,9 +212,12 @@ Layout: `[Back ⌫]  ———[Navigate ↑↓]———  [Cancel Esc] [Create �
 - Arrow navigation in issue list scrolls selected item into view
 - Arrow keys work from any focus within the modal (not just inside step components). Exception: text input focused = arrows control cursor
 - Next button visible on Steps 1, 2, and 3
-- Escape goes back (not close) when text input is focused on any non-first step
+- Escape goes back (not close) when text input is focused on any non-first step. Dialog's own Escape handler is suppressed (`onEscapeKeydown preventDefault`)
+- Enter confirms the current step from **any focus within the modal** (not just inside the step component). Global handler routes to the step's confirm function
+- Step 3 (Worktree): no element is focused on entry — blur active element on mount. Tab cycles through Yes → No → footer buttons
+- Empty name validation: step 2 shows inline error "Issue name is required" when Enter is pressed with empty name. Error clears on typing
 - Dynamic footer buttons: Back/Cancel swap Kbd hints based on text input focus state
-- Navigation hint (arrow Kbd icons + "Navigate" text) shown per step: ↑↓ step 1, hidden step 2, ←→ step 3, ↑↓←→ step 4
+- Navigation hint ("Navigate" text + separate arrow Kbd icons) shown per step: ↑↓ step 1 (always visible), hidden step 2, ←→ step 3, ↑↓←→ step 4 (hidden when hex input focused)
 - Step 1: no preselection on open, arrow nav fills search bar (display only, no search trigger)
 - Issue name excludes issue number, trailing special chars stripped
 - Color swatch text ("A") not selectable (`user-select: none`, `pointer-events: none`)
@@ -270,7 +277,7 @@ The following items were resolved during grilling and are now **set in stone**:
 7. ~~Backspace in text inputs (search, name, hex) must not propagate to wizard navigation~~ ✅ Fixed on dev
 8. ~~Escape in Issue Name step should go back (not close wizard) since Backspace edits text~~ ✅ Fixed on dev
 9. ~~Step header text is not vertically centered and is too small~~ ✅ Fixed on dev
-10. Enter on step 2 (Issue Name) skips step 3 (Worktree), jumping directly to step 4 (Color). Suspected cause: keydown event double-fires across step transition. See #181
-11. Escape with focused input on step 2 may cancel the wizard instead of going back. Button label and actual behavior must match. See #181
-12. Issue name includes the issue number prefix — should be excluded. See #181
-13. Color swatches show double ring (selected + focus-visible outline). See #181
+10. ~~Enter on step 2 (Issue Name) skips step 3 (Worktree), jumping directly to step 4 (Color). Suspected cause: keydown event double-fires across step transition. See #181~~ ✅ Fixed
+11. ~~Escape with focused input on step 2 may cancel the wizard instead of going back. Button label and actual behavior must match. See #181~~ ✅ Fixed — Dialog's `onEscapeKeydown` suppressed, global handler routes correctly
+12. ~~Issue name includes the issue number prefix — should be excluded. See #181~~ ✅ Fixed
+13. ~~Color swatches show double ring (selected + focus-visible outline). See #181~~ ✅ Fixed

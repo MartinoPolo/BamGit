@@ -105,6 +105,7 @@
 		}
 
 		event.preventDefault();
+		event.stopPropagation();
 		focusedIndex = newIndex;
 		swatchElements[newIndex]?.focus();
 		onSelect(colors[newIndex]);

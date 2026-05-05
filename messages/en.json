@@ -334,6 +334,7 @@
 	"wizard_assigned_heading": "Assigned to you",
 	"wizard_step_name": "Issue Name",
 	"wizard_name_placeholder": "Issue name",
+	"wizard_name_required": "Issue name is required",
 	"wizard_branch_preview": "Branch: {branch}",
 	"wizard_step_worktree": "Create Worktree?",
 	"wizard_worktree_yes": "Yes",

@@ -1,10 +1,19 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import TreePine from '@lucide/svelte/icons/tree-pine';
 	import X from '@lucide/svelte/icons/x';
 
 	const wizard = useCreationWizard();
+
+	onMount(() => {
+		requestAnimationFrame(() => {
+			if (document.activeElement instanceof HTMLElement) {
+				document.activeElement.blur();
+			}
+		});
+	});
 
 	let selectedChoice = $state<boolean>(true);
 
@@ -22,10 +31,7 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-			event.preventDefault();
-			selectedChoice = !selectedChoice;
-		} else if (event.key === 'Enter') {
+		if (event.key === 'Enter') {
 			event.preventDefault();
 			event.stopPropagation();
 			confirm();

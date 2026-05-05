@@ -124,7 +124,12 @@
 	function handleEnter(event: KeyboardEvent) {
 		switch (wizard.currentStep) {
 			case WIZARD_STEPS.GITHUB_SEARCH:
+				event.preventDefault();
+				githubSearchRef?.confirm();
+				break;
 			case WIZARD_STEPS.ISSUE_NAME:
+				event.preventDefault();
+				issueNameRef?.confirm();
 				break;
 			case WIZARD_STEPS.WORKTREE_CHOICE:
 				event.preventDefault();
@@ -319,17 +324,20 @@
 	});
 
 	const navigationHint = $derived.by((): 'vertical' | 'horizontal' | 'grid' | null => {
-		if (textInputFocused) {
-			return null;
-		}
 		switch (wizard.currentStep) {
 			case WIZARD_STEPS.GITHUB_SEARCH:
 				return 'vertical';
 			case WIZARD_STEPS.ISSUE_NAME:
 				return null;
 			case WIZARD_STEPS.WORKTREE_CHOICE:
+				if (textInputFocused) {
+					return null;
+				}
 				return 'horizontal';
 			case WIZARD_STEPS.COLOR_SELECTION:
+				if (textInputFocused) {
+					return null;
+				}
 				return 'grid';
 			default:
 				return null;
@@ -345,7 +353,10 @@
 />
 
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
-	<Dialog.Content class="top-[15%] -translate-y-0 max-w-lg">
+	<Dialog.Content
+		class="top-[15%] -translate-y-0 max-w-lg"
+		onEscapeKeydown={(e) => e.preventDefault()}
+	>
 		<Dialog.Header class="flex items-center">
 			<Dialog.Title class="text-base font-semibold text-foreground">
 				{stepLabel}
@@ -399,23 +410,21 @@
 				<div class="flex flex-1 items-center justify-center">
 					{#if navigationHint === 'vertical'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
-							<Kbd><ArrowUpIcon /></Kbd>
-							<Kbd><ArrowDownIcon /></Kbd>
 							{m.wizard_navigate()}
+							<Kbd><ArrowUpIcon /><ArrowDownIcon /></Kbd>
 						</span>
 					{:else if navigationHint === 'horizontal'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
-							<Kbd><ArrowLeftIcon /></Kbd>
-							<Kbd><ArrowRightIcon /></Kbd>
 							{m.wizard_navigate()}
+							<Kbd><ArrowLeftIcon /><ArrowRightIcon /></Kbd>
 						</span>
 					{:else if navigationHint === 'grid'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
-							<Kbd><ArrowUpIcon /></Kbd>
-							<Kbd><ArrowDownIcon /></Kbd>
-							<Kbd><ArrowLeftIcon /></Kbd>
-							<Kbd><ArrowRightIcon /></Kbd>
 							{m.wizard_navigate()}
+							<Kbd
+								><ArrowUpIcon /><ArrowDownIcon /><ArrowLeftIcon /><ArrowRightIcon
+								/></Kbd
+							>
 						</span>
 					{/if}
 				</div>
