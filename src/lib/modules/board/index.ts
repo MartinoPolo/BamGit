@@ -16,6 +16,7 @@ export type {
 export { ACCENT_COLORS } from './types.js';
 
 export { setSelectionContext, useSelection } from './selection.context.svelte.js';
+export { initUrlStateSync } from './url_state_sync.svelte.js';
 export {
 	BOTTOM_PANEL_TABS,
 	TAB_BEHAVIOR_MAP,

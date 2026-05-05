@@ -3,7 +3,10 @@ declare global {
 		// interface Error {}
 		// interface Locals {}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			activeIssueId?: string | null;
+			activeTab?: string | null;
+		}
 		// interface Platform {}
 	}
 }

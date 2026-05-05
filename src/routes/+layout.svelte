@@ -12,6 +12,7 @@
 	import {
 		setBoardContext,
 		setSelectionContext,
+		initUrlStateSync,
 		type CreateDashboardRequest,
 		type UpdateDashboardRequest,
 	} from '$lib/modules/board';
@@ -35,7 +36,8 @@
 
 	const windowCtx = setWindowContext();
 	const boardStore = setBoardContext();
-	setSelectionContext();
+	const selectionCtx = setSelectionContext();
+	initUrlStateSync(selectionCtx);
 	const notificationsCtx = setNotificationsContext();
 	const sessionStore = setSessionsContext(notificationsCtx);
 	setIssuesContext();
