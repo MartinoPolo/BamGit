@@ -334,6 +334,7 @@
 	"wizard_hint_enter": "Enter pro potvrzení",
 	"wizard_hint_escape": "Esc pro zrušení",
 	"wizard_hint_back": "Backspace pro návrat",
+	"wizard_navigate": "Navigovat",
 	"wizard_quick_add": "Rychle přidat",
 	"wizard_quick_add_worktree": "Rychle přidat + worktree",
 

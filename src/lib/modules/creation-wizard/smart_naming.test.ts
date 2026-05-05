@@ -298,109 +298,142 @@ describe('generateBranchName', () => {
 });
 
 describe('generateIssueName', () => {
+	describe('no number prefix', () => {
+		it('does not include issue number in output', () => {
+			const result = generateIssueName(133, 'multi-step creation wizard with smart naming');
+			expect(result).toBe('multi-step creation wizard with');
+		});
+
+		it('ignores issue number completely', () => {
+			const result = generateIssueName(42, 'Fix login bug in auth module');
+			expect(result).toBe('Fix login bug in');
+		});
+	});
+
 	describe('basic formatting', () => {
-		it('formats number followed by first four words', () => {
+		it('takes first four words from title', () => {
 			const result = generateIssueName(
 				133,
 				'feat: multi-step creation wizard with smart naming',
 			);
-			expect(result).toBe('133 multi-step creation wizard with');
-		});
-
-		it('formats simple title with issue number', () => {
-			const result = generateIssueName(42, 'Fix login bug in auth module');
-			expect(result).toBe('42 Fix login bug in');
+			expect(result).toBe('multi-step creation wizard with');
 		});
 
 		it('strips conventional commit prefix before taking words', () => {
-			const result = generateIssueName(
-				133,
-				'feat: multi-step creation wizard with smart naming',
-			);
-			expect(result).toBe('133 multi-step creation wizard with');
+			const result = generateIssueName(133, 'feat(ui): add dashboard layout for users');
+			expect(result).toBe('add dashboard layout for');
+		});
+	});
+
+	describe('trailing special character stripping', () => {
+		it('strips trailing comma', () => {
+			const result = generateIssueName(173, 'Issue card redesign: states,');
+			expect(result).toBe('Issue card redesign: states');
 		});
 
-		it('strips scoped prefix before taking words', () => {
-			const result = generateIssueName(133, 'feat(ui): add dashboard layout for users');
-			expect(result).toBe('133 add dashboard layout for');
+		it('strips trailing colon', () => {
+			const result = generateIssueName(1, 'fix: thing one:');
+			expect(result).toBe('thing one');
+		});
+
+		it('strips trailing dash', () => {
+			const result = generateIssueName(1, 'some feature name -');
+			expect(result).toBe('some feature name');
+		});
+
+		it('strips trailing semicolon', () => {
+			const result = generateIssueName(1, 'word one two three;');
+			expect(result).toBe('word one two three');
+		});
+
+		it('strips trailing em dash', () => {
+			const result = generateIssueName(1, 'feature name here —');
+			expect(result).toBe('feature name here');
+		});
+
+		it('strips trailing dot', () => {
+			const result = generateIssueName(1, 'fix the login bug.');
+			expect(result).toBe('fix the login bug');
+		});
+
+		it('preserves inline special characters', () => {
+			const result = generateIssueName(173, 'Issue card redesign: states and more');
+			expect(result).toBe('Issue card redesign: states');
 		});
 	});
 
 	describe('preserves original casing', () => {
 		it('preserves mixed case', () => {
 			const result = generateIssueName(42, 'Fix Login Bug In Auth');
-			expect(result).toBe('42 Fix Login Bug In');
+			expect(result).toBe('Fix Login Bug In');
 		});
 
 		it('preserves uppercase words', () => {
 			const result = generateIssueName(1, 'Add OAUTH2 Support For Users');
-			expect(result).toBe('1 Add OAUTH2 Support For');
+			expect(result).toBe('Add OAUTH2 Support For');
 		});
 
 		it('preserves lowercase title', () => {
 			const result = generateIssueName(1, 'add new feature for app');
-			expect(result).toBe('1 add new feature for');
+			expect(result).toBe('add new feature for');
 		});
 	});
 
 	describe('fewer than four words', () => {
 		it('uses all words when title has fewer than 4 words after prefix stripping', () => {
 			const result = generateIssueName(1, 'fix bug');
-			expect(result).toBe('1 fix bug');
+			expect(result).toBe('fix bug');
 		});
 
 		it('uses single word when only one word remains after prefix stripping', () => {
 			const result = generateIssueName(1, 'feat: refactoring');
-			expect(result).toBe('1 refactoring');
+			expect(result).toBe('refactoring');
 		});
 
-		it('returns just number when title is empty after prefix stripping', () => {
+		it('returns empty string when title is empty after prefix stripping', () => {
 			const result = generateIssueName(1, 'feat:');
-			expect(result).toBe('1');
+			expect(result).toBe('');
 		});
 
 		it('uses all words when exactly 4 words', () => {
 			const result = generateIssueName(1, 'add new login page');
-			expect(result).toBe('1 add new login page');
+			expect(result).toBe('add new login page');
 		});
 	});
 
 	describe('no filler word stripping', () => {
 		it('preserves filler words in issue name', () => {
 			const result = generateIssueName(42, 'Fix the login bug');
-			expect(result).toBe('42 Fix the login bug');
+			expect(result).toBe('Fix the login bug');
 		});
 
 		it('preserves "a", "an" articles', () => {
 			const result = generateIssueName(1, 'Add a new button for users');
-			expect(result).toBe('1 Add a new button');
+			expect(result).toBe('Add a new button');
 		});
 	});
 
 	describe('edge cases', () => {
-		it('returns just the number string for empty title', () => {
+		it('returns empty string for empty title', () => {
 			const result = generateIssueName(133, '');
-			expect(result).toBe('133');
+			expect(result).toBe('');
 		});
 
 		it('handles title that is only a conventional prefix with no content', () => {
 			const result = generateIssueName(1, 'feat: ');
-			expect(result).toBe('1');
+			expect(result).toBe('');
 		});
 	});
 
 	describe('full integration examples', () => {
-		it('example from spec: feat: multi-step creation wizard', () => {
-			const result = generateIssueName(
-				133,
-				'feat: multi-step creation wizard with smart naming',
-			);
-			expect(result).toBe('133 multi-step creation wizard with');
+		it('example from spec: Issue card redesign produces no number prefix', () => {
+			const result = generateIssueName(173, 'Issue card redesign: states, hover, borders');
+			expect(result).toBe('Issue card redesign: states');
 		});
 
-		it('example from spec: Fix login bug in auth module', () => {
+		it('example from spec: Fix login bug produces clean name', () => {
 			const result = generateIssueName(42, 'Fix login bug in auth module');
-			expect(result).toBe('42 Fix login bug in');
+			expect(result).toBe('Fix login bug in');
 		});
 	});
 });

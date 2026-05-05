@@ -9,6 +9,7 @@
 	let {
 		selectedColor,
 		onSelect,
+		onPresetClick,
 		colors = DEFAULT_COLOR_PALETTE,
 		usedColors = [],
 		displayText,
@@ -40,6 +41,31 @@
 		tick().then(() => {
 			swatchElements[focusedIndex]?.focus();
 		});
+	}
+
+	export function handleArrowKey(key: string) {
+		let step: number;
+		switch (key) {
+			case 'ArrowRight':
+				step = 1;
+				break;
+			case 'ArrowLeft':
+				step = -1;
+				break;
+			case 'ArrowDown':
+				step = GRID_COLUMNS;
+				break;
+			case 'ArrowUp':
+				step = -GRID_COLUMNS;
+				break;
+			default:
+				return;
+		}
+
+		const newIndex = findNextIndex(focusedIndex, step);
+		focusedIndex = newIndex;
+		swatchElements[newIndex]?.focus();
+		onSelect(colors[newIndex]);
 	}
 
 	function isSwatchDisabled(color: string): boolean {
@@ -84,8 +110,12 @@
 		onSelect(colors[newIndex]);
 	}
 
-	function handlePresetClick(color: string) {
-		onSelect(color);
+	function handlePresetClickInternal(color: string) {
+		if (onPresetClick) {
+			onPresetClick(color);
+		} else {
+			onSelect(color);
+		}
 		if (closeOnPresetClick) {
 			onClose?.();
 		}
@@ -113,17 +143,19 @@
 			type="button"
 			tabindex={index === focusedIndex ? 0 : -1}
 			class="flex h-7 w-7 items-center justify-center rounded-sm border border-border outline-none transition-transform
-				focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2
 				{color === effectiveColor ? 'scale-110 ring-2 ring-ring ring-inset' : ''}
 				{isUsed ? 'opacity-30 cursor-not-allowed' : 'hover:scale-110'}"
 			style="background-color: {color}"
 			disabled={isUsed}
 			onkeydown={handleGridKeydown}
-			onclick={() => handlePresetClick(color)}
+			onclick={() => handlePresetClickInternal(color)}
 			aria-label={color}
 		>
 			{#if displayText}
-				<span style="color: {getContrastTextColor(color)}" class="text-xs font-medium">
+				<span
+					style="color: {getContrastTextColor(color)}"
+					class="pointer-events-none select-none text-xs font-medium"
+				>
 					{displayText}
 				</span>
 			{/if}
@@ -133,7 +165,7 @@
 
 <div class="my-2 border-t border-border"></div>
 
-<div class="flex items-center gap-2">
+<div class="flex flex-1 items-center justify-center gap-2">
 	<label
 		class="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border shadow-sm transition-transform hover:scale-105"
 		style="background-color: {effectiveColor}"
@@ -141,7 +173,7 @@
 		{#if displayText}
 			<span
 				style="color: {getContrastTextColor(effectiveColor)}"
-				class="pointer-events-none text-xs font-medium"
+				class="pointer-events-none select-none text-xs font-medium"
 			>
 				{displayText}
 			</span>

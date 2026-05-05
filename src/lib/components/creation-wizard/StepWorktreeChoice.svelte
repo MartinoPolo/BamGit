@@ -12,12 +12,22 @@
 		wizard.selectWorktreeChoice(selectedChoice);
 	}
 
+	export function toggleChoice() {
+		selectedChoice = !selectedChoice;
+	}
+
+	function handleClick(choice: boolean) {
+		selectedChoice = choice;
+		wizard.selectWorktreeChoice(choice);
+	}
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
 			event.preventDefault();
 			selectedChoice = !selectedChoice;
 		} else if (event.key === 'Enter') {
 			event.preventDefault();
+			event.stopPropagation();
 			confirm();
 		}
 	}
@@ -28,7 +38,7 @@
 	<div class="flex items-center justify-center gap-4">
 		<button
 			type="button"
-			onclick={() => (selectedChoice = true)}
+			onclick={() => handleClick(true)}
 			class="flex size-24 flex-col items-center justify-center gap-2 rounded-lg border-2 transition-colors
 				{selectedChoice === true
 				? 'border-green-500 bg-green-500/10 text-green-400'
@@ -39,7 +49,7 @@
 		</button>
 		<button
 			type="button"
-			onclick={() => (selectedChoice = false)}
+			onclick={() => handleClick(false)}
 			class="flex size-24 flex-col items-center justify-center gap-2 rounded-lg border-2 transition-colors
 				{selectedChoice === false
 				? 'border-red-500 bg-red-500/10 text-red-400'

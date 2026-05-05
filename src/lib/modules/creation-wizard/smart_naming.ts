@@ -110,16 +110,21 @@ export function generateBranchName(issueNumber: number, title: string): string {
 	return `${prefix}${truncatedSlug}`;
 }
 
-export function generateIssueName(issueNumber: number, title: string): string {
+function stripTrailingSpecialCharacters(text: string): string {
+	return text.replace(/[\s,:\-.;—]+$/, '');
+}
+
+export function generateIssueName(_issueNumber: number, title: string): string {
 	const withoutPrefix = stripConventionalCommitPrefix(title);
 
 	const words = withoutPrefix.split(/\s+/).filter((word) => word.length > 0);
 
 	if (words.length === 0) {
-		return String(issueNumber);
+		return '';
 	}
 
 	const firstFourWords = words.slice(0, 4);
+	const joined = firstFourWords.join(' ');
 
-	return `${issueNumber} ${firstFourWords.join(' ')}`;
+	return stripTrailingSpecialCharacters(joined);
 }

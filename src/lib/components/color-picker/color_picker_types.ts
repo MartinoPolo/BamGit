@@ -1,6 +1,7 @@
 export interface ColorPickerContentProps {
 	selectedColor: string;
 	onSelect: (color: string) => void;
+	onPresetClick?: (color: string) => void;
 	colors?: string[];
 	usedColors?: string[];
 	displayText?: string;
