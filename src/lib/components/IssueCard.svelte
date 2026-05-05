@@ -3,10 +3,10 @@
 	import type { Issue } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
 	import { getContrastTextColor } from '$lib/components/color-picker/color_utils.js';
-	import PullRequestBadge from './PullRequestBadge.svelte';
-	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
+	import GitHubBadge from './GitHubBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
-	import GitBadgeGroup from './GitBadgeGroup.svelte';
+	import SyncBadge from './SyncBadge.svelte';
+	import MergeConflictBadge from './MergeConflictBadge.svelte';
 	import WorktreeProgressIndicator from './WorktreeProgressIndicator.svelte';
 	import ActionButtonGroup from './ActionButtonGroup.svelte';
 	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
@@ -73,20 +73,23 @@
 		forceExpanded ?? (issue.worktree_state === 'pending' || persistedExpanded),
 	);
 
-	let badgeContainerWidth = $state(0);
-	const compactBadges = $derived(badgeContainerWidth < 240);
-
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
 			case 'pending':
 				return {
 					label: m.issue_card_setting_up(),
-					class: 'bg-yellow-900/40 text-yellow-400',
+					class: 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-400 dark:border-yellow-700/50',
 				};
 			case 'active':
-				return { label: m.issue_card_worktree(), class: 'bg-green-900/40 text-green-400' };
+				return {
+					label: m.issue_card_worktree(),
+					class: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:border-green-700/50',
+				};
 			case 'failed':
-				return { label: m.issue_card_wt_failed(), class: 'bg-red-900/40 text-red-400' };
+				return {
+					label: m.issue_card_wt_failed(),
+					class: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-400 dark:border-red-700/50',
+				};
 			default:
 				return null;
 		}
@@ -150,7 +153,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-all duration-150 focus:outline-none {cardStateClass} {isArchived ||
+	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-all duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
 	isActive ||
 	isBatchSelected
 		? ''
@@ -265,9 +268,9 @@
 		</div>
 
 		<!-- Info rows -->
-		<div class="flex min-w-0 flex-col gap-1" bind:clientWidth={badgeContainerWidth}>
-			<!-- Row 1: Branch name + worktree state icon + worktree badge -->
-			<div class="flex min-w-0 items-center gap-1.5">
+		<div class="flex min-w-0 flex-col gap-1">
+			<!-- Row 1: Branch name + worktree state + sync info -->
+			<div class="flex min-w-0 flex-wrap items-center gap-1.5">
 				<div
 					class="flex min-w-0 flex-1 items-center gap-1.5 font-mono text-[11px] text-muted-foreground"
 				>
@@ -281,43 +284,47 @@
 					{/if}
 					<WorktreeStateIcon worktreeState={issue.worktree_state} />
 				</div>
-				{#if worktreeBadge}
-					<span
-						class="inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs {worktreeBadge.class}"
-					>
-						{#if issue.worktree_state === 'pending'}
-							<span
-								class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
-							></span>
-						{/if}
-						{worktreeBadge.label}
-					</span>
-				{/if}
+				<div class="flex shrink-0 items-center gap-1">
+					{#if worktreeBadge}
+						<span
+							class="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs {worktreeBadge.class}"
+						>
+							{#if issue.worktree_state === 'pending'}
+								<span
+									class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
+								></span>
+							{/if}
+							{worktreeBadge.label}
+						</span>
+					{/if}
+					{#if cache?.behind_base_count != null}
+						<SyncBadge behindBaseCount={cache.behind_base_count} />
+					{/if}
+					{#if cache?.merge_conflict === true}
+						<MergeConflictBadge />
+					{/if}
+				</div>
 			</div>
 
-			<!-- Row 2: GitHub issue badge + PR badge + git status badges -->
-			{#if cache?.github_issue_state != null || cache?.pr_state != null || (issue.branch_name != null && issue.branch_name !== '' && !compactBadges)}
+			<!-- Row 2: GitHub issue badge + PR badge -->
+			{#if cache?.github_issue_state != null || cache?.pr_state != null}
 				<div class="flex flex-wrap items-center gap-1">
 					{#if cache?.github_issue_state}
-						<GitHubIssueBadge
+						<GitHubBadge
+							type="issue"
 							state={cache.github_issue_state}
 							url={issue.github_issue_url}
-							issueNumber={issue.github_issue_number}
+							number={issue.github_issue_number}
 							disabled={!ghAvailable}
 						/>
 					{/if}
 					{#if cache?.pr_state}
-						<PullRequestBadge
+						<GitHubBadge
+							type="pr"
 							state={cache.pr_state}
 							url={cache.pr_url}
-							prNumber={cache.pr_number}
+							number={cache.pr_number}
 							disabled={!ghAvailable}
-						/>
-					{/if}
-					{#if issue.branch_name !== null && !compactBadges}
-						<GitBadgeGroup
-							branchName={issue.branch_name}
-							gitStatus={cache ?? undefined}
 						/>
 					{/if}
 				</div>
