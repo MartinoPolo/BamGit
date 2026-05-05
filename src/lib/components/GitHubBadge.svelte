@@ -7,7 +7,7 @@
 		ISSUE_STATE_CONFIG,
 		PR_STATE_CONFIG,
 		type StateConfig,
-	} from './github-badge-variants.js';
+	} from './github_badge_variants.js';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import GitPullRequest from '@lucide/svelte/icons/git-pull-request';
@@ -29,12 +29,13 @@
 
 	let { type, state, number, url, disabled = false }: Props = $props();
 
-	/* eslint-disable @typescript-eslint/no-explicit-any */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const ISSUE_ICONS: Record<string, any> = {
 		open: CircleDot,
 		closed: CircleCheck,
 	};
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const PR_ICONS: Record<PullRequestState, any> = {
 		open: GitPullRequest,
 		draft: GitPullRequestDraft,
@@ -47,10 +48,11 @@
 	};
 
 	const resolved = $derived.by(() => {
-		if (!state) {
+		if (state === null || state === undefined) {
 			return null;
 		}
 		let config: StateConfig | undefined;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let icon: any;
 		if (type === 'issue') {
 			config = ISSUE_STATE_CONFIG[state as keyof typeof ISSUE_STATE_CONFIG];
@@ -59,14 +61,14 @@
 			config = PR_STATE_CONFIG[state as PullRequestState];
 			icon = PR_ICONS[state as PullRequestState];
 		}
-		if (!config || !icon) {
+		if (config === undefined || icon === undefined) {
 			return null;
 		}
 		return { ...config, icon, colorClass: VARIANT_CLASSES[config.variant] };
 	});
 
 	const tooltip = $derived(
-		resolved
+		resolved !== null
 			? `${resolved.prefix} #${number} — ${resolved.label}${disabled ? ' (offline)' : ''}`
 			: '',
 	);
@@ -79,7 +81,7 @@
 	}
 </script>
 
-{#if resolved}
+{#if resolved !== null}
 	{@const Icon = resolved.icon}
 	<Tooltip.Provider>
 		<Tooltip.Root>

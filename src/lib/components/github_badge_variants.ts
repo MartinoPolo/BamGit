@@ -1,5 +1,6 @@
 import type { PullRequestState } from '$lib/types/generated';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const GITHUB_BADGE_VARIANTS = [
 	'success',
 	'danger',
