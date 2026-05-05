@@ -1,7 +1,6 @@
 <script lang="ts">
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
-
 	import GitHubBadge from './GitHubBadge.svelte';
 
 	interface Props {
@@ -18,15 +17,15 @@
 			case 'open':
 				return {
 					icon: CircleDot,
-					color: 'text-green-400',
-					bg: 'bg-green-400/10',
+					colorClass:
+						'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700/50',
 					label: 'Open',
 				};
 			case 'closed':
 				return {
 					icon: CircleCheck,
-					color: 'text-purple-400',
-					bg: 'bg-purple-400/10',
+					colorClass:
+						'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700/50',
 					label: 'Closed',
 				};
 			default:
@@ -38,8 +37,7 @@
 {#if config && state}
 	<GitHubBadge
 		icon={config.icon}
-		color={config.color}
-		bg={config.bg}
+		colorClass={config.colorClass}
 		label={config.label}
 		number={issueNumber}
 		{url}

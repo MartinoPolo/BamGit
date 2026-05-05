@@ -12,58 +12,57 @@
 
 	interface PullRequestStateConfig {
 		icon: typeof GitPullRequest;
-		color: string;
-		bg: string;
+		colorClass: string;
 		label: string;
 	}
 
 	const STATE_CONFIG: Record<PullRequestState, PullRequestStateConfig> = {
 		open: {
 			icon: GitPullRequest,
-			color: 'text-green-400',
-			bg: 'bg-green-400/10',
+			colorClass:
+				'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700/50',
 			label: 'Open',
 		},
 		draft: {
 			icon: GitPullRequestDraft,
-			color: 'text-neutral-400',
-			bg: 'bg-neutral-400/10',
+			colorClass:
+				'bg-neutral-50 text-neutral-600 border-neutral-200 dark:bg-neutral-800/40 dark:text-neutral-400 dark:border-neutral-600/50',
 			label: 'Draft',
 		},
 		'review-requested': {
 			icon: Eye,
-			color: 'text-yellow-400',
-			bg: 'bg-yellow-400/10',
+			colorClass:
+				'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700/50',
 			label: 'Review',
 		},
 		'changes-requested': {
 			icon: MessageSquareWarning,
-			color: 'text-orange-400',
-			bg: 'bg-orange-400/10',
+			colorClass:
+				'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-700/50',
 			label: 'Changes',
 		},
 		approved: {
 			icon: Check,
-			color: 'text-emerald-400',
-			bg: 'bg-emerald-400/10',
+			colorClass:
+				'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700/50',
 			label: 'Approved',
 		},
 		'ready-to-merge': {
 			icon: Sparkles,
-			color: 'text-cyan-400',
-			bg: 'bg-cyan-400/10',
+			colorClass:
+				'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/40 dark:text-cyan-300 dark:border-cyan-700/50',
 			label: 'Ready',
 		},
 		merged: {
 			icon: GitMerge,
-			color: 'text-purple-400',
-			bg: 'bg-purple-400/10',
+			colorClass:
+				'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700/50',
 			label: 'Merged',
 		},
 		closed: {
 			icon: GitPullRequestClosed,
-			color: 'text-red-400',
-			bg: 'bg-red-400/10',
+			colorClass:
+				'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700/50',
 			label: 'Closed',
 		},
 	};
@@ -83,8 +82,7 @@
 {#if config && state}
 	<GitHubBadge
 		icon={config.icon}
-		color={config.color}
-		bg={config.bg}
+		colorClass={config.colorClass}
 		label={config.label}
 		number={prNumber}
 		{url}
