@@ -28,7 +28,7 @@
 	import { TREE_CONTEXT_MENU_ACTIONS } from '$lib/modules/visualization';
 	import type { TreeContextMenuAction } from '$lib/modules/visualization';
 	import { useSelection } from '$lib/modules/board';
-	import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
+	import { BATCH_SELECTED_GLOW_COLOR } from './batch_selection_utils.js';
 
 	interface Props {
 		issues: readonly Issue[];
@@ -208,16 +208,16 @@
 			stateOverlay,
 			issueId: entry.issue.id,
 			hoveredIssueId: interaction.hoveredIssueId,
-			selectedIssueId: interaction.selectedIssueId,
+			activeIssueId: interaction.activeIssueId,
 			batchSelectedIssueIds: interaction.batchSelectedIssueIds,
 			hoverGlowColor: interaction.hoverGlowColor,
-			selectedGlowColor: interaction.selectedGlowColor,
-			batchSelectedGlowColor: GLOW_COLORS.pink,
+			activeGlowColor: interaction.activeGlowColor,
+			batchSelectedGlowColor: BATCH_SELECTED_GLOW_COLOR,
 		});
 	}
 
 	function handleTreeClick(entry: IssueEntry) {
-		interaction.selectIssue(entry.issue.id);
+		interaction.activateIssue(entry.issue.id);
 	}
 
 	function handleContextMenu(event: MouseEvent, entry: IssueEntry) {
@@ -226,7 +226,7 @@
 	}
 
 	function handleGroundClick() {
-		interaction.deselect();
+		interaction.deactivate();
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -234,7 +234,7 @@
 			if (contextMenu !== null) {
 				contextMenu = null;
 			} else {
-				interaction.deselect();
+				interaction.deactivate();
 			}
 		}
 	}

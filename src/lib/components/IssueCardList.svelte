@@ -19,9 +19,6 @@
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
 		prioritiesEnabled?: boolean;
-		paletteColors?: string[];
-		usedColors?: string[];
-		isDarkMode?: boolean;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
@@ -42,9 +39,6 @@
 		cacheMap = new Map(),
 		ghAvailable = false,
 		prioritiesEnabled = true,
-		paletteColors = [],
-		usedColors = [],
-		isDarkMode = false,
 		getChildren,
 		getNotificationDotColor,
 		getProgressLines,
@@ -104,7 +98,7 @@
 			selection.batchRangeSelect(issue.id, flatIssueIds);
 			return;
 		}
-		selection.selectIssue(issue.id);
+		selection.activateIssue(issue.id);
 	}
 
 	// fallow-ignore-next-line complexity
@@ -117,6 +111,7 @@
 		if (event.key === 'Escape') {
 			event.preventDefault();
 			selection.batchDeselectAll();
+			selection.deactivate();
 			return;
 		}
 		if (event.key === 'Control' || event.key === 'Meta' || event.key === 'Shift') {
@@ -211,33 +206,39 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div onkeydown={handleKeydown} onkeyup={handleKeyup} tabindex="-1" class="outline-none">
-	<!-- Batch action toolbar -->
-	{#if selection.batchCount > 0}
-		<div class="mb-3">
-			<BatchActionToolbar
-				selectedCount={selection.batchCount}
-				{selectedIssues}
-				selectAllCheckboxState={selectAllState}
-				onSelectAll={handleSelectAll}
-				onDeselectAll={handleDeselectAll}
-				onBatchArchive={handleBatchArchive}
-				onBatchUnarchive={handleBatchUnarchive}
-				onBatchDelete={handleBatchDelete}
-				onBatchChangePriority={handleBatchChangePriority}
-				onBatchPrune={handleBatchPrune}
-			/>
-		</div>
-	{/if}
+	<!-- Persistent toolbar -->
+	<div class="mb-3">
+		<BatchActionToolbar
+			selectedCount={selection.batchCount}
+			{selectedIssues}
+			selectAllCheckboxState={selectAllState}
+			onSelectAll={handleSelectAll}
+			onDeselectAll={handleDeselectAll}
+			onBatchArchive={handleBatchArchive}
+			onBatchUnarchive={handleBatchUnarchive}
+			onBatchDelete={handleBatchDelete}
+			onBatchChangePriority={handleBatchChangePriority}
+			onBatchPrune={handleBatchPrune}
+		/>
+	</div>
 
-	<!-- Two-column grid -->
-	<div class="grid grid-cols-2 gap-2">
+	<!-- Responsive grid -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="grid gap-2"
+		style="grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));"
+		onclick={(event) => {
+			if (event.target === event.currentTarget) {
+				selection.deactivate();
+				selection.batchDeselectAll();
+			}
+		}}
+	>
 		{#each flatVisualOrder as issue (issue.id)}
 			<IssueCardContextMenu
 				{issue}
 				isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-				{paletteColors}
-				{usedColors}
-				{isDarkMode}
 				onToggleSelect={() => handleToggleSelect(issue.id)}
 				{onArchive}
 				{onUnarchive}
@@ -259,7 +260,7 @@
 					{forceExpanded}
 					progressLines={getProgressLines?.(issue.id) ?? []}
 					{prioritiesEnabled}
-					isActive={selection.selectedIssueId === issue.id}
+					isActive={selection.activeIssueId === issue.id}
 					isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
 					isSelectionReady={isModifierHeld &&
 						!selection.batchSelectedIssueIds.has(issue.id)}
@@ -278,14 +279,14 @@
 			>
 				Archived ({archivedIssues.length})
 			</h3>
-			<div class="grid grid-cols-2 gap-2">
+			<div
+				class="grid gap-2"
+				style="grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));"
+			>
 				{#each archivedIssues as issue (issue.id)}
 					<IssueCardContextMenu
 						{issue}
 						isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-						{paletteColors}
-						{usedColors}
-						{isDarkMode}
 						onToggleSelect={() => handleToggleSelect(issue.id)}
 						{onArchive}
 						{onUnarchive}
@@ -297,7 +298,7 @@
 							{issue}
 							cache={cacheMap.get(issue.id)}
 							{ghAvailable}
-							isActive={selection.selectedIssueId === issue.id}
+							isActive={selection.activeIssueId === issue.id}
 							isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
 							onCardClick={(event) => handleCardClick(issue, event)}
 						/>

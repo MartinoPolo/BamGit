@@ -24,10 +24,10 @@
 		defaultValue: GLOW_COLORS.yellow,
 	});
 
-	const selectedGlowColor = new Persisted<string>({
-		key: 'grovekeeper_selected_glow_color',
+	const activeGlowColor = new Persisted<string>({
+		key: 'grovekeeper_active_glow_color',
 		serde: stringSerde(isHexColor),
-		defaultValue: GLOW_COLORS.blue,
+		defaultValue: GLOW_COLORS.green,
 	});
 
 	let creating = $state(false);
@@ -226,16 +226,16 @@
 				</div>
 			</div>
 			<div class="space-y-1">
-				<Label>Selected Glow</Label>
+				<Label>Active Glow</Label>
 				<div class="flex items-center gap-2">
 					<ColorPicker
-						selectedColor={selectedGlowColor.current}
+						selectedColor={activeGlowColor.current}
 						onSelect={(c) => {
-							selectedGlowColor.current = c;
+							activeGlowColor.current = c;
 						}}
 					/>
 					<span class="font-mono text-xs text-muted-foreground"
-						>{selectedGlowColor.current}</span
+						>{activeGlowColor.current}</span
 					>
 				</div>
 			</div>

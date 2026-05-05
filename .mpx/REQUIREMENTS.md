@@ -27,7 +27,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - The workspace dashboard is the root page for each workspace window
 - **Primary view: Forest View** — persistent collapsible panel, open by default. Renders below the dashboard header (never overlays header or sidebar). Collapse/expand via a forest-icon toggle button in the main toolbar. Forest occupies the top portion; the bottom portion hosts tabbed detail content
 - **Bottom panel tabs**: `Issues | Kanban | Dependencies | Activity | Session`. Issue Detail replaces tab content contextually when a tree/card is selected (per PRD #122 REQ-18 auto-promote logic). Filter-type tabs filter to selected issue, Highlight-type tabs highlight the node
-- **Issue cards** appear in the bottom panel Issues tab in a **two-column row-major grid** (`grid-template-columns: repeat(2, 1fr)`, row-major order). Each card shows: color header band (issue color background, WCAG-contrast text), issue name (clickable link to GitHub issue when linked), status badges, tree thumbnail (72px). Header right side has quick-action buttons (Open Folder, Open Terminal, Open Editor) — always visible, disabled when no worktree assigned. No checkboxes for selection — use border/shadow/glow only
+- **Issue cards** appear in the bottom panel Issues tab in a **responsive two-column row-major grid** (`grid-template-columns: repeat(auto-fill, minmax(450px, 1fr))`, row-major order). Cards have a 450px minimum width; the grid automatically drops to one column when viewport width cannot fit two. Each card shows: color header band (issue color background, WCAG-contrast text), issue name (clickable link to GitHub issue when linked), session state chip (same contrast technique as priority chip), status badges, tree thumbnail (72px). Header right side has quick-action buttons (Open Folder, Open Terminal, Open Editor) — always visible, ghost appearance when no folder assigned (reduced opacity, muted, still clickable to assign folder via native file picker). No checkboxes for selection — use border/shadow/glow only. No whole-card tooltip — all info visible directly on the card; individual button tooltips retained
 - The default/primary view is configurable in settings (forest open by default, or collapsed by default)
 - Badges on cards: branch status (active/local/remote-gone/deleted), PR state (open/draft/review-requested/merged/closed/ready-to-merge), GitHub issue state (open/closed), sync status (behind base count), merge conflict indicator
 - Badges are interactive: clicking PR/issue badge opens GitHub URL
@@ -35,9 +35,14 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - One workspace = one dashboard = one GitHub repo
 - **Overview dashboard** (separate window/page): shows all configured workspaces as cards with health indicators (active sessions, open PRs, pending HITL issues)
 - **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle (icon button) | Plant (split-button: Add Issue / Add Worktree Issue, persists last-used action)
-- **Bottom panel toolbar** (Issues tab): Sort | Filter | Select All checkbox (tri-state) | "N selected" count | Batch action buttons (Archive, Unarchive, Delete, Change Priority, Prune Selected Worktrees) | Clean Up Worktrees
-- **Batch selection**: Multi-select issue cards/trees for bulk operations. Triggers: right-click context menu "Select" (desktop), long press 500ms (mobile/touch), Ctrl+click (toggle individual), Shift+click (range select), Ctrl+A (select all), Escape (deselect all). Selection clears on tab change and Escape; does NOT clear after batch action. Normal click (no modifier) clears batch selection and activates clicked card. Batch actions: Archive, Unarchive (context-aware — both show if mixed), Delete, Change Priority. NOT batch: Change Color. Unavailable actions disabled with tooltip; partially applicable actions enabled with info tooltip ("affects 2 of 5")
-- **Active vs Selected terminology**: "Active" = single-click inspect (one at a time, shows bottom panel detail, blue glow `#4a9eff`). "Selected" = batch selection (multiple, for bulk ops, hot pink glow `#ec4899`). Activation clears batch selection. Selection-ready hover (Ctrl/Shift + hover) uses violet glow `#c084fc` on trees and visible border/shadow on cards. **Card state visual hierarchy**: default → hover (shadow lift + background brighten) → active (blue glow ring + outer halo) → selected (green/primary ring + body tint, no checkbox). States must be clearly distinguishable at a glance
+- **Bottom panel toolbar** (Issues tab): Always-visible persistent bar with consistent height (no layout shift). Default state (no selection): Sort | Filter | Clean Up Worktrees. Selected state: Select All checkbox (tri-state) | "N selected" count | Batch action buttons (Archive, Unarchive, Delete, Change Priority, Clean Selected Worktrees) | Deselect All (×). "Clean Up Worktrees" changes to "Clean Selected Worktrees" when batch selection is active. All worktree cleanup actions show a confirmation dialog
+- **Batch selection**: Multi-select issue cards/trees for bulk operations. Triggers: right-click context menu "Select" (desktop), long press 500ms (mobile/touch), Ctrl+click (toggle individual), Shift+click (range select with Windows Explorer pattern — range vs individually-selected items tracked separately, shift-clicking to a shorter range deselects items outside the new range while preserving Ctrl+clicked items), Ctrl+A (select all), Escape (deselect all). Selection clears on tab change and Escape; does NOT clear after batch action. Normal click (no modifier) clears batch selection and activates the clicked card. Clicking an already-active card does NOT deactivate it — deactivation only via Escape or clicking empty space in the grid. Batch actions: Archive, Unarchive (context-aware — both show if mixed), Delete, Change Priority. NOT batch: Change Color. Unavailable actions disabled with tooltip; partially applicable actions enabled with info tooltip ("affects 2 of 5")
+- **Active vs Selected terminology**: "Active" = single-click inspect (one at a time, shows bottom panel detail, green glow `#22c55e`). "Selected" = batch selection (multiple, for bulk ops, blue glow `#4a9eff`). Activation clears batch selection. Selection-ready (Ctrl/Shift held) uses blue glow `#4a9eff` at reduced intensity (same color as selected, thinner ring). **Card state visual hierarchy** — all states use uniform `ring-2` thickness (except selection-ready `ring-1`), differentiated by color alone. No halo shadows. Colors match forest glow exactly:
+    - Default → no ring
+    - Hover → `ring-2` yellow `#ffd700` (dark mode) / amber `#d4a017` (light mode)
+    - Active → `ring-2` green `#22c55e` (dark mode) / lighter green `#4ade80` (light mode)
+    - Selected → `ring-2` blue `#4a9eff` (dark mode) / mid blue `#3b82f6` (light mode)
+    - Selection-ready → `ring-1` blue `#4a9eff` (same color as selected, thinner, less intense glow)
 - **Issue card context menu**: Right-click opens a bits-ui `ContextMenu` with all actions from the overflow (⋯) menu: Select/Deselect (top, separated), Edit, Rename (standalone only), Priority submenu, Change Color, Setup/Remove Worktree, Archive/Unarchive, Delete. "Select" is the first item with a separator below it. When right-clicking a batch-selected card: show batch actions ("Archive 5 selected", etc.). When right-clicking an unselected card: clear batch selection, activate card, show single-card actions (file manager pattern). The overflow (⋯) button is kept for touch/accessibility but opens the same context menu component programmatically
 - **Forest context menu**: Migrate existing `ForestContextMenu` to bits-ui `ContextMenu` for consistency. Add "Select" action matching card context menu behavior
 - **Forest ↔ card two-way binding**: Selection state syncs between forest trees and issue cards. Hovering/selecting a tree highlights its card and vice versa. Glow colors match across both surfaces
@@ -86,11 +91,12 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 #### Priority System
 
-- Levels: lowest, low, medium, high, highest
+- Levels: lowest, low, medium, high, top (no "none" option — medium is the default)
 - Default: medium (assigned automatically, not prompted during creation)
 - Medium priority has no visible badge on the card
-- Non-default levels (low, lowest, high, highest) show a badge
-- Changeable via issue card action button or overflow menu dropdown
+- Non-default levels (low, lowest, high, top) show a badge in the card header
+- Priority badge in card header is clickable — spawns priority change menu inline
+- Also changeable via context menu Priority submenu
 - Some views sort by priority; blocking relationships can prioritize higher-priority issues closer to front
 
 ### Session Management
@@ -135,7 +141,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Each issue has an **issue environment**: worktree folder, editor instance, terminal session
 - **Editor:** Launch VS Code or Cursor via CLI. Verify Peacock color matches issue color in `.vscode/settings.json`.
 - **Terminal:** Open platform-appropriate terminal at worktree path. Pass issue color to terminal tab where supported.
-- Per-issue folder assignment: left-click opens explorer, right-click reassigns. Faded when unassigned.
+- Per-issue folder assignment via three header buttons (Open Folder, Open Terminal, Open Editor). When folder assigned: left-click opens respective app at folder path; right-click opens native file picker to reassign (silent replacement, no confirmation). When no folder assigned: ghost appearance (reduced opacity, muted) but still clickable — left-click opens native file picker to assign; right-click also opens file picker. Tooltips: "Open [path]" / "Open terminal [path]" / "Open editor [path]" when assigned, "Assign folder" when unassigned. Editor icon changes based on user's configured editor (VS Code, Cursor, etc.)
 
 #### Deferred for future PRD
 
@@ -292,8 +298,8 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - **Ready-to-merge:** Green glow (intensity 5). Fruiting stage handles the visual
 - **Changes-requested:** Seasonal stage (autumn palette). No storm cloud
 - **HITL label:** Grill accessory (static = available, animated = grilling session active)
-- **Batch-selected:** Hot pink glow (`#ec4899`, intensity 3). Two-way bound with issue card selection state
-- **Selection-ready hover** (Ctrl/Shift + hover): Violet glow (`#c084fc`, intensity 3). Distinct from normal hover yellow glow. Tree supports same selection triggers as cards: Ctrl+click (toggle), Shift+click (range), right-click context menu "Select"
+- **Batch-selected:** Blue glow (`#4a9eff`, intensity 3). Two-way bound with issue card selection state. Matches card `ring-2` blue
+- **Selection-ready** (Ctrl/Shift held): Blue glow (`#4a9eff`, intensity 1.5). Same color as selected but reduced intensity. Matches card `ring-1` blue. Tree supports same selection triggers as cards: Ctrl+click (toggle), Shift+click (range), right-click context menu "Select"
 
 #### Execution Phase Tools
 

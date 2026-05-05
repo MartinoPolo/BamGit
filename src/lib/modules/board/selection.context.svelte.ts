@@ -3,6 +3,7 @@ import { SvelteSet } from 'svelte/reactivity';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
 import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
+import { computeMergedBatchSelection } from '$lib/components/batch_selection_utils.js';
 import { BOTTOM_PANEL_TABS, shouldShowPrdOverview } from './selection.js';
 import type { BottomPanelTab } from './selection.js';
 
@@ -22,13 +23,15 @@ function isHexColor(value: unknown): value is string {
 }
 
 function createSelectionContext() {
-	const selectedIssueId = new StateRaw<string | null>(null);
+	const activeIssueId = new StateRaw<string | null>(null);
 	const hoveredIssueId = new StateRaw<string | null>(null);
 	const activeTab = new StateRaw<BottomPanelTab | null>(null);
 	const prdIssueId = new StateRaw<string | null>(null);
 	const forestCollapsed = new StateRaw(false);
 	const batchSelectedIssueIds = new SvelteSet<string>();
 	const batchAnchorId = new StateRaw<string | null>(null);
+	const individuallySelectedIds = new SvelteSet<string>();
+	const rangeSelectedIds = new SvelteSet<string>();
 
 	const hoverGlowColor = new Persisted<string>({
 		key: 'grovekeeper_hover_glow_color',
@@ -36,10 +39,10 @@ function createSelectionContext() {
 		defaultValue: GLOW_COLORS.yellow,
 	});
 
-	const selectedGlowColor = new Persisted<string>({
-		key: 'grovekeeper_selected_glow_color',
+	const activeGlowColor = new Persisted<string>({
+		key: 'grovekeeper_active_glow_color',
 		serde: stringSerde(isHexColor),
-		defaultValue: GLOW_COLORS.blue,
+		defaultValue: GLOW_COLORS.green,
 	});
 
 	function hoverIssue(issueId: string) {
@@ -50,74 +53,89 @@ function createSelectionContext() {
 		hoveredIssueId.current = null;
 	}
 
-	function selectIssue(issueId: string) {
-		if (selectedIssueId.current === issueId) {
-			selectedIssueId.current = null;
-			activeTab.current = null;
-		} else {
-			selectedIssueId.current = issueId;
-			if (activeTab.current === null && !shouldShowPrdOverview(issueId, prdIssueId.current)) {
+	function activateIssue(issueId: string) {
+		if (activeIssueId.current === issueId) {
+			if (activeTab.current !== BOTTOM_PANEL_TABS.issueDetail) {
 				activeTab.current = BOTTOM_PANEL_TABS.issueDetail;
 			}
+			return;
+		}
+		activeIssueId.current = issueId;
+		if (activeTab.current === null && !shouldShowPrdOverview(issueId, prdIssueId.current)) {
+			activeTab.current = BOTTOM_PANEL_TABS.issueDetail;
 		}
 		batchSelectedIssueIds.clear();
+		individuallySelectedIds.clear();
+		rangeSelectedIds.clear();
 		batchAnchorId.current = null;
 	}
 
-	function deselect() {
-		selectedIssueId.current = null;
+	function deactivate() {
+		activeIssueId.current = null;
 		activeTab.current = null;
 	}
 
 	function setActiveTab(tab: BottomPanelTab | null) {
 		activeTab.current = tab;
 		batchSelectedIssueIds.clear();
+		individuallySelectedIds.clear();
+		rangeSelectedIds.clear();
 		batchAnchorId.current = null;
 	}
 
 	function toggleBatchSelect(issueId: string) {
-		if (batchSelectedIssueIds.has(issueId)) {
+		if (individuallySelectedIds.has(issueId)) {
+			individuallySelectedIds.delete(issueId);
 			batchSelectedIssueIds.delete(issueId);
 		} else {
+			individuallySelectedIds.add(issueId);
 			batchSelectedIssueIds.add(issueId);
 		}
 		batchAnchorId.current = issueId;
 	}
 
 	function batchRangeSelect(targetId: string, flatOrder: readonly string[]) {
-		const anchorId = batchAnchorId.current;
-		if (anchorId === null) {
-			batchSelectedIssueIds.add(targetId);
+		const { mergedIds, rangeIds } = computeMergedBatchSelection(
+			individuallySelectedIds,
+			batchAnchorId.current,
+			targetId,
+			flatOrder,
+		);
+
+		rangeSelectedIds.clear();
+		for (const id of rangeIds) {
+			rangeSelectedIds.add(id);
+		}
+
+		batchSelectedIssueIds.clear();
+		for (const id of mergedIds) {
+			batchSelectedIssueIds.add(id);
+		}
+
+		if (batchAnchorId.current === null) {
 			batchAnchorId.current = targetId;
-			return;
-		}
-		const anchorIndex = flatOrder.indexOf(anchorId);
-		const targetIndex = flatOrder.indexOf(targetId);
-		if (anchorIndex === -1 || targetIndex === -1) {
-			batchSelectedIssueIds.add(targetId);
-			return;
-		}
-		const startIndex = Math.min(anchorIndex, targetIndex);
-		const endIndex = Math.max(anchorIndex, targetIndex);
-		for (let i = startIndex; i <= endIndex; i++) {
-			batchSelectedIssueIds.add(flatOrder[i]);
 		}
 	}
 
 	function batchSelectAll(issueIds: readonly string[]) {
 		for (const id of issueIds) {
 			batchSelectedIssueIds.add(id);
+			individuallySelectedIds.add(id);
 		}
 	}
 
 	function batchDeselectAll() {
 		batchSelectedIssueIds.clear();
+		individuallySelectedIds.clear();
+		rangeSelectedIds.clear();
 		batchAnchorId.current = null;
 	}
 
 	function removeBatchItems(ids: readonly string[]) {
 		for (const id of ids) {
 			batchSelectedIssueIds.delete(id);
+			individuallySelectedIds.delete(id);
+			rangeSelectedIds.delete(id);
 		}
 	}
 
@@ -133,8 +151,8 @@ function createSelectionContext() {
 		get hoveredIssueId() {
 			return hoveredIssueId.current;
 		},
-		get selectedIssueId() {
-			return selectedIssueId.current;
+		get activeIssueId() {
+			return activeIssueId.current;
 		},
 		get activeTab() {
 			return activeTab.current;
@@ -143,7 +161,7 @@ function createSelectionContext() {
 			return prdIssueId.current;
 		},
 		get showPrdOverview() {
-			return shouldShowPrdOverview(selectedIssueId.current, prdIssueId.current);
+			return shouldShowPrdOverview(activeIssueId.current, prdIssueId.current);
 		},
 		get hoverGlowColor() {
 			return hoverGlowColor.current;
@@ -151,11 +169,11 @@ function createSelectionContext() {
 		set hoverGlowColor(value: string) {
 			hoverGlowColor.current = value;
 		},
-		get selectedGlowColor() {
-			return selectedGlowColor.current;
+		get activeGlowColor() {
+			return activeGlowColor.current;
 		},
-		set selectedGlowColor(value: string) {
-			selectedGlowColor.current = value;
+		set activeGlowColor(value: string) {
+			activeGlowColor.current = value;
 		},
 		get forestCollapsed() {
 			return forestCollapsed.current;
@@ -169,8 +187,8 @@ function createSelectionContext() {
 		},
 		hoverIssue,
 		unhover,
-		selectIssue,
-		deselect,
+		activateIssue,
+		deactivate,
 		setActiveTab,
 		setPrdIssueId,
 		toggleForestCollapsed,

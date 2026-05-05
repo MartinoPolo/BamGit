@@ -141,8 +141,8 @@
 	}
 
 	const selectedIssue = $derived(
-		selection.selectedIssueId !== null
-			? (issues.find((issue) => issue.id === selection.selectedIssueId) ?? null)
+		selection.activeIssueId !== null
+			? (issues.find((issue) => issue.id === selection.activeIssueId) ?? null)
 			: null,
 	);
 
@@ -205,9 +205,6 @@
 					{cacheMap}
 					{ghAvailable}
 					{prioritiesEnabled}
-					{paletteColors}
-					{usedColors}
-					{isDarkMode}
 					{getChildren}
 					{getNotificationDotColor}
 					{getProgressLines}

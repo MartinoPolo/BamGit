@@ -43,9 +43,19 @@ describe('getPriorityBorderClass', () => {
 });
 
 describe('PRIORITY_OPTIONS', () => {
-	it('contains all priority values plus null', () => {
+	it('has exactly 5 priority options (no "none")', () => {
+		expect(PRIORITY_OPTIONS).toHaveLength(5);
+	});
+
+	it('every option has a non-null value', () => {
+		for (const option of PRIORITY_OPTIONS) {
+			expect(option.value).not.toBeNull();
+		}
+	});
+
+	it('contains all priority levels', () => {
 		const values = PRIORITY_OPTIONS.map((o) => o.value);
-		expect(values).toEqual(['top', 'high', 'medium', 'low', 'lowest', null]);
+		expect(values).toEqual(['top', 'high', 'medium', 'low', 'lowest']);
 	});
 });
 

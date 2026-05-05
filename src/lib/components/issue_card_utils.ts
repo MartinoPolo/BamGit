@@ -20,13 +20,12 @@ export const PRIORITY_BADGE_CLASSES = {
 	lowest: 'bg-gray-800/40 text-gray-400',
 } as const satisfies Record<IssuePriority, string>;
 
-export const PRIORITY_OPTIONS: { value: IssuePriority | null; label: () => string }[] = [
+export const PRIORITY_OPTIONS: { value: IssuePriority; label: () => string }[] = [
 	{ value: 'top', label: () => m.priority_top() },
 	{ value: 'high', label: () => m.priority_high() },
 	{ value: 'medium', label: () => m.priority_medium() },
 	{ value: 'low', label: () => m.priority_low() },
 	{ value: 'lowest', label: () => m.priority_lowest() },
-	{ value: null, label: () => m.priority_none() },
 ];
 
 // ─── Priority Border Class Logic ────────────────────────────────────────────
