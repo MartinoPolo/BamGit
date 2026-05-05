@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
 	computeRangeSelection,
 	computeSelectAllCheckboxState,
+	computeMergedBatchSelection,
 	CARD_STATE_CLASSES,
 	BATCH_SELECTED_GLOW_COLOR,
 } from './batch_selection_utils.js';
@@ -99,6 +100,20 @@ describe('CARD_STATE_CLASSES', () => {
 			expect(value.length).toBeGreaterThan(0);
 		}
 	});
+
+	it('active class uses green ring-2 without shadow', () => {
+		expect(CARD_STATE_CLASSES.active).toBe('ring-2 ring-[#22c55e] dark:ring-[#4ade80]');
+	});
+
+	it('selected class uses blue ring-2', () => {
+		expect(CARD_STATE_CLASSES.selected).toBe('ring-2 ring-[#4a9eff] dark:ring-[#3b82f6]');
+	});
+
+	it('selectionReady class uses blue ring-1 with reduced opacity', () => {
+		expect(CARD_STATE_CLASSES.selectionReady).toBe(
+			'ring-1 ring-[#4a9eff]/60 dark:ring-[#3b82f6]/60',
+		);
+	});
 });
 
 describe('BATCH_SELECTED_GLOW_COLOR', () => {
@@ -106,7 +121,59 @@ describe('BATCH_SELECTED_GLOW_COLOR', () => {
 		expect(BATCH_SELECTED_GLOW_COLOR).toMatch(/^#[0-9a-fA-F]{6}$/);
 	});
 
-	it('equals #ec4899', () => {
-		expect(BATCH_SELECTED_GLOW_COLOR).toBe('#ec4899');
+	it('equals #4a9eff', () => {
+		expect(BATCH_SELECTED_GLOW_COLOR).toBe('#4a9eff');
+	});
+});
+
+describe('computeMergedBatchSelection', () => {
+	const flatOrder = ['a', 'b', 'c', 'd', 'e'];
+
+	it('returns only target when no anchor (first shift-click)', () => {
+		const individual = new Set<string>();
+		const result = computeMergedBatchSelection(individual, null, 'c', flatOrder);
+		expect(result.mergedIds).toEqual(new Set(['c']));
+		expect(result.rangeIds).toEqual(new Set(['c']));
+	});
+
+	it('computes range from anchor to target and merges with individual selections', () => {
+		const individual = new Set(['a', 'e']); // Ctrl+clicked
+		const result = computeMergedBatchSelection(individual, 'b', 'd', flatOrder);
+		// Range: b,c,d. Individual: a,e. Merged: a,b,c,d,e
+		expect(result.mergedIds).toEqual(new Set(['a', 'b', 'c', 'd', 'e']));
+		expect(result.rangeIds).toEqual(new Set(['b', 'c', 'd']));
+	});
+
+	it('shift-clicking a shorter range removes items outside new range but keeps individuals', () => {
+		// First shift-click selected b,c,d,e (range b→e)
+		// Now shift-click to c (range b→c). Only b,c in range.
+		// Individual: a. Merged: a,b,c
+		const individual = new Set(['a']);
+		const result = computeMergedBatchSelection(individual, 'b', 'c', flatOrder);
+		expect(result.mergedIds).toEqual(new Set(['a', 'b', 'c']));
+		expect(result.rangeIds).toEqual(new Set(['b', 'c']));
+	});
+
+	it('preserves Ctrl+clicked items even when range shrinks', () => {
+		const individual = new Set(['a', 'c']); // Ctrl+clicked
+		const result = computeMergedBatchSelection(individual, 'd', 'e', flatOrder);
+		// Range: d,e. Individual: a,c. Merged: a,c,d,e
+		expect(result.mergedIds).toEqual(new Set(['a', 'c', 'd', 'e']));
+		expect(result.rangeIds).toEqual(new Set(['d', 'e']));
+	});
+
+	it('handles anchor not in flatOrder gracefully', () => {
+		const individual = new Set(['a']);
+		const result = computeMergedBatchSelection(individual, 'z', 'c', flatOrder);
+		// computeRangeSelection returns ['c'] when anchor not found
+		expect(result.mergedIds).toEqual(new Set(['a', 'c']));
+		expect(result.rangeIds).toEqual(new Set(['c']));
+	});
+
+	it('handles empty individual set with valid range', () => {
+		const individual = new Set<string>();
+		const result = computeMergedBatchSelection(individual, 'b', 'd', flatOrder);
+		expect(result.mergedIds).toEqual(new Set(['b', 'c', 'd']));
+		expect(result.rangeIds).toEqual(new Set(['b', 'c', 'd']));
 	});
 });

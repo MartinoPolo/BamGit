@@ -38,13 +38,13 @@ export const BOTTOM_PANEL_TAB_LABELS = {
 // ─── PRD Overview Logic ──────────────────────────────────────────────────
 
 export function shouldShowPrdOverview(
-	selectedIssueId: string | null,
+	activeIssueId: string | null,
 	prdIssueId: string | null,
 ): boolean {
-	if (selectedIssueId === null) {
+	if (activeIssueId === null) {
 		return true;
 	}
-	if (selectedIssueId === prdIssueId) {
+	if (activeIssueId === prdIssueId) {
 		return true;
 	}
 	return false;

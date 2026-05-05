@@ -58,15 +58,15 @@ describe('TAB_BEHAVIOR_MAP', () => {
 });
 
 describe('shouldShowPrdOverview', () => {
-	it('returns true when selectedIssueId is null (no selection)', () => {
+	it('returns true when activeIssueId is null (no activation)', () => {
 		expect(shouldShowPrdOverview(null, 'prd-123')).toBe(true);
 	});
 
-	it('returns true when selectedIssueId equals prdIssueId', () => {
+	it('returns true when activeIssueId equals prdIssueId', () => {
 		expect(shouldShowPrdOverview('prd-123', 'prd-123')).toBe(true);
 	});
 
-	it('returns false when selectedIssueId is a non-PRD issue', () => {
+	it('returns false when activeIssueId is a non-PRD issue', () => {
 		expect(shouldShowPrdOverview('issue-456', 'prd-123')).toBe(false);
 	});
 
@@ -74,7 +74,7 @@ describe('shouldShowPrdOverview', () => {
 		expect(shouldShowPrdOverview(null, null)).toBe(true);
 	});
 
-	it('returns false when prdIssueId is null but selectedIssueId is set', () => {
+	it('returns false when prdIssueId is null but activeIssueId is set', () => {
 		expect(shouldShowPrdOverview('issue-456', null)).toBe(false);
 	});
 });

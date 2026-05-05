@@ -487,7 +487,7 @@
 
 	function handlePageKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
-			selection.deselect();
+			selection.deactivate();
 		}
 	}
 </script>

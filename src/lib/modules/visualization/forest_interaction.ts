@@ -6,15 +6,15 @@ export interface ResolveGlowOverlayParams {
 	readonly stateOverlay: OverlayConfig;
 	readonly issueId: string;
 	readonly hoveredIssueId: string | null;
-	readonly selectedIssueId: string | null;
+	readonly activeIssueId: string | null;
 	readonly batchSelectedIssueIds: ReadonlySet<string>;
 	readonly hoverGlowColor: string;
-	readonly selectedGlowColor: string;
+	readonly activeGlowColor: string;
 	readonly batchSelectedGlowColor: string;
 }
 
 export function resolveGlowOverlay(params: ResolveGlowOverlayParams): OverlayConfig {
-	// Priority: hover(1) > selected(2) > batch-selected(3) > state-driven(4-6)
+	// Priority: hover(1) > active(2) > batch-selected(3) > state-driven(4-6)
 	if (params.issueId === params.hoveredIssueId) {
 		return {
 			glow: {
@@ -25,11 +25,11 @@ export function resolveGlowOverlay(params: ResolveGlowOverlayParams): OverlayCon
 			},
 		};
 	}
-	if (params.issueId === params.selectedIssueId) {
+	if (params.issueId === params.activeIssueId) {
 		return {
 			glow: {
 				enabled: true,
-				color: params.selectedGlowColor,
+				color: params.activeGlowColor,
 				intensity: INTERACTION_GLOW_INTENSITY,
 				pulse: false,
 			},

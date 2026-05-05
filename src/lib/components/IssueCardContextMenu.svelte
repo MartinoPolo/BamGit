@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
-	import ColorPicker from '$lib/components/color-picker/ColorPicker.svelte';
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
 	import { PRIORITY_OPTIONS } from '$lib/components/issue_card_utils.js';
 	import CheckIcon from '@lucide/svelte/icons/check';
@@ -21,9 +20,6 @@
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
 		isBatchSelected: boolean;
-		paletteColors?: string[];
-		usedColors?: string[];
-		isDarkMode?: boolean;
 		onToggleSelect: () => void;
 		children: Snippet;
 	}
@@ -31,9 +27,6 @@
 	let {
 		issue,
 		isBatchSelected,
-		paletteColors = [],
-		usedColors = [],
-		isDarkMode = false,
 		onToggleSelect,
 		onArchive,
 		onUnarchive,
@@ -94,7 +87,7 @@
 				<PriorityIcon class="size-4" />
 				Priority
 			</ContextMenu.SubTrigger>
-			<ContextMenu.SubContent>
+			<ContextMenu.SubContent alignOffset={-5} sideOffset={2}>
 				{#each PRIORITY_OPTIONS as option (option.value)}
 					<ContextMenu.Item onclick={() => onChangePriority(issue.id, option.value)}>
 						{#if issue.priority === option.value}
@@ -108,22 +101,11 @@
 			</ContextMenu.SubContent>
 		</ContextMenu.Sub>
 
-		<!-- Change Color — inline ColorPicker -->
+		<!-- Change Color -->
 		{#if onChangeColor}
-			<ContextMenu.Item class="gap-2" onSelect={(event) => event.preventDefault()}>
+			<ContextMenu.Item onclick={() => onChangeColor!(issue.id, issue.color ?? '#525252')}>
 				<PaletteIcon class="size-4" />
-				<span>Change Color</span>
-				<span class="ml-auto">
-					<ColorPicker
-						selectedColor={issue.color ?? '#000000'}
-						colors={paletteColors}
-						{usedColors}
-						{isDarkMode}
-						side="right"
-						portalDisabled={false}
-						onSelect={(color) => onChangeColor!(issue.id, color)}
-					/>
-				</span>
+				Change Color
 			</ContextMenu.Item>
 		{/if}
 

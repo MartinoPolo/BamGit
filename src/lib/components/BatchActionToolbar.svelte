@@ -41,6 +41,7 @@
 	const hasActiveIssues = $derived(selectedIssues.some((i) => i.status === 'active'));
 	const hasArchivedIssues = $derived(selectedIssues.some((i) => i.status === 'archived'));
 	const hasActiveWorktrees = $derived(selectedIssues.some((i) => i.worktree_state === 'active'));
+	const hasBatchSelection = $derived(selectedCount > 0);
 
 	const checkboxChecked = $derived(selectAllCheckboxState === 'all');
 	const checkboxIndeterminate = $derived(selectAllCheckboxState === 'some');
@@ -63,119 +64,166 @@
 
 <Tooltip.Provider>
 	<div
-		class="flex items-center gap-3 rounded-[var(--radius-md)] border px-[14px] py-2 text-[13px] font-medium"
-		style="background: color-mix(in oklch, var(--primary) 10%, var(--surface)); border-color: color-mix(in oklch, var(--primary) 30%, var(--border));"
+		class="flex min-h-[42px] items-center gap-3 rounded-[var(--radius-md)] border px-[14px] py-2 text-[13px] font-medium"
+		style="background: color-mix(in oklch, var(--primary) {hasBatchSelection
+			? '10%'
+			: '4%'}, var(--surface)); border-color: color-mix(in oklch, var(--primary) {hasBatchSelection
+			? '30%'
+			: '15%'}, var(--border));"
 	>
-		<!-- Select-all checkbox -->
-		<Checkbox
-			checked={checkboxChecked}
-			indeterminate={checkboxIndeterminate}
-			onclick={handleCheckboxClick}
-			aria-label="Select all issues"
-		/>
+		{#if hasBatchSelection}
+			<!-- Select-all checkbox -->
+			<Checkbox
+				checked={checkboxChecked}
+				indeterminate={checkboxIndeterminate}
+				onclick={handleCheckboxClick}
+				aria-label="Select all issues"
+			/>
 
-		<!-- Count badge + label -->
-		<div class="flex items-center gap-2">
-			<span class="rounded bg-primary px-2 py-0.5 font-mono text-xs text-primary-foreground">
-				{selectedCount}
-			</span>
-			<span class="text-foreground-muted">
-				{selectedCount === 1 ? 'issue selected' : 'issues selected'}
-			</span>
-		</div>
+			<!-- Count badge + label -->
+			<div class="flex items-center gap-2">
+				<span
+					class="rounded bg-primary px-2 py-0.5 font-mono text-xs text-primary-foreground"
+				>
+					{selectedCount}
+				</span>
+				<span class="text-foreground-muted">
+					{selectedCount === 1 ? 'issue selected' : 'issues selected'}
+				</span>
+			</div>
 
-		<!-- Spacer -->
-		<div class="flex-1"></div>
+			<!-- Spacer -->
+			<div class="flex-1"></div>
 
-		<!-- Action buttons -->
-		<div class="flex items-center gap-1.5">
-			<!-- Archive -->
-			{#if hasActiveIssues}
+			<!-- Batch action buttons -->
+			<div class="flex items-center gap-1.5">
+				{#if hasActiveIssues}
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									variant="ghost"
+									size="sm"
+									onclick={onBatchArchive}
+									disabled={!hasActiveIssues}
+									aria-label="Archive selected"
+								>
+									<ArchiveIcon />
+									Archive
+								</Button>
+							{/snippet}
+						</Tooltip.Trigger>
+						<Tooltip.Content>Archive selected issues</Tooltip.Content>
+					</Tooltip.Root>
+				{/if}
+
+				{#if hasArchivedIssues}
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									variant="ghost"
+									size="sm"
+									onclick={onBatchUnarchive}
+									disabled={!hasArchivedIssues}
+									aria-label="Unarchive selected"
+								>
+									<ArchiveRestoreIcon />
+									Unarchive
+								</Button>
+							{/snippet}
+						</Tooltip.Trigger>
+						<Tooltip.Content>Unarchive selected issues</Tooltip.Content>
+					</Tooltip.Root>
+				{/if}
+
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
 							<Button
 								{...props}
-								variant="ghost"
+								variant="danger"
 								size="sm"
-								onclick={onBatchArchive}
-								disabled={!hasActiveIssues}
-								aria-label="Archive selected"
+								onclick={onBatchDelete}
+								aria-label="Delete selected"
 							>
-								<ArchiveIcon />
-								Archive
+								<Trash2Icon />
+								Delete
 							</Button>
 						{/snippet}
 					</Tooltip.Trigger>
-					<Tooltip.Content>Archive selected issues</Tooltip.Content>
+					<Tooltip.Content>Delete selected issues</Tooltip.Content>
 				</Tooltip.Root>
-			{/if}
 
-			<!-- Unarchive -->
-			{#if hasArchivedIssues}
-				<Tooltip.Root>
-					<Tooltip.Trigger>
+				<Popover.Root bind:open={priorityPopoverOpen}>
+					<Popover.Trigger>
 						{#snippet child({ props })}
 							<Button
 								{...props}
 								variant="ghost"
 								size="sm"
-								onclick={onBatchUnarchive}
-								disabled={!hasArchivedIssues}
-								aria-label="Unarchive selected"
+								aria-label="Change priority"
 							>
-								<ArchiveRestoreIcon />
-								Unarchive
+								Change Priority
+								<ChevronDownIcon />
 							</Button>
 						{/snippet}
-					</Tooltip.Trigger>
-					<Tooltip.Content>Unarchive selected issues</Tooltip.Content>
-				</Tooltip.Root>
-			{/if}
+					</Popover.Trigger>
+					<Popover.Content class="w-40 p-1" align="end">
+						{#each PRIORITY_OPTIONS as option (option.value)}
+							<Popover.Item
+								onclick={() => handlePrioritySelect(option.value)}
+								role="menuitem"
+							>
+								{option.label()}
+							</Popover.Item>
+						{/each}
+					</Popover.Content>
+				</Popover.Root>
 
-			<!-- Delete -->
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							variant="danger"
-							size="sm"
-							onclick={onBatchDelete}
-							aria-label="Delete selected"
+				{#if hasActiveWorktrees}
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									variant="ghost"
+									size="sm"
+									onclick={onBatchPrune}
+									disabled={!hasActiveWorktrees}
+									aria-label="Clean selected worktrees"
+								>
+									<ScissorsIcon />
+									Clean Selected Worktrees
+								</Button>
+							{/snippet}
+						</Tooltip.Trigger>
+						<Tooltip.Content
+							>Remove active worktrees for selected issues</Tooltip.Content
 						>
-							<Trash2Icon />
-							Delete
-						</Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Content>Delete selected issues</Tooltip.Content>
-			</Tooltip.Root>
+					</Tooltip.Root>
+				{/if}
 
-			<!-- Change Priority -->
-			<Popover.Root bind:open={priorityPopoverOpen}>
-				<Popover.Trigger>
-					{#snippet child({ props })}
-						<Button {...props} variant="ghost" size="sm" aria-label="Change priority">
-							Change Priority
-							<ChevronDownIcon />
-						</Button>
-					{/snippet}
-				</Popover.Trigger>
-				<Popover.Content class="w-40 p-1" align="end">
-					{#each PRIORITY_OPTIONS as option (option.value)}
-						<Popover.Item
-							onclick={() => handlePrioritySelect(option.value)}
-							role="menuitem"
-						>
-							{option.label()}
-						</Popover.Item>
-					{/each}
-				</Popover.Content>
-			</Popover.Root>
-
-			<!-- Prune worktrees -->
-			{#if hasActiveWorktrees}
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					onclick={onDeselectAll}
+					aria-label="Deselect all"
+				>
+					<XIcon />
+				</Button>
+			</div>
+		{:else}
+			<!-- Default state: Clean Up Worktrees button -->
+			<div class="flex flex-1 items-center justify-between">
+				<span class="text-muted-foreground">
+					Hold <kbd class="rounded border border-border px-1 py-0.5 text-[10px]">Ctrl</kbd
+					>
+					or <kbd class="rounded border border-border px-1 py-0.5 text-[10px]">Shift</kbd>
+					to select multiple issues
+				</span>
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
@@ -184,27 +232,16 @@
 								variant="ghost"
 								size="sm"
 								onclick={onBatchPrune}
-								disabled={!hasActiveWorktrees}
-								aria-label="Prune worktrees"
+								aria-label="Clean up worktrees"
 							>
 								<ScissorsIcon />
-								Prune worktrees
+								Clean Up Worktrees
 							</Button>
 						{/snippet}
 					</Tooltip.Trigger>
-					<Tooltip.Content>Remove active worktrees for selected issues</Tooltip.Content>
+					<Tooltip.Content>Remove inactive and orphaned worktrees</Tooltip.Content>
 				</Tooltip.Root>
-			{/if}
-
-			<!-- Deselect all -->
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				onclick={onDeselectAll}
-				aria-label="Deselect all"
-			>
-				<XIcon />
-			</Button>
-		</div>
+			</div>
+		{/if}
 	</div>
 </Tooltip.Provider>

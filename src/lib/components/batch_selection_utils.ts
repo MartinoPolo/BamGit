@@ -44,10 +44,9 @@ export function computeSelectAllCheckboxState(
 }
 
 export const CARD_STATE_CLASSES = {
-	active: 'ring-2 ring-ring shadow-[0_0_12px_color-mix(in_oklch,var(--ring)_25%,transparent)]',
-	selected: 'ring-2 ring-primary bg-[color-mix(in_oklch,var(--primary)_4%,var(--surface))]',
-	selectionReady:
-		'ring-1 ring-[#c084fc] shadow-md bg-[color-mix(in_oklch,oklch(0.700_0.200_300)_4%,var(--surface))]',
+	active: 'ring-2 ring-[#22c55e] dark:ring-[#4ade80]',
+	selected: 'ring-2 ring-[#4a9eff] dark:ring-[#3b82f6]',
+	selectionReady: 'ring-1 ring-[#4a9eff]/60 dark:ring-[#3b82f6]/60',
 	dragging: 'rotate-[-1.5deg] scale-[1.02] shadow-lg opacity-92',
 	loading: 'pointer-events-none',
 	archived: 'opacity-70 grayscale-[0.8]',
@@ -55,4 +54,31 @@ export const CARD_STATE_CLASSES = {
 	disabled: 'opacity-42 pointer-events-none',
 } as const;
 
-export const BATCH_SELECTED_GLOW_COLOR = '#ec4899';
+export const BATCH_SELECTED_GLOW_COLOR = '#4a9eff';
+
+/**
+ * Compute the merged batch selection combining individually-selected IDs (Ctrl+click)
+ * with a range selection (Shift+click). Implements the Windows Explorer shift-deselect pattern:
+ * the range is always recomputed from anchor to target, and merged with the individual set.
+ */
+export function computeMergedBatchSelection(
+	individuallySelectedIds: ReadonlySet<string>,
+	anchorId: string | null,
+	targetId: string,
+	flatOrder: readonly string[],
+): { mergedIds: Set<string>; rangeIds: Set<string> } {
+	if (anchorId === null) {
+		const mergedIds = new Set(individuallySelectedIds);
+		mergedIds.add(targetId);
+		return { mergedIds, rangeIds: new Set([targetId]) };
+	}
+
+	const rangeIds = new Set(computeRangeSelection(anchorId, targetId, flatOrder));
+
+	const mergedIds = new Set(individuallySelectedIds);
+	for (const id of rangeIds) {
+		mergedIds.add(id);
+	}
+
+	return { mergedIds, rangeIds };
+}

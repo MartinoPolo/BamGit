@@ -51,7 +51,7 @@
 	}
 
 	function handleNodeSelect(issueId: string) {
-		selection.selectIssue(issueId);
+		selection.activateIssue(issueId);
 	}
 </script>
 
@@ -100,7 +100,7 @@
 						<DependencyGraphNode
 							{issue}
 							visualization={getVisualization(node.issueId)}
-							selected={selection.selectedIssueId === node.issueId}
+							selected={selection.activeIssueId === node.issueId}
 							onselect={handleNodeSelect}
 							{onhitlquickstart}
 						/>
