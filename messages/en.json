@@ -350,6 +350,7 @@
 	"wizard_hint_enter": "Enter to confirm",
 	"wizard_hint_escape": "Esc to cancel",
 	"wizard_hint_back": "Backspace to go back",
+	"wizard_navigate": "Navigate",
 	"wizard_quick_add": "Quick add",
 	"wizard_quick_add_worktree": "Quick add + worktree",
 

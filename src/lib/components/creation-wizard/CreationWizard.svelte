@@ -5,6 +5,10 @@
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import DeleteIcon from '@lucide/svelte/icons/delete';
+	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
+	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
+	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import { useCreationWizard, WIZARD_STEPS } from '$lib/modules/creation-wizard';
 	import type {
 		CreateIssueRequest,
@@ -37,6 +41,8 @@
 	let githubSearchRef: ReturnType<typeof StepGithubSearch> | undefined = $state();
 	let issueNameRef: ReturnType<typeof StepIssueName> | undefined = $state();
 	let worktreeChoiceRef: ReturnType<typeof StepWorktreeChoice> | undefined = $state();
+	let colorSelectionRef: ReturnType<typeof StepColorSelection> | undefined = $state();
+	let textInputFocused = $state(false);
 
 	function handleOpenChange(isOpen: boolean) {
 		if (!isOpen) {
@@ -51,10 +57,8 @@
 		return el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA';
 	}
 
-	function isTextInputNonEmpty(): boolean {
-		const el = document.activeElement;
-		const isInput = el?.tagName === 'INPUT' || el?.tagName === 'TEXTAREA';
-		return isInput && (el as HTMLInputElement).value !== '';
+	function trackFocus() {
+		textInputFocused = isTextInputFocused();
 	}
 
 	function handleBackspace(event: KeyboardEvent) {
@@ -72,20 +76,55 @@
 		event.preventDefault();
 		event.stopPropagation();
 
-		if (wizard.currentStep !== WIZARD_STEPS.GITHUB_SEARCH && isTextInputFocused()) {
+		if (wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH) {
+			wizard.closeWizard();
+		} else if (isTextInputFocused()) {
 			wizard.goBack();
 		} else {
 			wizard.closeWizard();
 		}
 	}
 
+	// fallow-ignore-next-line complexity
+	function handleArrowKeys(event: KeyboardEvent) {
+		if (isTextInputFocused()) {
+			return;
+		}
+
+		switch (wizard.currentStep) {
+			case WIZARD_STEPS.GITHUB_SEARCH:
+				if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+					event.preventDefault();
+					githubSearchRef?.handleArrow(event.key === 'ArrowDown' ? 1 : -1);
+				}
+				break;
+			case WIZARD_STEPS.WORKTREE_CHOICE:
+				if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+					event.preventDefault();
+					worktreeChoiceRef?.toggleChoice();
+				}
+				break;
+			case WIZARD_STEPS.COLOR_SELECTION:
+				if (
+					event.key === 'ArrowUp' ||
+					event.key === 'ArrowDown' ||
+					event.key === 'ArrowLeft' ||
+					event.key === 'ArrowRight'
+				) {
+					event.preventDefault();
+					colorSelectionRef?.handleArrow(event.key);
+				}
+				break;
+			case WIZARD_STEPS.ISSUE_NAME:
+			case WIZARD_STEPS.WORKTREE_PROGRESS:
+				break;
+		}
+	}
+
 	function handleEnter(event: KeyboardEvent) {
 		switch (wizard.currentStep) {
 			case WIZARD_STEPS.GITHUB_SEARCH:
-				break;
 			case WIZARD_STEPS.ISSUE_NAME:
-				event.preventDefault();
-				issueNameRef?.confirm();
 				break;
 			case WIZARD_STEPS.WORKTREE_CHOICE:
 				event.preventDefault();
@@ -100,6 +139,7 @@
 		}
 	}
 
+	// fallow-ignore-next-line complexity
 	function handleGlobalKeydown(event: KeyboardEvent) {
 		if (!wizard.open) {
 			return;
@@ -109,8 +149,15 @@
 			handleEscape(event);
 		} else if (event.key === 'Backspace') {
 			handleBackspace(event);
-		} else if (event.key === 'Enter' && !isTextInputNonEmpty()) {
+		} else if (event.key === 'Enter') {
 			handleEnter(event);
+		} else if (
+			event.key === 'ArrowUp' ||
+			event.key === 'ArrowDown' ||
+			event.key === 'ArrowLeft' ||
+			event.key === 'ArrowRight'
+		) {
+			handleArrowKeys(event);
 		}
 	}
 
@@ -243,9 +290,7 @@
 	const currentStepIndex = $derived(navigableSteps.indexOf(wizard.currentStep));
 
 	const isFirstStep = $derived(wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH);
-	const isIssueNameStep = $derived(wizard.currentStep === WIZARD_STEPS.ISSUE_NAME);
 	const isFinalStep = $derived(wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION);
-	const showBackButton = $derived(!isFirstStep && !isIssueNameStep);
 	const showNextButton = $derived(
 		wizard.currentStep === WIZARD_STEPS.GITHUB_SEARCH ||
 			wizard.currentStep === WIZARD_STEPS.ISSUE_NAME ||
@@ -257,9 +302,47 @@
 	const showFooter = $derived(
 		!showWorktreeProgress && wizard.currentStep !== WIZARD_STEPS.WORKTREE_PROGRESS,
 	);
+
+	const showBackButton = $derived(!isFirstStep);
+	const backKbdHint = $derived.by(() => {
+		if (textInputFocused) {
+			return 'escape' as const;
+		}
+		return 'backspace' as const;
+	});
+
+	const showCancelKbdHint = $derived.by(() => {
+		if (isFirstStep) {
+			return true;
+		}
+		return !textInputFocused;
+	});
+
+	const navigationHint = $derived.by((): 'vertical' | 'horizontal' | 'grid' | null => {
+		if (textInputFocused) {
+			return null;
+		}
+		switch (wizard.currentStep) {
+			case WIZARD_STEPS.GITHUB_SEARCH:
+				return 'vertical';
+			case WIZARD_STEPS.ISSUE_NAME:
+				return null;
+			case WIZARD_STEPS.WORKTREE_CHOICE:
+				return 'horizontal';
+			case WIZARD_STEPS.COLOR_SELECTION:
+				return 'grid';
+			default:
+				return null;
+		}
+	});
 </script>
 
-<svelte:window onkeydown={handleGlobalKeydown} onmouseup={handleMouseBack} />
+<svelte:window
+	onkeydown={handleGlobalKeydown}
+	onmouseup={handleMouseBack}
+	onfocusin={trackFocus}
+	onfocusout={trackFocus}
+/>
 
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
 	<Dialog.Content class="top-[15%] -translate-y-0 max-w-lg">
@@ -283,7 +366,7 @@
 			{/if}
 		</Dialog.Header>
 
-		<Dialog.Body class="flex flex-col gap-3 py-2">
+		<Dialog.Body class="flex flex-col gap-3 py-4">
 			{#if showWorktreeProgress}
 				<StepWorktreeProgress
 					worktreeState={worktreeProgressState}
@@ -297,7 +380,7 @@
 			{:else if wizard.currentStep === WIZARD_STEPS.WORKTREE_CHOICE}
 				<StepWorktreeChoice bind:this={worktreeChoiceRef} />
 			{:else if wizard.currentStep === WIZARD_STEPS.COLOR_SELECTION}
-				<StepColorSelection />
+				<StepColorSelection bind:this={colorSelectionRef} onConfirm={handleConfirmColor} />
 			{/if}
 		</Dialog.Body>
 
@@ -306,23 +389,41 @@
 				{#if showBackButton}
 					<Button variant="ghost" type="button" onclick={() => wizard.goBack()}>
 						{m.wizard_back()}
-						<Kbd><DeleteIcon /></Kbd>
+						{#if backKbdHint === 'escape'}
+							<Kbd>Esc</Kbd>
+						{:else}
+							<Kbd><DeleteIcon /></Kbd>
+						{/if}
 					</Button>
 				{/if}
-				<div class="flex-1"></div>
-				<Button
-					variant="ghost"
-					type="button"
-					onclick={() => {
-						if (isIssueNameStep) {
-							wizard.goBack();
-						} else {
-							wizard.closeWizard();
-						}
-					}}
-				>
-					{isIssueNameStep ? m.wizard_back() : m.btn_cancel()}
-					<Kbd>Esc</Kbd>
+				<div class="flex flex-1 items-center justify-center">
+					{#if navigationHint === 'vertical'}
+						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+							<Kbd><ArrowUpIcon /></Kbd>
+							<Kbd><ArrowDownIcon /></Kbd>
+							{m.wizard_navigate()}
+						</span>
+					{:else if navigationHint === 'horizontal'}
+						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+							<Kbd><ArrowLeftIcon /></Kbd>
+							<Kbd><ArrowRightIcon /></Kbd>
+							{m.wizard_navigate()}
+						</span>
+					{:else if navigationHint === 'grid'}
+						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
+							<Kbd><ArrowUpIcon /></Kbd>
+							<Kbd><ArrowDownIcon /></Kbd>
+							<Kbd><ArrowLeftIcon /></Kbd>
+							<Kbd><ArrowRightIcon /></Kbd>
+							{m.wizard_navigate()}
+						</span>
+					{/if}
+				</div>
+				<Button variant="ghost" type="button" onclick={() => wizard.closeWizard()}>
+					{m.btn_cancel()}
+					{#if showCancelKbdHint}
+						<Kbd>Esc</Kbd>
+					{/if}
 				</Button>
 				{#if showNextButton}
 					<Button type="button" onclick={handleNextClick}>

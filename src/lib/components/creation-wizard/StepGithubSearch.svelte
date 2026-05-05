@@ -17,7 +17,9 @@
 
 	const wizard = useCreationWizard();
 
-	let selectedIndex = $state(0);
+	let selectedIndex = $state(-1);
+	let arrowDisplayValue = $state('');
+	let isArrowSelecting = $state(false);
 	let inputElement = $state<HTMLInputElement | null>(null);
 	let listElement = $state<HTMLDivElement | null>(null);
 
@@ -28,16 +30,20 @@
 		return assignedIssues;
 	});
 
+	const inputDisplayValue = $derived(isArrowSelecting ? arrowDisplayValue : wizard.searchQuery);
+
 	$effect(() => {
 		void displayItems.length;
 		untrack(() => {
-			selectedIndex = 0;
+			selectedIndex = -1;
+			isArrowSelecting = false;
+			arrowDisplayValue = '';
 		});
 	});
 
 	$effect(() => {
 		const index = selectedIndex;
-		if (listElement) {
+		if (listElement && index >= 0) {
 			const child = listElement.querySelector(
 				`[data-index="${index}"]`,
 			) as HTMLElement | null;
@@ -59,13 +65,23 @@
 	}
 
 	function moveSelection(delta: number) {
-		if (displayItems.length > 0) {
+		if (displayItems.length === 0) {
+			return;
+		}
+
+		if (selectedIndex === -1) {
+			selectedIndex = delta > 0 ? 0 : displayItems.length - 1;
+		} else {
 			selectedIndex = (selectedIndex + delta + displayItems.length) % displayItems.length;
 		}
+
+		const item = displayItems[selectedIndex];
+		arrowDisplayValue = `#${item.number} ${item.title}`;
+		isArrowSelecting = true;
 	}
 
 	function confirmSelection() {
-		if (displayItems.length > 0 && selectedIndex < displayItems.length) {
+		if (selectedIndex >= 0 && selectedIndex < displayItems.length) {
 			wizard.selectGithubIssue(toSearchedIssue(displayItems[selectedIndex]));
 		} else {
 			wizard.skipGithubSearch();
@@ -74,6 +90,10 @@
 
 	export function confirm() {
 		confirmSelection();
+	}
+
+	export function handleArrow(delta: number) {
+		moveSelection(delta);
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -85,12 +105,15 @@
 			moveSelection(-1);
 		} else if (event.key === 'Enter') {
 			event.preventDefault();
+			event.stopPropagation();
 			confirmSelection();
 		}
 	}
 
 	function handleInput(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
+		isArrowSelecting = false;
+		arrowDisplayValue = '';
 		wizard.updateSearchQuery(target.value);
 	}
 </script>
@@ -104,7 +127,7 @@
 		/>
 		<Input
 			bind:ref={inputElement}
-			value={wizard.searchQuery}
+			value={inputDisplayValue}
 			oninput={handleInput}
 			placeholder={m.wizard_search_placeholder()}
 			class="pl-9"
