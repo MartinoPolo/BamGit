@@ -33,7 +33,6 @@
 		sessionState?: 'executing' | 'hitl' | 'review' | 'error' | 'paused' | 'done' | null;
 		isActive?: boolean;
 		isBatchSelected?: boolean;
-		isSelectionReady?: boolean;
 		onOverflowClick?: () => void;
 		onCardClick?: (event: MouseEvent) => void;
 		onExecuteAction?: (actionId: string, issueId: string) => void;
@@ -54,7 +53,6 @@
 		sessionState = null,
 		isActive = false,
 		isBatchSelected = false,
-		isSelectionReady = false,
 		onOverflowClick,
 		onCardClick,
 		onExecuteAction,
@@ -108,9 +106,6 @@
 		if (isActive) {
 			return CARD_STATE_CLASSES.active;
 		}
-		if (isSelectionReady) {
-			return CARD_STATE_CLASSES.selectionReady;
-		}
 		return '';
 	});
 
@@ -155,9 +150,11 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border shadow-sm transition-all duration-150 {cardStateClass} {isArchived
+	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-all duration-150 focus:outline-none {cardStateClass} {isArchived ||
+	isActive ||
+	isBatchSelected
 		? ''
-		: 'hover:ring-2 hover:ring-[#ffd700] dark:hover:ring-[#d4a017]'}"
+		: 'hover:ring-2 hover:ring-[#ffd700] active:ring-2 active:ring-[#22c55e] dark:hover:ring-[#d4a017] dark:active:ring-[#4ade80]'}"
 	style:--ic={color}
 	style="background: var(--surface);"
 	onclick={handleCardClick}
@@ -168,27 +165,27 @@
 		style="background-color: {color}; color: {headerTextColor};"
 	>
 		<div class="flex min-w-0 flex-1 items-baseline gap-1.5">
-			<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">
-				#{issue.github_issue_number ?? '—'}
-			</span>
 			{#if issue.github_issue_url}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->
 				<a
 					href={issue.github_issue_url}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="min-w-0 truncate text-[13.5px] font-semibold leading-snug hover:underline hover:underline-offset-2"
+					class="shrink-0 font-mono text-[11px] font-semibold opacity-72 hover:opacity-100"
 					style="color: inherit;"
 					onclick={(event) => event.stopPropagation()}
 				>
-					{issue.name}
+					#{issue.github_issue_number ?? '—'}
 				</a>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			{:else}
-				<span class="min-w-0 truncate text-[13.5px] font-semibold leading-snug">
-					{issue.name}
+				<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">
+					#{issue.github_issue_number ?? '—'}
 				</span>
 			{/if}
+			<span class="min-w-0 truncate text-[13.5px] font-semibold leading-snug">
+				{issue.name}
+			</span>
 		</div>
 
 		<div class="flex shrink-0 items-center gap-1.5">
@@ -268,13 +265,9 @@
 		</div>
 
 		<!-- Info rows -->
-		<div class="flex min-w-0 flex-col gap-1">
-			<!-- Branch + state badges row (REQ-7: branch left, badges right) -->
-			<div
-				class="flex min-w-0 flex-wrap items-center gap-1.5"
-				bind:clientWidth={badgeContainerWidth}
-			>
-				<!-- Branch name (left-aligned) -->
+		<div class="flex min-w-0 flex-col gap-1" bind:clientWidth={badgeContainerWidth}>
+			<!-- Row 1: Branch name + worktree state icon + worktree badge -->
+			<div class="flex min-w-0 items-center gap-1.5">
 				<div
 					class="flex min-w-0 flex-1 items-center gap-1.5 font-mono text-[11px] text-muted-foreground"
 				>
@@ -288,9 +281,23 @@
 					{/if}
 					<WorktreeStateIcon worktreeState={issue.worktree_state} />
 				</div>
+				{#if worktreeBadge}
+					<span
+						class="inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs {worktreeBadge.class}"
+					>
+						{#if issue.worktree_state === 'pending'}
+							<span
+								class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
+							></span>
+						{/if}
+						{worktreeBadge.label}
+					</span>
+				{/if}
+			</div>
 
-				<!-- State badges (right-aligned) -->
-				<div class="flex shrink-0 flex-wrap items-center justify-end gap-1">
+			<!-- Row 2: GitHub issue badge + PR badge + git status badges -->
+			{#if cache?.github_issue_state != null || cache?.pr_state != null || (issue.branch_name != null && issue.branch_name !== '' && !compactBadges)}
+				<div class="flex flex-wrap items-center gap-1">
 					{#if cache?.github_issue_state}
 						<GitHubIssueBadge
 							state={cache.github_issue_state}
@@ -313,22 +320,10 @@
 							gitStatus={cache ?? undefined}
 						/>
 					{/if}
-					{#if worktreeBadge}
-						<span
-							class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs {worktreeBadge.class}"
-						>
-							{#if issue.worktree_state === 'pending'}
-								<span
-									class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
-								></span>
-							{/if}
-							{worktreeBadge.label}
-						</span>
-					{/if}
 				</div>
-			</div>
+			{/if}
 
-			<!-- Labels row -->
+			<!-- Row 3: GitHub issue labels -->
 			{#if issue.labels.length > 0}
 				<div class="flex flex-wrap items-center gap-1">
 					{#each issue.labels as label (label.name)}

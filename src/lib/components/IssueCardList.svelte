@@ -6,7 +6,6 @@
 	import IssueCard from './IssueCard.svelte';
 	import IssueCardContextMenu from './IssueCardContextMenu.svelte';
 	import BatchActionToolbar from './BatchActionToolbar.svelte';
-	import { computeSelectAllCheckboxState } from './batch_selection_utils.js';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -81,10 +80,6 @@
 		flatVisualOrder.filter((issue) => selection.batchSelectedIssueIds.has(issue.id)),
 	);
 
-	const selectAllState = $derived(
-		computeSelectAllCheckboxState(selection.batchCount, flatVisualOrder.length),
-	);
-
 	let isModifierHeld = $state(false);
 
 	function handleCardClick(issue: Issue, event: MouseEvent) {
@@ -127,10 +122,6 @@
 
 	function handleToggleSelect(issueId: string) {
 		selection.toggleBatchSelect(issueId);
-	}
-
-	function handleSelectAll() {
-		selection.batchSelectAll(flatIssueIds);
 	}
 
 	function handleDeselectAll() {
@@ -211,8 +202,7 @@
 		<BatchActionToolbar
 			selectedCount={selection.batchCount}
 			{selectedIssues}
-			selectAllCheckboxState={selectAllState}
-			onSelectAll={handleSelectAll}
+			{isModifierHeld}
 			onDeselectAll={handleDeselectAll}
 			onBatchArchive={handleBatchArchive}
 			onBatchUnarchive={handleBatchUnarchive}
@@ -262,8 +252,6 @@
 					{prioritiesEnabled}
 					isActive={selection.activeIssueId === issue.id}
 					isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-					isSelectionReady={isModifierHeld &&
-						!selection.batchSelectedIssueIds.has(issue.id)}
 					onCardClick={(event) => handleCardClick(issue, event)}
 					{onExecuteAction}
 				/>

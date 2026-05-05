@@ -201,8 +201,8 @@
 	--primary: var(--moss-700);
 	--primary-fg: oklch(0.985 0.008 130);
 	--primary-soft: oklch(0.92 0.03 135);
-	--accent: var(--amber-500);
-	--accent-fg: oklch(0.16 0.02 50);
+	--accent: var(--moss-500);
+	--accent-fg: oklch(0.985 0.008 130);
 	--ring: var(--moss-600);
 	--sidebar-bg: oklch(0.955 0.01 135);
 	--sidebar-fg: oklch(0.3 0.02 145);
@@ -229,8 +229,8 @@
 	--primary: var(--moss-400);
 	--primary-fg: oklch(0.135 0.02 150);
 	--primary-soft: oklch(0.305 0.045 145);
-	--accent: var(--amber-400);
-	--accent-fg: oklch(0.15 0.02 50);
+	--accent: var(--moss-400);
+	--accent-fg: oklch(0.135 0.02 150);
 	--ring: var(--moss-400);
 	--sidebar-bg: oklch(0.18 0.022 150);
 	--sidebar-fg: oklch(0.77 0.02 140);
@@ -243,10 +243,22 @@
 
 /* ── Accent color overrides ─────────────────────────────────────────────── */
 
+[data-accent='moss'][data-theme='light'] {
+	--accent: var(--moss-500);
+	--accent-fg: oklch(0.985 0.008 130);
+}
+
+[data-accent='moss'][data-theme='dark'] {
+	--accent: var(--moss-400);
+	--accent-fg: oklch(0.135 0.02 150);
+}
+
 [data-accent='amber'][data-theme='light'] {
 	--primary: var(--amber-600);
 	--primary-fg: oklch(0.985 0.008 75);
 	--primary-soft: oklch(0.92 0.065 75);
+	--accent: var(--amber-500);
+	--accent-fg: oklch(0.16 0.02 50);
 	--ring: var(--amber-600);
 }
 
@@ -254,6 +266,8 @@
 	--primary: var(--amber-400);
 	--primary-fg: oklch(0.135 0.02 55);
 	--primary-soft: oklch(0.305 0.07 60);
+	--accent: var(--amber-400);
+	--accent-fg: oklch(0.15 0.02 50);
 	--ring: var(--amber-400);
 }
 
@@ -261,6 +275,8 @@
 	--primary: var(--bark-700);
 	--primary-fg: oklch(0.985 0.008 55);
 	--primary-soft: oklch(0.92 0.03 55);
+	--accent: var(--bark-500);
+	--accent-fg: oklch(0.985 0.008 55);
 	--ring: var(--bark-700);
 }
 
@@ -268,6 +284,8 @@
 	--primary: var(--bark-300);
 	--primary-fg: oklch(0.135 0.02 50);
 	--primary-soft: oklch(0.305 0.04 55);
+	--accent: var(--bark-300);
+	--accent-fg: oklch(0.135 0.02 50);
 	--ring: var(--bark-300);
 }
 
@@ -275,6 +293,8 @@
 	--primary: var(--azure-600);
 	--primary-fg: oklch(0.985 0.008 230);
 	--primary-soft: oklch(0.92 0.04 230);
+	--accent: var(--azure-500);
+	--accent-fg: oklch(0.985 0.008 230);
 	--ring: var(--azure-600);
 }
 
@@ -282,6 +302,8 @@
 	--primary: var(--azure-400);
 	--primary-fg: oklch(0.135 0.02 240);
 	--primary-soft: oklch(0.305 0.055 235);
+	--accent: var(--azure-400);
+	--accent-fg: oklch(0.135 0.02 240);
 	--ring: var(--azure-400);
 }
 

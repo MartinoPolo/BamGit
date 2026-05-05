@@ -93,7 +93,7 @@
 						{#if issue.priority === option.value}
 							<CheckIcon class="size-4" />
 						{:else}
-							<span class="size-4"></span>
+							<span class="inline-flex size-4 shrink-0"></span>
 						{/if}
 						{option.label()}
 					</ContextMenu.Item>

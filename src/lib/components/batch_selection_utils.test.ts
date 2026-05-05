@@ -84,7 +84,6 @@ describe('CARD_STATE_CLASSES', () => {
 		const expectedKeys = [
 			'active',
 			'selected',
-			'selectionReady',
 			'dragging',
 			'loading',
 			'archived',
@@ -107,12 +106,6 @@ describe('CARD_STATE_CLASSES', () => {
 
 	it('selected class uses blue ring-2', () => {
 		expect(CARD_STATE_CLASSES.selected).toBe('ring-2 ring-[#4a9eff] dark:ring-[#3b82f6]');
-	});
-
-	it('selectionReady class uses blue ring-1 with reduced opacity', () => {
-		expect(CARD_STATE_CLASSES.selectionReady).toBe(
-			'ring-1 ring-[#4a9eff]/60 dark:ring-[#3b82f6]/60',
-		);
 	});
 });
 

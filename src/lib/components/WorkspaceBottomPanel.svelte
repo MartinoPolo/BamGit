@@ -23,8 +23,6 @@
 	import IssueDetail from './IssueDetail.svelte';
 	import GhSetupBanner from './GhSetupBanner.svelte';
 	import AssignedIssuesPanel from './AssignedIssuesPanel.svelte';
-	import ScissorsIcon from '@lucide/svelte/icons/scissors';
-	import { Button } from '$lib/components/ui/button/index.js';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -180,21 +178,6 @@
 					<GhSetupBanner availability={ghAvailability} />
 				{/if}
 
-				<div class="flex items-center justify-between">
-					<div></div>
-					{#if onPrune}
-						<Button
-							variant="ghost"
-							size="sm"
-							title={m.topbar_prune_title()}
-							onclick={onPrune}
-						>
-							<ScissorsIcon size={12} />
-							<span>{m.topbar_prune()}</span>
-						</Button>
-					{/if}
-				</div>
-
 				<IssueCardList
 					{parentIssues}
 					{archivedIssues}
@@ -218,6 +201,7 @@
 					{onRemoveWorktree}
 					{onExecuteAction}
 					{onChangeColor}
+					onBatchPrune={onPrune ? () => onPrune!() : undefined}
 				/>
 
 				{#if assignedIssues.length > 0}
