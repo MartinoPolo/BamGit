@@ -3,6 +3,7 @@
 	import { PaneGroup, Pane } from 'paneforge';
 	import StyledPaneResizer from './StyledPaneResizer.svelte';
 	import TreesIcon from '@lucide/svelte/icons/trees';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		forestPanel: Snippet;
@@ -36,14 +37,14 @@
 			{@render forestPanel()}
 		</div>
 	</Pane>
-	<button
-		type="button"
-		class="flex w-full shrink-0 items-center justify-center gap-1.5 border-y border-border bg-surface-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+	<Button
+		variant="ghost"
 		onclick={handleCollapseToggle}
+		class="w-full shrink-0 rounded-none border-y border-border py-1 text-xs"
 		aria-label={collapsed ? 'Expand forest panel' : 'Collapse forest panel'}
 	>
 		<TreesIcon class="size-3.5" />
-	</button>
+	</Button>
 	<StyledPaneResizer />
 	<Pane minSize={20}>
 		<div class="flex h-full flex-col overflow-hidden">

@@ -3,6 +3,9 @@
 	import type { NotificationEventType } from '$lib/types/generated';
 	import { useNotifications } from '$lib/modules/notifications';
 	import { onMount } from 'svelte';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	const notificationStore = useNotifications();
 
@@ -91,88 +94,61 @@
 
 					<!-- Sound toggle -->
 					<div class="flex justify-center">
-						<button
-							class="h-5 w-9 rounded-full transition-colors {config.sound_enabled ===
-							true
-								? 'bg-primary'
-								: 'bg-muted'}"
-							onclick={() =>
-								toggleChannel(
-									config.event_type,
-									'sound_enabled',
-									config.sound_enabled !== true,
-								)}
-							title={config.sound_enabled === true ? 'Disable sound' : 'Enable sound'}
+						<SimpleTooltip
+							text={config.sound_enabled === true ? 'Disable sound' : 'Enable sound'}
 						>
-							<span
-								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.sound_enabled ===
-								true
-									? 'translate-x-4.5'
-									: ''}"
-							></span>
-						</button>
+							<Switch
+								checked={config.sound_enabled === true}
+								onCheckedChange={(checked) =>
+									toggleChannel(config.event_type, 'sound_enabled', checked)}
+							/>
+						</SimpleTooltip>
 					</div>
 
 					<!-- Toast toggle -->
 					<div class="flex justify-center">
-						<button
-							class="h-5 w-9 rounded-full transition-colors {config.toast_enabled ===
-							true
-								? 'bg-primary'
-								: 'bg-muted'}"
-							onclick={() =>
-								toggleChannel(
-									config.event_type,
-									'toast_enabled',
-									config.toast_enabled !== true,
-								)}
-							title={config.toast_enabled === true ? 'Disable toast' : 'Enable toast'}
+						<SimpleTooltip
+							text={config.toast_enabled === true ? 'Disable toast' : 'Enable toast'}
 						>
-							<span
-								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.toast_enabled ===
-								true
-									? 'translate-x-4.5'
-									: ''}"
-							></span>
-						</button>
+							<Switch
+								checked={config.toast_enabled === true}
+								onCheckedChange={(checked) =>
+									toggleChannel(config.event_type, 'toast_enabled', checked)}
+							/>
+						</SimpleTooltip>
 					</div>
 
 					<!-- Window flash toggle -->
 					<div class="flex justify-center">
-						<button
-							class="h-5 w-9 rounded-full transition-colors {config.window_flash_enabled ===
-							true
-								? 'bg-primary'
-								: 'bg-muted'}"
-							onclick={() =>
-								toggleChannel(
-									config.event_type,
-									'window_flash_enabled',
-									config.window_flash_enabled !== true,
-								)}
-							title={config.window_flash_enabled === true
+						<SimpleTooltip
+							text={config.window_flash_enabled === true
 								? 'Disable window flash'
 								: 'Enable window flash'}
 						>
-							<span
-								class="block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform {config.window_flash_enabled ===
-								true
-									? 'translate-x-4.5'
-									: ''}"
-							></span>
-						</button>
+							<Switch
+								checked={config.window_flash_enabled === true}
+								onCheckedChange={(checked) =>
+									toggleChannel(
+										config.event_type,
+										'window_flash_enabled',
+										checked,
+									)}
+							/>
+						</SimpleTooltip>
 					</div>
 
 					<!-- Test sound button -->
 					<div class="flex justify-center">
 						{#if config.sound_file}
-							<button
-								class="rounded px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-								onclick={() => handleTestSound(config.event_type)}
-								title="Play test sound"
-							>
-								&#9654;
-							</button>
+							<SimpleTooltip text="Play test sound">
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									onclick={() => handleTestSound(config.event_type)}
+								>
+									&#9654;
+								</Button>
+							</SimpleTooltip>
 						{:else}
 							<span class="text-xs text-muted-foreground/60">—</span>
 						{/if}

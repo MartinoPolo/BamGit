@@ -166,9 +166,9 @@
 						: 'text-foreground hover:bg-surface-hover'}"
 				>
 					{#if item.state === 'OPEN'}
-						<CircleDot size={14} class="shrink-0 text-green-400" />
+						<CircleDot size={14} class="shrink-0 text-gh-open" />
 					{:else}
-						<CircleCheck size={14} class="shrink-0 text-purple-400" />
+						<CircleCheck size={14} class="shrink-0 text-gh-closed" />
 					{/if}
 					<span class="min-w-0 truncate">#{item.number} {item.title}</span>
 				</button>

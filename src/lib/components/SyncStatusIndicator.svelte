@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { formatRelativeTime } from '$lib/utils/time';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	let { fetchedAt }: { fetchedAt: string | null } = $props();
 
@@ -19,6 +20,8 @@
 	});
 </script>
 
-<span class="text-[10px] text-muted-foreground" title="Last synced: {fetchedAt ?? 'never'}">
-	{displayText}
-</span>
+<SimpleTooltip text="Last synced: {fetchedAt ?? 'never'}">
+	<span class="text-[10px] text-muted-foreground">
+		{displayText}
+	</span>
+</SimpleTooltip>

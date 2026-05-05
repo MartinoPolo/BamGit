@@ -11,6 +11,9 @@
 	import ActionButtonGroup from './ActionButtonGroup.svelte';
 	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
 	import SessionStateChip from './SessionStateChip.svelte';
+	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import VscodeIcon from './icons/VscodeIcon.svelte';
@@ -76,20 +79,11 @@
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
 			case 'pending':
-				return {
-					label: m.issue_card_setting_up(),
-					class: 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-400 dark:border-yellow-700/50',
-				};
+				return { label: m.issue_card_setting_up(), variant: 'warning' as const };
 			case 'active':
-				return {
-					label: m.issue_card_worktree(),
-					class: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:border-green-700/50',
-				};
+				return { label: m.issue_card_worktree(), variant: 'success' as const };
 			case 'failed':
-				return {
-					label: m.issue_card_wt_failed(),
-					class: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-400 dark:border-red-700/50',
-				};
+				return { label: m.issue_card_wt_failed(), variant: 'danger' as const };
 			default:
 				return null;
 		}
@@ -111,12 +105,6 @@
 		}
 		return '';
 	});
-
-	const quickActionButtonClass = $derived(
-		isLightHeader
-			? 'hover:bg-black/10 text-black/60 hover:text-black/90'
-			: 'hover:bg-white/12 text-white/60 hover:text-white/90',
-	);
 
 	const priorityChipClass = $derived(
 		isLightHeader ? 'bg-white/22 text-black/80' : 'bg-black/18 text-inherit',
@@ -157,7 +145,7 @@
 	isActive ||
 	isBatchSelected
 		? ''
-		: 'hover:ring-2 hover:ring-[#ffd700] active:ring-2 active:ring-[#22c55e] dark:hover:ring-[#d4a017] dark:active:ring-[#4ade80]'}"
+		: 'hover:ring-2 hover:ring-ring-hover active:ring-2 active:ring-ring-active'}"
 	style:--ic={color}
 	style="background: var(--surface);"
 	onclick={handleCardClick}
@@ -204,49 +192,61 @@
 			{/if}
 
 			{#if priorityBadgeClass && prioritiesEnabled && issue.priority !== 'medium'}
-				<button
-					class="inline-flex cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
-					title="Change priority"
-					onclick={(event) => {
-						event.stopPropagation();
-						if (onPriorityClick) {
-							onPriorityClick();
-						}
-					}}
-				>
-					{issue.priority}
-				</button>
+				<SimpleTooltip text="Change priority">
+					<button
+						class="inline-flex cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
+						onclick={(event) => {
+							event.stopPropagation();
+							if (onPriorityClick) {
+								onPriorityClick();
+							}
+						}}
+					>
+						{issue.priority}
+					</button>
+				</SimpleTooltip>
 			{/if}
 
 			<!-- Quick-action buttons -->
 			<div class="ml-0.5 flex items-center gap-0.5">
-				<button
-					class="inline-flex size-5 items-center justify-center rounded border-none bg-transparent p-0 transition-all {quickActionButtonClass}"
-					style:opacity={hasWorktree ? 0.6 : 0.35}
-					title={hasWorktree ? `Open ${issue.branch_name ?? 'folder'}` : 'Assign folder'}
-					onclick={(event) => handleQuickAction(event, 'open-folder')}
-					oncontextmenu={handleQuickActionContextMenu}
+				<SimpleTooltip
+					text={hasWorktree ? `Open ${issue.branch_name ?? 'folder'}` : 'Assign folder'}
 				>
-					<FolderOpenIcon size={12} />
-				</button>
-				<button
-					class="inline-flex size-5 items-center justify-center rounded border-none bg-transparent p-0 transition-all {quickActionButtonClass}"
-					style:opacity={hasWorktree ? 0.6 : 0.35}
-					title={hasWorktree ? 'Open Terminal' : 'Assign folder'}
-					onclick={(event) => handleQuickAction(event, 'open-terminal')}
-					oncontextmenu={handleQuickActionContextMenu}
-				>
-					<TerminalIcon size={12} />
-				</button>
-				<button
-					class="inline-flex size-5 items-center justify-center rounded border-none bg-transparent p-0 transition-all {quickActionButtonClass}"
-					style:opacity={hasWorktree ? 0.6 : 0.35}
-					title={hasWorktree ? 'Open Editor' : 'Assign folder'}
-					onclick={(event) => handleQuickAction(event, 'open-editor')}
-					oncontextmenu={handleQuickActionContextMenu}
-				>
-					<VscodeIcon size={12} />
-				</button>
+					<Button
+						variant="ghost-overlay"
+						size="icon-sm"
+						class="size-5"
+						style="opacity: {hasWorktree ? 0.6 : 0.35}"
+						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
+						oncontextmenu={handleQuickActionContextMenu}
+					>
+						<FolderOpenIcon size={12} />
+					</Button>
+				</SimpleTooltip>
+				<SimpleTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
+					<Button
+						variant="ghost-overlay"
+						size="icon-sm"
+						class="size-5"
+						style="opacity: {hasWorktree ? 0.6 : 0.35}"
+						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
+						oncontextmenu={handleQuickActionContextMenu}
+					>
+						<TerminalIcon size={12} />
+					</Button>
+				</SimpleTooltip>
+				<SimpleTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
+					<Button
+						variant="ghost-overlay"
+						size="icon-sm"
+						class="size-5"
+						style="opacity: {hasWorktree ? 0.6 : 0.35}"
+						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
+						oncontextmenu={handleQuickActionContextMenu}
+					>
+						<VscodeIcon size={12} />
+					</Button>
+				</SimpleTooltip>
 			</div>
 		</div>
 	</div>
@@ -259,10 +259,11 @@
 			style="background: linear-gradient(180deg, color-mix(in oklch, {color} 18%, var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
 		>
 			{#if notificationDotColor !== null && sessionState === null}
-				<span
-					class="absolute top-1.5 right-1.5 size-[7px] animate-pulse rounded-full {notificationDotColor}"
-					title={m.issue_card_session_needs_attention()}
-				></span>
+				<SimpleTooltip text={m.issue_card_session_needs_attention()}>
+					<span
+						class="absolute top-1.5 right-1.5 size-[7px] animate-pulse rounded-full {notificationDotColor}"
+					></span>
+				</SimpleTooltip>
 			{/if}
 			<div class="mb-4 size-6 rounded-full bg-foreground/20"></div>
 		</div>
@@ -286,16 +287,14 @@
 				</div>
 				<div class="flex shrink-0 items-center gap-1">
 					{#if worktreeBadge}
-						<span
-							class="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs {worktreeBadge.class}"
-						>
+						<Badge variant={worktreeBadge.variant} size="compact">
 							{#if issue.worktree_state === 'pending'}
 								<span
 									class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
 								></span>
 							{/if}
 							{worktreeBadge.label}
-						</span>
+						</Badge>
 					{/if}
 					{#if cache?.behind_base_count != null}
 						<SyncBadge behindBaseCount={cache.behind_base_count} />
@@ -334,13 +333,14 @@
 			{#if issue.labels.length > 0}
 				<div class="flex flex-wrap items-center gap-1">
 					{#each issue.labels as label (label.name)}
-						<span
-							class="inline-block rounded-full px-1.5 py-px text-[10px] font-medium leading-3"
-							style="background-color: {label.color}33; color: {label.color}; border: 1px solid {label.color}44;"
-							title={label.name}
-						>
-							{label.name}
-						</span>
+						<SimpleTooltip text={label.name}>
+							<span
+								class="inline-block rounded-full px-1.5 py-px text-[10px] font-medium leading-3"
+								style="background-color: {label.color}33; color: {label.color}; border: 1px solid {label.color}44;"
+							>
+								{label.name}
+							</span>
+						</SimpleTooltip>
 					{/each}
 				</div>
 			{/if}
@@ -393,39 +393,20 @@
 				onExecute={(actionId) => onExecuteAction(actionId, issue.id)}
 			/>
 			{#if onOverflowClick}
-				<button
-					onclick={(event) => {
-						event.stopPropagation();
-						onOverflowClick();
-					}}
-					class="ic-action-btn"
-					title="More actions"
-				>
-					<MoreHorizontalIcon size={10} />
-				</button>
+				<SimpleTooltip text="More actions">
+					<Button
+						variant="secondary"
+						size="icon-sm"
+						class="h-[22px] w-auto px-1.5"
+						onclick={(event: MouseEvent) => {
+							event.stopPropagation();
+							onOverflowClick();
+						}}
+					>
+						<MoreHorizontalIcon size={10} />
+					</Button>
+				</SimpleTooltip>
 			{/if}
 		</div>
 	{/if}
 </div>
-
-<style>
-	.ic-action-btn {
-		display: inline-flex;
-		height: 22px;
-		align-items: center;
-		justify-content: center;
-		border-radius: 5px;
-		border: 1px solid var(--border);
-		background: var(--surface-2, hsl(0 0% 12%));
-		color: var(--muted-foreground);
-		font-family: sans-serif;
-		font-size: 11px;
-		padding-inline: 6px;
-		transition: all 0.15s;
-	}
-
-	.ic-action-btn:hover {
-		background: var(--surface-3, hsl(0 0% 14%));
-		border-color: var(--border-strong);
-	}
-</style>

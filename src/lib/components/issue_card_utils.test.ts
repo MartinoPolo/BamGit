@@ -17,24 +17,24 @@ describe('getPriorityBorderClass', () => {
 		expect(getPriorityBorderClass(null, false)).toBe('border-l-transparent');
 	});
 
-	it('returns border-l-red-500 for top priority when enabled', () => {
-		expect(getPriorityBorderClass('top', true)).toBe('border-l-red-500');
+	it('returns border-l-priority-top for top priority when enabled', () => {
+		expect(getPriorityBorderClass('top', true)).toBe('border-l-priority-top');
 	});
 
-	it('returns border-l-orange-400 for high priority when enabled', () => {
-		expect(getPriorityBorderClass('high', true)).toBe('border-l-orange-400');
+	it('returns border-l-priority-high for high priority when enabled', () => {
+		expect(getPriorityBorderClass('high', true)).toBe('border-l-priority-high');
 	});
 
-	it('returns border-l-yellow-400 for medium priority when enabled', () => {
-		expect(getPriorityBorderClass('medium', true)).toBe('border-l-yellow-400');
+	it('returns border-l-priority-medium for medium priority when enabled', () => {
+		expect(getPriorityBorderClass('medium', true)).toBe('border-l-priority-medium');
 	});
 
-	it('returns border-l-blue-400 for low priority when enabled', () => {
-		expect(getPriorityBorderClass('low', true)).toBe('border-l-blue-400');
+	it('returns border-l-priority-low for low priority when enabled', () => {
+		expect(getPriorityBorderClass('low', true)).toBe('border-l-priority-low');
 	});
 
-	it('returns border-l-gray-400 for lowest priority when enabled', () => {
-		expect(getPriorityBorderClass('lowest', true)).toBe('border-l-gray-400');
+	it('returns border-l-priority-lowest for lowest priority when enabled', () => {
+		expect(getPriorityBorderClass('lowest', true)).toBe('border-l-priority-lowest');
 	});
 
 	it('returns transparent for null priority when enabled', () => {
@@ -60,12 +60,12 @@ describe('PRIORITY_OPTIONS', () => {
 });
 
 describe('PRIORITY_BORDER_CLASSES', () => {
-	it('maps all five priority levels', () => {
-		expect(PRIORITY_BORDER_CLASSES.top).toBe('border-l-red-500');
-		expect(PRIORITY_BORDER_CLASSES.high).toBe('border-l-orange-400');
-		expect(PRIORITY_BORDER_CLASSES.medium).toBe('border-l-yellow-400');
-		expect(PRIORITY_BORDER_CLASSES.low).toBe('border-l-blue-400');
-		expect(PRIORITY_BORDER_CLASSES.lowest).toBe('border-l-gray-400');
+	it('maps all five priority levels to semantic tokens', () => {
+		expect(PRIORITY_BORDER_CLASSES.top).toBe('border-l-priority-top');
+		expect(PRIORITY_BORDER_CLASSES.high).toBe('border-l-priority-high');
+		expect(PRIORITY_BORDER_CLASSES.medium).toBe('border-l-priority-medium');
+		expect(PRIORITY_BORDER_CLASSES.low).toBe('border-l-priority-low');
+		expect(PRIORITY_BORDER_CLASSES.lowest).toBe('border-l-priority-lowest');
 	});
 });
 

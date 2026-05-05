@@ -8,7 +8,7 @@
 			{#snippet child({ props })}
 				<span
 					{...props}
-					class="inline-flex items-center gap-1 rounded border border-red-200 bg-red-50 px-1.5 py-0.5 text-[10px] leading-tight text-red-700 dark:border-red-700/50 dark:bg-red-900/40 dark:text-red-300"
+					class="inline-flex items-center gap-1 rounded border border-[color-mix(in_oklch,var(--status-danger)_40%,transparent)] bg-[color-mix(in_oklch,var(--status-danger)_14%,transparent)] px-1.5 py-0.5 text-[10px] leading-tight text-status-danger"
 				>
 					<span class="opacity-70">⚠</span>
 					conflict

@@ -3,6 +3,8 @@
 	import { useKeyboardShortcuts, eventToBinding } from '$lib/modules/keyboard-shortcuts';
 	import type { ShortcutCollision } from '$lib/modules/keyboard-shortcuts';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	const shortcutsCtx = useKeyboardShortcuts();
 
@@ -95,14 +97,14 @@
 											})}
 										</span>
 									{/if}
-									<button
-										type="button"
+									<Button
+										variant="primary"
+										size="sm"
 										onclick={confirmRebind}
 										disabled={collision !== null}
-										class="rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
 									>
 										{m.shortcuts_confirm()}
-									</button>
+									</Button>
 								{:else}
 									<span
 										class="animate-pulse rounded border border-dashed border-ring px-3 py-1 text-xs text-muted-foreground"
@@ -110,32 +112,30 @@
 										{m.shortcuts_press_key_combo()}
 									</span>
 								{/if}
-								<button
-									type="button"
-									onclick={cancelRebind}
-									class="text-xs text-muted-foreground hover:text-foreground"
-								>
+								<Button variant="ghost" size="sm" onclick={cancelRebind}>
 									{m.shortcuts_cancel()}
-								</button>
+								</Button>
 							</div>
 						{:else}
-							<button
-								type="button"
-								onclick={() => startRebind(shortcutBinding.actionId)}
-								class="cursor-pointer transition-opacity hover:opacity-70"
-								title={m.shortcuts_click_to_rebind()}
-							>
-								<Kbd>{shortcutBinding.binding}</Kbd>
-							</button>
-							{#if shortcutBinding.isCustom}
-								<button
-									type="button"
-									onclick={() => resetToDefault(shortcutBinding.actionId)}
-									class="text-xs text-muted-foreground hover:text-foreground"
-									title={m.shortcuts_reset_to_default()}
+							<SimpleTooltip text={m.shortcuts_click_to_rebind()}>
+								<Button
+									variant="ghost"
+									size="sm"
+									onclick={() => startRebind(shortcutBinding.actionId)}
 								>
-									{m.shortcuts_reset()}
-								</button>
+									<Kbd>{shortcutBinding.binding}</Kbd>
+								</Button>
+							</SimpleTooltip>
+							{#if shortcutBinding.isCustom}
+								<SimpleTooltip text={m.shortcuts_reset_to_default()}>
+									<Button
+										variant="ghost"
+										size="sm"
+										onclick={() => resetToDefault(shortcutBinding.actionId)}
+									>
+										{m.shortcuts_reset()}
+									</Button>
+								</SimpleTooltip>
 							{/if}
 						{/if}
 					</div>

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Action } from '$lib/types/generated';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	interface Props {
 		actions: Action[];
@@ -24,15 +26,18 @@
 
 <div class="flex items-center gap-0.5">
 	{#each actions as action (action.id)}
-		<button
-			onclick={(event) => {
-				event.stopPropagation();
-				onExecute(action.id);
-			}}
-			class="rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-			title={action.name}
-		>
-			<span class="text-[10px]">{getIconDisplay(action.icon)}</span>
-		</button>
+		<SimpleTooltip text={action.name}>
+			<Button
+				variant="ghost"
+				size="icon-sm"
+				class="h-[22px] w-auto px-1.5"
+				onclick={(event: MouseEvent) => {
+					event.stopPropagation();
+					onExecute(action.id);
+				}}
+			>
+				<span class="text-[10px]">{getIconDisplay(action.icon)}</span>
+			</Button>
+		</SimpleTooltip>
 	{/each}
 </div>

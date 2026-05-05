@@ -44,8 +44,8 @@ export function computeSelectAllCheckboxState(
 }
 
 export const CARD_STATE_CLASSES = {
-	active: 'ring-2 ring-[#22c55e] dark:ring-[#4ade80]',
-	selected: 'ring-2 ring-[#4a9eff] dark:ring-[#3b82f6]',
+	active: 'ring-2 ring-ring-active',
+	selected: 'ring-2 ring-ring-selected',
 	dragging: 'rotate-[-1.5deg] scale-[1.02] shadow-lg opacity-92',
 	loading: 'pointer-events-none',
 	archived: 'opacity-70 grayscale-[0.8]',
@@ -53,7 +53,7 @@ export const CARD_STATE_CLASSES = {
 	disabled: 'opacity-42 pointer-events-none',
 } as const;
 
-export const BATCH_SELECTED_GLOW_COLOR = '#4a9eff';
+export const BATCH_SELECTED_GLOW_COLOR = 'var(--ring-selected)';
 
 /**
  * Compute the merged batch selection combining individually-selected IDs (Ctrl+click)

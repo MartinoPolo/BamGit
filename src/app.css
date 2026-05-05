@@ -43,6 +43,25 @@
 	--color-status-danger: var(--status-danger);
 	--color-status-info: var(--status-info);
 	--color-code-bg: var(--code-bg);
+	--color-priority-top: var(--priority-top);
+	--color-priority-high: var(--priority-high);
+	--color-priority-medium: var(--priority-medium);
+	--color-priority-low: var(--priority-low);
+	--color-priority-lowest: var(--priority-lowest);
+	--color-gh-open: var(--gh-open);
+	--color-gh-closed: var(--gh-closed);
+	--color-gh-merged: var(--gh-merged);
+	--color-gh-draft: var(--gh-draft);
+	--color-session-running: var(--session-running);
+	--color-session-errored: var(--session-errored);
+	--color-session-idle: var(--session-idle);
+	--color-session-paused: var(--session-paused);
+	--color-session-finished: var(--session-finished);
+	--color-session-needs-input: var(--session-needs-input);
+	--color-session-needs-review: var(--session-needs-review);
+	--color-ring-hover: var(--ring-hover);
+	--color-ring-active: var(--ring-active);
+	--color-ring-selected: var(--ring-selected);
 	--color-moss-50: var(--moss-50);
 	--color-moss-100: var(--moss-100);
 	--color-moss-200: var(--moss-200);
@@ -140,6 +159,22 @@
 	--status-warning: oklch(0.77 0.155 75);
 	--status-danger: oklch(0.62 0.205 25);
 	--status-info: oklch(0.66 0.105 220);
+	--priority-top: oklch(0.62 0.205 25);
+	--priority-high: oklch(0.72 0.16 55);
+	--priority-medium: oklch(0.82 0.16 85);
+	--priority-low: oklch(0.66 0.105 220);
+	--priority-lowest: oklch(0.55 0.02 250);
+	--gh-open: oklch(0.66 0.135 145);
+	--gh-closed: oklch(0.58 0.14 310);
+	--gh-merged: oklch(0.58 0.14 310);
+	--gh-draft: oklch(0.55 0.02 250);
+	--session-running: oklch(0.66 0.135 145);
+	--session-errored: oklch(0.62 0.205 25);
+	--session-idle: oklch(0.66 0.105 220);
+	--session-paused: oklch(0.55 0.02 250);
+	--session-finished: oklch(0.45 0.015 250);
+	--session-needs-input: oklch(0.77 0.155 75);
+	--session-needs-review: oklch(0.66 0.105 220);
 	--text-2xs: 10.5px;
 	--text-xs: 11px;
 	--text-sm: 12px;
@@ -183,6 +218,9 @@
 	--focus-ring-offset: 2px;
 	--sidebar-width: 240px;
 	--sidebar-width-collapsed: 56px;
+	--ring-hover: oklch(0.82 0.16 85);
+	--ring-active: oklch(0.66 0.135 145);
+	--ring-selected: oklch(0.62 0.13 250);
 }
 
 [data-theme='light'] {
@@ -239,6 +277,9 @@
 	--sky-bot: var(--sky-dark-bot);
 	--ground-color: oklch(0.3 0.06 140);
 	--ground-dark: oklch(0.18 0.04 50);
+	--ring-hover: oklch(0.75 0.14 85);
+	--ring-active: oklch(0.72 0.15 145);
+	--ring-selected: oklch(0.58 0.12 250);
 }
 
 /* ── Accent color overrides ─────────────────────────────────────────────── */

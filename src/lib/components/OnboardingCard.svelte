@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		onCreateDashboard: () => void;
@@ -19,11 +20,8 @@
 			repository. A <strong class="text-foreground">portfolio dashboard</strong> groups multiple
 			repos together.
 		</p>
-		<button
-			onclick={onCreateDashboard}
-			class="rounded bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
-		>
+		<Button variant="primary" onclick={onCreateDashboard}>
 			{m.onboarding_create()}
-		</button>
+		</Button>
 	</div>
 </div>

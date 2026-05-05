@@ -6,6 +6,7 @@
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	interface Props {
 		collapsed?: boolean;
@@ -45,14 +46,12 @@
 {:else}
 	<Tabs class="w-full [&>*]:flex-1 [&>*]:justify-center">
 		{#each modes as { value, Icon, labelKey } (value)}
-			<Tab
-				active={theme.mode === value}
-				onclick={() => (theme.mode = value)}
-				title="{MODE_LABELS[labelKey]()} mode"
-			>
-				<Icon class="size-3.5" />
-				<span>{MODE_LABELS[labelKey]()}</span>
-			</Tab>
+			<SimpleTooltip text="{MODE_LABELS[labelKey]()} mode">
+				<Tab active={theme.mode === value} onclick={() => (theme.mode = value)}>
+					<Icon class="size-3.5" />
+					<span>{MODE_LABELS[labelKey]()}</span>
+				</Tab>
+			</SimpleTooltip>
 		{/each}
 	</Tabs>
 {/if}

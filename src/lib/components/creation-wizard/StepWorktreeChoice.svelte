@@ -47,7 +47,7 @@
 			onclick={() => handleClick(true)}
 			class="flex size-24 flex-col items-center justify-center gap-2 rounded-lg border-2 transition-colors
 				{selectedChoice === true
-				? 'border-green-500 bg-green-500/10 text-green-400'
+				? 'border-status-success bg-[color-mix(in_oklch,var(--status-success)_14%,transparent)] text-status-success'
 				: 'border-border bg-transparent text-muted-foreground hover:bg-surface-hover'}"
 		>
 			<TreePine size={24} />
@@ -58,7 +58,7 @@
 			onclick={() => handleClick(false)}
 			class="flex size-24 flex-col items-center justify-center gap-2 rounded-lg border-2 transition-colors
 				{selectedChoice === false
-				? 'border-red-500 bg-red-500/10 text-red-400'
+				? 'border-status-danger bg-[color-mix(in_oklch,var(--status-danger)_14%,transparent)] text-status-danger'
 				: 'border-border bg-transparent text-muted-foreground hover:bg-surface-hover'}"
 		>
 			<X size={24} />

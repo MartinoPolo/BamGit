@@ -11,6 +11,9 @@
 	import GitBranch from '@lucide/svelte/icons/git-branch';
 	import { openUrl } from '@tauri-apps/plugin-opener';
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { cn } from '$lib/utils.js';
 
 	interface Props {
 		issues: AssignedIssue[];
@@ -61,19 +64,21 @@
 
 {#snippet issueRow(issue: AssignedIssue, variant: 'unlinked' | 'linked' | 'deleted')}
 	<div class="group flex items-center gap-0.5">
-		<button
+		<Button
+			variant="ghost"
+			size="sm"
 			onclick={() => handleClick(issue.url)}
-			class="flex min-w-0 flex-1 items-center gap-2 rounded px-2 py-1 text-left text-xs transition-colors hover:bg-accent hover:text-foreground"
-			class:cursor-not-allowed={disabled}
-			class:opacity-50={disabled}
-			class:text-muted-foreground={variant !== 'deleted'}
-			class:text-orange-400={variant === 'deleted'}
+			class={cn(
+				'flex min-w-0 flex-1 justify-start rounded px-2 py-1 text-left text-xs',
+				disabled && 'cursor-not-allowed opacity-50',
+				variant !== 'deleted' ? 'text-muted-foreground' : 'text-status-warning',
+			)}
 			{disabled}
 		>
 			{#if issue.state === 'OPEN'}
-				<CircleDot size={12} class="shrink-0 text-green-400" />
+				<CircleDot size={12} class="shrink-0 text-gh-open" />
 			{:else}
-				<CircleCheck size={12} class="shrink-0 text-purple-400" />
+				<CircleCheck size={12} class="shrink-0 text-gh-closed" />
 			{/if}
 			<span class="min-w-0 truncate">#{issue.number} {issue.title}</span>
 			{#if issue.labels.length > 0}
@@ -88,27 +93,31 @@
 					{/each}
 				</span>
 			{/if}
-		</button>
+		</Button>
 		{#if variant === 'unlinked' || variant === 'deleted'}
 			{#if onWizardOpen}
-				<button
-					type="button"
-					onclick={() => onWizardOpen(issue)}
-					class="shrink-0 rounded p-0.5 text-muted-foreground/40 opacity-0 transition-all hover:bg-accent hover:text-foreground group-hover:opacity-100"
-					title={m.assigned_wizard_open()}
-				>
-					<Plus size={12} />
-				</button>
+				<SimpleTooltip text={m.assigned_wizard_open()}>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onclick={() => onWizardOpen(issue)}
+						class="shrink-0 opacity-0 group-hover:opacity-100"
+					>
+						<Plus size={12} />
+					</Button>
+				</SimpleTooltip>
 			{/if}
 			{#if onQuickAddWithWorktree}
-				<button
-					type="button"
-					onclick={() => onQuickAddWithWorktree(issue)}
-					class="shrink-0 rounded p-0.5 text-muted-foreground/40 opacity-0 transition-all hover:bg-accent hover:text-foreground group-hover:opacity-100"
-					title={m.assigned_quick_worktree()}
-				>
-					<GitBranch size={12} />
-				</button>
+				<SimpleTooltip text={m.assigned_quick_worktree()}>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onclick={() => onQuickAddWithWorktree(issue)}
+						class="shrink-0 opacity-0 group-hover:opacity-100"
+					>
+						<GitBranch size={12} />
+					</Button>
+				</SimpleTooltip>
 			{/if}
 		{/if}
 	</div>
@@ -116,10 +125,11 @@
 
 {#if issues.length > 0}
 	<div class="flex flex-col gap-1">
-		<button
-			type="button"
+		<Button
+			variant="ghost"
+			size="sm"
 			onclick={() => (collapsed.current = !collapsed.current)}
-			class="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+			class="flex items-center gap-1 px-0 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 hover:bg-transparent hover:text-muted-foreground"
 		>
 			{#if collapsed.current}
 				<ChevronRight size={12} />
@@ -127,7 +137,7 @@
 				<ChevronDown size={12} />
 			{/if}
 			{m.assigned_title({ count: issues.length })}
-		</button>
+		</Button>
 
 		{#if !collapsed.current}
 			<div class="flex flex-col gap-0.5">
@@ -158,13 +168,14 @@
 			{/if}
 
 			{#if hasMore && onLoadMore}
-				<button
-					type="button"
+				<Button
+					variant="ghost"
+					size="sm"
 					onclick={onLoadMore}
-					class="rounded px-2 py-1 text-xs text-muted-foreground/60 transition-colors hover:bg-accent hover:text-foreground"
+					class="text-muted-foreground/60"
 				>
 					{m.assigned_load_more()}
-				</button>
+				</Button>
 			{/if}
 		{/if}
 	</div>

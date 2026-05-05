@@ -6,6 +6,7 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	interface Props {
 		title: string;
@@ -44,40 +45,41 @@
 	<!-- Right: controls -->
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onSync}
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				title={m.topbar_sync()}
-				disabled={syncing}
-				onclick={onSync}
-			>
-				<RefreshCwIcon size={13} class={syncing ? 'animate-spin' : ''} />
-			</Button>
+			<SimpleTooltip text={m.topbar_sync()}>
+				<Button variant="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
+					<RefreshCwIcon size={13} class={syncing ? 'animate-spin' : ''} />
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
-		<Button variant="ghost" size="icon-sm" class="relative" title={m.topbar_notifications()}>
-			<BellIcon size={13} />
-			{#if hasNotifications}
-				<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
-			{/if}
-		</Button>
+		<SimpleTooltip text={m.topbar_notifications()}>
+			<Button variant="ghost" size="icon-sm" class="relative">
+				<BellIcon size={13} />
+				{#if hasNotifications}
+					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
+				{/if}
+			</Button>
+		</SimpleTooltip>
 
 		{#if onToggleForest}
-			<Button
-				variant={forestCollapsed ? 'ghost' : 'secondary'}
-				size="icon-sm"
-				title={forestCollapsed ? 'Show forest' : 'Hide forest'}
-				onclick={onToggleForest}
-			>
-				<TreesIcon size={13} />
-			</Button>
+			<SimpleTooltip text={forestCollapsed ? 'Show forest' : 'Hide forest'}>
+				<Button
+					variant={forestCollapsed ? 'ghost' : 'secondary'}
+					size="icon-sm"
+					onclick={onToggleForest}
+				>
+					<TreesIcon size={13} />
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
 		{#if onPlant}
-			<Button variant="primary" size="sm" title={m.topbar_plant_title()} onclick={onPlant}>
-				<PlusIcon size={12} />
-				<span>{m.topbar_plant()}</span>
-			</Button>
+			<SimpleTooltip text={m.topbar_plant_title()}>
+				<Button variant="primary" size="sm" onclick={onPlant}>
+					<PlusIcon size={12} />
+					<span>{m.topbar_plant()}</span>
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
 		{#if children}

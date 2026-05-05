@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { DiscoveredSession, DiscoveredSessionStatus } from '$lib/types/generated';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		session: DiscoveredSession;
@@ -18,11 +19,11 @@
 	};
 
 	const statusConfig: Record<DiscoveredSessionStatus, { color: string }> = {
-		working: { color: 'bg-green-500' },
-		needs_attention: { color: 'bg-amber-500' },
-		idle: { color: 'bg-blue-500' },
-		finished: { color: 'bg-neutral-600' },
-		unknown: { color: 'bg-neutral-500' },
+		working: { color: 'bg-session-running' },
+		needs_attention: { color: 'bg-session-needs-input' },
+		idle: { color: 'bg-session-idle' },
+		finished: { color: 'bg-session-finished' },
+		unknown: { color: 'bg-session-paused' },
 	};
 
 	const badge = $derived(statusConfig[session.status] ?? statusConfig.unknown);
@@ -73,14 +74,16 @@
 			<span>{session.token_count.toLocaleString()} tokens</span>
 		{/if}
 
-		<button
-			class="ml-auto rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-			onclick={(e) => {
-				e.stopPropagation();
+		<Button
+			variant="primary"
+			size="sm"
+			class="ml-auto"
+			onclick={(event: MouseEvent) => {
+				event.stopPropagation();
 				onAdopt(session);
 			}}
 		>
 			{m.discovered_adopt()}
-		</button>
+		</Button>
 	</div>
 </div>

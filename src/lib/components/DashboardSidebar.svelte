@@ -15,6 +15,7 @@
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {
@@ -109,15 +110,19 @@
 					</div>
 					<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
 				</div>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onclick={onToggleSidebar}
-					aria-label="Collapse sidebar"
-					title={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
+				<SimpleTooltip
+					text={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
+					side="right"
 				>
-					<PanelLeftIcon size={14} />
-				</Button>
+					<Button
+						variant="ghost"
+						size="icon-sm"
+						onclick={onToggleSidebar}
+						aria-label="Collapse sidebar"
+					>
+						<PanelLeftIcon size={14} />
+					</Button>
+				</SimpleTooltip>
 			{/if}
 		</div>
 
