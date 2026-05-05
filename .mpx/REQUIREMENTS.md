@@ -54,9 +54,9 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
     4. Color selection (24-color palette, auto-rotation, custom input). Clicking a swatch = select + advance (creates issue on last step)
     5. Worktree creation progress (if yes)
     - **Click-to-advance:** Clicking any selectable item confirms + advances to next step across all steps
-    - **Dynamic footer:** Back/Cancel buttons swap keyboard hints based on text input focus. Back shows Esc when input focused, Backspace when not. Cancel shows Esc only when no Back button or input not focused. Navigation hint (arrow Kbd labels + "Navigate" text) shown per step: ↑↓ on step 1, hidden on step 2, ←→ on step 3, ↑↓←→ on step 4
+    - **Dynamic footer:** Back/Cancel buttons swap keyboard hints based on text input focus. Back shows Esc when input focused, Backspace when not. Cancel shows Esc only when no Back button or input not focused. Navigation hint ("Navigate" text + separate arrow Kbd icons) shown per step: ↑↓ on step 1 (always visible), hidden on step 2, ←→ on step 3, ↑↓←→ on step 4 (hidden when hex input focused). Step 3: no element focused on entry (blur on mount)
     - **Arrow nav from any focus:** Arrow keys navigate items when any element in the modal is focused (not just text input). Exception: text input focused = arrows control cursor
-    - **Keyboard routing:** Enter confirms current step. Escape goes back when text input focused on non-first step, closes wizard otherwise. Backspace goes back when no text input focused
+    - **Keyboard routing:** Enter confirms current step from **any focus within the modal** (global handler routes to step's confirm function). Empty name on step 2 shows inline validation error. Escape goes back when text input focused on non-first step, closes wizard otherwise (Dialog's own Escape suppressed via `onEscapeKeydown`). Backspace goes back when no text input focused
 - **Quick add (no worktree):** One-click from assigned GitHub issue. Auto-fills name, GitHub link, assigns next color.
 - **Quick add (with worktree):** One-click from assigned issue or GitHub trigger. Auto-fills everything, auto-detects base branch, runs setup-worktree.sh.
 - **From raw requirements:** Quick ideas widget appends to `.mpx/RAW_REQUIREMENTS.md`. Processing trigger runs `/mp-grill-requirements` to refine → create GitHub issue.

@@ -9,6 +9,7 @@
 
 	let nameValue = $state(wizard.formData.issueName);
 	let inputElement = $state<HTMLInputElement | null>(null);
+	let showError = $state(false);
 
 	const branchPreview = $derived.by(() => {
 		if (wizard.formData.githubIssueNumber !== null) {
@@ -28,7 +29,10 @@
 	export function confirm() {
 		const trimmed = nameValue.trim();
 		if (trimmed) {
+			showError = false;
 			wizard.confirmIssueName(trimmed, branchPreview);
+		} else {
+			showError = true;
 		}
 	}
 
@@ -48,7 +52,11 @@
 		bind:value={nameValue}
 		placeholder={m.wizard_name_placeholder()}
 		onkeydown={handleKeydown}
+		oninput={() => (showError = false)}
 	/>
+	{#if showError}
+		<p class="text-xs text-destructive">{m.wizard_name_required()}</p>
+	{/if}
 	{#if branchPreview}
 		<p class="text-xs text-muted-foreground">
 			{m.wizard_branch_preview({ branch: branchPreview })}

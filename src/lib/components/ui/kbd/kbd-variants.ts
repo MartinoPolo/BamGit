@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { type VariantProps, tv } from 'tailwind-variants';
 
 export const kbdVariants = tv({
-	base: 'inline-flex items-center justify-center min-w-[18px] h-[18px] px-[5px] rounded-[4px] font-mono text-[10.5px] [&_svg:not([class*="size-"])]:size-3 [&_svg]:shrink-0',
+	base: 'inline-flex items-center justify-center gap-px min-w-[18px] h-[18px] px-[5px] rounded-[4px] font-mono text-[10.5px] [&_svg:not([class*="size-"])]:size-3 [&_svg]:shrink-0',
 	variants: {
 		variant: {
 			default: 'bg-surface-2 border border-border text-foreground-muted',
