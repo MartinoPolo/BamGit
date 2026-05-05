@@ -4,8 +4,7 @@
 	import type { GitStatusCache } from '$lib/types/generated';
 	import { PRIORITY_OPTIONS, PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
 	import ColorPicker from './color-picker/ColorPicker.svelte';
-	import PullRequestBadge from './PullRequestBadge.svelte';
-	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
+	import GitHubBadge from './GitHubBadge.svelte';
 	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
@@ -101,16 +100,18 @@
 	<div class="flex flex-col gap-2 text-xs text-muted-foreground">
 		{#if issue.github_issue_number !== null && cache}
 			<div class="flex items-center gap-4">
-				<GitHubIssueBadge
-					issueNumber={issue.github_issue_number}
+				<GitHubBadge
+					type="issue"
+					number={issue.github_issue_number}
 					state={cache.github_issue_state}
 					url={issue.github_issue_url}
 					disabled={!ghAvailable}
 				/>
 				{#if cache.pr_state}
-					<PullRequestBadge
+					<GitHubBadge
+						type="pr"
 						state={cache.pr_state}
-						prNumber={cache.pr_number}
+						number={cache.pr_number}
 						url={cache.pr_url}
 						disabled={!ghAvailable}
 					/>

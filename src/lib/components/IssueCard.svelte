@@ -3,8 +3,7 @@
 	import type { Issue } from '$lib/modules/issues';
 	import type { Action, GitStatusCache } from '$lib/types/generated';
 	import { getContrastTextColor } from '$lib/components/color-picker/color_utils.js';
-	import PullRequestBadge from './PullRequestBadge.svelte';
-	import GitHubIssueBadge from './GitHubIssueBadge.svelte';
+	import GitHubBadge from './GitHubBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
 	import SyncBadge from './SyncBadge.svelte';
 	import MergeConflictBadge from './MergeConflictBadge.svelte';
@@ -311,18 +310,20 @@
 			{#if cache?.github_issue_state != null || cache?.pr_state != null}
 				<div class="flex flex-wrap items-center gap-1">
 					{#if cache?.github_issue_state}
-						<GitHubIssueBadge
+						<GitHubBadge
+							type="issue"
 							state={cache.github_issue_state}
 							url={issue.github_issue_url}
-							issueNumber={issue.github_issue_number}
+							number={issue.github_issue_number}
 							disabled={!ghAvailable}
 						/>
 					{/if}
 					{#if cache?.pr_state}
-						<PullRequestBadge
+						<GitHubBadge
+							type="pr"
 							state={cache.pr_state}
 							url={cache.pr_url}
-							prNumber={cache.pr_number}
+							number={cache.pr_number}
 							disabled={!ghAvailable}
 						/>
 					{/if}
