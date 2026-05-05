@@ -150,7 +150,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-all duration-150 focus:outline-none {cardStateClass} {isArchived ||
+	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-all duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
 	isActive ||
 	isBatchSelected
 		? ''
