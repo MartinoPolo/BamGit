@@ -9,12 +9,12 @@
 
 	const colorClass = $derived.by(() => {
 		if (behindBaseCount <= 0) {
-			return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700/50';
+			return 'bg-[color-mix(in_oklch,var(--status-success)_14%,transparent)] text-status-success border-[color-mix(in_oklch,var(--status-success)_40%,transparent)]';
 		}
 		if (behindBaseCount <= 5) {
-			return 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700/50';
+			return 'bg-[color-mix(in_oklch,var(--status-warning)_14%,transparent)] text-status-warning border-[color-mix(in_oklch,var(--status-warning)_40%,transparent)]';
 		}
-		return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700/50';
+		return 'bg-[color-mix(in_oklch,var(--status-danger)_14%,transparent)] text-status-danger border-[color-mix(in_oklch,var(--status-danger)_40%,transparent)]';
 	});
 
 	const tooltip = $derived(

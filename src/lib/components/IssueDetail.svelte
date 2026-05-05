@@ -7,6 +7,7 @@
 	import GitHubBadge from './GitHubBadge.svelte';
 	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -155,19 +156,18 @@
 
 	<!-- Action buttons -->
 	<div class="flex flex-wrap gap-1.5 border-t border-border pt-3">
-		<Button variant="ghost" size="sm" onclick={() => onEdit(issue)} title={m.issue_card_edit()}>
-			<Pencil size={14} />
-		</Button>
+		<SimpleTooltip text={m.issue_card_edit()}>
+			<Button variant="ghost" size="sm" onclick={() => onEdit(issue)}>
+				<Pencil size={14} />
+			</Button>
+		</SimpleTooltip>
 
 		{#if isStandalone && onRename}
-			<Button
-				variant="ghost"
-				size="sm"
-				onclick={() => onRename(issue)}
-				title={m.issue_card_rename()}
-			>
-				<PenLine size={14} />
-			</Button>
+			<SimpleTooltip text={m.issue_card_rename()}>
+				<Button variant="ghost" size="sm" onclick={() => onRename(issue)}>
+					<PenLine size={14} />
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
 		{#if !isArchived}
@@ -183,60 +183,55 @@
 		{/if}
 
 		{#if canSetupWorktree && onSetupWorktree}
-			<Button
-				variant="ghost"
-				size="sm"
-				onclick={() => onSetupWorktree(issue)}
-				title={issue.worktree_state === 'failed'
+			<SimpleTooltip
+				text={issue.worktree_state === 'failed'
 					? m.issue_card_retry_worktree()
 					: m.issue_card_add_worktree()}
 			>
-				<GitBranchPlus size={14} />
-			</Button>
+				<Button variant="ghost" size="sm" onclick={() => onSetupWorktree(issue)}>
+					<GitBranchPlus size={14} />
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
 		{#if canRemoveWorktree && onRemoveWorktree}
-			<Button
-				variant="ghost"
-				size="sm"
-				onclick={() => onRemoveWorktree(issue)}
-				title={m.issue_card_remove_worktree()}
-				class="text-orange-400"
-			>
-				<GitBranch size={14} />
-			</Button>
+			<SimpleTooltip text={m.issue_card_remove_worktree()}>
+				<Button
+					variant="ghost"
+					size="sm"
+					onclick={() => onRemoveWorktree(issue)}
+					class="text-status-warning"
+				>
+					<GitBranch size={14} />
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
 		<div class="flex-1"></div>
 
 		{#if isArchived}
-			<Button
-				variant="ghost"
-				size="sm"
-				onclick={() => onUnarchive(issue.id)}
-				title={m.issue_card_unarchive()}
-			>
-				<ArchiveRestore size={14} />
-			</Button>
+			<SimpleTooltip text={m.issue_card_unarchive()}>
+				<Button variant="ghost" size="sm" onclick={() => onUnarchive(issue.id)}>
+					<ArchiveRestore size={14} />
+				</Button>
+			</SimpleTooltip>
 		{:else}
-			<Button
-				variant="ghost"
-				size="sm"
-				onclick={() => onArchive(issue)}
-				title={m.issue_card_archive()}
-			>
-				<Archive size={14} />
-			</Button>
+			<SimpleTooltip text={m.issue_card_archive()}>
+				<Button variant="ghost" size="sm" onclick={() => onArchive(issue)}>
+					<Archive size={14} />
+				</Button>
+			</SimpleTooltip>
 		{/if}
 
-		<Button
-			variant="ghost"
-			size="sm"
-			onclick={() => onDelete(issue)}
-			title={m.issue_card_delete()}
-			class="text-destructive"
-		>
-			<Trash2 size={14} />
-		</Button>
+		<SimpleTooltip text={m.issue_card_delete()}>
+			<Button
+				variant="ghost"
+				size="sm"
+				onclick={() => onDelete(issue)}
+				class="text-destructive"
+			>
+				<Trash2 size={14} />
+			</Button>
+		</SimpleTooltip>
 	</div>
 </div>

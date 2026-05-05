@@ -23,6 +23,7 @@
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import SproutIcon from '@lucide/svelte/icons/sprout';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
 	import ForestContextMenu from './ForestContextMenu.svelte';
 	import { TREE_CONTEXT_MENU_ACTIONS } from '$lib/modules/visualization';
@@ -291,14 +292,10 @@
 			</div>
 			<p class="text-sm text-foreground/70 font-medium">Your forest is empty</p>
 			{#if onAddIssue}
-				<button
-					type="button"
-					class="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-					onclick={onAddIssue}
-				>
+				<Button variant="primary" onclick={onAddIssue}>
 					<SproutIcon class="size-4" />
 					Plant your first tree
-				</button>
+				</Button>
 			{/if}
 		</div>
 	{:else}

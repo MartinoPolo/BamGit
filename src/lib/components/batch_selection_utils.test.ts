@@ -100,22 +100,18 @@ describe('CARD_STATE_CLASSES', () => {
 		}
 	});
 
-	it('active class uses green ring-2 without shadow', () => {
-		expect(CARD_STATE_CLASSES.active).toBe('ring-2 ring-[#22c55e] dark:ring-[#4ade80]');
+	it('active class uses semantic ring-active token', () => {
+		expect(CARD_STATE_CLASSES.active).toBe('ring-2 ring-ring-active');
 	});
 
-	it('selected class uses blue ring-2', () => {
-		expect(CARD_STATE_CLASSES.selected).toBe('ring-2 ring-[#4a9eff] dark:ring-[#3b82f6]');
+	it('selected class uses semantic ring-selected token', () => {
+		expect(CARD_STATE_CLASSES.selected).toBe('ring-2 ring-ring-selected');
 	});
 });
 
 describe('BATCH_SELECTED_GLOW_COLOR', () => {
-	it('is a hex color string', () => {
-		expect(BATCH_SELECTED_GLOW_COLOR).toMatch(/^#[0-9a-fA-F]{6}$/);
-	});
-
-	it('equals #4a9eff', () => {
-		expect(BATCH_SELECTED_GLOW_COLOR).toBe('#4a9eff');
+	it('is a CSS variable reference', () => {
+		expect(BATCH_SELECTED_GLOW_COLOR).toBe('var(--ring-selected)');
 	});
 });
 

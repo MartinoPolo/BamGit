@@ -215,7 +215,7 @@
 				<Button
 					variant="secondary"
 					size="sm"
-					class="shrink-0 bg-amber-600 text-white hover:bg-amber-500"
+					class="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
 					onclick={handleInterrupt}
 				>
 					{m.chat_interrupt()}

@@ -12,14 +12,14 @@
 
 {#if availability === 'not-installed'}
 	<div
-		class="flex items-center gap-2 rounded border border-yellow-800/50 bg-yellow-900/20 px-3 py-2 text-xs text-yellow-300"
+		class="flex items-center gap-2 rounded border border-[color-mix(in_oklch,var(--status-warning)_50%,transparent)] bg-[color-mix(in_oklch,var(--status-warning)_14%,transparent)] px-3 py-2 text-xs text-status-warning"
 	>
 		<AlertTriangle size={14} />
 		<span>
 			{m.gh_not_installed_before_link()}
 			<a
 				href="https://cli.github.com"
-				class="underline hover:text-yellow-200"
+				class="underline hover:opacity-80"
 				target="_blank"
 				rel="noopener noreferrer">{m.gh_cli_link()}</a
 			>
@@ -28,7 +28,7 @@
 	</div>
 {:else if availability === 'not-authenticated'}
 	<div
-		class="flex items-center gap-2 rounded border border-yellow-800/50 bg-yellow-900/20 px-3 py-2 text-xs text-yellow-300"
+		class="flex items-center gap-2 rounded border border-[color-mix(in_oklch,var(--status-warning)_50%,transparent)] bg-[color-mix(in_oklch,var(--status-warning)_14%,transparent)] px-3 py-2 text-xs text-status-warning"
 	>
 		<AlertTriangle size={14} />
 		<span>

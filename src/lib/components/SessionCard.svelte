@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, SessionState } from '$lib/types/generated';
 	import { NOTIFICATION_DOT_COLORS, useNotifications } from '$lib/modules/notifications';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	interface Props {
 		session: Session;
@@ -31,12 +32,12 @@
 	};
 
 	const stateConfig: Record<SessionState, { color: string }> = {
-		running: { color: 'bg-green-500' },
-		'needs-input': { color: 'bg-amber-500' },
-		'needs-review': { color: 'bg-blue-500' },
-		paused: { color: 'bg-neutral-400' },
-		finished: { color: 'bg-neutral-600' },
-		errored: { color: 'bg-red-500' },
+		running: { color: 'bg-session-running' },
+		'needs-input': { color: 'bg-session-needs-input' },
+		'needs-review': { color: 'bg-session-needs-review' },
+		paused: { color: 'bg-session-paused' },
+		finished: { color: 'bg-session-finished' },
+		errored: { color: 'bg-session-errored' },
 	};
 
 	const badge = $derived(stateConfig[session.state] ?? stateConfig.running);
@@ -120,15 +121,17 @@
 		{/if}
 
 		{#if isActive}
-			<button
-				class="ml-auto text-destructive hover:text-destructive/80"
-				onclick={(e) => {
-					e.stopPropagation();
+			<Button
+				variant="danger"
+				size="sm"
+				class="ml-auto"
+				onclick={(event: MouseEvent) => {
+					event.stopPropagation();
 					onTerminate(session.id);
 				}}
 			>
 				{m.session_stop()}
-			</button>
+			</Button>
 		{/if}
 	</div>
 </div>

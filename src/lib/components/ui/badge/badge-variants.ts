@@ -16,8 +16,10 @@ export const BADGE_VARIANT_OPTIONS = [
 
 export const BADGE_DOT_OPTIONS = ['static', 'pulsing'] as const;
 
+export const BADGE_SIZE_OPTIONS = ['default', 'compact'] as const;
+
 export const badgeVariants = tv({
-	base: 'inline-flex items-center gap-1 h-5 px-[7px] text-[11px] font-medium rounded-full border tracking-[0.01em] whitespace-nowrap',
+	base: 'inline-flex items-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
 	variants: {
 		variant: {
 			default: 'bg-surface-2 text-foreground-muted border-border',
@@ -31,17 +33,24 @@ export const badgeVariants = tv({
 			amber: 'bg-[color-mix(in_oklch,var(--accent)_16%,transparent)] text-[color-mix(in_oklch,var(--accent)_70%,var(--foreground))] border-[color-mix(in_oklch,var(--accent)_32%,transparent)]',
 			mono: 'bg-surface-2 text-foreground-muted border-border font-mono text-[10.5px]',
 		},
+		size: {
+			default: 'h-5 px-[7px] text-[11px] rounded-full',
+			compact: 'px-1.5 py-0.5 text-[10px] leading-tight rounded',
+		},
 	},
 	defaultVariants: {
 		variant: 'default',
+		size: 'default',
 	},
 });
 
 export type BadgeVariant = VariantProps<typeof badgeVariants>['variant'];
+export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
 export type BadgeDot = (typeof BADGE_DOT_OPTIONS)[number];
 
 export type BadgeProps = WithElementRef<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> & {
 	variant?: BadgeVariant;
+	size?: BadgeSize;
 	dot?: BadgeDot;
 	icon?: Snippet;
 	children?: Snippet;

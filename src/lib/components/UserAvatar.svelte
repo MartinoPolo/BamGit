@@ -19,7 +19,7 @@
 				{#snippet child({ props })}
 					<div
 						{...props}
-						class="relative flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
+						class="relative flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-primary-foreground"
 					>
 						{initials}
 						{#if activeCount > 0}
@@ -39,7 +39,7 @@
 	<div class="flex w-full items-center gap-2 py-2.5">
 		<div class="flex w-10 shrink-0 items-center justify-center">
 			<div
-				class="flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-white"
+				class="flex size-[26px] items-center justify-center rounded-full bg-[var(--moss-600)] text-[11px] font-semibold text-primary-foreground"
 			>
 				{initials}
 			</div>

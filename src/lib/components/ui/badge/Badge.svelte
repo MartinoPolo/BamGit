@@ -5,6 +5,7 @@
 	let {
 		class: className,
 		variant = 'default',
+		size = 'default',
 		dot,
 		icon,
 		ref = $bindable(null),
@@ -16,7 +17,7 @@
 <span
 	bind:this={ref}
 	data-slot="badge"
-	class={cn(badgeVariants({ variant }), className)}
+	class={cn(badgeVariants({ variant, size }), className)}
 	{...restProps}
 >
 	{#if icon}

@@ -20,12 +20,12 @@
 		<Loader2 size={32} class="animate-spin text-muted-foreground" />
 		<p class="text-sm text-muted-foreground">{m.wizard_progress_pending()}</p>
 	{:else if worktreeState === 'active'}
-		<CircleCheck size={32} class="text-green-400" />
-		<p class="text-sm text-green-400">{m.wizard_progress_active()}</p>
+		<CircleCheck size={32} class="text-status-success" />
+		<p class="text-sm text-status-success">{m.wizard_progress_active()}</p>
 		<Button variant="ghost" size="sm" onclick={onClose}>OK</Button>
 	{:else if worktreeState === 'failed'}
-		<CircleX size={32} class="text-red-400" />
-		<p class="text-sm text-red-400">{m.wizard_progress_failed()}</p>
+		<CircleX size={32} class="text-status-danger" />
+		<p class="text-sm text-status-danger">{m.wizard_progress_failed()}</p>
 		<Button variant="ghost" size="sm" onclick={onRetry}>{m.wizard_retry()}</Button>
 	{/if}
 </div>

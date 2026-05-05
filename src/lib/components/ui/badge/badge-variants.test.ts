@@ -81,3 +81,25 @@ describe('BADGE_DOT_OPTIONS', () => {
 		expect(BADGE_DOT_OPTIONS).toEqual(expect.arrayContaining(['static', 'pulsing']));
 	});
 });
+
+describe('badge size variants', () => {
+	it('default size uses h-5 and rounded-full', () => {
+		const classes = badgeVariants({ size: 'default' });
+		expect(classes).toContain('h-5');
+		expect(classes).toContain('rounded-full');
+	});
+
+	it('compact size uses smaller height and rounded corners', () => {
+		const classes = badgeVariants({ size: 'compact' });
+		expect(classes).toContain('rounded');
+		expect(classes).toContain('text-[10px]');
+		expect(classes).not.toContain('h-5');
+		expect(classes).not.toContain('rounded-full');
+	});
+
+	it('uses default size when no size specified', () => {
+		const classes = badgeVariants();
+		expect(classes).toContain('h-5');
+		expect(classes).toContain('rounded-full');
+	});
+});

@@ -390,7 +390,7 @@
 			{#if seedMessage}
 				<p
 					class="rounded px-3 py-2 text-sm {seedMessage.type === 'success'
-						? 'bg-green-500/20 text-green-400'
+						? 'bg-[color-mix(in_oklch,var(--status-success)_14%,transparent)] text-status-success'
 						: 'bg-destructive/20 text-destructive'}"
 				>
 					{seedMessage.text}
