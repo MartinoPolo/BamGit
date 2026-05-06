@@ -8,8 +8,7 @@ export interface ResolveGlowOverlayParams {
 	readonly hoveredIssueId: string | null;
 	readonly activeIssueId: string | null;
 	readonly batchSelectedIssueIds: ReadonlySet<string>;
-	readonly hoverGlowColor: string;
-	readonly activeGlowColor: string;
+	readonly issueColor: string;
 	readonly batchSelectedGlowColor: string;
 }
 
@@ -19,7 +18,7 @@ export function resolveGlowOverlay(params: ResolveGlowOverlayParams): OverlayCon
 		return {
 			glow: {
 				enabled: true,
-				color: params.hoverGlowColor,
+				color: params.issueColor,
 				intensity: INTERACTION_GLOW_INTENSITY,
 				pulse: false,
 			},
@@ -29,7 +28,7 @@ export function resolveGlowOverlay(params: ResolveGlowOverlayParams): OverlayCon
 		return {
 			glow: {
 				enabled: true,
-				color: params.activeGlowColor,
+				color: params.issueColor,
 				intensity: INTERACTION_GLOW_INTENSITY,
 				pulse: false,
 			},
