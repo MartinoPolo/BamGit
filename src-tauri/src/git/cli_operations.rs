@@ -66,6 +66,32 @@ pub fn get_behind_base_count(
         .map_err(|error| GitError::InvalidOutput(format!("Cannot parse count: {error}")))
 }
 
+/// Count commits that `branch_name` is ahead of `origin/branch_name`.
+/// Returns 0 if the remote tracking branch doesn't exist.
+pub fn get_ahead_remote_count(
+    working_directory: &Path,
+    branch_name: &str,
+) -> Result<i64, GitError> {
+    if is_unsafe_branch_ref(branch_name) {
+        return Err(GitError::UnsafeBranchRef(branch_name.to_string()));
+    }
+
+    let range = format!("origin/{branch_name}..refs/heads/{branch_name}");
+    match run_git_command(working_directory, &["rev-list", "--count", &range]) {
+        Ok(output) => output
+            .trim()
+            .parse::<i64>()
+            .map_err(|error| GitError::InvalidOutput(format!("Cannot parse count: {error}"))),
+        Err(_) => Ok(0),
+    }
+}
+
+/// Returns `true` if the working tree has uncommitted changes (staged or unstaged).
+pub fn has_local_changes(working_directory: &Path) -> Result<bool, GitError> {
+    let output = run_git_command(working_directory, &["status", "--porcelain"])?;
+    Ok(!output.trim().is_empty())
+}
+
 /// Returns `true` if merge-tree detects conflicts (exit code 1),
 /// `false` if clean (exit code 0), error otherwise.
 /// Uses explicit branch ref instead of HEAD.
@@ -129,4 +155,16 @@ mod tests {
         assert!(matches!(result.unwrap_err(), GitError::UnsafeBranchRef(_)));
     }
 
+    #[test]
+    fn rejects_unsafe_branch_for_ahead_remote_count() {
+        let result = get_ahead_remote_count(Path::new("."), "--malicious");
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), GitError::UnsafeBranchRef(_)));
+    }
+
+    #[test]
+    fn has_local_changes_returns_bool() {
+        let result = has_local_changes(Path::new("."));
+        assert!(result.is_ok());
+    }
 }

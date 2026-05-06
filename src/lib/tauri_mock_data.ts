@@ -352,6 +352,8 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		github_issue_state: 'open',
 		behind_base_count: 2,
 		merge_conflict: false,
+		has_local_changes: true,
+		ahead_remote_count: 3,
 		fetched_at: '2026-05-03T09:00:00Z',
 	},
 	{
@@ -363,6 +365,8 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		github_issue_state: 'open',
 		behind_base_count: 0,
 		merge_conflict: false,
+		has_local_changes: false,
+		ahead_remote_count: 0,
 		fetched_at: '2026-05-03T08:30:00Z',
 	},
 	{
@@ -374,6 +378,8 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		github_issue_state: 'open',
 		behind_base_count: 0,
 		merge_conflict: false,
+		has_local_changes: false,
+		ahead_remote_count: 0,
 		fetched_at: '2026-05-03T08:00:00Z',
 	},
 ];

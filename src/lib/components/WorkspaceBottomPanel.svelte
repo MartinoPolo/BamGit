@@ -2,7 +2,6 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
 	import type {
-		Action,
 		AssignedIssue,
 		GitStatusCache,
 		IssueDependency,
@@ -31,7 +30,6 @@
 		archivedIssues: Issue[];
 		showArchived: boolean;
 		isPortfolio: boolean;
-		actions?: Action[];
 		forceExpanded?: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
@@ -61,7 +59,6 @@
 		archivedIssues,
 		showArchived,
 		isPortfolio,
-		actions = [],
 		forceExpanded,
 		cacheMap = new Map(),
 		ghAvailable = false,
@@ -183,7 +180,6 @@
 					{archivedIssues}
 					{showArchived}
 					{isPortfolio}
-					{actions}
 					{forceExpanded}
 					{cacheMap}
 					{ghAvailable}

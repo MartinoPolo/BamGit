@@ -116,6 +116,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             github_issue_state TEXT,
             behind_base_count INTEGER,
             merge_conflict INTEGER,
+            has_local_changes INTEGER,
+            ahead_remote_count INTEGER,
             fetched_at TEXT
         );
 

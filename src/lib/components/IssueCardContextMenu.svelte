@@ -2,6 +2,11 @@
 	import type { Snippet } from 'svelte';
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
+	import {
+		ACTION_POOL,
+		type DerivedActions,
+		type ActionId,
+	} from '$lib/modules/contextual-actions';
 	import { PRIORITY_OPTIONS } from '$lib/components/issue_card_utils.js';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import EditIcon from '@lucide/svelte/icons/pencil';
@@ -15,18 +20,22 @@
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import SquareCheckIcon from '@lucide/svelte/icons/square-check';
 	import SquareIcon from '@lucide/svelte/icons/square';
+	import ZapIcon from '@lucide/svelte/icons/zap';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
 		isBatchSelected: boolean;
+		derivedActions?: DerivedActions | null;
 		onToggleSelect: () => void;
+		onContextualAction?: (actionId: ActionId) => void;
 		children: Snippet;
 	}
 
 	let {
 		issue,
 		isBatchSelected,
+		derivedActions = null,
 		onToggleSelect,
 		onArchive,
 		onUnarchive,
@@ -37,8 +46,31 @@
 		onSetupWorktree,
 		onRemoveWorktree,
 		onChangeColor,
+		onContextualAction,
 		children,
 	}: Props = $props();
+
+	const allContextualActions = $derived.by(() => {
+		if (!derivedActions) {
+			return [];
+		}
+		const actions: { id: ActionId; disabled: boolean }[] = [];
+		if (derivedActions.primary) {
+			actions.push({ id: derivedActions.primary, disabled: false });
+		}
+		if (derivedActions.secondary) {
+			actions.push({ id: derivedActions.secondary, disabled: false });
+		}
+		for (const id of derivedActions.overflow) {
+			actions.push({ id, disabled: false });
+		}
+		for (const id of derivedActions.disabled) {
+			if (!actions.some((a) => a.id === id)) {
+				actions.push({ id, disabled: true });
+			}
+		}
+		return actions;
+	});
 
 	const isArchived = $derived(issue.status === 'archived');
 	const isStandalone = $derived(issue.github_issue_url === null);
@@ -64,6 +96,27 @@
 			{/if}
 			{selectLabel}
 		</ContextMenu.Item>
+
+		<!-- Contextual Actions -->
+		{#if allContextualActions.length > 0 && onContextualAction}
+			<ContextMenu.Separator />
+			<ContextMenu.Sub>
+				<ContextMenu.SubTrigger>
+					<ZapIcon class="size-4" />
+					Actions
+				</ContextMenu.SubTrigger>
+				<ContextMenu.SubContent alignOffset={-5} sideOffset={2}>
+					{#each allContextualActions as action (action.id)}
+						<ContextMenu.Item
+							disabled={action.disabled}
+							onclick={() => onContextualAction!(action.id)}
+						>
+							{ACTION_POOL[action.id].label}
+						</ContextMenu.Item>
+					{/each}
+				</ContextMenu.SubContent>
+			</ContextMenu.Sub>
+		{/if}
 
 		<ContextMenu.Separator />
 

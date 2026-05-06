@@ -185,10 +185,35 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Configurable action buttons on issue cards
 - Each action = name + icon + command template (anything passable to agent CLI)
 - Command templates support variables: `{{issue_number}}`, `{{branch_name}}`, `{{worktree_folder}}`, etc.
-- Default set: Execute, Review, Check & Fix (mapping to mpx-claude-code skills)
+- Default set: Run, Review, Check & Fix, Commit, Commit & Push, Commit Push & PR, Push, Create PR, Sync Base, Merge, HITL, Code Clean, View Session, Setup Worktree, Remove Worktree
 - User can: add, edit, reorder, hide, replace defaults with custom actions
 - Actions can be skill invocations, raw prompts, multi-skill chains
 - Workspace-level and global actions supported
+
+#### Contextual Action System
+
+- **Max 2 visible buttons** on card; additional actions in overflow (⋯) menu. Context menu includes all actions with disabled states for unmet preconditions.
+- **Primary action** (first button) uses moss green background for the recommended next step.
+- **Pure function** `deriveContextualActions(issue, cache, sessionState, allActions)` returns prioritized action list. First match in a 14-row priority cascade wins. Rule-based `show_when` conditions on Action rows deferred to v2.
+- **"Run" action**: One-click full autonomous workflow — creates worktree (if needed) → `mp-execute #N` → review → commit → push → PR → merge. Primary action for idle and AFK issues.
+- **"View Session" action**: When session is running, primary action navigates to session detail page (history, agents, background terminals). All other actions disabled during active session.
+
+#### Action Invocation Types
+
+- **Agent actions** (spawn CLI session with pre-filled skill command): Run (`mp-execute`), HITL (`mp-hitl`), Review (`mp-review`), Check & Fix (`mp-check-fix`), Commit (`mp-commit`), Commit & Push (`mp-commit-push`), Commit Push & PR (`mp-commit-push-pr`), Create/Update PR (`mp-pr`), Code Clean (`mp-code-clean`)
+- **Deterministic actions** (direct git/Tauri commands, no agent): Push (`git push`), Merge (`gh pr merge`), Sync Base (`git merge` if no conflicts, else agent `mp-sync-base`), Setup Worktree, Remove Worktree
+- **UI actions**: Create Issue (global toolbar/command palette, not per-card)
+
+#### Required State Dimensions (backend prerequisite)
+
+- `has_local_changes` (dirty working tree) — needed for Commit actions. Not yet tracked in `GitStatusCache`.
+- `ahead_remote_count` (unpushed commits) — needed for Push/PR actions. Not yet tracked in `GitStatusCache`.
+
+#### Future: `prepareIssueContext()` Optimization
+
+- Gather issue body, comments, labels, git status, execution summaries deterministically before spawning agent session
+- Saves agentic tokens by front-loading context that skills currently gather themselves
+- When skills are split (implement → review → commit/push/PR), execution summary from previous step should be gathered and passed to next agent (session context handoff)
 
 ### Notification System
 

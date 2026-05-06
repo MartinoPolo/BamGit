@@ -17,8 +17,8 @@ fn upsert_cache(connection: &Connection, cache: &GitStatusCache) -> Result<(), S
     connection
         .execute(
             "INSERT INTO git_status_cache (issue_id, branch_status, pr_state, pr_number, pr_url, \
-             github_issue_state, behind_base_count, merge_conflict, fetched_at) \
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, datetime('now')) \
+             github_issue_state, behind_base_count, merge_conflict, has_local_changes, ahead_remote_count, fetched_at) \
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, datetime('now')) \
              ON CONFLICT(issue_id) DO UPDATE SET \
              branch_status = COALESCE(excluded.branch_status, branch_status), \
              pr_state = COALESCE(excluded.pr_state, pr_state), \
@@ -27,6 +27,8 @@ fn upsert_cache(connection: &Connection, cache: &GitStatusCache) -> Result<(), S
              github_issue_state = COALESCE(excluded.github_issue_state, github_issue_state), \
              behind_base_count = COALESCE(excluded.behind_base_count, behind_base_count), \
              merge_conflict = COALESCE(excluded.merge_conflict, merge_conflict), \
+             has_local_changes = COALESCE(excluded.has_local_changes, has_local_changes), \
+             ahead_remote_count = COALESCE(excluded.ahead_remote_count, ahead_remote_count), \
              fetched_at = datetime('now')",
             rusqlite::params![
                 cache.issue_id,
@@ -37,6 +39,8 @@ fn upsert_cache(connection: &Connection, cache: &GitStatusCache) -> Result<(), S
                 cache.github_issue_state,
                 cache.behind_base_count,
                 cache.merge_conflict,
+                cache.has_local_changes,
+                cache.ahead_remote_count,
             ],
         )
         .map_err(|error| format!("Failed to upsert GitHub status cache: {error}"))?;
@@ -236,7 +240,9 @@ pub async fn fetch_issue_state(
         github_issue_state: Some(resolved_state.to_string()),
         behind_base_count: None,
         merge_conflict: None,
-        fetched_at: None, // Set by DB via datetime('now')
+        has_local_changes: None,
+        ahead_remote_count: None,
+        fetched_at: None,
     };
 
     // Acquire write lock only for DB write (not held across .await)
@@ -295,6 +301,8 @@ pub async fn fetch_pr_for_branch(
         github_issue_state: None,
         behind_base_count: None,
         merge_conflict: None,
+        has_local_changes: None,
+        ahead_remote_count: None,
         fetched_at: None,
     };
 
@@ -591,6 +599,8 @@ pub async fn sync_all_github_state(
             github_issue_state,
             behind_base_count: None,
             merge_conflict: None,
+            has_local_changes: None,
+            ahead_remote_count: None,
             fetched_at: None,
         });
     }
@@ -681,6 +691,8 @@ mod tests {
             github_issue_state: Some("open".to_string()),
             behind_base_count: None,
             merge_conflict: None,
+            has_local_changes: None,
+            ahead_remote_count: None,
             fetched_at: None,
         };
 
@@ -708,6 +720,8 @@ mod tests {
             github_issue_state: Some("open".to_string()),
             behind_base_count: None,
             merge_conflict: None,
+            has_local_changes: None,
+            ahead_remote_count: None,
             fetched_at: None,
         };
         upsert_cache(&connection, &initial).unwrap();
@@ -722,6 +736,8 @@ mod tests {
             github_issue_state: None, // Should preserve "open" via COALESCE
             behind_base_count: None,
             merge_conflict: None,
+            has_local_changes: None,
+            ahead_remote_count: None,
             fetched_at: None,
         };
         upsert_cache(&connection, &update).unwrap();
@@ -761,6 +777,8 @@ mod tests {
                 github_issue_state: Some("open".to_string()),
                 behind_base_count: None,
                 merge_conflict: None,
+                has_local_changes: None,
+                ahead_remote_count: None,
                 fetched_at: None,
             };
             upsert_cache(&connection, &cache).unwrap();
