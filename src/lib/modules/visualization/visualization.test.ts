@@ -23,6 +23,7 @@ import type {
 	Viewport,
 	PositionedForestItem,
 } from './index';
+import type { IssueDependency } from '$lib/types/generated';
 import {
 	computeTreeVisualization,
 	mapIssueToStateDimensions,
@@ -1805,11 +1806,16 @@ describe('computeForestLayout — stumps in rows', () => {
 	});
 });
 
-describe('computeDepthRows', () => {
-	it('assigns all issues to depth 0 when prdIssueId is null', () => {
+describe('computeDepthRows (legacy tests adapted to dependency-based API)', () => {
+	const dep = (blocker: string, blocked: string): IssueDependency => ({
+		id: `dep-${blocker}-${blocked}`,
+		blocker_issue_id: blocker,
+		blocked_issue_id: blocked,
+	});
+
+	it('assigns all issues to depth 0 when no dependencies exist', () => {
 		const issueIds = ['issue1', 'issue2', 'issue3'];
-		const parents = new Map<string, string | null>();
-		const result = computeDepthRows(issueIds, parents, null);
+		const result = computeDepthRows(issueIds, []);
 
 		expect(result.size).toBe(3);
 		expect(result.get('issue1')).toBe(0);
@@ -1817,72 +1823,20 @@ describe('computeDepthRows', () => {
 		expect(result.get('issue3')).toBe(0);
 	});
 
-	it('assigns PRD issue direct children to depth 0', () => {
-		const issueIds = ['prd', 'child1', 'child2'];
-		const parents = new Map([
-			['child1', 'prd'],
-			['child2', 'prd'],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
+	it('places blocked issue one row behind blocker', () => {
+		const issueIds = ['blocker', 'child1', 'child2'];
+		const deps = [dep('blocker', 'child1'), dep('blocker', 'child2')];
+		const result = computeDepthRows(issueIds, deps);
 
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('child2')).toBe(0);
+		expect(result.get('blocker')).toBe(0);
+		expect(result.get('child1')).toBe(1);
+		expect(result.get('child2')).toBe(1);
 	});
 
-	it('computes correct depths for multi-level hierarchy', () => {
-		const issueIds = ['prd', 'child1', 'child2', 'grandchild1', 'grandchild2'];
-		const parents = new Map([
-			['child1', 'prd'],
-			['child2', 'prd'],
-			['grandchild1', 'child1'],
-			['grandchild2', 'child2'],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('child2')).toBe(0);
-		expect(result.get('grandchild1')).toBe(1);
-		expect(result.get('grandchild2')).toBe(1);
-	});
-
-	it('handles disconnected subtrees by assigning them depth 0', () => {
-		const issueIds = ['prd', 'child1', 'orphan1', 'orphan2'];
-		const parents = new Map([['child1', 'prd']]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('orphan1')).toBe(0);
-		expect(result.get('orphan2')).toBe(0);
-	});
-
-	it('handles missing parent references gracefully', () => {
-		const issueIds = ['prd', 'child1', 'unknown'];
-		const parents = new Map([['child1', 'prd']]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('unknown')).toBe(0);
-	});
-
-	it('does not include PRD issue itself in result', () => {
-		const issueIds = ['prd', 'child1'];
-		const parents = new Map([['child1', 'prd']]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.has('prd')).toBe(false);
-		expect(result.size).toBe(1);
-	});
-
-	it('handles complex deep hierarchy with proper depth assignment', () => {
-		const issueIds = ['prd', 'l1a', 'l1b', 'l2a', 'l2b', 'l3a'];
-		const parents = new Map([
-			['l1a', 'prd'],
-			['l1b', 'prd'],
-			['l2a', 'l1a'],
-			['l2b', 'l1b'],
-			['l3a', 'l2a'],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
+	it('computes correct depths for multi-level blocking chain', () => {
+		const issueIds = ['l1a', 'l1b', 'l2a', 'l2b', 'l3a'];
+		const deps = [dep('l1a', 'l2a'), dep('l1b', 'l2b'), dep('l2a', 'l3a')];
+		const result = computeDepthRows(issueIds, deps);
 
 		expect(result.get('l1a')).toBe(0);
 		expect(result.get('l1b')).toBe(0);
@@ -1891,136 +1845,36 @@ describe('computeDepthRows', () => {
 		expect(result.get('l3a')).toBe(2);
 	});
 
-	it('handles single issue with no children', () => {
-		const issueIds = ['prd'];
-		const parents = new Map<string, string | null>();
-		const result = computeDepthRows(issueIds, parents, 'prd');
+	it('handles disconnected issues by assigning them depth 0', () => {
+		const issueIds = ['blocker', 'child1', 'orphan1', 'orphan2'];
+		const deps = [dep('blocker', 'child1')];
+		const result = computeDepthRows(issueIds, deps);
 
-		expect(result.size).toBe(0);
+		expect(result.get('child1')).toBe(1);
+		expect(result.get('orphan1')).toBe(0);
+		expect(result.get('orphan2')).toBe(0);
 	});
 
-	it('handles null parent values in the map', () => {
-		const issueIds = ['prd', 'child1', 'child2'];
-		const parents = new Map([
-			['child1', 'prd'],
-			['child2', null],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('child2')).toBe(0);
-	});
-});
-
-describe('computeDepthRows', () => {
 	it('returns empty depth map when issueIds is empty', () => {
-		const result = computeDepthRows([], new Map(), null);
+		const result = computeDepthRows([], []);
 		expect(result.size).toBe(0);
 	});
 
-	it('assigns all issues to depth 0 when prdIssueId is null', () => {
-		const issueIds = ['issue1', 'issue2', 'issue3'];
-		const parents = new Map<string, string | null>();
-		const result = computeDepthRows(issueIds, parents, null);
+	it('handles single issue with no dependencies', () => {
+		const issueIds = ['solo'];
+		const result = computeDepthRows(issueIds, []);
 
-		expect(result.size).toBe(3);
-		expect(result.get('issue1')).toBe(0);
-		expect(result.get('issue2')).toBe(0);
-		expect(result.get('issue3')).toBe(0);
-	});
-
-	it('assigns PRD issue direct children to depth 0', () => {
-		const issueIds = ['prd', 'child1', 'child2'];
-		const parents = new Map([
-			['child1', 'prd'],
-			['child2', 'prd'],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('child2')).toBe(0);
-	});
-
-	it('computes correct depths for multi-level hierarchy', () => {
-		const issueIds = ['prd', 'child1', 'child2', 'grandchild1', 'grandchild2'];
-		const parents = new Map([
-			['child1', 'prd'],
-			['child2', 'prd'],
-			['grandchild1', 'child1'],
-			['grandchild2', 'child2'],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('child2')).toBe(0);
-		expect(result.get('grandchild1')).toBe(1);
-		expect(result.get('grandchild2')).toBe(1);
-	});
-
-	it('handles disconnected subtrees by assigning them depth 0', () => {
-		const issueIds = ['prd', 'child1', 'orphan1', 'orphan2'];
-		const parents = new Map([['child1', 'prd']]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('orphan1')).toBe(0);
-		expect(result.get('orphan2')).toBe(0);
-	});
-
-	it('handles missing parent references gracefully', () => {
-		const issueIds = ['prd', 'child1', 'unknown'];
-		const parents = new Map([['child1', 'prd']]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('unknown')).toBe(0);
-	});
-
-	it('does not include PRD issue itself in result', () => {
-		const issueIds = ['prd', 'child1'];
-		const parents = new Map([['child1', 'prd']]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.has('prd')).toBe(false);
 		expect(result.size).toBe(1);
+		expect(result.get('solo')).toBe(0);
 	});
 
-	it('handles complex deep hierarchy with proper depth assignment', () => {
-		const issueIds = ['prd', 'l1a', 'l1b', 'l2a', 'l2b', 'l3a'];
-		const parents = new Map([
-			['l1a', 'prd'],
-			['l1b', 'prd'],
-			['l2a', 'l1a'],
-			['l2b', 'l1b'],
-			['l3a', 'l2a'],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
+	it('ignores dependencies referencing unknown issue IDs', () => {
+		const issueIds = ['a', 'b'];
+		const deps = [dep('unknown', 'a'), dep('a', 'ghost')];
+		const result = computeDepthRows(issueIds, deps);
 
-		expect(result.get('l1a')).toBe(0);
-		expect(result.get('l1b')).toBe(0);
-		expect(result.get('l2a')).toBe(1);
-		expect(result.get('l2b')).toBe(1);
-		expect(result.get('l3a')).toBe(2);
-	});
-
-	it('handles single issue with no children', () => {
-		const issueIds = ['prd'];
-		const parents = new Map<string, string | null>();
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.size).toBe(0);
-	});
-
-	it('handles null parent values in the map', () => {
-		const issueIds = ['prd', 'child1', 'child2'];
-		const parents = new Map([
-			['child1', 'prd'],
-			['child2', null],
-		]);
-		const result = computeDepthRows(issueIds, parents, 'prd');
-
-		expect(result.get('child1')).toBe(0);
-		expect(result.get('child2')).toBe(0);
+		expect(result.get('a')).toBe(0);
+		expect(result.get('b')).toBe(0);
 	});
 });
 
