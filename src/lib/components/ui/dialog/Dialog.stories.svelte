@@ -21,7 +21,7 @@
 	});
 </script>
 
-<Story name="Plant Tree">
+<Story name="Create Issue">
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -29,21 +29,21 @@
 					{#snippet child({ props })}
 						<Button {...props}>
 							<PlusIcon class="size-3.5" />
-							Plant tree
+							Create Issue
 						</Button>
 					{/snippet}
 				</Dialog.Trigger>
 				<Dialog.Content portalProps={{ disabled: true }}>
 					<Dialog.Title class="sr-only">Start a new agent session</Dialog.Title>
 					<Dialog.Description class="sr-only">
-						Fill in the details to plant a new tree and start a new agent session.
+						Fill in the details to create a new issue and start an agent session.
 					</Dialog.Description>
 					<Dialog.Header>
 						<div>
 							<div
 								class="mb-0.5 text-[length:var(--text-xs)] font-medium uppercase tracking-wider text-foreground-subtle"
 							>
-								Modal · plant a tree
+								Modal · create issue
 							</div>
 							<div class="text-[length:var(--text-lg)] font-semibold">
 								Start a new agent session
@@ -102,7 +102,7 @@
 						</Dialog.Close>
 						<Button variant="primary">
 							<PlusIcon class="size-3.5" />
-							Plant tree
+							Create Issue
 						</Button>
 					</Dialog.Footer>
 				</Dialog.Content>
@@ -254,7 +254,7 @@
 						</Dialog.Close>
 						<Button variant="primary">
 							<PlusIcon class="size-3.5" />
-							Plant tree
+							Create Issue
 						</Button>
 					</Dialog.Footer>
 				</Dialog.Content>

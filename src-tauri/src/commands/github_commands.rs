@@ -431,6 +431,96 @@ pub async fn search_github_issues(
     Ok(issues)
 }
 
+#[derive(serde::Serialize)]
+pub struct UserRepo {
+    pub name: String,
+    pub owner: String,
+    pub description: Option<String>,
+    pub is_private: bool,
+}
+
+#[tauri::command]
+pub async fn list_user_repos() -> Result<Vec<UserRepo>, String> {
+    let stdout = run_gh_command(&[
+        "repo",
+        "list",
+        "--json",
+        "name,owner,description,isPrivate",
+        "--limit",
+        "100",
+        "--sort",
+        "pushed",
+    ])
+    .await?;
+
+    let raw: Vec<serde_json::Value> =
+        serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
+
+    let repos = raw
+        .into_iter()
+        .filter_map(|value| {
+            let name = value.get("name")?.as_str()?.to_string();
+            let owner = value.get("owner")?.get("login")?.as_str()?.to_string();
+            let description = value.get("description").and_then(|d| d.as_str()).map(String::from);
+            let is_private = value.get("isPrivate").and_then(|v| v.as_bool()).unwrap_or(false);
+            Some(UserRepo { name, owner, description, is_private })
+        })
+        .collect();
+
+    Ok(repos)
+}
+
+#[tauri::command]
+pub async fn search_github_repos(query: String) -> Result<Vec<UserRepo>, String> {
+    let trimmed = query.trim();
+    if trimmed.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let stdout = run_gh_command(&[
+        "api",
+        &format!("/search/repositories?q={}&per_page=20", urlencoded(trimmed)),
+    ])
+    .await?;
+
+    let parsed: serde_json::Value =
+        serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse search output: {error}"))?;
+
+    let items = parsed
+        .get("items")
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default();
+
+    let repos = items
+        .into_iter()
+        .filter_map(|value| {
+            let name = value.get("name")?.as_str()?.to_string();
+            let owner = value.get("owner")?.get("login")?.as_str()?.to_string();
+            let description = value.get("description").and_then(|d| d.as_str()).map(String::from);
+            let is_private = value.get("private").and_then(|v| v.as_bool()).unwrap_or(false);
+            Some(UserRepo { name, owner, description, is_private })
+        })
+        .collect();
+
+    Ok(repos)
+}
+
+fn urlencoded(input: &str) -> String {
+    let mut encoded = String::with_capacity(input.len() * 3);
+    for byte in input.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                encoded.push(byte as char);
+            }
+            _ => {
+                encoded.push_str(&format!("%{byte:02X}"));
+            }
+        }
+    }
+    encoded
+}
+
 #[tauri::command]
 pub async fn sync_all_github_state(
     state: State<'_, DatabaseState>,

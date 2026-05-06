@@ -97,7 +97,7 @@
 <Story name="Loading">
 	{#snippet template()}
 		<div class="max-w-[540px]">
-			<Toast tone="loading" title="Planting tree…" body="Setting up worktree for #142">
+			<Toast tone="loading" title="Setting up worktree…" body="Creating worktree for #142">
 				{#snippet icon()}<RefreshIcon class="size-3.5 animate-spin" />{/snippet}
 			</Toast>
 		</div>
@@ -149,7 +149,7 @@
 					</button>
 				{/snippet}
 			</Toast>
-			<Toast tone="loading" title="Planting tree…" body="Setting up worktree for #142">
+			<Toast tone="loading" title="Setting up worktree…" body="Creating worktree for #142">
 				{#snippet icon()}<RefreshIcon class="size-3.5 animate-spin" />{/snippet}
 			</Toast>
 		</div>

@@ -34,6 +34,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'execute_action',
 	'open_workspace_window',
 	'update_peacock_color',
+	'pick_folder',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
@@ -96,6 +97,57 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_window_bindings: () => MOCK_WINDOW_BINDINGS,
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
 	get_app_setting: () => null,
+
+	// ─── Dialog ──────────────────────────────────────────────────────────────
+	pick_folder: () => 'C:/mock/selected-folder',
+
+	// ─── Repo search ─────────────────────────────────────────────────────────
+	list_user_repos: () => [
+		{
+			name: 'grovekeeper',
+			owner: 'MartinoPolo',
+			description: 'Agent orchestration GUI',
+			is_private: false,
+		},
+		{
+			name: 'low-poly-2d-trees',
+			owner: 'MartinoPolo',
+			description: '2D tree rendering library',
+			is_private: false,
+		},
+		{
+			name: 'my-private-app',
+			owner: 'MartinoPolo',
+			description: 'Private project',
+			is_private: true,
+		},
+		{
+			name: 'react-dashboard',
+			owner: 'MartinoPolo',
+			description: 'Dashboard template',
+			is_private: false,
+		},
+		{
+			name: 'api-gateway',
+			owner: 'acme-corp',
+			description: 'API gateway service',
+			is_private: true,
+		},
+	],
+	search_github_repos: () => [
+		{
+			name: 'svelte',
+			owner: 'sveltejs',
+			description: 'Cybernetically enhanced web apps',
+			is_private: false,
+		},
+		{
+			name: 'tauri',
+			owner: 'tauri-apps',
+			description: 'Build smaller, faster apps',
+			is_private: false,
+		},
+	],
 
 	// ─── Search ───────────────────────────────────────────────────────────────
 	search_github_issues: () => [],

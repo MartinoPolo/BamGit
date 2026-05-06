@@ -15,7 +15,7 @@
 		syncing?: boolean;
 		forestCollapsed?: boolean;
 		onSync?: () => void;
-		onPlant?: () => void;
+		onCreateIssue?: () => void;
 		onToggleForest?: () => void;
 		children?: Snippet;
 	}
@@ -27,7 +27,7 @@
 		syncing = false,
 		forestCollapsed = false,
 		onSync,
-		onPlant,
+		onCreateIssue,
 		onToggleForest,
 		children,
 	}: Props = $props();
@@ -73,11 +73,11 @@
 			</SimpleTooltip>
 		{/if}
 
-		{#if onPlant}
-			<SimpleTooltip text={m.topbar_plant_title()}>
-				<Button variant="primary" size="sm" onclick={onPlant}>
+		{#if onCreateIssue}
+			<SimpleTooltip text={m.topbar_create_issue_title()}>
+				<Button variant="primary" size="sm" onclick={onCreateIssue}>
 					<PlusIcon size={12} />
-					<span>{m.topbar_plant()}</span>
+					<span>{m.topbar_create_issue()}</span>
 				</Button>
 			</SimpleTooltip>
 		{/if}

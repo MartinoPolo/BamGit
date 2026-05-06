@@ -151,7 +151,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="shrink-0 px-2 pt-1">
+	<div class="flex shrink-0 justify-center px-2 pt-1">
 		<Tabs.Root>
 			{#each tabValues as tab (tab)}
 				<Tabs.Tab active={defaultTab === tab} onclick={() => handleTabClick(tab)}>
@@ -170,7 +170,7 @@
 				{stageCounts}
 			/>
 		{:else if defaultTab === BOTTOM_PANEL_TABS.issues}
-			<div class="flex flex-col gap-4 p-5">
+			<div class="flex flex-col gap-4 px-5 pt-3 pb-5">
 				{#if ghSetupBanner && ghAvailability}
 					<GhSetupBanner availability={ghAvailability} />
 				{/if}

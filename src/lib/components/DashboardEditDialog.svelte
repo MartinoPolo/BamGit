@@ -7,6 +7,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import PaletteSelector from './PaletteSelector.svelte';
+	import PathInput from './PathInput.svelte';
+	import RepoCombobox from './RepoCombobox.svelte';
 	import { buildUpdateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
@@ -103,7 +105,7 @@
 							<Label for="edit-dashboard-github-repo"
 								>{m.dashboard_field_github_repo()}</Label
 							>
-							<Input
+							<RepoCombobox
 								id="edit-dashboard-github-repo"
 								bind:value={githubRepo}
 								placeholder={m.dashboard_placeholder_github_repo()}
@@ -113,7 +115,7 @@
 							<Label for="edit-dashboard-local-folder"
 								>{m.dashboard_field_local_folder()}</Label
 							>
-							<Input id="edit-dashboard-local-folder" bind:value={localFolder} />
+							<PathInput id="edit-dashboard-local-folder" bind:value={localFolder} />
 						</div>
 						<div class="flex flex-col gap-1.5">
 							<Label for="edit-dashboard-base-branch"
@@ -125,7 +127,10 @@
 							<Label for="edit-dashboard-worktree"
 								>{m.dashboard_field_worktree_parent_folder()}</Label
 							>
-							<Input id="edit-dashboard-worktree" bind:value={worktreeParentFolder} />
+							<PathInput
+								id="edit-dashboard-worktree"
+								bind:value={worktreeParentFolder}
+							/>
 						</div>
 					{/if}
 				</Dialog.Body>

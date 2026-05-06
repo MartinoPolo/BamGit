@@ -20,8 +20,8 @@
 	"topbar_sync": "Sync",
 	"topbar_legend": "Legend",
 	"topbar_notifications": "Notifications",
-	"topbar_plant": "Plant",
-	"topbar_plant_title": "Plant a tree",
+	"topbar_create_issue": "Vytvořit úkol",
+	"topbar_create_issue_title": "Vytvořit nový úkol",
 	"topbar_prune": "Clean up worktrees",
 	"topbar_prune_title": "Remove worktrees for fully-closed issues",
 

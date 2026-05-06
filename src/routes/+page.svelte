@@ -511,7 +511,7 @@
 		forestCollapsed={selection.forestCollapsed}
 		syncing={versionControlStore.syncing}
 		onSync={githubRepoParts ? handleSyncAll : undefined}
-		onPlant={openCreateDialog}
+		onCreateIssue={openCreateDialog}
 		onToggleForest={() => selection.toggleForestCollapsed()}
 	/>
 
