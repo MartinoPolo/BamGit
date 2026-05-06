@@ -83,6 +83,7 @@ describe('CARD_STATE_CLASSES', () => {
 	it('has all expected state keys', () => {
 		const expectedKeys = [
 			'active',
+			'hovered',
 			'selected',
 			'selectionReady',
 			'dragging',

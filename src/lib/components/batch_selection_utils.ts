@@ -45,6 +45,7 @@ export function computeSelectAllCheckboxState(
 
 export const CARD_STATE_CLASSES = {
 	active: 'card-state-active-ic',
+	hovered: 'card-state-hovered-ic',
 	selected: 'card-state-selected-primary',
 	selectionReady: 'card-state-selection-ready',
 	dragging: 'rotate-[-1.5deg] scale-[1.02] shadow-lg opacity-92',

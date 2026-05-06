@@ -187,6 +187,7 @@
 					{getChildren}
 					{getNotificationDotColor}
 					{getProgressLines}
+					{getVisualization}
 					{onArchive}
 					{onUnarchive}
 					{onEdit}
