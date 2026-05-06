@@ -236,36 +236,33 @@
 					<Button
 						variant="ghost-overlay"
 						size="icon-sm"
-						class="size-5"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<FolderOpenIcon size={12} />
+						<FolderOpenIcon />
 					</Button>
 				</SimpleTooltip>
 				<SimpleTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
 					<Button
 						variant="ghost-overlay"
 						size="icon-sm"
-						class="size-5"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<TerminalIcon size={12} />
+						<TerminalIcon />
 					</Button>
 				</SimpleTooltip>
 				<SimpleTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
 					<Button
 						variant="ghost-overlay"
 						size="icon-sm"
-						class="size-5"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<VscodeIcon size={12} />
+						<VscodeIcon />
 					</Button>
 				</SimpleTooltip>
 			</div>

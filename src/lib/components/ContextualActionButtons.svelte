@@ -71,12 +71,12 @@
 			<Button
 				variant="contextual-primary"
 				size="sm"
-				class="h-[22px] px-2 text-[10px] font-semibold"
+				class="font-semibold"
 				onclick={(event: MouseEvent) => handleClick(event, primaryId)}
 			>
 				{#if getIcon(primaryId)}
 					{@const IconComponent = getIcon(primaryId)!}
-					<IconComponent size={10} />
+					<IconComponent />
 				{/if}
 				{getLabel(primaryId)}
 			</Button>
@@ -89,12 +89,11 @@
 			<Button
 				variant="secondary"
 				size="sm"
-				class="h-[22px] px-2 text-[10px]"
 				onclick={(event: MouseEvent) => handleClick(event, secondaryId)}
 			>
 				{#if getIcon(secondaryId)}
 					{@const IconComponent = getIcon(secondaryId)!}
-					<IconComponent size={10} />
+					<IconComponent />
 				{/if}
 				{getLabel(secondaryId)}
 			</Button>
@@ -110,10 +109,9 @@
 							{...props}
 							variant="secondary"
 							size="icon-sm"
-							class="h-[22px] w-auto px-1.5"
 							onclick={(event: MouseEvent) => event.stopPropagation()}
 						>
-							<MoreHorizontalIcon size={10} />
+							<MoreHorizontalIcon />
 						</Button>
 					</SimpleTooltip>
 				{/snippet}
