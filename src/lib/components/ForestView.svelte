@@ -20,10 +20,6 @@
 		DEFAULT_TREE_CONFIG,
 		OVERLAY_DEFAULTS,
 		TRUNK_DEAD_SPACE_PERCENT,
-		generateTree,
-		computeTreeHull,
-		VIEWBOX_WIDTH,
-		VIEWBOX_HEIGHT,
 	} from 'low-poly-2d-trees';
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
@@ -189,42 +185,6 @@
 		return { width: TREE_NATURAL_WIDTH, height: TREE_NATURAL_HEIGHT };
 	}
 
-	const clipPathCache = new Map<string, string>();
-
-	function getClipPath(entry: IssueEntry): string | undefined {
-		if (entry.visualization.kind === 'potted-plant') {
-			return undefined;
-		}
-		const cacheKey =
-			entry.visualization.kind === 'oak'
-				? `oak-${entry.visualization.seed}`
-				: `tree-${entry.visualization.config.seed}-${entry.visualization.config.shape}-${entry.visualization.config.stage}`;
-
-		const cached = clipPathCache.get(cacheKey);
-		if (cached) {
-			return cached;
-		}
-
-		const config =
-			entry.visualization.kind === 'oak' ? getOakConfig(entry) : entry.visualization.config;
-		const geometry = generateTree(config);
-		const hull = computeTreeHull(geometry, 12);
-
-		if (hull.length < 3) {
-			return undefined;
-		}
-
-		const points = hull
-			.map(
-				(p) =>
-					`${((p.x / VIEWBOX_WIDTH) * 100).toFixed(1)}% ${((p.y / VIEWBOX_HEIGHT) * 100).toFixed(1)}%`,
-			)
-			.join(', ');
-		const polygon = `polygon(${points})`;
-		clipPathCache.set(cacheKey, polygon);
-		return polygon;
-	}
-
 	function getOakConfig(entry: IssueEntry): TreeConfig {
 		if (entry.visualization.kind !== 'oak') {
 			return DEFAULT_TREE_CONFIG;
@@ -370,7 +330,6 @@
 				{#if entry}
 					{@const size = getNaturalSize(entry)}
 					{@const overlayConfig = getResolvedOverlayConfig(entry)}
-					{@const clipPath = getClipPath(entry)}
 					{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
 					<ForestTreeTooltip
 						issueTitle={entry.issue.name}
@@ -380,7 +339,7 @@
 							<button
 								{...triggerProps}
 								type="button"
-								class="absolute cursor-pointer border-0 bg-transparent p-0 transition-transform hover:brightness-110 focus-visible:outline-2 focus-visible:outline-ring"
+								class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-auto [&>svg]:cursor-pointer"
 								style:left="{positioned.x}px"
 								style:top="{positioned.y}px"
 								style:width="{size.width}px"
@@ -389,7 +348,7 @@
 									100}%)) scale({positioned.scale})"
 								style:opacity={positioned.opacity}
 								style:z-index={positioned.zIndex}
-								style:clip-path={clipPath}
+								style:pointer-events="none"
 								onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
 								onmouseleave={() => interaction.unhover()}
 								onclick={() => handleTreeClick(entry)}
