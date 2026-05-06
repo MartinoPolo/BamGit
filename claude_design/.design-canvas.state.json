@@ -1,1 +1,1 @@
-{"sections":{"overlays":{"title":"Overlays"},"components":{"labels":{"cards":"Issue card states"}},"variants":{"order":["variant-a","variant-c","variant-b"]}}}
+{"sections":{"overlays":{"title":"Overlays"},"components":{"labels":{"cards":"Issue card states"}},"variants":{"order":["variant-a","variant-c","variant-b"]},"agent-states":{"labels":{"at4":"Many agents (15+ scrolling)"}}}}

@@ -31,9 +31,10 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 <script type="text/babel" src="design-canvas.jsx"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
 <script type="text/babel" src="session-shared.jsx"></script>
-<script type="text/babel" src="session-variant-a.jsx"></script>
-<script type="text/babel" src="session-variant-b.jsx"></script>
-<script type="text/babel" src="session-variant-c.jsx"></script>
+<script type="text/babel" src="session-layout.jsx"></script>
+<script type="text/babel" src="session-states.jsx"></script>
+<script type="text/babel" src="session-tool-states.jsx"></script>
+<script type="text/babel" src="session-agent-states.jsx"></script>
 
 <script type="text/babel">
 
@@ -46,19 +47,45 @@ function App() {
     document.body.setAttribute('data-theme', t);
   }, [tweaks.theme]);
 
+  const W = 1280, H = 820;
+
   return (
     <>
       <DesignCanvas>
-        <DCSection id="variants" title="Session Chat View — 3 Layout Variants">
-          <DCArtboard id="variant-a" label="A — Top bar + right sidebar" width={1280} height={820}>
-            <VariantA/>
-          </DCArtboard>
-          <DCArtboard id="variant-b" label="B — Floating HUD + slide-over tree" width={1280} height={820}>
-            <VariantB/>
-          </DCArtboard>
-          <DCArtboard id="variant-c" label="C — Left panel layout" width={1280} height={820}>
-            <VariantC/>
-          </DCArtboard>
+        {/* ═══ Page-Level States ═══ */}
+        <DCSection id="page-states" title="Page States (15)">
+          <DCArtboard id="s01" label="01 — Active session, mid-conversation" width={W} height={H}><State01_Active/></DCArtboard>
+          <DCArtboard id="s02" label="02 — Needs input (permission card)" width={W} height={H}><State02_NeedsInput/></DCArtboard>
+          <DCArtboard id="s03" label="03 — Empty / just spawned" width={W} height={H}><State03_Empty/></DCArtboard>
+          <DCArtboard id="s04" label="04 — Errored" width={W} height={H}><State04_Errored/></DCArtboard>
+          <DCArtboard id="s05" label="05 — Long conversation (dimmed + jump)" width={W} height={H}><State05_LongConvo/></DCArtboard>
+          <DCArtboard id="s06" label="06 — Image attached (carousel expanded)" width={W} height={H}><State06_ImageAttached/></DCArtboard>
+          <DCArtboard id="s07" label="07 — Image carousel collapsed" width={W} height={H}><State07_ImageCollapsed/></DCArtboard>
+          <DCArtboard id="s08" label="08 — Sidebar collapsed" width={W} height={H}><State08_SidebarCollapsed/></DCArtboard>
+          <DCArtboard id="s09" label="09 — Quota warning (red zone)" width={W} height={H}><State09_QuotaWarning/></DCArtboard>
+          <DCArtboard id="s10" label="10 — Long-text input" width={W} height={H}><State10_LongInput/></DCArtboard>
+          <DCArtboard id="s11" label="11 — Tools popover open" width={W} height={H}><State11_ToolsPopover/></DCArtboard>
+          <DCArtboard id="s12" label="12 — Model dropdown open" width={W} height={H}><State12_ModelDropdown/></DCArtboard>
+          <DCArtboard id="s13" label="13 — Skill config panel" width={W} height={H}><State13_SkillConfig/></DCArtboard>
+          <DCArtboard id="s14" label="14 — Open in CLI tooltip" width={W} height={H}><State14_CLITooltip/></DCArtboard>
+          <DCArtboard id="s15" label="15 — Overflow menu open" width={W} height={H}><State15_Overflow/></DCArtboard>
+        </DCSection>
+
+        {/* ═══ Tool Card Sub-Component States ═══ */}
+        <DCSection id="tool-states" title="Tool Card States">
+          <DCArtboard id="tl1" label="Level 1 — All Types + Error + Running + Dimmed + Grouping" width={720} height={720}><ToolL1Showcase/></DCArtboard>
+          <DCArtboard id="tl2" label="Level 2 — Per-Tool Content Layouts" width={720} height={1600}><ToolL2Showcase/></DCArtboard>
+          <DCArtboard id="tl3" label="Level 3 — Permission / Elicitation / Ask" width={720} height={680}><ToolL3Showcase/></DCArtboard>
+        </DCSection>
+
+        {/* ═══ Sub-Agent Tree States ═══ */}
+        <DCSection id="agent-states" title="Sub-Agent Tree States">
+          <DCArtboard id="at0" label="Empty (no agents)" width={320} height={160}><AgentTreeEmpty/></DCArtboard>
+          <DCArtboard id="at1" label="Single agent" width={320} height={200}><AgentTreeSingle/></DCArtboard>
+          <DCArtboard id="at2" label="Canonical (spec sample)" width={320} height={340}><AgentTreeCanonical/></DCArtboard>
+          <DCArtboard id="at3" label="Deep nesting (4+ levels)" width={320} height={400}><AgentTreeDeep/></DCArtboard>
+          <DCArtboard id="at4" label="Many agents (15+ scrolling)" width={320} height={420}><AgentTreeMany/></DCArtboard>
+          <DCArtboard id="at5" label="Interaction states" width={320} height={440}><AgentTreeStates/></DCArtboard>
         </DCSection>
       </DesignCanvas>
 
