@@ -28,6 +28,8 @@ const ISSUE_PERF_AUDIT = 'mock-issue-perf';
 const ISSUE_CI_PIPELINE = 'mock-issue-ci';
 const ISSUE_ONBOARDING = 'mock-issue-onboarding';
 const ISSUE_ARCHIVED = 'mock-issue-archived';
+const ISSUE_API_GATEWAY = 'mock-issue-api-gateway';
+const ISSUE_INTEGRATION_TESTS = 'mock-issue-integration-tests';
 
 const PALETTE_VIVID = 'palette-vivid';
 
@@ -179,6 +181,52 @@ export const MOCK_ISSUES: Issue[] = [
 		created_at: '2026-05-02T11:45:00Z',
 	},
 	{
+		id: ISSUE_API_GATEWAY,
+		dashboard_id: DASHBOARD_GROVEKEEPER,
+		name: 'Build API gateway with rate limiting',
+		priority: 'medium',
+		color: '#8b5cf6',
+		status: 'active',
+		github_issue_url: 'https://github.com/MartinoPolo/Grovekeeper/issues/85',
+		github_issue_number: 85,
+		branch_name: '85-api-gateway',
+		base_branch: 'dev',
+		worktree_folder: null,
+		worktree_state: 'none',
+		parent_issue_id: null,
+		editor_folder: null,
+		dev_server_command: null,
+		dev_server_port: null,
+		dev_server_pid: null,
+		browser_url: null,
+		labels: '[{"name":"backend","color":"#8b5cf6"}]',
+		sort_order: 5,
+		created_at: '2026-05-03T10:00:00Z',
+	},
+	{
+		id: ISSUE_INTEGRATION_TESTS,
+		dashboard_id: DASHBOARD_GROVEKEEPER,
+		name: 'Add integration test suite for API',
+		priority: 'low',
+		color: '#06b6d4',
+		status: 'active',
+		github_issue_url: 'https://github.com/MartinoPolo/Grovekeeper/issues/92',
+		github_issue_number: 92,
+		branch_name: null,
+		base_branch: 'dev',
+		worktree_folder: null,
+		worktree_state: 'none',
+		parent_issue_id: null,
+		editor_folder: null,
+		dev_server_command: null,
+		dev_server_port: null,
+		dev_server_pid: null,
+		browser_url: null,
+		labels: '[{"name":"testing","color":"#14b8a6"}]',
+		sort_order: 6,
+		created_at: '2026-05-04T14:00:00Z',
+	},
+	{
 		id: ISSUE_ARCHIVED,
 		dashboard_id: DASHBOARD_GROVEKEEPER,
 		name: 'Migrate to Tailwind v4',
@@ -210,6 +258,16 @@ export const MOCK_ISSUE_DEPENDENCIES: IssueDependency[] = [
 		id: 'mock-dep-1',
 		blocker_issue_id: ISSUE_AUTH_MIDDLEWARE,
 		blocked_issue_id: ISSUE_ONBOARDING,
+	},
+	{
+		id: 'mock-dep-2',
+		blocker_issue_id: ISSUE_AUTH_MIDDLEWARE,
+		blocked_issue_id: ISSUE_API_GATEWAY,
+	},
+	{
+		id: 'mock-dep-3',
+		blocker_issue_id: ISSUE_API_GATEWAY,
+		blocked_issue_id: ISSUE_INTEGRATION_TESTS,
 	},
 ];
 

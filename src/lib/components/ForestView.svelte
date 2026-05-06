@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue } from '$lib/modules/issues';
-	import type { GitStatusCache } from '$lib/types/generated';
+	import type { GitStatusCache, IssueDependency } from '$lib/types/generated';
 	import {
 		computeVisualization,
 		computeForestLayout,
@@ -19,6 +19,7 @@
 		PottedPlant,
 		DEFAULT_TREE_CONFIG,
 		OVERLAY_DEFAULTS,
+		TRUNK_DEAD_SPACE_PERCENT,
 	} from 'low-poly-2d-trees';
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
@@ -33,6 +34,7 @@
 
 	interface Props {
 		issues: readonly Issue[];
+		dependencies: readonly IssueDependency[];
 		getGitStatus: (issueId: string) => GitStatusCache | undefined;
 		getSessionsForIssue: (issueId: string) => readonly SessionForMapping[];
 		onAddIssue?: () => void;
@@ -42,6 +44,7 @@
 
 	let {
 		issues,
+		dependencies,
 		getGitStatus,
 		getSessionsForIssue,
 		onAddIssue,
@@ -90,9 +93,7 @@
 	}
 
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
-		let prdIssueId: string | null = null;
 		const visualizations = new SvelteMap<string, TreeVisualization>();
-		const parentIssueIds = new SvelteMap<string, string | null>();
 
 		for (const issue of issues) {
 			const visualization = computeVisualization(
@@ -101,14 +102,10 @@
 				getSessionsForIssue(issue.id),
 			);
 			visualizations.set(issue.id, visualization);
-			parentIssueIds.set(issue.id, issue.parent_issue_id);
-			if (visualization.kind === 'oak') {
-				prdIssueId = issue.id;
-			}
 		}
 
 		const issueIds = issues.map((issue) => issue.id);
-		const depthRows = computeDepthRows(issueIds, parentIssueIds, prdIssueId);
+		const depthRows = computeDepthRows(issueIds, dependencies);
 
 		const results: IssueEntry[] = [];
 		for (const issue of issues) {
@@ -226,6 +223,30 @@
 		contextMenu = { x: event.clientX, y: event.clientY, issueId: entry.issue.id };
 	}
 
+	// fallow-ignore-next-line complexity
+	function getGroundElementProps(
+		entry: IssueEntry,
+		rowIndex: number,
+	): { groundElements: boolean; groundElementCount?: number } {
+		if (rowIndex !== 0) {
+			return { groundElements: false };
+		}
+		if (entry.visualization.kind === 'oak') {
+			return { groundElements: true };
+		}
+		const stage =
+			entry.visualization.kind === 'tree'
+				? entry.visualization.config.stage
+				: entry.visualization.stage;
+		if (stage === 'seed' || stage === 'sprouting') {
+			return { groundElements: false };
+		}
+		if (stage === 'sapling' || stage === 'growing') {
+			return { groundElements: true, groundElementCount: 4 };
+		}
+		return { groundElements: true };
+	}
+
 	function handleGroundClick() {
 		interaction.deactivate();
 	}
@@ -236,6 +257,9 @@
 				contextMenu = null;
 			} else {
 				interaction.deactivate();
+				if (document.activeElement instanceof HTMLElement) {
+					document.activeElement.blur();
+				}
 			}
 		}
 	}
@@ -282,6 +306,7 @@
 	bind:clientHeight={rawViewportHeight}
 	style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
 	style:min-height="0"
+	style:isolation="isolate"
 	onkeydown={handleKeydown}
 	tabindex="0"
 >
@@ -305,6 +330,7 @@
 				{#if entry}
 					{@const size = getNaturalSize(entry)}
 					{@const overlayConfig = getResolvedOverlayConfig(entry)}
+					{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
 					<ForestTreeTooltip
 						issueTitle={entry.issue.name}
 						issueStatus={entry.issue.status}
@@ -313,14 +339,16 @@
 							<button
 								{...triggerProps}
 								type="button"
-								class="absolute cursor-pointer border-0 bg-transparent p-0 transition-transform hover:brightness-110 focus-visible:outline-2 focus-visible:outline-ring"
+								class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-auto [&>svg]:cursor-pointer"
 								style:left="{positioned.x}px"
 								style:top="{positioned.y}px"
 								style:width="{size.width}px"
 								style:height="{size.height}px"
-								style:transform="translate(-50%, -100%) scale({positioned.scale})"
+								style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
+									100}%)) scale({positioned.scale})"
 								style:opacity={positioned.opacity}
 								style:z-index={positioned.zIndex}
+								style:pointer-events="none"
 								onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
 								onmouseleave={() => interaction.unhover()}
 								onclick={() => handleTreeClick(entry)}
@@ -331,7 +359,8 @@
 									<LowPolyTree
 										config={getOakConfig(entry)}
 										{overlayConfig}
-										groundElements={positioned.rowIndex === 0}
+										groundElements={groundProps.groundElements}
+										groundElementCount={groundProps.groundElementCount}
 									/>
 								{:else if entry.visualization.kind === 'tree'}
 									<LowPolyTree
@@ -341,7 +370,8 @@
 										animateCanopySway={entry.visualization.animateCanopySway}
 										animateGrowth={entry.visualization.animateGrowth}
 										animateTools={entry.visualization.animateTools}
-										groundElements={positioned.rowIndex === 0}
+										groundElements={groundProps.groundElements}
+										groundElementCount={groundProps.groundElementCount}
 									/>
 								{:else if entry.visualization.kind === 'potted-plant'}
 									<PottedPlant
