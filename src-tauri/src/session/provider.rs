@@ -16,6 +16,7 @@ pub enum ProviderKind {
     ClaudeCode,
     OpenCode,
     Codex,
+    Cursor,
 }
 
 impl Default for ProviderKind {
@@ -30,6 +31,7 @@ impl ProviderKind {
             Self::ClaudeCode => "claude-code",
             Self::OpenCode => "open-code",
             Self::Codex => "codex",
+            Self::Cursor => "cursor",
         }
     }
 }
@@ -97,6 +99,11 @@ pub enum SessionTransport {
         working_directory: PathBuf,
         model: Option<String>,
         sandbox: Option<String>,
+    },
+    AcpJsonRpc {
+        stdin: Option<ChildStdin>,
+        acp_session_id: String,
+        next_request_id: u64,
     },
 }
 
@@ -255,4 +262,26 @@ pub trait ProviderAdapter: Send + Sync {
 
     /// Kill the provider process immediately.
     async fn terminate(&self, handle: &mut SessionHandle) -> Result<(), ProviderError>;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn provider_kind_cursor_serializes_to_kebab_case() {
+        let serialized = serde_json::to_string(&ProviderKind::Cursor).unwrap();
+        assert_eq!(serialized, "\"cursor\"");
+    }
+
+    #[test]
+    fn provider_kind_cursor_as_str() {
+        assert_eq!(ProviderKind::Cursor.as_str(), "cursor");
+    }
+
+    #[test]
+    fn provider_kind_cursor_deserializes() {
+        let deserialized: ProviderKind = serde_json::from_str("\"cursor\"").unwrap();
+        assert_eq!(deserialized, ProviderKind::Cursor);
+    }
 }

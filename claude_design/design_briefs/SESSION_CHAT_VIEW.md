@@ -51,7 +51,7 @@ Single horizontal bar above both columns. Three groups:
 
 ### Left group
 - **Session title** — issue title or first user message, truncated to ~60ch with ellipsis.
-- **Session state badge** — running / needs-input / needs-review / paused / finished / errored. Color-coded (running pulse green, needs-input amber, errored red).
+- **Session state badge** — running / needs-input / needs-review / stopped / finished / errored. Color-coded (running pulse green, needs-input amber, errored red).
 
 ### Center group (git context)
 Single inline row, monospace where appropriate:
@@ -63,7 +63,7 @@ When window narrows: badges collapse to icon-only.
 
 ### Right group
 - **Open in CLI** action — labeled icon button `[↗ Open in CLI]`. Resumes the current session in the native provider CLI (e.g., `claude --resume <session-id>`, `codex --resume <id>`, etc.) by spawning the provider-appropriate command in a terminal at the worktree path. Works for all four providers; command varies per provider.
-- **Overflow menu** `[⋮]` — placeholder for future session-level actions (Stop, Pause, Export transcript, Copy session ID). Empty in v1 but reserved.
+- **Overflow menu** `[⋮]` — session-level actions: Export chat, Restart (future), Delete session (future). Stop is handled by the send↔stop morph in the input panel (see section 6). No "Pause" action — stopping the agent and returning later achieves the same effect.
 - **Tab switcher**: Chat (default) | Files | Stats
 
 ### Constraints
@@ -79,7 +79,7 @@ When window narrows: badges collapse to icon-only.
 Sections top to bottom, divided by separator lines:
 
 **A. Header strip**
-- Collapse toggle (icon) — top-right corner, toggles to the 44px strip.
+- Collapse toggle (icon) — **left-aligned** in the header row, closest to the content boundary. Toggles to the 44px strip.
 - No label needed. Future-proof: leave room for additions.
 
 **B. Provider section**
@@ -150,7 +150,7 @@ The primary content area between the tabs and the floating input panel.
 
 **Streaming** — text appears character-by-character with a subtle caret at the insertion point. Tool calls can appear mid-stream and resolve while the assistant continues.
 
-**Content dimming** — content above the last user message is visually dimmed (reduced opacity). Dimmed content remains scrollable.
+**Content dimming** — content above the last user message is visually dimmed (`opacity: 0.4`). Dimmed content remains scrollable and fully interactable (accordions, navigation links, copy buttons all work). On hover, the **entire turn** (user message + assistant response + all tool cards in that turn) restores to full opacity with `transition: opacity 150ms ease-out`. This makes older content recede visually while remaining accessible.
 
 **Image rendering** — images are rendered inline in message bubbles. Each image has a small `#N` caption beneath it (matches the global session numbering — see Image Handling section).
 
@@ -259,8 +259,12 @@ Floating, rounded, elevated surface — **not** a full-width bar with padding. C
 **Container properties**
 - Max-width ~900px (or ~80% of chat column, whichever is smaller)
 - ~20px above the bottom of the chat column
-- Rounded corners, subtle shadow, surface-elevated background
+- Rounded corners, subtle shadow, **solid opaque** surface-elevated background (`var(--surface)`)
 - Drag-and-drop target for images and files (drop indicator overlay when dragging)
+
+**Shared content column** — the message stream content (assistant text, tool cards, sub-agent expansions, system messages) must be constrained to the **same max-width as the floating input panel** (~900px, centered). This prevents content from "leaking" past the edges of the input card. User message bubbles remain narrower (75% of column). This matches the pattern used by Claude.ai and ChatGPT where content and input share a single column constraint.
+
+**Gradient fade** — a gradient overlay covers the bottom ~120px of the chat column behind the input panel: `linear-gradient(transparent, var(--background))`. This fades scrolling content before it reaches the panel, preventing visual collision. The gradient is `pointer-events: none` so it doesn't block interaction with the input panel.
 
 **Vertical structure (top → bottom)**
 
@@ -317,7 +321,19 @@ Single row, two groups separated by flex space:
   - Then: model list per provider (each entry shows context window in parens)
   - Then: effort/thinking-mode selection (Low / Medium / High / off)
 - `[Approve each ▾]` — permission mode (Approve each / Auto-accept edits / Bypass all)
-- `[→ Send]` — primary action
+- `[→ Send / ■ Stop]` — primary action. **Morphs between Send and Stop** based on session state:
+  - **Idle / waiting for input:** Send icon (`→`), keyboard hint `Enter` (or `Ctrl+Enter` for newline). Primary color.
+  - **Agent actively generating:** Stop icon (`■`), keyboard hint `Ctrl+C`. Danger/red color. Single click interrupts the current generation immediately.
+  - Transition is instant (no animation). The button returns to Send when the agent finishes or is stopped.
+  - There is no separate "Pause" action — stopping the agent and returning later achieves the same effect.
+
+**Component sizing rules**
+- All buttons in the input panel use predefined size variants — **no inline height overrides**.
+- Bottom controls row: all buttons (Attach, Tools, Local, Model dropdown, Approve each, Send/Stop) use `.gk-btn-sm` (`--size-control-sm`, 26px). The Send button is distinguished by primary color, not by being taller.
+- Skill chips row: all chips use `.gk-btn-sm` (26px) — same height as the bottom controls.
+- All tool card headers (L1, L2, L3) use a **single consistent height of 36px**.
+- All badges use `.gk-badge` (20px) — no inline height overrides to 15px or 17px.
+- All inputs use `.gk-input` (`--size-control-md`, 32px) — no inline height overrides.
 
 **Sync rules**
 - Provider, model, effort, permission mode are session-level state
@@ -349,10 +365,11 @@ Accessed via gear/settings icon near the skills row (or via the Tools popover). 
 
 ## 8. Layout Constraints
 
-- Full width within container — no fixed max-width on the chat column itself
+- **Shared content column**: message stream content and floating input panel share the same max-width (~900px, centered). No content extends wider than the input panel.
 - Right sidebar fixed width: 272px expanded, 44px collapsed
 - Floating input panel: max-width 900px, centered, 20px from chat-column bottom
 - Message stream fills available space between tabs and the floating panel
+- **Gradient fade**: bottom ~120px of chat column fades from transparent to `var(--background)` behind the input panel
 - Top bar fills full page width
 - Dark theme primary; light theme supported (already in current HTML mockup)
 - All scrollable areas (message stream, sub-agents tree, tool card content, image carousel) scroll independently

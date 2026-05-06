@@ -10,23 +10,23 @@
 
 Priority-ordered rule table. First matching rule wins — evaluated top-to-bottom.
 
-| #   | Condition                                                                        | Stage         | Notes                                         |
-| --- | -------------------------------------------------------------------------------- | ------------- | --------------------------------------------- |
-| 1   | `worktreeState=removed` AND `grovekeeperStatus=archived`                         | **stump**     | Fully cleared, lifecycle complete             |
-| 2   | `branchStatus=deleted`                                                           | **dead**      | Branch abandoned                              |
-| 3   | `branchStatus=remote-gone` AND `prState!=merged`                                 | **dead**      | Remote abandoned (not merged)                 |
-| 4   | `prState=merged`                                                                 | **bare**      | Lifecycle complete, regardless of issue state |
-| 5   | `prState=closed` (not merged)                                                    | **wilting**   | PR rejected/abandoned                         |
-| 6   | `prState=ready-to-merge`                                                         | **fruiting**  | Mature, ready to harvest. Green glow (5)      |
-| 7   | `prState=approved`                                                               | **fruiting**  | Approved, CI may be pending. Green glow (2)   |
-| 8   | `prState=changes-requested`                                                      | **seasonal**  | Autumn setback — reviewer requested changes   |
-| 9   | `prState=review-requested` OR `prState=open`                                     | **flowering** | Blossoming, PR is open and visible            |
-| 10  | `prState=draft`                                                                  | **leafy**     | Work done, PR not ready for review            |
-| 11  | `aggregateSessionState` in {running, needs-input, needs-review, paused, errored} | **growing**   | Active work in progress                       |
-| 12  | `hasCommitsOnBranch` AND `prState=no-pr`                                         | **leafy**     | Work done, no PR yet                          |
-| 13  | `worktreeState=active` AND `branchStatus` in {active, local-only}                | **sapling**   | Ready for work, no session run yet            |
-| 14  | `worktreeState` in {pending, failed}                                             | **sprouting** | Setting up (pending) or setup failed          |
-| 15  | (fallback)                                                                       | **seed**      | Just an idea — GH issue exists, nothing else  |
+| #   | Condition                                                                         | Stage         | Notes                                         |
+| --- | --------------------------------------------------------------------------------- | ------------- | --------------------------------------------- |
+| 1   | `worktreeState=removed` AND `grovekeeperStatus=archived`                          | **stump**     | Fully cleared, lifecycle complete             |
+| 2   | `branchStatus=deleted`                                                            | **dead**      | Branch abandoned                              |
+| 3   | `branchStatus=remote-gone` AND `prState!=merged`                                  | **dead**      | Remote abandoned (not merged)                 |
+| 4   | `prState=merged`                                                                  | **bare**      | Lifecycle complete, regardless of issue state |
+| 5   | `prState=closed` (not merged)                                                     | **wilting**   | PR rejected/abandoned                         |
+| 6   | `prState=ready-to-merge`                                                          | **fruiting**  | Mature, ready to harvest. Green glow (5)      |
+| 7   | `prState=approved`                                                                | **fruiting**  | Approved, CI may be pending. Green glow (2)   |
+| 8   | `prState=changes-requested`                                                       | **seasonal**  | Autumn setback — reviewer requested changes   |
+| 9   | `prState=review-requested` OR `prState=open`                                      | **flowering** | Blossoming, PR is open and visible            |
+| 10  | `prState=draft`                                                                   | **leafy**     | Work done, PR not ready for review            |
+| 11  | `aggregateSessionState` in {running, needs-input, needs-review, stopped, errored} | **growing**   | Active work in progress                       |
+| 12  | `hasCommitsOnBranch` AND `prState=no-pr`                                          | **leafy**     | Work done, no PR yet                          |
+| 13  | `worktreeState=active` AND `branchStatus` in {active, local-only}                 | **sapling**   | Ready for work, no session run yet            |
+| 14  | `worktreeState` in {pending, failed}                                              | **sprouting** | Setting up (pending) or setup failed          |
+| 15  | (fallback)                                                                        | **seed**      | Just an idea — GH issue exists, nothing else  |
 
 ### Botanical Progression
 
@@ -43,7 +43,7 @@ Side branches: `seasonal` (changes-requested setback), `wilting` (PR closed), `d
 When an issue has multiple sessions, the worst active state wins:
 
 ```
-needs-input > errored > needs-review > running > paused > finished > no-session
+needs-input > errored > needs-review > running > stopped > finished > no-session
 ```
 
 ---
@@ -95,7 +95,7 @@ Accessories triggered by issue/session/git state, independent of execution phase
 | Condition                   | Accessory                 | Anchor    | Animation                                      |
 | --------------------------- | ------------------------- | --------- | ---------------------------------------------- |
 | `worktreeState=pending`     | **wateringCan**           | trunkBase | Pour motion (transient growth)                 |
-| `sessionState=paused`       | **ladder**                | trunkBase | Gentle wobble (someone stepped away)           |
+| `sessionState=stopped`      | **ladder**                | trunkBase | Gentle wobble (someone stepped away)           |
 | `label=HITL`                | **grill**                 | trunkBase | Static = available; Animated = grilling active |
 | `sessionState=errored`      | **speechBubble (red)**    | crownTop  | Static                                         |
 | `sessionState=needs-input`  | **speechBubble (orange)** | crownTop  | Static                                         |
@@ -128,8 +128,8 @@ Speech bubble and stormCloud never co-occur (no crownTop conflict).
 
 When multiple trunkBase accessories could apply, show the highest priority (mutually exclusive in practice):
 
-1. Execution phase tool (session running, not paused)
-2. Ladder (session paused)
+1. Execution phase tool (session running, not stopped)
+2. Ladder (session stopped)
 3. Grill (HITL label, no active session)
 4. WateringCan (worktree pending — no session possible yet)
 
@@ -186,10 +186,10 @@ The approved → ready-to-merge intensity jump (2 → 5) makes "CI just went gre
 
 Animation state communicates whether a session is actively running:
 
-| Session State            | canopySway | animateGrowth | Visual Effect                    |
-| ------------------------ | ---------- | ------------- | -------------------------------- |
-| Running (active session) | Yes        | Yes           | Tree is alive and moving         |
-| Paused / no session      | No         | No            | Tree is still (ladder if paused) |
+| Session State            | canopySway | animateGrowth | Visual Effect                     |
+| ------------------------ | ---------- | ------------- | --------------------------------- |
+| Running (active session) | Yes        | Yes           | Tree is alive and moving          |
+| Stopped / no session     | No         | No            | Tree is still (ladder if stopped) |
 
 Row 1 (front) trees get full animation. Rows 2+ (blocked issues behind) are always static for performance.
 

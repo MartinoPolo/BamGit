@@ -14,8 +14,8 @@ function TopBar({ state = 'running', title = 'Implement OpenCode provider', show
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
         <I.GitBranch size={12} sw={1.6} style={{ color: 'var(--foreground-subtle)' }}/>
         <span className="font-mono" style={{ fontSize: 11, color: 'var(--foreground-muted)' }}>feat/session-ui</span>
-        <span className="gk-badge gk-badge-info" style={{ height: 17, fontSize: 10 }}>#90 open</span>
-        <span className="gk-badge gk-badge-moss" style={{ height: 17, fontSize: 10 }}>PR #5 draft</span>
+        <span className="gk-badge gk-badge-info" style={{ fontSize: 10 }}>#90 open</span>
+        <span className="gk-badge gk-badge-moss" style={{ fontSize: 10 }}>PR #5 draft</span>
       </div>
 
       {/* Right: actions + tabs */}
@@ -47,8 +47,7 @@ function RightSidebar({ onCollapse, ctxPct = 54, q5hPct = 42, q7dPct = 18, cost 
     <div style={{ width: 272, borderLeft: '1px solid var(--border)', background: 'var(--sidebar-bg)', display: 'flex', flexDirection: 'column', flexShrink: 0, overflow: 'hidden' }}>
       {/* Header */}
       <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center' }}>
-        <div style={{ flex: 1 }}></div>
-        <button className="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" style={{ width: 24, height: 24 }} onClick={onCollapse}>
+        <button className="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" onClick={onCollapse}>
           <I.PanelLeft size={13} sw={1.8} style={{ transform: 'scaleX(-1)' }}/>
         </button>
       </div>
@@ -89,7 +88,7 @@ function RightSidebar({ onCollapse, ctxPct = 54, q5hPct = 42, q7dPct = 18, cost 
         <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 6 }}>
           <I.Cpu size={12} sw={1.8} style={{ color: 'var(--foreground-subtle)' }}/>
           <span style={{ fontSize: 11, fontWeight: 600, flex: 1 }}>Sub-Agents</span>
-          <span className="gk-badge" style={{ height: 15, fontSize: 9, padding: '0 5px' }}>5</span>
+          <span className="gk-badge" style={{ fontSize: 9, padding: '0 5px' }}>5</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: '6px 4px' }}>
           <AgentTreeContent showActive/>
@@ -117,7 +116,7 @@ function CollapsedSidebar({ onExpand, ctxPct = 54, state = 'running' }) {
   const pulseColor = state === 'running' ? 'var(--status-success)' : state === 'errored' ? 'var(--status-danger)' : 'var(--status-warning)';
   return (
     <div style={{ width: 44, borderLeft: '1px solid var(--border)', background: 'var(--sidebar-bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 8, gap: 10, flexShrink: 0 }}>
-      <button className="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" style={{ width: 28, height: 28 }} onClick={onExpand}>
+      <button className="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" onClick={onExpand}>
         <I.PanelLeft size={14} sw={1.8} style={{ transform: 'scaleX(-1)' }}/>
       </button>
       <div style={{ width: 8, height: 8, borderRadius: '50%', background: pulseColor, animation: 'gk-pulse 1.8s ease-in-out infinite' }}></div>
@@ -132,12 +131,28 @@ function CollapsedSidebar({ onExpand, ctxPct = 54, state = 'running' }) {
   );
 }
 
+/* ── Send / Stop button ────────────────────────────────────── */
+function SendStopButton({ isRunning }) {
+  if (isRunning) {
+    return (
+      <button className="gk-btn gk-btn-danger gk-btn-sm gk-btn-icon" style={{ padding: 0, borderRadius: 7 }}>
+        <I.Square size={11} sw={2.4}/>
+      </button>
+    );
+  }
+  return (
+    <button className="gk-btn gk-btn-primary gk-btn-sm gk-btn-icon" style={{ padding: 0, borderRadius: 7 }}>
+      <I.Send size={13} sw={2}/>
+    </button>
+  );
+}
+
 /* ── Floating Input Panel ──────────────────────────────────── */
-function FloatingInput({ showImages, longText, imageCount = 0, showToolsPopover, showModelDropdown }) {
+function FloatingInput({ showImages, longText, imageCount = 0, showToolsPopover, showModelDropdown, isRunning }) {
   const skills = ['Execute', 'Review', 'Check & Fix', 'Commit', 'Ship'];
   return (
-    <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 900, zIndex: 15, padding: '0 20px', pointerEvents: 'none' }}>
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, boxShadow: 'var(--shadow-lg)', overflow: 'hidden', pointerEvents: 'auto' }}>
+    <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 900, zIndex: 15, pointerEvents: 'none' }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, boxShadow: 'var(--shadow-lg)', pointerEvents: 'auto' }}>
         {/* Image carousel */}
         {showImages && (
           <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 6, alignItems: 'center', overflowX: 'auto' }}>
@@ -148,7 +163,7 @@ function FloatingInput({ showImages, longText, imageCount = 0, showToolsPopover,
                 <button style={{ position: 'absolute', top: 2, right: 2, width: 14, height: 14, borderRadius: 3, background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', fontSize: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>×</button>
               </div>
             ))}
-            <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ height: 28, fontSize: 10, flexShrink: 0, padding: '0 8px' }}>+ Add</button>
+            <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10, flexShrink: 0, padding: '0 8px' }}>+ Add</button>
           </div>
         )}
         {/* Collapsed image strip */}
@@ -162,9 +177,9 @@ function FloatingInput({ showImages, longText, imageCount = 0, showToolsPopover,
         {/* Skill chips */}
         <div style={{ padding: '8px 12px 4px', display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {skills.map(s => (
-            <button key={s} className="gk-btn gk-btn-secondary gk-btn-sm" style={{ fontSize: 10.5, height: 22, padding: '0 8px', borderRadius: 999 }}>{s}</button>
+            <button key={s} className="gk-btn gk-btn-secondary gk-btn-sm" style={{ fontSize: 10.5, padding: '0 8px', borderRadius: 999 }}>{s}</button>
           ))}
-          <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10.5, height: 22, padding: '0 6px' }}>More ▾</button>
+          <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10.5, padding: '0 6px' }}>More ▾</button>
         </div>
 
         {/* Textarea */}
@@ -177,11 +192,11 @@ function FloatingInput({ showImages, longText, imageCount = 0, showToolsPopover,
         {/* Bottom controls */}
         <div style={{ padding: '6px 12px 8px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 6 }}>
           {/* Left group */}
-          <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 11, height: 24 }}>
+          <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 11 }}>
             <I.Plus size={11} sw={2}/> Attach
           </button>
           <div style={{ position: 'relative' }}>
-            <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 11, height: 24 }}>
+            <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 11 }}>
               Tools ▾
             </button>
             {showToolsPopover && <ToolsPopover/>}
@@ -190,17 +205,15 @@ function FloatingInput({ showImages, longText, imageCount = 0, showToolsPopover,
           <div style={{ flex: 1 }}></div>
 
           {/* Right group */}
-          <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10.5, height: 24, fontFamily: 'var(--font-mono)' }}>Local ▾</button>
+          <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10.5, fontFamily: 'var(--font-mono)' }}>Local ▾</button>
           <div style={{ position: 'relative' }}>
-            <button className="gk-btn gk-btn-secondary gk-btn-sm" style={{ fontSize: 10.5, height: 24, fontFamily: 'var(--font-mono)', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <button className="gk-btn gk-btn-secondary gk-btn-sm" style={{ fontSize: 10.5, fontFamily: 'var(--font-mono)', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Claude Code · Opus 4.7 (1M) · High ▾
             </button>
             {showModelDropdown && <ModelDropdown/>}
           </div>
-          <button className="gk-btn gk-btn-secondary gk-btn-sm" style={{ fontSize: 10.5, height: 24 }}>Approve each ▾</button>
-          <button className="gk-btn gk-btn-primary gk-btn-sm" style={{ height: 28, width: 28, padding: 0, borderRadius: 7 }}>
-            <I.Send size={13} sw={2}/>
-          </button>
+          <button className="gk-btn gk-btn-secondary gk-btn-sm" style={{ fontSize: 10.5 }}>Approve each ▾</button>
+          <SendStopButton isRunning={isRunning}/>
         </div>
       </div>
     </div>
@@ -255,13 +268,10 @@ function ModelDropdown() {
 function OverflowMenu() {
   return (
     <div className="gk-popover" style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, width: 200, zIndex: 30 }}>
-      <div className="gk-popover-item"><I.Pause size={13} sw={1.6}/> Pause session</div>
-      <div className="gk-popover-item"><I.Square size={13} sw={1.6}/> Stop session</div>
-      <div className="gk-popover-divider"></div>
       <div className="gk-popover-item"><I.Save size={13} sw={1.6}/> Export chat</div>
-      <div className="gk-popover-item"><I.Refresh size={13} sw={1.6}/> Restart</div>
       <div className="gk-popover-divider"></div>
-      <div className="gk-popover-item is-danger" style={{ color: 'var(--status-danger)' }}><I.Trash size={13} sw={1.6}/> Delete session</div>
+      <div className="gk-popover-item" style={{ color: 'var(--foreground-subtle)' }}><I.Refresh size={13} sw={1.6}/> Restart <span style={{ fontSize: 10, marginLeft: 'auto', opacity: 0.6 }}>coming soon</span></div>
+      <div className="gk-popover-item" style={{ color: 'color-mix(in oklch, var(--status-danger) 50%, var(--foreground-subtle))' }}><I.Trash size={13} sw={1.6}/> Delete session <span style={{ fontSize: 10, marginLeft: 'auto', opacity: 0.6 }}>coming soon</span></div>
     </div>
   );
 }
@@ -293,7 +303,7 @@ function SkillConfigPanel() {
                 {ev.skills.map(s => (
                   <span key={s} className="gk-badge gk-badge-moss" style={{ fontSize: 10 }}>{s} ×</span>
                 ))}
-                <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ height: 20, fontSize: 10, padding: '0 6px' }}>+ Add</button>
+                <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10, padding: '0 6px' }}>+ Add</button>
               </div>
             </div>
           ))}
@@ -302,7 +312,7 @@ function SkillConfigPanel() {
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               <span className="gk-badge" style={{ fontSize: 10 }}>.claude/skills/</span>
               <span className="gk-badge" style={{ fontSize: 10 }}>.grovekeeper/skills/</span>
-              <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ height: 20, fontSize: 10, padding: '0 6px' }}>+ Add path</button>
+              <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10, padding: '0 6px' }}>+ Add path</button>
             </div>
           </div>
         </div>
@@ -323,17 +333,17 @@ function SampleStream({ showPermCard, showSubAgent = true }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <SystemMsg text="Session started · Claude Code · feat/session-ui" dimmed/>
-      <UserMsg text="Implement the provider trait for OpenCode. Follow the same pattern as the Claude Code provider but handle the different authentication flow." dimmed/>
-      <div style={{ opacity: 0.4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <UserMsg text="Implement the provider trait for OpenCode. Follow the same pattern as the Claude Code provider but handle the different authentication flow."/>
+      <DimmedTurn>
         <AssistantMsg>I'll examine the existing Claude Code provider to understand the pattern, then implement the OpenCode provider.</AssistantMsg>
-        <ToolCardL1 tool="Read" detail="src/providers/claude_code.rs" outputLabel="142 lines" duration="0.3s" dimmed/>
-        <ToolCardL1 tool="Read" detail="src/providers/mod.rs" outputLabel="58 lines" duration="0.2s" dimmed/>
-        <ToolCardL1 tool="Grep" detail="impl Provider" outputLabel="4 files · 12 matches" duration="0.4s" dimmed/>
+        <ToolCardL1 tool="Read" detail="src/providers/claude_code.rs" outputLabel="142 lines" duration="0.3s"/>
+        <ToolCardL1 tool="Read" detail="src/providers/mod.rs" outputLabel="58 lines" duration="0.2s"/>
+        <ToolCardL1 tool="Grep" detail="impl Provider" outputLabel="4 files · 12 matches" duration="0.4s"/>
         <AssistantMsg>The provider trait requires <InlineCode>spawn()</InlineCode>, <InlineCode>send_message()</InlineCode>, and <InlineCode>handle_tool_result()</InlineCode>. Creating the module now.</AssistantMsg>
-        <ToolCardL1 tool="Write" detail="src/providers/opencode.rs" outputLabel="created" duration="1.2s" dimmed/>
-        <ToolCardL1 tool="Edit" detail="src/providers/mod.rs" outputLabel="+4 −0" duration="0.5s" dimmed/>
+        <ToolCardL1 tool="Write" detail="src/providers/opencode.rs" outputLabel="created" duration="1.2s"/>
+        <ToolCardL1 tool="Edit" detail="src/providers/mod.rs" outputLabel="+4 −0" duration="0.5s"/>
         <ToolGroup count={6}/>
-      </div>
+      </DimmedTurn>
       <UserMsg text="Good. Now run the tests to make sure the new provider compiles and the existing tests still pass."/>
       <AssistantMsg streaming>I'll run the test suite to verify everything compiles correctly.</AssistantMsg>
       <ToolCardL2 tool="Bash" detail="$ cargo test --workspace" outputLabel="running…" duration="2.1s" status="running"
@@ -353,8 +363,12 @@ function SessionPage({ sidebarCollapsed, state, ctxPct, q5hPct, q7dPct, showImag
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Chat column */}
         <div style={{ flex: 1, position: 'relative', overflow: 'auto', padding: '16px 24px 140px' }}>
-          {children || <SampleStream showPermCard={showPermCard} showSubAgent={showSubAgent}/>}
-          <FloatingInput showImages={showImages} longText={longText} imageCount={imageCount} showToolsPopover={showToolsPopover} showModelDropdown={showModelDropdown}/>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            {children || <SampleStream showPermCard={showPermCard} showSubAgent={showSubAgent}/>}
+          </div>
+          {/* Gradient fade */}
+          <div style={{ position: 'sticky', bottom: 0, height: 120, background: 'linear-gradient(transparent, var(--background))', pointerEvents: 'none', zIndex: 10, marginTop: -120 }}></div>
+          <FloatingInput showImages={showImages} longText={longText} imageCount={imageCount} showToolsPopover={showToolsPopover} showModelDropdown={showModelDropdown} isRunning={state === 'running'}/>
         </div>
         {/* Right sidebar */}
         {collapsed
@@ -373,7 +387,7 @@ function SessionPage({ sidebarCollapsed, state, ctxPct, q5hPct, q7dPct, showImag
 }
 
 Object.assign(window, {
-  TopBar, RightSidebar, CollapsedSidebar, FloatingInput, SidebarRow,
+  TopBar, RightSidebar, CollapsedSidebar, FloatingInput, SendStopButton, SidebarRow,
   ToolsPopover, ModelDropdown, OverflowMenu, SkillConfigPanel,
   SampleStream, SessionPage,
 });

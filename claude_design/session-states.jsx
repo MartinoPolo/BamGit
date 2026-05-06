@@ -1,4 +1,4 @@
-/* global React, I, SessionPage, SessionBadge, SampleStream, FloatingInput,
+/* global React, I, SessionPage, SessionBadge, SampleStream, FloatingInput, DimmedTurn,
    ToolCardL1, ToolCardL2, ToolCardL3Perm, ToolCardL3Elicit, ToolCardL3Ask,
    ToolGroup, UserMsg, AssistantMsg, SystemMsg, InlineCode, SubAgentExpansion */
 
@@ -18,12 +18,12 @@ function State02_NeedsInput() {
     <SessionPage state="needs-input">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <SystemMsg text="Session started · Claude Code · feat/session-ui" dimmed/>
-        <UserMsg text="Refactor the authentication module to support OAuth2 PKCE flow." dimmed/>
-        <div style={{ opacity: 0.4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <UserMsg text="Refactor the authentication module to support OAuth2 PKCE flow."/>
+        <DimmedTurn>
           <AssistantMsg>I'll update the auth module. Let me first check the current implementation.</AssistantMsg>
-          <ToolCardL1 tool="Read" detail="src/auth/mod.rs" outputLabel="89 lines" duration="0.2s" dimmed/>
-          <ToolCardL1 tool="Read" detail="src/auth/oauth.rs" outputLabel="134 lines" duration="0.3s" dimmed/>
-        </div>
+          <ToolCardL1 tool="Read" detail="src/auth/mod.rs" outputLabel="89 lines" duration="0.2s"/>
+          <ToolCardL1 tool="Read" detail="src/auth/oauth.rs" outputLabel="134 lines" duration="0.3s"/>
+        </DimmedTurn>
         <UserMsg text="Go ahead and make the changes."/>
         <AssistantMsg>I need to modify several files to add the PKCE flow. I'll start with the core auth module.</AssistantMsg>
         <ToolCardL1 tool="Edit" detail="src/auth/mod.rs" outputLabel="+28 −4" duration="0.8s"/>
@@ -56,12 +56,12 @@ function State04_Errored() {
     <SessionPage state="errored" ctxPct={72}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <SystemMsg text="Session started · Claude Code · fix/memory-leak" dimmed/>
-        <UserMsg text="Find and fix the memory leak in the session manager." dimmed/>
-        <div style={{ opacity: 0.4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <UserMsg text="Find and fix the memory leak in the session manager."/>
+        <DimmedTurn>
           <AssistantMsg>I'll investigate the session manager for memory leaks.</AssistantMsg>
-          <ToolCardL1 tool="Read" detail="src/session/manager.rs" outputLabel="245 lines" duration="0.4s" dimmed/>
-          <ToolCardL1 tool="Grep" detail="Arc::new|Rc::new" outputLabel="8 files · 23 matches" duration="0.6s" dimmed/>
-        </div>
+          <ToolCardL1 tool="Read" detail="src/session/manager.rs" outputLabel="245 lines" duration="0.4s"/>
+          <ToolCardL1 tool="Grep" detail="Arc::new|Rc::new" outputLabel="8 files · 23 matches" duration="0.6s"/>
+        </DimmedTurn>
         <UserMsg text="Check the event loop too."/>
         <AssistantMsg>Running valgrind to profile memory usage:</AssistantMsg>
         <ToolCardL2 tool="Bash" detail="$ valgrind --tool=memcheck ./target/debug/grovekeeper" outputLabel="error" duration="12.4s" status="error"
@@ -95,13 +95,13 @@ function State05_LongConvo() {
         {/* Many dimmed old messages */}
         {[1,2,3].map(i => (
           <React.Fragment key={i}>
-            <UserMsg text={`Earlier instruction #${i} — this content is from earlier in the conversation and has been dimmed to reduce visual noise.`} dimmed/>
-            <div style={{ opacity: 0.4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <UserMsg text={`Earlier instruction #${i} — this content is from earlier in the conversation and has been dimmed to reduce visual noise.`}/>
+            <DimmedTurn>
               <AssistantMsg>Acknowledged. Working on task #{i}.</AssistantMsg>
-              <ToolCardL1 tool="Read" detail={`src/module_${i}.rs`} outputLabel={`${40 + i * 20} lines`} duration="0.3s" dimmed/>
-              <ToolCardL1 tool="Edit" detail={`src/module_${i}.rs`} outputLabel={`+${i * 5} −${i * 2}`} duration="0.5s" dimmed/>
+              <ToolCardL1 tool="Read" detail={`src/module_${i}.rs`} outputLabel={`${40 + i * 20} lines`} duration="0.3s"/>
+              <ToolCardL1 tool="Edit" detail={`src/module_${i}.rs`} outputLabel={`+${i * 5} −${i * 2}`} duration="0.5s"/>
               <ToolGroup count={4 + i}/>
-            </div>
+            </DimmedTurn>
           </React.Fragment>
         ))}
         <SystemMsg text="— 34 earlier messages hidden —" dimmed/>
@@ -143,11 +143,11 @@ function State07_ImageCollapsed() {
     <SessionPage state="running" imageCount={5}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <SystemMsg text="Session started · Claude Code · feat/ui-polish" dimmed/>
-        <UserMsg text="Fix the layout issues shown in images #1-#3." dimmed images={[1, 2, 3]}/>
-        <div style={{ opacity: 0.4, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <UserMsg text="Fix the layout issues shown in images #1-#3."/>
+        <DimmedTurn>
           <AssistantMsg>Fixed the layout issues across all three screenshots.</AssistantMsg>
           <ToolGroup count={8}/>
-        </div>
+        </DimmedTurn>
         <UserMsg text="Now check image #5 — the mobile breakpoint is broken."/>
         <AssistantMsg streaming>Looking at image #5. The mobile breakpoint issue appears to be in the media query.</AssistantMsg>
         <ToolCardL1 tool="Read" detail="src/ui/responsive.css" outputLabel="62 lines" duration="0.2s"/>
@@ -167,9 +167,11 @@ function State09_QuotaWarning() {
     <SessionPage state="running" ctxPct={82} q5hPct={92} q7dPct={45}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <SystemMsg text="Session started · Claude Code · feat/session-ui" dimmed/>
-        <UserMsg text="Continue implementing the remaining provider methods." dimmed/>
-        <AssistantMsg dimmed>Working on the remaining methods.</AssistantMsg>
-        <ToolGroup count={18}/>
+        <UserMsg text="Continue implementing the remaining provider methods."/>
+        <DimmedTurn>
+          <AssistantMsg>Working on the remaining methods.</AssistantMsg>
+          <ToolGroup count={18}/>
+        </DimmedTurn>
         <UserMsg text="The context is getting long. Summarize what you've done and continue."/>
         <AssistantMsg streaming>Let me summarize the progress so far and continue with a fresh context.</AssistantMsg>
         {/* Context warning inline */}
@@ -177,7 +179,7 @@ function State09_QuotaWarning() {
           <I.AlertTriangle size={13} sw={2} style={{ color: 'var(--status-danger)' }}/>
           <span style={{ fontSize: 12, color: 'var(--status-danger)', fontWeight: 500 }}>Context at 82% — consider starting a new session or summarizing</span>
           <div style={{ flex: 1 }}></div>
-          <button className="gk-btn gk-btn-sm" style={{ fontSize: 10.5, height: 22 }}>Compact</button>
+        <button className="gk-btn gk-btn-sm" style={{ fontSize: 10.5 }}>Compact</button>
         </div>
       </div>
     </SessionPage>
@@ -206,8 +208,10 @@ Also, make sure the error messages are user-friendly — no raw HTTP status code
     <SessionPage state="running" longText={longText}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <SystemMsg text="Session started · Claude Code · refactor/auth"/>
-        <UserMsg text="Let me describe the full refactor plan." dimmed/>
-        <AssistantMsg dimmed>Ready to hear the plan.</AssistantMsg>
+        <UserMsg text="Let me describe the full refactor plan."/>
+        <DimmedTurn>
+          <AssistantMsg>Ready to hear the plan.</AssistantMsg>
+        </DimmedTurn>
       </div>
     </SessionPage>
   );
