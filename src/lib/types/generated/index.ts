@@ -27,6 +27,7 @@ export type { NotificationEventType } from './NotificationEventType';
 export type { OverviewWorkspaceData } from './OverviewWorkspaceData';
 export type { PortfolioDashboardPointer } from './PortfolioDashboardPointer';
 export type { ProviderCapabilities } from './ProviderCapabilities';
+export type { ProviderKind } from './ProviderKind';
 export type { PrunableIssue } from './PrunableIssue';
 export type { PullRequestState } from './PullRequestState';
 export type { SearchedGithubIssue } from './SearchedGithubIssue';

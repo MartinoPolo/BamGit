@@ -8,6 +8,7 @@ import type {
 	DiscoveredSession,
 	DiscoveredSessionsPayload,
 	NotificationEventType,
+	ProviderKind,
 } from '$lib/types/generated';
 import { computeSessionEventEffects, type NotificationAction } from './session_events.js';
 import { SvelteMap } from 'svelte/reactivity';
@@ -20,7 +21,7 @@ interface SpawnSessionRequest {
 	issue_id?: string | null;
 	permission_mode?: string | null;
 	model?: string | null;
-	provider?: 'claude-code' | 'open-code' | null;
+	provider?: ProviderKind | null;
 }
 
 interface AdoptSessionRequest {

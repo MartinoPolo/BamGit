@@ -425,6 +425,24 @@ export const MOCK_SESSIONS: Session[] = [
 		source: 'adopted',
 		working_directory: 'C:/_MP_projects/worktrees/71-ci-timeout-fix',
 	},
+	{
+		id: 'mock-session-codex',
+		issue_id: ISSUE_DARK_MODE,
+		provider: 'codex',
+		state: 'running',
+		pid: 12347,
+		cli_session_id: 'thread_0199a213',
+		started_at: '2026-05-04T10:00:00Z',
+		ended_at: null,
+		cost_usd: 0.15,
+		token_count: 5400,
+		original_intent: 'Generate unit tests for dark mode toggle',
+		last_prompt: 'Add tests for theme persistence',
+		last_response_summary: 'Writing vitest specs for localStorage theme save/load...',
+		execution_phase: 'tdd',
+		source: 'spawned',
+		working_directory: 'C:/_MP_projects/worktrees/55-dark-mode-toggle',
+	},
 ];
 
 // ─── Actions ──────────────────────────────────────────────────────────────────

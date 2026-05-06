@@ -15,11 +15,22 @@ use ts_rs::TS;
 pub enum ProviderKind {
     ClaudeCode,
     OpenCode,
+    Codex,
 }
 
 impl Default for ProviderKind {
     fn default() -> Self {
         Self::ClaudeCode
+    }
+}
+
+impl ProviderKind {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::ClaudeCode => "claude-code",
+            Self::OpenCode => "open-code",
+            Self::Codex => "codex",
+        }
     }
 }
 
@@ -79,6 +90,13 @@ pub enum SessionTransport {
         base_url: String,
         opencode_session_id: String,
         http_client: reqwest::Client,
+    },
+    CodexExec {
+        thread_id: Option<String>,
+        event_sender: mpsc::Sender<SessionEvent>,
+        working_directory: PathBuf,
+        model: Option<String>,
+        sandbox: Option<String>,
     },
 }
 

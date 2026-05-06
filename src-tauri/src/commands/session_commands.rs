@@ -63,10 +63,7 @@ pub async fn spawn_session(
         env_vars: HashMap::new(),
     };
 
-    let provider_str = match provider_kind {
-        ProviderKind::ClaudeCode => "claude-code",
-        ProviderKind::OpenCode => "open-code",
-    };
+    let provider_str = provider_kind.as_str();
 
     let database_connection = open_actor_database_connection(&app_handle)?;
 

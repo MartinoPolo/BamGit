@@ -3,4 +3,4 @@
 /**
  * Which provider backend to use for a session.
  */
-export type ProviderKind = "claude-code" | "open-code";
+export type ProviderKind = "claude-code" | "open-code" | "codex";
