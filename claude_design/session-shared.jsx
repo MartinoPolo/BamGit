@@ -36,7 +36,7 @@ function SessionBadge({ state }) {
     running:       { cls: 'gk-badge-success', label: 'Running', pulse: true },
     'needs-input': { cls: 'gk-badge-warning', label: 'Needs Input', pulse: true },
     'needs-review':{ cls: 'gk-badge-info',    label: 'Needs Review' },
-    paused:        { cls: 'gk-badge-warning', label: 'Paused' },
+    stopped:       { cls: 'gk-badge-warning', label: 'Stopped' },
     finished:      { cls: 'gk-badge-moss',    label: 'Finished' },
     errored:       { cls: 'gk-badge-danger',  label: 'Errored' },
   }[state] || { cls: '', label: state };
@@ -69,7 +69,7 @@ function ToolCardL1({ tool, detail, outputLabel, duration, status = 'success', d
                      status === 'error' ? <I.X size={12} sw={2.2} style={{ color: 'var(--status-danger)' }}/> :
                      <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', border: '2px solid var(--foreground-muted)', borderTopColor: 'transparent', animation: 'gk-spin 0.7s linear infinite' }}></span>;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px', borderRadius: 6, background: 'var(--surface-2)', border: `1px solid ${borderColor}`, borderLeftWidth: error ? 3 : 1, borderLeftColor: error ? 'var(--status-danger)' : borderColor, cursor: 'pointer', opacity: dimmed ? 0.5 : 0.8, transition: 'opacity 120ms' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 36, padding: '0 10px', borderRadius: 6, background: 'var(--surface-2)', border: `1px solid ${borderColor}`, borderLeftWidth: error ? 3 : 1, borderLeftColor: error ? 'var(--status-danger)' : borderColor, cursor: 'pointer', opacity: dimmed ? 0.5 : 0.8, transition: 'opacity 120ms' }}>
       <span style={{ color: t.color, display: 'flex' }}>{t.icon({ size: 13, sw: 1.8 })}</span>
       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--foreground)', minWidth: 32 }}>{tool}</span>
       <span className="font-mono" style={{ fontSize: 11, color: 'var(--foreground-muted)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{detail}</span>
@@ -89,7 +89,7 @@ function ToolCardL2({ tool, detail, outputLabel, duration, status = 'running', c
     <I.X size={12} sw={2.2} style={{ color: 'var(--status-danger)' }}/>;
   return (
     <div style={{ borderRadius: 8, border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--surface)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 10px', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 36, padding: '0 10px', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
         <span style={{ color: t.color, display: 'flex' }}>{t.icon({ size: 13, sw: 1.8 })}</span>
         <span style={{ fontSize: 12, fontWeight: 600 }}>{tool}</span>
         <span className="font-mono" style={{ fontSize: 11, color: 'var(--foreground-muted)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{detail}</span>
@@ -142,7 +142,7 @@ function ToolCardL3Elicit({ server, message }) {
         <div style={{ padding: '10px 12px', flex: 1 }}>
           <div style={{ fontSize: 13, color: 'var(--foreground)', marginBottom: 10, lineHeight: 1.5 }}>{message}</div>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <input className="gk-input" placeholder="Enter value…" style={{ height: 28, fontSize: 12, flex: 1, maxWidth: 320 }}/>
+            <input className="gk-input" placeholder="Enter value…" style={{ fontSize: 12, flex: 1, maxWidth: 320 }}/>
             <button className="gk-btn gk-btn-primary gk-btn-sm">Submit <span className="gk-kbd" style={{ marginLeft: 4, fontSize: 9, height: 15, minWidth: 14, background: 'rgba(255,255,255,0.15)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' }}>↵</span></button>
             <button className="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
           </div>
@@ -276,6 +276,17 @@ function SessionTabs({ active = 'chat' }) {
   );
 }
 
+/* ── Dimmed turn wrapper (hover restores opacity) ──────────── */
+function DimmedTurn({ children }) {
+  const [hovered, setHovered] = React.useState(false);
+  return (
+    <div style={{ opacity: hovered ? 1 : 0.4, transition: 'opacity 150ms ease-out', display: 'flex', flexDirection: 'column', gap: 6 }}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      {children}
+    </div>
+  );
+}
+
 /* ── Inline sub-agent expansion block ──────────────────────── */
 function SubAgentExpansion({ name, model, tools, duration }) {
   return (
@@ -285,7 +296,7 @@ function SubAgentExpansion({ name, model, tools, duration }) {
         <span style={{ fontSize: 12, fontWeight: 600 }}>Sub-agent: {name}</span>
         <span className="font-mono" style={{ fontSize: 10, color: 'var(--foreground-subtle)' }}>{model} · {tools} tools · {duration}</span>
         <div style={{ flex: 1 }}></div>
-        <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ height: 20, fontSize: 10, padding: '0 6px' }}>Collapse</button>
+        <button className="gk-btn gk-btn-ghost gk-btn-sm" style={{ fontSize: 10, padding: '0 6px' }}>Collapse</button>
       </div>
       <div style={{ opacity: 0.85, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ color: 'var(--foreground-muted)', fontSize: 13, lineHeight: 1.5 }}>Exploring the project structure to understand codebase layout.</div>
@@ -300,6 +311,6 @@ function SubAgentExpansion({ name, model, tools, duration }) {
 Object.assign(window, {
   TOOL_ICONS, ctxColor, quotaColor, ProgressBar, SessionBadge, ProviderChip,
   ToolCardL1, ToolCardL2, ToolCardL3Perm, ToolCardL3Elicit, ToolCardL3Ask, ToolGroup,
-  UserMsg, AssistantMsg, SystemMsg, InlineCode,
+  UserMsg, AssistantMsg, SystemMsg, InlineCode, DimmedTurn,
   AgentNode, AgentTreeContent, SessionTabs, SubAgentExpansion,
 });

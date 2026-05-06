@@ -103,7 +103,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 - Sessions represent individual AI agent CLI executions tied to an issue
 - One issue can have many sessions (over time and concurrently)
-- Session states: running, needs-input, needs-review, paused, finished, errored
+- Session states: running, needs-input, needs-review, stopped, finished, errored (no "paused" state — stopping and returning later is equivalent)
 - Three modes of session management:
     - **Spawn:** Grovekeeper launches agent CLI as child process, communicates via stream-JSON protocol
     - **Monitor:** Grovekeeper discovers externally-launched sessions by polling session directories
@@ -114,7 +114,7 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 ### Session Dashboard (Chat UI)
 
-Canonical design spec: `claude_design/design_briefs/SESSION_CHAT_VIEW.md`. Variant C (right sidebar layout) is the chosen base; refined per the 2026-05-06 grilling.
+Canonical design spec: `claude_design/design_briefs/SESSION_CHAT_VIEW.md`. Variant C (right sidebar layout) is the chosen base; refined per the 2026-05-06 grilling session.
 
 #### Page layout
 
@@ -122,16 +122,16 @@ Three regions: full-width **top bar**, **chat column** (left), **right sidebar**
 
 #### Top bar
 
-- Left group: session title + state badge (running / needs-input / needs-review / paused / finished / errored)
+- Left group: session title + state badge (running / needs-input / needs-review / stopped / finished / errored)
 - Center group: branch name + issue badge + PR badge (single inline row, monospace where appropriate, badges clickable to open GitHub URLs, collapse to icon-only on narrow widths)
-- Right group: `[↗ Open in CLI]` action (resumes session in native provider CLI — `claude --resume`, `codex --resume`, etc., spawned in terminal at worktree path) + `[⋮]` overflow placeholder for future session actions (Stop, Pause, Export transcript, Copy session ID) + tab switcher (Chat / Files / Stats)
+- Right group: `[↗ Open in CLI]` action (resumes session in native provider CLI — `claude --resume`, `codex --resume`, etc., spawned in terminal at worktree path) + `[⋮]` overflow menu (Export chat; Restart and Delete session reserved for future) + tab switcher (Chat / Files / Stats). Stop is handled by send↔stop morph in the input panel, not the overflow menu
 - No provider/model/permission/cost fields in the top bar
 
 #### Right sidebar (expanded, 272px)
 
 Sections top to bottom with separators:
 
-1. Header: collapse toggle only
+1. Header: collapse toggle (left-aligned, closest to content boundary)
 2. **Provider** section: provider icon + name (clickable chip — placeholder for future provider switcher)
 3. **Global usage** section: 5h quota progress bar + countdown, 7d quota progress bar + countdown
 4. **Session metrics** section (separator above to distinguish global vs session-scoped data): Context bar + value, Cost value, Tokens value
@@ -157,14 +157,14 @@ Vertical strip: collapse toggle, state pulse dot, vertical context bar with rota
     - Tool call cards: 3-level system (compact / expanded / interactive) per `SESSION_CHAT_VIEW.md`
     - Approval / elicitation / question cards as Level 3 tool cards
     - Streaming text appears character-by-character with caret
-    - Content above last user prompt is visually dimmed (scrollable, not removed)
+    - Content above last user prompt is visually dimmed (`opacity: 0.4`). Dimmed content remains scrollable and fully interactable. On hover, the entire turn (user msg + assistant response + tool cards) restores to full opacity with `transition: opacity 150ms ease-out`
     - Floating quick-nav buttons: "Jump to latest response", "Jump to latest prompt"
     - Inline sub-agent expansion when a tree node is clicked — colored left border, nested expansions use progressive border colors
     - Images render inline in message bubbles with `#N` caption beneath each
 
 #### Floating input panel
 
-Floating, rounded, elevated surface (not a full-width bar). Max-width ~900px, centered in chat column, ~20px from chat-column bottom.
+Floating, rounded, elevated surface (not a full-width bar). Max-width ~900px, centered in chat column, ~20px from chat-column bottom. Solid opaque background. Content column shares the same ~900px max-width constraint (no content wider than the input panel). Gradient fade (~120px) behind the panel prevents content from visually colliding with it.
 
 Vertical structure:
 
@@ -173,7 +173,9 @@ Vertical structure:
 3. **Textarea**: 3-line default, auto-grow up to ~50vh then internal scroll. Slash autocomplete (`/`), `@` mentions for files / issues / sub-agents / past images. Pasted image inserts `[Image #N]` pill.
 4. **Bottom controls row**:
     - Left group: `[+ Attach]`, `[Tools ▾]` (popover with per-session MCP / skills / tools toggles)
-    - Right group: `[Local ▾]` (location placeholder; future Cloud / Remote SSH), `[Provider · Model · Effort ▾]` (combined dropdown grouped by provider, then models with context window in parens, then effort levels), `[Approve each ▾]` (permission mode), `[→ Send]`
+    - Right group: `[Local ▾]` (location placeholder; future Cloud / Remote SSH), `[Provider · Model · Effort ▾]` (combined dropdown grouped by provider, then models with context window in parens, then effort levels), `[Approve each ▾]` (permission mode), `[→ Send / ■ Stop]` (morphs: Send with `Enter` hint when idle, Stop with `Ctrl+C` hint when agent is generating)
+
+- All buttons in the input panel use `.gk-btn-sm` (26px) — no inline height overrides. Send/Stop distinguished by primary/danger color, not size. All tool card headers standardized to 36px. All badges use `.gk-badge` (20px)
 
 Sync rule: model, effort, permission mode, location are session-level state and live ONLY in the input panel. Sidebar provider is read-only (with future switcher menu); no other duplicates.
 
@@ -345,7 +347,7 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 
 1. **GitHub Label:** `HITL` or `AFK`. Under a PRD, issues without either label should not exist — display in **error state** if they do (red glow, speech bubble with warning). In repo-wide forest (outside PRD context), unlabeled issues are displayed in a **special way** (distinct visual treatment, TBD — possibly potted plants if no worktree, or a unique badge/dimming for unlabeled trees with worktrees)
 2. **Worktree State:** `none`, `pending`, `active`, `failed`, `removing`, `removed`
-3. **Session State (aggregate):** `no-session`, `running`, `needs-input`, `needs-review`, `paused`, `finished`, `errored`. Priority order for aggregate: needs-input > errored > needs-review > running > paused > finished > no-session
+3. **Session State (aggregate):** `no-session`, `running`, `needs-input`, `needs-review`, `stopped`, `finished`, `errored`. Priority order for aggregate: needs-input > errored > needs-review > running > stopped > finished > no-session
 4. **Execution Phase (derived from stream-JSON):** `none`, `analyzing`, `tdd` (red+green+refactor), `reviewing` (review+check+fix), `testing` (checks+tests), `fixing` (applying fixes), `shipping` (commit+push+PR+CI+merge)
 5. **Branch Status:** `no-branch`, `active`, `local-only`, `remote-gone`, `deleted`
 6. **PR State:** `no-pr`, `draft`, `open`, `review-requested`, `changes-requested`, `approved`, `ready-to-merge`, `merged`, `closed`
@@ -362,7 +364,7 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 | Seed           | Seed on soil             | GH issue exists, worktree=none, no session               |
 | Sprouting      | Sprouting seed           | Worktree pending or failed                               |
 | Sapling        | Young sapling            | Worktree=active, branch exists, no session run yet       |
-| Growing        | Sapling with growth      | Session active (running, paused, errored, needs-input)   |
+| Growing        | Sapling with growth      | Session active (running, stopped, errored, needs-input)  |
 | Leafy tree     | Tree with full canopy    | Draft PR, or commits on branch with no PR                |
 | Flowering tree | Tree with flowers        | PR open or review-requested (blossoming, under review)   |
 | Fruiting tree  | Tree with fruit          | PR approved or ready-to-merge (mature, ready to harvest) |
