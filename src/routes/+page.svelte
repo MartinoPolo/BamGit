@@ -529,10 +529,18 @@
 		</div>
 	{:else}
 		<div class="flex-1 overflow-hidden">
-			<WorkspaceDashboardLayout>
+			<WorkspaceDashboardLayout
+				collapsed={selection.forestCollapsed}
+				onToggle={(value) => {
+					if (value !== selection.forestCollapsed) {
+						selection.toggleForestCollapsed();
+					}
+				}}
+			>
 				{#snippet forestPanel()}
 					<ForestView
 						issues={forestIssues}
+						dependencies={issueStore.dependencies}
 						getGitStatus={getGitStatusForForest}
 						getSessionsForIssue={getSessionsForForest}
 						onAddIssue={openCreateDialog}
