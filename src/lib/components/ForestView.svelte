@@ -294,7 +294,7 @@
 			{#if onAddIssue}
 				<Button variant="primary" onclick={onAddIssue}>
 					<SproutIcon class="size-4" />
-					Plant your first tree
+					Create your first issue
 				</Button>
 			{/if}
 		</div>

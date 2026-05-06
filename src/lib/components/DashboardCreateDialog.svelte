@@ -8,6 +8,8 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import PaletteSelector from './PaletteSelector.svelte';
+	import PathInput from './PathInput.svelte';
+	import RepoCombobox from './RepoCombobox.svelte';
 	import { buildCreateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
@@ -163,7 +165,7 @@
 				{:else if dashboardType === 'repo'}
 					<div class="flex flex-col gap-1.5">
 						<Label for="dashboard-github-repo">{m.dashboard_field_github_repo()}</Label>
-						<Input
+						<RepoCombobox
 							id="dashboard-github-repo"
 							bind:value={githubRepo}
 							placeholder={m.dashboard_placeholder_github_repo()}
@@ -173,7 +175,7 @@
 						<Label for="dashboard-local-folder"
 							>{m.dashboard_field_local_folder()}</Label
 						>
-						<Input
+						<PathInput
 							id="dashboard-local-folder"
 							bind:value={localFolder}
 							placeholder={m.dashboard_placeholder_local_folder()}
@@ -193,7 +195,7 @@
 						<Label for="dashboard-worktree-folder"
 							>{m.dashboard_field_worktree_parent_folder()}</Label
 						>
-						<Input
+						<PathInput
 							id="dashboard-worktree-folder"
 							bind:value={worktreeParentFolder}
 							placeholder={m.dashboard_placeholder_worktree_parent()}

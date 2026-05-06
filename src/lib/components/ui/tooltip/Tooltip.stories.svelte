@@ -49,7 +49,7 @@
 						</button>
 					</Tooltip.Trigger>
 					<Tooltip.Content side="bottom" portalProps={{ disabled: true }}>
-						Plant a tree
+						Create issue
 						<Kbd>{formatBindingForDisplay('Ctrl+N')}</Kbd>
 					</Tooltip.Content>
 				</Tooltip.Root>
@@ -109,7 +109,7 @@
 						<button
 							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
 						>
-							Plant a tree
+							Create issue
 						</button>
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}>
@@ -203,7 +203,7 @@
 							</button>
 						</Tooltip.Trigger>
 						<Tooltip.Content side="bottom" portalProps={{ disabled: true }}
-							>Bottom · Plant a tree</Tooltip.Content
+							>Bottom · Create issue</Tooltip.Content
 						>
 					</Tooltip.Root>
 				</div>

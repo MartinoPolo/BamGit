@@ -1,6 +1,6 @@
 <script lang="ts">
 	import FolderIcon from '@lucide/svelte/icons/folder';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 
@@ -23,6 +23,6 @@
 	>
 		<FolderIcon size={13} class="text-primary" />
 		<span class="flex-1 truncate text-[12.5px] font-medium">{name}</span>
-		<ChevronDownIcon size={12} class="text-foreground-subtle" />
+		<PencilIcon size={12} class="text-foreground-subtle" />
 	</Button>
 {/if}

@@ -10,10 +10,10 @@ mod window_manager;
 
 use commands::{
     action_commands, color_palette_commands, dashboard_commands, dependency_commands,
-    git_status_commands, github_commands, issue_commands, keyboard_shortcut_commands,
-    label_shape_mapping_commands, notification_commands, portfolio_commands,
-    raw_requirements_commands, seed_commands, session_commands, terminal_commands,
-    window_commands, worktree_commands,
+    dialog_commands, git_status_commands, github_commands, issue_commands,
+    keyboard_shortcut_commands, label_shape_mapping_commands, notification_commands,
+    portfolio_commands, raw_requirements_commands, seed_commands, session_commands,
+    terminal_commands, window_commands, worktree_commands,
 };
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
@@ -29,6 +29,7 @@ use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .setup(|app| {
             // Register single-instance plugin in setup so we have access to app handle
@@ -190,6 +191,9 @@ pub fn run() {
             raw_requirements_commands::write_raw_requirements,
             seed_commands::seed_demo_workspace,
             seed_commands::delete_demo_workspace,
+            dialog_commands::pick_folder,
+            github_commands::list_user_repos,
+            github_commands::search_github_repos,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
