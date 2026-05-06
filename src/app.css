@@ -59,9 +59,6 @@
 	--color-session-finished: var(--session-finished);
 	--color-session-needs-input: var(--session-needs-input);
 	--color-session-needs-review: var(--session-needs-review);
-	--color-ring-hover: var(--ring-hover);
-	--color-ring-active: var(--ring-active);
-	--color-ring-selected: var(--ring-selected);
 	--color-moss-50: var(--moss-50);
 	--color-moss-100: var(--moss-100);
 	--color-moss-200: var(--moss-200);
@@ -218,9 +215,8 @@
 	--focus-ring-offset: 2px;
 	--sidebar-width: 240px;
 	--sidebar-width-collapsed: 56px;
-	--ring-hover: oklch(0.82 0.16 85);
-	--ring-active: oklch(0.66 0.135 145);
-	--ring-selected: oklch(0.62 0.13 250);
+	--tree-bg-mix: 22%;
+	--selection-ready: oklch(0.7 0.2 300);
 }
 
 [data-theme='light'] {
@@ -277,9 +273,7 @@
 	--sky-bot: var(--sky-dark-bot);
 	--ground-color: oklch(0.3 0.06 140);
 	--ground-dark: oklch(0.18 0.04 50);
-	--ring-hover: oklch(0.75 0.14 85);
-	--ring-active: oklch(0.72 0.15 145);
-	--ring-selected: oklch(0.58 0.12 250);
+	--tree-bg-mix: 14%;
 }
 
 /* ── Accent color overrides ─────────────────────────────────────────────── */
@@ -380,6 +374,33 @@
 	);
 	background-size: 200% 100%;
 	animation: shimmer 2s infinite linear;
+}
+
+/* ── Issue card state rings (box-shadow, referencing --ic per-card) ──── */
+
+.card-ic-interactive:hover {
+	box-shadow:
+		0 0 0 2px color-mix(in oklch, var(--ic) 40%, transparent),
+		var(--shadow-md);
+	border-color: color-mix(in oklch, var(--ic) 60%, var(--border-strong));
+	background: color-mix(in oklch, var(--ic) 6%, var(--surface));
+}
+
+.card-state-active-ic {
+	box-shadow:
+		0 0 0 3px color-mix(in oklch, var(--ic) 55%, transparent),
+		0 0 14px color-mix(in oklch, var(--ic) 20%, transparent);
+	background: color-mix(in oklch, var(--ic) 6%, var(--surface));
+}
+
+.card-state-selected-primary {
+	box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 45%, transparent);
+	background: color-mix(in oklch, var(--primary) 4%, var(--surface));
+}
+
+.card-state-selection-ready {
+	box-shadow: 0 0 0 2px color-mix(in oklch, var(--selection-ready) 30%, transparent);
+	background: color-mix(in oklch, var(--selection-ready) 4%, var(--surface));
 }
 
 @layer base {

@@ -7,8 +7,7 @@ import type { TreeContextMenuAction, ResolveGlowOverlayParams } from './index';
 // Test Data
 // ════════════════════════════════════════════════════════════════════════
 
-const HOVER_COLOR = '#ffd700';
-const ACTIVE_COLOR = '#4a9eff';
+const ISSUE_COLOR = '#ef4444';
 const BATCH_SELECTED_COLOR = '#ec4899';
 
 const STATE_ERRORED: OverlayConfig = {
@@ -28,8 +27,7 @@ function createParams(overrides: Partial<ResolveGlowOverlayParams> = {}): Resolv
 		issueId: 'issue-1',
 		hoveredIssueId: null,
 		activeIssueId: null,
-		hoverGlowColor: HOVER_COLOR,
-		activeGlowColor: ACTIVE_COLOR,
+		issueColor: ISSUE_COLOR,
 		batchSelectedIssueIds: new Set<string>(),
 		batchSelectedGlowColor: BATCH_SELECTED_COLOR,
 		...overrides,
@@ -65,25 +63,25 @@ describe('TREE_CONTEXT_MENU_ACTIONS', () => {
 // ════════════════════════════════════════════════════════════════════════
 
 describe('resolveGlowOverlay', () => {
-	it('returns hover glow when issueId matches hoveredIssueId', () => {
+	it('returns hover glow using issue color when issueId matches hoveredIssueId', () => {
 		const result = resolveGlowOverlay(
 			createParams({ issueId: 'issue-1', hoveredIssueId: 'issue-1' }),
 		);
 		expect(result.glow).toEqual({
 			enabled: true,
-			color: HOVER_COLOR,
+			color: ISSUE_COLOR,
 			intensity: 3,
 			pulse: false,
 		});
 	});
 
-	it('returns active glow when issueId matches activeIssueId and NOT hovered', () => {
+	it('returns active glow using issue color when issueId matches activeIssueId and NOT hovered', () => {
 		const result = resolveGlowOverlay(
 			createParams({ issueId: 'issue-1', activeIssueId: 'issue-1', hoveredIssueId: null }),
 		);
 		expect(result.glow).toEqual({
 			enabled: true,
-			color: ACTIVE_COLOR,
+			color: ISSUE_COLOR,
 			intensity: 3,
 			pulse: false,
 		});
@@ -109,7 +107,7 @@ describe('resolveGlowOverlay', () => {
 				activeIssueId: 'issue-1',
 			}),
 		);
-		expect(result.glow.color).toBe(HOVER_COLOR);
+		expect(result.glow.color).toBe(ISSUE_COLOR);
 	});
 
 	it('hover takes priority over state-driven errored glow', () => {
@@ -120,7 +118,7 @@ describe('resolveGlowOverlay', () => {
 				hoveredIssueId: 'issue-1',
 			}),
 		);
-		expect(result.glow.color).toBe(HOVER_COLOR);
+		expect(result.glow.color).toBe(ISSUE_COLOR);
 		expect(result.glow.pulse).toBe(false);
 	});
 
@@ -133,7 +131,7 @@ describe('resolveGlowOverlay', () => {
 				activeIssueId: 'issue-1',
 			}),
 		);
-		expect(result.glow.color).toBe(ACTIVE_COLOR);
+		expect(result.glow.color).toBe(ISSUE_COLOR);
 		expect(result.glow.pulse).toBe(false);
 	});
 
@@ -176,7 +174,7 @@ describe('resolveGlowOverlay', () => {
 				batchSelectedIssueIds: new Set(['issue-1']),
 			}),
 		);
-		expect(result.glow.color).toBe(HOVER_COLOR);
+		expect(result.glow.color).toBe(ISSUE_COLOR);
 	});
 
 	it('active takes priority over batch-selected', () => {
@@ -188,7 +186,7 @@ describe('resolveGlowOverlay', () => {
 				batchSelectedIssueIds: new Set(['issue-1']),
 			}),
 		);
-		expect(result.glow.color).toBe(ACTIVE_COLOR);
+		expect(result.glow.color).toBe(ISSUE_COLOR);
 	});
 
 	it('batch-selected takes priority over state-driven overlay', () => {

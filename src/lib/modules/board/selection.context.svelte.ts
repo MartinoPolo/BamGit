@@ -1,8 +1,6 @@
 import { createContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
-import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
-import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
 import { computeMergedBatchSelection } from '$lib/components/batch_selection_utils.js';
 import { BOTTOM_PANEL_TABS, shouldShowPrdOverview } from './selection.js';
 import type { BottomPanelTab } from './selection.js';
@@ -18,10 +16,6 @@ export function setSelectionContext() {
 	return ctx;
 }
 
-function isHexColor(value: unknown): value is string {
-	return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
-}
-
 function createSelectionContext() {
 	const activeIssueId = new StateRaw<string | null>(null);
 	const hoveredIssueId = new StateRaw<string | null>(null);
@@ -32,18 +26,6 @@ function createSelectionContext() {
 	const batchAnchorId = new StateRaw<string | null>(null);
 	const individuallySelectedIds = new SvelteSet<string>();
 	const rangeSelectedIds = new SvelteSet<string>();
-
-	const hoverGlowColor = new Persisted<string>({
-		key: 'grovekeeper_hover_glow_color',
-		serde: stringSerde(isHexColor),
-		defaultValue: GLOW_COLORS.yellow,
-	});
-
-	const activeGlowColor = new Persisted<string>({
-		key: 'grovekeeper_active_glow_color',
-		serde: stringSerde(isHexColor),
-		defaultValue: GLOW_COLORS.green,
-	});
 
 	function hoverIssue(issueId: string) {
 		hoveredIssueId.current = issueId;
@@ -166,18 +148,6 @@ function createSelectionContext() {
 		},
 		get showPrdOverview() {
 			return shouldShowPrdOverview(activeIssueId.current, prdIssueId.current);
-		},
-		get hoverGlowColor() {
-			return hoverGlowColor.current;
-		},
-		set hoverGlowColor(value: string) {
-			hoverGlowColor.current = value;
-		},
-		get activeGlowColor() {
-			return activeGlowColor.current;
-		},
-		set activeGlowColor(value: string) {
-			activeGlowColor.current = value;
 		},
 		get forestCollapsed() {
 			return forestCollapsed.current;

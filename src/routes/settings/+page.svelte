@@ -2,33 +2,14 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
 	import ShortcutSettingsPanel from '$lib/components/ShortcutSettingsPanel.svelte';
-	import { ColorPicker } from '$lib/components/color-picker/index.js';
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { ColorPalette } from '$lib/types/generated';
-	import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
-	import { GLOW_COLORS } from '$lib/modules/visualization/constants.js';
 	import { invoke } from '@tauri-apps/api/core';
 	const boardStore = useBoard();
-
-	function isHexColor(value: unknown): value is string {
-		return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
-	}
-
-	const hoverGlowColor = new Persisted<string>({
-		key: 'grovekeeper_hover_glow_color',
-		serde: stringSerde(isHexColor),
-		defaultValue: GLOW_COLORS.yellow,
-	});
-
-	const activeGlowColor = new Persisted<string>({
-		key: 'grovekeeper_active_glow_color',
-		serde: stringSerde(isHexColor),
-		defaultValue: GLOW_COLORS.green,
-	});
 
 	let creating = $state(false);
 	let newPaletteName = $state('');
@@ -201,44 +182,6 @@
 					{color}
 				</Button>
 			{/each}
-		</div>
-	</section>
-
-	<!-- Forest Glow Colors Section -->
-	<section class="space-y-4">
-		<h2 class="text-lg font-medium">Forest Glow Colors</h2>
-		<p class="text-sm text-muted-foreground">
-			Customize the glow colors for tree hover and selection in the forest view.
-		</p>
-		<div class="flex flex-wrap gap-6">
-			<div class="space-y-1">
-				<Label>Hover Glow</Label>
-				<div class="flex items-center gap-2">
-					<ColorPicker
-						selectedColor={hoverGlowColor.current}
-						onSelect={(c) => {
-							hoverGlowColor.current = c;
-						}}
-					/>
-					<span class="font-mono text-xs text-muted-foreground"
-						>{hoverGlowColor.current}</span
-					>
-				</div>
-			</div>
-			<div class="space-y-1">
-				<Label>Active Glow</Label>
-				<div class="flex items-center gap-2">
-					<ColorPicker
-						selectedColor={activeGlowColor.current}
-						onSelect={(c) => {
-							activeGlowColor.current = c;
-						}}
-					/>
-					<span class="font-mono text-xs text-muted-foreground"
-						>{activeGlowColor.current}</span
-					>
-				</div>
-			</div>
 		</div>
 	</section>
 

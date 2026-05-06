@@ -271,6 +271,7 @@
 					{prioritiesEnabled}
 					isActive={selection.activeIssueId === issue.id}
 					isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
+					isSelectionReady={isModifierHeld}
 					onCardClick={(event) => handleCardClick(issue, event)}
 					{onExecuteAction}
 				/>
@@ -307,6 +308,7 @@
 							{ghAvailable}
 							isActive={selection.activeIssueId === issue.id}
 							isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
+							isSelectionReady={isModifierHeld}
 							onCardClick={(event) => handleCardClick(issue, event)}
 						/>
 					</IssueCardContextMenu>

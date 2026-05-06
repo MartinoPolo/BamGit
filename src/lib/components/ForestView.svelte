@@ -208,8 +208,7 @@
 			hoveredIssueId: interaction.hoveredIssueId,
 			activeIssueId: interaction.activeIssueId,
 			batchSelectedIssueIds: interaction.batchSelectedIssueIds,
-			hoverGlowColor: interaction.hoverGlowColor,
-			activeGlowColor: interaction.activeGlowColor,
+			issueColor: entry.issue.color ?? '#525252',
 			batchSelectedGlowColor: BATCH_SELECTED_GLOW_COLOR,
 		});
 	}

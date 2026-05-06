@@ -84,6 +84,7 @@ describe('CARD_STATE_CLASSES', () => {
 		const expectedKeys = [
 			'active',
 			'selected',
+			'selectionReady',
 			'dragging',
 			'loading',
 			'archived',
@@ -100,18 +101,22 @@ describe('CARD_STATE_CLASSES', () => {
 		}
 	});
 
-	it('active class uses semantic ring-active token', () => {
-		expect(CARD_STATE_CLASSES.active).toBe('ring-2 ring-ring-active');
+	it('active class uses box-shadow CSS class referencing --ic', () => {
+		expect(CARD_STATE_CLASSES.active).toBe('card-state-active-ic');
 	});
 
-	it('selected class uses semantic ring-selected token', () => {
-		expect(CARD_STATE_CLASSES.selected).toBe('ring-2 ring-ring-selected');
+	it('selected class uses box-shadow CSS class referencing --primary', () => {
+		expect(CARD_STATE_CLASSES.selected).toBe('card-state-selected-primary');
+	});
+
+	it('selectionReady class uses violet ring CSS class', () => {
+		expect(CARD_STATE_CLASSES.selectionReady).toBe('card-state-selection-ready');
 	});
 });
 
 describe('BATCH_SELECTED_GLOW_COLOR', () => {
-	it('is a CSS variable reference', () => {
-		expect(BATCH_SELECTED_GLOW_COLOR).toBe('var(--ring-selected)');
+	it('uses --primary CSS variable', () => {
+		expect(BATCH_SELECTED_GLOW_COLOR).toBe('var(--primary)');
 	});
 });
 

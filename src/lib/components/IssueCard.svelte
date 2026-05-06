@@ -39,6 +39,7 @@
 		sessionState?: 'executing' | 'hitl' | 'review' | 'error' | 'paused' | 'done' | null;
 		isActive?: boolean;
 		isBatchSelected?: boolean;
+		isSelectionReady?: boolean;
 		onCardClick?: (event: MouseEvent) => void;
 		onExecuteAction?: (actionId: string, issueId: string) => void;
 		onPriorityClick?: () => void;
@@ -57,6 +58,7 @@
 		sessionState = null,
 		isActive = false,
 		isBatchSelected = false,
+		isSelectionReady = false,
 		onCardClick,
 		onExecuteAction,
 		onPriorityClick,
@@ -102,6 +104,9 @@
 		}
 		if (isActive) {
 			return CARD_STATE_CLASSES.active;
+		}
+		if (isSelectionReady) {
+			return CARD_STATE_CLASSES.selectionReady;
 		}
 		return '';
 	});
@@ -162,13 +167,13 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-all duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
+	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-all duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
 	isActive ||
-	isBatchSelected
+	isBatchSelected ||
+	isSelectionReady
 		? ''
-		: 'hover:ring-2 hover:ring-ring-hover active:ring-2 active:ring-ring-active'}"
+		: 'card-ic-interactive'}"
 	style:--ic={color}
-	style="background: var(--surface);"
 	onclick={handleCardClick}
 >
 	<!-- Header band -->
@@ -215,7 +220,7 @@
 			{#if priorityBadgeClass && prioritiesEnabled && issue.priority !== 'medium'}
 				<SimpleTooltip text="Change priority">
 					<button
-						class="inline-flex cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
+						class="inline-flex h-[18px] cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
 						onclick={(event) => {
 							event.stopPropagation();
 							if (onPriorityClick) {
@@ -240,7 +245,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<FolderOpenIcon />
+						<FolderOpenIcon size={14} strokeWidth={1.5} />
 					</Button>
 				</SimpleTooltip>
 				<SimpleTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
@@ -251,7 +256,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<TerminalIcon />
+						<TerminalIcon size={14} strokeWidth={1.5} />
 					</Button>
 				</SimpleTooltip>
 				<SimpleTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
@@ -262,7 +267,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<VscodeIcon />
+						<VscodeIcon size={14} strokeWidth={1.5} />
 					</Button>
 				</SimpleTooltip>
 			</div>
@@ -274,7 +279,7 @@
 		<!-- Tree thumbnail placeholder -->
 		<div
 			class="relative flex size-[72px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
-			style="background: linear-gradient(180deg, color-mix(in oklch, {color} 18%, var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
+			style="background: linear-gradient(180deg, color-mix(in oklch, {color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
 		>
 			{#if notificationDotColor !== null && sessionState === null}
 				<SimpleTooltip text={m.issue_card_session_needs_attention()}>
