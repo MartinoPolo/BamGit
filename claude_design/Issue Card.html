@@ -103,11 +103,12 @@
     background: var(--ic);
     color: var(--ic-fg, #fff);
     gap: 10px; min-height: 32px;
+    cursor: pointer;
   }
   .ic-header-left { display: flex; align-items: baseline; gap: 7px; min-width: 0; flex: 1; }
-  .ic-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; opacity: 0.72; letter-spacing: 0.01em; flex-shrink: 0; }
-  .ic-name { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; text-decoration: none; color: inherit; cursor: pointer; }
-  .ic-name:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .ic-num { font-family: var(--font-mono); font-size: 11px; font-weight: 600; opacity: 0.72; letter-spacing: 0.01em; flex-shrink: 0; text-decoration: none; color: inherit; cursor: pointer; }
+  .ic-num:hover { opacity: 1; text-decoration: underline; text-underline-offset: 2px; }
+  .ic-name { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .ic-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .ic-pri-chip {
     display: inline-flex; align-items: center; gap: 3px;
@@ -160,13 +161,11 @@
   .ic-state-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
   .ic-labels-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 
-  /* Hover actions */
+  /* Action buttons — always visible */
   .ic-actions {
     display: flex; gap: 3px; align-items: center;
     position: absolute; bottom: 8px; right: 10px;
-    opacity: 0; transition: opacity 140ms; pointer-events: none;
   }
-  .ic-card:hover .ic-actions, .ic-actions.is-forced { opacity: 1; pointer-events: auto; }
 
   .ic-action-btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -185,30 +184,31 @@
 
   /* ── CARD STATES ─────────────────────────────────────────── */
 
-  /* Hover — background brightens, shadow lifts, border tints toward issue color */
+  /* Hover — significant ring in issue color */
   .ic-card:hover, .ic-card.is-hover {
-    border-color: color-mix(in oklch, var(--ic) 35%, var(--border-strong));
-    box-shadow: var(--shadow-md);
+    border-color: color-mix(in oklch, var(--ic) 60%, var(--border-strong));
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--ic) 40%, transparent), var(--shadow-md);
     background: color-mix(in oklch, var(--ic) 6%, var(--surface));
   }
 
-  /* Active (single-click inspect) — blue glow ring + outer glow halo */
+  /* Active (single-click inspect) — thick ring in issue color + outer glow */
   .ic-card.is-active {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 35%, transparent), 0 0 12px color-mix(in oklch, var(--ring) 25%, transparent);
+    border-color: var(--ic);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ic) 55%, transparent), 0 0 14px color-mix(in oklch, var(--ic) 20%, transparent);
+    background: color-mix(in oklch, var(--ic) 6%, var(--surface));
   }
 
-  /* Selected (batch) — primary sharp ring + body tint, NO halo */
+  /* Selected (batch) — primary sharp ring + body tint */
   .ic-card.is-selected {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 40%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 45%, transparent);
     background: color-mix(in oklch, var(--primary) 4%, var(--surface));
   }
 
   /* Multi-selected — same as selected */
   .ic-card.is-multi-selected {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 40%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 45%, transparent);
     background: color-mix(in oklch, var(--primary) 4%, var(--surface));
   }
   .ic-card.is-multi-selected .ic-body {
@@ -218,7 +218,7 @@
   /* Selection-ready hover (Ctrl/Shift held) — violet */
   .ic-card.is-selection-ready {
     border-color: #c084fc;
-    box-shadow: 0 0 0 2px color-mix(in oklch, oklch(0.700 0.200 300) 30%, transparent), var(--shadow-md);
+    box-shadow: 0 0 0 3px color-mix(in oklch, oklch(0.700 0.200 300) 35%, transparent), var(--shadow-md);
     background: color-mix(in oklch, oklch(0.700 0.200 300) 4%, var(--surface));
   }
 
@@ -310,12 +310,19 @@
   .multi-bar-actions { margin-left: auto; display: flex; gap: 6px; }
 </style>
 </head>
-<body class="theme-dark gk-root">
+<body class="theme-dark gk-root" data-theme="dark">
 <div id="root"></div>
+
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light"
+}/*EDITMODE-END*/;
+</script>
 
 <script type="text/babel" src="icons.jsx"></script>
 <script type="text/babel" src="tree.jsx"></script>
 <script type="text/babel" src="issue-card.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
 
 <script type="text/babel" data-presets="env,react">
 
@@ -365,6 +372,14 @@ function ContextMenuPanel({ title, items }) {
 
 /* ─── Page ─────────────────────────────────────────────────── */
 function Page() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  React.useEffect(() => {
+    const t = tweaks.theme;
+    document.body.className = 'gk-root ' + (t === 'dark' ? 'theme-dark' : 'theme-light');
+    document.body.setAttribute('data-theme', t);
+  }, [tweaks.theme]);
+
   return (
     <div className="page">
       <div className="pg-eyebrow">Component spec / Issue Card — states &amp; palette</div>
@@ -374,6 +389,7 @@ function Page() {
         layout at realistic widths. The full 24-color palette is exercised — light-background
         headers automatically flip to dark text via the WCAG luminance threshold from color_utils.ts.
       </p>
+
 
       {/* ═══ 1. Color palette reference ═══ */}
       <section className="section">
@@ -451,25 +467,25 @@ function Page() {
           <IssueCard {...SAMPLE_ISSUES[1]} />
         </div>
 
-        <div className="state-label">hover — background brightens, shadow lifts, border tints toward issue color</div>
+        <div className="state-label">hover — significant ring in issue color, shadow lifts</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[0]} cardState="hover" showActions />
           <IssueCard {...LIGHT_ISSUES[2]} cardState="hover" showActions />
         </div>
 
-        <div className="state-label">selected — primary (green) ring, body tint, NO checkbox</div>
+        <div className="state-label">selected — primary (green) ring, body tint</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[2]} cardState="selected" />
           <IssueCard {...LIGHT_ISSUES[0]} cardState="selected" />
         </div>
 
-        <div className="state-label">active — blue glow ring + outer glow halo</div>
+        <div className="state-label">active — thick ring in issue color + outer glow</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[3]} cardState="active" />
           <IssueCard {...LIGHT_ISSUES[4]} cardState="active" />
         </div>
 
-        <div className="state-label">multi-selected — primary ring + body tint, NO checkbox</div>
+        <div className="state-label">multi-selected — primary ring + body tint</div>
         <div className="two-col">
           <IssueCard {...SAMPLE_ISSUES[0]} cardState="multi-selected" />
           <IssueCard {...SAMPLE_ISSUES[1]} cardState="multi-selected" />
@@ -603,6 +619,15 @@ function Page() {
         </div>
       </section>
 
+      <TweaksPanel>
+        <TweakSection title="Appearance">
+          <TweakRadio
+            label="Theme" value={tweaks.theme}
+            options={[{ value: 'dark', label: 'Dark' }, { value: 'light', label: 'Light' }]}
+            onChange={v => setTweak('theme', v)}
+          />
+        </TweakSection>
+      </TweaksPanel>
     </div>
   );
 }

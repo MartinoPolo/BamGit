@@ -44,7 +44,7 @@
 const { useState, useEffect } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "theme": "dark",
+  "theme": "light",
   "accent": "moss",
   "density": "comfortable",
   "showGrid": true
@@ -112,9 +112,6 @@ function App() {
           <DCArtboard id="ui" label="UI library" width={920} height={1200}>
             <ComponentsArtboard />
           </DCArtboard>
-          <DCArtboard id="cards" label="Issue card states" width={760} height={780}>
-            <IssueCardArtboard />
-          </DCArtboard>
         </DCSection>
 
         <DCSection id="states" title="Component states" subtitle="Every primitive frozen in every meaningful state — rest, hover, focus, selected, disabled, loading, error, success, read-only.">
@@ -129,9 +126,6 @@ function App() {
           </DCArtboard>
           <DCArtboard id="tabs-states" label="Tabs & segmented control" width={1100} height={780}>
             <TabsStatesArtboard />
-          </DCArtboard>
-          <DCArtboard id="card-states" label="Issue card — states & sizes" width={1280} height={1340}>
-            <IssueCardStatesArtboard />
           </DCArtboard>
           <DCArtboard id="tree-states" label="Tree component" width={1280} height={1280}>
             <TreeStatesArtboard />

@@ -37,14 +37,15 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle (icon button) | Create Issue (split-button: Add Issue / Add Worktree Issue, persists last-used action)
 - **Bottom panel toolbar** (Issues tab): Always-visible persistent bar with consistent height (no layout shift). Default state (no selection): ghost appearance (no background/border), showing Sort | Filter | Clean Up Worktrees. Selected state: "N selected" count | Batch action buttons (Archive, Unarchive, Delete, Change Priority, Clean Selected Worktrees) | Deselect All (×). Modifier-held state (Ctrl/Shift pressed, nothing selected): toolbar gains selected-state visual styling (bg + border) but keeps default content. "Clean Up Worktrees" changes to "Clean Selected Worktrees" when batch selection is active. All worktree cleanup actions show a confirmation dialog
 - **Batch selection**: Multi-select issue cards/trees for bulk operations. Triggers: right-click context menu "Select" (desktop), long press 500ms (mobile/touch), Ctrl+click (toggle individual), Shift+click (range select with Windows Explorer pattern — range vs individually-selected items tracked separately, shift-clicking to a shorter range deselects items outside the new range while preserving Ctrl+clicked items), Ctrl+A (select all), Escape (deselect all). Selection clears on tab change and Escape; does NOT clear after batch action. Normal click (no modifier) clears batch selection and activates the clicked card. Clicking an already-active card does NOT deactivate it — deactivation only via Escape or clicking empty space in the grid. Batch actions: Archive, Unarchive (context-aware — both show if mixed), Delete, Change Priority. NOT batch: Change Color. Unavailable actions disabled with tooltip; partially applicable actions enabled with info tooltip ("affects 2 of 5")
-- **Active vs Selected terminology**: "Active" = single-click inspect (one at a time, shows bottom panel detail, green glow `#22c55e`). "Selected" = batch selection (multiple, for bulk ops, blue glow `#4a9eff`). Activation clears batch selection. **Card state visual hierarchy** — all states use uniform `ring-2` thickness, differentiated by color alone. No halo shadows. Colors match forest glow exactly. Hover ring suppressed on active/selected cards. CSS `:active` pseudo-class flashes green ring on mousedown for click feedback:
-    - Default → no ring
-    - Hover → `ring-2` yellow `#ffd700` (dark mode) / amber `#d4a017` (light mode) — only on non-active, non-selected cards
-    - Active → `ring-2` green `#22c55e` (dark mode) / lighter green `#4ade80` (light mode)
-    - Selected → `ring-2` blue `#4a9eff` (dark mode) / mid blue `#3b82f6` (light mode)
+- **Active vs Selected terminology**: "Active" = single-click inspect (one at a time, shows bottom panel detail). "Selected" = batch selection (multiple, for bulk ops). Activation clears batch selection. **Card state visual hierarchy** — uses `box-shadow` (not Tailwind `ring-*`) for all state rings, enabling both sharp rings and soft glows. States differentiated by ring thickness, glow blur, and color source. Hover/active rings suppressed on selected cards. Background tint applied on hover and active (`color-mix(in oklch, var(--ic) 6%, var(--surface))`):
+    - Default → no ring, no tint
+    - Hover → 2px sharp `box-shadow` ring in **issue's own color** (40% opacity) + border tint + subtle background tint — only on non-active, non-selected cards
+    - Active → 3px `box-shadow` ring in **issue's own color** (55% opacity) + 14px blurred outer glow (20% opacity) + background tint — heavier, committed feel
+    - Selected (batch) → 3px `box-shadow` ring in `--primary` (moss green, 45% opacity) + subtle body tint — system-level action, not issue-specific
+    - Selection-ready (Ctrl/Shift held) → violet ring
 - **Issue card context menu**: Right-click opens a bits-ui `ContextMenu` with all actions from the overflow (⋯) menu: Select/Deselect (top, separated), Edit, Rename (standalone only), Priority submenu, Change Color, Setup/Remove Worktree, Archive/Unarchive, Delete. "Select" is the first item with a separator below it. When right-clicking a batch-selected card: show batch actions ("Archive 5 selected", etc.). When right-clicking an unselected card: clear batch selection, activate card, show single-card actions (file manager pattern). The overflow (⋯) button is kept for touch/accessibility but opens the same context menu component programmatically
 - **Forest context menu**: Migrate existing `ForestContextMenu` to bits-ui `ContextMenu` for consistency. Add "Select" action matching card context menu behavior
-- **Forest ↔ card two-way binding**: Selection state syncs between forest trees and issue cards. Hovering/selecting a tree highlights its card and vice versa. Glow colors match across both surfaces
+- **Forest ↔ card two-way binding**: Selection state syncs between forest trees and issue cards. Hovering/selecting a tree highlights its card and vice versa. Both surfaces use the issue's own color for hover and active glows — forest uses SVG `feGaussianBlur`, cards use CSS `box-shadow` with blur. Selected (batch) uses `--primary` on both surfaces
 - **Legend**: floating button inside the forest panel, not in the main toolbar
 - "Assigned Issues" panel accessible from dashboard (sidebar widget or collapsible section, quick-access) showing GitHub issues assigned to user (via `gh`) for quick import
 - Dashboard-level color palette configuration (vivid, pastel, etc. — 24 colors, 6 hues × 4 rows)
@@ -113,27 +114,97 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 
 ### Session Dashboard (Chat UI)
 
-- Rich chat rendering:
-    - Markdown (headers, lists, code blocks, links, tables)
-    - Syntax-highlighted code blocks with copy button
-    - Tool call cards: collapsible detail per tool (Read, Write, Edit, Bash, Grep, etc.)
-    - Diff views for file changes (Edit tool results)
-    - User/Assistant message bubbles with provider-specific avatars
-    - Approval/permission request cards (Allow / Allow always / Deny)
-    - Turn counter and cost indicator in header
-- Session interaction UX:
-    - Quick-navigate buttons: jump to latest response start, jump to latest prompt start
-    - Content before last prompt visually grayed out (scrollable, not removed)
-    - Input box always visible and accessible (fixed at bottom)
-- Sub-agent display:
-    - Deterministic tree of all sub-agents spawned (parsed from session JSON/JSONL)
-    - Per sub-agent: name, model, status, tool usage count
-    - Not AI-generated summaries — parsed from actual session data
-- Session detail right panel (280px):
-    - Tree thumbnail (issue visualization)
-    - Stats card: turns, cost, tokens, cache hit ratio, tool count
-    - Worktree card: branch, path, commits + Terminal/Editor buttons
-- Session history: browse past sessions for any issue, search content, filter by date/provider/outcome
+Canonical design spec: `claude_design/design_briefs/SESSION_CHAT_VIEW.md`. Variant C (right sidebar layout) is the chosen base; refined per the 2026-05-06 grilling.
+
+#### Page layout
+
+Three regions: full-width **top bar**, **chat column** (left), **right sidebar** (272px expanded / 44px collapsed).
+
+#### Top bar
+
+- Left group: session title + state badge (running / needs-input / needs-review / paused / finished / errored)
+- Center group: branch name + issue badge + PR badge (single inline row, monospace where appropriate, badges clickable to open GitHub URLs, collapse to icon-only on narrow widths)
+- Right group: `[↗ Open in CLI]` action (resumes session in native provider CLI — `claude --resume`, `codex --resume`, etc., spawned in terminal at worktree path) + `[⋮]` overflow placeholder for future session actions (Stop, Pause, Export transcript, Copy session ID) + tab switcher (Chat / Files / Stats)
+- No provider/model/permission/cost fields in the top bar
+
+#### Right sidebar (expanded, 272px)
+
+Sections top to bottom with separators:
+
+1. Header: collapse toggle only
+2. **Provider** section: provider icon + name (clickable chip — placeholder for future provider switcher)
+3. **Global usage** section: 5h quota progress bar + countdown, 7d quota progress bar + countdown
+4. **Session metrics** section (separator above to distinguish global vs session-scoped data): Context bar + value, Cost value, Tokens value
+5. **Sub-Agents** section: header + count badge + tree (responsive height — fills remaining sidebar space, scrolls if long)
+
+Progress bar alignment: equal-width bars across all rows, filling space between longest left label and longest right value with ~8px padding.
+
+Color thresholds:
+
+- Context: green <40% / orange 40–60% / red >60%
+- 5h and 7d quotas: green <60% / orange 60–85% / red >85%
+
+#### Right sidebar (collapsed, 44px)
+
+Vertical strip: collapse toggle, state pulse dot, vertical context bar with rotated `%`, "N agents" rotated text. No cost in collapsed state.
+
+#### Chat column
+
+- Tab switcher (Chat / Files / Stats) at the top
+- Message stream:
+    - User messages right-aligned bubbles, assistant left-aligned with full markdown
+    - Syntax-highlighted code blocks with copy button and language label
+    - Tool call cards: 3-level system (compact / expanded / interactive) per `SESSION_CHAT_VIEW.md`
+    - Approval / elicitation / question cards as Level 3 tool cards
+    - Streaming text appears character-by-character with caret
+    - Content above last user prompt is visually dimmed (scrollable, not removed)
+    - Floating quick-nav buttons: "Jump to latest response", "Jump to latest prompt"
+    - Inline sub-agent expansion when a tree node is clicked — colored left border, nested expansions use progressive border colors
+    - Images render inline in message bubbles with `#N` caption beneath each
+
+#### Floating input panel
+
+Floating, rounded, elevated surface (not a full-width bar). Max-width ~900px, centered in chat column, ~20px from chat-column bottom.
+
+Vertical structure:
+
+1. **Image carousel** (collapsible): collapsed by default; expands on paste/upload; auto-collapses on send. Session-wide persistent `#N` numbering. Carousel of all session images with `#N` captions; horizontal arrow scrolling on overflow.
+2. **Skill chips row**: Execute, Review, Check & Fix, Commit, Ship, More ▾. Always visible. Context-aware (some chips appear/hide on session events). Click pre-fills textarea with the slash command.
+3. **Textarea**: 3-line default, auto-grow up to ~50vh then internal scroll. Slash autocomplete (`/`), `@` mentions for files / issues / sub-agents / past images. Pasted image inserts `[Image #N]` pill.
+4. **Bottom controls row**:
+    - Left group: `[+ Attach]`, `[Tools ▾]` (popover with per-session MCP / skills / tools toggles)
+    - Right group: `[Local ▾]` (location placeholder; future Cloud / Remote SSH), `[Provider · Model · Effort ▾]` (combined dropdown grouped by provider, then models with context window in parens, then effort levels), `[Approve each ▾]` (permission mode), `[→ Send]`
+
+Sync rule: model, effort, permission mode, location are session-level state and live ONLY in the input panel. Sidebar provider is read-only (with future switcher menu); no other duplicates.
+
+#### Sub-agent display
+
+- Deterministic tree of all sub-agents spawned (parsed from session JSON/JSONL, not AI-generated)
+- Per node: name, model (abbreviated), status indicator (running / completed / failed), tool count, duration
+- Lives in the right sidebar's Sub-Agents section
+- Click a node → expand its messages inline in the chat stream at the spawn point, with colored left border; nested expansions use progressively different border colors
+- Active expansion indicator on the tree node when inline expansion is open
+
+#### Image handling
+
+- Session-wide persistent numbering. Image #1 stays #1 for the lifetime of the session.
+- Pasted/uploaded image inserts `[Image #N]` pill in textarea at cursor; backspace deletes the pill as a unit
+- Past images are referenceable by number naturally in subsequent prompts (the placeholder is in transcript history)
+- Image carousel above the textarea provides visual access; collapses on send
+
+#### Session-level actions
+
+- **Open in CLI** (top bar): resumes the session in the native provider CLI by spawning the appropriate command in a terminal at the worktree path. Provider-aware: each provider has its own resume command and behavior. Tooltip shows the exact command before clicking.
+
+#### Skill controls and configuration
+
+- Skill chips row in the input panel (see above) for one-click slash command insertion
+- Tools popover in the input panel for per-session toggles (MCP servers, skill availability, tool availability)
+- Skill configuration panel (separate surface, accessed via gear): event-based skill assignment (On session start, After execution, On error, On merge conflict, After commit, After PR created) + skill discovery from `.claude/` user/project folders + custom paths
+
+#### Session history and search
+
+Browse past sessions for any issue. Full-text search content with multi-scope (single session / issue-scoped / PRD-scoped). Background search process. Filter by date / provider / outcome.
 
 ### Issue Environment
 

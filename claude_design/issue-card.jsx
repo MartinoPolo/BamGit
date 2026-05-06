@@ -100,7 +100,7 @@ function IssueCard({
   seed = 1, noWorktree = false,
   /* ── State overrides ── */
   cardState = null,       // null | 'hover' | 'selected' | 'active' | 'multi-selected' | 'selection-ready' | 'dragging' | 'loading' | 'archived' | 'error' | 'disabled'
-  showActions = false,    // force-show actions (e.g. for hover state showcase)
+  showActions = false,    // legacy — actions are now always visible
 }) {
   const fg = icContrastText(color);
   const mode = icTextMode(color);
@@ -110,7 +110,7 @@ function IssueCard({
   if (cardState) cls.push(`is-${cardState}`);
 
   const hasWorktree = !noWorktree && !!branch;
-  const qaDisabledStyle = { opacity: 0.35, pointerEvents: 'none' };
+  const qaDisabledStyle = { opacity: 0.35 };
   const qaStyle = hasWorktree ? {} : qaDisabledStyle;
 
   return (
@@ -123,8 +123,8 @@ function IssueCard({
       /* Header band */
       React.createElement('div', { className: 'ic-header' },
         React.createElement('div', { className: 'ic-header-left' },
-          React.createElement('span', { className: 'ic-num' }, `#${num}`),
-          React.createElement('a', { className: 'ic-name', href: `https://github.com/org/repo/issues/${num}`, onClick: e => e.preventDefault() }, name),
+          React.createElement('a', { className: 'ic-num', href: `https://github.com/org/repo/issues/${num}`, onClick: e => e.preventDefault(), title: `Open issue #${num} on GitHub` }, `#${num}`),
+          React.createElement('span', { className: 'ic-name' }, name),
         ),
         React.createElement('div', { className: 'ic-header-right' },
           childCount > 0 && React.createElement('span', { className: 'ic-child-chip' },
@@ -175,8 +175,8 @@ function IssueCard({
         ),
       ),
 
-      /* Hover actions */
-      React.createElement('div', { className: `ic-actions ${showActions ? 'is-forced' : ''}` },
+      /* Action buttons — always visible */
+      React.createElement('div', { className: 'ic-actions' },
         React.createElement('button', { className: 'ic-action-btn is-primary' },
           React.createElement(I.Play, { size: 9, sw: 2 }), 'Run'),
         React.createElement('button', { className: 'ic-action-btn' },
