@@ -2,6 +2,7 @@
 	import type { Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks, IssuePriority } from '$lib/modules/issues';
+	import type { TreeVisualization } from '$lib/modules/visualization';
 	import {
 		deriveContextualActions,
 		type ContextualActionInput,
@@ -24,6 +25,7 @@
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
 		getProgressLines?: (issueId: string) => readonly string[];
+		getVisualization?: (issueId: string) => TreeVisualization | undefined;
 		onBatchArchive?: (issueIds: string[]) => void;
 		onBatchUnarchive?: (issueIds: string[]) => void;
 		onBatchDelete?: (issueIds: string[]) => void;
@@ -43,6 +45,7 @@
 		getChildren,
 		getNotificationDotColor,
 		getProgressLines,
+		getVisualization,
 		onArchive,
 		onUnarchive,
 		onEdit,
@@ -269,10 +272,14 @@
 					{forceExpanded}
 					progressLines={getProgressLines?.(issue.id) ?? []}
 					{prioritiesEnabled}
+					visualization={getVisualization?.(issue.id)}
 					isActive={selection.activeIssueId === issue.id}
+					isHovered={selection.hoveredIssueId === issue.id}
 					isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
 					isSelectionReady={isModifierHeld}
 					onCardClick={(event) => handleCardClick(issue, event)}
+					onMouseEnter={() => selection.hoverIssue(issue.id)}
+					onMouseLeave={() => selection.unhover()}
 					{onExecuteAction}
 				/>
 			</IssueCardContextMenu>
@@ -306,10 +313,14 @@
 							{issue}
 							cache={cacheMap.get(issue.id)}
 							{ghAvailable}
+							visualization={getVisualization?.(issue.id)}
 							isActive={selection.activeIssueId === issue.id}
+							isHovered={selection.hoveredIssueId === issue.id}
 							isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
 							isSelectionReady={isModifierHeld}
 							onCardClick={(event) => handleCardClick(issue, event)}
+							onMouseEnter={() => selection.hoverIssue(issue.id)}
+							onMouseLeave={() => selection.unhover()}
 						/>
 					</IssueCardContextMenu>
 				{/each}

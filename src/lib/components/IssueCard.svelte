@@ -26,6 +26,9 @@
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
 	import { PRIORITY_BADGE_CLASSES, issueExpandedStates } from './issue_card_utils.js';
+	import type { TreeVisualization } from '$lib/modules/visualization';
+	import { LowPolyTree, PottedPlant, DEFAULT_TREE_CONFIG } from 'low-poly-2d-trees';
+	import type { TreeConfig } from 'low-poly-2d-trees';
 
 	interface Props {
 		issue: Issue;
@@ -37,10 +40,14 @@
 		progressLines?: readonly string[];
 		prioritiesEnabled?: boolean;
 		sessionState?: 'executing' | 'hitl' | 'review' | 'error' | 'paused' | 'done' | null;
+		visualization?: TreeVisualization | undefined;
 		isActive?: boolean;
+		isHovered?: boolean;
 		isBatchSelected?: boolean;
 		isSelectionReady?: boolean;
 		onCardClick?: (event: MouseEvent) => void;
+		onMouseEnter?: () => void;
+		onMouseLeave?: () => void;
 		onExecuteAction?: (actionId: string, issueId: string) => void;
 		onPriorityClick?: () => void;
 		onQuickActionAssignFolder?: (issueId: string) => void;
@@ -56,10 +63,14 @@
 		progressLines = [],
 		prioritiesEnabled = true,
 		sessionState = null,
+		visualization,
 		isActive = false,
+		isHovered = false,
 		isBatchSelected = false,
 		isSelectionReady = false,
 		onCardClick,
+		onMouseEnter,
+		onMouseLeave,
 		onExecuteAction,
 		onPriorityClick,
 		onQuickActionAssignFolder,
@@ -105,10 +116,25 @@
 		if (isActive) {
 			return CARD_STATE_CLASSES.active;
 		}
+		if (isHovered) {
+			return CARD_STATE_CLASSES.hovered;
+		}
 		if (isSelectionReady) {
 			return CARD_STATE_CLASSES.selectionReady;
 		}
 		return '';
+	});
+
+	const thumbnailOakConfig = $derived.by((): TreeConfig | null => {
+		if (visualization?.kind !== 'oak') {
+			return null;
+		}
+		return {
+			...DEFAULT_TREE_CONFIG,
+			shape: 'oak',
+			stage: 'leafy',
+			seed: visualization.seed,
+		};
 	});
 
 	const priorityChipClass = $derived(
@@ -169,12 +195,15 @@
 <div
 	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-all duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
 	isActive ||
+	isHovered ||
 	isBatchSelected ||
 	isSelectionReady
 		? ''
 		: 'card-ic-interactive'}"
 	style:--ic={color}
 	onclick={handleCardClick}
+	onmouseenter={onMouseEnter}
+	onmouseleave={onMouseLeave}
 >
 	<!-- Header band -->
 	<div
@@ -276,7 +305,7 @@
 
 	<!-- Body: tree thumbnail | info -->
 	<div class="grid items-start gap-2.5 p-2.5 pr-3" style="grid-template-columns: 72px 1fr;">
-		<!-- Tree thumbnail placeholder -->
+		<!-- Tree thumbnail -->
 		<div
 			class="relative flex size-[72px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
 			style="background: linear-gradient(180deg, color-mix(in oklch, {color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
@@ -284,11 +313,25 @@
 			{#if notificationDotColor !== null && sessionState === null}
 				<SimpleTooltip text={m.issue_card_session_needs_attention()}>
 					<span
-						class="absolute top-1.5 right-1.5 size-[7px] animate-pulse rounded-full {notificationDotColor}"
+						class="absolute top-1.5 right-1.5 z-10 size-[7px] animate-pulse rounded-full {notificationDotColor}"
 					></span>
 				</SimpleTooltip>
 			{/if}
-			<div class="mb-4 size-6 rounded-full bg-foreground/20"></div>
+			{#if visualization?.kind === 'tree'}
+				<div class="absolute inset-0">
+					<LowPolyTree config={visualization.config} />
+				</div>
+			{:else if visualization?.kind === 'potted-plant'}
+				<div class="absolute inset-0">
+					<PottedPlant stage={visualization.stage} seed={visualization.seed} />
+				</div>
+			{:else if visualization?.kind === 'oak' && thumbnailOakConfig}
+				<div class="absolute inset-0">
+					<LowPolyTree config={thumbnailOakConfig} />
+				</div>
+			{:else}
+				<div class="mb-4 size-6 rounded-full bg-foreground/20"></div>
+			{/if}
 		</div>
 
 		<!-- Info rows -->

@@ -213,7 +213,12 @@
 		});
 	}
 
-	function handleTreeClick(entry: IssueEntry) {
+	function handleTreeClick(entry: IssueEntry, event: MouseEvent) {
+		if (event.ctrlKey || event.metaKey) {
+			event.preventDefault();
+			interaction.toggleBatchSelect(entry.issue.id);
+			return;
+		}
 		interaction.activateIssue(entry.issue.id);
 	}
 
@@ -338,7 +343,7 @@
 							<button
 								{...triggerProps}
 								type="button"
-								class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-auto [&>svg]:cursor-pointer"
+								class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
 								style:left="{positioned.x}px"
 								style:top="{positioned.y}px"
 								style:width="{size.width}px"
@@ -350,7 +355,7 @@
 								style:pointer-events="none"
 								onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
 								onmouseleave={() => interaction.unhover()}
-								onclick={() => handleTreeClick(entry)}
+								onclick={(event) => handleTreeClick(entry, event)}
 								oncontextmenu={(e) => handleContextMenu(e, entry)}
 								aria-label="Tree for issue {entry.issue.name}"
 							>

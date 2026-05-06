@@ -378,7 +378,8 @@
 
 /* ── Issue card state rings (box-shadow, referencing --ic per-card) ──── */
 
-.card-ic-interactive:hover {
+.card-ic-interactive:hover,
+.card-state-hovered-ic {
 	box-shadow:
 		0 0 0 2px color-mix(in oklch, var(--ic) 40%, transparent),
 		var(--shadow-md);
