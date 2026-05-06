@@ -7,6 +7,7 @@ use tokio::sync::{mpsc, Mutex};
 
 use super::claude_code_provider::ClaudeCodeProvider;
 use super::codex_provider::CodexProvider;
+use super::cursor_provider::CursorProvider;
 use super::opencode_provider::OpenCodeProvider;
 use super::provider::{ActorCommand, ProviderAdapter, ProviderKind, SpawnConfig};
 use super::session_actor;
@@ -28,6 +29,7 @@ impl SessionManager {
             ProviderKind::ClaudeCode => Box::new(ClaudeCodeProvider::new()),
             ProviderKind::OpenCode => Box::new(OpenCodeProvider::new()),
             ProviderKind::Codex => Box::new(CodexProvider::new()),
+            ProviderKind::Cursor => Box::new(CursorProvider::new()),
         }
     }
 
