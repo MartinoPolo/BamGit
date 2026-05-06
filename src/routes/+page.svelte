@@ -553,7 +553,6 @@
 						archivedIssues={issueStore.archivedIssues}
 						showArchived={issueStore.showArchived}
 						isPortfolio={boardStore.activeDashboard?.type === 'portfolio'}
-						actions={actionStore.visibleActions}
 						forceExpanded={allExpanded ? true : undefined}
 						cacheMap={versionControlStore.stateMap}
 						ghAvailable={versionControlStore.isGhAvailable}

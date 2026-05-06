@@ -1,14 +1,19 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue } from '$lib/modules/issues';
-	import type { Action, GitStatusCache } from '$lib/types/generated';
+	import type { GitStatusCache } from '$lib/types/generated';
+	import {
+		deriveContextualActions,
+		type ActionId,
+		type ContextualActionInput,
+	} from '$lib/modules/contextual-actions';
 	import { getContrastTextColor } from '$lib/components/color-picker/color_utils.js';
 	import GitHubBadge from './GitHubBadge.svelte';
 	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
 	import SyncBadge from './SyncBadge.svelte';
 	import MergeConflictBadge from './MergeConflictBadge.svelte';
 	import WorktreeProgressIndicator from './WorktreeProgressIndicator.svelte';
-	import ActionButtonGroup from './ActionButtonGroup.svelte';
+	import ContextualActionButtons from './ContextualActionButtons.svelte';
 	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
 	import SessionStateChip from './SessionStateChip.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -17,7 +22,6 @@
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import VscodeIcon from './icons/VscodeIcon.svelte';
-	import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
@@ -25,7 +29,6 @@
 
 	interface Props {
 		issue: Issue;
-		actions?: Action[];
 		cache?: GitStatusCache | null;
 		ghAvailable?: boolean;
 		notificationDotColor?: string | null;
@@ -36,7 +39,6 @@
 		sessionState?: 'executing' | 'hitl' | 'review' | 'error' | 'paused' | 'done' | null;
 		isActive?: boolean;
 		isBatchSelected?: boolean;
-		onOverflowClick?: () => void;
 		onCardClick?: (event: MouseEvent) => void;
 		onExecuteAction?: (actionId: string, issueId: string) => void;
 		onPriorityClick?: () => void;
@@ -45,7 +47,6 @@
 
 	let {
 		issue,
-		actions = [],
 		cache = null,
 		ghAvailable = false,
 		notificationDotColor = null,
@@ -56,7 +57,6 @@
 		sessionState = null,
 		isActive = false,
 		isBatchSelected = false,
-		onOverflowClick,
 		onCardClick,
 		onExecuteAction,
 		onPriorityClick,
@@ -109,6 +109,27 @@
 	const priorityChipClass = $derived(
 		isLightHeader ? 'bg-white/22 text-black/80' : 'bg-black/18 text-inherit',
 	);
+
+	// fallow-ignore-next-line complexity
+	const contextualActions = $derived.by(() => {
+		const input: ContextualActionInput = {
+			worktreeState: issue.worktree_state,
+			sessionState,
+			prState: cache?.pr_state ?? null,
+			hasLocalChanges: cache?.has_local_changes ?? false,
+			aheadRemoteCount: cache?.ahead_remote_count ?? 0,
+			behindBaseCount: cache?.behind_base_count ?? 0,
+			mergeConflict: cache?.merge_conflict ?? false,
+			labels: issue.labels,
+		};
+		return deriveContextualActions(input);
+	});
+
+	function handleContextualAction(actionId: ActionId) {
+		if (onExecuteAction) {
+			onExecuteAction(actionId, issue.id);
+		}
+	}
 
 	function handleCardClick(event: MouseEvent) {
 		if (onCardClick) {
@@ -385,28 +406,13 @@
 		</div>
 	{/if}
 
-	<!-- Action buttons (always visible, bottom-right) -->
-	{#if actions.length > 0 && onExecuteAction && !isArchived}
+	<!-- Contextual action buttons (always visible, bottom-right) -->
+	{#if !isArchived && onExecuteAction}
 		<div class="absolute bottom-2 right-2.5 flex items-center gap-1">
-			<ActionButtonGroup
-				{actions}
-				onExecute={(actionId) => onExecuteAction(actionId, issue.id)}
+			<ContextualActionButtons
+				derivedActions={contextualActions}
+				onExecute={handleContextualAction}
 			/>
-			{#if onOverflowClick}
-				<SimpleTooltip text="More actions">
-					<Button
-						variant="secondary"
-						size="icon-sm"
-						class="h-[22px] w-auto px-1.5"
-						onclick={(event: MouseEvent) => {
-							event.stopPropagation();
-							onOverflowClick();
-						}}
-					>
-						<MoreHorizontalIcon size={10} />
-					</Button>
-				</SimpleTooltip>
-			{/if}
 		</div>
 	{/if}
 </div>

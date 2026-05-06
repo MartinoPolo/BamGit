@@ -14,6 +14,8 @@ export const buttonVariants = tv({
 			'ghost-overlay':
 				'bg-transparent border-transparent text-current opacity-60 hover:opacity-90 hover:bg-[color-mix(in_oklch,currentColor_10%,transparent)]',
 			danger: 'bg-transparent text-status-danger border-[color-mix(in_oklch,var(--status-danger)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--status-danger)_12%,transparent)]',
+			'contextual-primary':
+				'bg-moss-700 text-white shadow-sm hover:bg-moss-600 dark:bg-moss-600 dark:hover:bg-moss-500',
 		},
 		size: {
 			sm: 'h-[var(--size-control-sm)] px-[9px] text-[length:var(--text-sm)] rounded-[var(--radius-sm)]',

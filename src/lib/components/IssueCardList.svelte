@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { Issue } from '$lib/modules/issues';
-	import type { Action, GitStatusCache } from '$lib/types/generated';
+	import type { GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks, IssuePriority } from '$lib/modules/issues';
+	import {
+		deriveContextualActions,
+		type ContextualActionInput,
+	} from '$lib/modules/contextual-actions';
 	import { useSelection } from '$lib/modules/board';
 	import IssueCard from './IssueCard.svelte';
 	import IssueCardContextMenu from './IssueCardContextMenu.svelte';
@@ -13,7 +17,6 @@
 		archivedIssues: Issue[];
 		showArchived: boolean;
 		isPortfolio: boolean;
-		actions?: Action[];
 		forceExpanded?: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
@@ -33,7 +36,6 @@
 		archivedIssues,
 		showArchived,
 		isPortfolio,
-		actions = [],
 		forceExpanded,
 		cacheMap = new Map(),
 		ghAvailable = false,
@@ -193,6 +195,22 @@
 		}
 		return getChildren(issueId).length;
 	}
+
+	// fallow-ignore-next-line complexity
+	function getDerivedActions(issue: Issue) {
+		const cache = cacheMap.get(issue.id);
+		const input: ContextualActionInput = {
+			worktreeState: issue.worktree_state,
+			sessionState: null,
+			prState: cache?.pr_state ?? null,
+			hasLocalChanges: cache?.has_local_changes ?? false,
+			aheadRemoteCount: cache?.ahead_remote_count ?? 0,
+			behindBaseCount: cache?.behind_base_count ?? 0,
+			mergeConflict: cache?.merge_conflict ?? false,
+			labels: issue.labels,
+		};
+		return deriveContextualActions(input);
+	}
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -229,7 +247,9 @@
 			<IssueCardContextMenu
 				{issue}
 				isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
+				derivedActions={getDerivedActions(issue)}
 				onToggleSelect={() => handleToggleSelect(issue.id)}
+				onContextualAction={(actionId) => onExecuteAction?.(actionId, issue.id)}
 				{onArchive}
 				{onUnarchive}
 				{onEdit}
@@ -242,7 +262,6 @@
 			>
 				<IssueCard
 					{issue}
-					{actions}
 					cache={cacheMap.get(issue.id)}
 					{ghAvailable}
 					notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}

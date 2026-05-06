@@ -108,6 +108,8 @@ function createGitStatus(overrides: Partial<GitStatusCache> = {}): GitStatusCach
 		github_issue_state: null,
 		behind_base_count: null,
 		merge_conflict: null,
+		has_local_changes: null,
+		ahead_remote_count: null,
 		fetched_at: null,
 		...overrides,
 	};

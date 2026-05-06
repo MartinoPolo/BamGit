@@ -12,7 +12,7 @@ use crate::models::git_status::{
 
 const GIT_STATUS_SELECT_COLUMNS_ALIASED: &str =
     "g.issue_id, g.branch_status, g.pr_state, g.pr_number, g.pr_url, g.github_issue_state, \
-     g.behind_base_count, g.merge_conflict, g.fetched_at";
+     g.behind_base_count, g.merge_conflict, g.has_local_changes, g.ahead_remote_count, g.fetched_at";
 
 #[tauri::command]
 pub fn refresh_git_status(
@@ -22,20 +22,21 @@ pub fn refresh_git_status(
 ) -> Result<GitStatusCache, String> {
     let connection = database_state.write()?;
 
-    // Load issue + dashboard to get branch_name, base_branch, local_folder
-    let (branch_name, base_branch, local_folder, default_base_branch): (
+    // Load issue + dashboard to get branch_name, base_branch, local_folder, worktree_folder
+    let (branch_name, base_branch, local_folder, default_base_branch, worktree_folder): (
+        Option<String>,
         Option<String>,
         Option<String>,
         Option<String>,
         Option<String>,
     ) = connection
         .query_row(
-            "SELECT i.branch_name, i.base_branch, d.local_folder, d.default_base_branch \
+            "SELECT i.branch_name, i.base_branch, d.local_folder, d.default_base_branch, i.worktree_folder \
              FROM issues i \
              JOIN dashboards d ON i.dashboard_id = d.id \
              WHERE i.id = ?1",
             [&issue_id],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?)),
         )
         .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())?;
 
@@ -68,17 +69,29 @@ pub fn refresh_git_status(
         (None, None)
     };
 
+    let ahead_remote_count =
+        cli_operations::get_ahead_remote_count(working_directory, &branch_name).ok();
+
+    // Use worktree folder for local changes detection (dirty working tree check)
+    let changes_directory = worktree_folder
+        .as_deref()
+        .map(Path::new)
+        .unwrap_or(working_directory);
+    let has_local_changes = cli_operations::has_local_changes(changes_directory).ok();
+
     // Upsert into git_status_cache
     connection
         .execute(
-            "INSERT INTO git_status_cache (issue_id, branch_status, behind_base_count, merge_conflict, fetched_at)
-             VALUES (?1, ?2, ?3, ?4, datetime('now'))
+            "INSERT INTO git_status_cache (issue_id, branch_status, behind_base_count, merge_conflict, has_local_changes, ahead_remote_count, fetched_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, datetime('now'))
              ON CONFLICT(issue_id) DO UPDATE SET
                 branch_status = excluded.branch_status,
                 behind_base_count = excluded.behind_base_count,
                 merge_conflict = excluded.merge_conflict,
+                has_local_changes = excluded.has_local_changes,
+                ahead_remote_count = excluded.ahead_remote_count,
                 fetched_at = excluded.fetched_at",
-            rusqlite::params![issue_id, branch_status, behind_base_count, merge_conflict,],
+            rusqlite::params![issue_id, branch_status, behind_base_count, merge_conflict, has_local_changes, ahead_remote_count],
         )
         .map_err(|error| format!("Failed to upsert git status cache: {error}"))?;
 
