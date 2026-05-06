@@ -20,6 +20,7 @@ interface SpawnSessionRequest {
 	issue_id?: string | null;
 	permission_mode?: string | null;
 	model?: string | null;
+	provider?: 'claude-code' | 'open-code' | null;
 }
 
 interface AdoptSessionRequest {

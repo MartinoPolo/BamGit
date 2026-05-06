@@ -1,30 +1,51 @@
 use async_trait::async_trait;
 use serde_json::Value;
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::Command;
+use tokio::sync::mpsc;
 
 use super::protocol_parser::ProtocolState;
 use super::provider::{
     ApprovalDecision, ProviderAdapter, ProviderCapabilities, ProviderError, SessionEvent,
-    SessionHandle, SpawnConfig,
+    SessionHandle, SessionTransport, SpawnConfig,
 };
 
-pub struct ClaudeCodeProvider {
-    /// Each provider instance owns a protocol parser for stateful event tracking.
-    protocol_state: std::sync::Mutex<ProtocolState>,
-}
+pub struct ClaudeCodeProvider;
 
 impl ClaudeCodeProvider {
     pub fn new() -> Self {
-        Self {
-            protocol_state: std::sync::Mutex::new(ProtocolState::new()),
+        Self
+    }
+
+    fn get_stdin(
+        handle: &mut SessionHandle,
+    ) -> Result<&mut tokio::process::ChildStdin, ProviderError> {
+        match &mut handle.transport {
+            SessionTransport::Stdio { stdin } => stdin.as_mut().ok_or(ProviderError::NotRunning),
+            _ => Err(ProviderError::NotRunning),
         }
+    }
+
+    async fn write_json(
+        handle: &mut SessionHandle,
+        payload: &Value,
+    ) -> Result<(), ProviderError> {
+        let stdin = Self::get_stdin(handle)?;
+        let mut line = serde_json::to_string(payload)
+            .map_err(|e| ProviderError::IoError(std::io::Error::other(e)))?;
+        line.push('\n');
+        stdin.write_all(line.as_bytes()).await?;
+        stdin.flush().await?;
+        Ok(())
     }
 }
 
 #[async_trait]
 impl ProviderAdapter for ClaudeCodeProvider {
-    async fn spawn(&self, config: SpawnConfig) -> Result<SessionHandle, ProviderError> {
+    async fn spawn(
+        &self,
+        config: SpawnConfig,
+    ) -> Result<(SessionHandle, mpsc::Receiver<SessionEvent>), ProviderError> {
         let mut cmd = Command::new("claude");
 
         cmd.arg("-p")
@@ -65,20 +86,57 @@ impl ProviderAdapter for ClaudeCodeProvider {
 
         let pid = child.id().unwrap_or(0);
         let stdin = child.stdin.take();
-        let stdout = child.stdout.take();
+        let stdout = child
+            .stdout
+            .take()
+            .ok_or_else(|| ProviderError::SpawnFailed("Failed to capture stdout".into()))?;
         let stderr = child.stderr.take();
 
-        if stdout.is_none() {
-            return Err(ProviderError::SpawnFailed("Failed to capture stdout".into()));
+        let (event_sender, event_receiver) = mpsc::channel::<SessionEvent>(256);
+
+        // Spawn stdout reader — parses stream-JSON into SessionEvents
+        let stdout_sender = event_sender.clone();
+        tokio::spawn(async move {
+            let mut protocol_state = ProtocolState::new();
+            let mut reader = BufReader::new(stdout).lines();
+            while let Ok(Some(line)) = reader.next_line().await {
+                if let Ok(raw) = serde_json::from_str::<Value>(&line) {
+                    match protocol_state.map_event(&raw) {
+                        Ok(events) => {
+                            for event in events {
+                                if stdout_sender.send(event).await.is_err() {
+                                    return;
+                                }
+                            }
+                        }
+                        Err(e) => log::warn!("Parse error: {e}"),
+                    }
+                }
+            }
+        });
+
+        if let Some(stderr) = stderr {
+            tokio::spawn(async move {
+                let mut reader = BufReader::new(stderr).lines();
+                while let Ok(Some(line)) = reader.next_line().await {
+                    let raw_event = SessionEvent::Raw {
+                        source: "stderr".into(),
+                        data: Value::String(line),
+                    };
+                    if event_sender.send(raw_event).await.is_err() {
+                        return;
+                    }
+                }
+            });
         }
 
-        Ok(SessionHandle {
+        let handle = SessionHandle {
             child,
-            stdin,
-            stdout,
-            stderr,
             pid,
-        })
+            transport: SessionTransport::Stdio { stdin },
+        };
+
+        Ok((handle, event_receiver))
     }
 
     async fn send_turn(
@@ -86,21 +144,11 @@ impl ProviderAdapter for ClaudeCodeProvider {
         handle: &mut SessionHandle,
         message: &str,
     ) -> Result<(), ProviderError> {
-        let stdin = handle.stdin.as_mut().ok_or(ProviderError::NotRunning)?;
-
         let payload = serde_json::json!({
             "type": "user_message",
             "message": message
         });
-
-        let mut line = serde_json::to_string(&payload)
-            .map_err(|e| ProviderError::IoError(std::io::Error::other(e)))?;
-        line.push('\n');
-
-        stdin.write_all(line.as_bytes()).await?;
-        stdin.flush().await?;
-
-        Ok(())
+        Self::write_json(handle, &payload).await
     }
 
     async fn respond_to_request(
@@ -109,8 +157,6 @@ impl ProviderAdapter for ClaudeCodeProvider {
         request_id: &str,
         decision: &ApprovalDecision,
     ) -> Result<(), ProviderError> {
-        let stdin = handle.stdin.as_mut().ok_or(ProviderError::NotRunning)?;
-
         let payload = serde_json::json!({
             "type": "control_response",
             "request_id": request_id,
@@ -119,15 +165,7 @@ impl ProviderAdapter for ClaudeCodeProvider {
                 "decision": decision.as_str()
             }
         });
-
-        let mut line = serde_json::to_string(&payload)
-            .map_err(|e| ProviderError::IoError(std::io::Error::other(e)))?;
-        line.push('\n');
-
-        stdin.write_all(line.as_bytes()).await?;
-        stdin.flush().await?;
-
-        Ok(())
+        Self::write_json(handle, &payload).await
     }
 
     async fn respond_to_user_input(
@@ -136,8 +174,6 @@ impl ProviderAdapter for ClaudeCodeProvider {
         request_id: &str,
         answers: &Value,
     ) -> Result<(), ProviderError> {
-        let stdin = handle.stdin.as_mut().ok_or(ProviderError::NotRunning)?;
-
         let payload = serde_json::json!({
             "type": "control_response",
             "request_id": request_id,
@@ -146,15 +182,7 @@ impl ProviderAdapter for ClaudeCodeProvider {
                 "answers": answers
             }
         });
-
-        let mut line = serde_json::to_string(&payload)
-            .map_err(|e| ProviderError::IoError(std::io::Error::other(e)))?;
-        line.push('\n');
-
-        stdin.write_all(line.as_bytes()).await?;
-        stdin.flush().await?;
-
-        Ok(())
+        Self::write_json(handle, &payload).await
     }
 
     fn capabilities(&self) -> ProviderCapabilities {
@@ -178,38 +206,21 @@ impl ProviderAdapter for ClaudeCodeProvider {
     }
 
     async fn interrupt(&self, handle: &mut SessionHandle) -> Result<(), ProviderError> {
-        let stdin = handle.stdin.as_mut().ok_or(ProviderError::NotRunning)?;
-
         let request_id = format!("grovekeeper_ctrl_{}", uuid::Uuid::new_v4());
         let payload = serde_json::json!({
             "type": "control_request",
             "request_id": request_id,
             "request": { "subtype": "interrupt" }
         });
-
-        let mut line = serde_json::to_string(&payload)
-            .map_err(|e| ProviderError::IoError(std::io::Error::other(e)))?;
-        line.push('\n');
-
-        stdin.write_all(line.as_bytes()).await?;
-        stdin.flush().await?;
-
-        Ok(())
+        Self::write_json(handle, &payload).await
     }
 
     async fn terminate(&self, handle: &mut SessionHandle) -> Result<(), ProviderError> {
-        // Drop stdin to send EOF, then kill
-        handle.stdin.take();
+        if let SessionTransport::Stdio { stdin } = &mut handle.transport {
+            stdin.take();
+        }
         handle.child.kill().await?;
         Ok(())
-    }
-
-    fn parse_event(&self, raw: &Value) -> Result<Vec<SessionEvent>, ProviderError> {
-        let mut state = self
-            .protocol_state
-            .lock()
-            .map_err(|e| ProviderError::ParseError(e.to_string()))?;
-        state.map_event(raw)
     }
 }
 
@@ -220,9 +231,32 @@ mod tests {
     use serde_json::json;
     use tokio::io::AsyncReadExt;
 
-    // Helper: spawn a subprocess whose stdout echoes stdin lines,
-    // giving us a real ChildStdin/ChildStdout pair for integration tests.
-    fn spawn_echo_process() -> SessionHandle {
+    struct EchoHandle {
+        handle: SessionHandle,
+        stdout: Option<tokio::process::ChildStdout>,
+    }
+
+    impl From<(SessionHandle, Option<tokio::process::ChildStdout>)> for EchoHandle {
+        fn from((handle, stdout): (SessionHandle, Option<tokio::process::ChildStdout>)) -> Self {
+            Self { handle, stdout }
+        }
+    }
+
+    impl EchoHandle {
+        async fn read_output(&mut self) -> String {
+            if let SessionTransport::Stdio { stdin } = &mut self.handle.transport {
+                stdin.take();
+            }
+            let mut output = String::new();
+            if let Some(mut stdout) = self.stdout.take() {
+                stdout.read_to_string(&mut output).await.unwrap();
+            }
+            output
+        }
+    }
+
+    // Re-wrap spawn_echo_process to return EchoHandle
+    fn echo() -> EchoHandle {
         let mut child = tokio::process::Command::new("findstr")
             .arg(".")
             .stdin(std::process::Stdio::piped())
@@ -235,16 +269,15 @@ mod tests {
         let stdin = child.stdin.take();
         let stdout = child.stdout.take();
 
-        SessionHandle {
-            child,
-            stdin,
+        EchoHandle {
+            handle: SessionHandle {
+                child,
+                pid,
+                transport: SessionTransport::Stdio { stdin },
+            },
             stdout,
-            stderr: None,
-            pid,
         }
     }
-
-    // ─── Behavior 2: ApprovalDecision::as_str ──────────────────────────────
 
     #[test]
     fn approval_decision_allow_as_str() {
@@ -260,8 +293,6 @@ mod tests {
     fn approval_decision_allow_for_session_as_str() {
         assert_eq!(ApprovalDecision::AllowForSession.as_str(), "allow_for_session");
     }
-
-    // ─── Behavior 6: ClaudeCodeProvider capabilities ───────────────────────
 
     #[test]
     fn capabilities_returns_all_true_for_claude_code() {
@@ -281,26 +312,17 @@ mod tests {
         );
     }
 
-    // ─── Behavior 4: respond_to_request sends correct JSON ─────────────────
-
     #[tokio::test]
     async fn respond_to_request_sends_control_response_allow() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
+        let mut eh = echo();
 
         provider
-            .respond_to_request(&mut handle, "req_123", &ApprovalDecision::Allow)
+            .respond_to_request(&mut eh.handle, "req_123", &ApprovalDecision::Allow)
             .await
             .unwrap();
 
-        // Close stdin so the echo process exits and we can read stdout
-        handle.stdin.take();
-
-        let mut output = String::new();
-        if let Some(mut stdout) = handle.stdout.take() {
-            stdout.read_to_string(&mut output).await.unwrap();
-        }
-
+        let output = eh.read_output().await;
         let parsed: serde_json::Value = serde_json::from_str(output.trim()).unwrap();
         assert_eq!(parsed["type"], "control_response");
         assert_eq!(parsed["request_id"], "req_123");
@@ -311,20 +333,14 @@ mod tests {
     #[tokio::test]
     async fn respond_to_request_sends_deny_decision() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
+        let mut eh = echo();
 
         provider
-            .respond_to_request(&mut handle, "req_456", &ApprovalDecision::Deny)
+            .respond_to_request(&mut eh.handle, "req_456", &ApprovalDecision::Deny)
             .await
             .unwrap();
 
-        handle.stdin.take();
-
-        let mut output = String::new();
-        if let Some(mut stdout) = handle.stdout.take() {
-            stdout.read_to_string(&mut output).await.unwrap();
-        }
-
+        let output = eh.read_output().await;
         let parsed: serde_json::Value = serde_json::from_str(output.trim()).unwrap();
         assert_eq!(parsed["response"]["decision"], "deny");
     }
@@ -332,44 +348,30 @@ mod tests {
     #[tokio::test]
     async fn respond_to_request_sends_allow_for_session_decision() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
+        let mut eh = echo();
 
         provider
-            .respond_to_request(&mut handle, "req_789", &ApprovalDecision::AllowForSession)
+            .respond_to_request(&mut eh.handle, "req_789", &ApprovalDecision::AllowForSession)
             .await
             .unwrap();
 
-        handle.stdin.take();
-
-        let mut output = String::new();
-        if let Some(mut stdout) = handle.stdout.take() {
-            stdout.read_to_string(&mut output).await.unwrap();
-        }
-
+        let output = eh.read_output().await;
         let parsed: serde_json::Value = serde_json::from_str(output.trim()).unwrap();
         assert_eq!(parsed["response"]["decision"], "allow_for_session");
     }
 
-    // ─── Behavior 5: respond_to_user_input sends correct JSON ──────────────
-
     #[tokio::test]
     async fn respond_to_user_input_sends_elicitation_response() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
+        let mut eh = echo();
 
         let answers = json!({"name": "test", "confirmed": true});
         provider
-            .respond_to_user_input(&mut handle, "req_eli_1", &answers)
+            .respond_to_user_input(&mut eh.handle, "req_eli_1", &answers)
             .await
             .unwrap();
 
-        handle.stdin.take();
-
-        let mut output = String::new();
-        if let Some(mut stdout) = handle.stdout.take() {
-            stdout.read_to_string(&mut output).await.unwrap();
-        }
-
+        let output = eh.read_output().await;
         let parsed: serde_json::Value = serde_json::from_str(output.trim()).unwrap();
         assert_eq!(parsed["type"], "control_response");
         assert_eq!(parsed["request_id"], "req_eli_1");
@@ -378,59 +380,48 @@ mod tests {
         assert_eq!(parsed["response"]["answers"]["confirmed"], true);
     }
 
-    // ─── Behavior 7: send_turn (renamed from send_message) ─────────────────
-
     #[tokio::test]
     async fn send_turn_sends_user_message_format() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
+        let mut eh = echo();
 
-        provider
-            .send_turn(&mut handle, "hello world")
-            .await
-            .unwrap();
+        provider.send_turn(&mut eh.handle, "hello world").await.unwrap();
 
-        handle.stdin.take();
-
-        let mut output = String::new();
-        if let Some(mut stdout) = handle.stdout.take() {
-            stdout.read_to_string(&mut output).await.unwrap();
-        }
-
+        let output = eh.read_output().await;
         let parsed: serde_json::Value = serde_json::from_str(output.trim()).unwrap();
         assert_eq!(parsed["type"], "user_message");
         assert_eq!(parsed["message"], "hello world");
     }
 
-    // ─── Behavior 8: NotRunning when stdin is None ──────────────────────────
-
     #[tokio::test]
     async fn respond_to_request_returns_not_running_when_stdin_gone() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
-        handle.stdin.take(); // Remove stdin
+        let mut eh = echo();
+        if let SessionTransport::Stdio { stdin } = &mut eh.handle.transport {
+            stdin.take();
+        }
 
         let result = provider
-            .respond_to_request(&mut handle, "req_x", &ApprovalDecision::Allow)
+            .respond_to_request(&mut eh.handle, "req_x", &ApprovalDecision::Allow)
             .await;
 
         assert!(result.is_err());
-        let error_message = result.unwrap_err().to_string();
-        assert_eq!(error_message, "session not running");
+        assert_eq!(result.unwrap_err().to_string(), "session not running");
     }
 
     #[tokio::test]
     async fn respond_to_user_input_returns_not_running_when_stdin_gone() {
         let provider = ClaudeCodeProvider::new();
-        let mut handle = spawn_echo_process();
-        handle.stdin.take(); // Remove stdin
+        let mut eh = echo();
+        if let SessionTransport::Stdio { stdin } = &mut eh.handle.transport {
+            stdin.take();
+        }
 
         let result = provider
-            .respond_to_user_input(&mut handle, "req_y", &json!({}))
+            .respond_to_user_input(&mut eh.handle, "req_y", &json!({}))
             .await;
 
         assert!(result.is_err());
-        let error_message = result.unwrap_err().to_string();
-        assert_eq!(error_message, "session not running");
+        assert_eq!(result.unwrap_err().to_string(), "session not running");
     }
 }
