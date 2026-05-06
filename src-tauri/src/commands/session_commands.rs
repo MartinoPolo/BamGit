@@ -14,7 +14,7 @@ use crate::session::discovery_polling::DiscoveryPoller;
 use crate::session::manager::SessionManager;
 use serde_json::Value;
 
-use crate::session::provider::{ActorCommand, ApprovalDecision, SpawnConfig};
+use crate::session::provider::{ActorCommand, ApprovalDecision, ProviderKind, SpawnConfig};
 
 const SESSION_SELECT_COLUMNS: &str =
     "id, issue_id, provider, state, pid, cli_session_id, started_at, ended_at, \
@@ -51,6 +51,8 @@ pub async fn spawn_session(
 ) -> Result<String, String> {
     let session_id = uuid::Uuid::new_v4().to_string();
 
+    let provider_kind = request.provider.unwrap_or_default();
+
     let config = SpawnConfig {
         prompt: request.prompt,
         working_directory: PathBuf::from(&request.working_directory),
@@ -61,21 +63,25 @@ pub async fn spawn_session(
         env_vars: HashMap::new(),
     };
 
+    let provider_str = match provider_kind {
+        ProviderKind::ClaudeCode => "claude-code",
+        ProviderKind::OpenCode => "open-code",
+    };
+
     let database_connection = open_actor_database_connection(&app_handle)?;
 
-    // Also create the session row in the main DB connection (for immediate visibility)
     {
         let conn = state.write()?;
         conn.execute(
             "INSERT INTO sessions (id, issue_id, provider, state, original_intent, source, working_directory) \
-             VALUES (?1, ?2, 'claude-code', 'running', ?3, 'spawned', ?4)",
-            rusqlite::params![session_id, request.issue_id, config.prompt, request.working_directory],
+             VALUES (?1, ?2, ?3, 'running', ?4, 'spawned', ?5)",
+            rusqlite::params![session_id, request.issue_id, provider_str, config.prompt, request.working_directory],
         )
         .map_err(|e| format!("Failed to create session row: {e}"))?;
     }
 
     if let Err(e) = manager
-        .spawn_session(session_id.clone(), config, app_handle, database_connection)
+        .spawn_session(session_id.clone(), config, provider_kind, app_handle, database_connection)
         .await
     {
         {
@@ -270,7 +276,13 @@ pub async fn adopt_session(
     }
 
     manager
-        .spawn_session(session_id.clone(), config, app_handle, database_connection)
+        .spawn_session(
+            session_id.clone(),
+            config,
+            ProviderKind::ClaudeCode,
+            app_handle,
+            database_connection,
+        )
         .await?;
 
     Ok(session_id)

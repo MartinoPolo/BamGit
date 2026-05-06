@@ -4,8 +4,24 @@ use std::path::PathBuf;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::process::{Child, ChildStdin};
+use tokio::sync::mpsc;
 use ts_rs::TS;
-use tokio::process::{Child, ChildStderr, ChildStdin, ChildStdout};
+
+/// Which provider backend to use for a session.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[ts(export)]
+#[serde(rename_all = "kebab-case")]
+pub enum ProviderKind {
+    ClaudeCode,
+    OpenCode,
+}
+
+impl Default for ProviderKind {
+    fn default() -> Self {
+        Self::ClaudeCode
+    }
+}
 
 /// Decision for responding to a tool-use permission prompt.
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -54,15 +70,25 @@ pub struct SpawnConfig {
     pub env_vars: HashMap<String, String>,
 }
 
-/// Handle to a running CLI child process.
-/// stdout/stderr are Option so the actor can take ownership for reading
-/// while the handle is still passed to provider methods for stdin/child access.
+/// Transport-specific data for provider operations.
+pub enum SessionTransport {
+    Stdio {
+        stdin: Option<ChildStdin>,
+    },
+    Http {
+        base_url: String,
+        opencode_session_id: String,
+        http_client: reqwest::Client,
+    },
+}
+
+/// Handle to a running provider process.
+/// The provider's `spawn` method also returns an event receiver — the actor
+/// reads unified `SessionEvent`s from that channel regardless of transport.
 pub struct SessionHandle {
     pub child: Child,
-    pub stdin: Option<ChildStdin>,
-    pub stdout: Option<ChildStdout>,
-    pub stderr: Option<ChildStderr>,
     pub pid: u32,
+    pub transport: SessionTransport,
 }
 
 /// Unified event type that all providers map their protocol to.
@@ -161,18 +187,30 @@ pub enum ProviderError {
     ParseError(String),
     #[error("session not running")]
     NotRunning,
+    #[error("http error: {0}")]
+    HttpError(String),
 }
 
-/// A provider adapter is an agent CLI backend (Claude Code, Codex, etc.).
-/// Each adapter knows how to spawn, communicate with, and control its CLI.
+/// A provider adapter is an agent CLI backend (Claude Code, OpenCode, etc.).
+/// Each adapter knows how to spawn, communicate with, and control its backend.
+///
+/// The `spawn` method returns both a handle (for sending commands) and an event
+/// receiver (for the actor to consume). The provider is responsible for pushing
+/// parsed `SessionEvent`s into the channel — the actor never reads raw transport.
 #[async_trait]
 pub trait ProviderAdapter: Send + Sync {
-    /// Spawn a new CLI process and return a handle for communication.
-    async fn spawn(&self, config: SpawnConfig) -> Result<SessionHandle, ProviderError>;
+    /// Spawn the provider process and return a handle + event stream.
+    async fn spawn(
+        &self,
+        config: SpawnConfig,
+    ) -> Result<(SessionHandle, mpsc::Receiver<SessionEvent>), ProviderError>;
 
-    /// Send a user turn (prompt) to a running session via stdin.
-    async fn send_turn(&self, handle: &mut SessionHandle, message: &str)
-        -> Result<(), ProviderError>;
+    /// Send a user turn (prompt) to a running session.
+    async fn send_turn(
+        &self,
+        handle: &mut SessionHandle,
+        message: &str,
+    ) -> Result<(), ProviderError>;
 
     /// Respond to a tool-use permission prompt with an approval decision.
     async fn respond_to_request(
@@ -197,9 +235,6 @@ pub trait ProviderAdapter: Send + Sync {
     /// Gracefully interrupt the current turn.
     async fn interrupt(&self, handle: &mut SessionHandle) -> Result<(), ProviderError>;
 
-    /// Kill the CLI process immediately.
+    /// Kill the provider process immediately.
     async fn terminate(&self, handle: &mut SessionHandle) -> Result<(), ProviderError>;
-
-    /// Parse a raw JSON line from stdout into zero or more SessionEvents.
-    fn parse_event(&self, raw: &Value) -> Result<Vec<SessionEvent>, ProviderError>;
 }

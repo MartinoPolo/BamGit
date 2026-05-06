@@ -333,7 +333,13 @@ pub async fn execute_action(
     };
 
     manager
-        .spawn_session(session_id.clone(), config, app_handle, database_connection)
+        .spawn_session(
+            session_id.clone(),
+            config,
+            crate::session::provider::ProviderKind::ClaudeCode,
+            app_handle,
+            database_connection,
+        )
         .await?;
 
     Ok(session_id)

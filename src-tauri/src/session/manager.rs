@@ -6,12 +6,12 @@ use tauri::AppHandle;
 use tokio::sync::{mpsc, Mutex};
 
 use super::claude_code_provider::ClaudeCodeProvider;
-use super::provider::{ActorCommand, ProviderAdapter, SpawnConfig};
+use super::opencode_provider::OpenCodeProvider;
+use super::provider::{ActorCommand, ProviderAdapter, ProviderKind, SpawnConfig};
 use super::session_actor;
 
 /// Registry of active session actors. Managed as Tauri state.
 pub struct SessionManager {
-    /// Maps session_id -> mpsc sender for sending commands to the actor.
     actors: Arc<Mutex<HashMap<String, mpsc::Sender<ActorCommand>>>>,
 }
 
@@ -22,22 +22,29 @@ impl SessionManager {
         }
     }
 
-    /// Spawn the CLI process, start an actor task, and register it.
+    fn create_provider(kind: ProviderKind) -> Box<dyn ProviderAdapter> {
+        match kind {
+            ProviderKind::ClaudeCode => Box::new(ClaudeCodeProvider::new()),
+            ProviderKind::OpenCode => Box::new(OpenCodeProvider::new()),
+        }
+    }
+
+    /// Spawn the provider process, start an actor task, and register it.
     /// Caller is responsible for creating the DB row first.
     pub async fn spawn_session(
         &self,
         session_id: String,
         config: SpawnConfig,
+        provider_kind: ProviderKind,
         app_handle: AppHandle,
         database_connection: Arc<StdMutex<Connection>>,
     ) -> Result<String, String> {
-        let provider = ClaudeCodeProvider::new();
-        let handle = provider
+        let provider = Self::create_provider(provider_kind);
+        let (handle, event_receiver) = provider
             .spawn(config)
             .await
             .map_err(|e| format!("Failed to spawn session: {e}"))?;
 
-        // Update PID in DB
         {
             let conn = database_connection.lock().map_err(|e| e.to_string())?;
             let _ = conn.execute(
@@ -59,14 +66,14 @@ impl SessionManager {
             session_actor::run_actor(
                 actor_session_id.clone(),
                 handle,
-                Box::new(provider),
+                provider,
+                event_receiver,
                 app_handle,
                 database_connection,
                 command_receiver,
             )
             .await;
 
-            // Remove from actor registry on completion
             let mut actors = actors_ref.lock().await;
             actors.remove(&actor_session_id);
         });

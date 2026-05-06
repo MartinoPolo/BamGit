@@ -2,10 +2,8 @@ use std::sync::Mutex as StdMutex;
 
 use rusqlite::Connection;
 use serde::Serialize;
-use serde_json::Value;
 use ts_rs::TS;
 use tauri::{AppHandle, Emitter, Manager};
-use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
 use super::provider::{ActorCommand, ProviderAdapter, SessionEvent, SessionHandle};
@@ -22,54 +20,24 @@ pub struct SessionEventPayload {
 }
 
 /// Runs the session actor loop as a tokio task.
-/// Reads stdout line-by-line, parses events, emits to frontend, updates DB.
+/// Reads parsed events from the provider's event channel (transport-agnostic).
 pub async fn run_actor(
     session_id: String,
     mut handle: SessionHandle,
     provider: Box<dyn ProviderAdapter>,
+    mut event_receiver: mpsc::Receiver<SessionEvent>,
     app_handle: AppHandle,
     database_connection: std::sync::Arc<StdMutex<Connection>>,
     mut command_receiver: mpsc::Receiver<ActorCommand>,
 ) {
-    // Take stdout/stderr from handle — actor owns them for reading.
-    // handle retains stdin + child for provider methods.
-    let stdout = match handle.stdout.take() {
-        Some(s) => s,
-        None => {
-            log::error!("Session {session_id}: no stdout available");
-            return;
-        }
-    };
-
-    let mut stdout_reader = BufReader::new(stdout).lines();
-
-    // stderr is optional — if not available, we just skip it
-    let mut stderr_reader = handle.stderr.take().map(|s| BufReader::new(s).lines());
-
     loop {
         tokio::select! {
-            line = stdout_reader.next_line() => {
-                match line {
-                    Ok(Some(line)) => {
-                        if let Ok(raw) = serde_json::from_str::<Value>(&line) {
-                            match provider.parse_event(&raw) {
-                                Ok(events) => {
-                                    for event in events {
-                                        handle_event(
-                                            &session_id,
-                                            &event,
-                                            &app_handle,
-                                            &database_connection,
-                                        );
-                                    }
-                                }
-                                Err(e) => {
-                                    log::warn!("Parse error for session {session_id}: {e}");
-                                }
-                            }
-                        }
+            event = event_receiver.recv() => {
+                match event {
+                    Some(event) => {
+                        handle_event(&session_id, &event, &app_handle, &database_connection);
                     }
-                    Ok(None) => {
+                    None => {
                         let exit_event = SessionEvent::RunState {
                             state: "finished".into(),
                             error: None,
@@ -78,32 +46,6 @@ pub async fn run_actor(
                         update_session_ended(&session_id, &database_connection);
                         break;
                     }
-                    Err(e) => {
-                        log::error!("Stdout read error for session {session_id}: {e}");
-                        let error_event = SessionEvent::RunState {
-                            state: "errored".into(),
-                            error: Some(e.to_string()),
-                        };
-                        handle_event(&session_id, &error_event, &app_handle, &database_connection);
-                        update_session_ended(&session_id, &database_connection);
-                        break;
-                    }
-                }
-            }
-
-            // Read stderr lines (for debug/raw events) — only if stderr is available
-            line = async {
-                match stderr_reader.as_mut() {
-                    Some(reader) => reader.next_line().await,
-                    None => std::future::pending().await,
-                }
-            } => {
-                if let Ok(Some(line)) = line {
-                    let raw_event = SessionEvent::Raw {
-                        source: "stderr".into(),
-                        data: Value::String(line),
-                    };
-                    emit_event(&session_id, &raw_event, &app_handle, None);
                 }
             }
 
@@ -130,8 +72,6 @@ pub async fn run_actor(
                         if let Err(e) = provider.interrupt(&mut handle).await {
                             log::error!("Failed to interrupt session {session_id}: {e}");
                         } else {
-                            // Set paused state immediately — the CLI will emit
-                            // result(idle) later which transitions to needs-review
                             update_session_state(&session_id, &SessionState::Paused, &database_connection);
                             let pause_event = SessionEvent::RunState {
                                 state: "paused".into(),
@@ -153,7 +93,6 @@ pub async fn run_actor(
                         break;
                     }
                     None => {
-                        // Channel closed — manager dropped
                         break;
                     }
                 }

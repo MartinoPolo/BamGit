@@ -86,6 +86,7 @@ pub struct SpawnSessionRequest {
     pub issue_id: Option<String>,
     pub permission_mode: Option<String>,
     pub model: Option<String>,
+    pub provider: Option<crate::session::provider::ProviderKind>,
 }
 
 #[cfg(test)]
