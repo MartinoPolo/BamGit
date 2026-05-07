@@ -29,7 +29,6 @@ export default defineConfig({
 	server: {
 		port: 1420,
 		open: true,
-		strictPort: true,
 		host: host || false,
 		hmr: host
 			? {
