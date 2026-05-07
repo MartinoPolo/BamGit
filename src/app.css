@@ -378,6 +378,19 @@
 	animation: shimmer 2s infinite linear;
 }
 
+.gk-card-gradient-tint::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: linear-gradient(
+		180deg,
+		color-mix(in oklch, var(--gk-card-tint-color) 8%, transparent) 0%,
+		transparent 60%
+	);
+	pointer-events: none;
+}
+
 /* ── Issue card state rings (box-shadow, referencing --ic per-card) ──── */
 
 .card-ic-interactive:hover,
