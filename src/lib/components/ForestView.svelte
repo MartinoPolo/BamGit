@@ -101,6 +101,7 @@
 		readonly result: TreeVisualization;
 	}
 
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive perf cache
 	const visualizationCache = new Map<string, VisualizationCacheEntry>();
 
 	// fallow-ignore-next-line complexity
@@ -159,6 +160,7 @@
 	// fallow-ignore-next-line complexity
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const visualizations = new SvelteMap<string, TreeVisualization>();
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local to derived, not persisted
 		const activeIds = new Set<string>();
 
 		for (const issue of issues) {

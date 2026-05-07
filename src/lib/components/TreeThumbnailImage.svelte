@@ -1,4 +1,5 @@
 <script lang="ts" module>
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive perf cache
 	const thumbnailCache = new Map<string, string>();
 </script>
 
@@ -45,7 +46,7 @@
 
 	$effect(() => {
 		const cached = thumbnailCache.get(cacheKey);
-		if (cached) {
+		if (cached !== undefined) {
 			imageUrl = cached;
 			return;
 		}

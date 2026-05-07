@@ -467,6 +467,7 @@
 		}
 	}
 
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive perf cache
 	const cardVisualizationCache = new Map<
 		string,
 		{ fingerprint: string; result: TreeVisualization }
