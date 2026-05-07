@@ -396,12 +396,13 @@
 				<div class="flex flex-wrap items-center gap-1">
 					{#each issue.labels as label (label.name)}
 						<SimpleTooltip text={label.name}>
-							<span
-								class="inline-block rounded-full px-1.5 py-px text-[10px] font-medium leading-3"
-								style="background-color: {label.color}33; color: {label.color}; border: 1px solid {label.color}44;"
+							<Badge
+								size="compact"
+								class="rounded-full py-px leading-3"
+								style="background-color: {label.color}33; color: {label.color}; border-color: {label.color}44;"
 							>
 								{label.name}
-							</span>
+							</Badge>
 						</SimpleTooltip>
 					{/each}
 				</div>

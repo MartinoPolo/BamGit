@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { HelpText } from '$lib/components/ui/help-text/index.js';
 	import { onMount } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import { generateBranchName } from '$lib/modules/creation-wizard';
@@ -55,11 +56,9 @@
 		oninput={() => (showError = false)}
 	/>
 	{#if showError}
-		<p class="text-xs text-destructive">{m.wizard_name_required()}</p>
+		<HelpText status="error" class="mt-0">{m.wizard_name_required()}</HelpText>
 	{/if}
 	{#if branchPreview}
-		<p class="text-xs text-muted-foreground">
-			{m.wizard_branch_preview({ branch: branchPreview })}
-		</p>
+		<HelpText class="mt-0">{m.wizard_branch_preview({ branch: branchPreview })}</HelpText>
 	{/if}
 </div>
