@@ -165,7 +165,15 @@ pub enum SessionEvent {
         input_tokens: u64,
         #[ts(type = "number")]
         output_tokens: u64,
+        #[ts(type = "number")]
+        cache_read_tokens: u64,
+        #[ts(type = "number")]
+        cache_write_tokens: u64,
         cost_usd: f64,
+        #[ts(type = "number | null")]
+        duration_ms: Option<u64>,
+        #[ts(type = "number | null")]
+        num_turns: Option<u32>,
     },
     PermissionPrompt {
         request_id: String,

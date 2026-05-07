@@ -1,6 +1,7 @@
 #[macro_use]
 mod macros;
 
+pub mod achievement;
 pub mod action;
 pub mod app_setting;
 pub mod color_palette;
@@ -11,6 +12,7 @@ pub mod issue;
 pub mod issue_dependency;
 pub mod keyboard_shortcut;
 pub mod label_shape_mapping;
+pub mod metrics;
 pub mod notification;
 pub mod overview;
 pub mod portfolio;
