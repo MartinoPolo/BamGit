@@ -68,7 +68,7 @@ export function buildUpdateIssueRequest(
 export function buildCreateDashboardRequest(
 	name: string,
 	dashboardType: 'repo' | 'portfolio',
-	colorPaletteId: string | null,
+	accentColor: string,
 	githubRepo: string,
 	localFolder: string,
 	defaultBaseBranch: string,
@@ -82,11 +82,8 @@ export function buildCreateDashboardRequest(
 	const request: CreateDashboardRequest = {
 		name: trimmedName,
 		type: dashboardType,
+		accent_color: accentColor,
 	};
-
-	if (colorPaletteId !== null) {
-		request.color_palette_id = colorPaletteId;
-	}
 
 	if (dashboardType === 'repo') {
 		request.github_repo = trimOrNull(githubRepo) ?? undefined;
@@ -101,7 +98,7 @@ export function buildCreateDashboardRequest(
 export function buildUpdateDashboardRequest(
 	dashboard: { id: string; type: string } | null,
 	name: string,
-	colorPaletteId: string | null,
+	accentColor: string | null,
 	githubRepo: string,
 	localFolder: string,
 	defaultBaseBranch: string,
@@ -114,7 +111,7 @@ export function buildUpdateDashboardRequest(
 	const request: UpdateDashboardRequest = {
 		id: dashboard.id,
 		name: name.trim(),
-		color_palette_id: colorPaletteId,
+		accent_color: accentColor,
 	};
 
 	if (dashboard.type === 'repo') {

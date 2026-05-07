@@ -172,14 +172,12 @@
 <DashboardCreateDialog
 	open={boardStore.showCreateDialog}
 	repoDashboards={boardStore.repoDashboards}
-	colorPalettes={boardStore.palettes}
 	onClose={() => (boardStore.showCreateDialog = false)}
 	onCreate={handleCreateDashboard}
 />
 
 <DashboardEditDialog
 	dashboard={editingDashboard}
-	colorPalettes={boardStore.palettes}
 	onClose={() => (editingDashboard = null)}
 	onUpdate={handleUpdateDashboard}
 	onDelete={handleDeleteDashboard}

@@ -9,6 +9,7 @@ pub struct OverviewWorkspaceData {
     pub github_repo: Option<String>,
     pub local_folder: Option<String>,
     pub color_palette_id: Option<String>,
+    pub accent_color: Option<String>,
     #[ts(type = "number")]
     pub open_issue_count: i64,
     #[ts(type = "number")]

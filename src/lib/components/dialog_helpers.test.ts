@@ -104,21 +104,16 @@ describe('buildUpdateIssueRequest', () => {
 });
 
 describe('buildCreateDashboardRequest', () => {
-	it('builds minimal repo request', () => {
-		const result = buildCreateDashboardRequest('My Repo', 'repo', null, '', '', '', '');
-		expect(result).toEqual({ name: 'My Repo', type: 'repo' });
-	});
-
-	it('includes palette id when provided', () => {
-		const result = buildCreateDashboardRequest('My Repo', 'repo', 'pal-1', '', '', '', '');
-		expect(result?.color_palette_id).toBe('pal-1');
+	it('builds repo request with accent color', () => {
+		const result = buildCreateDashboardRequest('My Repo', 'repo', '#62874b', '', '', '', '');
+		expect(result).toEqual({ name: 'My Repo', type: 'repo', accent_color: '#62874b' });
 	});
 
 	it('includes repo-specific fields for repo type', () => {
 		const result = buildCreateDashboardRequest(
 			'My Repo',
 			'repo',
-			null,
+			'#62874b',
 			'owner/repo',
 			'/local',
 			'main',
@@ -134,7 +129,7 @@ describe('buildCreateDashboardRequest', () => {
 		const result = buildCreateDashboardRequest(
 			'Portfolio',
 			'portfolio',
-			null,
+			'#62874b',
 			'owner/repo',
 			'/local',
 			'main',
@@ -145,7 +140,7 @@ describe('buildCreateDashboardRequest', () => {
 	});
 
 	it('returns null for empty name', () => {
-		expect(buildCreateDashboardRequest('', 'repo', null, '', '', '', '')).toBeNull();
+		expect(buildCreateDashboardRequest('', 'repo', '#62874b', '', '', '', '')).toBeNull();
 	});
 });
 
@@ -157,7 +152,7 @@ describe('buildUpdateDashboardRequest', () => {
 		const result = buildUpdateDashboardRequest(
 			repoDashboard,
 			'Updated',
-			'pal-1',
+			'#62874b',
 			'owner/repo',
 			'/local',
 			'main',
@@ -166,7 +161,7 @@ describe('buildUpdateDashboardRequest', () => {
 		expect(result).toEqual({
 			id: 'dash-1',
 			name: 'Updated',
-			color_palette_id: 'pal-1',
+			accent_color: '#62874b',
 			github_repo: 'owner/repo',
 			local_folder: '/local',
 			default_base_branch: 'main',

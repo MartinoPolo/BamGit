@@ -21,6 +21,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             default_base_branch TEXT,
             worktree_parent_folder TEXT,
             color_palette_id TEXT REFERENCES color_palettes(id),
+            accent_color TEXT,
             default_shape TEXT NOT NULL DEFAULT 'cherry',
             priorities_enabled INTEGER NOT NULL DEFAULT 1
         );

@@ -3,23 +3,22 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
-	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
+	import GithubIcon from './icons/GithubIcon.svelte';
+	import FolderIcon from '@lucide/svelte/icons/folder';
 	import CircleAlertIcon from '@lucide/svelte/icons/circle-alert';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
-	import type { OverviewWorkspaceData, ColorPalette } from '$lib/types/generated';
+	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	interface Props {
 		workspace: OverviewWorkspaceData;
-		palette: ColorPalette | null;
 		onclick: () => void;
 		onGithubClick?: () => void;
 		onFolderClick?: () => void;
 	}
 
-	let { workspace, palette, onclick, onGithubClick, onFolderClick }: Props = $props();
+	let { workspace, onclick, onGithubClick, onFolderClick }: Props = $props();
 
-	const accentColor = $derived(palette?.colors[0] ?? '#6b7280');
+	const accentColor = $derived(workspace.accent_color ?? '#6b7280');
 
 	function formatRelativeTime(isoString: string | null): string {
 		if (isoString == null) {
@@ -83,7 +82,7 @@
 								onGithubClick?.();
 							}}
 						>
-							<ExternalLinkIcon class="size-3.5" />
+							<GithubIcon size={14} strokeWidth={1.7} />
 						</Button>
 					{/if}
 					{#if workspace.local_folder}
@@ -96,7 +95,7 @@
 								onFolderClick?.();
 							}}
 						>
-							<FolderOpenIcon class="size-3.5" />
+							<FolderIcon size={14} strokeWidth={1.7} />
 						</Button>
 					{/if}
 				</div>
