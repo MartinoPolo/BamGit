@@ -35,7 +35,7 @@ When multiple sessions exist for the issue, the user must be able to switch betw
 
 Always visible for the active session (without scrolling):
 
-- **Session state badge**: running / needs-input / needs-review / paused / finished / errored
+- **Session state badge**: running / needs-input / needs-review / stopped / finished / errored
 - **Provider icon** — which AI tool
 - **Model name** — short (e.g., "Opus 4.7")
 - **Session cost** — USD
@@ -47,9 +47,9 @@ Shows the tail end of the session — enough to see what happened recently:
 
 - Last 2-4 messages (user + assistant), vertically stacked
 - Messages truncated if long (single-line or 2-line clip with fade)
-- Tool calls shown as single-line compact entries (icon + name + status), not full cards
+- Tool calls shown as single-line compact entries (icon + name + status), not full cards. Header height follows the shared 36px tool card header standard from `SESSION_CHAT_VIEW.md`
 - "Needs input" state: approval card visible inline (Allow / Deny) — this must be actionable from the bottom panel
-- Content before the last exchange visually dimmed
+- Content before the last exchange visually dimmed (`opacity: 0.4`), restores to full opacity on hover (`150ms ease-out` transition, entire turn restores as a unit)
 
 ### Chat Input
 
@@ -71,6 +71,7 @@ Shows the tail end of the session — enough to see what happened recently:
 - Input must be pinned to the bottom — never scrolls away
 - Message preview should use remaining space between status summary and input
 - Dark theme primary
+- All buttons use `.gk-btn-sm` (26px height), badges use `.gk-badge` (20px height), inputs use `.gk-input` (32px height) — no inline height overrides. Matches the standardized sizing from the session chat view update.
 
 ## States to Explore in Variants
 
