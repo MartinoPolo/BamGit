@@ -27,8 +27,7 @@
 	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
 	import { PRIORITY_BADGE_CLASSES, issueExpandedStates } from './issue_card_utils.js';
 	import type { TreeVisualization } from '$lib/modules/visualization';
-	import { LowPolyTree, PottedPlant, DEFAULT_TREE_CONFIG } from 'low-poly-2d-trees';
-	import type { TreeConfig } from 'low-poly-2d-trees';
+	import TreeThumbnailImage from './TreeThumbnailImage.svelte';
 
 	interface Props {
 		issue: Issue;
@@ -120,18 +119,6 @@
 			return isModifierHeld ? CARD_STATE_CLASSES.selectionHover : CARD_STATE_CLASSES.hovered;
 		}
 		return '';
-	});
-
-	const thumbnailOakConfig = $derived.by((): TreeConfig | null => {
-		if (visualization?.kind !== 'oak') {
-			return null;
-		}
-		return {
-			...DEFAULT_TREE_CONFIG,
-			shape: 'oak',
-			stage: 'leafy',
-			seed: visualization.seed,
-		};
 	});
 
 	const priorityChipClass = $derived(
@@ -313,17 +300,9 @@
 					></span>
 				</SimpleTooltip>
 			{/if}
-			{#if visualization?.kind === 'tree'}
+			{#if visualization}
 				<div class="absolute inset-0">
-					<LowPolyTree config={visualization.config} />
-				</div>
-			{:else if visualization?.kind === 'potted-plant'}
-				<div class="absolute inset-0">
-					<PottedPlant stage={visualization.stage} seed={visualization.seed} />
-				</div>
-			{:else if visualization?.kind === 'oak' && thumbnailOakConfig}
-				<div class="absolute inset-0">
-					<LowPolyTree config={thumbnailOakConfig} />
+					<TreeThumbnailImage {visualization} />
 				</div>
 			{:else}
 				<div class="mb-4 size-6 rounded-full bg-foreground/20"></div>
