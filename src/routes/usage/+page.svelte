@@ -403,7 +403,7 @@
 							<div
 								class={cn(
 									'flex items-center gap-3 rounded-lg border p-3 transition-colors',
-									achievement.unlocked_at
+									achievement.unlocked_at !== null
 										? 'border-primary/30 bg-primary/5'
 										: 'opacity-50',
 								)}
@@ -411,13 +411,15 @@
 								<div
 									class={cn(
 										'flex size-10 shrink-0 items-center justify-center rounded-lg text-lg',
-										achievement.unlocked_at ? 'bg-primary/10' : 'bg-muted',
+										achievement.unlocked_at !== null
+											? 'bg-primary/10'
+											: 'bg-muted',
 									)}
 								>
 									<TrophyIcon
 										class={cn(
 											'size-5',
-											achievement.unlocked_at
+											achievement.unlocked_at !== null
 												? 'text-primary'
 												: 'text-muted-foreground',
 										)}
