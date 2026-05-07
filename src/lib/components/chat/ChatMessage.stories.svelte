@@ -13,10 +13,8 @@
 </script>
 
 <script lang="ts">
-	import type { ChatMessage as ChatMessageType } from '$lib/modules/chat/index.js';
 	import ContentDimmer from './ContentDimmer.svelte';
 	import StreamingCaret from './StreamingCaret.svelte';
-	import CodeBlock from './CodeBlock.svelte';
 	import SystemMessage from './SystemMessage.svelte';
 	import InlineImage from './InlineImage.svelte';
 </script>
@@ -200,22 +198,6 @@
 				}}
 				streaming={true}
 			/>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="CodeBlock Component">
-	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-4">
-			<CodeBlock
-				language="typescript"
-				code={`export interface Provider {\n  spawn(): Promise<Session>;\n  sendMessage(msg: string): Promise<void>;\n  handleToolResult(id: string, result: unknown): Promise<void>;\n}`}
-			/>
-			<CodeBlock
-				language="bash"
-				code={`$ cargo test --workspace\n   Compiling grovekeeper v0.8.0\nrunning 24 tests...\ntest providers::claude_code::tests::test_spawn ... ok\ntest providers::opencode::tests::test_auth ... ok`}
-			/>
-			<CodeBlock code="plain text without language label" />
 		</div>
 	{/snippet}
 </Story>

@@ -9,8 +9,8 @@ const marked = new Marked({
 			return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 		},
 		code({ text, lang }) {
-			const langClass = lang ? ` class="language-${lang}"` : '';
-			const langAttr = lang ? ` data-language="${lang}"` : '';
+			const langClass = lang != null ? ` class="language-${lang}"` : '';
+			const langAttr = lang != null ? ` data-language="${lang}"` : '';
 			return `<pre${langAttr}><code${langClass}>${escapeHtml(text)}</code></pre>`;
 		},
 	},

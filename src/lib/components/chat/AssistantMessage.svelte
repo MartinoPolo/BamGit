@@ -16,6 +16,7 @@
 	{#if streaming}
 		<span class="whitespace-pre-wrap">{content}</span><StreamingCaret />
 	{:else}
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html renderedHtml}
 	{/if}
 </div>
