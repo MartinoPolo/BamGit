@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, SessionEventPayload } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
 	import {
@@ -15,20 +14,22 @@
 	} from '$lib/modules/chat/index.js';
 	import { listen, type UnlistenFn } from '$lib/tauri.js';
 	import { onMount, onDestroy, tick } from 'svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import {
 		ChatMessage as ChatMessageComponent,
 		ContentDimmer,
 		QuickNavButtons,
 		AssistantMessage,
 	} from '$lib/components/chat/index.js';
+	import SessionTopBar from '$lib/components/session/SessionTopBar.svelte';
+	import SessionSidebar from '$lib/components/session/SessionSidebar.svelte';
+	import FloatingInputPanel from '$lib/components/session/FloatingInputPanel.svelte';
 
 	interface Props {
 		session: Session;
+		onBack?: () => void;
 	}
 
-	let { session }: Props = $props();
+	let { session, onBack }: Props = $props();
 
 	const sessionStore = useSessions();
 
@@ -188,104 +189,99 @@
 	}
 </script>
 
-<div class="flex h-full flex-col">
-	<!-- Message stream -->
-	<div
-		class="relative flex-1 overflow-y-auto"
-		bind:this={scrollContainer}
-		onscroll={updateScrollPosition}
-	>
-		<div class="mx-auto max-w-[900px] px-6 pb-36 pt-4">
-			<div class="flex flex-col gap-2.5">
-				{#each turns as turn, turnIndex (turn.id)}
-					{@const isDimmed =
-						lastUserMessageTurnIndex > 0 && turnIndex < lastUserMessageTurnIndex}
-					<ContentDimmer dimmed={isDimmed}>
-						{#each turn.systemMessages as sysMsg (sysMsg.id)}
-							<div data-message-index={messages.indexOf(sysMsg)}>
-								<ChatMessageComponent message={sysMsg} />
-							</div>
-						{/each}
-						{#if turn.userMessage !== null}
-							<div data-message-index={messages.indexOf(turn.userMessage)}>
-								<ChatMessageComponent message={turn.userMessage} />
-							</div>
-						{/if}
-						{#each turn.assistantMessages as assistantMsg, assistantIndex (assistantMsg.id)}
-							<div data-message-index={messages.indexOf(assistantMsg)}>
-								<ChatMessageComponent message={assistantMsg} />
-							</div>
-							{@const toolsBefore = turn.toolMessages.filter(
-								(t) =>
-									t.timestamp >= assistantMsg.timestamp &&
-									(assistantIndex + 1 >= turn.assistantMessages.length ||
-										t.timestamp <
-											turn.assistantMessages[assistantIndex + 1].timestamp),
-							)}
-							{#each toolsBefore as toolMsg (toolMsg.id)}
-								<div data-message-index={messages.indexOf(toolMsg)}>
-									<ChatMessageComponent message={toolMsg} />
-								</div>
-							{/each}
-						{/each}
-						{#if turn.assistantMessages.length === 0}
-							{#each turn.toolMessages as toolMsg (toolMsg.id)}
-								<div data-message-index={messages.indexOf(toolMsg)}>
-									<ChatMessageComponent message={toolMsg} />
-								</div>
-							{/each}
-						{/if}
-					</ContentDimmer>
-				{/each}
+<div class="flex h-full flex-col overflow-hidden">
+	<!-- Top bar -->
+	<SessionTopBar {session} {onBack} />
 
-				<!-- Streaming text -->
-				{#if currentStreamingText}
-					<div>
-						<AssistantMessage content={currentStreamingText} streaming={true} />
+	<div class="flex flex-1 overflow-hidden">
+		<!-- Chat column -->
+		<div class="relative flex flex-1 flex-col overflow-hidden">
+			<!-- Message stream -->
+			<div
+				class="relative flex-1 overflow-y-auto"
+				bind:this={scrollContainer}
+				onscroll={updateScrollPosition}
+			>
+				<div class="mx-auto max-w-[900px] px-6 pb-36 pt-4">
+					<div class="flex flex-col gap-2.5">
+						{#each turns as turn, turnIndex (turn.id)}
+							{@const isDimmed =
+								lastUserMessageTurnIndex > 0 &&
+								turnIndex < lastUserMessageTurnIndex}
+							<ContentDimmer dimmed={isDimmed}>
+								{#each turn.systemMessages as sysMsg (sysMsg.id)}
+									<div data-message-index={messages.indexOf(sysMsg)}>
+										<ChatMessageComponent message={sysMsg} />
+									</div>
+								{/each}
+								{#if turn.userMessage !== null}
+									<div data-message-index={messages.indexOf(turn.userMessage)}>
+										<ChatMessageComponent message={turn.userMessage} />
+									</div>
+								{/if}
+								{#each turn.assistantMessages as assistantMsg, assistantIndex (assistantMsg.id)}
+									<div data-message-index={messages.indexOf(assistantMsg)}>
+										<ChatMessageComponent message={assistantMsg} />
+									</div>
+									{@const toolsBefore = turn.toolMessages.filter(
+										(t) =>
+											t.timestamp >= assistantMsg.timestamp &&
+											(assistantIndex + 1 >= turn.assistantMessages.length ||
+												t.timestamp <
+													turn.assistantMessages[assistantIndex + 1]
+														.timestamp),
+									)}
+									{#each toolsBefore as toolMsg (toolMsg.id)}
+										<div data-message-index={messages.indexOf(toolMsg)}>
+											<ChatMessageComponent message={toolMsg} />
+										</div>
+									{/each}
+								{/each}
+								{#if turn.assistantMessages.length === 0}
+									{#each turn.toolMessages as toolMsg (toolMsg.id)}
+										<div data-message-index={messages.indexOf(toolMsg)}>
+											<ChatMessageComponent message={toolMsg} />
+										</div>
+									{/each}
+								{/if}
+							</ContentDimmer>
+						{/each}
+
+						<!-- Streaming text -->
+						{#if currentStreamingText}
+							<div>
+								<AssistantMessage content={currentStreamingText} streaming={true} />
+							</div>
+						{/if}
 					</div>
-				{/if}
+				</div>
+
+				<!-- Quick nav buttons -->
+				<QuickNavButtons
+					{showJumpToPrompt}
+					{showJumpToResponse}
+					onJumpToPrompt={() => scrollToLastMessage('user')}
+					onJumpToResponse={() => scrollToLastMessage('assistant')}
+				/>
+
+				<!-- Gradient fade -->
+				<div
+					class="pointer-events-none sticky bottom-0 -mt-[120px] h-[120px] bg-gradient-to-b from-transparent to-background"
+				></div>
 			</div>
-		</div>
 
-		<!-- Quick nav buttons -->
-		<QuickNavButtons
-			{showJumpToPrompt}
-			{showJumpToResponse}
-			onJumpToPrompt={() => scrollToLastMessage('user')}
-			onJumpToResponse={() => scrollToLastMessage('assistant')}
-		/>
-
-		<!-- Gradient fade -->
-		<div
-			class="pointer-events-none sticky bottom-0 -mt-[120px] h-[120px] bg-gradient-to-b from-transparent to-background"
-		></div>
-	</div>
-
-	<!-- Input bar -->
-	<div class="border-t border-border p-3">
-		<div class="mx-auto flex max-w-[900px] items-center gap-2">
-			{#if session.state === 'running'}
-				<Button
-					variant="secondary"
-					size="sm"
-					class="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
-					onclick={handleInterrupt}
-				>
-					{m.chat_interrupt()}
-				</Button>
-			{/if}
-
-			<Input
-				class="flex-1"
-				placeholder={isActive ? m.chat_placeholder_active() : m.chat_placeholder_ended()}
+			<!-- Floating input panel -->
+			<FloatingInputPanel
+				{session}
 				bind:value={promptInput}
-				onkeydown={handleKeydown}
 				disabled={!isActive}
+				onSend={handleSend}
+				onStop={handleInterrupt}
+				onKeydown={handleKeydown}
 			/>
-
-			<Button class="shrink-0" onclick={handleSend} disabled={!canSend}>
-				{m.chat_send()}
-			</Button>
 		</div>
+
+		<!-- Right sidebar -->
+		<SessionSidebar {session} contextPercent={54} quota5hPercent={42} quota7dPercent={18} />
 	</div>
 </div>

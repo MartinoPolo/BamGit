@@ -84,18 +84,8 @@
 
 {#if selectedSession}
 	<!-- Chat view for selected session -->
-	<div class="flex h-full flex-col">
-		<div class="flex items-center gap-3 border-b border-border px-4 py-3">
-			<Button variant="ghost" size="sm" onclick={handleBack}>
-				{m.session_back()}
-			</Button>
-			<h2 class="truncate text-sm font-medium text-foreground">
-				{selectedSession.original_intent ?? m.session_fallback_title()}
-			</h2>
-		</div>
-		<div class="flex-1">
-			<SessionChatView session={selectedSession} />
-		</div>
+	<div class="h-full">
+		<SessionChatView session={selectedSession} onBack={handleBack} />
 	</div>
 {:else}
 	<!-- Session list -->
