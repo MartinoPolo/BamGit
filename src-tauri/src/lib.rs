@@ -128,6 +128,8 @@ pub fn run() {
             issue_commands::delete_issue,
             issue_commands::archive_issue,
             issue_commands::unarchive_issue,
+            issue_commands::update_issue_character,
+            issue_commands::toggle_issue_sound_mute,
             portfolio_commands::add_repo_to_portfolio,
             portfolio_commands::remove_repo_from_portfolio,
             portfolio_commands::get_portfolio_repos,

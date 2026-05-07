@@ -37,10 +37,12 @@ impl NotificationService {
     }
 
     /// Fire notifications for a session state change event.
+    /// If issue_id is provided, checks is_sound_muted on the issue.
     pub fn notify(
         &self,
         event_type: NotificationEventType,
         session_id: &str,
+        issue_id: Option<&str>,
         message: &str,
         app_handle: &AppHandle,
         database_connection: &std::sync::Arc<Mutex<Connection>>,
@@ -56,11 +58,15 @@ impl NotificationService {
             }
         };
 
+        let issue_muted = issue_id
+            .and_then(|id| self.is_issue_sound_muted(id, database_connection))
+            .unwrap_or(false);
+
         if config.toast_enabled {
             self.send_toast(event_type, message, app_handle);
         }
 
-        if config.sound_enabled {
+        if config.sound_enabled && !issue_muted {
             if let Some(ref sound_file) = config.sound_file {
                 self.enqueue_sound(sound_file, event_type, session_id, app_handle, database_connection);
             }
@@ -189,6 +195,21 @@ impl NotificationService {
                 |row| row.get::<_, f64>(0),
             )
             .unwrap_or(1.0)
+    }
+
+    fn is_issue_sound_muted(
+        &self,
+        issue_id: &str,
+        database_connection: &std::sync::Arc<Mutex<Connection>>,
+    ) -> Option<bool> {
+        let connection = database_connection.lock().ok()?;
+        connection
+            .query_row(
+                "SELECT is_sound_muted FROM issues WHERE id = ?1",
+                [issue_id],
+                |row| row.get::<_, bool>(0),
+            )
+            .ok()
     }
 
     fn request_attention(&self, event_type: NotificationEventType, app_handle: &AppHandle) {

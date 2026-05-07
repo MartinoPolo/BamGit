@@ -47,7 +47,10 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             browser_url TEXT,
             labels TEXT,
             sort_order INTEGER NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            character_pack_id TEXT,
+            character_avatar TEXT,
+            is_sound_muted INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS portfolio_dashboard_pointers (

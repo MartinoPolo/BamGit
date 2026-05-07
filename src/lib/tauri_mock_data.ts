@@ -93,6 +93,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"auth","color":"#ef4444"},{"name":"security","color":"#f59e0b"}]',
 		sort_order: 0,
 		created_at: '2026-04-28T10:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_DARK_MODE,
@@ -116,6 +119,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"ui","color":"#8b5cf6"},{"name":"theme","color":"#6366f1"}]',
 		sort_order: 1,
 		created_at: '2026-04-29T14:30:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_PERF_AUDIT,
@@ -139,6 +145,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"performance","color":"#f97316"}]',
 		sort_order: 2,
 		created_at: '2026-04-30T09:15:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_CI_PIPELINE,
@@ -162,6 +171,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"ci","color":"#06b6d4"},{"name":"testing","color":"#14b8a6"}]',
 		sort_order: 3,
 		created_at: '2026-05-01T08:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_ONBOARDING,
@@ -185,6 +197,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"ui","color":"#8b5cf6"},{"name":"onboarding","color":"#10b981"}]',
 		sort_order: 4,
 		created_at: '2026-05-02T11:45:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_API_GATEWAY,
@@ -208,6 +223,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"backend","color":"#8b5cf6"}]',
 		sort_order: 5,
 		created_at: '2026-05-03T10:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_INTEGRATION_TESTS,
@@ -231,6 +249,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"testing","color":"#14b8a6"}]',
 		sort_order: 6,
 		created_at: '2026-05-04T14:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_WORKTREE_PENDING,
@@ -254,6 +275,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"api","color":"#06b6d4"}]',
 		sort_order: 7,
 		created_at: '2026-05-03T10:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_WORKTREE_FAILED,
@@ -277,6 +301,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"database","color":"#f43f5e"},{"name":"migration","color":"#a855f7"}]',
 		sort_order: 8,
 		created_at: '2026-05-03T11:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_PR_MERGED,
@@ -300,6 +327,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"api","color":"#06b6d4"},{"name":"security","color":"#f59e0b"}]',
 		sort_order: 9,
 		created_at: '2026-05-03T12:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_CONFLICT,
@@ -323,6 +353,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"refactor","color":"#6b7280"},{"name":"routing","color":"#d946ef"}]',
 		sort_order: 10,
 		created_at: '2026-05-03T13:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 	{
 		id: ISSUE_ARCHIVED,
@@ -346,6 +379,9 @@ export const MOCK_ISSUES: Issue[] = [
 		labels: '[{"name":"refactor","color":"#6b7280"}]',
 		sort_order: 5,
 		created_at: '2026-04-15T16:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	},
 ];
 

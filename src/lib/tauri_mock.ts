@@ -201,9 +201,20 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 		worktree_state: 'none',
 		sort_order: 99,
 		created_at: new Date().toISOString(),
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 		...(request as object),
 	}),
 	update_issue: ({ request }) => request,
+	update_issue_character: ({ issueId }) => {
+		const issue = MOCK_ISSUES.find((i) => i.id === issueId);
+		return issue ?? null;
+	},
+	toggle_issue_sound_mute: ({ issueId }) => {
+		const issue = MOCK_ISSUES.find((i) => i.id === issueId);
+		return issue ? { ...issue, is_sound_muted: !issue.is_sound_muted } : null;
+	},
 	delete_issue: () => null,
 	archive_issue: ({ id }) => {
 		const issue = MOCK_ISSUES.find((i) => i.id === id);
