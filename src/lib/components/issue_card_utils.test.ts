@@ -4,7 +4,6 @@ import {
 	PRIORITY_OPTIONS,
 	PRIORITY_BORDER_CLASSES,
 	PRIORITY_BADGE_CLASSES,
-	isExpandedStates,
 } from './issue_card_utils.js';
 
 describe('getPriorityBorderClass', () => {
@@ -75,31 +74,5 @@ describe('PRIORITY_BADGE_CLASSES', () => {
 		expect(PRIORITY_BADGE_CLASSES.high).toBeDefined();
 		expect(PRIORITY_BADGE_CLASSES.low).toBeDefined();
 		expect(PRIORITY_BADGE_CLASSES.lowest).toBeDefined();
-	});
-});
-
-describe('isExpandedStates', () => {
-	it('returns true for empty object', () => {
-		expect(isExpandedStates({})).toBe(true);
-	});
-
-	it('returns true for object with boolean values', () => {
-		expect(isExpandedStates({ abc: true, def: false })).toBe(true);
-	});
-
-	it('returns false for null', () => {
-		expect(isExpandedStates(null)).toBe(false);
-	});
-
-	it('returns false for string', () => {
-		expect(isExpandedStates('string')).toBe(false);
-	});
-
-	it('returns false for object with non-boolean values', () => {
-		expect(isExpandedStates({ abc: 123 })).toBe(false);
-	});
-
-	it('returns false for array', () => {
-		expect(isExpandedStates([true])).toBe(false);
 	});
 });

@@ -8,7 +8,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { ColorPalette } from '$lib/types/generated';
-	import { invoke } from '@tauri-apps/api/core';
+	import { invoke } from '$lib/tauri.js';
 	const boardStore = useBoard();
 
 	let creating = $state(false);
