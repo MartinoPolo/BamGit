@@ -5,10 +5,8 @@
 
 	const { Story } = defineMeta({
 		title: 'Session/FloatingInputPanel',
-		component: FloatingInputPanel,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
-		tags: ['autodocs'],
 	});
 </script>
 

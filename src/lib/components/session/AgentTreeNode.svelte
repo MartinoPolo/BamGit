@@ -3,6 +3,7 @@
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import XIcon from '@lucide/svelte/icons/x';
+	import AgentTreeNode from './AgentTreeNode.svelte';
 
 	interface Props {
 		agent: SubAgent;
@@ -13,7 +14,7 @@
 
 	let { agent, depth = 0, activeAgentId = null, onSelect }: Props = $props();
 
-	let expanded = $state(agent.children.length > 0);
+	let expanded = $state(true);
 
 	const isActive = $derived(activeAgentId === agent.id);
 	const hasChildren = $derived(agent.children.length > 0);
@@ -32,12 +33,28 @@
 		type="button"
 	>
 		{#if hasChildren}
-			<ChevronRightIcon
-				size={10}
-				strokeWidth={2}
-				class="shrink-0 text-foreground-subtle transition-transform duration-[120ms]"
-				style="transform: {expanded ? 'none' : 'rotate(-90deg)'}"
-			/>
+			<span
+				class="flex shrink-0 cursor-pointer items-center"
+				role="button"
+				tabindex="-1"
+				onclick={(e) => {
+					e.stopPropagation();
+					expanded = !expanded;
+				}}
+				onkeydown={(e) => {
+					if (e.key === 'Enter') {
+						e.stopPropagation();
+						expanded = !expanded;
+					}
+				}}
+			>
+				<ChevronRightIcon
+					size={10}
+					strokeWidth={2}
+					class="text-foreground-subtle transition-transform duration-[120ms]"
+					style="transform: {expanded ? 'rotate(90deg)' : 'none'}"
+				/>
+			</span>
 		{:else}
 			<span class="w-2.5 shrink-0"></span>
 		{/if}
@@ -73,7 +90,7 @@
 	<!-- Children -->
 	{#if expanded && hasChildren}
 		{#each agent.children as child (child.id)}
-			<svelte:self agent={child} depth={depth + 1} {activeAgentId} {onSelect} />
+			<AgentTreeNode agent={child} depth={depth + 1} {activeAgentId} {onSelect} />
 		{/each}
 	{/if}
 </div>

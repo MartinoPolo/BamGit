@@ -5,10 +5,8 @@
 
 	const { Story } = defineMeta({
 		title: 'Session/Components',
-		component: SessionStateBadge,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
-		tags: ['autodocs'],
 	});
 </script>
 
@@ -32,7 +30,7 @@
 <Story name="Session State Badges">
 	{#snippet template()}
 		<div class="flex flex-wrap items-center gap-3 p-4">
-			{#each allStates as state}
+			{#each allStates as state (state)}
 				<SessionStateBadge {state} />
 			{/each}
 		</div>
@@ -65,7 +63,7 @@
 <Story name="Provider Chips">
 	{#snippet template()}
 		<div class="flex flex-wrap items-center gap-3 p-4">
-			{#each providers as provider}
+			{#each providers as provider (provider)}
 				<ProviderChip {provider} />
 			{/each}
 			<ProviderChip provider="unknown-provider" />

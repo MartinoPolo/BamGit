@@ -3,7 +3,7 @@
 	import AlertTriangleIcon from '@lucide/svelte/icons/alert-triangle';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
-	import { extractToolDetail, getToolAccentColor, getToolIcon } from './tool_card_utils.js';
+	import { extractToolDetail, getToolAccentColor } from './tool_card_utils.js';
 
 	interface Props {
 		message: ChatMessage;

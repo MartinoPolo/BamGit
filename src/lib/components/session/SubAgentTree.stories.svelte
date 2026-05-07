@@ -5,10 +5,8 @@
 
 	const { Story } = defineMeta({
 		title: 'Session/SubAgentTree',
-		component: SubAgentTree,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
-		tags: ['autodocs'],
 	});
 </script>
 
@@ -215,38 +213,36 @@
 				toolCount={12}
 				duration="23s"
 			>
-				{#snippet children()}
-					<div class="text-[13px] leading-[1.5] text-foreground-muted">
-						Exploring the project structure to understand codebase layout.
-					</div>
-					<ToolCardCompact
-						message={{
-							id: 'sub-1',
-							role: 'tool',
-							content: '',
-							timestamp: Date.now(),
-							toolName: 'Glob',
-							toolUseId: 'tu_sub1',
-							toolStatus: 'success',
-							toolInput: { pattern: '**/*.rs' },
-						}}
-					/>
-					<ToolCardCompact
-						message={{
-							id: 'sub-2',
-							role: 'tool',
-							content: '',
-							timestamp: Date.now(),
-							toolName: 'Read',
-							toolUseId: 'tu_sub2',
-							toolStatus: 'success',
-							toolInput: { file_path: 'src/main.rs' },
-						}}
-					/>
-					<div class="text-[13px] leading-[1.5] text-foreground-muted">
-						Found 23 Rust source files in 4 modules.
-					</div>
-				{/snippet}
+				<div class="text-[13px] leading-[1.5] text-foreground-muted">
+					Exploring the project structure to understand codebase layout.
+				</div>
+				<ToolCardCompact
+					message={{
+						id: 'sub-1',
+						role: 'tool',
+						content: '',
+						timestamp: Date.now(),
+						toolName: 'Glob',
+						toolUseId: 'tu_sub1',
+						toolStatus: 'success',
+						toolInput: { pattern: '**/*.rs' },
+					}}
+				/>
+				<ToolCardCompact
+					message={{
+						id: 'sub-2',
+						role: 'tool',
+						content: '',
+						timestamp: Date.now(),
+						toolName: 'Read',
+						toolUseId: 'tu_sub2',
+						toolStatus: 'success',
+						toolInput: { file_path: 'src/main.rs' },
+					}}
+				/>
+				<div class="text-[13px] leading-[1.5] text-foreground-muted">
+					Found 23 Rust source files in 4 modules.
+				</div>
 			</SubAgentExpansion>
 			<div class="text-[13px] text-foreground">Assistant message after sub-agent...</div>
 		</div>

@@ -58,7 +58,7 @@
 		<!-- Image carousel (expanded) -->
 		{#if showImages && imageCount > 0}
 			<div class="flex items-center gap-1.5 overflow-x-auto border-b border-border px-3 py-2">
-				{#each Array(imageCount) as _, i}
+				{#each Array.from({ length: imageCount }, (_, idx) => idx) as i (i)}
 					<div
 						class="relative flex size-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-surface-3"
 					>

@@ -113,7 +113,7 @@ describe('buildChatMessage', () => {
 		expect(buildChatMessage(event)).toBeNull();
 	});
 
-	it('creates system message from permission_prompt', () => {
+	it('creates tool message with permission interactionType from permission_prompt', () => {
 		// fallow-ignore-next-line code-duplication
 		const event: SessionEvent = {
 			type: 'permission_prompt',
@@ -123,8 +123,10 @@ describe('buildChatMessage', () => {
 		};
 		const message = buildChatMessage(event);
 		expect(message).not.toBeNull();
-		expect(message!.role).toBe('system');
-		expect(message!.content).toBeTruthy();
+		expect(message!.role).toBe('tool');
+		expect(message!.interactionType).toBe('permission');
+		expect(message!.toolName).toBe('Bash');
+		expect(message!.requestId).toBe('req_1');
 	});
 
 	it('creates system message from system_status', () => {

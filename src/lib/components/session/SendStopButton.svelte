@@ -2,7 +2,6 @@
 	import SendIcon from '@lucide/svelte/icons/send';
 	import SquareIcon from '@lucide/svelte/icons/square';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
 
 	interface Props {
 		isRunning: boolean;

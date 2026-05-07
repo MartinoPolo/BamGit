@@ -61,7 +61,7 @@ export function getToolAccentColor(toolName: string): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const TOOL_ICON_MAP: Record<string, Component<any>> = {
+const TOOL_ICON_MAP: Record<string, Component<any>> = {
 	Bash: TerminalIcon,
 	Read: EyeIcon,
 	Write: PencilIcon,
