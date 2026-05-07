@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, SessionEventPayload } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
 	import {
@@ -15,8 +14,6 @@
 	} from '$lib/modules/chat/index.js';
 	import { listen, type UnlistenFn } from '$lib/tauri.js';
 	import { onMount, onDestroy, tick } from 'svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import {
 		ChatMessage as ChatMessageComponent,
 		ContentDimmer,
@@ -25,6 +22,7 @@
 	} from '$lib/components/chat/index.js';
 	import SessionTopBar from '$lib/components/session/SessionTopBar.svelte';
 	import SessionSidebar from '$lib/components/session/SessionSidebar.svelte';
+	import FloatingInputPanel from '$lib/components/session/FloatingInputPanel.svelte';
 
 	interface Props {
 		session: Session;
@@ -271,35 +269,15 @@
 				></div>
 			</div>
 
-			<!-- Input bar -->
-			<div class="border-t border-border p-3">
-				<div class="mx-auto flex max-w-[900px] items-center gap-2">
-					{#if session.state === 'running'}
-						<Button
-							variant="secondary"
-							size="sm"
-							class="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
-							onclick={handleInterrupt}
-						>
-							{m.chat_interrupt()}
-						</Button>
-					{/if}
-
-					<Input
-						class="flex-1"
-						placeholder={isActive
-							? m.chat_placeholder_active()
-							: m.chat_placeholder_ended()}
-						bind:value={promptInput}
-						onkeydown={handleKeydown}
-						disabled={!isActive}
-					/>
-
-					<Button class="shrink-0" onclick={handleSend} disabled={!canSend}>
-						{m.chat_send()}
-					</Button>
-				</div>
-			</div>
+			<!-- Floating input panel -->
+			<FloatingInputPanel
+				{session}
+				bind:value={promptInput}
+				disabled={!isActive}
+				onSend={handleSend}
+				onStop={handleInterrupt}
+				onKeydown={handleKeydown}
+			/>
 		</div>
 
 		<!-- Right sidebar -->
