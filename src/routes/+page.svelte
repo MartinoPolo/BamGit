@@ -467,16 +467,26 @@
 		}
 	}
 
+	const cardVisualizationCache = new Map<
+		string,
+		{ fingerprint: string; result: TreeVisualization }
+	>();
+
 	function getVisualization(issueId: string): TreeVisualization | undefined {
 		const issue = forestIssues.find((i) => i.id === issueId);
 		if (issue === undefined) {
 			return undefined;
 		}
-		return computeVisualization(
-			issue,
-			versionControlStore.getState(issueId),
-			sessionStore.sessionsByIssueId.get(issueId) ?? [],
-		);
+		const gitStatus = versionControlStore.getState(issueId);
+		const sessions = sessionStore.sessionsByIssueId.get(issueId) ?? [];
+		const fingerprint = `${issue.status}|${issue.worktree_state}|${issue.color}|${issue.labels.map((l) => l.name).join(',')}|${gitStatus?.branch_status}|${gitStatus?.pr_state}|${sessions.map((s) => s.state).join(',')}`;
+		const cached = cardVisualizationCache.get(issueId);
+		if (cached && cached.fingerprint === fingerprint) {
+			return cached.result;
+		}
+		const result = computeVisualization(issue, gitStatus, sessions);
+		cardVisualizationCache.set(issueId, { fingerprint, result });
+		return result;
 	}
 
 	function getGitStatusForForest(issueId: string) {
