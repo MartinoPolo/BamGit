@@ -35,10 +35,11 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
     for config in NotificationConfig::defaults() {
         connection.execute(
             "INSERT OR IGNORE INTO notification_config \
-             (event_type, sound_enabled, sound_file, toast_enabled, window_flash_enabled) \
-             VALUES (?1, ?2, ?3, ?4, ?5)",
+             (event_type, importance_tier, sound_enabled, sound_file, toast_enabled, window_flash_enabled) \
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             rusqlite::params![
                 config.event_type,
+                config.importance_tier,
                 config.sound_enabled,
                 config.sound_file,
                 config.toast_enabled,
@@ -56,7 +57,8 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
         })?;
 
     connection.execute_batch(
-        "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');",
+        "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');
+         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('notification_volume', '0.8');",
     )?;
 
     Ok(())

@@ -86,10 +86,10 @@ describe('mockInvoke', () => {
 
 		it('get_notification_configs returns all event types', async () => {
 			const configs = await mockInvoke<NotificationConfig[]>('get_notification_configs');
-			expect(configs.length).toBe(5);
+			expect(configs.length).toBe(15);
 			const eventTypes = configs.map((c) => c.event_type);
-			expect(eventTypes).toContain('needs-input');
-			expect(eventTypes).toContain('finished');
+			expect(eventTypes).toContain('session.needs-input');
+			expect(eventTypes).toContain('session.end');
 		});
 
 		it('get_overview_data returns workspace data', async () => {

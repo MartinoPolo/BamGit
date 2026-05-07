@@ -1,0 +1,54 @@
+{
+  "name": "grove",
+  "display_name": "Grove",
+  "version": "1.0.0",
+  "author": "Grovekeeper",
+  "avatar": null,
+  "categories": {
+    "session.start": [
+      { "file": "start.wav", "label": "Session Start Ding" }
+    ],
+    "session.end": [
+      { "file": "session_end.wav", "label": "Soft Notification Bell" }
+    ],
+    "session.error": [
+      { "file": "error.wav", "label": "Error Deny" }
+    ],
+    "session.needs-input": [
+      { "file": "needs_input.wav", "label": "Attention Alert" }
+    ],
+    "task.complete": [
+      { "file": "complete.wav", "label": "Task Complete Drop" }
+    ],
+    "task.acknowledge": [
+      { "file": "acknowledge.wav", "label": "Quick Blip" }
+    ],
+    "pr.ready": [
+      { "file": "ready.wav", "label": "PR Ready Pling" }
+    ],
+    "pr.merged": [
+      { "file": "merged.wav", "label": "PR Merged Fanfare" }
+    ],
+    "pr.review-requested": [
+      { "file": "ready.wav", "label": "Review Requested" }
+    ],
+    "merge.conflict": [
+      { "file": "conflict.wav", "label": "Merge Conflict" }
+    ],
+    "branch.behind-base": [
+      { "file": "acknowledge.wav", "label": "Branch Behind" }
+    ],
+    "github.issue-assigned": [
+      { "file": "notification.wav", "label": "Issue Assigned" }
+    ],
+    "github.trigger-received": [
+      { "file": "start.wav", "label": "Trigger Received" }
+    ],
+    "achievement.unlocked": [
+      { "file": "achievement.wav", "label": "Achievement Unlocked" }
+    ],
+    "resource.limit": [
+      { "file": "error.wav", "label": "Resource Limit" }
+    ]
+  }
+}

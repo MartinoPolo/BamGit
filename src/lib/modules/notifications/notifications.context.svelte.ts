@@ -4,6 +4,9 @@ import { invoke, isTauri } from '$lib/tauri.js';
 import type {
 	NotificationConfig as GeneratedNotificationConfig,
 	NotificationEventType,
+	ImportanceTier,
+	SoundPackInfo,
+	SoundVolumeOverride,
 } from '$lib/types/generated';
 
 // ─── Narrowed types ───────────────────────────────────────────────────────
@@ -27,14 +30,58 @@ export interface UpdateNotificationConfigRequest {
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
+const CRITICAL_EVENTS: NotificationEventType[] = ['session.needs-input', 'session.end'];
+const IMPORTANT_EVENTS: NotificationEventType[] = [
+	'session.error',
+	'merge.conflict',
+	'resource.limit',
+	'pr.ready',
+];
+
 /** Tailwind color classes for notification indicator dots. null = no dot shown. */
-export const NOTIFICATION_DOT_COLORS: Record<NotificationEventType, string | null> = {
-	'needs-input': 'bg-amber-400',
-	'needs-review': 'bg-blue-400',
-	errored: 'bg-red-400',
-	finished: null,
-	'pr-ready': null,
+export const NOTIFICATION_DOT_COLORS: Partial<Record<NotificationEventType, string | null>> = {
+	'session.needs-input': 'bg-amber-400',
+	'session.error': 'bg-red-400',
+	'session.end': 'bg-green-400',
+	'merge.conflict': 'bg-orange-400',
+	'resource.limit': 'bg-yellow-400',
+	'pr.ready': 'bg-blue-400',
 };
+
+/** Human-readable labels for importance tiers. */
+/** @public */
+export const IMPORTANCE_TIER_LABELS: Record<ImportanceTier, string> = {
+	critical: 'Critical',
+	important: 'Important',
+	normal: 'Normal',
+};
+
+/** Tier ordering for display. */
+/** @public */
+export const IMPORTANCE_TIER_ORDER: ImportanceTier[] = ['critical', 'important', 'normal'];
+
+/** @public */
+export function getImportanceTier(eventType: NotificationEventType): ImportanceTier {
+	if ((CRITICAL_EVENTS as string[]).includes(eventType)) {
+		return 'critical';
+	}
+	if ((IMPORTANT_EVENTS as string[]).includes(eventType)) {
+		return 'important';
+	}
+	return 'normal';
+}
+
+/** Group configs by importance tier in display order. */
+/** @public */
+export function groupConfigsByTier(
+	configs: NotificationConfig[],
+): { tier: ImportanceTier; label: string; configs: NotificationConfig[] }[] {
+	return IMPORTANCE_TIER_ORDER.map((tier) => ({
+		tier,
+		label: IMPORTANCE_TIER_LABELS[tier],
+		configs: configs.filter((c) => c.importance_tier === tier),
+	})).filter((group) => group.configs.length > 0);
+}
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -56,6 +103,9 @@ function createNotificationsContext() {
 	const pendingNotifications = new SvelteMap<string, NotificationEventType>();
 	let loading = $state(false);
 	let error = $state<string | null>(null);
+	let globalVolume = $state(0.8);
+	let soundPacks = $state<SoundPackInfo[]>([]);
+	let volumeOverrides = $state<SoundVolumeOverride[]>([]);
 
 	return {
 		get configs() {
@@ -69,6 +119,15 @@ function createNotificationsContext() {
 		},
 		get error() {
 			return error;
+		},
+		get globalVolume() {
+			return globalVolume;
+		},
+		get soundPacks() {
+			return soundPacks;
+		},
+		get volumeOverrides() {
+			return volumeOverrides;
 		},
 
 		async loadConfigs() {
@@ -87,6 +146,92 @@ function createNotificationsContext() {
 			} finally {
 				loading = false;
 			}
+		},
+
+		async loadGlobalVolume() {
+			if (!isTauri()) {
+				return;
+			}
+			try {
+				globalVolume = await invoke<number>('get_notification_volume');
+			} catch (err) {
+				console.error('Failed to load global volume:', err);
+			}
+		},
+
+		async setGlobalVolume(volume: number) {
+			globalVolume = volume;
+			if (!isTauri()) {
+				return;
+			}
+			try {
+				await invoke('set_notification_volume', { volume });
+			} catch (err) {
+				console.error('Failed to set global volume:', err);
+			}
+		},
+
+		async loadSoundPacks() {
+			if (!isTauri()) {
+				return;
+			}
+			try {
+				soundPacks = await invoke<SoundPackInfo[]>('list_sound_packs');
+			} catch (err) {
+				console.error('Failed to load sound packs:', err);
+			}
+		},
+
+		async loadVolumeOverrides() {
+			if (!isTauri()) {
+				return;
+			}
+			try {
+				volumeOverrides = await invoke<SoundVolumeOverride[]>(
+					'get_all_sound_volume_overrides',
+				);
+			} catch (err) {
+				console.error('Failed to load volume overrides:', err);
+			}
+		},
+
+		async setSoundVolumeOverride(
+			eventType: NotificationEventType,
+			soundFile: string,
+			volume: number,
+		) {
+			if (!isTauri()) {
+				return;
+			}
+			try {
+				await invoke('set_sound_volume_override', {
+					eventType,
+					soundFile,
+					volume,
+				});
+				volumeOverrides = volumeOverrides.map((o) =>
+					o.event_type === eventType && o.sound_file === soundFile ? { ...o, volume } : o,
+				);
+				if (
+					!volumeOverrides.some(
+						(o) => o.event_type === eventType && o.sound_file === soundFile,
+					)
+				) {
+					volumeOverrides = [
+						...volumeOverrides,
+						{ event_type: eventType, sound_file: soundFile, volume },
+					];
+				}
+			} catch (err) {
+				console.error('Failed to set volume override:', err);
+			}
+		},
+
+		getVolumeOverride(eventType: NotificationEventType, soundFile: string): number {
+			const override = volumeOverrides.find(
+				(o) => o.event_type === eventType && o.sound_file === soundFile,
+			);
+			return override?.volume ?? 1.0;
 		},
 
 		updateConfig(updated: NotificationConfig) {
@@ -111,7 +256,6 @@ function createNotificationsContext() {
 			return pendingNotifications.get(sessionId);
 		},
 
-		// Notification commands (inlined)
 		async updateNotificationConfig(
 			request: UpdateNotificationConfigRequest,
 		): Promise<NotificationConfig> {
@@ -122,6 +266,17 @@ function createNotificationsContext() {
 
 		async testNotificationSound(eventType: string): Promise<void> {
 			return invoke('test_notification_sound', { eventType });
+		},
+
+		async installSoundPack(sourcePath: string): Promise<SoundPackInfo> {
+			const pack = await invoke<SoundPackInfo>('install_sound_pack', { sourcePath });
+			soundPacks = [...soundPacks, pack];
+			return pack;
+		},
+
+		async removeSoundPack(packName: string): Promise<void> {
+			await invoke('remove_sound_pack', { packName });
+			soundPacks = soundPacks.filter((p) => p.name !== packName);
 		},
 	};
 }
