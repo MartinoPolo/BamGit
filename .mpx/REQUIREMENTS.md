@@ -305,30 +305,65 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 - Cross-platform (Tauri notification plugin + rodio sound + window attention)
 - Frontend passes translated title/body to Rust dispatch command (Rust does not generate user-facing text)
 - Per-event configuration stored in SQLite
-- CESP/peon-ping manifest format for sound packs
-- Bundled default sound pack (royalty-free, nature-themed)
+- Sound formats: WAV (bundled) + OGG (user packs) via rodio. No MP3
+- CESP/peon-ping manifest format for sound pack import (`openpeon.json`); native `grovekeeper.json` manifest for full 15-event packs
+- Bundled default "Grove" sound pack (10 unique CC0 sounds, all ≤3s)
 - Sound rotation: multiple sounds per event, random selection excluding last played
 - Per-event: enable/disable, assign sound, mute, merge events to share sounds
+- Bundled pack in `resources/sounds/`, user packs in `<app_data_dir>/sound-packs/<pack-name>/`
+
+#### Character Pack System
+
+- **Characters assigned per-issue** — random from enabled pool on issue creation, manual override via spawn dialog or issue card context menu
+- Sessions without a Grovekeeper issue get no character (default pack, no persona)
+- Character identity: icon + name in selection UI, icon only on issue card
+- Issue card avatar placement: bottom-right corner next to action buttons, same rounding as icon-only button
+    - Left-click: mute all sounds for that issue (toggle, crossed-out visual)
+    - Right-click: dropdown — character list (icon + name), divider, "Play random sound", "Mute" toggle
+- Each character pack provides sounds for all 15 events + a small avatar image
+
+#### Importance Tiers
+
+| Tier          | Events                                                          | Sound Default | Debounce    |
+| ------------- | --------------------------------------------------------------- | ------------- | ----------- |
+| **Critical**  | `session.needs-input`, `session.end`                            | ON            | Never       |
+| **Important** | `session.error`, `merge.conflict`, `resource.limit`, `pr.ready` | ON            | Per-session |
+| **Normal**    | All others (9 events)                                           | OFF (muted)   | Per-session |
+
+Rule: `sound_enabled` defaults to `true` only for Critical and Important events. Normal events are assigned a sound but muted by default. Users toggle in settings.
+
+#### Playback Behavior
+
+- Sequential queue with wait-for-finish — simultaneous notifications play one after another
+- Queue cap at 5 — overflow plays a single summary sound
+- Per-session debounce — same session + same event type within window gets suppressed
+- Only Critical events are never debounced
+
+#### Volume Control
+
+- Two layers: global volume (float 0.0–1.0, default 0.8) + per-sound user override in DB
+- Final playback volume = `global_volume × user_override`
+- Controlled from Sound/Notification Settings UI
 
 #### Notification Events
 
-| Event                     | Toast    | Sound        | Window Flash |
-| ------------------------- | -------- | ------------ | ------------ |
-| `session.start`           | Optional | Optional     | No           |
-| `session.end`             | Yes      | Optional     | No           |
-| `session.error`           | Yes      | Yes (urgent) | Yes          |
-| `session.needs-input`     | Yes      | Yes (urgent) | Yes          |
-| `task.complete`           | Yes      | Optional     | No           |
-| `task.acknowledge`        | Optional | Optional     | No           |
-| `pr.ready`                | Yes      | Optional     | No           |
-| `pr.merged`               | Yes      | Optional     | No           |
-| `pr.review-requested`     | Yes      | Optional     | No           |
-| `merge.conflict`          | No       | No           | No           |
-| `branch.behind-base`      | No       | No           | No           |
-| `github.issue-assigned`   | No       | No           | No           |
-| `github.trigger-received` | Yes      | Optional     | No           |
-| `achievement.unlocked`    | Yes      | Yes          | No           |
-| `resource.limit`          | Yes      | Yes          | No           |
+| Event                     | Tier      | Toast    | Sound (default) | Window Flash      |
+| ------------------------- | --------- | -------- | --------------- | ----------------- |
+| `session.needs-input`     | Critical  | Yes      | ON              | Yes (until focus) |
+| `session.end`             | Critical  | Yes      | ON              | No                |
+| `session.error`           | Important | Yes      | ON              | Yes (until focus) |
+| `merge.conflict`          | Important | Yes      | ON              | No                |
+| `resource.limit`          | Important | Yes      | ON              | No                |
+| `pr.ready`                | Important | Yes      | ON              | No                |
+| `session.start`           | Normal    | Optional | OFF             | No                |
+| `task.complete`           | Normal    | Yes      | OFF             | No                |
+| `task.acknowledge`        | Normal    | Optional | OFF             | No                |
+| `pr.merged`               | Normal    | Yes      | OFF             | No                |
+| `pr.review-requested`     | Normal    | Yes      | OFF             | No                |
+| `branch.behind-base`      | Normal    | No       | OFF             | No                |
+| `github.issue-assigned`   | Normal    | No       | OFF             | No                |
+| `github.trigger-received` | Normal    | Yes      | OFF             | No                |
+| `achievement.unlocked`    | Normal    | Yes      | OFF             | No                |
 
 ### Configuration & Data
 
@@ -523,7 +558,7 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 - RAG integration (vector databases, embedding models, retrieval pipelines)
 - Advanced prompt analytics (A/B testing, prompt versioning)
 - Full autopilot system (webhook triggers, cron-scheduled execution)
-- Agent personality / Warcraft voices (custom sound packs deferred beyond bundled defaults)
+- Agent personality / Warcraft voices (character packs are in scope; specific copyrighted content is user-supplied)
 - GitHub App for triggering from GitHub UI (using label polling instead)
 - Webhook relay for instant GitHub triggers
 - Built-in code editor (using external VS Code/Cursor)

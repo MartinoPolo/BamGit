@@ -325,9 +325,14 @@ import { Persisted } from '$lib/reactivity/persisted.svelte';
 ### Notification Service
 
 - **Toast:** Frontend passes translated title/body to Rust dispatch command (Rust does not generate user-facing text).
-- **Sound:** rodio playback of WAV files. CESP-compatible sound pack support. Random rotation excluding last played.
-- **Window attention:** Tauri `window.request_user_attention()`.
-- **Per-event config:** stored in `notification_config` DB table.
+- **Sound:** rodio playback of WAV + OGG files. CESP-compatible sound pack import (`openpeon.json`) + native `grovekeeper.json` packs. Random rotation excluding last played.
+- **Character packs:** Per-issue character assignment (random from enabled pool, manual override). Each pack provides sounds for all 15 events + avatar image. Sessions without a Grovekeeper issue use the default pack with no persona.
+- **Playback queue:** Sequential wait-for-finish queue, capped at 5. Overflow plays summary sound. Per-session debounce for non-Critical events.
+- **Importance tiers:** Critical (never debounced, sound ON by default), Important (sound ON, debounce-able), Normal (sound OFF by default, debounce-able).
+- **Volume:** Global multiplier (0.0–1.0) × per-sound user override (DB). No manifest-level volume.
+- **Window attention:** Tauri `window.request_user_attention()`. Critical = flash until focused, Informational = flash briefly.
+- **Per-event config:** stored in `notification_config` DB table. `sound_volume_overrides` table for per-sound user adjustments.
+- **Pack storage:** Bundled in `resources/sounds/`, user packs in `<app_data_dir>/sound-packs/<pack-name>/`.
 
 ### Platform Module (new)
 
