@@ -14,7 +14,6 @@
 	interface Props {
 		selectedCount: number;
 		selectedIssues: Issue[];
-		isModifierHeld?: boolean;
 		onDeselectAll: () => void;
 		onBatchArchive: () => void;
 		onBatchUnarchive: () => void;
@@ -26,7 +25,6 @@
 	let {
 		selectedCount,
 		selectedIssues,
-		isModifierHeld = false,
 		onDeselectAll,
 		onBatchArchive,
 		onBatchUnarchive,
@@ -44,18 +42,12 @@
 		if (hasBatchSelection) {
 			return 'color-mix(in oklch, var(--primary) 10%, var(--surface))';
 		}
-		if (isModifierHeld) {
-			return 'color-mix(in oklch, var(--primary) 8%, var(--surface))';
-		}
 		return 'transparent';
 	});
 
 	const toolbarBorderColor = $derived.by(() => {
 		if (hasBatchSelection) {
 			return 'color-mix(in oklch, var(--primary) 30%, var(--border))';
-		}
-		if (isModifierHeld) {
-			return 'color-mix(in oklch, var(--primary) 22%, var(--border))';
 		}
 		return 'transparent';
 	});

@@ -84,8 +84,8 @@ describe('CARD_STATE_CLASSES', () => {
 		const expectedKeys = [
 			'active',
 			'hovered',
+			'selectionHover',
 			'selected',
-			'selectionReady',
 			'dragging',
 			'loading',
 			'archived',
@@ -108,10 +108,6 @@ describe('CARD_STATE_CLASSES', () => {
 
 	it('selected class uses box-shadow CSS class referencing --primary', () => {
 		expect(CARD_STATE_CLASSES.selected).toBe('card-state-selected-primary');
-	});
-
-	it('selectionReady class uses violet ring CSS class', () => {
-		expect(CARD_STATE_CLASSES.selectionReady).toBe('card-state-selection-ready');
 	});
 });
 
