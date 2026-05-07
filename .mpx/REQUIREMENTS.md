@@ -33,7 +33,19 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Badges are interactive: clicking PR/issue badge opens GitHub URL
 - Badges are responsive: collapse to icon-only when header space is insufficient
 - One workspace = one dashboard = one GitHub repo
-- **Overview dashboard** (separate window/page): shows all configured workspaces as cards with health indicators (active sessions, open PRs, pending HITL issues)
+- **Overview dashboard** (separate window/page): shows all configured workspaces as cards in a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))`). Each workspace card is a living dashboard widget:
+    - **Header**: workspace name (bold), accent-color thumbnail (or 2-letter initials placeholder), subtitle line showing repo default branch + active worktree count. Top-right: GitHub icon button (custom fill-based `GithubIcon.svelte`) + folder icon button (Lucide `folder` closed)
+    - **Health grid** (4 equal-width stat cells, order: Issues → PRs → ATTN → HITL): Issues shows dual number `{afk_actionable}/{total_tracked}` (AFK = unblocked issues with AFK label; total = non-PRD Grovekeeper issues). ATTN uses danger tone (red) with pulse dot when >0. HITL uses warning tone (amber) with pulse dot when >0. Each stat cell is clickable — navigates to the relevant filtered view in the workspace dashboard
+    - **PRD row** (compact inline): `{N} PRDs · {completed}/{total} done [progress_bar]`. Aggregate sub-issue completion across all open PRDs. Click → PRD view. Hidden when no PRDs exist
+    - **AFK status row**: LED indicator (glowing green when on, gray when off) + label + session breakdown (`5 sessions (3 AFK)` / `idle` / `last {time}`). AFK session count = sessions spawned by AFK loop only. Click → AFK loop page. Start/stop toggle only in workspace dashboard, not on overview card
+    - **Footer**: `today $X.XX` (cost period hardcoded to "today", configurable period deferred to PRD #93 Metrics) + relative timestamp of last workspace activity
+    - **Card variants**: default, active (breathing glow when AFK on), needs-attention (amber accent when HITL >0), urgent (red accent when ATTN >0), dormant (desaturated when no activity >24h), empty (placeholder when no issues tracked)
+    - **Accent colors**: 12-preset palette (moss, amber, bark, azure, plum, teal, rose, coral, gold, sage, indigo, fuchsia) selected via inline `ColorPickerContent` (2×6 grid) in workspace settings
+    - **Card component integration**: derives from base `Card` with `accentBarColor` (3px left border) and `gradientTint` (8% accent overlay) props. State variants handled by WorkspaceCard, not Card
+    - **Icon buttons**: `ghost` variant, `icon-sm` (26px), `text-foreground-subtle` at rest, strokeWidth 1.7. Unassigned state: opacity 0.35, click/right-click opens workspace config wizard
+    - **Add Workspace card**: dashed border, centered + icon, "Add workspace" label (no subtitle). Click opens workspace creation wizard
+    - Click any card area (except buttons) → opens/focuses that workspace's window
+    - Hover: translateY(-2px) + accent-colored glow + border tint
 - **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle (icon button) | Create Issue (split-button: Add Issue / Add Worktree Issue, persists last-used action)
 - **Bottom panel toolbar** (Issues tab): Always-visible persistent bar with consistent height (no layout shift). Default state (no selection): ghost appearance (no background/border), showing Sort | Filter | Clean Up Worktrees. Selected state: "N selected" count | Batch action buttons (Archive, Unarchive, Delete, Change Priority, Clean Selected Worktrees) | Deselect All (×). Modifier-held state (Ctrl/Shift pressed, nothing selected): toolbar gains selected-state visual styling (bg + border) but keeps default content. "Clean Up Worktrees" changes to "Clean Selected Worktrees" when batch selection is active. All worktree cleanup actions show a confirmation dialog
 - **Batch selection**: Multi-select issue cards/trees for bulk operations. Triggers: right-click context menu "Select" (desktop), long press 500ms (mobile/touch), Ctrl+click (toggle individual), Shift+click (range select with Windows Explorer pattern — range vs individually-selected items tracked separately, shift-clicking to a shorter range deselects items outside the new range while preserving Ctrl+clicked items), Ctrl+A (select all), Escape (deselect all). Selection clears on tab change and Escape; does NOT clear after batch action. Normal click (no modifier) clears batch selection and activates the clicked card. Clicking an already-active card does NOT deactivate it — deactivation only via Escape or clicking empty space in the grid. Batch actions: Archive, Unarchive (context-aware — both show if mixed), Delete, Change Priority. NOT batch: Change Color. Unavailable actions disabled with tooltip; partially applicable actions enabled with info tooltip ("affects 2 of 5")
@@ -472,6 +484,14 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 - Card grid with badges (model, category, version). Click → full detail panel.
 - Discovery: `~/.claude/`, project `.claude/`, mpx-claude-code, memories folder. Scan on navigate + manual refresh.
 - "Open file" / "Open in editor" / "Open folder" buttons per item. Read-only display in Grovekeeper.
+
+### PRD Management & Visualization
+
+- **PRD row on workspace cards**: compact inline row showing open PRD count + aggregate sub-issue progress bar. Visible on overview dashboard workspace cards. Click navigates to PRD view
+- **PRD view**: dedicated view for browsing and managing PRDs within a workspace. Shows PRD cards with sub-issue progress, blocking relationships between PRDs, and status indicators. Accessible as both a bottom panel tab in the workspace dashboard and a standalone navigable page
+- **PRD cards**: each card shows PRD title, sub-issue completion ratio, blocking/blocked-by relationships, labels, and quick navigation to the PRD's GitHub issue
+- **PRD progress tracking**: aggregate metrics per workspace — open PRDs, split PRDs (have sub-issues), PRDs in progress (at least one completed sub-issue). Surfaced on workspace card PRD row and in PRD view
+- **Scope**: separate PRD to be created — "PRD: PRD Management & Visualization"
 
 ### Internationalization
 
