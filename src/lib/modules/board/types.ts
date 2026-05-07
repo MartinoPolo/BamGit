@@ -10,6 +10,7 @@ export interface CreateDashboardRequest {
 	default_base_branch?: string | null;
 	worktree_parent_folder?: string | null;
 	color_palette_id?: string | null;
+	accent_color?: string | null;
 	default_shape?: string;
 }
 
@@ -23,6 +24,7 @@ export interface UpdateDashboardRequest {
 	default_base_branch?: string | null;
 	worktree_parent_folder?: string | null;
 	color_palette_id?: string | null;
+	accent_color?: string | null;
 	default_shape?: string;
 }
 
@@ -49,7 +51,20 @@ export interface AddRepoToPortfolioRequest {
 /** @public */
 export type ThemeMode = 'dark' | 'light' | 'system';
 
-export const ACCENT_COLORS = ['moss', 'amber', 'bark', 'azure'] as const;
+export const ACCENT_COLORS = [
+	'moss',
+	'amber',
+	'gold',
+	'coral',
+	'rose',
+	'fuchsia',
+	'sage',
+	'teal',
+	'azure',
+	'indigo',
+	'plum',
+	'bark',
+] as const;
 /** @public */
 export type AccentColor = (typeof ACCENT_COLORS)[number];
 

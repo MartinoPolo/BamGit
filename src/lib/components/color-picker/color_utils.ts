@@ -36,6 +36,27 @@ export const DEFAULT_COLOR_PALETTE: string[] = [
 	'#8b5e3c',
 ];
 
+/**
+ * 12 workspace accent colors derived from OKLCH 500 token values.
+ * Grid order: 2 rows × 6 columns matching the design spec.
+ */
+export const WORKSPACE_ACCENT_PALETTE: string[] = [
+	// Row 1: moss, amber, gold, coral, rose, fuchsia
+	'#62874b',
+	'#e77a16',
+	'#af8a00',
+	'#d35b4b',
+	'#d95e6d',
+	'#bb4d87',
+	// Row 2: sage, teal, azure, indigo, plum, bark
+	'#4f906f',
+	'#009a9b',
+	'#0082b8',
+	'#5864bf',
+	'#9a53aa',
+	'#845738',
+];
+
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 /**
