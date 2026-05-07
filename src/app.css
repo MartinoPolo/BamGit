@@ -106,6 +106,8 @@
 	--duration-4: 220ms;
 	--duration-5: 320ms;
 	--animate-shimmer: shimmer 1.4s linear infinite;
+	--animate-ws-pulse-ring: ws-pulse-ring 1.6s ease-out infinite;
+	--animate-ws-led: ws-led 2s ease-in-out infinite;
 }
 
 :root {
@@ -362,6 +364,33 @@
 
 	50% {
 		opacity: 0.45;
+	}
+}
+
+@keyframes ws-pulse-ring {
+	0% {
+		box-shadow: 0 0 0 0 color-mix(in oklch, currentcolor 60%, transparent);
+	}
+
+	70% {
+		box-shadow: 0 0 0 6px color-mix(in oklch, currentcolor 0%, transparent);
+	}
+
+	100% {
+		box-shadow: 0 0 0 0 color-mix(in oklch, currentcolor 0%, transparent);
+	}
+}
+
+@keyframes ws-led {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	50% {
+		opacity: 0.55;
+		transform: scale(0.9);
 	}
 }
 
