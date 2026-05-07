@@ -1,5 +1,5 @@
 # Local convention — user's unversioned file pattern
-*.local.*
+*.local*
 
 # Environment & secrets
 .env
