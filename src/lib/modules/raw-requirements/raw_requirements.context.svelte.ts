@@ -3,8 +3,47 @@ import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { invoke, isTauri } from '$lib/tauri.js';
 import { useBoard } from '$lib/modules/board/index.js';
 import { useWindow } from '$lib/modules/window/index.js';
+import { useToasts } from '$lib/modules/toasts/index.js';
 import { parseRawRequirements, serializeRawRequirements, formatTimestamp } from './parser.js';
 import type { RawRequirementNote } from './types.js';
+
+const MOCK_NOTES: RawRequirementNote[] = [
+	{
+		timestamp: '2026-05-01 09:15',
+		content: 'Add keyboard shortcut for quick issue creation',
+		processed: false,
+	},
+	{
+		timestamp: '2026-05-01 14:30',
+		content: 'Forest view should show dependency arrows between trees',
+		processed: false,
+	},
+	{
+		timestamp: '2026-05-02 10:00',
+		content: 'Color picker needs a "recently used" section',
+		processed: true,
+	},
+	{
+		timestamp: '2026-05-03 08:45',
+		content: 'Session cost tracking should aggregate by PRD',
+		processed: false,
+	},
+	{
+		timestamp: '2026-05-04 16:20',
+		content: 'Add bulk archive for completed sub-issues',
+		processed: false,
+	},
+	{
+		timestamp: '2026-05-05 11:00',
+		content: 'Dashboard overview should show active session count per workspace',
+		processed: false,
+	},
+	{
+		timestamp: '2026-05-06 09:30',
+		content: 'Consider adding a notification when a session finishes in background',
+		processed: false,
+	},
+];
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -24,6 +63,7 @@ export function setRawRequirementsContext() {
 function createRawRequirementsContext() {
 	const boardStore = useBoard();
 	const windowCtx = useWindow();
+	const toasts = useToasts();
 
 	const notes = new StateRaw<RawRequirementNote[]>([]);
 	const open = new StateRaw(false);
@@ -36,9 +76,14 @@ function createRawRequirementsContext() {
 	}
 
 	async function load(): Promise<void> {
+		if (loading.current) {
+			return;
+		}
 		const localFolder = getLocalFolder();
 		if (localFolder === null || !isTauri()) {
-			notes.current = [];
+			if (!isTauri() && notes.current.length === 0) {
+				notes.current = MOCK_NOTES;
+			}
 			return;
 		}
 		saveError.current = null;
@@ -68,6 +113,7 @@ function createRawRequirementsContext() {
 		} catch (error) {
 			console.error('Failed to save raw requirements:', error);
 			saveError.current = String(error);
+			toasts.show({ tone: 'danger', title: 'Failed to save idea', body: String(error) });
 		}
 	}
 

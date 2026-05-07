@@ -43,6 +43,7 @@ export const TOOL_TYPES = {
 
 /** Special GitHub issue labels that trigger visualization behavior. */
 export const SPECIAL_LABELS = {
+	prd: 'prd',
 	hitl: 'HITL',
 	afk: 'AFK',
 } as const;

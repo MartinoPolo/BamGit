@@ -328,6 +328,13 @@
 	"raw_requirements_process": "Process Requirements",
 	"raw_requirements_empty": "No ideas captured yet. Start typing below.",
 	"raw_requirements_processed": "processed",
+	"raw_requirements_process_coming_soon": "Processing pipeline coming soon",
+	"raw_requirements_toggle_processed": "Toggle processed",
+	"raw_requirements_full_page": "Full page",
+	"raw_requirements_full_page_title": "Quick Ideas",
+	"raw_requirements_full_page_subtitle": "All captured ideas and requirements",
+	"topbar_show_forest": "Show forest",
+	"topbar_hide_forest": "Hide forest",
 
 	"wizard_title": "Create Issue",
 	"wizard_step_search": "Search GitHub Issues",
