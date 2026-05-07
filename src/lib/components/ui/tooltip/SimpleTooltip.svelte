@@ -18,7 +18,7 @@
 	<TooltipRoot>
 		<TooltipTrigger>
 			{#snippet child({ props })}
-				<span {...props} style="display: contents;">
+				<span {...props} class="inline-flex items-center">
 					{@render children()}
 				</span>
 			{/snippet}

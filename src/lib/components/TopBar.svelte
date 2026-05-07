@@ -3,6 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
 	import BellIcon from '@lucide/svelte/icons/bell';
+	import LightbulbIcon from '@lucide/svelte/icons/lightbulb';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -15,6 +16,7 @@
 		syncing?: boolean;
 		forestCollapsed?: boolean;
 		onSync?: () => void;
+		onQuickIdeas?: () => void;
 		onCreateIssue?: () => void;
 		onToggleForest?: () => void;
 		children?: Snippet;
@@ -27,6 +29,7 @@
 		syncing = false,
 		forestCollapsed = false,
 		onSync,
+		onQuickIdeas,
 		onCreateIssue,
 		onToggleForest,
 		children,
@@ -60,6 +63,14 @@
 				{/if}
 			</Button>
 		</SimpleTooltip>
+
+		{#if onQuickIdeas}
+			<SimpleTooltip text={m.raw_requirements_title()}>
+				<Button variant="ghost" size="icon-sm" onclick={onQuickIdeas}>
+					<LightbulbIcon size={13} />
+				</Button>
+			</SimpleTooltip>
+		{/if}
 
 		{#if onToggleForest}
 			<SimpleTooltip text={forestCollapsed ? 'Show forest' : 'Hide forest'}>

@@ -4,11 +4,16 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import XIcon from '@lucide/svelte/icons/x';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { useRawRequirements } from '$lib/modules/raw-requirements/index.js';
+	import { resolve } from '$app/paths';
+
+	const FULL_PAGE_NOTE_THRESHOLD = 6;
 
 	const rawRequirementsCtx = useRawRequirements();
 
@@ -162,11 +167,37 @@
 				onkeydown={handleNewNoteKeydown}
 			/>
 			<div class="mt-3 flex items-center justify-between">
-				<div>
+				<div class="flex items-center gap-2">
 					{#if rawRequirementsCtx.hasNotes}
-						<Button variant="secondary" size="sm">
-							<SparklesIcon />
-							{m.raw_requirements_process()}
+						<Tooltip.Provider>
+							<Tooltip.Root>
+								<Tooltip.Trigger>
+									{#snippet child({ props })}
+										<span {...props}>
+											<Button variant="secondary" size="sm" disabled>
+												<SparklesIcon />
+												{m.raw_requirements_process()}
+											</Button>
+										</span>
+									{/snippet}
+								</Tooltip.Trigger>
+								<Tooltip.Content side="top" sideOffset={6}>
+									{m.raw_requirements_process_coming_soon()}
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
+					{/if}
+					{#if rawRequirementsCtx.notes.length >= FULL_PAGE_NOTE_THRESHOLD}
+						<Button
+							variant="ghost"
+							size="sm"
+							onclick={() => {
+								rawRequirementsCtx.close();
+							}}
+							href={resolve('/quick-ideas')}
+						>
+							<ExternalLinkIcon />
+							{m.raw_requirements_full_page()}
 						</Button>
 					{/if}
 				</div>

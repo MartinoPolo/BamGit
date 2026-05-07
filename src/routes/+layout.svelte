@@ -82,7 +82,7 @@
 		shortcutsCtx.registerShortcut({
 			id: 'quick-ideas',
 			label: 'Quick Ideas',
-			defaultBinding: 'Ctrl+Shift+I',
+			defaultBinding: 'Ctrl+Shift+Q',
 			allowFromEditable: true,
 			callback: () => void rawRequirementsCtx.toggle(),
 		});

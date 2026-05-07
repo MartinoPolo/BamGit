@@ -10,6 +10,7 @@
 	} from '$lib/modules/visualization';
 	import type {
 		TreeVisualization,
+		TreeComputeContext,
 		ForestLayoutItem,
 		SessionForMapping,
 	} from '$lib/modules/visualization';
@@ -32,8 +33,11 @@
 	import { useSelection } from '$lib/modules/board';
 	import { BATCH_SELECTED_GLOW_COLOR } from './batch_selection_utils.js';
 
+	const PRD_LABEL = 'prd';
+
 	interface Props {
 		issues: readonly Issue[];
+		allIssues: readonly Issue[];
 		dependencies: readonly IssueDependency[];
 		getGitStatus: (issueId: string) => GitStatusCache | undefined;
 		getSessionsForIssue: (issueId: string) => readonly SessionForMapping[];
@@ -44,6 +48,7 @@
 
 	let {
 		issues,
+		allIssues,
 		dependencies,
 		getGitStatus,
 		getSessionsForIssue,
@@ -92,14 +97,53 @@
 		readonly layoutItem: ForestLayoutItem;
 	}
 
+	const childrenByParentId = $derived.by(() => {
+		const map = new Map<string, Issue[]>();
+		for (const issue of allIssues) {
+			if (issue.parent_issue_id !== null) {
+				const existing = map.get(issue.parent_issue_id);
+				if (existing !== undefined) {
+					existing.push(issue);
+				} else {
+					map.set(issue.parent_issue_id, [issue]);
+				}
+			}
+		}
+		return map;
+	});
+
+	function buildComputeContext(issue: Issue): TreeComputeContext | undefined {
+		const isPrd = issue.labels.some((label) => label.name.toLowerCase() === PRD_LABEL);
+		if (!isPrd) {
+			return undefined;
+		}
+		const children = childrenByParentId.get(issue.id) ?? [];
+		const totalCount = children.length;
+		const completedCount = children.filter((child) => child.status === 'archived').length;
+		const sessions = getSessionsForIssue(issue.id);
+
+		return {
+			isPrd: true,
+			prdTitle: issue.name,
+			subIssueCompletionRatio: totalCount > 0 ? completedCount / totalCount : 0,
+			subIssueCount: totalCount,
+			hasCompletedSession: sessions.some((s) => s.state === 'finished'),
+			hasCommitsOnBranch: getGitStatus(issue.id)?.branch_status === 'active',
+			sessionCount: sessions.length,
+			issueId: issue.id,
+		};
+	}
+
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const visualizations = new SvelteMap<string, TreeVisualization>();
 
 		for (const issue of issues) {
+			const context = buildComputeContext(issue);
 			const visualization = computeVisualization(
 				issue,
 				getGitStatus(issue.id),
 				getSessionsForIssue(issue.id),
+				context,
 			);
 			visualizations.set(issue.id, visualization);
 		}
