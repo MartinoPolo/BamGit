@@ -266,42 +266,47 @@
 		}}
 	>
 		{#each flatVisualOrder as issue (issue.id)}
-			<IssueCardContextMenu
-				{issue}
-				isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-				derivedActions={getDerivedActions(issue)}
-				onToggleSelect={() => handleToggleSelect(issue.id)}
-				onContextualAction={(actionId) => onExecuteAction?.(actionId, issue.id)}
-				{onArchive}
-				{onUnarchive}
-				{onEdit}
-				{onDelete}
-				{onChangePriority}
-				{onRename}
-				{onSetupWorktree}
-				{onRemoveWorktree}
-				{onChangeColor}
+			<div
+				style:content-visibility="auto"
+				style:contain-intrinsic-size="auto 450px auto 180px"
 			>
-				<IssueCard
+				<IssueCardContextMenu
 					{issue}
-					cache={cacheMap.get(issue.id)}
-					{ghAvailable}
-					notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
-					childCount={getChildCount(issue.id)}
-					prdParent={getPrdParent(issue)}
-					{prioritiesEnabled}
-					visualization={getVisualization?.(issue.id)}
-					isActive={selection.activeIssueId === issue.id}
-					isHovered={selection.hoveredIssueId === issue.id}
 					isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-					{isModifierHeld}
-					onCardClick={(event) => handleCardClick(issue, event)}
-					onTitleClick={() => handleTitleClick(issue)}
-					onMouseEnter={() => selection.hoverIssue(issue.id)}
-					onMouseLeave={() => selection.unhover()}
-					{onExecuteAction}
-				/>
-			</IssueCardContextMenu>
+					derivedActions={getDerivedActions(issue)}
+					onToggleSelect={() => handleToggleSelect(issue.id)}
+					onContextualAction={(actionId) => onExecuteAction?.(actionId, issue.id)}
+					{onArchive}
+					{onUnarchive}
+					{onEdit}
+					{onDelete}
+					{onChangePriority}
+					{onRename}
+					{onSetupWorktree}
+					{onRemoveWorktree}
+					{onChangeColor}
+				>
+					<IssueCard
+						{issue}
+						cache={cacheMap.get(issue.id)}
+						{ghAvailable}
+						notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
+						childCount={getChildCount(issue.id)}
+						prdParent={getPrdParent(issue)}
+						{prioritiesEnabled}
+						visualization={getVisualization?.(issue.id)}
+						isActive={selection.activeIssueId === issue.id}
+						isHovered={selection.hoveredIssueId === issue.id}
+						isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
+						{isModifierHeld}
+						onCardClick={(event) => handleCardClick(issue, event)}
+						onTitleClick={() => handleTitleClick(issue)}
+						onMouseEnter={() => selection.hoverIssue(issue.id)}
+						onMouseLeave={() => selection.unhover()}
+						{onExecuteAction}
+					/>
+				</IssueCardContextMenu>
+			</div>
 		{/each}
 	</div>
 
@@ -318,31 +323,36 @@
 				style="grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));"
 			>
 				{#each archivedIssues as issue (issue.id)}
-					<IssueCardContextMenu
-						{issue}
-						isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-						onToggleSelect={() => handleToggleSelect(issue.id)}
-						{onArchive}
-						{onUnarchive}
-						{onEdit}
-						{onDelete}
-						{onChangePriority}
+					<div
+						style:content-visibility="auto"
+						style:contain-intrinsic-size="auto 450px auto 180px"
 					>
-						<IssueCard
+						<IssueCardContextMenu
 							{issue}
-							cache={cacheMap.get(issue.id)}
-							{ghAvailable}
-							prdParent={getPrdParent(issue)}
-							visualization={getVisualization?.(issue.id)}
-							isActive={selection.activeIssueId === issue.id}
-							isHovered={selection.hoveredIssueId === issue.id}
 							isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-							onCardClick={(event) => handleCardClick(issue, event)}
-							onTitleClick={() => handleTitleClick(issue)}
-							onMouseEnter={() => selection.hoverIssue(issue.id)}
-							onMouseLeave={() => selection.unhover()}
-						/>
-					</IssueCardContextMenu>
+							onToggleSelect={() => handleToggleSelect(issue.id)}
+							{onArchive}
+							{onUnarchive}
+							{onEdit}
+							{onDelete}
+							{onChangePriority}
+						>
+							<IssueCard
+								{issue}
+								cache={cacheMap.get(issue.id)}
+								{ghAvailable}
+								prdParent={getPrdParent(issue)}
+								visualization={getVisualization?.(issue.id)}
+								isActive={selection.activeIssueId === issue.id}
+								isHovered={selection.hoveredIssueId === issue.id}
+								isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
+								onCardClick={(event) => handleCardClick(issue, event)}
+								onTitleClick={() => handleTitleClick(issue)}
+								onMouseEnter={() => selection.hoverIssue(issue.id)}
+								onMouseLeave={() => selection.unhover()}
+							/>
+						</IssueCardContextMenu>
+					</div>
 				{/each}
 			</div>
 		</div>

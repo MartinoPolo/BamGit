@@ -96,6 +96,30 @@
 		readonly layoutItem: ForestLayoutItem;
 	}
 
+	interface VisualizationCacheEntry {
+		readonly fingerprint: string;
+		readonly result: TreeVisualization;
+	}
+
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- intentionally non-reactive perf cache
+	const visualizationCache = new Map<string, VisualizationCacheEntry>();
+
+	// fallow-ignore-next-line complexity
+	function computeVisualizationFingerprint(
+		issue: Issue,
+		gitStatus: GitStatusCache | undefined,
+		sessions: readonly SessionForMapping[],
+		context: TreeComputeContext | undefined,
+	): string {
+		const sessionPart = sessions.map((s) => s.state).join(',');
+		const runningPhase = sessions.find((s) => s.state === 'running')?.execution_phase ?? '';
+		const labelPart = issue.labels.map((l) => l.name).join(',');
+		const ctxPart = context
+			? `${context.subIssueCompletionRatio}|${context.subIssueCount}|${context.hasCompletedSession}|${context.hasCommitsOnBranch}|${context.sessionCount}`
+			: '';
+		return `${issue.status}|${issue.worktree_state}|${issue.branch_name}|${issue.color}|${labelPart}|${gitStatus?.branch_status}|${gitStatus?.pr_state}|${gitStatus?.github_issue_state}|${gitStatus?.merge_conflict}|${gitStatus?.behind_base_count}|${sessionPart}|${runningPhase}|${ctxPart}`;
+	}
+
 	const childrenByParentId = $derived.by(() => {
 		const map = new SvelteMap<string, Issue[]>();
 		for (const issue of allIssues) {
@@ -133,18 +157,38 @@
 		};
 	}
 
+	// fallow-ignore-next-line complexity
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const visualizations = new SvelteMap<string, TreeVisualization>();
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local to derived, not persisted
+		const activeIds = new Set<string>();
 
 		for (const issue of issues) {
+			activeIds.add(issue.id);
 			const context = buildComputeContext(issue);
-			const visualization = computeVisualization(
+			const gitStatus = getGitStatus(issue.id);
+			const sessions = getSessionsForIssue(issue.id);
+			const fingerprint = computeVisualizationFingerprint(
 				issue,
-				getGitStatus(issue.id),
-				getSessionsForIssue(issue.id),
+				gitStatus,
+				sessions,
 				context,
 			);
+			const cached = visualizationCache.get(issue.id);
+			let visualization: TreeVisualization;
+			if (cached && cached.fingerprint === fingerprint) {
+				visualization = cached.result;
+			} else {
+				visualization = computeVisualization(issue, gitStatus, sessions, context);
+				visualizationCache.set(issue.id, { fingerprint, result: visualization });
+			}
 			visualizations.set(issue.id, visualization);
+		}
+
+		for (const key of visualizationCache.keys()) {
+			if (!activeIds.has(key)) {
+				visualizationCache.delete(key);
+			}
 		}
 
 		const issueIds = issues.map((issue) => issue.id);
@@ -354,6 +398,7 @@
 	style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
 	style:min-height="0"
 	style:isolation="isolate"
+	style:contain="content"
 	onkeydown={handleKeydown}
 	tabindex="0"
 >
@@ -396,6 +441,7 @@
 								style:opacity={positioned.opacity}
 								style:z-index={positioned.zIndex}
 								style:pointer-events="none"
+								style:will-change="transform"
 								onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
 								onmouseleave={() => interaction.unhover()}
 								onclick={(event) => handleTreeClick(entry, event)}
