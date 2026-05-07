@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/modules/chat/index.js';
 	import CompassIcon from '@lucide/svelte/icons/compass';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
 
@@ -76,8 +77,13 @@
 				{/each}
 			</div>
 		{/if}
-		<Button variant="primary" size="sm" onclick={() => onConfirm?.(selectedIndex)}>
-			Confirm <Kbd class="ml-1">↵</Kbd>
+		<Button
+			variant="primary"
+			size="sm"
+			class="h-[var(--size-control-md)]"
+			onclick={() => onConfirm?.(selectedIndex)}
+		>
+			Confirm <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
 		</Button>
 	</div>
 </div>
