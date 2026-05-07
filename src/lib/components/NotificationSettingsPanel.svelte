@@ -6,6 +6,11 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import VolumeIcon from '@lucide/svelte/icons/volume-2';
+	import PackageIcon from '@lucide/svelte/icons/package';
+	import TrashIcon from '@lucide/svelte/icons/trash-2';
 
 	const notificationStore = useNotifications();
 
@@ -55,6 +60,9 @@
 
 	onMount(() => {
 		notificationStore.loadConfigs();
+		notificationStore.loadGlobalVolume();
+		notificationStore.loadSoundPacks();
+		notificationStore.loadVolumeOverrides();
 	});
 
 	async function toggleChannel(
@@ -80,9 +88,24 @@
 			console.error('Failed to test sound:', error);
 		}
 	}
+
+	function handleVolumeChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const volume = parseFloat(target.value);
+		notificationStore.setGlobalVolume(volume);
+	}
+
+	async function handleRemovePack(packName: string) {
+		try {
+			await notificationStore.removeSoundPack(packName);
+		} catch (error) {
+			console.error('Failed to remove sound pack:', error);
+		}
+	}
 </script>
 
-<div class="space-y-4">
+<div class="space-y-6">
+	<!-- Header + Global Volume -->
 	<div>
 		<h2 class="text-lg font-semibold text-foreground">{m.notification_title()}</h2>
 		<p class="text-sm text-muted-foreground">
@@ -90,9 +113,28 @@
 		</p>
 	</div>
 
+	<!-- Global volume control -->
+	<div class="flex items-center gap-3 rounded-lg border border-border bg-muted/30 px-4 py-3">
+		<VolumeIcon class="size-4 shrink-0 text-muted-foreground" />
+		<span class="text-sm font-medium text-foreground">Global Volume</span>
+		<input
+			type="range"
+			min="0"
+			max="1"
+			step="0.05"
+			value={notificationStore.globalVolume}
+			oninput={handleVolumeChange}
+			class="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-border accent-primary"
+		/>
+		<span class="w-10 text-right text-xs text-muted-foreground">
+			{Math.round(notificationStore.globalVolume * 100)}%
+		</span>
+	</div>
+
 	{#if notificationStore.loading}
 		<p class="text-muted-foreground">{m.loading_notification_settings()}</p>
 	{:else}
+		<!-- Event config tiers -->
 		{#each configsByTier as group (group.tier)}
 			<div class="overflow-hidden rounded-lg border border-border">
 				<!-- Tier header -->
@@ -129,7 +171,6 @@
 							!config.toast_enabled &&
 							!config.window_flash_enabled}
 					>
-						<!-- Event label and description -->
 						<div>
 							<span class="text-sm font-medium text-foreground">
 								{EVENT_LABELS[config.event_type]?.() ?? config.event_type}
@@ -139,7 +180,6 @@
 							</p>
 						</div>
 
-						<!-- Sound toggle -->
 						<div class="flex justify-center">
 							<SimpleTooltip
 								text={config.sound_enabled === true
@@ -154,7 +194,6 @@
 							</SimpleTooltip>
 						</div>
 
-						<!-- Toast toggle -->
 						<div class="flex justify-center">
 							<SimpleTooltip
 								text={config.toast_enabled === true
@@ -169,7 +208,6 @@
 							</SimpleTooltip>
 						</div>
 
-						<!-- Window flash toggle -->
 						<div class="flex justify-center">
 							<SimpleTooltip
 								text={config.window_flash_enabled === true
@@ -188,7 +226,6 @@
 							</SimpleTooltip>
 						</div>
 
-						<!-- Test sound button -->
 						<div class="flex justify-center">
 							{#if config.sound_file}
 								<SimpleTooltip text="Play test sound">
@@ -208,5 +245,64 @@
 				{/each}
 			</div>
 		{/each}
+	{/if}
+
+	<Separator />
+
+	<!-- Sound Packs section -->
+	<div>
+		<div class="flex items-center gap-2">
+			<PackageIcon class="size-4 text-muted-foreground" />
+			<h3 class="text-sm font-semibold text-foreground">Sound Packs</h3>
+		</div>
+		<p class="mt-1 text-xs text-muted-foreground">
+			Installed sound packs. Place packs in the sound-packs directory or install via file
+			picker.
+		</p>
+	</div>
+
+	{#if notificationStore.soundPacks.length === 0}
+		<p class="text-sm text-muted-foreground">No sound packs installed.</p>
+	{:else}
+		<div class="space-y-2">
+			{#each notificationStore.soundPacks as pack (pack.name)}
+				<div
+					class="flex items-center justify-between rounded-lg border border-border px-4 py-3"
+				>
+					<div class="flex items-center gap-3">
+						<PackageIcon class="size-5 text-muted-foreground" />
+						<div>
+							<span class="text-sm font-medium text-foreground">
+								{pack.display_name}
+							</span>
+							<div class="flex items-center gap-2">
+								<span class="text-xs text-muted-foreground">
+									v{pack.version}
+								</span>
+								{#if pack.author}
+									<span class="text-xs text-muted-foreground">
+										by {pack.author}
+									</span>
+								{/if}
+								<Badge variant="mono">
+									{pack.event_count} sounds
+								</Badge>
+							</div>
+						</div>
+					</div>
+					{#if pack.name !== 'grove'}
+						<SimpleTooltip text="Remove pack">
+							<Button
+								variant="ghost"
+								size="icon-sm"
+								onclick={() => handleRemovePack(pack.name)}
+							>
+								<TrashIcon class="size-4" />
+							</Button>
+						</SimpleTooltip>
+					{/if}
+				</div>
+			{/each}
+		</div>
 	{/if}
 </div>
