@@ -25,12 +25,11 @@
 	const isEditing = $derived(rawRequirementsCtx.editingIndex === index);
 
 	function startEditing() {
-		const currentNote = rawRequirementsCtx.notes[index];
-		if (!currentNote) {
+		if (index < 0 || index >= rawRequirementsCtx.notes.length) {
 			return;
 		}
 		rawRequirementsCtx.editingIndex = index;
-		editContent = currentNote.content;
+		editContent = rawRequirementsCtx.notes[index].content;
 	}
 
 	function cancelEditing() {
