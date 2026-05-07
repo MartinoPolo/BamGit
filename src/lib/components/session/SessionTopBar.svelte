@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Session } from '$lib/types/generated/Session.js';
+	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
@@ -17,6 +18,7 @@
 		activeTab?: 'chat' | 'files' | 'stats';
 		onTabChange?: (tab: 'chat' | 'files' | 'stats') => void;
 		onOpenInCli?: () => void;
+		onBack?: () => void;
 	}
 
 	let {
@@ -27,6 +29,7 @@
 		activeTab = 'chat',
 		onTabChange,
 		onOpenInCli,
+		onBack,
 	}: Props = $props();
 
 	const sessionTitle = $derived(
@@ -39,7 +42,12 @@
 </script>
 
 <div class="flex h-10 shrink-0 items-center gap-2.5 border-b border-border bg-surface px-3.5">
-	<!-- Left: title + state badge -->
+	<!-- Left: back button + title + state badge -->
+	{#if onBack}
+		<Button variant="ghost" size="icon-sm" onclick={onBack}>
+			<ArrowLeftIcon size={14} strokeWidth={2} />
+		</Button>
+	{/if}
 	<span
 		class="max-w-[280px] shrink-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold tracking-[-0.01em]"
 	>

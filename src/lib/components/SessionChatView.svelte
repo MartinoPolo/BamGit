@@ -26,9 +26,10 @@
 
 	interface Props {
 		session: Session;
+		onBack?: () => void;
 	}
 
-	let { session }: Props = $props();
+	let { session, onBack }: Props = $props();
 
 	const sessionStore = useSessions();
 
@@ -190,7 +191,7 @@
 
 <div class="flex h-full flex-col overflow-hidden">
 	<!-- Top bar -->
-	<SessionTopBar {session} />
+	<SessionTopBar {session} {onBack} />
 
 	<div class="flex flex-1 overflow-hidden">
 		<!-- Chat column -->
