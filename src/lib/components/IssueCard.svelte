@@ -467,7 +467,10 @@
 	}
 
 	:global(.card-state-active-ic) {
-		box-shadow: 0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
+		box-shadow:
+			0 0 0 3px var(--surface),
+			0 0 0 5px color-mix(in oklch, var(--ic) 50%, transparent),
+			0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
 		background: color-mix(in oklch, oklch(0.55 0.08 55) 10%, var(--surface));
 	}
 
