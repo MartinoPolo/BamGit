@@ -472,7 +472,7 @@
 
 	:global(.card-state-active-ic) {
 		box-shadow:
-			0 0 0 2px color-mix(in oklch, var(--ic) 50%, transparent),
+			0 0 0 4px color-mix(in oklch, var(--ic) 40%, transparent),
 			0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
 		background: color-mix(in oklch, oklch(0.55 0.08 55) 10%, var(--surface));
 	}
