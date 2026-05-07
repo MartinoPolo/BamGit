@@ -9,6 +9,14 @@
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
+		args: {
+			message: {
+				id: 'default',
+				role: 'assistant' as const,
+				content: 'Default message for autodocs.',
+				timestamp: Date.now(),
+			},
+		},
 	});
 </script>
 
