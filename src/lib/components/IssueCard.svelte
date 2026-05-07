@@ -86,8 +86,6 @@
 		issue.worktree_state === 'active' || issue.worktree_state === 'pending',
 	);
 
-	const expanded = $derived(issue.worktree_state === 'pending');
-
 	const hasPrdLabel = $derived(prdParent !== null && prdParent.number !== null);
 
 	const worktreeBadge = $derived.by(() => {
