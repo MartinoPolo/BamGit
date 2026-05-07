@@ -14,9 +14,7 @@
 
 <script lang="ts">
 	import ContentDimmer from './ContentDimmer.svelte';
-	import StreamingCaret from './StreamingCaret.svelte';
 	import SystemMessage from './SystemMessage.svelte';
-	import InlineImage from './InlineImage.svelte';
 </script>
 
 <Story name="User Message">
@@ -197,31 +195,6 @@
 					timestamp: Date.now(),
 				}}
 				streaming={true}
-			/>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Streaming Caret">
-	{#snippet template()}
-		<div class="mx-auto max-w-[900px]">
-			<p class="text-[13px] text-foreground">
-				Some text with a streaming indicator<StreamingCaret />
-			</p>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Inline Image">
-	{#snippet template()}
-		<div class="mx-auto max-w-[900px] flex gap-4">
-			<InlineImage
-				src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='120'><rect fill='%23334155' width='200' height='120' rx='8'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='14'>Image #1</text></svg>"
-				imageNumber={1}
-			/>
-			<InlineImage
-				src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='120'><rect fill='%231e3a5f' width='200' height='120' rx='8'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='14'>Image #2</text></svg>"
-				imageNumber={2}
 			/>
 		</div>
 	{/snippet}
