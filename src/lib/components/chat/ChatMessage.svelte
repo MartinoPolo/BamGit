@@ -14,12 +14,14 @@
 	let { message, streaming = false }: Props = $props();
 </script>
 
-{#if message.role === MESSAGE_ROLE.user}
-	<UserBubble content={message.content} />
-{:else if message.role === MESSAGE_ROLE.assistant}
-	<AssistantMessage content={message.content} {streaming} />
-{:else if message.role === MESSAGE_ROLE.tool}
-	<ToolCardCompact {message} />
-{:else if message.role === MESSAGE_ROLE.system}
-	<SystemMessage content={message.content} />
+{#if message}
+	{#if message.role === MESSAGE_ROLE.user}
+		<UserBubble content={message.content} />
+	{:else if message.role === MESSAGE_ROLE.assistant}
+		<AssistantMessage content={message.content} {streaming} />
+	{:else if message.role === MESSAGE_ROLE.tool}
+		<ToolCardCompact {message} />
+	{:else if message.role === MESSAGE_ROLE.system}
+		<SystemMessage content={message.content} />
+	{/if}
 {/if}
