@@ -329,7 +329,10 @@
 				</SimpleTooltip>
 			{/if}
 			{#if visualization}
-				<div class="absolute inset-0" style="transform: scale(1.4) translateY(10%);">
+				<div
+					class="absolute inset-0"
+					style="transform: scale(1.4); transform-origin: bottom center;"
+				>
 					<TreeThumbnailImage {visualization} />
 				</div>
 			{:else}
