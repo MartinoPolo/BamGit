@@ -123,7 +123,7 @@ export function generateIssueName(_issueNumber: number, title: string): string {
 		return '';
 	}
 
-	const firstFourWords = words.slice(0, 4);
+	const firstFourWords = words.slice(0, 5);
 	const joined = firstFourWords.join(' ');
 
 	return stripTrailingSpecialCharacters(joined);

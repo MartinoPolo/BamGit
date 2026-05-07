@@ -7,6 +7,14 @@ use crate::models::issue::{CreateIssueRequest, Issue, UpdateIssueRequest};
 
 use super::shared::resolve_nullable_field;
 
+fn validate_branch_name_chars(name: &str) -> Result<(), String> {
+    if name.chars().all(|c| c.is_alphanumeric() || "-_/.".contains(c)) {
+        Ok(())
+    } else {
+        Err(format!("Invalid branch name characters in: {name}"))
+    }
+}
+
 const ISSUE_SELECT_COLUMNS: &str =
     "id, dashboard_id, name, priority, color, status, github_issue_url, github_issue_number, \
      branch_name, base_branch, worktree_folder, worktree_state, parent_issue_id, editor_folder, \
@@ -129,6 +137,9 @@ pub fn update_issue(
     let github_issue_url = resolve_nullable_field(request.github_issue_url, existing.github_issue_url);
     let github_issue_number = resolve_nullable_field(request.github_issue_number, existing.github_issue_number);
     let branch_name = resolve_nullable_field(request.branch_name, existing.branch_name);
+    if let Some(ref name) = branch_name {
+        validate_branch_name_chars(name)?;
+    }
     let base_branch = resolve_nullable_field(request.base_branch, existing.base_branch);
     let worktree_folder = resolve_nullable_field(request.worktree_folder, existing.worktree_folder);
     let worktree_state = request.worktree_state.unwrap_or(existing.worktree_state);

@@ -1,6 +1,3 @@
-/** @public */
-export type SelectAllCheckboxState = 'all' | 'some' | 'none';
-
 /**
  * Compute the range of issue IDs between anchor and target in a flat visual order.
  * Always returns IDs in forward (array) order regardless of anchor/target positions.
@@ -22,25 +19,6 @@ export function computeRangeSelection(
 	const endIndex = Math.max(anchorIndex, targetIndex);
 
 	return flatOrder.slice(startIndex, endIndex + 1);
-}
-
-/**
- * Compute the select-all checkbox state based on selected vs total count.
- */
-export function computeSelectAllCheckboxState(
-	selectedCount: number,
-	totalCount: number,
-): SelectAllCheckboxState {
-	if (totalCount === 0) {
-		return 'none';
-	}
-	if (selectedCount === totalCount) {
-		return 'all';
-	}
-	if (selectedCount > 0) {
-		return 'some';
-	}
-	return 'none';
 }
 
 export const CARD_STATE_CLASSES = {

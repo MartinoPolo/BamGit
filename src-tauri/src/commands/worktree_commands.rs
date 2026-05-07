@@ -225,6 +225,11 @@ fn stream_output(
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
+fn validate_path_exists(path: &str, label: &str) -> Result<std::path::PathBuf, String> {
+    std::fs::canonicalize(path)
+        .map_err(|e| format!("{label} path is invalid or does not exist: {e}"))
+}
+
 fn validate_branch_name(name: &str) -> Result<(), String> {
     if name.is_empty() || name.len() > 100 {
         return Err("Branch name must be 1-100 characters".to_string());
@@ -297,10 +302,12 @@ pub async fn setup_worktree(
         args.push(color.clone());
     }
 
+    let canonical_working_dir = validate_path_exists(&request.working_directory, "Working directory")?;
+
     // Spawn the script
     let mut child = Command::new(&bash_path)
         .args(&args)
-        .current_dir(&request.working_directory)
+        .current_dir(&canonical_working_dir)
         .env("GROVEKEEPER", "1") // Signal to script it's being called from Grovekeeper
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
@@ -424,9 +431,11 @@ pub async fn remove_worktree(
         request.branch_name.clone(),
     ];
 
+    let canonical_working_dir = validate_path_exists(&request.working_directory, "Working directory")?;
+
     let mut child = Command::new(&bash_path)
         .args(&args)
-        .current_dir(&request.working_directory)
+        .current_dir(&canonical_working_dir)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
@@ -583,7 +592,9 @@ pub fn get_prunable_issues(
 pub fn update_peacock_color(worktree_folder: String, color: String) -> Result<(), String> {
     validate_hex_color(&color)?;
 
-    let vscode_dir = Path::new(&worktree_folder).join(".vscode");
+    let canonical = std::fs::canonicalize(&worktree_folder)
+        .map_err(|e| format!("Worktree folder path is invalid: {e}"))?;
+    let vscode_dir = canonical.join(".vscode");
     std::fs::create_dir_all(&vscode_dir)
         .map_err(|e| format!("Failed to create .vscode dir: {e}"))?;
 

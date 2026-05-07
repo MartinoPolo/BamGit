@@ -35,7 +35,6 @@
 		prioritiesEnabled?: boolean;
 		paletteColors?: string[];
 		usedColors?: string[];
-		isDarkMode?: boolean;
 		dependencies: readonly IssueDependency[];
 		ghSetupBanner?: boolean;
 		ghAvailability?: GhCliAvailability;
@@ -62,7 +61,6 @@
 		prioritiesEnabled = true,
 		paletteColors = [],
 		usedColors = [],
-		isDarkMode = false,
 		dependencies,
 		ghSetupBanner = false,
 		ghAvailability,
@@ -220,7 +218,6 @@
 					{ghAvailable}
 					{paletteColors}
 					{usedColors}
-					{isDarkMode}
 					{onArchive}
 					{onUnarchive}
 					{onEdit}

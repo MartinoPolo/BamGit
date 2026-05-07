@@ -84,8 +84,11 @@
 
 	let isModifierHeld = $state(false);
 
-	function updateModifierState(event: MouseEvent | KeyboardEvent) {
-		isModifierHeld = event.ctrlKey || event.metaKey || event.shiftKey;
+	function updateModifierState(event: KeyboardEvent | PointerEvent) {
+		const next = event.ctrlKey || event.metaKey || event.shiftKey;
+		if (next !== isModifierHeld) {
+			isModifierHeld = next;
+		}
 	}
 
 	function handleCardClick(issue: Issue, event: MouseEvent) {

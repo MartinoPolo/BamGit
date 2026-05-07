@@ -23,7 +23,6 @@
 		ghAvailable?: boolean;
 		paletteColors?: string[];
 		usedColors?: string[];
-		isDarkMode?: boolean;
 	}
 
 	let {
@@ -32,7 +31,6 @@
 		ghAvailable = false,
 		paletteColors = [],
 		usedColors = [],
-		isDarkMode = false,
 		onArchive,
 		onUnarchive,
 		onEdit,
@@ -177,7 +175,6 @@
 				selectedColor={issue.color ?? ''}
 				colors={paletteColors}
 				{usedColors}
-				{isDarkMode}
 				displayText="A"
 				side="top"
 				onSelect={handleColorSelect}

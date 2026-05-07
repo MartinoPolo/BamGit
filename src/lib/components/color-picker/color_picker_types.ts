@@ -11,7 +11,6 @@ export interface ColorPickerContentProps {
 }
 
 export interface ColorPickerProps extends ColorPickerContentProps {
-	isDarkMode?: boolean;
 	side?: 'top' | 'bottom' | 'left' | 'right';
 	align?: 'start' | 'center' | 'end';
 	open?: boolean;
