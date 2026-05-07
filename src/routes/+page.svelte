@@ -63,7 +63,7 @@
 
 	let usedColors = $state<string[]>([]);
 	let editingIssue = $state<Issue | null>(null);
-	let allExpanded = $state(false);
+
 	let pruneDialogOpen = $state(false);
 	let prunableIssues = $state<PrunableIssue[]>([]);
 	let pruneRemoving = $state(false);
@@ -554,7 +554,6 @@
 						archivedIssues={issueStore.archivedIssues}
 						showArchived={issueStore.showArchived}
 						isPortfolio={boardStore.activeDashboard?.type === 'portfolio'}
-						forceExpanded={allExpanded ? true : undefined}
 						cacheMap={versionControlStore.stateMap}
 						ghAvailable={versionControlStore.isGhAvailable}
 						prioritiesEnabled={boardStore.activeDashboard?.priorities_enabled ?? true}
@@ -570,7 +569,6 @@
 						{getVisualization}
 						getChildren={issueStore.getChildren}
 						{getNotificationDotColor}
-						getProgressLines={(issueId) => issueStore.getProgressLines(issueId)}
 						onArchive={(issue) => (archiveTargetIssue = issue)}
 						onUnarchive={handleUnarchiveIssue}
 						onEdit={async (issue) => {

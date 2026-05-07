@@ -22,7 +22,7 @@
 	];
 </script>
 
-<div class="flex flex-wrap gap-1 px-3 pb-1 pt-2">
+<div class="flex flex-wrap items-center gap-1 px-3 pb-1 pt-2">
 	{#each defaultChips as chip (chip.command)}
 		<Button
 			variant="secondary"

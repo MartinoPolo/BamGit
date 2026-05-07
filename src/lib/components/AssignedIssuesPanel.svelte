@@ -9,8 +9,9 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Plus from '@lucide/svelte/icons/plus';
 	import GitBranch from '@lucide/svelte/icons/git-branch';
-	import { openUrl } from '@tauri-apps/plugin-opener';
+	import { openUrl } from '$lib/opener.js';
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
@@ -53,11 +54,7 @@
 
 	async function handleClick(url: string) {
 		if (!disabled) {
-			try {
-				await openUrl(url);
-			} catch {
-				// Fails silently in browser mock mode
-			}
+			await openUrl(url);
 		}
 	}
 </script>
@@ -84,12 +81,13 @@
 			{#if issue.labels.length > 0}
 				<span class="flex shrink-0 items-center gap-1">
 					{#each issue.labels as label (label.name)}
-						<span
-							class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none"
-							style="background-color: {label.color}20; color: {label.color}; border: 1px solid {label.color}40;"
+						<Badge
+							size="compact"
+							class="rounded-full"
+							style="background-color: {label.color}20; color: {label.color}; border-color: {label.color}40;"
 						>
 							{label.name}
-						</span>
+						</Badge>
 					{/each}
 				</span>
 			{/if}

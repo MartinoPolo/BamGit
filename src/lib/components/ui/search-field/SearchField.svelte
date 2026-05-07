@@ -15,13 +15,13 @@
 
 <div class="relative" data-slot="search-field">
 	<SearchIcon
-		class="pointer-events-none absolute left-2.5 top-[9px] size-[13px] text-foreground-subtle"
+		class="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-foreground-subtle"
 	/>
 	<input
 		bind:this={ref}
 		bind:value
 		data-slot="search-field-input"
-		class={cn(inputVariants(), 'pl-[30px]', className)}
+		class={cn(inputVariants(), 'pl-9', className)}
 		type="search"
 		{...restProps}
 	/>

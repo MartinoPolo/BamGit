@@ -22,6 +22,7 @@ const COMMAND_BODIES: Record<string, string> = {
 	open_workspace_window: 'Opening workspace windows requires the desktop app',
 	update_peacock_color: 'Peacock color sync requires the desktop app',
 	pick_folder: 'Folder picker requires the desktop app',
+	open_path: 'Opening local folders requires the desktop app',
 };
 
 // ─── Dedup ───────────────────────────────────────────────────────────────────

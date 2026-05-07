@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -70,26 +71,20 @@
 		<div class="max-h-[320px] overflow-y-auto p-1.5">
 			{#each [...paletteCtx.groupedResults] as [category, items], groupIndex (category)}
 				{#if groupIndex > 0}
-					<hr data-slot="popover-divider" class="my-1 border-t border-border" />
+					<Popover.Divider />
 				{/if}
 
-				<div
-					data-slot="popover-label"
-					class="px-2 pb-1 pt-1.5 text-[length:var(--text-2xs)] font-medium uppercase tracking-wider text-foreground-subtle"
-				>
-					{CATEGORY_LABELS[category]()}
-				</div>
+				<Popover.Label>{CATEGORY_LABELS[category]()}</Popover.Label>
 
 				{#each items as item (item.id)}
 					{@const flatIdx = paletteCtx.flatIndexByItemId.get(item.id) ?? -1}
 					{@const isSelected = flatIdx === paletteCtx.selectedIndex}
-					<div
-						data-slot="popover-item"
-						data-state={isSelected ? 'active' : undefined}
+					<Popover.Item
+						active={isSelected}
 						role="option"
 						aria-selected={isSelected}
 						tabindex={-1}
-						class="flex min-h-[28px] w-full cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 text-[length:var(--text-sm)] text-foreground outline-none hover:bg-surface-2 focus-visible:bg-surface-2 data-[state=active]:bg-surface-2 data-[state=active]:text-primary"
+						class="data-[state=active]:bg-surface-2"
 						onclick={() => paletteCtx.executeItem(item)}
 						onkeydown={(event) => {
 							if (event.key === 'Enter') {
@@ -124,7 +119,7 @@
 								{/if}
 							{/if}
 						</span>
-					</div>
+					</Popover.Item>
 				{/each}
 			{/each}
 

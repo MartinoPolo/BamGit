@@ -3,6 +3,7 @@
 	import { TOOL_STATUS } from '$lib/modules/chat/index.js';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import XIcon from '@lucide/svelte/icons/x';
+	import * as Card from '$lib/components/ui/card/index.js';
 	import {
 		extractToolDetail,
 		extractToolOutput,
@@ -23,8 +24,9 @@
 	const accentColor = $derived(getToolAccentColor(message.toolName ?? ''));
 </script>
 
-<div
-	class="overflow-hidden rounded-lg border border-border bg-surface"
+<Card.Card
+	padding="none"
+	class="overflow-hidden"
 	role="region"
 	aria-label="Tool card: {message.toolName}"
 >
@@ -56,9 +58,12 @@
 
 	<!-- Content panel with accent border -->
 	<div class="flex">
-		<div class="w-[3px] shrink-0" style="background: {accentColor}"></div>
+		<div
+			class="w-[3px] shrink-0"
+			style="background: {(message.isError ?? false) ? 'var(--status-danger)' : accentColor}"
+		></div>
 		<pre
 			class="m-0 max-h-[260px] flex-1 overflow-auto break-all whitespace-pre-wrap px-3 py-2.5 font-mono text-[11.5px] leading-[1.55] text-foreground-muted">{output ||
 				detail}</pre>
 	</div>
-</div>
+</Card.Card>
