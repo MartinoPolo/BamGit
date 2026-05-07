@@ -354,6 +354,7 @@
 	style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
 	style:min-height="0"
 	style:isolation="isolate"
+	style:contain="content"
 	onkeydown={handleKeydown}
 	tabindex="0"
 >
@@ -396,6 +397,7 @@
 								style:opacity={positioned.opacity}
 								style:z-index={positioned.zIndex}
 								style:pointer-events="none"
+								style:will-change="transform"
 								onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
 								onmouseleave={() => interaction.unhover()}
 								onclick={(event) => handleTreeClick(entry, event)}
