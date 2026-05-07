@@ -459,6 +459,7 @@
 </div>
 
 <style>
+	/* stylelint-disable selector-pseudo-class-no-unknown */
 	:global(.card-ic-interactive):hover,
 	:global(.card-state-hovered-ic) {
 		box-shadow:
