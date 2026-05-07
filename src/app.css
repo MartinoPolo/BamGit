@@ -42,6 +42,7 @@
 	--color-status-warning: var(--status-warning);
 	--color-status-danger: var(--status-danger);
 	--color-status-info: var(--status-info);
+	--color-status-merged: var(--status-merged);
 	--color-code-bg: var(--code-bg);
 	--color-priority-top: var(--priority-top);
 	--color-priority-high: var(--priority-high);
@@ -237,6 +238,7 @@
 	--status-warning: oklch(0.77 0.155 75);
 	--status-danger: oklch(0.62 0.205 25);
 	--status-info: oklch(0.66 0.105 220);
+	--status-merged: var(--gh-merged);
 	--priority-top: oklch(0.62 0.205 25);
 	--priority-high: oklch(0.72 0.16 55);
 	--priority-medium: oklch(0.82 0.16 85);

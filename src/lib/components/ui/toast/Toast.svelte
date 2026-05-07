@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils.js';
 	import { toastVariants, toastIconColors, type ToastProps } from './toast-variants.js';
 	import XIcon from '@lucide/svelte/icons/x';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	let {
 		ref = $bindable<HTMLDivElement | null>(null),
@@ -43,13 +44,14 @@
 	{/if}
 
 	{#if onDismiss}
-		<button
-			type="button"
+		<Button
+			variant="ghost"
+			size="icon-sm"
+			class="size-6 text-foreground-subtle"
 			onclick={onDismiss}
 			aria-label="Dismiss"
-			class="shrink-0 inline-flex size-6 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-surface-2 hover:text-foreground"
 		>
 			<XIcon class="size-3" />
-		</button>
+		</Button>
 	{/if}
 </div>

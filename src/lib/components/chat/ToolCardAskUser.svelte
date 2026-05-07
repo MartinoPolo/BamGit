@@ -3,6 +3,8 @@
 	import CompassIcon from '@lucide/svelte/icons/compass';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import * as Card from '$lib/components/ui/card/index.js';
+	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 
 	interface Props {
 		message: ChatMessage;
@@ -11,7 +13,9 @@
 
 	let { message, onConfirm }: Props = $props();
 
-	let selectedIndex = $state(0);
+	let selectedValue = $state('0');
+
+	const selectedIndex = $derived(parseInt(selectedValue, 10));
 
 	const options = $derived.by(() => {
 		if (
@@ -42,7 +46,7 @@
 	});
 </script>
 
-<div class="overflow-hidden rounded-lg border border-border bg-surface">
+<Card.Card padding="none" class="overflow-hidden">
 	<!-- Header -->
 	<div class="flex h-9 items-center gap-2 border-b border-border bg-surface-2 px-3">
 		<CompassIcon size={13} strokeWidth={1.8} class="text-foreground-muted" />
@@ -55,7 +59,7 @@
 			{question}
 		</div>
 		{#if options.length > 0}
-			<div class="mb-2.5 flex flex-col gap-1">
+			<RadioGroup.Root bind:value={selectedValue} class="mb-2.5 gap-1">
 				{#each options as option, i (i)}
 					<label
 						class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-[5px] text-[12.5px]"
@@ -64,20 +68,14 @@
 							? 'border: 1px solid color-mix(in oklch, var(--primary) 30%, var(--border))'
 							: 'border: 1px solid transparent'}
 					>
-						<input
-							type="radio"
-							name="ask-option"
-							class="accent-primary"
-							checked={selectedIndex === i}
-							onchange={() => (selectedIndex = i)}
-						/>
+						<RadioGroup.Item value={String(i)} />
 						<span>{option}</span>
 					</label>
 				{/each}
-			</div>
+			</RadioGroup.Root>
 		{/if}
 		<Button variant="primary" size="sm" onclick={() => onConfirm?.(selectedIndex)}>
 			Confirm <Kbd class="ml-1">↵</Kbd>
 		</Button>
 	</div>
-</div>
+</Card.Card>

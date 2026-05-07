@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
 	import type { ColorPickerContentProps } from './color_picker_types.js';
 	import { DEFAULT_COLOR_PALETTE, getContrastTextColor, isValidHexColor } from './color_utils.js';
 
@@ -164,7 +165,7 @@
 	{/each}
 </div>
 
-<div class="my-2 border-t border-border"></div>
+<Separator class="my-2" />
 
 <div class="flex flex-1 items-center justify-center gap-2">
 	<label
