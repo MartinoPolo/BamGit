@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/modules/chat/index.js';
 	import AlertTriangleIcon from '@lucide/svelte/icons/alert-triangle';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
 	import { extractToolDetail, getToolAccentColor } from './tool_card_utils.js';
@@ -44,17 +45,28 @@
 			{/if}
 			<div class="flex gap-1.5">
 				<Button
+					variant="primary"
 					size="sm"
-					class="bg-status-success text-white hover:bg-status-success/90"
+					class="h-[var(--size-control-md)]"
 					onclick={onAllow}
 				>
-					Allow <Kbd class="ml-1">↵</Kbd>
+					Allow <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button variant="secondary" size="sm" onclick={onAllowAlways}>
-					Allow Always <Kbd class="ml-1">⌃↵</Kbd>
+				<Button
+					variant="secondary"
+					size="sm"
+					class="h-[var(--size-control-md)]"
+					onclick={onAllowAlways}
+				>
+					Allow Always <Kbd>⌃<CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button variant="danger" size="sm" onclick={onDeny}>
-					Deny <Kbd class="ml-1">Esc</Kbd>
+				<Button
+					variant="danger"
+					size="sm"
+					class="h-[var(--size-control-md)]"
+					onclick={onDeny}
+				>
+					Deny <Kbd>Esc</Kbd>
 				</Button>
 			</div>
 		</div>

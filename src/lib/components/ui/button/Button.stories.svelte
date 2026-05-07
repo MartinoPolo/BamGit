@@ -12,7 +12,14 @@
 		argTypes: {
 			variant: {
 				control: 'select',
-				options: ['primary', 'secondary', 'ghost', 'danger'],
+				options: [
+					'primary',
+					'secondary',
+					'ghost',
+					'ghost-overlay',
+					'danger',
+					'contextual-primary',
+				],
 			},
 			size: {
 				control: 'select',
@@ -52,6 +59,31 @@
 	{/snippet}
 </Story>
 
+<Story name="Ghost Overlay">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex gap-4">
+			<div class="rounded-lg bg-primary p-4">
+				<div class="flex items-center gap-2">
+					<Button variant="ghost-overlay" size="icon-sm" {...args}><MailIcon /></Button>
+					<Button variant="ghost-overlay" size="icon-sm" {...args}
+						><SettingsIcon /></Button
+					>
+					<Button variant="ghost-overlay" {...args}>Action</Button>
+				</div>
+			</div>
+			<div class="rounded-lg bg-surface-2 p-4">
+				<div class="flex items-center gap-2">
+					<Button variant="ghost-overlay" size="icon-sm" {...args}><MailIcon /></Button>
+					<Button variant="ghost-overlay" size="icon-sm" {...args}
+						><SettingsIcon /></Button
+					>
+					<Button variant="ghost-overlay" {...args}>Action</Button>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Danger">
 	{#snippet template(args: ButtonProps)}
 		<Button variant="danger" {...args}>Danger</Button>
@@ -64,6 +96,7 @@
 			<Button variant="primary" disabled {...args}>Primary</Button>
 			<Button variant="secondary" disabled {...args}>Secondary</Button>
 			<Button variant="ghost" disabled {...args}>Ghost</Button>
+			<Button variant="ghost-overlay" disabled {...args}>Ghost Overlay</Button>
 			<Button variant="danger" disabled {...args}>Danger</Button>
 		</div>
 	{/snippet}
@@ -75,6 +108,7 @@
 			<Button variant="primary" {...args}>Primary</Button>
 			<Button variant="secondary" {...args}>Secondary</Button>
 			<Button variant="ghost" {...args}>Ghost</Button>
+			<Button variant="ghost-overlay" {...args}>Ghost Overlay</Button>
 			<Button variant="danger" {...args}>Danger</Button>
 		</div>
 	{/snippet}

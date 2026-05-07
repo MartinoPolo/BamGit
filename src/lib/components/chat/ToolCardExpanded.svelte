@@ -56,7 +56,10 @@
 
 	<!-- Content panel with accent border -->
 	<div class="flex">
-		<div class="w-[3px] shrink-0" style="background: {accentColor}"></div>
+		<div
+			class="w-[3px] shrink-0"
+			style="background: {message.isError ? 'var(--status-danger)' : accentColor}"
+		></div>
 		<pre
 			class="m-0 max-h-[260px] flex-1 overflow-auto break-all whitespace-pre-wrap px-3 py-2.5 font-mono text-[11.5px] leading-[1.55] text-foreground-muted">{output ||
 				detail}</pre>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ChatMessage } from '$lib/modules/chat/index.js';
 	import DatabaseIcon from '@lucide/svelte/icons/database';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Kbd } from '$lib/components/ui/kbd/index.js';
@@ -75,10 +76,20 @@
 					bind:value={inputValue}
 					onkeydown={handleKeydown}
 				/>
-				<Button variant="primary" size="sm" onclick={handleSubmit}>
-					Submit <Kbd class="ml-1">↵</Kbd>
+				<Button
+					variant="primary"
+					size="sm"
+					class="h-[var(--size-control-md)]"
+					onclick={handleSubmit}
+				>
+					Submit <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button variant="ghost" size="sm" onclick={onCancel}>Cancel</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					class="h-[var(--size-control-md)]"
+					onclick={onCancel}>Cancel</Button
+				>
 			</div>
 		</div>
 	</div>
