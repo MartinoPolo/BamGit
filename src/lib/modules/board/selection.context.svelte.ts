@@ -43,17 +43,15 @@ function createSelectionContext() {
 	}
 
 	function activateIssue(issueId: string) {
-		if (activeIssueId.current === issueId) {
-			if (activeTab.current !== BOTTOM_PANEL_TABS.issueDetail) {
-				activeTab.current = BOTTOM_PANEL_TABS.issueDetail;
-			}
-			return;
-		}
 		activeIssueId.current = issueId;
-		if (activeTab.current === null && !shouldShowPrdOverview(issueId, prdIssueId.current)) {
-			activeTab.current = BOTTOM_PANEL_TABS.issueDetail;
-		}
+		activeTab.current = BOTTOM_PANEL_TABS.issueDetail;
+	}
+
+	function selectExclusive(issueId: string) {
 		clearBatchSelection();
+		batchSelectedIssueIds.add(issueId);
+		individuallySelectedIds.add(issueId);
+		batchAnchorId.current = issueId;
 	}
 
 	function deactivate() {
@@ -167,6 +165,7 @@ function createSelectionContext() {
 		setActiveTab,
 		setPrdIssueId,
 		toggleForestCollapsed,
+		selectExclusive,
 		toggleBatchSelect,
 		batchRangeSelect,
 		batchSelectAll,

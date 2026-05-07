@@ -1,6 +1,5 @@
 import * as m from '$lib/paraglide/messages.js';
 import type { IssuePriority } from '$lib/modules/issues';
-import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte';
 
 // ─── Priority Display Constants ─────────────────────────────────────────────
 
@@ -39,18 +38,3 @@ export function getPriorityBorderClass(
 	}
 	return PRIORITY_BORDER_CLASSES[priority];
 }
-
-// ─── Collapse/Expand Persistence ────────────────────────────────────────────
-
-export function isExpandedStates(value: unknown): value is Record<string, boolean> {
-	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-		return false;
-	}
-	return Object.values(value).every((v) => typeof v === 'boolean');
-}
-
-export const issueExpandedStates = new Persisted<Record<string, boolean>>({
-	key: 'grovekeeper_issue_expanded',
-	serde: jsonSerde(isExpandedStates),
-	defaultValue: {},
-});
