@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { cardVariants, CARD_STATE_OPTIONS, CARD_STATE_CLASSES } from './card-variants.js';
 
 describe('cardVariants', () => {
-	it('generates base classes with surface bg, border, radius-lg, and shadow-sm', () => {
+	it('generates base classes with relative, surface bg, border, radius-lg, and shadow-sm', () => {
 		const classes = cardVariants();
+		expect(classes).toContain('relative');
 		expect(classes).toContain('bg-surface');
 		expect(classes).toContain('border');
 		expect(classes).toContain('shadow-sm');

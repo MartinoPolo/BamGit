@@ -21,9 +21,9 @@ Quick-glance health overview of a workspace. Click opens/focuses that workspace'
 
 ### Quick Access Buttons (top-right corner)
 
-- **GitHub link** — custom `GithubIcon.svelte` (fill-based, Simple Icons SVG). Opens repo URL in browser
+- **GitHub link** — custom stroke-based `GithubIcon.svelte` (Lucide/Feather style, matching the design's icon). Opens repo URL in browser
 - **Local folder** — Lucide `folder` (closed). Opens project path in file explorer
-- Both: 26×26px (`icon-sm`), `ghost` variant, `text-foreground-subtle` at rest, `text-foreground` + `bg-surface-2` on hover, strokeWidth N/A for fill icons / 1.7 for Lucide
+- Both: 26×26px (`icon-sm`), `ghost` variant, `text-foreground-subtle` at rest, `text-foreground` + `bg-surface-2` on hover, strokeWidth 1.7
 - **Unassigned state**: opacity 0.35. Left-click AND right-click open workspace config wizard for that field
 - **Assigned state**: opacity 1.0 (via `text-foreground-subtle`). Left-click opens target. Right-click opens workspace config wizard
 
@@ -195,11 +195,11 @@ Horizontal status indicator with LED, label, and right-aligned metadata.
 
 ### GithubIcon (`src/lib/components/icons/`)
 
-Fill-based SVG from Simple Icons. Props: `size`, `class`. No `strokeWidth` (fill icon).
+Stroke-based SVG matching Lucide/Feather style (same path as in `claude_design/icons.jsx`). Props: `size`, `strokeWidth`, `class`. Matches Lucide component API so it blends with other icons.
 
 ### VscodeIcon (rewrite)
 
-Replace stroke-based approximation with proper Simple Icons fill-based SVG. Same props as GithubIcon.
+Replace current stroke-based approximation with proper Simple Icons fill-based SVG (`fill="currentColor"`, no stroke). Props: `size`, `class`. No `strokeWidth` (fill icon).
 
 ---
 

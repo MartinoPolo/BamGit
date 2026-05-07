@@ -6,6 +6,8 @@
 		class: className,
 		padding = 'none',
 		state,
+		accentBarColor,
+		gradientTint,
 		ref = $bindable(null),
 		children,
 		...restProps
@@ -21,7 +23,15 @@
 	bind:this={ref}
 	data-slot="card"
 	data-state={dataState}
-	class={cn(cardVariants({ padding }), stateClass, className)}
+	class={cn(
+		cardVariants({ padding }),
+		stateClass,
+		accentBarColor != null && 'border-l-[3px]',
+		gradientTint != null && 'gk-card-gradient-tint',
+		className,
+	)}
+	style:border-left-color={accentBarColor}
+	style:--gk-card-tint-color={gradientTint}
 	{...restProps}
 >
 	{@render children?.()}
