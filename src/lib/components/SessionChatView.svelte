@@ -2,21 +2,30 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, SessionEventPayload } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
+	import {
+		buildChatMessage,
+		groupMessagesIntoTurns,
+		shouldAutoScroll,
+		shouldShowJumpToLatestResponse,
+		shouldShowJumpToLatestPrompt,
+		findLastMessageIndex,
+		MESSAGE_ROLE,
+		type ChatMessage,
+		type ScrollPosition,
+	} from '$lib/modules/chat/index.js';
 	import { listen, type UnlistenFn } from '$lib/tauri.js';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import {
+		ChatMessage as ChatMessageComponent,
+		ContentDimmer,
+		QuickNavButtons,
+		AssistantMessage,
+	} from '$lib/components/chat/index.js';
 
 	interface Props {
 		session: Session;
-	}
-
-	interface ChatMessage {
-		id: number;
-		role: 'user' | 'assistant' | 'tool' | 'system';
-		content: string;
-		tool_name?: string;
-		is_error?: boolean;
 	}
 
 	let { session }: Props = $props();
@@ -24,8 +33,8 @@
 	const sessionStore = useSessions();
 
 	let nextMessageId = 0;
-	function createMessage(fields: Omit<ChatMessage, 'id'>): ChatMessage {
-		return { id: nextMessageId++, ...fields };
+	function generateMessageId(): string {
+		return `local_${nextMessageId++}`;
 	}
 
 	let messages = $state<ChatMessage[]>([]);
@@ -33,6 +42,8 @@
 	let promptInput = $state('');
 	let sending = $state(false);
 	let unlistenFn: UnlistenFn | null = null;
+	let scrollContainer: HTMLDivElement | undefined = $state();
+	let scrollPosition = $state<ScrollPosition>({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
 
 	const isActive = $derived(session.state !== 'finished' && session.state !== 'errored');
 
@@ -42,79 +53,76 @@
 			(session.state === 'needs-review' || session.state === 'needs-input'),
 	);
 
+	const turns = $derived(groupMessagesIntoTurns(messages));
+
+	const lastUserMessageTurnIndex = $derived.by(() => {
+		for (let i = turns.length - 1; i >= 0; i--) {
+			if (turns[i].userMessage !== null) {
+				return i;
+			}
+		}
+		return -1;
+	});
+
+	const showJumpToResponse = $derived(shouldShowJumpToLatestResponse(messages, scrollPosition));
+	const showJumpToPrompt = $derived(shouldShowJumpToLatestPrompt(messages, scrollPosition));
+
 	function appendMessage(message: ChatMessage) {
 		messages = [...messages, message];
 	}
 
-	function handleMessageDelta(event: Record<string, unknown>) {
-		currentStreamingText += event.text as string;
-	}
+	function handleSessionEvent(sessionEvent: SessionEventPayload['event']) {
+		if (sessionEvent.type === 'message_delta') {
+			currentStreamingText += sessionEvent.text;
+			return;
+		}
 
-	function handleMessageComplete() {
-		if (currentStreamingText) {
-			appendMessage(createMessage({ role: 'assistant', content: currentStreamingText }));
+		if (sessionEvent.type === 'message_complete') {
 			currentStreamingText = '';
 		}
-	}
 
-	function handleToolStart(event: Record<string, unknown>) {
-		appendMessage(
-			createMessage({
-				role: 'tool',
-				content: m.chat_tool_running({ toolName: event.tool_name as string }),
-				tool_name: event.tool_name as string,
-			}),
-		);
-	}
-
-	function handleToolEnd(event: Record<string, unknown>) {
-		const output = event.output;
-		const content = typeof output === 'string' ? output : JSON.stringify(output, null, 2);
-		const truncated = content.length > 500 ? content.slice(0, 497) + '...' : content;
-		appendMessage(
-			createMessage({
-				role: 'tool',
-				content: truncated,
-				tool_name: event.tool_name as string,
-				is_error: event.is_error as boolean,
-			}),
-		);
-	}
-
-	function handleRunState(event: Record<string, unknown>) {
-		const state = event.state as string;
-		if (state === 'failed' || state === 'completed') {
-			appendMessage(
-				createMessage({
-					role: 'system',
-					content:
-						state === 'failed'
-							? m.chat_session_errored({
-									error: (event.error as string) ?? 'unknown',
-								})
-							: m.chat_session_completed(),
-				}),
-			);
+		const chatMessage = buildChatMessage(sessionEvent);
+		if (chatMessage !== null) {
+			appendMessage(chatMessage);
 		}
 	}
 
-	function handlePermissionPrompt(event: Record<string, unknown>) {
-		appendMessage(
-			createMessage({
-				role: 'system',
-				content: m.chat_permission_needed({ toolName: event.tool_name as string }),
-			}),
-		);
+	function updateScrollPosition() {
+		if (scrollContainer === undefined) {
+			return;
+		}
+		scrollPosition = {
+			scrollTop: scrollContainer.scrollTop,
+			scrollHeight: scrollContainer.scrollHeight,
+			clientHeight: scrollContainer.clientHeight,
+		};
 	}
 
-	const SESSION_EVENT_HANDLERS: Record<string, (event: Record<string, unknown>) => void> = {
-		message_delta: handleMessageDelta,
-		message_complete: handleMessageComplete,
-		tool_start: handleToolStart,
-		tool_end: handleToolEnd,
-		run_state: handleRunState,
-		permission_prompt: handlePermissionPrompt,
-	};
+	async function scrollToBottom() {
+		await tick();
+		if (scrollContainer !== undefined) {
+			scrollContainer.scrollTop = scrollContainer.scrollHeight;
+		}
+	}
+
+	function scrollToLastMessage(role: ChatMessage['role']) {
+		const index = findLastMessageIndex(messages, role);
+		if (index === -1 || scrollContainer === undefined) {
+			return;
+		}
+		const target = scrollContainer.querySelector(`[data-message-index="${index}"]`);
+		if (target instanceof HTMLElement) {
+			target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	}
+
+	$effect(() => {
+		if (messages.length > 0 || currentStreamingText) {
+			if (shouldAutoScroll(scrollPosition)) {
+				void scrollToBottom();
+			}
+		}
+	});
 
 	onMount(async () => {
 		unlistenFn = await listen<SessionEventPayload>('session-event', (event) => {
@@ -122,8 +130,7 @@
 			if (sessionId !== session.id) {
 				return;
 			}
-
-			SESSION_EVENT_HANDLERS[sessionEvent.type]?.(sessionEvent);
+			handleSessionEvent(sessionEvent);
 		});
 	});
 
@@ -139,15 +146,22 @@
 		promptInput = '';
 		sending = true;
 
-		messages = [...messages, createMessage({ role: 'user', content: message })];
+		appendMessage({
+			id: generateMessageId(),
+			role: MESSAGE_ROLE.user,
+			content: message,
+			timestamp: Date.now(),
+		});
 
 		try {
 			await sessionStore.sendMessage(session.id, message);
 		} catch (err) {
-			messages = [
-				...messages,
-				createMessage({ role: 'system', content: `Failed to send: ${String(err)}` }),
-			];
+			appendMessage({
+				id: generateMessageId(),
+				role: MESSAGE_ROLE.system,
+				content: `Failed to send: ${String(err)}`,
+				timestamp: Date.now(),
+			});
 		} finally {
 			sending = false;
 		}
@@ -157,10 +171,12 @@
 		try {
 			await sessionStore.interruptSession(session.id);
 		} catch (err) {
-			messages = [
-				...messages,
-				createMessage({ role: 'system', content: `Failed to interrupt: ${String(err)}` }),
-			];
+			appendMessage({
+				id: generateMessageId(),
+				role: MESSAGE_ROLE.system,
+				content: `Failed to interrupt: ${String(err)}`,
+				timestamp: Date.now(),
+			});
 		}
 	}
 
@@ -173,44 +189,81 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<!-- Messages -->
-	<div class="flex-1 space-y-3 overflow-y-auto p-4">
-		{#each messages as message (message.id)}
-			<div
-				class="rounded-lg p-3 text-sm {message.role === 'user'
-					? 'ml-8 bg-primary/10 text-primary'
-					: message.role === 'tool'
-						? 'bg-muted font-mono text-xs text-foreground'
-						: message.role === 'system'
-							? 'bg-card text-center text-xs text-muted-foreground'
-							: 'mr-8 bg-muted text-foreground'}"
-			>
-				{#if message.role === 'tool' && message.tool_name !== undefined}
-					<div
-						class="mb-1 text-xs font-medium {message.is_error === true
-							? 'text-destructive'
-							: 'text-muted-foreground'}"
-					>
-						{message.tool_name}
-						{message.is_error === true ? ' (error)' : ''}
+	<!-- Message stream -->
+	<div
+		class="relative flex-1 overflow-y-auto"
+		bind:this={scrollContainer}
+		onscroll={updateScrollPosition}
+	>
+		<div class="mx-auto max-w-[900px] px-6 pb-36 pt-4">
+			<div class="flex flex-col gap-2.5">
+				{#each turns as turn, turnIndex (turn.id)}
+					{@const isDimmed =
+						lastUserMessageTurnIndex > 0 && turnIndex < lastUserMessageTurnIndex}
+					<ContentDimmer dimmed={isDimmed}>
+						{#each turn.systemMessages as sysMsg (sysMsg.id)}
+							<div data-message-index={messages.indexOf(sysMsg)}>
+								<ChatMessageComponent message={sysMsg} />
+							</div>
+						{/each}
+						{#if turn.userMessage !== null}
+							<div data-message-index={messages.indexOf(turn.userMessage)}>
+								<ChatMessageComponent message={turn.userMessage} />
+							</div>
+						{/if}
+						{#each turn.assistantMessages as assistantMsg, assistantIndex (assistantMsg.id)}
+							<div data-message-index={messages.indexOf(assistantMsg)}>
+								<ChatMessageComponent message={assistantMsg} />
+							</div>
+							{@const toolsBefore = turn.toolMessages.filter(
+								(t) =>
+									t.timestamp >= assistantMsg.timestamp &&
+									(assistantIndex + 1 >= turn.assistantMessages.length ||
+										t.timestamp <
+											turn.assistantMessages[assistantIndex + 1].timestamp),
+							)}
+							{#each toolsBefore as toolMsg (toolMsg.id)}
+								<div data-message-index={messages.indexOf(toolMsg)}>
+									<ChatMessageComponent message={toolMsg} />
+								</div>
+							{/each}
+						{/each}
+						{#if turn.assistantMessages.length === 0}
+							{#each turn.toolMessages as toolMsg (toolMsg.id)}
+								<div data-message-index={messages.indexOf(toolMsg)}>
+									<ChatMessageComponent message={toolMsg} />
+								</div>
+							{/each}
+						{/if}
+					</ContentDimmer>
+				{/each}
+
+				<!-- Streaming text -->
+				{#if currentStreamingText}
+					<div>
+						<AssistantMessage content={currentStreamingText} streaming={true} />
 					</div>
 				{/if}
-				<pre class="whitespace-pre-wrap">{message.content}</pre>
 			</div>
-		{/each}
+		</div>
 
-		{#if currentStreamingText}
-			<div class="mr-8 rounded-lg bg-muted p-3 text-sm text-foreground">
-				<pre class="whitespace-pre-wrap">{currentStreamingText}<span class="animate-pulse"
-						>|</span
-					></pre>
-			</div>
-		{/if}
+		<!-- Quick nav buttons -->
+		<QuickNavButtons
+			{showJumpToPrompt}
+			{showJumpToResponse}
+			onJumpToPrompt={() => scrollToLastMessage('user')}
+			onJumpToResponse={() => scrollToLastMessage('assistant')}
+		/>
+
+		<!-- Gradient fade -->
+		<div
+			class="pointer-events-none sticky bottom-0 -mt-[120px] h-[120px] bg-gradient-to-b from-transparent to-background"
+		></div>
 	</div>
 
 	<!-- Input bar -->
 	<div class="border-t border-border p-3">
-		<div class="flex items-center gap-2">
+		<div class="mx-auto flex max-w-[900px] items-center gap-2">
 			{#if session.state === 'running'}
 				<Button
 					variant="secondary"
