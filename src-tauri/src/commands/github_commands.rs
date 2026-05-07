@@ -80,17 +80,21 @@ fn read_all_caches_for_dashboard(
 
 /// Run a gh CLI command and return stdout. Returns Err on non-zero exit or missing binary.
 async fn run_gh_command(args: &[&str]) -> Result<String, String> {
-    let output = tokio::process::Command::new("gh")
-        .args(args)
-        .output()
-        .await
-        .map_err(|error| {
-            if error.kind() == std::io::ErrorKind::NotFound {
-                "gh CLI not found. Install it from https://cli.github.com".to_string()
-            } else {
-                format!("Failed to run gh command: {error}")
-            }
-        })?;
+    let output = tokio::time::timeout(
+        std::time::Duration::from_secs(30),
+        tokio::process::Command::new("gh")
+            .args(args)
+            .output(),
+    )
+    .await
+    .map_err(|_| "gh command timed out after 30 seconds".to_string())?
+    .map_err(|error| {
+        if error.kind() == std::io::ErrorKind::NotFound {
+            "gh CLI not found. Install it from https://cli.github.com".to_string()
+        } else {
+            format!("Failed to run gh command: {error}")
+        }
+    })?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -136,7 +140,11 @@ fn build_bulk_sync_graphql_query(
     for (index, branch) in branch_names.iter().enumerate() {
         if let Some(branch_name) = branch {
             // Escape the branch name for GraphQL string literal
-            let escaped = branch_name.replace('\\', "\\\\").replace('"', "\\\"");
+            let escaped = branch_name
+                .replace('\\', "\\\\")
+                .replace('"', "\\\"")
+                .replace('{', "\\{")
+                .replace('}', "\\}");
             fragments.push(format!(
                 "pr_{index}: pullRequests(headRefName: \"{escaped}\", first: 1, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ \
                  nodes {{ number state url isDraft reviewRequests(first: 10) {{ nodes {{ requestedReviewer {{ ... on User {{ login }} ... on Team {{ name }} }} }} }} latestReviews(first: 1) {{ nodes {{ state }} }} }} }}"
@@ -551,8 +559,8 @@ pub async fn sync_all_github_state(
     // Filter to issues that have a github_issue_number
     let syncable: Vec<_> = issues_data
         .iter()
-        .filter(|(_, number, _)| number.is_some())
-        .collect();
+        .filter_map(|(id, number, branch)| number.map(|n| (id, n, branch)))
+        .collect::<Vec<_>>();
 
     if syncable.is_empty() {
         return Ok(SyncAllResult {
@@ -561,7 +569,7 @@ pub async fn sync_all_github_state(
         });
     }
 
-    let issue_numbers: Vec<i64> = syncable.iter().map(|(_, n, _)| n.unwrap()).collect();
+    let issue_numbers: Vec<i64> = syncable.iter().map(|(_, n, _)| *n).collect();
     let branch_names: Vec<Option<&str>> = syncable
         .iter()
         .map(|(_, _, b)| b.as_deref())
@@ -616,7 +624,7 @@ pub async fn sync_all_github_state(
 
             if let Some(body) = issue_data.get("body").and_then(|b| b.as_str()) {
                 let blocked_by_numbers = parse_blocked_by_numbers(body);
-                let blocked_issue_id = issue_id;
+                let blocked_issue_id = issue_id.to_string();
                 for blocker_number in blocked_by_numbers {
                     if let Some(blocker_id) = number_to_issue_id.get(&blocker_number) {
                         dependency_edges.push((blocker_id.clone(), blocked_issue_id.clone()));
@@ -678,10 +686,10 @@ pub async fn sync_all_github_state(
             }
         }
 
-        labels_to_write.push((issue_id.clone(), labels_json));
+        labels_to_write.push((issue_id.to_string(), labels_json));
 
         caches_to_write.push(GitStatusCache {
-            issue_id: issue_id.clone(),
+            issue_id: issue_id.to_string(),
             branch_status: None,
             pr_state,
             pr_number,

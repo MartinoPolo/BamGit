@@ -301,27 +301,27 @@ describe('generateIssueName', () => {
 	describe('no number prefix', () => {
 		it('does not include issue number in output', () => {
 			const result = generateIssueName(133, 'multi-step creation wizard with smart naming');
-			expect(result).toBe('multi-step creation wizard with');
+			expect(result).toBe('multi-step creation wizard with smart');
 		});
 
 		it('ignores issue number completely', () => {
 			const result = generateIssueName(42, 'Fix login bug in auth module');
-			expect(result).toBe('Fix login bug in');
+			expect(result).toBe('Fix login bug in auth');
 		});
 	});
 
 	describe('basic formatting', () => {
-		it('takes first four words from title', () => {
+		it('takes first five words from title', () => {
 			const result = generateIssueName(
 				133,
 				'feat: multi-step creation wizard with smart naming',
 			);
-			expect(result).toBe('multi-step creation wizard with');
+			expect(result).toBe('multi-step creation wizard with smart');
 		});
 
 		it('strips conventional commit prefix before taking words', () => {
 			const result = generateIssueName(133, 'feat(ui): add dashboard layout for users');
-			expect(result).toBe('add dashboard layout for');
+			expect(result).toBe('add dashboard layout for users');
 		});
 	});
 
@@ -358,29 +358,29 @@ describe('generateIssueName', () => {
 
 		it('preserves inline special characters', () => {
 			const result = generateIssueName(173, 'Issue card redesign: states and more');
-			expect(result).toBe('Issue card redesign: states');
+			expect(result).toBe('Issue card redesign: states and');
 		});
 	});
 
 	describe('preserves original casing', () => {
 		it('preserves mixed case', () => {
 			const result = generateIssueName(42, 'Fix Login Bug In Auth');
-			expect(result).toBe('Fix Login Bug In');
+			expect(result).toBe('Fix Login Bug In Auth');
 		});
 
 		it('preserves uppercase words', () => {
 			const result = generateIssueName(1, 'Add OAUTH2 Support For Users');
-			expect(result).toBe('Add OAUTH2 Support For');
+			expect(result).toBe('Add OAUTH2 Support For Users');
 		});
 
 		it('preserves lowercase title', () => {
 			const result = generateIssueName(1, 'add new feature for app');
-			expect(result).toBe('add new feature for');
+			expect(result).toBe('add new feature for app');
 		});
 	});
 
-	describe('fewer than four words', () => {
-		it('uses all words when title has fewer than 4 words after prefix stripping', () => {
+	describe('fewer than five words', () => {
+		it('uses all words when title has fewer than 5 words after prefix stripping', () => {
 			const result = generateIssueName(1, 'fix bug');
 			expect(result).toBe('fix bug');
 		});
@@ -399,6 +399,11 @@ describe('generateIssueName', () => {
 			const result = generateIssueName(1, 'add new login page');
 			expect(result).toBe('add new login page');
 		});
+
+		it('uses all words when exactly 5 words', () => {
+			const result = generateIssueName(1, 'add new login page now');
+			expect(result).toBe('add new login page now');
+		});
 	});
 
 	describe('no filler word stripping', () => {
@@ -409,7 +414,7 @@ describe('generateIssueName', () => {
 
 		it('preserves "a", "an" articles', () => {
 			const result = generateIssueName(1, 'Add a new button for users');
-			expect(result).toBe('Add a new button');
+			expect(result).toBe('Add a new button for');
 		});
 	});
 
@@ -428,12 +433,12 @@ describe('generateIssueName', () => {
 	describe('full integration examples', () => {
 		it('example from spec: Issue card redesign produces no number prefix', () => {
 			const result = generateIssueName(173, 'Issue card redesign: states, hover, borders');
-			expect(result).toBe('Issue card redesign: states');
+			expect(result).toBe('Issue card redesign: states, hover');
 		});
 
 		it('example from spec: Fix login bug produces clean name', () => {
 			const result = generateIssueName(42, 'Fix login bug in auth module');
-			expect(result).toBe('Fix login bug in');
+			expect(result).toBe('Fix login bug in auth');
 		});
 	});
 });

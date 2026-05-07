@@ -10,7 +10,6 @@
 		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
-			isDarkMode: { control: 'boolean' },
 			displayText: { control: 'text' },
 			side: { control: 'select', options: ['top', 'bottom', 'left', 'right'] },
 			align: { control: 'select', options: ['start', 'center', 'end'] },
@@ -30,7 +29,7 @@
 	}
 </script>
 
-<Story name="Default" args={{ isDarkMode: false }}>
+<Story name="Default" args={{}}>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4">
 			<ColorPicker {...args} {selectedColor} onSelect={handleSelect} />
@@ -39,7 +38,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Display Text" args={{ isDarkMode: false, displayText: 'A' }}>
+<Story name="With Display Text" args={{ displayText: 'A' }}>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4">
 			<ColorPicker {...args} {selectedColor} onSelect={handleSelect} />
@@ -48,7 +47,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Used Colors" args={{ isDarkMode: false, displayText: 'A' }}>
+<Story name="With Used Colors" args={{ displayText: 'A' }}>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex flex-col gap-3">
 			<p class="text-xs text-muted-foreground">
@@ -67,7 +66,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Dark Mode" args={{ isDarkMode: true }}>
+<Story name="Dark Mode" args={{}}>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4">
 			<ColorPicker {...args} {selectedColor} onSelect={handleSelect} />

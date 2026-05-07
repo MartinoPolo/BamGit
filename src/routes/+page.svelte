@@ -12,6 +12,7 @@
 	} from '$lib/modules/notifications';
 	import { useSessions } from '$lib/modules/sessions';
 	import { useRawRequirements } from '$lib/modules/raw-requirements/index.js';
+	import { useToasts } from '$lib/modules/toasts/index.js';
 	import type {
 		Issue,
 		IssuePriority,
@@ -46,6 +47,7 @@
 	const selection = useSelection();
 	const rawRequirementsCtx = useRawRequirements();
 	const wizardStore = useCreationWizard();
+	const toastsCtx = useToasts();
 
 	function getNotificationDotColor(issueId: string): string | null {
 		const issueSessions = sessionStore.sessionsByIssueId.get(issueId);
@@ -176,7 +178,6 @@
 			paletteColors: activePaletteColors,
 			usedColors,
 			nextAvailableColor: nextColor,
-			isDarkMode: boardStore.theme.isDark,
 			localFolder: boardStore.activeDashboard?.local_folder ?? null,
 			defaultBaseBranch: boardStore.activeDashboard?.default_base_branch ?? null,
 			githubRepo: githubRepoParts,
@@ -205,6 +206,11 @@
 			}
 		} catch (err) {
 			console.error(`Failed to ${label}:`, err);
+			toastsCtx.show({
+				tone: 'danger',
+				title: `Failed to ${label}`,
+				body: String(err),
+			});
 		}
 	}
 
@@ -323,7 +329,7 @@
 		archiveTargetIssue = null;
 
 		if (removeWorktree) {
-			await handleRemoveWorktreeForIssue(issue);
+			await handleRemoveWorktree(issue);
 		}
 		await handleAction('archive issue', () => issueStore.archiveIssue(issue.id));
 	}
@@ -336,30 +342,13 @@
 		deleteTargetIssue = null;
 
 		if (removeWorktree) {
-			await handleRemoveWorktreeForIssue(issue);
+			await handleRemoveWorktree(issue);
 		}
 		await handleAction('delete issue', () => issueStore.removeIssue(issue.id));
 	}
 
 	async function handleRename(id: string, name: string) {
 		await handleAction('rename issue', () => issueStore.updateIssue({ id, name }));
-	}
-
-	async function handleRemoveWorktreeForIssue(issue: Issue) {
-		const dashboard = boardStore.activeDashboard;
-		if (dashboard?.local_folder == null || issue.branch_name == null) {
-			return;
-		}
-		await handleAction(
-			'remove worktree',
-			() =>
-				issueStore.removeWorktree({
-					issue_id: issue.id,
-					branch_name: issue.branch_name!,
-					working_directory: dashboard.local_folder!,
-				}),
-			false,
-		);
 	}
 
 	async function handleSetupWorktree(issue: Issue) {
@@ -459,10 +448,10 @@
 					});
 				}
 			}
-			pruneDialogOpen = false;
 		} catch (err) {
 			console.error('Failed to prune worktrees:', err);
 		} finally {
+			pruneDialogOpen = false;
 			pruneRemoving = false;
 		}
 	}
@@ -571,7 +560,6 @@
 						prioritiesEnabled={boardStore.activeDashboard?.priorities_enabled ?? true}
 						paletteColors={activePaletteColors}
 						{usedColors}
-						isDarkMode={boardStore.theme.isDark}
 						dependencies={issueStore.dependencies}
 						ghSetupBanner={githubRepoParts !== null &&
 							versionControlStore.ghAvailability !== 'available'}
@@ -617,7 +605,6 @@
 		issue={editingIssue}
 		paletteColors={activePaletteColors}
 		{usedColors}
-		isDarkMode={boardStore.theme.isDark}
 		onClose={() => (editingIssue = null)}
 		onUpdate={handleUpdateIssue}
 	/>
@@ -656,7 +643,6 @@
 		issue={colorChangeTargetIssue}
 		paletteColors={activePaletteColors}
 		{usedColors}
-		isDarkMode={boardStore.theme.isDark}
 		onClose={() => (colorChangeTargetIssue = null)}
 		onChangeColor={handleChangeColor}
 	/>

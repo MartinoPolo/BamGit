@@ -25,7 +25,7 @@
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
-	import { PRIORITY_BADGE_CLASSES, issueExpandedStates } from './issue_card_utils.js';
+	import { PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import { LowPolyTree, PottedPlant, DEFAULT_TREE_CONFIG } from 'low-poly-2d-trees';
 	import type { TreeConfig } from 'low-poly-2d-trees';
@@ -84,10 +84,7 @@
 		issue.worktree_state === 'active' || issue.worktree_state === 'pending',
 	);
 
-	const persistedExpanded = $derived(issueExpandedStates.current[issue.id] ?? false);
-	const expanded = $derived(
-		forceExpanded ?? (issue.worktree_state === 'pending' || persistedExpanded),
-	);
+	const expanded = $derived(forceExpanded ?? issue.worktree_state === 'pending');
 
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
@@ -391,10 +388,13 @@
 				</div>
 			{/if}
 
-			<!-- Row 3: GitHub issue labels -->
+			<!-- Row 3: GitHub issue labels (compacted: show first 3 + overflow count) -->
 			{#if issue.labels.length > 0}
+				{@const maxVisible = 3}
+				{@const visibleLabels = issue.labels.slice(0, maxVisible)}
+				{@const overflowCount = issue.labels.length - maxVisible}
 				<div class="flex flex-wrap items-center gap-1">
-					{#each issue.labels as label (label.name)}
+					{#each visibleLabels as label (label.name)}
 						<SimpleTooltip text={label.name}>
 							<span
 								class="inline-block rounded-full px-1.5 py-px text-[10px] font-medium leading-3"
@@ -404,6 +404,20 @@
 							</span>
 						</SimpleTooltip>
 					{/each}
+					{#if overflowCount > 0}
+						<SimpleTooltip
+							text={issue.labels
+								.slice(maxVisible)
+								.map((l) => l.name)
+								.join(', ')}
+						>
+							<span
+								class="inline-block rounded-full border border-border px-1.5 py-px text-[10px] font-medium leading-3 text-muted-foreground"
+							>
+								+{overflowCount}
+							</span>
+						</SimpleTooltip>
+					{/if}
 				</div>
 			{/if}
 		</div>

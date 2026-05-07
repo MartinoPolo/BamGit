@@ -1,13 +1,12 @@
 import { createContext } from 'svelte';
 import { invoke } from '$lib/tauri.js';
-import type { AssignedIssue } from '$lib/types/generated';
+import type { AssignedIssue, SearchedGithubIssue } from '$lib/types/generated';
 import { generateBranchName, generateIssueName } from './smart_naming.js';
 import {
 	WIZARD_STEPS,
 	type WizardStep,
 	type WizardFormData,
 	type WizardDependencies,
-	type SearchedGithubIssue,
 } from './types.js';
 
 // ─── Context ────────────────────────────────────────────────────────────────
@@ -44,7 +43,6 @@ const EMPTY_DEPENDENCIES: WizardDependencies = {
 	paletteColors: [],
 	usedColors: [],
 	nextAvailableColor: '',
-	isDarkMode: false,
 	localFolder: null,
 	defaultBaseBranch: null,
 	githubRepo: null,

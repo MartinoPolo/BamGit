@@ -14,19 +14,11 @@
 		issue: Issue | null;
 		paletteColors: string[];
 		usedColors?: string[];
-		isDarkMode?: boolean;
 		onClose: () => void;
 		onUpdate: (request: UpdateIssueRequest) => void;
 	}
 
-	let {
-		issue,
-		paletteColors,
-		usedColors = [],
-		isDarkMode = false,
-		onClose,
-		onUpdate,
-	}: Props = $props();
+	let { issue, paletteColors, usedColors = [], onClose, onUpdate }: Props = $props();
 
 	let name = $state('');
 	let priority = $state<string>('');
@@ -103,7 +95,6 @@
 						colors={paletteColors}
 						selectedColor={color}
 						usedColors={editUsedColors}
-						{isDarkMode}
 						displayText="A"
 						onSelect={(c) => {
 							color = c;

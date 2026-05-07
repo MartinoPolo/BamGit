@@ -8,19 +8,11 @@
 		issue: Issue | null;
 		paletteColors?: string[];
 		usedColors?: string[];
-		isDarkMode?: boolean;
 		onClose: () => void;
 		onChangeColor: (issueId: string, newColor: string) => void;
 	}
 
-	let {
-		issue,
-		paletteColors = [],
-		usedColors = [],
-		isDarkMode = false,
-		onClose,
-		onChangeColor,
-	}: Props = $props();
+	let { issue, paletteColors = [], usedColors = [], onClose, onChangeColor }: Props = $props();
 
 	const open = $derived(issue !== null);
 
@@ -51,7 +43,6 @@
 					colors={paletteColors}
 					selectedColor={issue.color ?? ''}
 					{usedColors}
-					{isDarkMode}
 					displayText="A"
 					onSelect={handleSelect}
 				/>

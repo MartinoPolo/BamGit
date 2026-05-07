@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
 	computeRangeSelection,
-	computeSelectAllCheckboxState,
 	computeMergedBatchSelection,
 	CARD_STATE_CLASSES,
 	BATCH_SELECTED_GLOW_COLOR,
@@ -50,32 +49,6 @@ describe('computeRangeSelection', () => {
 	it('returns full range when anchor is last and target is first', () => {
 		const flatOrder = ['a', 'b', 'c'];
 		expect(computeRangeSelection('c', 'a', flatOrder)).toEqual(['a', 'b', 'c']);
-	});
-});
-
-describe('computeSelectAllCheckboxState', () => {
-	it("returns 'all' when selectedCount equals totalCount and totalCount > 0", () => {
-		expect(computeSelectAllCheckboxState(5, 5)).toBe('all');
-	});
-
-	it("returns 'some' when selectedCount is between 0 and totalCount", () => {
-		expect(computeSelectAllCheckboxState(3, 5)).toBe('some');
-	});
-
-	it("returns 'some' when selectedCount is 1 out of many", () => {
-		expect(computeSelectAllCheckboxState(1, 10)).toBe('some');
-	});
-
-	it("returns 'none' when selectedCount is 0", () => {
-		expect(computeSelectAllCheckboxState(0, 5)).toBe('none');
-	});
-
-	it("returns 'none' when totalCount is 0", () => {
-		expect(computeSelectAllCheckboxState(0, 0)).toBe('none');
-	});
-
-	it("returns 'all' when both counts are 1", () => {
-		expect(computeSelectAllCheckboxState(1, 1)).toBe('all');
 	});
 });
 

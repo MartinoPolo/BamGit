@@ -247,7 +247,7 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 - Per-project worktree folder: `{parent}/{project-name}-worktrees/` (configurable in settings)
 - Auto-detect existing worktrees in configured folder on first setup
 - Path change dialog: move worktrees / redetect in new folder / delete all originals
-- Smart branch/worktree naming: strip filler words + conventional commit prefixes, keep issue number + ~5 words, max ~50 chars, lowercase, dashes, git-safe
+- Smart branch/worktree naming: Branch/worktree name from GitHub issue title: first 5 words, max 50 characters, lowercase, dashes, git-safe.
 
 ### Git & GitHub Integration
 
