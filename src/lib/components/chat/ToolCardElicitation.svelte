@@ -1,0 +1,85 @@
+<script lang="ts">
+	import type { ChatMessage } from '$lib/modules/chat/index.js';
+	import DatabaseIcon from '@lucide/svelte/icons/database';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Kbd } from '$lib/components/ui/kbd/index.js';
+
+	interface Props {
+		message: ChatMessage;
+		onSubmit?: (value: string) => void;
+		onCancel?: () => void;
+	}
+
+	let { message, onSubmit, onCancel }: Props = $props();
+
+	let inputValue = $state('');
+
+	const serverName = $derived.by(() => {
+		if (
+			typeof message.toolInput === 'object' &&
+			message.toolInput !== null &&
+			!Array.isArray(message.toolInput)
+		) {
+			const input = message.toolInput as Record<string, unknown>;
+			if (typeof input.server === 'string') {
+				return input.server;
+			}
+		}
+		return 'MCP Server';
+	});
+
+	function handleSubmit() {
+		if (inputValue.trim()) {
+			onSubmit?.(inputValue.trim());
+			inputValue = '';
+		}
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			handleSubmit();
+		}
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			onCancel?.();
+		}
+	}
+</script>
+
+<div
+	class="overflow-hidden rounded-lg border bg-surface"
+	style="border-color: color-mix(in oklch, var(--status-info) 40%, var(--border))"
+>
+	<!-- Header -->
+	<div
+		class="flex h-9 items-center gap-2 border-b px-3"
+		style="background: color-mix(in oklch, var(--status-info) 8%, var(--surface-2)); border-color: color-mix(in oklch, var(--status-info) 30%, var(--border))"
+	>
+		<DatabaseIcon size={13} strokeWidth={1.8} class="text-status-info" />
+		<span class="text-xs font-semibold">MCP: {serverName}</span>
+	</div>
+
+	<!-- Content -->
+	<div class="flex">
+		<div class="w-[3px] shrink-0 bg-status-info"></div>
+		<div class="flex-1 px-3 py-2.5">
+			<div class="mb-2.5 text-[13px] leading-[1.5] text-foreground">
+				{message.content}
+			</div>
+			<div class="flex items-center gap-1.5">
+				<Input
+					class="max-w-[320px] flex-1 text-xs"
+					placeholder="Enter value…"
+					bind:value={inputValue}
+					onkeydown={handleKeydown}
+				/>
+				<Button variant="primary" size="sm" onclick={handleSubmit}>
+					Submit <Kbd class="ml-1">↵</Kbd>
+				</Button>
+				<Button variant="ghost" size="sm" onclick={onCancel}>Cancel</Button>
+			</div>
+		</div>
+	</div>
+</div>

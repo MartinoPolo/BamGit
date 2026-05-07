@@ -10,8 +10,10 @@ export {
 export {
 	MESSAGE_ROLE,
 	TOOL_STATUS,
+	INTERACTION_TYPE,
 	type ChatMessage,
 	type ChatTurn,
 	type MessageRole,
 	type ToolStatus,
+	type InteractionType,
 } from './chat_message_types.js';

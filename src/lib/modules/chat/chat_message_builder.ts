@@ -3,6 +3,7 @@ import * as m from '$lib/paraglide/messages.js';
 import {
 	MESSAGE_ROLE,
 	TOOL_STATUS,
+	INTERACTION_TYPE,
 	type ChatMessage,
 	type ChatTurn,
 } from './chat_message_types.js';
@@ -75,9 +76,25 @@ export function buildChatMessage(event: SessionEvent): ChatMessage | null {
 		case 'permission_prompt':
 			return {
 				id: generateId(),
-				role: MESSAGE_ROLE.system,
+				role: MESSAGE_ROLE.tool,
 				content: m.chat_permission_needed({ toolName: event.tool_name }),
 				timestamp,
+				toolName: event.tool_name,
+				toolInput: event.tool_input,
+				toolStatus: TOOL_STATUS.running,
+				interactionType: INTERACTION_TYPE.permission,
+				requestId: event.request_id,
+			};
+
+		case 'elicitation_prompt':
+			return {
+				id: generateId(),
+				role: MESSAGE_ROLE.tool,
+				content: event.message,
+				timestamp,
+				toolStatus: TOOL_STATUS.running,
+				interactionType: INTERACTION_TYPE.elicitation,
+				requestId: event.request_id,
 			};
 
 		case 'system_status':
@@ -93,7 +110,6 @@ export function buildChatMessage(event: SessionEvent): ChatMessage | null {
 		case 'usage_update':
 		case 'tool_progress':
 		case 'tool_use_summary':
-		case 'elicitation_prompt':
 		case 'compact_boundary':
 		case 'control_cancelled':
 		case 'raw':

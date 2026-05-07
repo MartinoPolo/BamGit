@@ -17,6 +17,14 @@ export const TOOL_STATUS = {
 
 export type ToolStatus = (typeof TOOL_STATUS)[keyof typeof TOOL_STATUS];
 
+export const INTERACTION_TYPE = {
+	permission: 'permission',
+	elicitation: 'elicitation',
+	askUser: 'ask-user',
+} as const;
+
+export type InteractionType = (typeof INTERACTION_TYPE)[keyof typeof INTERACTION_TYPE];
+
 export interface ChatMessage {
 	id: string;
 	role: MessageRole;
@@ -29,6 +37,8 @@ export interface ChatMessage {
 	toolOutput?: JsonValue;
 	isError?: boolean;
 	messageId?: string;
+	interactionType?: InteractionType;
+	requestId?: string;
 }
 
 export interface ChatTurn {

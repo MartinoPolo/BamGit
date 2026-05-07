@@ -11,6 +11,12 @@ export { default as ToolCardExpanded } from './ToolCardExpanded.svelte';
 // fallow-ignore-next-line unused-export
 export { default as ToolCardGroup } from './ToolCardGroup.svelte';
 // fallow-ignore-next-line unused-export
+export { default as ToolCardPermission } from './ToolCardPermission.svelte';
+// fallow-ignore-next-line unused-export
+export { default as ToolCardElicitation } from './ToolCardElicitation.svelte';
+// fallow-ignore-next-line unused-export
+export { default as ToolCardAskUser } from './ToolCardAskUser.svelte';
+// fallow-ignore-next-line unused-export
 export { default as CodeBlock } from './CodeBlock.svelte';
 // fallow-ignore-next-line unused-export
 export { default as StreamingCaret } from './StreamingCaret.svelte';
