@@ -747,3 +747,11 @@
 		opacity: 0;
 	}
 }
+
+/* ── Disable background interaction during modal dialogs ──────────────── */
+
+body:has([data-dialog-overlay][data-state='open']) main,
+body:has([data-dialog-overlay][data-state='open']) aside,
+body:has([data-dialog-overlay][data-state='open']) [data-slot='sidebar'] {
+	pointer-events: none;
+}
