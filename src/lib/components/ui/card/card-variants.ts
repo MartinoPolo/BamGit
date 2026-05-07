@@ -32,7 +32,7 @@ export const CARD_STATE_CLASSES: Partial<Record<CardState, string>> = {
 };
 
 export const cardVariants = tv({
-	base: 'bg-surface border rounded-[var(--radius-lg)] shadow-sm',
+	base: 'relative bg-surface border rounded-[var(--radius-lg)] shadow-sm',
 	variants: {
 		padding: {
 			none: '',
@@ -49,5 +49,7 @@ export type CardPadding = VariantProps<typeof cardVariants>['padding'];
 export type CardProps = WithElementRef<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
 	padding?: CardPadding;
 	state?: CardState;
+	accentBarColor?: string;
+	gradientTint?: string;
 	children?: Snippet;
 };

@@ -80,3 +80,27 @@
 		</Card>
 	{/snippet}
 </Story>
+
+<Story name="Accent Bar Color">
+	{#snippet template(args: CardProps)}
+		<Card padding="padded" accentBarColor="oklch(0.580 0.096 134)" {...args}>
+			<p class="text-sm text-foreground">Card with accent bar color.</p>
+		</Card>
+	{/snippet}
+</Story>
+
+<Story name="Gradient Tint">
+	{#snippet template(args: CardProps)}
+		<Card padding="padded" gradientTint="oklch(0.570 0.130 235)" {...args}>
+			<p class="text-sm text-foreground">Card with gradient tint overlay.</p>
+		</Card>
+	{/snippet}
+</Story>
+
+<Story name="Accent Bar + Gradient Tint">
+	{#snippet template(args: CardProps)}
+		<Card padding="padded" accentBarColor="#e06c75" gradientTint="#e06c75" {...args}>
+			<p class="text-sm text-foreground">Card with both accent bar and gradient tint.</p>
+		</Card>
+	{/snippet}
+</Story>
