@@ -1,13 +1,14 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { CreateDashboardRequest } from '$lib/modules/board';
-	import type { Dashboard, ColorPalette } from '$lib/types/generated';
+	import type { Dashboard } from '$lib/types/generated';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import PaletteSelector from './PaletteSelector.svelte';
+	import { ColorPickerContent } from '$lib/components/color-picker/index.js';
+	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/color-picker/color_utils.js';
 	import PathInput from './PathInput.svelte';
 	import RepoCombobox from './RepoCombobox.svelte';
 	import { buildCreateDashboardRequest } from './dialog_helpers.js';
@@ -15,12 +16,11 @@
 	interface Props {
 		open: boolean;
 		repoDashboards: Dashboard[];
-		colorPalettes: ColorPalette[];
 		onClose: () => void;
 		onCreate: (request: CreateDashboardRequest, selectedRepoIds: string[]) => void;
 	}
 
-	let { open, repoDashboards, colorPalettes, onClose, onCreate }: Props = $props();
+	let { open, repoDashboards, onClose, onCreate }: Props = $props();
 
 	let dashboardType = $state<'repo' | 'portfolio'>('repo');
 	let name = $state('');
@@ -28,7 +28,7 @@
 	let localFolder = $state('');
 	let defaultBaseBranch = $state('');
 	let worktreeParentFolder = $state('');
-	let colorPaletteId = $state<string | null>(null);
+	let accentColor = $state(WORKSPACE_ACCENT_PALETTE[0]);
 	let selectedRepoIds = $state<Set<string>>(new Set());
 
 	function resetForm() {
@@ -38,7 +38,7 @@
 		localFolder = '';
 		defaultBaseBranch = '';
 		worktreeParentFolder = '';
-		colorPaletteId = null;
+		accentColor = WORKSPACE_ACCENT_PALETTE[0];
 		selectedRepoIds = new Set();
 	}
 
@@ -47,7 +47,7 @@
 		const request = buildCreateDashboardRequest(
 			name,
 			dashboardType,
-			colorPaletteId,
+			accentColor,
 			githubRepo,
 			localFolder,
 			defaultBaseBranch,
@@ -114,12 +114,15 @@
 					/>
 				</div>
 
-				<!-- Color palette -->
-				<PaletteSelector
-					palettes={colorPalettes}
-					selectedPaletteId={colorPaletteId}
-					onSelect={(id) => (colorPaletteId = id)}
-				/>
+				<!-- Accent color -->
+				<div class="flex flex-col gap-1.5">
+					<Label>{m.palette_color_palette()}</Label>
+					<ColorPickerContent
+						colors={WORKSPACE_ACCENT_PALETTE}
+						selectedColor={accentColor}
+						onSelect={(color) => (accentColor = color)}
+					/>
+				</div>
 
 				<!-- Repo-specific fields -->
 				{#if dashboardType === 'portfolio'}

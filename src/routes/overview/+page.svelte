@@ -60,7 +60,6 @@
 			{#each workspaces as workspace (workspace.dashboard_id)}
 				<WorkspaceCard
 					{workspace}
-					palette={boardStore.getPaletteForDashboard(workspace.color_palette_id ?? null)}
 					onclick={() => handleOpenWorkspace(workspace.dashboard_id)}
 					onGithubClick={workspace.github_repo != null
 						? () => handleGithubClick(workspace.github_repo!)

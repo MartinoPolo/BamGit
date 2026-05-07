@@ -1,32 +1,32 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { UpdateDashboardRequest } from '$lib/modules/board';
-	import type { Dashboard, ColorPalette } from '$lib/types/generated';
+	import type { Dashboard } from '$lib/types/generated';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import PaletteSelector from './PaletteSelector.svelte';
+	import { ColorPickerContent } from '$lib/components/color-picker/index.js';
+	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/color-picker/color_utils.js';
 	import PathInput from './PathInput.svelte';
 	import RepoCombobox from './RepoCombobox.svelte';
 	import { buildUpdateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
 		dashboard: Dashboard | null;
-		colorPalettes: ColorPalette[];
 		onClose: () => void;
 		onUpdate: (request: UpdateDashboardRequest) => void;
 		onDelete: (id: string) => void;
 	}
 
-	let { dashboard, colorPalettes, onClose, onUpdate, onDelete }: Props = $props();
+	let { dashboard, onClose, onUpdate, onDelete }: Props = $props();
 
 	let name = $state('');
 	let githubRepo = $state('');
 	let localFolder = $state('');
 	let defaultBaseBranch = $state('');
 	let worktreeParentFolder = $state('');
-	let colorPaletteId = $state<string | null>(null);
+	let accentColor = $state(WORKSPACE_ACCENT_PALETTE[0]);
 	let confirmDelete = $state(false);
 
 	const open = $derived(dashboard !== null);
@@ -38,7 +38,7 @@
 			localFolder = dashboard.local_folder ?? '';
 			defaultBaseBranch = dashboard.default_base_branch ?? '';
 			worktreeParentFolder = dashboard.worktree_parent_folder ?? '';
-			colorPaletteId = dashboard.color_palette_id ?? null;
+			accentColor = dashboard.accent_color ?? WORKSPACE_ACCENT_PALETTE[0];
 			confirmDelete = false;
 		}
 	});
@@ -48,7 +48,7 @@
 		const request = buildUpdateDashboardRequest(
 			dashboard,
 			name,
-			colorPaletteId,
+			accentColor,
 			githubRepo,
 			localFolder,
 			defaultBaseBranch,
@@ -94,11 +94,14 @@
 						<Input id="edit-dashboard-name" bind:value={name} required />
 					</div>
 
-					<PaletteSelector
-						palettes={colorPalettes}
-						selectedPaletteId={colorPaletteId}
-						onSelect={(id) => (colorPaletteId = id)}
-					/>
+					<div class="flex flex-col gap-1.5">
+						<Label>{m.palette_color_palette()}</Label>
+						<ColorPickerContent
+							colors={WORKSPACE_ACCENT_PALETTE}
+							selectedColor={accentColor}
+							onSelect={(color) => (accentColor = color)}
+						/>
+					</div>
 
 					{#if dashboard.type === 'repo'}
 						<div class="flex flex-col gap-1.5">

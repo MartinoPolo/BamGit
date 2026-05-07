@@ -210,6 +210,7 @@ pub fn get_overview_data(
                 d.github_repo,
                 d.local_folder,
                 d.color_palette_id,
+                d.accent_color,
                 COALESCE((SELECT COUNT(*) FROM issues i WHERE i.dashboard_id = d.id AND i.status = 'active'), 0) AS open_issue_count,
                 COALESCE((SELECT COUNT(*) FROM sessions s JOIN issues i ON s.issue_id = i.id WHERE i.dashboard_id = d.id AND s.state = 'running'), 0) AS active_session_count,
                 (SELECT MAX(s2.started_at) FROM sessions s2 JOIN issues i2 ON s2.issue_id = i2.id WHERE i2.dashboard_id = d.id) AS last_activity,
@@ -228,10 +229,11 @@ pub fn get_overview_data(
                 github_repo: row.get(2)?,
                 local_folder: row.get(3)?,
                 color_palette_id: row.get(4)?,
-                open_issue_count: row.get(5)?,
-                active_session_count: row.get(6)?,
-                last_activity: row.get(7)?,
-                total_cost_usd: row.get(8)?,
+                accent_color: row.get(5)?,
+                open_issue_count: row.get(6)?,
+                active_session_count: row.get(7)?,
+                last_activity: row.get(8)?,
+                total_cost_usd: row.get(9)?,
             })
         })
         .map_err(|error| format!("Failed to query overview data: {error}"))?

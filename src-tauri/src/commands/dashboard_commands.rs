@@ -9,7 +9,7 @@ use crate::models::dashboard::{
 };
 
 const DASHBOARD_SELECT_COLUMNS: &str =
-    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, default_shape, priorities_enabled";
+    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, accent_color, default_shape, priorities_enabled";
 
 fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
     let dashboard_type_string: String = row.get(2)?;
@@ -27,8 +27,9 @@ fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
         default_base_branch: row.get(5)?,
         worktree_parent_folder: row.get(6)?,
         color_palette_id: row.get(7)?,
-        default_shape: row.get(8)?,
-        priorities_enabled: row.get(9)?,
+        accent_color: row.get(8)?,
+        default_shape: row.get(9)?,
+        priorities_enabled: row.get(10)?,
     })
 }
 
@@ -42,8 +43,8 @@ pub fn create_dashboard(
 
     connection
         .execute(
-            "INSERT INTO dashboards (id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            "INSERT INTO dashboards (id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, accent_color)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
             rusqlite::params![
                 id,
                 request.name,
@@ -53,6 +54,7 @@ pub fn create_dashboard(
                 request.default_base_branch,
                 request.worktree_parent_folder,
                 request.color_palette_id,
+                request.accent_color,
             ],
         )
         .map_err(|error| format!("Failed to create dashboard: {error}"))?;
@@ -69,6 +71,7 @@ pub fn create_dashboard(
         default_base_branch: request.default_base_branch,
         worktree_parent_folder: request.worktree_parent_folder,
         color_palette_id: request.color_palette_id,
+        accent_color: request.accent_color,
         default_shape: DEFAULT_TREE_SHAPE.to_string(),
         priorities_enabled: true,
     })
@@ -134,6 +137,7 @@ pub fn update_dashboard(
             request.color_palette_id,
             existing.color_palette_id,
         ),
+        accent_color: resolve_nullable_field(request.accent_color, existing.accent_color),
         default_shape: request.default_shape.unwrap_or(existing.default_shape),
         priorities_enabled: request.priorities_enabled.unwrap_or(existing.priorities_enabled),
     };
@@ -142,7 +146,7 @@ pub fn update_dashboard(
         .execute(
             "UPDATE dashboards SET name = ?1, type = ?2, github_repo = ?3, local_folder = ?4, \
              default_base_branch = ?5, worktree_parent_folder = ?6, color_palette_id = ?7, \
-             default_shape = ?8, priorities_enabled = ?9 WHERE id = ?10",
+             accent_color = ?8, default_shape = ?9, priorities_enabled = ?10 WHERE id = ?11",
             rusqlite::params![
                 updated.name,
                 updated.dashboard_type.to_string(),
@@ -151,6 +155,7 @@ pub fn update_dashboard(
                 updated.default_base_branch,
                 updated.worktree_parent_folder,
                 updated.color_palette_id,
+                updated.accent_color,
                 updated.default_shape,
                 updated.priorities_enabled,
                 updated.id,
