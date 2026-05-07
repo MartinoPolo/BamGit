@@ -140,6 +140,10 @@
 	"chat_placeholder_ended": "Session ended",
 	"chat_send": "Send",
 	"chat_tool_running": "Running {toolName}...",
+	"chat_jump_to_prompt": "Přejít na poslední prompt",
+	"chat_jump_to_response": "Přejít na poslední odpověď",
+	"chat_copy_code": "Kopírovat",
+	"chat_copied": "Zkopírováno",
 
 	"notification_title": "Notifications",
 	"notification_description": "Configure how you're notified for each event type.",
