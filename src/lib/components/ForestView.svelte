@@ -32,8 +32,7 @@
 	import type { TreeContextMenuAction } from '$lib/modules/visualization';
 	import { useSelection } from '$lib/modules/board';
 	import { BATCH_SELECTED_GLOW_COLOR } from './batch_selection_utils.js';
-
-	const PRD_LABEL = 'prd';
+	import { SPECIAL_LABELS } from '$lib/modules/visualization';
 
 	interface Props {
 		issues: readonly Issue[];
@@ -113,7 +112,7 @@
 	});
 
 	function buildComputeContext(issue: Issue): TreeComputeContext | undefined {
-		const isPrd = issue.labels.some((label) => label.name.toLowerCase() === PRD_LABEL);
+		const isPrd = issue.labels.some((label) => label.name.toLowerCase() === SPECIAL_LABELS.prd);
 		if (!isPrd) {
 			return undefined;
 		}

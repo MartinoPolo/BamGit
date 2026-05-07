@@ -73,7 +73,7 @@
 		{/if}
 
 		{#if onToggleForest}
-			<SimpleTooltip text={forestCollapsed ? 'Show forest' : 'Hide forest'}>
+			<SimpleTooltip text={forestCollapsed ? m.topbar_show_forest() : m.topbar_hide_forest()}>
 				<Button
 					variant={forestCollapsed ? 'ghost' : 'secondary'}
 					size="icon-sm"

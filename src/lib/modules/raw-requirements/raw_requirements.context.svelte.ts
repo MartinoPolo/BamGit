@@ -3,6 +3,7 @@ import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { invoke, isTauri } from '$lib/tauri.js';
 import { useBoard } from '$lib/modules/board/index.js';
 import { useWindow } from '$lib/modules/window/index.js';
+import { useToasts } from '$lib/modules/toasts/index.js';
 import { parseRawRequirements, serializeRawRequirements, formatTimestamp } from './parser.js';
 import type { RawRequirementNote } from './types.js';
 
@@ -62,6 +63,7 @@ export function setRawRequirementsContext() {
 function createRawRequirementsContext() {
 	const boardStore = useBoard();
 	const windowCtx = useWindow();
+	const toasts = useToasts();
 
 	const notes = new StateRaw<RawRequirementNote[]>([]);
 	const open = new StateRaw(false);
@@ -74,6 +76,9 @@ function createRawRequirementsContext() {
 	}
 
 	async function load(): Promise<void> {
+		if (loading.current) {
+			return;
+		}
 		const localFolder = getLocalFolder();
 		if (localFolder === null || !isTauri()) {
 			if (!isTauri() && notes.current.length === 0) {
@@ -108,6 +113,7 @@ function createRawRequirementsContext() {
 		} catch (error) {
 			console.error('Failed to save raw requirements:', error);
 			saveError.current = String(error);
+			toasts.show({ tone: 'danger', title: 'Failed to save idea', body: String(error) });
 		}
 	}
 
