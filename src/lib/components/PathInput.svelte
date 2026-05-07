@@ -2,7 +2,7 @@
 	import { invoke } from '$lib/tauri.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
+	import FolderIcon from '@lucide/svelte/icons/folder';
 
 	interface Props {
 		value: string;
@@ -23,6 +23,6 @@
 <div class="flex gap-1.5">
 	<Input {id} bind:value {placeholder} class="flex-1" />
 	<Button variant="ghost" size="icon-sm" type="button" onclick={handleBrowse} class="shrink-0">
-		<FolderOpenIcon size={14} />
+		<FolderIcon size={14} strokeWidth={1.7} />
 	</Button>
 </div>

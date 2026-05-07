@@ -19,7 +19,7 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
-	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
+	import FolderIcon from '@lucide/svelte/icons/folder';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import VscodeIcon from './icons/VscodeIcon.svelte';
 	import LayersIcon from '@lucide/svelte/icons/layers';
@@ -274,7 +274,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<FolderOpenIcon size={14} strokeWidth={1.5} />
+						<FolderIcon size={14} strokeWidth={1.7} />
 					</Button>
 				</SimpleTooltip>
 				<SimpleTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
@@ -285,7 +285,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<TerminalIcon size={14} strokeWidth={1.5} />
+						<TerminalIcon size={14} strokeWidth={1.7} />
 					</Button>
 				</SimpleTooltip>
 				<SimpleTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
@@ -296,7 +296,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<VscodeIcon size={14} strokeWidth={1.5} />
+						<VscodeIcon size={14} />
 					</Button>
 				</SimpleTooltip>
 			</div>
