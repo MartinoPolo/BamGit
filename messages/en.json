@@ -141,6 +141,10 @@
 	"chat_placeholder_ended": "Session ended",
 	"chat_send": "Send",
 	"chat_tool_running": "Running {toolName}...",
+	"chat_jump_to_prompt": "Jump to latest prompt",
+	"chat_jump_to_response": "Jump to latest response",
+	"chat_copy_code": "Copy",
+	"chat_copied": "Copied",
 
 	"notification_title": "Notifications",
 	"notification_description": "Configure how you're notified for each event type.",
