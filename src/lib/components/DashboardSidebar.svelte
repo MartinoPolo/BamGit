@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import CodeIcon from '@lucide/svelte/icons/code';
+	import BarChart3Icon from '@lucide/svelte/icons/bar-chart-3';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
@@ -41,6 +42,7 @@
 	const NAV_LABELS = {
 		dashboard: () => m.nav_dashboard(),
 		sessions: () => m.nav_sessions(),
+		usage: () => 'Usage',
 		settings: () => m.nav_settings(),
 	} as const;
 
@@ -50,6 +52,7 @@
 	const navigationItems = [
 		{ href: resolve('/'), icon: TreesIcon, labelKey: 'dashboard' as const },
 		{ href: resolve('/sessions'), icon: CodeIcon, labelKey: 'sessions' as const },
+		{ href: resolve('/usage'), icon: BarChart3Icon, labelKey: 'usage' as const },
 		{ href: resolve('/settings'), icon: SettingsIcon, labelKey: 'settings' as const },
 	];
 

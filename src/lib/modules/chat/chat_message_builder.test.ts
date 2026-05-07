@@ -108,7 +108,11 @@ describe('buildChatMessage', () => {
 			type: 'usage_update',
 			input_tokens: 100,
 			output_tokens: 50,
+			cache_read_tokens: 0,
+			cache_write_tokens: 0,
 			cost_usd: 0.01,
+			duration_ms: null,
+			num_turns: null,
 		};
 		expect(buildChatMessage(event)).toBeNull();
 	});

@@ -719,3 +719,182 @@ export const MOCK_PRUNABLE_ISSUES: PrunableIssue[] = [];
 // ─── Sync Result ──────────────────────────────────────────────────────────────
 
 export const MOCK_SYNC_RESULT: SyncAllResult = { synced_count: 3, errors: [] };
+
+// ─── Usage Dashboard ──────────────────────────────────────────────────────────
+
+export const MOCK_USAGE_DASHBOARD = {
+	stats: {
+		total_cost_usd: 12.84,
+		session_count: 47,
+		one_shot_rate: 74.0,
+		cache_hit_ratio: 68.0,
+		cost_delta_percent: -18.0,
+		session_count_delta: 9,
+	},
+	daily_costs: Array.from({ length: 30 }, (_, i) => ({
+		date: `2026-04-${String(i + 1).padStart(2, '0')}`,
+		cost_usd: Math.random() * 1.5,
+		session_count: Math.floor(Math.random() * 5) + 1,
+	})),
+	activity_breakdown: [
+		{ category: 'coding', cost_usd: 4.2, turn_count: 89, one_shot_percent: 82.0 },
+		{ category: 'debugging', cost_usd: 2.8, turn_count: 52, one_shot_percent: 61.0 },
+		{ category: 'refactoring', cost_usd: 1.9, turn_count: 31, one_shot_percent: 90.0 },
+		{ category: 'testing', cost_usd: 1.4, turn_count: 28, one_shot_percent: 78.0 },
+		{ category: 'exploration', cost_usd: 1.1, turn_count: 24, one_shot_percent: 0.0 },
+		{ category: 'planning', cost_usd: 0.8, turn_count: 18, one_shot_percent: 0.0 },
+		{ category: 'conversation', cost_usd: 0.64, turn_count: 15, one_shot_percent: 0.0 },
+	],
+	top_sessions: [
+		{
+			session_id: 's1',
+			issue_name: 'Auth middleware rewrite',
+			issue_number: 42,
+			cost_usd: 1.42,
+			turn_count: 28,
+			tool_call_count: 67,
+			started_at: '2026-04-24T14:30:00Z',
+		},
+		{
+			session_id: 's2',
+			issue_name: 'Dark mode toggle',
+			issue_number: 15,
+			cost_usd: 0.98,
+			turn_count: 15,
+			tool_call_count: 34,
+			started_at: '2026-04-22T10:00:00Z',
+		},
+		{
+			session_id: 's3',
+			issue_name: 'Perf audit',
+			issue_number: 7,
+			cost_usd: 0.87,
+			turn_count: 12,
+			tool_call_count: 29,
+			started_at: '2026-04-20T09:00:00Z',
+		},
+		{
+			session_id: 's4',
+			issue_name: 'CI pipeline fix',
+			issue_number: 3,
+			cost_usd: 0.76,
+			turn_count: 9,
+			tool_call_count: 22,
+			started_at: '2026-04-18T16:00:00Z',
+		},
+		{
+			session_id: 's5',
+			issue_name: null,
+			issue_number: null,
+			cost_usd: 0.54,
+			turn_count: 7,
+			tool_call_count: 15,
+			started_at: '2026-04-15T11:00:00Z',
+		},
+	],
+	tool_usage: [
+		{ tool_name: 'Read', call_count: 342 },
+		{ tool_name: 'Edit', call_count: 187 },
+		{ tool_name: 'Bash', call_count: 156 },
+		{ tool_name: 'Grep', call_count: 134 },
+		{ tool_name: 'Write', call_count: 89 },
+		{ tool_name: 'Glob', call_count: 76 },
+		{ tool_name: 'Agent', call_count: 42 },
+		{ tool_name: 'WebSearch', call_count: 18 },
+		{ tool_name: 'mcp__svelte', call_count: 12 },
+		{ tool_name: 'TaskCreate', call_count: 8 },
+	],
+};
+
+export const MOCK_ACHIEVEMENTS = [
+	{
+		kind: 'first-seed',
+		display_name: 'First Seed',
+		description: 'Created your first issue',
+		threshold: 1,
+		progress: 1,
+		unlocked_at: '2026-04-01T10:00:00Z',
+	},
+	{
+		kind: 'planted-10-trees',
+		display_name: 'Planted 10 Trees',
+		description: 'Created 10 issues',
+		threshold: 10,
+		progress: 12,
+		unlocked_at: '2026-04-15T14:00:00Z',
+	},
+	{
+		kind: 'planted-50-trees',
+		display_name: 'Planted 50 Trees',
+		description: 'Created 50 issues',
+		threshold: 50,
+		progress: 12,
+		unlocked_at: null,
+	},
+	{
+		kind: 'green-thumb',
+		display_name: 'Green Thumb',
+		description: 'Completed 10 sessions via Grovekeeper',
+		threshold: 10,
+		progress: 10,
+		unlocked_at: '2026-04-20T16:00:00Z',
+	},
+	{
+		kind: 'forest-keeper',
+		display_name: 'Forest Keeper',
+		description: 'Resolved 5 HITL issues',
+		threshold: 5,
+		progress: 3,
+		unlocked_at: null,
+	},
+	{
+		kind: 'conflict-resolver',
+		display_name: 'Conflict Resolver',
+		description: 'Auto-resolved 3 merge conflicts',
+		threshold: 3,
+		progress: 1,
+		unlocked_at: null,
+	},
+	{
+		kind: 'one-shot-wonder',
+		display_name: 'One-Shot Wonder',
+		description: '5 sessions with 100% one-shot rate',
+		threshold: 5,
+		progress: 5,
+		unlocked_at: '2026-05-01T09:00:00Z',
+	},
+	{
+		kind: 'cache-master',
+		display_name: 'Cache Master',
+		description: 'A session with 90%+ cache hit ratio',
+		threshold: 1,
+		progress: 1,
+		unlocked_at: '2026-04-25T12:00:00Z',
+	},
+	{
+		kind: 'big-spender',
+		display_name: 'Big Spender',
+		description: 'Spent $100 total on AI sessions',
+		threshold: 100,
+		progress: 12,
+		unlocked_at: null,
+	},
+	{
+		kind: 'speed-runner',
+		display_name: 'Speed Runner',
+		description: 'Completed a session in under 60 seconds',
+		threshold: 1,
+		progress: 0,
+		unlocked_at: null,
+	},
+];
+
+export const MOCK_IMPORT_SUMMARY = {
+	providers: [
+		{ provider: 'claude-code', sessions_imported: 142, sessions_skipped: 0 },
+		{ provider: 'cursor', sessions_imported: 89, sessions_skipped: 3 },
+		{ provider: 'codex', sessions_imported: 16, sessions_skipped: 0 },
+	],
+	total_sessions: 247,
+	total_skipped: 3,
+};

@@ -156,11 +156,85 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             UNIQUE(dashboard_id, github_issue_number)
         );
 
+        CREATE TABLE IF NOT EXISTS session_metrics (
+            session_id TEXT PRIMARY KEY REFERENCES sessions(id) ON DELETE CASCADE,
+            provider TEXT NOT NULL,
+            model TEXT,
+            input_tokens INTEGER NOT NULL DEFAULT 0,
+            output_tokens INTEGER NOT NULL DEFAULT 0,
+            cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+            cache_write_tokens INTEGER NOT NULL DEFAULT 0,
+            cost_usd REAL NOT NULL DEFAULT 0.0,
+            duration_seconds REAL,
+            turn_count INTEGER NOT NULL DEFAULT 0,
+            tool_call_count INTEGER NOT NULL DEFAULT 0,
+            one_shot_turns INTEGER NOT NULL DEFAULT 0,
+            edit_turns INTEGER NOT NULL DEFAULT 0,
+            retry_count INTEGER NOT NULL DEFAULT 0,
+            started_at TEXT NOT NULL,
+            ended_at TEXT,
+            imported INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS turn_metrics (
+            id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+            turn_index INTEGER NOT NULL,
+            category TEXT NOT NULL DEFAULT 'general',
+            model TEXT,
+            input_tokens INTEGER NOT NULL DEFAULT 0,
+            output_tokens INTEGER NOT NULL DEFAULT 0,
+            cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+            cache_write_tokens INTEGER NOT NULL DEFAULT 0,
+            cost_usd REAL NOT NULL DEFAULT 0.0,
+            has_edits INTEGER NOT NULL DEFAULT 0,
+            retry_count INTEGER NOT NULL DEFAULT 0,
+            tool_call_count INTEGER NOT NULL DEFAULT 0,
+            timestamp TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS tool_usage (
+            id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+            turn_id TEXT REFERENCES turn_metrics(id) ON DELETE CASCADE,
+            tool_name TEXT NOT NULL,
+            is_error INTEGER NOT NULL DEFAULT 0,
+            duration_seconds REAL,
+            timestamp TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS achievements (
+            kind TEXT PRIMARY KEY,
+            progress INTEGER NOT NULL DEFAULT 0,
+            unlocked_at TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS import_history (
+            dedup_key TEXT PRIMARY KEY,
+            provider TEXT NOT NULL,
+            imported_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS model_pricing_cache (
+            model_id TEXT PRIMARY KEY,
+            input_cost_per_token REAL NOT NULL,
+            output_cost_per_token REAL NOT NULL,
+            cache_read_cost_per_token REAL,
+            cache_write_cost_per_token REAL,
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
         CREATE INDEX IF NOT EXISTS idx_issues_dashboard_id ON issues(dashboard_id);
         CREATE INDEX IF NOT EXISTS idx_sessions_issue_id ON sessions(issue_id);
         CREATE INDEX IF NOT EXISTS idx_issue_dependencies_blocker ON issue_dependencies(blocker_issue_id);
         CREATE INDEX IF NOT EXISTS idx_issue_dependencies_blocked ON issue_dependencies(blocked_issue_id);
         CREATE INDEX IF NOT EXISTS idx_deleted_assigned_issues_dashboard ON deleted_assigned_issues(dashboard_id);
+        CREATE INDEX IF NOT EXISTS idx_session_metrics_started_at ON session_metrics(started_at);
+        CREATE INDEX IF NOT EXISTS idx_session_metrics_provider ON session_metrics(provider);
+        CREATE INDEX IF NOT EXISTS idx_turn_metrics_session_id ON turn_metrics(session_id);
+        CREATE INDEX IF NOT EXISTS idx_turn_metrics_category ON turn_metrics(category);
+        CREATE INDEX IF NOT EXISTS idx_tool_usage_session_id ON tool_usage(session_id);
+        CREATE INDEX IF NOT EXISTS idx_tool_usage_tool_name ON tool_usage(tool_name);
 
         COMMIT;
         ",

@@ -103,7 +103,11 @@ impl CodexEventParser {
                 events.push(SessionEvent::UsageUpdate {
                     input_tokens,
                     output_tokens,
+                    cache_read_tokens: 0,
+                    cache_write_tokens: 0,
                     cost_usd,
+                    duration_ms: None,
+                    num_turns: None,
                 });
             }
         }
