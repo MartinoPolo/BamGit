@@ -12,6 +12,7 @@ export const BADGE_VARIANT_OPTIONS = [
 	'moss',
 	'amber',
 	'mono',
+	'merged',
 ] as const;
 
 export const BADGE_DOT_OPTIONS = ['static', 'pulsing'] as const;
@@ -32,6 +33,7 @@ export const badgeVariants = tv({
 			moss: 'bg-[color-mix(in_oklch,var(--primary)_14%,transparent)] text-primary border-[color-mix(in_oklch,var(--primary)_30%,transparent)]',
 			amber: 'bg-[color-mix(in_oklch,var(--accent)_16%,transparent)] text-[color-mix(in_oklch,var(--accent)_70%,var(--foreground))] border-[color-mix(in_oklch,var(--accent)_32%,transparent)]',
 			mono: 'bg-surface-2 text-foreground-muted border-border font-mono text-[10.5px]',
+			merged: 'bg-[color-mix(in_oklch,var(--status-merged)_14%,transparent)] text-status-merged border-[color-mix(in_oklch,var(--status-merged)_30%,transparent)]',
 		},
 		size: {
 			default: 'h-5 px-[7px] text-[11px] rounded-full',

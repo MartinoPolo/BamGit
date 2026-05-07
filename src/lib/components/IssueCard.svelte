@@ -9,12 +9,9 @@
 	} from '$lib/modules/contextual-actions';
 	import { getContrastTextColor } from '$lib/components/color-picker/color_utils.js';
 	import GitHubBadge from './GitHubBadge.svelte';
-	import SyncStatusIndicator from './SyncStatusIndicator.svelte';
 	import SyncBadge from './SyncBadge.svelte';
 	import MergeConflictBadge from './MergeConflictBadge.svelte';
-	import WorktreeProgressIndicator from './WorktreeProgressIndicator.svelte';
 	import ContextualActionButtons from './ContextualActionButtons.svelte';
-	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
 	import SessionStateChip from './SessionStateChip.svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -25,9 +22,14 @@
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
-	import { PRIORITY_BADGE_CLASSES, issueExpandedStates } from './issue_card_utils.js';
+	import { PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import TreeThumbnailImage from './TreeThumbnailImage.svelte';
+
+	interface PrdParent {
+		number: number | null;
+		url: string | null;
+	}
 
 	interface Props {
 		issue: Issue;
@@ -35,8 +37,7 @@
 		ghAvailable?: boolean;
 		notificationDotColor?: string | null;
 		childCount?: number;
-		forceExpanded?: boolean;
-		progressLines?: readonly string[];
+		prdParent?: PrdParent | null;
 		prioritiesEnabled?: boolean;
 		sessionState?: 'executing' | 'hitl' | 'review' | 'error' | 'paused' | 'done' | null;
 		visualization?: TreeVisualization | undefined;
@@ -45,6 +46,7 @@
 		isBatchSelected?: boolean;
 		isModifierHeld?: boolean;
 		onCardClick?: (event: MouseEvent) => void;
+		onTitleClick?: (event: MouseEvent) => void;
 		onMouseEnter?: () => void;
 		onMouseLeave?: () => void;
 		onExecuteAction?: (actionId: string, issueId: string) => void;
@@ -58,8 +60,7 @@
 		ghAvailable = false,
 		notificationDotColor = null,
 		childCount = 0,
-		forceExpanded,
-		progressLines = [],
+		prdParent = null,
 		prioritiesEnabled = true,
 		sessionState = null,
 		visualization,
@@ -68,6 +69,7 @@
 		isBatchSelected = false,
 		isModifierHeld = false,
 		onCardClick,
+		onTitleClick,
 		onMouseEnter,
 		onMouseLeave,
 		onExecuteAction,
@@ -83,10 +85,7 @@
 		issue.worktree_state === 'active' || issue.worktree_state === 'pending',
 	);
 
-	const persistedExpanded = $derived(issueExpandedStates.current[issue.id] ?? false);
-	const expanded = $derived(
-		forceExpanded ?? (issue.worktree_state === 'pending' || persistedExpanded),
-	);
+	const hasPrdLabel = $derived(prdParent !== null && prdParent.number !== null);
 
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
@@ -152,6 +151,13 @@
 		}
 	}
 
+	function handleTitleClick(event: MouseEvent) {
+		event.stopPropagation();
+		if (onTitleClick) {
+			onTitleClick(event);
+		}
+	}
+
 	function handleQuickAction(event: MouseEvent, action: string) {
 		event.stopPropagation();
 		if (!hasWorktree) {
@@ -194,25 +200,47 @@
 		style="background-color: {color}; color: {headerTextColor}; filter: saturate(var(--header-saturate, 1));"
 	>
 		<div class="flex min-w-0 flex-1 items-baseline gap-1.5">
-			{#if issue.github_issue_url}
-				<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->
-				<a
-					href={issue.github_issue_url}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="shrink-0 font-mono text-[11px] font-semibold opacity-72 hover:opacity-100"
-					style="color: inherit;"
-					onclick={(event) => event.stopPropagation()}
-				>
+			<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">
+				{#if hasPrdLabel && prdParent?.url}
+					<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->
+					<a
+						href={prdParent.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:opacity-100"
+						style="color: inherit;"
+						onclick={(event) => event.stopPropagation()}>PRD#{prdParent.number}</a
+					>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
+					<span class="opacity-50">/</span>
+				{:else if hasPrdLabel && prdParent}
+					PRD#{prdParent.number}
+					<span class="opacity-50">/</span>
+				{/if}
+				{#if issue.github_issue_url}
+					<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->
+					<a
+						href={issue.github_issue_url}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:opacity-100"
+						style="color: inherit;"
+						onclick={(event) => event.stopPropagation()}
+						>#{issue.github_issue_number ?? '—'}</a
+					>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
+				{:else}
 					#{issue.github_issue_number ?? '—'}
-				</a>
-				<!-- eslint-enable svelte/no-navigation-without-resolve -->
-			{:else}
-				<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">
-					#{issue.github_issue_number ?? '—'}
-				</span>
-			{/if}
-			<span class="min-w-0 truncate text-[13.5px] font-semibold leading-snug">
+				{/if}
+			</span>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<span
+				class="min-w-0 truncate text-[13.5px] font-semibold leading-snug {onTitleClick
+					? 'cursor-pointer hover:underline'
+					: ''}"
+				onclick={handleTitleClick}
+			>
 				{issue.name}
 			</span>
 		</div>
@@ -324,7 +352,6 @@
 					{:else}
 						<span class="text-foreground/35">no worktree</span>
 					{/if}
-					<WorktreeStateIcon worktreeState={issue.worktree_state} />
 				</div>
 				<div class="flex shrink-0 items-center gap-1">
 					{#if worktreeBadge}
@@ -374,57 +401,18 @@
 			{#if issue.labels.length > 0}
 				<div class="flex flex-wrap items-center gap-1">
 					{#each issue.labels as label (label.name)}
-						<SimpleTooltip text={label.name}>
-							<span
-								class="inline-block rounded-full px-1.5 py-px text-[10px] font-medium leading-3"
-								style="background-color: {label.color}33; color: {label.color}; border: 1px solid {label.color}44;"
-							>
-								{label.name}
-							</span>
-						</SimpleTooltip>
+						<Badge
+							size="compact"
+							class="rounded-full py-px leading-3"
+							style="background-color: {label.color}33; color: {label.color}; border-color: {label.color}44;"
+						>
+							{label.name}
+						</Badge>
 					{/each}
 				</div>
 			{/if}
 		</div>
 	</div>
-
-	<!-- Expanded detail section -->
-	{#if expanded}
-		<div class="border-t border-border px-3 py-3 text-xs text-muted-foreground">
-			<div class="grid grid-cols-2 gap-2">
-				<div>
-					<span class="text-muted-foreground/60">{m.issue_card_status()}</span>
-					{issue.status}
-				</div>
-				<div>
-					<span class="text-muted-foreground/60">{m.issue_card_worktree_label()}</span>
-					{issue.worktree_state}
-				</div>
-				{#if issue.priority}
-					<div>
-						<span class="text-muted-foreground/60">{m.issue_card_priority_label()}</span
-						>
-						{issue.priority}
-					</div>
-				{/if}
-				{#if issue.created_at}
-					<div>
-						<span class="text-muted-foreground/60">{m.issue_card_created()}</span>
-						{new Date(issue.created_at).toLocaleDateString()}
-					</div>
-				{/if}
-				{#if cache}
-					<div>
-						<span class="text-muted-foreground/60">{m.issue_card_synced()}</span>
-						<SyncStatusIndicator fetchedAt={cache.fetched_at} />
-					</div>
-				{/if}
-			</div>
-			{#if issue.worktree_state === 'pending' && progressLines.length > 0}
-				<WorktreeProgressIndicator lines={progressLines} />
-			{/if}
-		</div>
-	{/if}
 
 	<!-- Contextual action buttons (always visible, bottom-right) -->
 	{#if !isArchived && onExecuteAction}
@@ -456,14 +444,14 @@
 		position: absolute;
 		inset: 0;
 		border-radius: inherit;
-		border: 2px solid color-mix(in srgb, var(--selection) 45%, transparent);
+		border: 2px solid color-mix(in oklch, var(--ic) 45%, transparent);
 		pointer-events: none;
 		z-index: 10;
 	}
 
 	:global(.card-state-active-ic) {
 		box-shadow: 0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
-		background: color-mix(in oklch, var(--ic) 6%, var(--surface));
+		background: color-mix(in oklch, oklch(0.55 0.08 55) 10%, var(--surface));
 	}
 
 	:global(.card-state-active-ic)::after {
@@ -477,8 +465,8 @@
 	}
 
 	:global(.card-state-selected-primary) {
-		box-shadow: 0 0 14px color-mix(in srgb, var(--selection) 15%, transparent);
-		background: color-mix(in srgb, var(--selection) 20%, var(--surface));
+		box-shadow: 0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
+		background: color-mix(in srgb, var(--selection) 18%, var(--surface));
 	}
 
 	:global(.card-state-selected-primary)::after {
@@ -486,7 +474,7 @@
 		position: absolute;
 		inset: 0;
 		border-radius: inherit;
-		border: 3px solid color-mix(in srgb, var(--selection) 55%, transparent);
+		border: 3px solid color-mix(in oklch, var(--ic) 65%, transparent);
 		pointer-events: none;
 		z-index: 10;
 	}

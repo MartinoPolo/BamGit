@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { openUrl } from '@tauri-apps/plugin-opener';
+	import { openUrl } from '$lib/opener.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import type { PullRequestState } from '$lib/types/generated';
 	import {

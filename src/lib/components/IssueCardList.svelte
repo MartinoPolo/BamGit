@@ -3,6 +3,7 @@
 	import type { GitStatusCache } from '$lib/types/generated';
 	import type { IssueCardCallbacks, IssuePriority } from '$lib/modules/issues';
 	import type { TreeVisualization } from '$lib/modules/visualization';
+	import { SPECIAL_LABELS } from '$lib/modules/visualization/constants.js';
 	import {
 		deriveContextualActions,
 		type ContextualActionInput,
@@ -18,13 +19,11 @@
 		archivedIssues: Issue[];
 		showArchived: boolean;
 		isPortfolio: boolean;
-		forceExpanded?: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
 		prioritiesEnabled?: boolean;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
-		getProgressLines?: (issueId: string) => readonly string[];
 		getVisualization?: (issueId: string) => TreeVisualization | undefined;
 		onBatchArchive?: (issueIds: string[]) => void;
 		onBatchUnarchive?: (issueIds: string[]) => void;
@@ -38,13 +37,11 @@
 		archivedIssues,
 		showArchived,
 		isPortfolio,
-		forceExpanded,
 		cacheMap = new Map(),
 		ghAvailable = false,
 		prioritiesEnabled = true,
 		getChildren,
 		getNotificationDotColor,
-		getProgressLines,
 		getVisualization,
 		onArchive,
 		onUnarchive,
@@ -102,7 +99,28 @@
 			selection.toggleBatchSelect(issue.id);
 			return;
 		}
+		selection.selectExclusive(issue.id);
+	}
+
+	function handleTitleClick(issue: Issue) {
 		selection.activateIssue(issue.id);
+	}
+
+	const parentIssueMap = $derived(new Map(parentIssues.map((i) => [i.id, i])));
+
+	function getPrdParent(issue: Issue): { number: number | null; url: string | null } | null {
+		if (issue.parent_issue_id === null) {
+			return null;
+		}
+		const parent = parentIssueMap.get(issue.parent_issue_id);
+		if (parent === undefined) {
+			return null;
+		}
+		const hasPrdLabel = parent.labels.some((l) => l.name.toLowerCase() === SPECIAL_LABELS.prd);
+		if (!hasPrdLabel) {
+			return null;
+		}
+		return { number: parent.github_issue_number, url: parent.github_issue_url };
 	}
 
 	// fallow-ignore-next-line complexity
@@ -274,8 +292,7 @@
 						{ghAvailable}
 						notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
 						childCount={getChildCount(issue.id)}
-						{forceExpanded}
-						progressLines={getProgressLines?.(issue.id) ?? []}
+						prdParent={getPrdParent(issue)}
 						{prioritiesEnabled}
 						visualization={getVisualization?.(issue.id)}
 						isActive={selection.activeIssueId === issue.id}
@@ -283,6 +300,7 @@
 						isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
 						{isModifierHeld}
 						onCardClick={(event) => handleCardClick(issue, event)}
+						onTitleClick={() => handleTitleClick(issue)}
 						onMouseEnter={() => selection.hoverIssue(issue.id)}
 						onMouseLeave={() => selection.unhover()}
 						{onExecuteAction}
@@ -323,11 +341,13 @@
 								{issue}
 								cache={cacheMap.get(issue.id)}
 								{ghAvailable}
+								prdParent={getPrdParent(issue)}
 								visualization={getVisualization?.(issue.id)}
 								isActive={selection.activeIssueId === issue.id}
 								isHovered={selection.hoveredIssueId === issue.id}
 								isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
 								onCardClick={(event) => handleCardClick(issue, event)}
+								onTitleClick={() => handleTitleClick(issue)}
 								onMouseEnter={() => selection.hoverIssue(issue.id)}
 								onMouseLeave={() => selection.unhover()}
 							/>

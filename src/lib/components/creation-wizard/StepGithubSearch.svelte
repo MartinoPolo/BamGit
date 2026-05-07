@@ -1,10 +1,9 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import { SearchField } from '$lib/components/ui/search-field/index.js';
 	import { onMount, untrack } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import type { AssignedIssue, SearchedGithubIssue } from '$lib/types/generated';
-	import SearchIcon from '@lucide/svelte/icons/search';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
@@ -120,25 +119,19 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="flex flex-col gap-3" onkeydown={handleKeydown}>
-	<div class="relative">
-		<SearchIcon
-			size={14}
-			class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-		/>
-		<Input
-			bind:ref={inputElement}
-			value={inputDisplayValue}
-			oninput={handleInput}
-			placeholder={m.wizard_search_placeholder()}
-			class="pl-9"
-		/>
+	<SearchField
+		bind:ref={inputElement}
+		value={inputDisplayValue}
+		oninput={handleInput}
+		placeholder={m.wizard_search_placeholder()}
+	>
 		{#if wizard.searching}
 			<Loader2
 				size={14}
 				class="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground"
 			/>
 		{/if}
-	</div>
+	</SearchField>
 
 	{#if wizard.skipNotice}
 		<p class="text-center text-xs text-muted-foreground">{m.wizard_search_skipping()}</p>

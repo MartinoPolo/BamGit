@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { openPath } from '@tauri-apps/plugin-opener';
+	import { openPath } from '$lib/opener.js';
 	import { useBoard } from '$lib/modules/board';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import WorkspaceCard from '$lib/components/WorkspaceCard.svelte';

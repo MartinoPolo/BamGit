@@ -23,10 +23,10 @@
 <div>
 	<!-- Node row -->
 	<button
-		class="flex w-full cursor-pointer items-center gap-[5px] rounded-[5px] px-1.5 py-[5px] text-xs"
+		class="flex w-full cursor-pointer items-center gap-[5px] rounded-[5px] py-[5px] pr-1.5 text-xs"
 		class:bg-primary-soft={isActive}
 		class:bg-surface-2={expanded && !isActive}
-		style="margin-left: {depth * 14}px; border-left: 2px solid {isActive
+		style="padding-left: {depth * 14 + 6}px; border-left: 2px solid {isActive
 			? 'var(--primary)'
 			: 'transparent'}"
 		onclick={() => onSelect?.(agent.id)}
@@ -79,12 +79,12 @@
 
 	<!-- Meta row -->
 	<div
-		class="flex items-center gap-2 px-1.5 pb-0.5 font-mono text-[10px] text-foreground-subtle"
-		style="margin-left: {depth * 14 + 28}px"
+		class="flex min-w-0 items-center gap-2 overflow-hidden pb-0.5 pr-1.5 font-mono text-[10px] text-foreground-subtle"
+		style="padding-left: {depth * 14 + 34}px"
 	>
-		<span>{agent.model}</span>
-		<span>{agent.toolCount} tools</span>
-		<span>{agent.duration}</span>
+		<span class="shrink-0">{agent.model}</span>
+		<span class="shrink-0">{agent.toolCount} tools</span>
+		<span class="truncate">{agent.duration}</span>
 	</div>
 
 	<!-- Children -->
