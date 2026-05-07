@@ -45,9 +45,9 @@
 	setActionsContext();
 	const shortcutsCtx = setKeyboardShortcutsContext();
 	const commandPaletteCtx = setCommandPaletteContext();
+	const toastsCtx = setToastsContext();
 	const rawRequirementsCtx = setRawRequirementsContext();
 	setCreationWizardContext();
-	const toastsCtx = setToastsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
@@ -59,6 +59,7 @@
 		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
 		void preloadCode(resolve('/settings'));
+		void preloadCode(resolve('/quick-ideas'));
 		void shortcutsCtx.loadCustomBindings();
 
 		shortcutsCtx.registerShortcut({
@@ -82,7 +83,7 @@
 		shortcutsCtx.registerShortcut({
 			id: 'quick-ideas',
 			label: 'Quick Ideas',
-			defaultBinding: 'Ctrl+Shift+I',
+			defaultBinding: 'Ctrl+Shift+Q',
 			allowFromEditable: true,
 			callback: () => void rawRequirementsCtx.toggle(),
 		});

@@ -11,6 +11,7 @@
 		findNotificationDotColor,
 	} from '$lib/modules/notifications';
 	import { useSessions } from '$lib/modules/sessions';
+	import { useRawRequirements } from '$lib/modules/raw-requirements/index.js';
 	import type {
 		Issue,
 		IssuePriority,
@@ -43,6 +44,7 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 	const selection = useSelection();
+	const rawRequirementsCtx = useRawRequirements();
 	const wizardStore = useCreationWizard();
 
 	function getNotificationDotColor(issueId: string): string | null {
@@ -511,6 +513,7 @@
 		forestCollapsed={selection.forestCollapsed}
 		syncing={versionControlStore.syncing}
 		onSync={githubRepoParts ? handleSyncAll : undefined}
+		onQuickIdeas={() => void rawRequirementsCtx.toggle()}
 		onCreateIssue={openCreateDialog}
 		onToggleForest={() => selection.toggleForestCollapsed()}
 	/>
@@ -540,6 +543,7 @@
 				{#snippet forestPanel()}
 					<ForestView
 						issues={forestIssues}
+						allIssues={issueStore.issues}
 						dependencies={issueStore.dependencies}
 						getGitStatus={getGitStatusForForest}
 						getSessionsForIssue={getSessionsForForest}

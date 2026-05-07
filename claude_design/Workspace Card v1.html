@@ -236,48 +236,6 @@
     100% { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 0%, transparent); }
   }
 
-  /* PRD row */
-  .ws-prd {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    margin-bottom: 6px;
-    cursor: pointer;
-  }
-  .ws-prd:hover {
-    border-color: var(--border-strong);
-  }
-  .ws-prd-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--foreground-muted);
-    white-space: nowrap;
-  }
-  .ws-prd-progress {
-    flex: 1;
-    height: 4px;
-    background: color-mix(in oklch, var(--foreground) 10%, transparent);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .ws-prd-progress-fill {
-    height: 100%;
-    background: var(--ws-accent);
-    border-radius: 2px;
-    transition: width 300ms ease-out;
-  }
-  .ws-prd-count {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    color: var(--foreground-subtle);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
   /* AFK row */
   .ws-afk {
     display: flex;
@@ -380,6 +338,7 @@
     border-color: color-mix(in oklch, var(--moss-500) 40%, var(--border));
   }
   .ws-add-label { font-size: 13px; font-weight: 500; }
+  .ws-add-hint { font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle); }
 
   /* Page chrome */
   .page {
@@ -464,9 +423,8 @@ const { useState } = React;
 
 /* ─── Sub-pieces ──────────────────────────────────────────── */
 
-function Stat({ label, value, tone = "neutral", pulse = false, icon: Ico, dualValue }) {
-  const isZero = dualValue ? (dualValue.num === 0 && dualValue.den === 0) : value === 0;
-  const numTone = isZero ? "zero" : tone;
+function Stat({ label, value, tone = "neutral", pulse = false, icon: Ico }) {
+  const numTone = value === 0 ? "zero" : tone;
   return (
     <div className="ws-stat" data-tone={numTone}>
       <div className="ws-stat-label">
@@ -474,63 +432,25 @@ function Stat({ label, value, tone = "neutral", pulse = false, icon: Ico, dualVa
         {label}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        {dualValue ? (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}
-               title={`${dualValue.num} actionable AFK issues out of ${dualValue.den} tracked`}>
-            <span className="ws-stat-num">{dualValue.num}</span>
-            <span className="ws-stat-num" style={{
-              fontWeight: 400,
-              fontSize: 12,
-              color: 'var(--foreground-muted)'
-            }}>/{dualValue.den}</span>
-          </div>
-        ) : (
-          <span className="ws-stat-num">{value}</span>
-        )}
-        {pulse && !isZero ? <span className="ws-pulse-dot" /> : null}
+        <span className="ws-stat-num">{value}</span>
+        {pulse && value > 0 ? <span className="ws-pulse-dot" /> : null}
       </div>
     </div>
   );
 }
 
-function PRDRow({ prdCount, completedSubs, totalSubs }) {
-  const pct = totalSubs > 0 ? (completedSubs / totalSubs) * 100 : 0;
-  return (
-    <div className="ws-prd">
-      <I.ClipboardList size={12} sw={1.7} style={{ color: 'var(--foreground-subtle)', flexShrink: 0 }} />
-      <span className="ws-prd-label">{prdCount} PRDs</span>
-      <div className="ws-prd-progress">
-        <div className="ws-prd-progress-fill" style={{ width: `${pct}%` }} />
-      </div>
-      <span className="ws-prd-count">{completedSubs}/{totalSubs} done</span>
-    </div>
-  );
-}
-
-function AFKRow({ on, sessions, lastActivity, afkCount }) {
-  let meta;
-  if (on) {
-    if (sessions > 0 && afkCount > 0) {
-      meta = `${sessions} sessions (${afkCount} AFK)`;
-    } else if (sessions > 0) {
-      meta = `${sessions} session${sessions === 1 ? '' : 's'}`;
-    } else {
-      meta = 'idle';
-    }
-  } else {
-    if (sessions > 0) {
-      meta = `${sessions} session${sessions === 1 ? '' : 's'}`;
-    } else {
-      meta = `last ${lastActivity}`;
-    }
-  }
+function AFKRow({ on, sessions, lastActivity }) {
   return (
     <div className="ws-afk" data-on={String(on)}>
       <span className="ws-afk-led" />
       <span className="ws-afk-label">
         {on ? "AFK loop running" : "AFK loop off"}
       </span>
-      <span className="ws-afk-meta">{meta}</span>
+      <span className="ws-afk-meta">
+        {on
+          ? (sessions ? `${sessions} session${sessions === 1 ? '' : 's'}` : 'idle')
+          : `last ${lastActivity}`}
+      </span>
     </div>
   );
 }
@@ -543,18 +463,12 @@ function WorkspaceCard({
   accent = "var(--moss-500)",
   variant = "default",         // default | active | needs-attention | urgent | dormant | empty
   branch = "main",
-  worktreeCount = 0,
-  afkReady = 0,
   prs = 0,
   prsAttention = 0,
   issues = 0,
   hitl = 0,
-  prdCount = 0,
-  completedSubs = 0,
-  totalSubs = 0,
   afk = false,
   sessions = 0,
-  afkCount = 0,
   lastActivity = "2m ago",
   cost = "$1.24",
   costLabel = "today",
@@ -591,12 +505,12 @@ function WorkspaceCard({
             <I.GitBranch size={10} sw={1.8} />
             <span>{branch}</span>
             <span className="ws-sub-dot" />
-            <span>{isEmpty ? "no issues yet" : `${worktreeCount} worktrees`}</span>
+            <span>{isEmpty ? "no issues yet" : `${issues + prs} tracked`}</span>
           </div>
         </div>
         <div className="ws-quick" onClick={(e) => e.stopPropagation()}>
           <button className="ws-icon-btn" title="Open on GitHub" aria-label="Open on GitHub">
-            <I.Github size={14} />
+            <I.Github size={14} sw={1.7} />
           </button>
           <button className="ws-icon-btn" title="Open in file explorer" aria-label="Open folder">
             <I.Folder size={14} sw={1.7} />
@@ -623,7 +537,6 @@ function WorkspaceCard({
         </div>
       ) : (
         <div className="ws-health">
-          <Stat label="Issues" dualValue={{ num: afkReady, den: issues }} icon={I.ListChecks} />
           <Stat label="PRs" value={prs} icon={I.GitPull} />
           <Stat
             label="Attn"
@@ -632,6 +545,7 @@ function WorkspaceCard({
             icon={I.AlertTriangle}
             pulse={prsAttention > 0}
           />
+          <Stat label="Issues" value={issues} icon={I.Bug} />
           <Stat
             label="HITL"
             value={hitl}
@@ -642,13 +556,8 @@ function WorkspaceCard({
         </div>
       )}
 
-      {/* PRD */}
-      {!isEmpty && prdCount > 0 && (
-        <PRDRow prdCount={prdCount} completedSubs={completedSubs} totalSubs={totalSubs} />
-      )}
-
       {/* AFK */}
-      <AFKRow on={afk} sessions={sessions} lastActivity={lastActivity} afkCount={afkCount} />
+      <AFKRow on={afk} sessions={sessions} lastActivity={lastActivity} />
 
       {/* Footer */}
       <div className="ws-foot">
@@ -670,6 +579,7 @@ function AddWorkspaceCard() {
     <button className="ws-add" type="button">
       <span className="ws-add-plus"><I.Plus size={18} sw={1.8} /></span>
       <span className="ws-add-label">Add workspace</span>
+      <span className="ws-add-hint">connect a GitHub repo</span>
     </button>
   );
 }
@@ -679,16 +589,11 @@ function AddWorkspaceCard() {
 const ACCENTS = {
   moss:    'oklch(0.580 0.096 134)',
   amber:   'oklch(0.690 0.165 55)',
-  gold:    'oklch(0.650 0.135 90)',
-  coral:   'oklch(0.620 0.155 30)',
-  rose:    'oklch(0.640 0.155 15)',
-  fuchsia: 'oklch(0.580 0.155 350)',
-  sage:    'oklch(0.600 0.085 160)',
-  teal:    'oklch(0.620 0.110 195)',
-  azure:   'oklch(0.570 0.130 235)',
-  indigo:  'oklch(0.540 0.140 275)',
-  plum:    'oklch(0.560 0.150 320)',
+  azure:   'oklch(0.620 0.130 230)',
   bark:    'oklch(0.500 0.075 55)',
+  plum:    'oklch(0.560 0.150 320)',
+  teal:    'oklch(0.620 0.110 195)',
+  rose:    'oklch(0.640 0.155 15)',
 };
 
 function App() {
@@ -714,11 +619,8 @@ function App() {
             accent={ACCENTS.moss}
             variant="active"
             branch="main"
-            worktreeCount={5}
-            afkReady={3} issues={10}
-            prs={2} prsAttention={0} hitl={0}
-            prdCount={3} completedSubs={12} totalSubs={31}
-            afk={true} sessions={3} afkCount={3}
+            prs={2} prsAttention={0} issues={11} hitl={0}
+            afk={true} sessions={3}
             lastActivity="just now"
             cost="$4.82" costLabel="today"
             hasThumb={true}
@@ -728,11 +630,8 @@ function App() {
             accent={ACCENTS.amber}
             variant="needs-attention"
             branch="develop"
-            worktreeCount={3}
-            afkReady={8} issues={23}
-            prs={4} prsAttention={1} hitl={2}
-            prdCount={2} completedSubs={8} totalSubs={15}
-            afk={true} sessions={1} afkCount={1}
+            prs={4} prsAttention={1} issues={23} hitl={2}
+            afk={true} sessions={1}
             lastActivity="3m ago"
             cost="$12.40" costLabel="today"
           />
@@ -741,10 +640,7 @@ function App() {
             accent={ACCENTS.azure}
             variant="urgent"
             branch="release/v2"
-            worktreeCount={4}
-            afkReady={2} issues={8}
-            prs={6} prsAttention={3} hitl={0}
-            prdCount={1} completedSubs={3} totalSubs={10}
+            prs={6} prsAttention={3} issues={8} hitl={0}
             afk={false}
             lastActivity="14m ago"
             cost="$0.00" costLabel="today"
@@ -754,10 +650,7 @@ function App() {
             accent={ACCENTS.teal}
             variant="default"
             branch="main"
-            worktreeCount={2}
-            afkReady={1} issues={4}
-            prs={1} prsAttention={0} hitl={0}
-            prdCount={1} completedSubs={0} totalSubs={6}
+            prs={1} prsAttention={0} issues={4} hitl={0}
             afk={false}
             lastActivity="1h ago"
             cost="$0.42" costLabel="today"
@@ -767,9 +660,7 @@ function App() {
             accent={ACCENTS.plum}
             variant="default"
             branch="design-tokens"
-            worktreeCount={1}
-            afkReady={0} issues={2}
-            prs={0} prsAttention={0} hitl={0}
+            prs={0} prsAttention={0} issues={2} hitl={0}
             afk={false}
             lastActivity="5h ago"
             cost="$0.18" costLabel="today"
@@ -779,9 +670,7 @@ function App() {
             accent={ACCENTS.bark}
             variant="dormant"
             branch="main"
-            worktreeCount={1}
-            afkReady={0} issues={0}
-            prs={0} prsAttention={0} hitl={0}
+            prs={0} prsAttention={0} issues={0} hitl={0}
             afk={false}
             lastActivity="3d ago"
             cost="$0.00" costLabel="today"
@@ -810,9 +699,7 @@ function App() {
             <div className="state-label">default — healthy, AFK off</div>
             <WorkspaceCard
               name="moss-cli" accent={ACCENTS.teal}
-              worktreeCount={2} afkReady={1} issues={4}
-              prs={1} prsAttention={0} hitl={0}
-              prdCount={1} completedSubs={0} totalSubs={6}
+              prs={1} issues={4} prsAttention={0} hitl={0}
               afk={false} lastActivity="1h ago" cost="$0.42"
             />
           </div>
@@ -821,10 +708,8 @@ function App() {
             <div className="state-label">active — AFK on, sessions running</div>
             <WorkspaceCard
               name="grovekeeper" accent={ACCENTS.moss} variant="active"
-              worktreeCount={5} afkReady={3} issues={10}
-              prs={2} prsAttention={0} hitl={0}
-              prdCount={3} completedSubs={12} totalSubs={31}
-              afk={true} sessions={3} afkCount={3} lastActivity="just now" cost="$4.82"
+              prs={2} issues={11} prsAttention={0} hitl={0}
+              afk={true} sessions={3} lastActivity="just now" cost="$4.82"
               hasThumb
             />
           </div>
@@ -833,10 +718,8 @@ function App() {
             <div className="state-label">needs attention — HITL pending</div>
             <WorkspaceCard
               name="codeburn" accent={ACCENTS.amber} variant="needs-attention"
-              worktreeCount={3} afkReady={8} issues={23}
-              prs={4} prsAttention={0} hitl={2}
-              prdCount={2} completedSubs={8} totalSubs={15}
-              afk={true} sessions={1} afkCount={1} lastActivity="3m ago" cost="$12.40"
+              prs={4} issues={23} prsAttention={0} hitl={2}
+              afk={true} sessions={1} lastActivity="3m ago" cost="$12.40"
             />
           </div>
 
@@ -844,9 +727,7 @@ function App() {
             <div className="state-label">urgent — merge conflicts / behind base</div>
             <WorkspaceCard
               name="orchard-api" accent={ACCENTS.azure} variant="urgent"
-              worktreeCount={4} afkReady={2} issues={8}
-              prs={6} prsAttention={3} hitl={0}
-              prdCount={1} completedSubs={3} totalSubs={10}
+              prs={6} issues={8} prsAttention={3} hitl={0}
               afk={false} lastActivity="14m ago" cost="$0.00"
             />
           </div>
@@ -855,8 +736,7 @@ function App() {
             <div className="state-label">dormant — no activity &gt; 24h</div>
             <WorkspaceCard
               name="acorn-deploy" accent={ACCENTS.bark} variant="dormant"
-              worktreeCount={1} afkReady={0} issues={0}
-              prs={0} prsAttention={0} hitl={0}
+              prs={0} issues={0} prsAttention={0} hitl={0}
               afk={false} lastActivity="3d ago" cost="$0.00"
             />
           </div>
@@ -873,8 +753,7 @@ function App() {
             <div className="state-label">hover — interactive lift</div>
             <WorkspaceCard
               name="fern-ui" accent={ACCENTS.plum} state="hover"
-              worktreeCount={1} afkReady={0} issues={3}
-              prs={1} prsAttention={0} hitl={0}
+              prs={1} issues={3} prsAttention={0} hitl={0}
               afk={false} lastActivity="22m ago" cost="$0.66"
             />
           </div>
@@ -885,135 +764,6 @@ function App() {
           </div>
         </div>
       </section>
-      {/* ─── Component Showcase ────────────────────────────── */}
-
-      {/* 4.1 StatCell component */}
-      <section className="section">
-        <div className="section-head">
-          <span className="section-title">StatCell component</span>
-          <span className="section-sub">four tones · zero state · pulse dot · clickable</span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: 8, maxWidth: 680 }}>
-          <Stat label="Issues" dualValue={{ num: 3, den: 10 }} icon={I.ListChecks} />
-          <Stat label="Issues" dualValue={{ num: 0, den: 0 }} icon={I.ListChecks} />
-          <Stat label="PRs" value={4} icon={I.GitPull} />
-          <Stat label="PRs" value={0} icon={I.GitPull} />
-          <Stat label="Attn" value={3} tone="danger" pulse={true} icon={I.AlertTriangle} />
-          <Stat label="Attn" value={0} icon={I.AlertTriangle} />
-          <Stat label="HITL" value={2} tone="warn" pulse={true} icon={I.User} />
-          <Stat label="HITL" value={0} icon={I.User} />
-        </div>
-      </section>
-
-      {/* 4.2 StatusRow component */}
-      <section className="section">
-        <div className="section-head">
-          <span className="section-title">StatusRow component</span>
-          <span className="section-sub">AFK on/off · with meta · PRD row</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 320 }}>
-          <AFKRow on={true} sessions={5} afkCount={3} />
-          <AFKRow on={true} sessions={0} />
-          <AFKRow on={false} sessions={0} lastActivity="14m ago" />
-          <AFKRow on={false} sessions={2} lastActivity="2h ago" />
-          <PRDRow prdCount={3} completedSubs={12} totalSubs={31} />
-        </div>
-      </section>
-
-      {/* 4.3 Icon button states */}
-      <section className="section">
-        <div className="section-head">
-          <span className="section-title">Icon buttons</span>
-          <span className="section-sub">ghost variant · assigned vs unassigned · hover</span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '12px 20px', alignItems: 'center', maxWidth: 400 }}>
-          <span className="section-sub">Assigned, resting</span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button className="ws-icon-btn is-frozen"><I.Github size={14} /></button>
-            <button className="ws-icon-btn is-frozen"><I.Folder size={14} sw={1.7} /></button>
-          </div>
-
-          <span className="section-sub">Assigned, hover</span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button className="ws-icon-btn is-frozen" data-state="hover" style={{ background: 'var(--surface-2)', color: 'var(--foreground)' }}>
-              <I.Github size={14} />
-            </button>
-            <button className="ws-icon-btn is-frozen" data-state="hover" style={{ background: 'var(--surface-2)', color: 'var(--foreground)' }}>
-              <I.Folder size={14} sw={1.7} />
-            </button>
-          </div>
-
-          <span className="section-sub">Unassigned, resting</span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button className="ws-icon-btn is-frozen" style={{ opacity: 0.35 }}><I.Github size={14} /></button>
-            <button className="ws-icon-btn is-frozen" style={{ opacity: 0.35 }}><I.Folder size={14} sw={1.7} /></button>
-          </div>
-
-          <span className="section-sub">Unassigned, hover</span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button className="ws-icon-btn is-frozen" style={{ opacity: 0.35, background: 'var(--surface-2)' }}>
-              <I.Github size={14} />
-            </button>
-            <button className="ws-icon-btn is-frozen" style={{ opacity: 0.35, background: 'var(--surface-2)' }}>
-              <I.Folder size={14} sw={1.7} />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 4.4 Workspace accent picker */}
-      <section className="section">
-        <div className="section-head">
-          <span className="section-title">Workspace accent picker</span>
-          <span className="section-sub">12 presets · 2×6 grid · inline (no dropdown)</span>
-        </div>
-        <AccentPicker />
-      </section>
-    </div>
-  );
-}
-
-/* ─── Accent Picker ───────────────────────────────────────── */
-
-function AccentPicker() {
-  const [selected, setSelected] = React.useState('moss');
-  const row1 = ['moss', 'amber', 'gold', 'coral', 'rose', 'fuchsia'];
-  const row2 = ['sage', 'teal', 'azure', 'indigo', 'plum', 'bark'];
-
-  const swatchStyle = (key) => ({
-    width: 32, height: 32, borderRadius: '50%',
-    background: ACCENTS[key],
-    border: selected === key ? '2px solid var(--foreground)' : '2px solid transparent',
-    outline: selected === key ? `2px solid ${ACCENTS[key]}` : 'none',
-    outlineOffset: 2,
-    cursor: 'pointer',
-    transition: 'outline 120ms, border-color 120ms',
-  });
-
-  return (
-    <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 12, padding: 16, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 32px)', gap: 10 }}>
-        {row1.map(k => (
-          <div key={k} style={swatchStyle(k)} title={k} onClick={() => setSelected(k)} />
-        ))}
-        {row2.map(k => (
-          <div key={k} style={swatchStyle(k)} title={k} onClick={() => setSelected(k)} />
-        ))}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 20, height: 20, borderRadius: 4, background: ACCENTS[selected], border: '1px solid var(--border)' }} />
-        <input
-          type="text"
-          readOnly
-          value={ACCENTS[selected]}
-          style={{
-            fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--foreground-muted)',
-            background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-            padding: '4px 8px', width: 200,
-          }}
-        />
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--foreground-subtle)' }}>{selected}</span>
-      </div>
     </div>
   );
 }

@@ -87,15 +87,19 @@
 
 	let isModifierHeld = $state(false);
 
+	function updateModifierState(event: MouseEvent | KeyboardEvent) {
+		isModifierHeld = event.ctrlKey || event.metaKey || event.shiftKey;
+	}
+
 	function handleCardClick(issue: Issue, event: MouseEvent) {
-		if (event.ctrlKey || event.metaKey) {
-			event.preventDefault();
-			selection.toggleBatchSelect(issue.id);
-			return;
-		}
 		if (event.shiftKey) {
 			event.preventDefault();
 			selection.batchRangeSelect(issue.id, flatIssueIds);
+			return;
+		}
+		if (event.ctrlKey || event.metaKey) {
+			event.preventDefault();
+			selection.toggleBatchSelect(issue.id);
 			return;
 		}
 		selection.activateIssue(issue.id);
@@ -108,20 +112,12 @@
 			selection.batchSelectAll(flatIssueIds);
 			return;
 		}
+		updateModifierState(event);
 		if (event.key === 'Escape') {
 			event.preventDefault();
 			selection.batchDeselectAll();
 			selection.deactivate();
 			return;
-		}
-		if (event.key === 'Control' || event.key === 'Meta' || event.key === 'Shift') {
-			isModifierHeld = true;
-		}
-	}
-
-	function handleKeyup(event: KeyboardEvent) {
-		if (event.key === 'Control' || event.key === 'Meta' || event.key === 'Shift') {
-			isModifierHeld = false;
 		}
 	}
 
@@ -217,13 +213,18 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div onkeydown={handleKeydown} onkeyup={handleKeyup} tabindex="-1" class="outline-none">
+<div
+	onkeydown={handleKeydown}
+	onkeyup={updateModifierState}
+	onpointermove={updateModifierState}
+	tabindex="-1"
+	class="outline-none"
+>
 	<!-- Persistent toolbar -->
 	<div class="mb-3">
 		<BatchActionToolbar
 			selectedCount={selection.batchCount}
 			{selectedIssues}
-			{isModifierHeld}
 			onDeselectAll={handleDeselectAll}
 			onBatchArchive={handleBatchArchive}
 			onBatchUnarchive={handleBatchUnarchive}
@@ -276,7 +277,7 @@
 					isActive={selection.activeIssueId === issue.id}
 					isHovered={selection.hoveredIssueId === issue.id}
 					isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-					isSelectionReady={isModifierHeld}
+					{isModifierHeld}
 					onCardClick={(event) => handleCardClick(issue, event)}
 					onMouseEnter={() => selection.hoverIssue(issue.id)}
 					onMouseLeave={() => selection.unhover()}
@@ -317,7 +318,6 @@
 							isActive={selection.activeIssueId === issue.id}
 							isHovered={selection.hoveredIssueId === issue.id}
 							isBatchSelected={selection.batchSelectedIssueIds.has(issue.id)}
-							isSelectionReady={isModifierHeld}
 							onCardClick={(event) => handleCardClick(issue, event)}
 							onMouseEnter={() => selection.hoverIssue(issue.id)}
 							onMouseLeave={() => selection.unhover()}

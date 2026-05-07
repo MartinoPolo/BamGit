@@ -35,20 +35,21 @@
 		{@render children?.()}
 		<TooltipPrimitive.Arrow>
 			{#snippet child({ props })}
+				{@const cleanStyle = String(props.style ?? '').replace(
+					/transform(-origin)?:[^;]+;?\s*/g,
+					'',
+				)}
 				<div
 					class={cn(
-						'size-2.5 translate-y-[calc(-50%-2px)] rotate-45 bg-surface-3 border-border-strong z-[var(--z-tooltip)]',
-						'data-[side=top]:border-b data-[side=top]:border-r',
-						'data-[side=bottom]:border-t data-[side=bottom]:border-l',
-						'data-[side=left]:border-t data-[side=left]:border-r',
-						'data-[side=right]:border-b data-[side=right]:border-l',
-						'data-[side=top]:translate-x-1/2 data-[side=top]:translate-y-[calc(-50%+2px)]',
-						'data-[side=bottom]:-translate-x-1/2 data-[side=bottom]:-translate-y-[calc(-50%+1px)]',
-						'data-[side=right]:translate-x-[calc(50%+2px)] data-[side=right]:translate-y-1/2',
-						'data-[side=left]:-translate-y-[calc(50%-3px)]',
+						'size-2.5 rotate-45 bg-surface-3 z-[var(--z-tooltip)] border-border-strong',
+						'data-[side=top]:border-b data-[side=top]:border-r data-[side=top]:translate-y-1/2',
+						'data-[side=bottom]:border-t data-[side=bottom]:border-l data-[side=bottom]:-translate-y-1/2',
+						'data-[side=left]:border-t data-[side=left]:border-r data-[side=left]:translate-x-1/2',
+						'data-[side=right]:border-b data-[side=right]:border-l data-[side=right]:-translate-x-1/2',
 						arrowClasses,
 					)}
 					{...props}
+					style={cleanStyle}
 				></div>
 			{/snippet}
 		</TooltipPrimitive.Arrow>

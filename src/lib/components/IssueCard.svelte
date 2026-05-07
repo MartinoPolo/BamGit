@@ -44,7 +44,7 @@
 		isActive?: boolean;
 		isHovered?: boolean;
 		isBatchSelected?: boolean;
-		isSelectionReady?: boolean;
+		isModifierHeld?: boolean;
 		onCardClick?: (event: MouseEvent) => void;
 		onMouseEnter?: () => void;
 		onMouseLeave?: () => void;
@@ -67,7 +67,7 @@
 		isActive = false,
 		isHovered = false,
 		isBatchSelected = false,
-		isSelectionReady = false,
+		isModifierHeld = false,
 		onCardClick,
 		onMouseEnter,
 		onMouseLeave,
@@ -117,10 +117,7 @@
 			return CARD_STATE_CLASSES.active;
 		}
 		if (isHovered) {
-			return CARD_STATE_CLASSES.hovered;
-		}
-		if (isSelectionReady) {
-			return CARD_STATE_CLASSES.selectionReady;
+			return isModifierHeld ? CARD_STATE_CLASSES.selectionHover : CARD_STATE_CLASSES.hovered;
 		}
 		return '';
 	});
@@ -193,11 +190,10 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-all duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
+	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-[box-shadow] duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
 	isActive ||
 	isHovered ||
-	isBatchSelected ||
-	isSelectionReady
+	isBatchSelected
 		? ''
 		: 'card-ic-interactive'}"
 	style:--ic={color}
@@ -208,7 +204,7 @@
 	<!-- Header band -->
 	<div
 		class="flex min-h-8 items-center justify-between gap-2.5 px-3 py-1.5"
-		style="background-color: {color}; color: {headerTextColor};"
+		style="background-color: {color}; color: {headerTextColor}; filter: saturate(var(--header-saturate, 1));"
 	>
 		<div class="flex min-w-0 flex-1 items-baseline gap-1.5">
 			{#if issue.github_issue_url}
@@ -461,3 +457,57 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	:global(.card-ic-interactive):hover,
+	:global(.card-state-hovered-ic) {
+		box-shadow:
+			inset 0 0 0 2px color-mix(in oklch, var(--ic) 40%, transparent),
+			var(--shadow-md);
+	}
+
+	:global(.card-state-selection-hover) {
+		box-shadow: var(--shadow-md);
+		background: color-mix(in srgb, var(--selection) 10%, var(--surface));
+	}
+
+	:global(.card-state-selection-hover)::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		border: 2px solid color-mix(in srgb, var(--selection) 45%, transparent);
+		pointer-events: none;
+		z-index: 10;
+	}
+
+	:global(.card-state-active-ic) {
+		box-shadow: 0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
+		background: color-mix(in oklch, var(--ic) 6%, var(--surface));
+	}
+
+	:global(.card-state-active-ic)::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		border: 3px solid color-mix(in oklch, var(--ic) 65%, transparent);
+		pointer-events: none;
+		z-index: 10;
+	}
+
+	:global(.card-state-selected-primary) {
+		box-shadow: 0 0 14px color-mix(in srgb, var(--selection) 15%, transparent);
+		background: color-mix(in srgb, var(--selection) 20%, var(--surface));
+	}
+
+	:global(.card-state-selected-primary)::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		border: 3px solid color-mix(in srgb, var(--selection) 55%, transparent);
+		pointer-events: none;
+		z-index: 10;
+	}
+</style>

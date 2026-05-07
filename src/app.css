@@ -132,6 +132,7 @@
 	--azure-500: oklch(0.57 0.13 235);
 	--azure-600: oklch(0.49 0.115 240);
 	--azure-700: oklch(0.4 0.095 240);
+	--selection: oklch(0.62 0.15 245);
 	--sky-light-top: oklch(0.965 0.018 220);
 	--sky-light-bot: oklch(0.94 0.025 130);
 	--sky-dark-top: oklch(0.225 0.028 240);
@@ -216,7 +217,7 @@
 	--sidebar-width: 240px;
 	--sidebar-width-collapsed: 56px;
 	--tree-bg-mix: 22%;
-	--selection-ready: oklch(0.7 0.2 300);
+	--header-saturate: 1;
 }
 
 [data-theme='light'] {
@@ -274,6 +275,7 @@
 	--ground-color: oklch(0.3 0.06 140);
 	--ground-dark: oklch(0.18 0.04 50);
 	--tree-bg-mix: 14%;
+	--header-saturate: 0.7;
 }
 
 /* ── Accent color overrides ─────────────────────────────────────────────── */
@@ -374,34 +376,6 @@
 	);
 	background-size: 200% 100%;
 	animation: shimmer 2s infinite linear;
-}
-
-/* ── Issue card state rings (box-shadow, referencing --ic per-card) ──── */
-
-.card-ic-interactive:hover,
-.card-state-hovered-ic {
-	box-shadow:
-		0 0 0 2px color-mix(in oklch, var(--ic) 40%, transparent),
-		var(--shadow-md);
-	border-color: color-mix(in oklch, var(--ic) 60%, var(--border-strong));
-	background: color-mix(in oklch, var(--ic) 6%, var(--surface));
-}
-
-.card-state-active-ic {
-	box-shadow:
-		0 0 0 3px color-mix(in oklch, var(--ic) 55%, transparent),
-		0 0 14px color-mix(in oklch, var(--ic) 20%, transparent);
-	background: color-mix(in oklch, var(--ic) 6%, var(--surface));
-}
-
-.card-state-selected-primary {
-	box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 45%, transparent);
-	background: color-mix(in oklch, var(--primary) 4%, var(--surface));
-}
-
-.card-state-selection-ready {
-	box-shadow: 0 0 0 2px color-mix(in oklch, var(--selection-ready) 30%, transparent);
-	background: color-mix(in oklch, var(--selection-ready) 4%, var(--surface));
 }
 
 @layer base {
