@@ -98,7 +98,7 @@
 	}
 
 	const childrenByParentId = $derived.by(() => {
-		const map = new Map<string, Issue[]>();
+		const map = new SvelteMap<string, Issue[]>();
 		for (const issue of allIssues) {
 			if (issue.parent_issue_id !== null) {
 				const existing = map.get(issue.parent_issue_id);
