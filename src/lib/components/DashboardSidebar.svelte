@@ -6,6 +6,7 @@
 	import CodeIcon from '@lucide/svelte/icons/code';
 	import BarChart3Icon from '@lucide/svelte/icons/bar-chart-3';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import BrandMark from './BrandMark.svelte';
@@ -42,6 +43,7 @@
 	const NAV_LABELS = {
 		dashboard: () => m.nav_dashboard(),
 		sessions: () => m.nav_sessions(),
+		ai_config: () => m.nav_ai_config(),
 		usage: () => 'Usage',
 		settings: () => m.nav_settings(),
 	} as const;
@@ -52,6 +54,7 @@
 	const navigationItems = [
 		{ href: resolve('/'), icon: TreesIcon, labelKey: 'dashboard' as const },
 		{ href: resolve('/sessions'), icon: CodeIcon, labelKey: 'sessions' as const },
+		{ href: resolve('/ai-config'), icon: SparklesIcon, labelKey: 'ai_config' as const },
 		{ href: resolve('/usage'), icon: BarChart3Icon, labelKey: 'usage' as const },
 		{ href: resolve('/settings'), icon: SettingsIcon, labelKey: 'settings' as const },
 	];
