@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Files &amp; Stats — Variant A: Dense, developer-focused</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== FULL tokens.css INLINE ===== */
+:root {
+  --moss-50:  oklch(0.972 0.018 130);
+  --moss-100: oklch(0.940 0.034 130);
+  --moss-200: oklch(0.880 0.058 130);
+  --moss-300: oklch(0.795 0.082 130);
+  --moss-400: oklch(0.690 0.098 132);
+  --moss-500: oklch(0.580 0.096 134);
+  --moss-600: oklch(0.480 0.082 138);
+  --moss-700: oklch(0.395 0.066 142);
+  --moss-800: oklch(0.300 0.048 145);
+  --moss-900: oklch(0.215 0.032 148);
+  --moss-950: oklch(0.155 0.024 150);
+  --amber-300: oklch(0.840 0.130 78);
+  --amber-400: oklch(0.770 0.150 65);
+  --amber-500: oklch(0.690 0.165 55);
+  --amber-600: oklch(0.595 0.160 48);
+  --bark-300: oklch(0.700 0.060 60);
+  --bark-500: oklch(0.500 0.075 55);
+  --bark-700: oklch(0.345 0.055 50);
+  --azure-300: oklch(0.750 0.090 230);
+  --azure-400: oklch(0.660 0.120 230);
+  --azure-500: oklch(0.570 0.130 235);
+  --azure-600: oklch(0.490 0.115 240);
+  --azure-700: oklch(0.400 0.095 240);
+  --sky-light-top: oklch(0.965 0.018 220);
+  --sky-light-bot: oklch(0.940 0.025 130);
+  --sky-dark-top:  oklch(0.225 0.028 240);
+  --sky-dark-bot:  oklch(0.180 0.030 150);
+  --status-success: oklch(0.660 0.135 145);
+  --status-warning: oklch(0.770 0.155 75);
+  --status-danger:  oklch(0.620 0.205 25);
+  --status-info:    oklch(0.660 0.105 220);
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --text-2xs: 10.5px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-md:  13px;
+  --text-base:14px;
+  --text-lg:  15px;
+  --text-xl:  17px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --leading-tight:  1.15;
+  --leading-snug:   1.25;
+  --leading-normal: 1.4;
+  --leading-relaxed:1.55;
+  --leading-loose:  1.7;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+  --border-width-1: 1px;
+  --border-width-2: 1.5px;
+  --border-width-3: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --size-control-sm: 26px;
+  --size-control-md: 32px;
+  --size-control-lg: 38px;
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+  --duration-1: 90ms;
+  --duration-2: 120ms;
+  --duration-3: 160ms;
+  --duration-4: 220ms;
+  --duration-5: 320ms;
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --ease-out:      cubic-bezier(.16,.84,.44,1);
+  --ease-in:       cubic-bezier(.5,0,.75,0);
+  --sidebar-width:  240px;
+  --sidebar-width-collapsed: 56px;
+}
+.theme-dark, [data-theme='dark'] {
+  color-scheme: dark;
+  --background:        oklch(0.155 0.018 150);
+  --surface:           oklch(0.190 0.020 150);
+  --surface-2:         oklch(0.225 0.022 150);
+  --surface-hover:     oklch(0.265 0.024 150);
+  --surface-3:         oklch(0.265 0.024 150);
+  --foreground:        oklch(0.965 0.010 130);
+  --foreground-muted:  oklch(0.730 0.018 135);
+  --foreground-subtle: oklch(0.560 0.020 140);
+  --border:            oklch(0.295 0.022 148);
+  --border-strong:     oklch(0.380 0.028 145);
+  --primary:           var(--moss-400);
+  --primary-fg:        oklch(0.135 0.020 150);
+  --primary-soft:      oklch(0.305 0.045 145);
+  --accent:            var(--amber-400);
+  --accent-fg:         oklch(0.15 0.02 50);
+  --ring:              var(--moss-400);
+  --sidebar-bg:        oklch(0.180 0.022 150);
+  --sidebar-fg:        oklch(0.770 0.020 140);
+  --code-bg:           oklch(0.215 0.020 150);
+  --sky-top:           var(--sky-dark-top);
+  --sky-bot:           var(--sky-dark-bot);
+  --ground-color:      oklch(0.300 0.060 140);
+  --ground-dark:       oklch(0.180 0.040 50);
+}
+.gk-root {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "ss01", "cv11";
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.gk-root, .gk-root * { box-sizing: border-box; }
+.font-mono { font-family: var(--font-mono); }
+.gk-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
+  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
+  white-space: nowrap; user-select: none;
+}
+.gk-btn:active { transform: scale(0.96); }
+.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.gk-btn-primary { background: var(--primary); color: var(--primary-fg); box-shadow: var(--shadow-sm), var(--shadow-inset); }
+.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
+.gk-btn-secondary { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
+.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.gk-btn-ghost { background: transparent; color: var(--foreground-muted); border: 1px solid transparent; }
+.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
+.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
+.gk-btn-icon { padding: 0; width: 32px; }
+.gk-btn-icon.gk-btn-sm { width: 26px; }
+.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.gk-input { font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--foreground); width: 100%; outline: none; transition: border-color 120ms ease, box-shadow 120ms ease; }
+.gk-input::placeholder { color: var(--foreground-subtle); }
+.gk-input:focus { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
+.gk-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.gk-badge {
+  display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px;
+  font-size: 11px; font-weight: 500; border-radius: 999px;
+  background: var(--surface-2); color: var(--foreground-muted); border: 1px solid var(--border);
+  font-family: var(--font-sans); letter-spacing: 0.01em; white-space: nowrap;
+}
+.gk-badge-mono { font-family: var(--font-mono); font-size: 10.5px; }
+.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
+.gk-badge-danger { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
+.gk-badge-info { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
+.gk-badge-moss { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+.gk-badge-amber { background: color-mix(in oklch, var(--accent) 16%, transparent); color: color-mix(in oklch, var(--accent) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--accent) 32%, transparent); }
+.gk-tabs { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); padding: 3px; border-radius: var(--radius-md); gap: 2px; }
+.gk-tab { padding: 5px 12px; font-size: 12px; font-weight: 500; border-radius: 6px; color: var(--foreground-muted); cursor: pointer; transition: all 120ms ease; border: none; background: transparent; font-family: var(--font-sans); }
+.gk-tab:hover { color: var(--foreground); }
+.gk-tab.is-active { background: var(--surface); color: var(--foreground); box-shadow: var(--shadow-sm); }
+.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
+.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
+.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
+.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
+.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+.cb-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cb-panel-title { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--foreground-muted); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: baseline; gap: 8px; padding-bottom: 6px; border-bottom: 1px dashed var(--border); }
+.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.cb-panel-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+.cb-panel-sub { font-family: var(--font-mono); font-size: 10.5px; font-weight: 400; color: var(--foreground-subtle); text-transform: none; letter-spacing: 0; margin-left: auto; }
+.cb-row { display: grid; align-items: center; gap: 10px; font-size: 12px; padding: 3px 0; min-height: 22px; font-family: var(--font-sans); }
+.cb-num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 11.5px; text-align: right; color: var(--foreground); }
+.cb-mute { color: var(--foreground-subtle); font-family: var(--font-mono); font-size: 11px; }
+.cb-bar { height: 10px; border-radius: 2px; background: linear-gradient(90deg, oklch(0.770 0.155 75) 0%, oklch(0.700 0.180 50) 60%, oklch(0.640 0.205 25) 100%); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06); min-width: 2px; }
+.cb-bar-cool { background: linear-gradient(90deg, oklch(0.700 0.110 200) 0%, oklch(0.620 0.130 230) 60%, oklch(0.560 0.150 260) 100%); }
+.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
+.gk-root ::-webkit-scrollbar-track { background: transparent; }
+.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
+.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+
+/* ===== VARIANT A CUSTOM STYLES ===== */
+html, body { margin: 0; padding: 0; min-height: 100vh; }
+
+.variant-label {
+  position: fixed; top: 12px; left: 12px; z-index: 100;
+  font-size: var(--text-2xs); font-weight: var(--weight-semibold);
+  color: var(--foreground-subtle); letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  background: var(--surface-2); border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: var(--radius-sm);
+}
+
+.page-wrapper {
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* Tab header strip */
+.tab-header {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-6) var(--space-8);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky; top: 0; z-index: var(--z-sticky);
+}
+
+/* ---- FILES TAB ---- */
+.files-layout {
+  display: flex; flex: 1; min-height: 0;
+}
+
+.file-sidebar {
+  width: 280px; min-width: 280px;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.file-sidebar-header {
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.file-summary-row {
+  display: flex; align-items: center; gap: var(--space-4);
+  font-family: var(--font-mono); font-size: var(--text-sm);
+}
+
+.file-summary-count {
+  color: var(--foreground-muted); font-weight: var(--weight-medium);
+}
+
+.additions { color: var(--status-success); }
+.deletions { color: var(--status-danger); }
+
+.file-list {
+  flex: 1; overflow-y: auto; padding: var(--space-2) 0;
+}
+
+.file-item {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--text-sm); cursor: pointer;
+  transition: background var(--duration-2) ease;
+  border-left: 2px solid transparent;
+}
+.file-item:hover { background: var(--surface-2); }
+.file-item.is-active {
+  background: var(--primary-soft);
+  border-left-color: var(--primary);
+}
+
+.file-item-status {
+  width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+}
+.file-item-status.modified { background: var(--amber-400); }
+.file-item-status.added { background: var(--status-success); }
+.file-item-status.deleted { background: var(--status-danger); }
+.file-item-status.renamed { background: var(--status-info); }
+
+.file-item-path {
+  flex: 1; min-width: 0;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--foreground-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  direction: rtl; text-align: left;
+}
+.file-item-path span { direction: ltr; unicode-bidi: bidi-override; }
+
+.file-item-stats {
+  font-family: var(--font-mono); font-size: 10.5px;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* Diff area */
+.diff-area {
+  flex: 1; overflow-y: auto; min-width: 0;
+}
+
+.diff-file-block {
+  border-bottom: 1px solid var(--border);
+}
+
+.diff-file-header {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 5;
+}
+
+.diff-file-path {
+  font-family: var(--font-mono); font-size: var(--text-sm);
+  color: var(--foreground); font-weight: var(--weight-medium);
+  flex: 1; min-width: 0;
+}
+
+.diff-file-stats {
+  font-family: var(--font-mono); font-size: 11px;
+  display: flex; gap: var(--space-4);
+}
+
+.diff-table {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-mono); font-size: 12px; line-height: 20px;
+}
+
+.diff-table td {
+  padding: 0 var(--space-4); vertical-align: top;
+  white-space: pre-wrap; word-break: break-all;
+}
+
+.diff-line-num {
+  width: 48px; min-width: 48px;
+  color: var(--foreground-subtle);
+  text-align: right; user-select: none;
+  font-size: 11px; padding-right: var(--space-3) !important;
+  border-right: 1px solid var(--border);
+}
+
+.diff-line-sign {
+  width: 20px; min-width: 20px;
+  text-align: center; user-select: none;
+  font-weight: var(--weight-bold);
+}
+
+.diff-line-content {
+  padding-left: var(--space-4) !important;
+}
+
+.diff-line-add {
+  background: color-mix(in oklch, var(--status-success) 10%, transparent);
+}
+.diff-line-add .diff-line-sign { color: var(--status-success); }
+.diff-line-add .diff-line-content { color: var(--foreground); }
+
+.diff-line-del {
+  background: color-mix(in oklch, var(--status-danger) 8%, transparent);
+}
+.diff-line-del .diff-line-sign { color: var(--status-danger); }
+.diff-line-del .diff-line-content { color: var(--foreground); }
+
+.diff-line-ctx .diff-line-content {
+  color: var(--foreground-muted);
+}
+
+.diff-hunk-header {
+  background: color-mix(in oklch, var(--status-info) 6%, transparent);
+  color: var(--foreground-subtle); font-size: 11px;
+}
+.diff-hunk-header td { padding: var(--space-2) var(--space-4); }
+
+.diff-expander {
+  text-align: center; cursor: pointer;
+  color: var(--foreground-subtle); font-size: 11px;
+  padding: var(--space-2) 0;
+  background: var(--surface-2);
+  transition: background var(--duration-2) ease;
+}
+.diff-expander:hover { background: var(--surface-3); color: var(--foreground-muted); }
+
+/* ---- STATS TAB ---- */
+.stats-section {
+  padding: var(--space-8);
+  border-top: 2px solid var(--border);
+}
+
+.stats-section-title {
+  display: flex; align-items: center; gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.stats-grid {
+  display: grid; gap: var(--space-4);
+  max-width: 900px;
+}
+
+.stats-grid-2col { grid-template-columns: 1fr 1fr; }
+.stats-grid-3col { grid-template-columns: 1fr 1fr 1fr; }
+.stats-grid-4col { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.stat-cell {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: var(--space-4) var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.stat-label {
+  font-size: 10.5px; color: var(--foreground-subtle);
+  font-family: var(--font-mono); text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat-value {
+  font-family: var(--font-mono); font-size: var(--text-xl);
+  font-weight: var(--weight-semibold); color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+.stat-value-sm {
+  font-size: var(--text-base);
+}
+
+.stat-sub {
+  font-size: 10.5px; color: var(--foreground-subtle);
+  font-family: var(--font-mono);
+}
+
+/* Tool usage table */
+.tool-table {
+  width: 100%; border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.tool-table th {
+  text-align: left; font-weight: var(--weight-medium);
+  font-size: 10.5px; color: var(--foreground-subtle);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+.tool-table th.num-col { text-align: right; }
+
+.tool-table td {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  font-size: 12px;
+}
+
+.tool-table tr:last-child td { border-bottom: none; }
+
+.tool-name {
+  font-family: var(--font-mono); color: var(--foreground);
+  font-weight: var(--weight-medium); font-size: 12px;
+}
+
+.tool-count {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  text-align: right; color: var(--foreground);
+}
+
+.tool-bar-cell { padding-left: var(--space-8) !important; }
+.tool-bar {
+  height: 6px; border-radius: 2px;
+  background: var(--primary);
+  opacity: 0.7;
+}
+
+.section-divider {
+  height: 1px; background: var(--border);
+  margin: var(--space-8) 0;
+}
+
+/* Cost model rows */
+.model-row {
+  display: grid; grid-template-columns: 1fr auto auto;
+  gap: var(--space-6); align-items: center;
+  padding: var(--space-2) 0;
+  font-size: var(--text-sm);
+}
+
+.model-name {
+  font-family: var(--font-mono); color: var(--foreground-muted);
+  font-size: 11.5px;
+}
+
+.model-cost {
+  font-family: var(--font-mono); color: var(--foreground);
+  font-variant-numeric: tabular-nums; font-size: 12px;
+  text-align: right;
+}
+
+.model-pct {
+  font-family: var(--font-mono); color: var(--foreground-subtle);
+  font-size: 10.5px; text-align: right; min-width: 40px;
+}
+
+@media (max-width: 768px) {
+  .file-sidebar { width: 220px; min-width: 220px; }
+  .stats-grid-3col, .stats-grid-4col { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .files-layout { flex-direction: column; }
+  .file-sidebar { width: 100%; min-width: 0; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
+  .stats-grid-2col, .stats-grid-3col, .stats-grid-4col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body class="gk-root theme-dark">
+<div class="variant-label">Variant A: Dense, developer-focused</div>
+<div class="page-wrapper">
+
+  <!-- Tab header -->
+  <div class="tab-header">
+    <div class="gk-tabs">
+      <button class="gk-tab">Chat</button>
+      <button class="gk-tab is-active">Files</button>
+      <button class="gk-tab">Stats</button>
+    </div>
+    <div style="flex:1"></div>
+    <button class="gk-btn gk-btn-ghost gk-btn-sm">Expand All</button>
+    <button class="gk-btn gk-btn-ghost gk-btn-sm">Collapse All</button>
+    <div class="gk-tabs" style="margin-left:var(--space-4)">
+      <button class="gk-tab is-active" style="font-size:11px">Unified</button>
+      <button class="gk-tab" style="font-size:11px">Split</button>
+    </div>
+  </div>
+
+  <!-- FILES TAB CONTENT -->
+  <div class="files-layout" style="height: calc(100vh - 200px);">
+    <!-- Sidebar file tree -->
+    <div class="file-sidebar">
+      <div class="file-sidebar-header">
+        <div class="file-summary-row">
+          <span class="file-summary-count">12 files changed</span>
+          <span class="additions">+347</span>
+          <span class="deletions">&minus;89</span>
+        </div>
+        <div style="margin-top:var(--space-3)">
+          <input class="gk-input gk-btn-sm" placeholder="Filter files..." style="height:26px;font-size:11px;padding:0 8px">
+        </div>
+      </div>
+      <div class="file-list">
+        <div class="file-item is-active">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/lib/components/SessionView.svelte</span></div>
+          <div class="file-item-stats"><span class="additions">+48</span> <span class="deletions">&minus;12</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/lib/modules/sessions/session_store.ts</span></div>
+          <div class="file-item-stats"><span class="additions">+31</span> <span class="deletions">&minus;8</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status added"></div>
+          <div class="file-item-path"><span>src/lib/components/DiffViewer.svelte</span></div>
+          <div class="file-item-stats"><span class="additions">+127</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/lib/modules/sessions/types.ts</span></div>
+          <div class="file-item-stats"><span class="additions">+22</span> <span class="deletions">&minus;5</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src-tauri/src/commands/session.rs</span></div>
+          <div class="file-item-stats"><span class="additions">+34</span> <span class="deletions">&minus;19</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status deleted"></div>
+          <div class="file-item-path"><span>src/lib/components/OldStatsPanel.svelte</span></div>
+          <div class="file-item-stats"><span class="deletions">&minus;45</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/lib/modules/toasts/mock_toast_bridge.ts</span></div>
+          <div class="file-item-stats"><span class="additions">+6</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status added"></div>
+          <div class="file-item-path"><span>src/lib/components/FileTree.svelte</span></div>
+          <div class="file-item-stats"><span class="additions">+53</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status renamed"></div>
+          <div class="file-item-path"><span>src/lib/modules/sessions/cost_utils.ts</span></div>
+          <div class="file-item-stats"><span class="additions">+4</span> <span class="deletions">&minus;0</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/routes/+layout.svelte</span></div>
+          <div class="file-item-stats"><span class="additions">+8</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/lib/tauri_mock.ts</span></div>
+          <div class="file-item-stats"><span class="additions">+11</span></div>
+        </div>
+        <div class="file-item">
+          <div class="file-item-status modified"></div>
+          <div class="file-item-path"><span>src/lib/tauri_mock_data.ts</span></div>
+          <div class="file-item-stats"><span class="additions">+3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diff view -->
+    <div class="diff-area">
+      <!-- File 1 diff -->
+      <div class="diff-file-block">
+        <div class="diff-file-header">
+          <div class="file-item-status modified" style="flex-shrink:0"></div>
+          <div class="diff-file-path">src/lib/components/SessionView.svelte</div>
+          <div class="diff-file-stats">
+            <span class="additions">+48</span>
+            <span class="deletions">&minus;12</span>
+          </div>
+          <button class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" title="Copy file path">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+        <table class="diff-table">
+          <tr class="diff-hunk-header">
+            <td colspan="4">@@ -14,8 +14,12 @@ import { sessionStore } from '../modules/sessions/session_store';</td>
+          </tr>
+          <tr class="diff-line-ctx">
+            <td class="diff-line-num">14</td>
+            <td class="diff-line-num">14</td>
+            <td class="diff-line-sign"></td>
+            <td class="diff-line-content">  import type { SessionMetadata } from '../modules/sessions/types';</td>
+          </tr>
+          <tr class="diff-line-ctx">
+            <td class="diff-line-num">15</td>
+            <td class="diff-line-num">15</td>
+            <td class="diff-line-sign"></td>
+            <td class="diff-line-content">  import { onMount } from 'svelte';</td>
+          </tr>
+          <tr class="diff-line-del">
+            <td class="diff-line-num">16</td>
+            <td class="diff-line-num"></td>
+            <td class="diff-line-sign">-</td>
+            <td class="diff-line-content">  import { StatsPanel } from './OldStatsPanel.svelte';</td>
+          </tr>
+          <tr class="diff-line-del">
+            <td class="diff-line-num">17</td>
+            <td class="diff-line-num"></td>
+            <td class="diff-line-sign">-</td>
+            <td class="diff-line-content">  import { computeCost } from '../modules/sessions/legacy_cost';</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">16</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  import { DiffViewer } from './DiffViewer.svelte';</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">17</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  import { FileTree } from './FileTree.svelte';</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">18</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  import { computeSessionCost } from '../modules/sessions/cost_utils';</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">19</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  import type { FileDiff, ToolUsageEntry } from '../modules/sessions/types';</td>
+          </tr>
+          <tr class="diff-line-ctx">
+            <td class="diff-line-num">18</td>
+            <td class="diff-line-num">20</td>
+            <td class="diff-line-sign"></td>
+            <td class="diff-line-content"></td>
+          </tr>
+          <tr class="diff-line-ctx">
+            <td class="diff-line-num">19</td>
+            <td class="diff-line-num">21</td>
+            <td class="diff-line-sign"></td>
+            <td class="diff-line-content">  let { session }: { session: SessionMetadata } = $props();</td>
+          </tr>
+          <tr class="diff-hunk-header">
+            <td colspan="4">@@ -38,6 +42,18 @@</td>
+          </tr>
+          <tr class="diff-line-ctx">
+            <td class="diff-line-num">38</td>
+            <td class="diff-line-num">42</td>
+            <td class="diff-line-sign"></td>
+            <td class="diff-line-content">    const filesChanged = $derived(sessionStore.getFilesChanged(session.id));</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">43</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">    const totalAdditions = $derived(</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">44</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">      filesChanged.reduce((sum, f) => sum + f.additions, 0)</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">45</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">    );</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">46</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">    const totalDeletions = $derived(</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">47</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">      filesChanged.reduce((sum, f) => sum + f.deletions, 0)</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">48</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">    );</td>
+          </tr>
+          <tr class="diff-line-ctx">
+            <td class="diff-line-num">39</td>
+            <td class="diff-line-num">49</td>
+            <td class="diff-line-sign"></td>
+            <td class="diff-line-content">  &lt;/script&gt;</td>
+          </tr>
+        </table>
+        <div class="diff-expander">Show 24 hidden lines</div>
+      </div>
+
+      <!-- File 2 diff -->
+      <div class="diff-file-block">
+        <div class="diff-file-header">
+          <div class="file-item-status added" style="flex-shrink:0"></div>
+          <div class="diff-file-path">src/lib/components/DiffViewer.svelte</div>
+          <div class="diff-file-stats">
+            <span class="additions">+127</span>
+          </div>
+          <span class="gk-badge gk-badge-success gk-badge-mono" style="margin-left:auto">new file</span>
+        </div>
+        <table class="diff-table">
+          <tr class="diff-hunk-header">
+            <td colspan="4">@@ -0,0 +1,127 @@</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">1</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">&lt;script lang="ts"&gt;</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">2</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  import type { FileDiff } from '../modules/sessions/types';</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">3</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  import { parseDiffHunks } from '../modules/sessions/diff_parser';</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">4</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content"></td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">5</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  let { diff, expanded = true }: { diff: FileDiff; expanded?: boolean } = $props();</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">6</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  const hunks = $derived(parseDiffHunks(diff.rawPatch));</td>
+          </tr>
+          <tr class="diff-line-add">
+            <td class="diff-line-num"></td>
+            <td class="diff-line-num">7</td>
+            <td class="diff-line-sign">+</td>
+            <td class="diff-line-content">  let isExpanded = $state(expanded);</td>
+          </tr>
+        </table>
+        <div class="diff-expander">Show 120 more lines</div>
+      </div>
+
+      <!-- File 3 diff (deleted) -->
+      <div class="diff-file-block">
+        <div class="diff-file-header">
+          <div class="file-item-status deleted" style="flex-shrink:0"></div>
+          <div class="diff-file-path">src/lib/components/OldStatsPanel.svelte</div>
+          <div class="diff-file-stats">
+            <span class="deletions">&minus;45</span>
+          </div>
+          <span class="gk-badge gk-badge-danger gk-badge-mono" style="margin-left:auto">deleted</span>
+        </div>
+        <table class="diff-table">
+          <tr class="diff-hunk-header">
+            <td colspan="4">@@ -1,45 +0,0 @@</td>
+          </tr>
+          <tr class="diff-line-del">
+            <td class="diff-line-num">1</td>
+            <td class="diff-line-num"></td>
+            <td class="diff-line-sign">-</td>
+            <td class="diff-line-content">&lt;script lang="ts"&gt;</td>
+          </tr>
+          <tr class="diff-line-del">
+            <td class="diff-line-num">2</td>
+            <td class="diff-line-num"></td>
+            <td class="diff-line-sign">-</td>
+            <td class="diff-line-content">  import type { SessionMetadata } from '../modules/sessions/types';</td>
+          </tr>
+          <tr class="diff-line-del">
+            <td class="diff-line-num">3</td>
+            <td class="diff-line-num"></td>
+            <td class="diff-line-sign">-</td>
+            <td class="diff-line-content">  export let session: SessionMetadata;</td>
+          </tr>
+          <tr class="diff-line-del">
+            <td class="diff-line-num">4</td>
+            <td class="diff-line-num"></td>
+            <td class="diff-line-sign">-</td>
+            <td class="diff-line-content">  // Legacy cost calculation — replaced by cost_utils.ts</td>
+          </tr>
+        </table>
+        <div class="diff-expander">Show 41 more lines</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS TAB CONTENT (shown below for visual review) -->
+  <div class="stats-section">
+    <div class="stats-section-title">
+      <div class="gk-tabs">
+        <button class="gk-tab">Chat</button>
+        <button class="gk-tab">Files</button>
+        <button class="gk-tab is-active">Stats</button>
+      </div>
+    </div>
+
+    <!-- Cost -->
+    <div style="max-width:900px">
+      <div class="cb-panel" style="margin-bottom:var(--space-6)">
+        <div class="cb-panel-title">Cost</div>
+        <div class="stats-grid stats-grid-2col" style="gap:var(--space-3)">
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Total Cost</div>
+            <div class="stat-value" style="color:var(--accent)">$4.387</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-3) 0">
+            <div class="stat-label">By Model</div>
+            <div class="model-row">
+              <div class="model-name">claude-opus-4-6</div>
+              <div class="model-cost">$3.812</div>
+              <div class="model-pct">86.9%</div>
+            </div>
+            <div class="model-row">
+              <div class="model-name">claude-sonnet-4-5</div>
+              <div class="model-cost">$0.491</div>
+              <div class="model-pct">11.2%</div>
+            </div>
+            <div class="model-row">
+              <div class="model-name">claude-haiku-3.5</div>
+              <div class="model-cost">$0.084</div>
+              <div class="model-pct">1.9%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tokens -->
+      <div class="cb-panel" style="margin-bottom:var(--space-6)">
+        <div class="cb-panel-title">Tokens</div>
+        <div class="stats-grid stats-grid-4col" style="gap:var(--space-3)">
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Input</div>
+            <div class="stat-value stat-value-sm">284,391</div>
+          </div>
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Output</div>
+            <div class="stat-value stat-value-sm">18,742</div>
+          </div>
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Cache Read</div>
+            <div class="stat-value stat-value-sm">201,208</div>
+          </div>
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Cache Write</div>
+            <div class="stat-value stat-value-sm">83,183</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-4);margin-top:var(--space-2)">
+          <div class="stat-label" style="margin:0;white-space:nowrap">Cache Hit</div>
+          <div style="flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden">
+            <div style="width:70.8%;height:100%;background:var(--primary);border-radius:3px"></div>
+          </div>
+          <div class="cb-num" style="min-width:42px">70.8%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-4);margin-top:var(--space-1)">
+          <div class="stat-label" style="margin:0;white-space:nowrap">Context</div>
+          <div style="flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden">
+            <div style="width:28.4%;height:100%;border-radius:3px" class="cb-bar-cool"></div>
+          </div>
+          <div class="cb-mute" style="min-width:80px;text-align:right;font-size:10.5px">284k / 1M</div>
+        </div>
+      </div>
+
+      <!-- Session Activity -->
+      <div class="cb-panel" style="margin-bottom:var(--space-6)">
+        <div class="cb-panel-title">Session Activity</div>
+        <div class="stats-grid stats-grid-4col" style="gap:var(--space-3)">
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Turns</div>
+            <div class="stat-value stat-value-sm">17</div>
+          </div>
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Duration</div>
+            <div class="stat-value stat-value-sm">1h 23m</div>
+          </div>
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Started</div>
+            <div class="stat-value stat-value-sm" style="font-size:12px">14:32</div>
+            <div class="stat-sub">May 8, 2026</div>
+          </div>
+          <div class="stat-cell" style="border:none;padding:var(--space-3) 0">
+            <div class="stat-label">Status</div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);margin-top:var(--space-1)">
+              <span class="gk-badge gk-badge-success"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block"></span> Running</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool Usage -->
+      <div class="cb-panel">
+        <div class="cb-panel-title">Tool Usage<span class="cb-panel-sub">87 total calls</span></div>
+        <table class="tool-table">
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th class="num-col">Calls</th>
+              <th></th>
+              <th class="num-col">Avg (ms)</th>
+              <th class="num-col">Success</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tool-name">Read</td>
+              <td class="tool-count">28</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:100%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">142</td>
+              <td class="tool-count" style="color:var(--status-success)">100%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">Edit</td>
+              <td class="tool-count">19</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:67.8%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">238</td>
+              <td class="tool-count" style="color:var(--status-success)">94.7%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">Bash</td>
+              <td class="tool-count">14</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:50%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">1,847</td>
+              <td class="tool-count" style="color:var(--status-success)">85.7%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">Grep</td>
+              <td class="tool-count">11</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:39.3%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">89</td>
+              <td class="tool-count" style="color:var(--status-success)">100%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">Glob</td>
+              <td class="tool-count">7</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:25%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">34</td>
+              <td class="tool-count" style="color:var(--status-success)">100%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">Write</td>
+              <td class="tool-count">4</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:14.3%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">196</td>
+              <td class="tool-count" style="color:var(--status-success)">100%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">Agent</td>
+              <td class="tool-count">3</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:10.7%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">12,430</td>
+              <td class="tool-count" style="color:var(--status-success)">100%</td>
+            </tr>
+            <tr>
+              <td class="tool-name">WebFetch</td>
+              <td class="tool-count">1</td>
+              <td class="tool-bar-cell"><div class="tool-bar" style="width:3.6%"></div></td>
+              <td class="tool-count" style="color:var(--foreground-muted)">2,310</td>
+              <td class="tool-count" style="color:var(--status-success)">100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
