@@ -266,6 +266,10 @@ function createIssuesContext() {
 			return toIssue(raw);
 		},
 
+		patchIssueLocal(issueId: string, patch: Partial<Issue>) {
+			issues = issues.map((issue) => (issue.id === issueId ? { ...issue, ...patch } : issue));
+		},
+
 		setSortMode(mode: SortMode) {
 			sortMode = mode;
 		},

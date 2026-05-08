@@ -1,6 +1,6 @@
 import { createContext } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { invoke, isTauri } from '$lib/tauri.js';
+import { invoke } from '$lib/tauri.js';
 import type {
 	NotificationConfig as GeneratedNotificationConfig,
 	NotificationEventType,
@@ -131,9 +131,6 @@ function createNotificationsContext() {
 		},
 
 		async loadConfigs() {
-			if (!isTauri()) {
-				return;
-			}
 			try {
 				loading = true;
 				error = null;
@@ -149,9 +146,6 @@ function createNotificationsContext() {
 		},
 
 		async loadGlobalVolume() {
-			if (!isTauri()) {
-				return;
-			}
 			try {
 				globalVolume = await invoke<number>('get_notification_volume');
 			} catch (err) {
@@ -161,9 +155,6 @@ function createNotificationsContext() {
 
 		async setGlobalVolume(volume: number) {
 			globalVolume = volume;
-			if (!isTauri()) {
-				return;
-			}
 			try {
 				await invoke('set_notification_volume', { volume });
 			} catch (err) {
@@ -172,9 +163,6 @@ function createNotificationsContext() {
 		},
 
 		async loadSoundPacks() {
-			if (!isTauri()) {
-				return;
-			}
 			try {
 				soundPacks = await invoke<SoundPackInfo[]>('list_sound_packs');
 			} catch (err) {
@@ -183,9 +171,6 @@ function createNotificationsContext() {
 		},
 
 		async loadVolumeOverrides() {
-			if (!isTauri()) {
-				return;
-			}
 			try {
 				volumeOverrides = await invoke<SoundVolumeOverride[]>(
 					'get_all_sound_volume_overrides',
@@ -200,9 +185,6 @@ function createNotificationsContext() {
 			soundFile: string,
 			volume: number,
 		) {
-			if (!isTauri()) {
-				return;
-			}
 			try {
 				await invoke('set_sound_volume_override', {
 					eventType,

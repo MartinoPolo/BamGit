@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import type { Issue } from '$lib/modules/issues';
+	import { useIssues, type Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import {
 		deriveContextualActions,
@@ -79,6 +79,8 @@
 		onPriorityClick,
 		onQuickActionAssignFolder,
 	}: Props = $props();
+
+	const issuesStore = useIssues();
 
 	const color = $derived(issue.color ?? '#525252');
 	const headerTextColor = $derived(getContrastTextColor(color));
@@ -186,7 +188,7 @@
 		event.stopPropagation();
 		try {
 			await invoke('toggle_issue_sound_mute', { issueId: issue.id });
-			issue.is_sound_muted = !issue.is_sound_muted;
+			issuesStore.patchIssueLocal(issue.id, { is_sound_muted: !issue.is_sound_muted });
 		} catch (error) {
 			console.error('Failed to toggle mute:', error);
 		}
