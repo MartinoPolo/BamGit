@@ -1,5 +1,7 @@
 # Project Instructions
 
+This app is in heavy development and not in production — no backwards compatibility is required. When implementing changes, freely delete, replace, or restructure obsolete code and schemas without preservation shims.
+
 ## Svelte
 
 Before finalizing any .svelte or .svelte.ts file, run svelte-autofixer and iterate until no issues remain.

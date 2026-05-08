@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Spawning Dialog — Variant C: Provider-card-first</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ========== TOKENS.CSS (inlined) ========== */
+:root {
+  --moss-50:  oklch(0.972 0.018 130);
+  --moss-100: oklch(0.940 0.034 130);
+  --moss-200: oklch(0.880 0.058 130);
+  --moss-300: oklch(0.795 0.082 130);
+  --moss-400: oklch(0.690 0.098 132);
+  --moss-500: oklch(0.580 0.096 134);
+  --moss-600: oklch(0.480 0.082 138);
+  --moss-700: oklch(0.395 0.066 142);
+  --moss-800: oklch(0.300 0.048 145);
+  --moss-900: oklch(0.215 0.032 148);
+  --moss-950: oklch(0.155 0.024 150);
+  --amber-300: oklch(0.840 0.130 78);
+  --amber-400: oklch(0.770 0.150 65);
+  --amber-500: oklch(0.690 0.165 55);
+  --amber-600: oklch(0.595 0.160 48);
+  --bark-300: oklch(0.700 0.060 60);
+  --bark-500: oklch(0.500 0.075 55);
+  --bark-700: oklch(0.345 0.055 50);
+  --azure-300: oklch(0.750 0.090 230);
+  --azure-400: oklch(0.660 0.120 230);
+  --azure-500: oklch(0.570 0.130 235);
+  --azure-600: oklch(0.490 0.115 240);
+  --azure-700: oklch(0.400 0.095 240);
+  --sky-light-top: oklch(0.965 0.018 220);
+  --sky-light-bot: oklch(0.940 0.025 130);
+  --sky-dark-top:  oklch(0.225 0.028 240);
+  --sky-dark-bot:  oklch(0.180 0.030 150);
+  --status-success: oklch(0.660 0.135 145);
+  --status-warning: oklch(0.770 0.155 75);
+  --status-danger:  oklch(0.620 0.205 25);
+  --status-info:    oklch(0.660 0.105 220);
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --text-2xs: 10.5px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-md:  13px;
+  --text-base:14px;
+  --text-lg:  15px;
+  --text-xl:  17px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --leading-tight:  1.15;
+  --leading-snug:   1.25;
+  --leading-normal: 1.4;
+  --leading-relaxed:1.55;
+  --leading-loose:  1.7;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+  --border-width-1: 1px;
+  --border-width-2: 1.5px;
+  --border-width-3: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --size-control-sm: 26px;
+  --size-control-md: 32px;
+  --size-control-lg: 38px;
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+  --duration-1: 90ms;
+  --duration-2: 120ms;
+  --duration-3: 160ms;
+  --duration-4: 220ms;
+  --duration-5: 320ms;
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --ease-out:      cubic-bezier(.16,.84,.44,1);
+  --ease-in:       cubic-bezier(.5,0,.75,0);
+  --sidebar-width:  240px;
+  --sidebar-width-collapsed: 56px;
+}
+
+.theme-dark, [data-theme='dark'] {
+  color-scheme: dark;
+  --background:        oklch(0.155 0.018 150);
+  --surface:           oklch(0.190 0.020 150);
+  --surface-2:         oklch(0.225 0.022 150);
+  --surface-hover:     oklch(0.265 0.024 150);
+  --surface-3:         oklch(0.265 0.024 150);
+  --foreground:        oklch(0.965 0.010 130);
+  --foreground-muted:  oklch(0.730 0.018 135);
+  --foreground-subtle: oklch(0.560 0.020 140);
+  --border:            oklch(0.295 0.022 148);
+  --border-strong:     oklch(0.380 0.028 145);
+  --primary:           var(--moss-400);
+  --primary-fg:        oklch(0.135 0.020 150);
+  --primary-soft:      oklch(0.305 0.045 145);
+  --accent:            var(--amber-400);
+  --accent-fg:         oklch(0.15 0.02 50);
+  --ring:              var(--moss-400);
+  --sidebar-bg:        oklch(0.180 0.022 150);
+  --sidebar-fg:        oklch(0.770 0.020 140);
+  --code-bg:           oklch(0.215 0.020 150);
+  --sky-top:           var(--sky-dark-top);
+  --sky-bot:           var(--sky-dark-bot);
+  --ground-color:      oklch(0.300 0.060 140);
+  --ground-dark:       oklch(0.180 0.040 50);
+}
+
+/* Base */
+.gk-root {
+  font-family: var(--font-sans); color: var(--foreground); background: var(--background);
+  font-feature-settings: "ss01", "cv11"; font-synthesis: none;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+.gk-root, .gk-root * { box-sizing: border-box; }
+.font-mono { font-family: var(--font-mono); }
+
+/* Buttons */
+.gk-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
+  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
+  white-space: nowrap; user-select: none;
+}
+.gk-btn:active { transform: scale(0.96); }
+.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.gk-btn-primary {
+  background: var(--primary); color: var(--primary-fg);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
+.gk-btn-secondary {
+  background: var(--surface-2); color: var(--foreground); border-color: var(--border);
+}
+.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.gk-btn-ghost { background: transparent; color: var(--foreground-muted); }
+.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
+.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
+.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
+.gk-btn-icon { padding: 0; width: 32px; }
+.gk-btn-icon.gk-btn-sm { width: 26px; }
+.gk-btn:disabled, .gk-btn[data-state="disabled"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.gk-btn:active:not(:disabled) { transform: scale(0.96); filter: brightness(0.95); }
+
+/* Inputs */
+.gk-input, .gk-select, .gk-textarea {
+  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  color: var(--foreground); width: 100%; outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.gk-textarea { height: auto; padding: 8px 10px; resize: vertical; line-height: 1.5; }
+.gk-input::placeholder, .gk-textarea::placeholder { color: var(--foreground-subtle); }
+.gk-input:focus, .gk-select:focus, .gk-textarea:focus {
+  border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+}
+.gk-label {
+  font-size: 12px; color: var(--foreground-muted); font-weight: 500;
+  margin-bottom: 6px; display: block; letter-spacing: 0.01em;
+}
+
+/* Checkbox */
+.gk-check {
+  appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--border-strong);
+  border-radius: 4px; background: var(--surface); cursor: pointer; position: relative;
+  transition: background 120ms ease, border-color 120ms ease; flex-shrink: 0;
+}
+.gk-check:checked { background: var(--primary); border-color: var(--primary); }
+.gk-check:checked::after {
+  content: ""; position: absolute; left: 4.5px; top: 1px; width: 4px; height: 8px;
+  border: solid var(--primary-fg); border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+
+/* Radio */
+.gk-radio {
+  appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--border-strong);
+  border-radius: 50%; background: var(--surface); cursor: pointer; position: relative;
+  transition: border-color 120ms;
+}
+.gk-radio:checked { border-color: var(--primary); }
+.gk-radio:checked::after {
+  content: ""; position: absolute; inset: 3px; background: var(--primary); border-radius: 50%;
+}
+.gk-radio:hover { border-color: var(--ring); }
+
+/* Card */
+.gk-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+}
+
+/* Badge */
+.gk-badge {
+  display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px;
+  font-size: 11px; font-weight: 500; border-radius: 999px;
+  background: var(--surface-2); color: var(--foreground-muted);
+  border: 1px solid var(--border); font-family: var(--font-sans);
+  letter-spacing: 0.01em; white-space: nowrap;
+}
+.gk-badge-moss { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+
+/* Modal */
+.gk-modal-backdrop {
+  position: fixed; inset: 0; background: color-mix(in oklch, oklch(0.10 0.02 150) 50%, transparent);
+  backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center;
+  z-index: var(--z-modal);
+}
+.gk-modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl); width: 100%; max-width: 520px;
+  display: flex; flex-direction: column; max-height: 86%;
+}
+.gk-modal-header {
+  padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.gk-modal-body { padding: 18px; overflow-y: auto; }
+.gk-modal-footer {
+  padding: 12px 18px; border-top: 1px solid var(--border); display: flex;
+  justify-content: flex-end; gap: 8px; background: var(--surface-2);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+/* Type scale */
+.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
+.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+
+/* Kbd */
+.gk-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 4px; font-family: var(--font-mono);
+  font-size: 10.5px; color: var(--foreground-muted);
+}
+
+/* Toggle */
+.gk-toggle {
+  width: 32px; height: 18px; border-radius: 999px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  position: relative; cursor: pointer; transition: background 120ms; flex-shrink: 0;
+}
+.gk-toggle::after {
+  content: ""; position: absolute; top: 1px; left: 1px;
+  width: 14px; height: 14px; border-radius: 999px;
+  background: var(--surface); box-shadow: var(--shadow-sm); transition: left 140ms;
+}
+.gk-toggle[data-on="true"] { background: var(--primary); border-color: var(--primary); }
+.gk-toggle[data-on="true"]::after { left: 16px; }
+
+/* Divider */
+.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+
+/* ========== VARIANT C STYLES ========== */
+html, body { margin: 0; padding: 0; height: 100%; }
+
+.variant-label {
+  position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+  z-index: 100; padding: 4px 14px; border-radius: var(--radius-full);
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+
+/* Provider cards grid — 2x2 */
+.provider-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.provider-card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 14px 12px 12px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); cursor: pointer;
+  transition: all 160ms var(--ease-standard);
+  background: transparent; font-family: var(--font-sans); text-align: left;
+  position: relative;
+}
+.provider-card:hover {
+  border-color: var(--border-strong); background: var(--surface-2);
+}
+.provider-card:active { transform: scale(0.98); }
+.provider-card:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.provider-card.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 6%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 12%, transparent);
+}
+.provider-card-icon {
+  font-size: 22px; line-height: 1; height: 28px;
+  display: flex; align-items: center;
+}
+.provider-card-name {
+  font-size: var(--text-base); font-weight: var(--weight-semibold);
+  color: var(--foreground); letter-spacing: var(--tracking-snug);
+}
+.provider-card:not(.is-selected) .provider-card-name { color: var(--foreground-muted); }
+.provider-card-desc {
+  font-size: var(--text-xs); color: var(--foreground-subtle); line-height: var(--leading-normal);
+  font-family: var(--font-mono);
+}
+.provider-card-default {
+  position: absolute; top: 8px; right: 8px;
+}
+
+/* Expanded config panel — slides below selected card */
+.config-expanded {
+  margin-top: 12px; padding: 14px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.config-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.config-row-full { grid-column: 1 / -1; }
+
+/* Permission mode inline */
+.permission-inline {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.permission-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 120ms ease;
+  background: transparent; font-family: var(--font-sans);
+  font-size: var(--text-sm); color: var(--foreground-muted);
+}
+.permission-chip:hover { border-color: var(--border-strong); color: var(--foreground); background: var(--surface-hover); }
+.permission-chip.is-selected {
+  border-color: color-mix(in oklch, var(--primary) 50%, transparent);
+  background: color-mix(in oklch, var(--primary) 8%, transparent);
+  color: var(--foreground);
+}
+.permission-chip:active { transform: scale(0.97); }
+.permission-chip:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+
+/* Bottom context section — always visible */
+.context-section {
+  margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+}
+.context-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 10px 12px;
+}
+.context-issue-row { display: flex; align-items: center; gap: 8px; }
+.context-issue-title {
+  font-size: var(--text-md); color: var(--foreground); flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.context-expand-btn {
+  background: none; border: none; color: var(--foreground-subtle); font-size: var(--text-sm);
+  cursor: pointer; padding: 0; font-family: var(--font-sans); transition: color 120ms;
+}
+.context-expand-btn:hover { color: var(--foreground-muted); }
+
+/* Resume row */
+.resume-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0 0;
+}
+
+/* Footer */
+.footer-hint {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--text-xs); color: var(--foreground-subtle);
+  margin-right: auto;
+}
+</style>
+</head>
+<body class="gk-root theme-dark">
+
+<div class="variant-label gk-eyebrow">Variant C: Provider-card-first</div>
+
+<div class="gk-modal-backdrop">
+  <div class="gk-modal" style="max-width: 520px;" role="dialog" aria-labelledby="dialog-title" aria-modal="true">
+
+    <!-- Header -->
+    <div class="gk-modal-header">
+      <h2 class="gk-h2" id="dialog-title" style="margin: 0;">Spawn Session</h2>
+      <button class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm" aria-label="Close" title="Close (Esc)">
+        <span style="font-size: 16px; line-height: 1;">&times;</span>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="gk-modal-body">
+
+      <!-- Provider Cards — 2x2 grid -->
+      <div class="provider-grid">
+        <!-- Claude Code — selected -->
+        <button class="provider-card is-selected" tabindex="0">
+          <span class="provider-card-default">
+            <span class="gk-badge gk-badge-moss" style="height: 18px; font-size: 10px;">default</span>
+          </span>
+          <span class="provider-card-icon" style="color: var(--moss-400);">&#9670;</span>
+          <span class="provider-card-name">Claude Code</span>
+          <span class="provider-card-desc">claude CLI<br>stdin/stdout stream-JSON</span>
+        </button>
+
+        <!-- OpenCode -->
+        <button class="provider-card" tabindex="-1">
+          <span class="provider-card-icon" style="color: var(--azure-400);">&#9671;</span>
+          <span class="provider-card-name">OpenCode</span>
+          <span class="provider-card-desc">opencode serve<br>HTTP REST + SSE</span>
+        </button>
+
+        <!-- Codex -->
+        <button class="provider-card" tabindex="-1">
+          <span class="provider-card-icon" style="color: var(--amber-400);">&#9635;</span>
+          <span class="provider-card-name">Codex</span>
+          <span class="provider-card-desc">codex CLI<br>stdio JSON IPC</span>
+        </button>
+
+        <!-- Cursor -->
+        <button class="provider-card" tabindex="-1">
+          <span class="provider-card-icon" style="color: var(--bark-300);">&#9655;</span>
+          <span class="provider-card-name">Cursor</span>
+          <span class="provider-card-desc">agent acp<br>JSON-RPC</span>
+        </button>
+      </div>
+
+      <!-- Expanded config for selected provider (Claude Code) -->
+      <div class="config-expanded">
+        <div class="config-row">
+          <!-- Model -->
+          <div>
+            <label class="gk-label" for="model-select">Model</label>
+            <select class="gk-select" id="model-select">
+              <option selected>claude-opus-4-7 (200K)</option>
+              <option>claude-sonnet-4-6 (200K)</option>
+              <option>claude-sonnet-4 (200K)</option>
+              <option>claude-haiku-3.5 (200K)</option>
+            </select>
+          </div>
+          <!-- Workspace -->
+          <div>
+            <label class="gk-label" for="workspace-select">Workspace</label>
+            <select class="gk-select" id="workspace-select">
+              <option selected>/repos/Grovekeeper</option>
+              <option>/repos/low-poly-2d-trees</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Permission Mode — horizontal chips -->
+        <div>
+          <label class="gk-label">Permission mode</label>
+          <div class="permission-inline">
+            <button class="permission-chip is-selected">
+              <input type="radio" name="permission" class="gk-radio" checked style="width: 14px; height: 14px;">
+              Approve each
+            </button>
+            <button class="permission-chip">
+              <input type="radio" name="permission" class="gk-radio" style="width: 14px; height: 14px;">
+              Auto-accept edits
+            </button>
+            <button class="permission-chip">
+              <input type="radio" name="permission" class="gk-radio" style="width: 14px; height: 14px;">
+              Bypass all
+            </button>
+          </div>
+        </div>
+
+        <!-- Resume -->
+        <div class="resume-row">
+          <span style="font-size: var(--text-sm); color: var(--foreground-muted); font-weight: var(--weight-medium);">Resume existing session</span>
+          <div class="gk-toggle" data-on="false" role="switch" aria-checked="false" tabindex="0"></div>
+        </div>
+      </div>
+
+      <!-- Context Section — always visible -->
+      <div class="context-section">
+        <label class="gk-label">Context</label>
+        <div class="context-card">
+          <div class="context-issue-row">
+            <input type="checkbox" class="gk-check" checked>
+            <span class="gk-badge gk-badge-moss" style="font-family: var(--font-mono); font-size: 10.5px;">#42</span>
+            <span class="context-issue-title">Fix authentication timeout on workspace switch</span>
+          </div>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);">
+            <button class="context-expand-btn">&#9662; Show issue description</button>
+          </div>
+        </div>
+
+        <!-- Prompt prefix -->
+        <div style="margin-top: 10px;">
+          <label class="gk-label" for="prompt-prefix">
+            Prompt prefix
+            <span style="color: var(--foreground-subtle); font-weight: 400;">(optional)</span>
+          </label>
+          <textarea class="gk-textarea" id="prompt-prefix" rows="2" placeholder="e.g., Focus on the Rust backend auth module only..."></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="gk-modal-footer">
+      <div class="footer-hint">
+        <span class="gk-kbd">Esc</span> to close
+        <span style="margin-left: 4px;" class="gk-kbd">&crarr;</span> to start
+      </div>
+      <button class="gk-btn gk-btn-ghost">Cancel</button>
+      <button class="gk-btn gk-btn-primary gk-btn-lg" style="min-width: 120px;">
+        <span style="font-size: 14px;">&#9654;</span>
+        Start Session
+      </button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

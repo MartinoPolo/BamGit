@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Instant;
 
+use tauri::async_runtime;
 use tokio::sync::mpsc;
 
 use crate::models::notification::NotificationEventType;
@@ -57,7 +58,7 @@ impl PlaybackQueueHandle {
 /// Start the playback queue actor. Returns a handle for enqueuing sounds.
 pub fn start_playback_queue() -> PlaybackQueueHandle {
     let (sender, receiver) = mpsc::unbounded_channel();
-    tokio::spawn(playback_queue_actor(receiver));
+    async_runtime::spawn(playback_queue_actor(receiver));
     PlaybackQueueHandle { sender }
 }
 
