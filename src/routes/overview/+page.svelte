@@ -61,7 +61,7 @@
 	{:else if error !== null}
 		<p class="text-destructive">{m.error_prefix({ message: error })}</p>
 	{:else}
-		<div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
+		<div class="grid auto-rows-[1fr] grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
 			{#each workspaces as workspace (workspace.dashboard_id)}
 				<WorkspaceCard
 					{workspace}

@@ -172,7 +172,7 @@
 </script>
 
 <button
-	class="block w-full text-left"
+	class="block h-full w-full text-left"
 	{onclick}
 	data-variant={variant}
 	style:--ws-accent={accentColor}
@@ -182,7 +182,7 @@
 		accentBarColor={accentColor}
 		{gradientTint}
 		class={cn(
-			'group relative isolate cursor-pointer transition-all duration-200',
+			'group relative isolate h-full cursor-pointer transition-all duration-200',
 			'hover:-translate-y-0.5 hover:shadow-md',
 			isDormant && 'opacity-[0.72] saturate-[0.7]',
 		)}
@@ -325,6 +325,8 @@
 							{workspace.prd_completed_subs}/{workspace.prd_total_subs} done
 						</span>
 					</button>
+				{:else}
+					<div class="mb-1.5 h-[30px]"></div>
 				{/if}
 
 				<!-- AFK status row -->
