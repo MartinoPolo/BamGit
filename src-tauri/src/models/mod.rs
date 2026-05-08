@@ -2,6 +2,7 @@
 mod macros;
 
 pub mod action;
+pub mod ai_config;
 pub mod app_setting;
 pub mod color_palette;
 pub mod dashboard;

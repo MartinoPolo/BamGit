@@ -9,8 +9,8 @@ mod session;
 mod window_manager;
 
 use commands::{
-    action_commands, color_palette_commands, dashboard_commands, dependency_commands,
-    dialog_commands, git_status_commands, github_commands, issue_commands,
+    action_commands, ai_config_commands, color_palette_commands, dashboard_commands,
+    dependency_commands, dialog_commands, git_status_commands, github_commands, issue_commands,
     keyboard_shortcut_commands, label_shape_mapping_commands, notification_commands,
     portfolio_commands, raw_requirements_commands, seed_commands, session_commands,
     terminal_commands, window_commands, worktree_commands,
@@ -194,6 +194,9 @@ pub fn run() {
             dialog_commands::pick_folder,
             github_commands::list_user_repos,
             github_commands::search_github_repos,
+            ai_config_commands::discover_ai_config,
+            ai_config_commands::get_custom_discovery_paths,
+            ai_config_commands::set_custom_discovery_paths,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
