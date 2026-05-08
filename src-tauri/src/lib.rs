@@ -19,6 +19,7 @@ use commands::{
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
 use models::app_setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
+use notification::playback_queue;
 use notification::service::NotificationService;
 use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
@@ -73,7 +74,7 @@ pub fn run() {
                 .app_data_dir()
                 .expect("Failed to resolve app data directory");
 
-            let database_state = database::connection::initialize_database(app_data_directory)
+            let database_state = database::connection::initialize_database(app_data_directory.clone())
                 .expect("Failed to initialize database");
 
             let resource_directory = app
@@ -97,7 +98,11 @@ pub fn run() {
             app.manage(SessionManager::new());
             app.manage(FetchCoordinator::new());
             app.manage(DiscoveryPoller::new());
-            app.manage(NotificationService::new(resource_directory));
+            app.manage(NotificationService::new(
+                resource_directory,
+                app_data_directory.clone(),
+            ));
+            app.manage(playback_queue::start_playback_queue());
 
             // Auto-start discovery polling (3-second interval)
             let poller = app.state::<DiscoveryPoller>();
@@ -124,6 +129,8 @@ pub fn run() {
             issue_commands::delete_issue,
             issue_commands::archive_issue,
             issue_commands::unarchive_issue,
+            issue_commands::update_issue_character,
+            issue_commands::toggle_issue_sound_mute,
             portfolio_commands::add_repo_to_portfolio,
             portfolio_commands::remove_repo_from_portfolio,
             portfolio_commands::get_portfolio_repos,
@@ -167,6 +174,14 @@ pub fn run() {
             notification_commands::get_notification_configs,
             notification_commands::update_notification_config,
             notification_commands::test_notification_sound,
+            notification_commands::get_notification_volume,
+            notification_commands::set_notification_volume,
+            notification_commands::get_sound_volume_override,
+            notification_commands::set_sound_volume_override,
+            notification_commands::get_all_sound_volume_overrides,
+            notification_commands::list_sound_packs,
+            notification_commands::install_sound_pack,
+            notification_commands::remove_sound_pack,
             color_palette_commands::get_all_color_palettes,
             color_palette_commands::get_color_palette,
             color_palette_commands::create_color_palette,
@@ -208,6 +223,9 @@ pub fn run() {
             if let tauri::RunEvent::Exit = event {
                 let poller = app_handle.state::<DiscoveryPoller>();
                 poller.stop();
+
+                let queue = app_handle.state::<playback_queue::PlaybackQueueHandle>();
+                queue.shutdown();
 
                 let manager = app_handle.state::<SessionManager>();
                 tauri::async_runtime::block_on(manager.cleanup_all());

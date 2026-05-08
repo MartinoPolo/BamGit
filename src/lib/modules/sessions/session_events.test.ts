@@ -57,7 +57,10 @@ describe('computeSessionEventEffects — resolvedState', () => {
 			'needs-input',
 			null,
 		);
-		expect(notificationAction).toEqual({ type: 'add', notificationType: 'needs-input' });
+		expect(notificationAction).toEqual({
+			type: 'add',
+			notificationType: 'session.needs-input',
+		});
 	});
 
 	it('returns add notification action for needs-review state', () => {
@@ -66,7 +69,10 @@ describe('computeSessionEventEffects — resolvedState', () => {
 			'needs-review',
 			null,
 		);
-		expect(notificationAction).toEqual({ type: 'add', notificationType: 'needs-review' });
+		expect(notificationAction).toEqual({
+			type: 'add',
+			notificationType: 'session.needs-input',
+		});
 	});
 
 	it('returns add notification action for errored state', () => {
@@ -75,7 +81,7 @@ describe('computeSessionEventEffects — resolvedState', () => {
 			'errored',
 			null,
 		);
-		expect(notificationAction).toEqual({ type: 'add', notificationType: 'errored' });
+		expect(notificationAction).toEqual({ type: 'add', notificationType: 'session.error' });
 	});
 
 	it('returns clear notification action for running state (not in notification map)', () => {
@@ -289,6 +295,9 @@ describe('computeSessionEventEffects — combined effects', () => {
 		);
 		expect(sessionPatch.state).toBe('needs-input');
 		expect(sessionPatch.last_response_summary).toBe('Done');
-		expect(notificationAction).toEqual({ type: 'add', notificationType: 'needs-input' });
+		expect(notificationAction).toEqual({
+			type: 'add',
+			notificationType: 'session.needs-input',
+		});
 	});
 });

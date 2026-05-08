@@ -18,7 +18,8 @@ fn validate_branch_name_chars(name: &str) -> Result<(), String> {
 const ISSUE_SELECT_COLUMNS: &str =
     "id, dashboard_id, name, priority, color, status, github_issue_url, github_issue_number, \
      branch_name, base_branch, worktree_folder, worktree_state, parent_issue_id, editor_folder, \
-     dev_server_command, dev_server_port, dev_server_pid, browser_url, labels, sort_order, created_at";
+     dev_server_command, dev_server_port, dev_server_pid, browser_url, labels, sort_order, created_at, \
+     character_pack_id, character_avatar, is_sound_muted";
 
 fn row_to_issue(row: &Row) -> Result<Issue, rusqlite::Error> {
     Ok(Issue {
@@ -43,6 +44,9 @@ fn row_to_issue(row: &Row) -> Result<Issue, rusqlite::Error> {
         labels: row.get(18)?,
         sort_order: row.get(19)?,
         created_at: row.get(20)?,
+        character_pack_id: row.get(21)?,
+        character_avatar: row.get(22)?,
+        is_sound_muted: row.get(23)?,
     })
 }
 
@@ -249,6 +253,49 @@ pub fn unarchive_issue(state: State<DatabaseState>, id: String) -> Result<Issue,
     connection
         .query_row(&query, [&id], |row| row_to_issue(row))
         .map_err(|error| format!("Failed to read unarchived issue: {error}"))
+}
+
+// ─── Character commands ──────────────────────────────────────────────────────
+
+#[tauri::command]
+pub fn update_issue_character(
+    state: State<DatabaseState>,
+    issue_id: String,
+    pack_id: Option<String>,
+) -> Result<Issue, String> {
+    let connection = state.write()?;
+
+    connection
+        .execute(
+            "UPDATE issues SET character_pack_id = ?1 WHERE id = ?2",
+            rusqlite::params![pack_id, issue_id],
+        )
+        .map_err(|error| format!("Failed to update character: {error}"))?;
+
+    let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
+    connection
+        .query_row(&query, [&issue_id], |row| row_to_issue(row))
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())
+}
+
+#[tauri::command]
+pub fn toggle_issue_sound_mute(
+    state: State<DatabaseState>,
+    issue_id: String,
+) -> Result<Issue, String> {
+    let connection = state.write()?;
+
+    connection
+        .execute(
+            "UPDATE issues SET is_sound_muted = NOT is_sound_muted WHERE id = ?1",
+            [&issue_id],
+        )
+        .map_err(|error| format!("Failed to toggle mute: {error}"))?;
+
+    let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
+    connection
+        .query_row(&query, [&issue_id], |row| row_to_issue(row))
+        .map_err(|_| "ERR_ISSUE_NOT_FOUND".to_string())
 }
 
 #[cfg(test)]

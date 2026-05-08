@@ -47,7 +47,10 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             browser_url TEXT,
             labels TEXT,
             sort_order INTEGER NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            character_pack_id TEXT,
+            character_avatar TEXT,
+            is_sound_muted INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS portfolio_dashboard_pointers (
@@ -102,10 +105,19 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
 
         CREATE TABLE IF NOT EXISTS notification_config (
             event_type TEXT PRIMARY KEY,
+            importance_tier TEXT NOT NULL DEFAULT 'normal'
+                CHECK (importance_tier IN ('critical', 'important', 'normal')),
             sound_enabled INTEGER NOT NULL DEFAULT 0,
             sound_file TEXT,
             toast_enabled INTEGER NOT NULL DEFAULT 0,
             window_flash_enabled INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS sound_volume_overrides (
+            event_type TEXT NOT NULL,
+            sound_file TEXT NOT NULL,
+            volume REAL NOT NULL DEFAULT 1.0,
+            PRIMARY KEY (event_type, sound_file)
         );
 
         CREATE TABLE IF NOT EXISTS git_status_cache (

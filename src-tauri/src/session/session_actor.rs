@@ -211,9 +211,32 @@ fn fire_notification(
 ) {
     if let Some(event_type) = session_state_to_event_type(state) {
         if let Some(service) = app_handle.try_state::<NotificationService>() {
-            service.notify(event_type, session_id, message, app_handle, database_connection);
+            let issue_id = resolve_session_issue_id(session_id, database_connection);
+            service.notify(
+                event_type,
+                session_id,
+                issue_id.as_deref(),
+                message,
+                app_handle,
+                database_connection,
+            );
         }
     }
+}
+
+fn resolve_session_issue_id(
+    session_id: &str,
+    connection: &std::sync::Arc<StdMutex<Connection>>,
+) -> Option<String> {
+    let connection = connection.lock().ok()?;
+    connection
+        .query_row(
+            "SELECT issue_id FROM sessions WHERE id = ?1",
+            [session_id],
+            |row| row.get::<_, Option<String>>(0),
+        )
+        .ok()
+        .flatten()
 }
 
 // --- DB helpers (lock briefly, never across await) ---

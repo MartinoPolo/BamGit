@@ -93,6 +93,20 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 
 	// ─── Notifications reads ──────────────────────────────────────────────────
 	get_notification_configs: () => MOCK_NOTIFICATION_CONFIGS,
+	get_notification_volume: () => 0.8,
+	get_sound_volume_override: () => 1.0,
+	get_all_sound_volume_overrides: () => [],
+	list_sound_packs: () => [
+		{
+			name: 'grove',
+			display_name: 'Grove',
+			version: '1.0.0',
+			author: 'Grovekeeper',
+			avatar: null,
+			event_count: 15,
+			path: 'resources/sounds/grove',
+		},
+	],
 
 	// ─── Keyboard shortcuts reads ─────────────────────────────────────────────
 	get_custom_bindings: () => MOCK_CUSTOM_BINDINGS,
@@ -364,9 +378,20 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 		worktree_state: 'none',
 		sort_order: 99,
 		created_at: new Date().toISOString(),
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 		...(request as object),
 	}),
 	update_issue: ({ request }) => request,
+	update_issue_character: ({ issueId }) => {
+		const issue = MOCK_ISSUES.find((i) => i.id === issueId);
+		return issue ?? null;
+	},
+	toggle_issue_sound_mute: ({ issueId }) => {
+		const issue = MOCK_ISSUES.find((i) => i.id === issueId);
+		return issue ? { ...issue, is_sound_muted: !issue.is_sound_muted } : null;
+	},
 	delete_issue: () => null,
 	archive_issue: ({ id }) => {
 		const issue = MOCK_ISSUES.find((i) => i.id === id);
@@ -397,6 +422,18 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	adopt_session: () => `mock-session-${crypto.randomUUID().slice(0, 8)}`,
 	update_notification_config: ({ request }) => request,
 	test_notification_sound: () => null,
+	set_notification_volume: () => null,
+	set_sound_volume_override: () => null,
+	install_sound_pack: () => ({
+		name: 'mock-pack',
+		display_name: 'Mock Pack',
+		version: '1.0.0',
+		author: 'Mock',
+		avatar: null,
+		event_count: 0,
+		path: '',
+	}),
+	remove_sound_pack: () => null,
 	upsert_custom_binding: () => null,
 	delete_custom_binding: () => null,
 	open_workspace_window: () => null,
