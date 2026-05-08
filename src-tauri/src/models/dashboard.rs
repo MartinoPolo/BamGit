@@ -28,6 +28,36 @@ impl DashboardType {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, TS, PartialEq)]
+#[ts(export)]
+#[serde(rename_all = "lowercase")]
+pub enum DashboardStatus {
+    Active,
+    Archived,
+    Deleted,
+}
+
+impl std::fmt::Display for DashboardStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DashboardStatus::Active => write!(f, "active"),
+            DashboardStatus::Archived => write!(f, "archived"),
+            DashboardStatus::Deleted => write!(f, "deleted"),
+        }
+    }
+}
+
+impl DashboardStatus {
+    pub fn from_db(value: String) -> Result<Self, String> {
+        match value.as_str() {
+            "active" => Ok(DashboardStatus::Active),
+            "archived" => Ok(DashboardStatus::Archived),
+            "deleted" => Ok(DashboardStatus::Deleted),
+            other => Err(format!("Invalid dashboard status: {other}")),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct Dashboard {
@@ -43,6 +73,7 @@ pub struct Dashboard {
     pub accent_color: Option<String>,
     pub default_shape: String,
     pub priorities_enabled: bool,
+    pub status: DashboardStatus,
 }
 
 #[derive(Debug, Deserialize)]
@@ -81,7 +112,7 @@ pub struct UpdateDashboardRequest {
     pub priorities_enabled: Option<bool>,
 }
 
-fn deserialize_optional_nullable<'de, D>(deserializer: D) -> Result<Option<Option<String>>, D::Error>
+pub fn deserialize_optional_nullable<'de, D>(deserializer: D) -> Result<Option<Option<String>>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {

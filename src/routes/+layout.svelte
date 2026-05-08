@@ -59,6 +59,7 @@
 		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
 		void preloadCode(resolve('/settings'));
+		void preloadCode(resolve('/workspace-settings'));
 		void preloadCode(resolve('/usage'));
 		void preloadCode(resolve('/quick-ideas'));
 		void preloadCode(resolve('/ai-config'));
@@ -127,10 +128,9 @@
 
 	async function handleDeleteDashboard(id: string) {
 		try {
-			await boardStore.deleteDashboard(id);
-			await boardStore.refreshDashboards();
+			await boardStore.archiveDashboard(id);
 		} catch (err) {
-			console.error('Failed to delete dashboard:', err);
+			console.error('Failed to archive dashboard:', err);
 		}
 	}
 

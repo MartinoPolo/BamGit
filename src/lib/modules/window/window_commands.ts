@@ -33,8 +33,10 @@ export function saveWindowGeometry(
 	});
 }
 
-export function getOverviewData(): Promise<OverviewWorkspaceData[]> {
-	return invoke('get_overview_data');
+export function getOverviewData(
+	includeArchived: boolean = false,
+): Promise<OverviewWorkspaceData[]> {
+	return invoke('get_overview_data', { includeArchived });
 }
 
 export function getAppSetting(key: string): Promise<AppSetting | null> {

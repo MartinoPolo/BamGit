@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use super::dashboard::DashboardStatus;
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct OverviewWorkspaceData {
@@ -34,4 +36,5 @@ pub struct OverviewWorkspaceData {
     pub prd_completed_subs: i64,
     #[ts(type = "number")]
     pub prd_total_subs: i64,
+    pub status: DashboardStatus,
 }

@@ -24,6 +24,8 @@ const COMMAND_BODIES: Record<string, string> = {
 	pick_folder: 'Folder picker requires the desktop app',
 	open_path: 'Opening local folders requires the desktop app',
 	discover_ai_config: 'AI config discovery requires the desktop app',
+	run_workspace_command: 'Running commands requires the desktop app',
+	kill_workspace_process: 'Killing processes requires the desktop app',
 };
 
 export function showMockToast(command: string): void {

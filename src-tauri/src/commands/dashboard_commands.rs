@@ -5,11 +5,11 @@ use uuid::Uuid;
 use crate::database::connection::DatabaseState;
 use crate::database::defaults::{seed_label_shape_mappings_for_dashboard, DEFAULT_TREE_SHAPE};
 use crate::models::dashboard::{
-    CreateDashboardRequest, Dashboard, DashboardType, UpdateDashboardRequest,
+    CreateDashboardRequest, Dashboard, DashboardStatus, DashboardType, UpdateDashboardRequest,
 };
 
 const DASHBOARD_SELECT_COLUMNS: &str =
-    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, accent_color, default_shape, priorities_enabled";
+    "id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, color_palette_id, accent_color, default_shape, priorities_enabled, status";
 
 fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
     let dashboard_type_string: String = row.get(2)?;
@@ -17,6 +17,11 @@ fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
         DashboardType::from_db(dashboard_type_string).map_err(|error| {
             rusqlite::Error::FromSqlConversionFailure(2, rusqlite::types::Type::Text, error.into())
         })?;
+
+    let status_string: String = row.get(11)?;
+    let status = DashboardStatus::from_db(status_string).map_err(|error| {
+        rusqlite::Error::FromSqlConversionFailure(11, rusqlite::types::Type::Text, error.into())
+    })?;
 
     Ok(Dashboard {
         id: row.get(0)?,
@@ -30,6 +35,7 @@ fn row_to_dashboard(row: &Row) -> Result<Dashboard, rusqlite::Error> {
         accent_color: row.get(8)?,
         default_shape: row.get(9)?,
         priorities_enabled: row.get(10)?,
+        status,
     })
 }
 
@@ -74,14 +80,22 @@ pub fn create_dashboard(
         accent_color: request.accent_color,
         default_shape: DEFAULT_TREE_SHAPE.to_string(),
         priorities_enabled: true,
+        status: DashboardStatus::Active,
     })
 }
 
 #[tauri::command]
-pub fn get_dashboards(state: State<DatabaseState>) -> Result<Vec<Dashboard>, String> {
+pub fn get_dashboards(
+    state: State<DatabaseState>,
+    include_archived: Option<bool>,
+) -> Result<Vec<Dashboard>, String> {
     let connection = state.read()?;
 
-    let query = format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards");
+    let query = if include_archived.unwrap_or(false) {
+        format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards WHERE status IN ('active', 'archived')")
+    } else {
+        format!("SELECT {DASHBOARD_SELECT_COLUMNS} FROM dashboards WHERE status = 'active'")
+    };
     let mut statement = connection
         .prepare(&query)
         .map_err(|error| format!("Failed to prepare query: {error}"))?;
@@ -140,6 +154,7 @@ pub fn update_dashboard(
         accent_color: resolve_nullable_field(request.accent_color, existing.accent_color),
         default_shape: request.default_shape.unwrap_or(existing.default_shape),
         priorities_enabled: request.priorities_enabled.unwrap_or(existing.priorities_enabled),
+        status: existing.status,
     };
 
     connection
@@ -167,16 +182,67 @@ pub fn update_dashboard(
 }
 
 #[tauri::command]
-pub fn delete_dashboard(state: State<DatabaseState>, id: String) -> Result<(), String> {
+pub fn archive_dashboard(state: State<DatabaseState>, id: String) -> Result<(), String> {
     let connection = state.write()?;
 
     let rows_affected = connection
-        .execute("DELETE FROM dashboards WHERE id = ?1", [&id])
-        .map_err(|error| format!("Failed to delete dashboard: {error}"))?;
+        .execute(
+            "UPDATE dashboards SET status = 'archived' WHERE id = ?1 AND status = 'active'",
+            [&id],
+        )
+        .map_err(|error| format!("Failed to archive dashboard: {error}"))?;
 
     if rows_affected == 0 {
-        return Err("ERR_DASHBOARD_NOT_FOUND".to_string());
+        return Err("ERR_DASHBOARD_NOT_FOUND_OR_NOT_ACTIVE".to_string());
     }
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn unarchive_dashboard(state: State<DatabaseState>, id: String) -> Result<(), String> {
+    let connection = state.write()?;
+
+    let rows_affected = connection
+        .execute(
+            "UPDATE dashboards SET status = 'active' WHERE id = ?1 AND status = 'archived'",
+            [&id],
+        )
+        .map_err(|error| format!("Failed to unarchive dashboard: {error}"))?;
+
+    if rows_affected == 0 {
+        return Err("ERR_DASHBOARD_NOT_FOUND_OR_NOT_ARCHIVED".to_string());
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn delete_dashboard(
+    state: State<DatabaseState>,
+    id: String,
+    confirm_name: String,
+) -> Result<(), String> {
+    let connection = state.write()?;
+
+    let current_name: String = connection
+        .query_row(
+            "SELECT name FROM dashboards WHERE id = ?1 AND status = 'archived'",
+            [&id],
+            |row| row.get(0),
+        )
+        .map_err(|_| "ERR_DASHBOARD_NOT_FOUND_OR_NOT_ARCHIVED".to_string())?;
+
+    if current_name != confirm_name {
+        return Err("ERR_NAME_MISMATCH".to_string());
+    }
+
+    connection
+        .execute(
+            "UPDATE dashboards SET status = 'deleted' WHERE id = ?1",
+            [&id],
+        )
+        .map_err(|error| format!("Failed to delete dashboard: {error}"))?;
 
     Ok(())
 }
