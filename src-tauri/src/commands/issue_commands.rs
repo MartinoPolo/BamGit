@@ -1,8 +1,9 @@
 use rusqlite::Row;
-use tauri::State;
+use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
 use crate::database::connection::DatabaseState;
+use crate::metrics::achievement_tracker;
 use crate::models::issue::{CreateIssueRequest, Issue, UpdateIssueRequest};
 
 use super::shared::resolve_nullable_field;
@@ -52,6 +53,7 @@ fn row_to_issue(row: &Row) -> Result<Issue, rusqlite::Error> {
 
 #[tauri::command]
 pub fn create_issue(
+    app_handle: AppHandle,
     state: State<DatabaseState>,
     request: CreateIssueRequest,
 ) -> Result<Issue, String> {
@@ -75,6 +77,11 @@ pub fn create_issue(
             ],
         )
         .map_err(|error| format!("Failed to create issue: {error}"))?;
+
+    let newly_unlocked = achievement_tracker::check_issue_achievements(&connection);
+    for kind in &newly_unlocked {
+        let _ = app_handle.emit("achievement-unlocked", kind.as_str());
+    }
 
     let query = format!("SELECT {ISSUE_SELECT_COLUMNS} FROM issues WHERE id = ?1");
     connection

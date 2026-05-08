@@ -7,8 +7,11 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::mpsc;
 
 use super::provider::{ActorCommand, ProviderAdapter, SessionEvent, SessionHandle};
+use crate::metrics::achievement_tracker;
+use crate::models::achievement::AchievementKind;
 use crate::models::session::SessionState;
 use crate::notification::service::{session_state_to_event_type, NotificationService};
+use crate::SharedPricingEngine;
 
 /// Payload emitted to the frontend via Tauri events.
 #[derive(Debug, Clone, Serialize, TS)]
@@ -44,6 +47,7 @@ pub async fn run_actor(
                         };
                         handle_event(&session_id, &exit_event, &app_handle, &database_connection);
                         update_session_ended(&session_id, &database_connection);
+                        handle_session_completion(&session_id, &app_handle, &database_connection).await;
                         break;
                     }
                 }
@@ -90,6 +94,7 @@ pub async fn run_actor(
                         };
                         handle_event(&session_id, &term_event, &app_handle, &database_connection);
                         update_session_ended(&session_id, &database_connection);
+                        handle_session_completion(&session_id, &app_handle, &database_connection).await;
                         break;
                     }
                     None => {
@@ -372,5 +377,124 @@ fn update_cli_session_id(
             log::error!("Failed to update cli_session_id for {session_id}: {e}");
         }
     }
+}
+
+// --- Session completion: pricing, achievements, events ---
+
+struct SessionMetricsSnapshot {
+    model: Option<String>,
+    input_tokens: i64,
+    output_tokens: i64,
+    cache_read_tokens: i64,
+    cache_write_tokens: i64,
+    duration_seconds: Option<f64>,
+}
+
+fn read_session_metrics_snapshot(
+    session_id: &str,
+    conn: &Connection,
+) -> Option<SessionMetricsSnapshot> {
+    conn.query_row(
+        "SELECT model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, duration_seconds \
+         FROM session_metrics WHERE session_id = ?1",
+        [session_id],
+        |row| {
+            Ok(SessionMetricsSnapshot {
+                model: row.get(0)?,
+                input_tokens: row.get(1)?,
+                output_tokens: row.get(2)?,
+                cache_read_tokens: row.get(3)?,
+                cache_write_tokens: row.get(4)?,
+                duration_seconds: row.get(5)?,
+            })
+        },
+    )
+    .ok()
+}
+
+async fn handle_session_completion(
+    session_id: &str,
+    app_handle: &AppHandle,
+    database_connection: &std::sync::Arc<StdMutex<Connection>>,
+) {
+    let snapshot = {
+        let Ok(conn) = database_connection.lock() else {
+            return;
+        };
+        read_session_metrics_snapshot(session_id, &conn)
+    };
+
+    let Some(snapshot) = snapshot else {
+        let _ = app_handle.emit("metrics-updated", session_id);
+        return;
+    };
+
+    if let Some(ref model) = snapshot.model {
+        if let Some(pricing_state) = app_handle.try_state::<SharedPricingEngine>() {
+            let result = {
+                let engine = pricing_state.lock().await;
+                engine.calculate_cost(
+                    model,
+                    snapshot.input_tokens as u64,
+                    snapshot.output_tokens as u64,
+                    snapshot.cache_read_tokens as u64,
+                    snapshot.cache_write_tokens as u64,
+                    false,
+                )
+            };
+
+            if result.pricing_available {
+                if let Ok(conn) = database_connection.lock() {
+                    let _ = conn.execute(
+                        "UPDATE session_metrics SET cost_usd = ?1 WHERE session_id = ?2",
+                        rusqlite::params![result.cost_usd, session_id],
+                    );
+                    let _ = conn.execute(
+                        "UPDATE sessions SET cost_usd = ?1 WHERE id = ?2",
+                        rusqlite::params![result.cost_usd, session_id],
+                    );
+                }
+            }
+        }
+    }
+
+    let newly_unlocked = {
+        let Ok(conn) = database_connection.lock() else {
+            let _ = app_handle.emit("metrics-updated", session_id);
+            return;
+        };
+
+        let cache_total = snapshot.cache_read_tokens + snapshot.input_tokens;
+        let cache_hit_ratio = if cache_total > 0 {
+            snapshot.cache_read_tokens as f64 / cache_total as f64 * 100.0
+        } else {
+            0.0
+        };
+
+        let cost: f64 = conn
+            .query_row(
+                "SELECT COALESCE(cost_usd, 0.0) FROM session_metrics WHERE session_id = ?1",
+                [session_id],
+                |row| row.get(0),
+            )
+            .unwrap_or(0.0);
+
+        achievement_tracker::check_session_achievements(
+            &conn,
+            cost,
+            snapshot.duration_seconds,
+            cache_hit_ratio,
+        )
+    };
+
+    let _ = app_handle.emit("metrics-updated", session_id);
+
+    for kind in &newly_unlocked {
+        emit_achievement_unlocked(kind, app_handle);
+    }
+}
+
+fn emit_achievement_unlocked(kind: &AchievementKind, app_handle: &AppHandle) {
+    let _ = app_handle.emit("achievement-unlocked", kind.as_str());
 }
 
