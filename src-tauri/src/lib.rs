@@ -18,8 +18,11 @@ use commands::{
     process_commands, session_commands, terminal_commands, window_commands,
     workspace_command_commands, worktree_commands,
 };
+use std::sync::Arc;
+
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
+use metrics::pricing::PricingEngine;
 use models::app_setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
 use notification::playback_queue;
 use notification::service::NotificationService;
@@ -28,6 +31,8 @@ use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
 use tauri::Manager;
 use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
+
+pub type SharedPricingEngine = Arc<tokio::sync::Mutex<PricingEngine>>;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -97,7 +102,14 @@ pub fn run() {
                     .unwrap_or_else(|_| STARTUP_BEHAVIOR_OVERVIEW.to_string())
             };
 
+            let mut pricing_engine = PricingEngine::new(&app_data_directory);
+            {
+                let conn = database_state.read().unwrap_or_else(|e| panic!("{e}"));
+                pricing_engine.load_overrides_from_database(&conn);
+            }
+
             app.manage(database_state);
+            app.manage(Arc::new(tokio::sync::Mutex::new(pricing_engine)) as SharedPricingEngine);
             app.manage(SessionManager::new());
             app.manage(ProcessManager::new());
             app.manage(FetchCoordinator::new());
@@ -222,6 +234,7 @@ pub fn run() {
             metrics_commands::get_usage_dashboard,
             metrics_commands::get_achievements,
             metrics_commands::import_historical_sessions,
+            metrics_commands::get_exchange_rates,
             process_commands::run_workspace_command,
             process_commands::kill_workspace_process,
             process_commands::get_running_processes,

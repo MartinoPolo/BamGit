@@ -31,6 +31,7 @@
 	let loadingUserRepos = $state(false);
 	let searchingRemote = $state(false);
 	let searchDebounceTimer = $state<ReturnType<typeof setTimeout> | undefined>(undefined);
+	let inputRef = $state<HTMLInputElement | null>(null);
 
 	const localFiltered = $derived.by(() => {
 		if (searchValue === '') {
@@ -102,6 +103,10 @@
 
 	function handleOpenChangeComplete(isOpen: boolean) {
 		if (!isOpen) {
+			const typed = inputRef?.value.trim() ?? '';
+			if (typed !== '' && value !== typed) {
+				value = typed;
+			}
 			searchValue = '';
 			searchResults = [];
 		}
@@ -117,6 +122,7 @@
 >
 	<div class="relative">
 		<Combobox.Input
+			bind:ref={inputRef}
 			{id}
 			{placeholder}
 			oninput={handleInput}

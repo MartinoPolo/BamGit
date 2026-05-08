@@ -62,7 +62,20 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
     )?;
 
     seed_grovekeeper_workspace(connection)?;
+    seed_fast_mode_multipliers(connection)?;
 
+    Ok(())
+}
+
+fn seed_fast_mode_multipliers(connection: &Connection) -> Result<(), rusqlite::Error> {
+    for (model_id, multiplier) in &[("claude-opus-4-7", 6.0), ("claude-opus-4-6", 6.0)] {
+        connection.execute(
+            "INSERT OR IGNORE INTO model_pricing_cache \
+             (model_id, input_cost_per_token, output_cost_per_token, fast_mode_multiplier, source) \
+             VALUES (?1, 0.0, 0.0, ?2, 'litellm')",
+            rusqlite::params![model_id, multiplier],
+        )?;
+    }
     Ok(())
 }
 

@@ -245,6 +245,9 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             output_cost_per_token REAL NOT NULL,
             cache_read_cost_per_token REAL,
             cache_write_cost_per_token REAL,
+            fast_mode_multiplier REAL,
+            source TEXT NOT NULL DEFAULT 'litellm'
+                CHECK (source IN ('user', 'litellm', 'openrouter')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
@@ -260,6 +263,9 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE INDEX IF NOT EXISTS idx_tool_usage_session_id ON tool_usage(session_id);
         CREATE INDEX IF NOT EXISTS idx_tool_usage_tool_name ON tool_usage(tool_name);
         CREATE INDEX IF NOT EXISTS idx_workspace_commands_dashboard ON workspace_commands(dashboard_id);
+        CREATE INDEX IF NOT EXISTS idx_turn_metrics_timestamp ON turn_metrics(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_tool_usage_timestamp ON tool_usage(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_session_metrics_cost_usd ON session_metrics(cost_usd DESC);
 
         COMMIT;
         ",

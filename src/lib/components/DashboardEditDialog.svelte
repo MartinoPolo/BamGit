@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { UpdateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard } from '$lib/types/generated';
@@ -8,8 +9,10 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { ColorPickerContent } from '$lib/components/color-picker/index.js';
 	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/color-picker/color_utils.js';
+	import { useVersionControl } from '$lib/modules/version-control';
 	import PathInput from './PathInput.svelte';
 	import RepoCombobox from './RepoCombobox.svelte';
+	import GhSetupBanner from './GhSetupBanner.svelte';
 	import { buildUpdateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
@@ -20,6 +23,8 @@
 	}
 
 	let { dashboard, onClose, onUpdate, onDelete }: Props = $props();
+
+	const versionControl = useVersionControl();
 
 	let name = $state('');
 	let githubRepo = $state('');
@@ -33,13 +38,15 @@
 
 	$effect(() => {
 		if (dashboard !== null) {
-			name = dashboard.name;
-			githubRepo = dashboard.github_repo ?? '';
-			localFolder = dashboard.local_folder ?? '';
-			defaultBaseBranch = dashboard.default_base_branch ?? '';
-			worktreeParentFolder = dashboard.worktree_parent_folder ?? '';
-			accentColor = dashboard.accent_color ?? WORKSPACE_ACCENT_PALETTE[0];
-			confirmDelete = false;
+			untrack(() => {
+				name = dashboard!.name;
+				githubRepo = dashboard!.github_repo ?? '';
+				localFolder = dashboard!.local_folder ?? '';
+				defaultBaseBranch = dashboard!.default_base_branch ?? '';
+				worktreeParentFolder = dashboard!.worktree_parent_folder ?? '';
+				accentColor = dashboard!.accent_color ?? WORKSPACE_ACCENT_PALETTE[0];
+				confirmDelete = false;
+			});
 		}
 	});
 
@@ -104,6 +111,8 @@
 					</div>
 
 					{#if dashboard.type === 'repo'}
+						<GhSetupBanner availability={versionControl.ghAvailability} />
+
 						<div class="flex flex-col gap-1.5">
 							<Label for="edit-dashboard-github-repo"
 								>{m.dashboard_field_github_repo()}</Label

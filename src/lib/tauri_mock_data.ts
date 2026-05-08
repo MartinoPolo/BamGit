@@ -1102,6 +1102,7 @@ export const MOCK_USAGE_DASHBOARD = {
 		{ tool_name: 'mcp__svelte', call_count: 12 },
 		{ tool_name: 'TaskCreate', call_count: 8 },
 	],
+	pricing_available: true,
 };
 
 export const MOCK_ACHIEVEMENTS = [

@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use serde::Serialize;
-use tauri::State;
+use tauri::{Manager, State};
 use ts_rs::TS;
 
 use crate::database::connection::DatabaseState;
-use crate::metrics::{achievement_tracker, historical_import, queries};
+use crate::metrics::{achievement_tracker, currency, historical_import, queries};
 use crate::models::achievement::Achievement;
 use crate::models::metrics::{MetricsPeriod, UsageDashboardData};
 
@@ -31,9 +33,10 @@ pub struct ProviderImportSummary {
 pub fn get_usage_dashboard(
     state: State<DatabaseState>,
     period: MetricsPeriod,
+    dashboard_id: Option<String>,
 ) -> Result<UsageDashboardData, String> {
     let connection = state.read()?;
-    queries::query_usage_dashboard(&connection, period)
+    queries::query_usage_dashboard(&connection, &period, dashboard_id.as_deref())
         .map_err(|error| format!("Failed to query usage dashboard: {error}"))
 }
 
@@ -68,4 +71,19 @@ pub fn import_historical_sessions(state: State<DatabaseState>) -> Result<ImportS
         total_sessions,
         total_skipped,
     })
+}
+
+#[tauri::command]
+pub async fn get_exchange_rates(
+    app_handle: tauri::AppHandle,
+) -> Result<HashMap<String, f64>, String> {
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to resolve app data dir: {e}"))?;
+    let service = currency::CurrencyService::new(&app_data_dir);
+    service
+        .get_exchange_rates()
+        .await
+        .map_err(|e| format!("Failed to fetch exchange rates: {e}"))
 }
