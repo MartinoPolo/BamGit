@@ -61,5 +61,30 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
          INSERT OR IGNORE INTO app_settings (key, value) VALUES ('notification_volume', '0.8');",
     )?;
 
+    seed_grovekeeper_workspace(connection)?;
+
+    Ok(())
+}
+
+const GROVEKEEPER_DASHBOARD_ID: &str = "seed-grovekeeper";
+
+fn seed_grovekeeper_workspace(connection: &Connection) -> Result<(), rusqlite::Error> {
+    connection.execute(
+        "INSERT OR IGNORE INTO dashboards \
+         (id, name, type, github_repo, local_folder, default_base_branch, worktree_parent_folder, default_shape) \
+         VALUES (?1, ?2, 'repo', ?3, ?4, ?5, ?6, ?7)",
+        rusqlite::params![
+            GROVEKEEPER_DASHBOARD_ID,
+            "Grovekeeper",
+            "MartinoPolo/Grovekeeper",
+            "C:/_MP_projects/Grovekeeper",
+            "dev",
+            "C:/_MP_projects/worktrees",
+            DEFAULT_TREE_SHAPE,
+        ],
+    )?;
+
+    seed_label_shape_mappings_for_dashboard(connection, GROVEKEEPER_DASHBOARD_ID)?;
+
     Ok(())
 }

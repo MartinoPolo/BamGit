@@ -210,44 +210,59 @@
 }
 
 /* ── Accent color overrides ─────────────────────────────────── */
+/* IMPORTANT: Use inline OKLCH values, NOT var(--color-shade) references.
+   Tailwind CSS v4 @theme inline tree-shakes variables unused by utility
+   classes, which strips both the :root tokens and these selectors. */
 
 [data-accent='amber'][data-theme='light'] {
-  --primary: var(--amber-600);
+  --primary: oklch(0.595 0.160 48);
   --primary-fg: oklch(0.985 0.008 75);
   --primary-soft: oklch(0.920 0.065 75);
-  --ring: var(--amber-600);
+  --accent: oklch(0.690 0.165 55);
+  --accent-fg: oklch(0.160 0.020 50);
+  --ring: oklch(0.595 0.160 48);
 }
 [data-accent='amber'][data-theme='dark'] {
-  --primary: var(--amber-400);
+  --primary: oklch(0.770 0.150 65);
   --primary-fg: oklch(0.135 0.020 55);
   --primary-soft: oklch(0.305 0.070 60);
-  --ring: var(--amber-400);
+  --accent: oklch(0.770 0.150 65);
+  --accent-fg: oklch(0.150 0.020 50);
+  --ring: oklch(0.770 0.150 65);
 }
 
 [data-accent='bark'][data-theme='light'] {
-  --primary: var(--bark-700);
+  --primary: oklch(0.345 0.055 50);
   --primary-fg: oklch(0.985 0.008 55);
   --primary-soft: oklch(0.920 0.030 55);
-  --ring: var(--bark-700);
+  --accent: oklch(0.500 0.075 55);
+  --accent-fg: oklch(0.985 0.008 55);
+  --ring: oklch(0.345 0.055 50);
 }
 [data-accent='bark'][data-theme='dark'] {
-  --primary: var(--bark-300);
+  --primary: oklch(0.700 0.060 60);
   --primary-fg: oklch(0.135 0.020 50);
   --primary-soft: oklch(0.305 0.040 55);
-  --ring: var(--bark-300);
+  --accent: oklch(0.700 0.060 60);
+  --accent-fg: oklch(0.135 0.020 50);
+  --ring: oklch(0.700 0.060 60);
 }
 
 [data-accent='azure'][data-theme='light'] {
-  --primary: var(--azure-600);
+  --primary: oklch(0.490 0.115 240);
   --primary-fg: oklch(0.985 0.008 230);
   --primary-soft: oklch(0.920 0.040 230);
-  --ring: var(--azure-600);
+  --accent: oklch(0.570 0.130 235);
+  --accent-fg: oklch(0.985 0.008 230);
+  --ring: oklch(0.490 0.115 240);
 }
 [data-accent='azure'][data-theme='dark'] {
-  --primary: var(--azure-400);
+  --primary: oklch(0.660 0.120 230);
   --primary-fg: oklch(0.135 0.020 240);
   --primary-soft: oklch(0.305 0.055 235);
-  --ring: var(--azure-400);
+  --accent: oklch(0.660 0.120 230);
+  --accent-fg: oklch(0.135 0.020 240);
+  --ring: oklch(0.660 0.120 230);
 }
 
 /* Base */
