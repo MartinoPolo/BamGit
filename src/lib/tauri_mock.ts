@@ -120,6 +120,13 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_usage_dashboard: () => MOCK_USAGE_DASHBOARD,
 	get_achievements: () => MOCK_ACHIEVEMENTS,
 	import_historical_sessions: () => MOCK_IMPORT_SUMMARY,
+	get_exchange_rates: () => ({
+		EUR: 0.92,
+		GBP: 0.79,
+		CZK: 22.5,
+		JPY: 149.8,
+		CAD: 1.36,
+	}),
 
 	// ─── Dialog ──────────────────────────────────────────────────────────────
 	pick_folder: () => 'C:/mock/selected-folder',
