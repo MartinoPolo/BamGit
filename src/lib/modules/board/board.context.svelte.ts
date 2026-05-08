@@ -189,8 +189,19 @@ function createBoardContext() {
 			return invoke('update_dashboard', { request });
 		},
 
-		async deleteDashboard(id: string): Promise<void> {
-			return invoke('delete_dashboard', { id });
+		async archiveDashboard(id: string): Promise<void> {
+			await invoke('archive_dashboard', { id });
+			await this.refreshDashboards();
+		},
+
+		async unarchiveDashboard(id: string): Promise<void> {
+			await invoke('unarchive_dashboard', { id });
+			await this.refreshDashboards();
+		},
+
+		async deleteDashboard(id: string, confirmName: string): Promise<void> {
+			await invoke('delete_dashboard', { id, confirmName });
+			await this.refreshDashboards();
 		},
 
 		// Portfolio

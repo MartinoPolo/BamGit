@@ -6,6 +6,7 @@ mod git;
 mod metrics;
 mod models;
 mod notification;
+mod process;
 mod session;
 mod window_manager;
 
@@ -14,17 +15,24 @@ use commands::{
     dependency_commands, dialog_commands, git_status_commands, github_commands, issue_commands,
     keyboard_shortcut_commands, label_shape_mapping_commands, metrics_commands,
     notification_commands, portfolio_commands, raw_requirements_commands, seed_commands,
-    session_commands, terminal_commands, window_commands, worktree_commands,
+    process_commands, session_commands, terminal_commands, window_commands,
+    workspace_command_commands, worktree_commands,
 };
+use std::sync::Arc;
+
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
+use metrics::pricing::PricingEngine;
 use models::app_setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
 use notification::playback_queue;
 use notification::service::NotificationService;
+use process::manager::ProcessManager;
 use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
 use tauri::Manager;
 use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
+
+pub type SharedPricingEngine = Arc<tokio::sync::Mutex<PricingEngine>>;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -94,8 +102,16 @@ pub fn run() {
                     .unwrap_or_else(|_| STARTUP_BEHAVIOR_OVERVIEW.to_string())
             };
 
+            let mut pricing_engine = PricingEngine::new(&app_data_directory);
+            {
+                let conn = database_state.read().unwrap_or_else(|e| panic!("{e}"));
+                pricing_engine.load_overrides_from_database(&conn);
+            }
+
             app.manage(database_state);
+            app.manage(Arc::new(tokio::sync::Mutex::new(pricing_engine)) as SharedPricingEngine);
             app.manage(SessionManager::new());
+            app.manage(ProcessManager::new());
             app.manage(FetchCoordinator::new());
             app.manage(DiscoveryPoller::new());
             app.manage(NotificationService::new(
@@ -121,6 +137,8 @@ pub fn run() {
             dashboard_commands::get_dashboards,
             dashboard_commands::get_dashboard,
             dashboard_commands::update_dashboard,
+            dashboard_commands::archive_dashboard,
+            dashboard_commands::unarchive_dashboard,
             dashboard_commands::delete_dashboard,
             issue_commands::create_issue,
             issue_commands::get_issues_for_dashboard,
@@ -216,6 +234,17 @@ pub fn run() {
             metrics_commands::get_usage_dashboard,
             metrics_commands::get_achievements,
             metrics_commands::import_historical_sessions,
+            metrics_commands::get_exchange_rates,
+            process_commands::run_workspace_command,
+            process_commands::kill_workspace_process,
+            process_commands::get_running_processes,
+            process_commands::get_processes_for_issue,
+            process_commands::get_process_logs,
+            workspace_command_commands::create_workspace_command,
+            workspace_command_commands::get_workspace_commands_for_dashboard,
+            workspace_command_commands::update_workspace_command,
+            workspace_command_commands::delete_workspace_command,
+            workspace_command_commands::reorder_workspace_commands,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
@@ -226,6 +255,9 @@ pub fn run() {
 
                 let queue = app_handle.state::<playback_queue::PlaybackQueueHandle>();
                 queue.shutdown();
+
+                let pm = app_handle.state::<ProcessManager>();
+                pm.cleanup_all();
 
                 let manager = app_handle.state::<SessionManager>();
                 tauri::async_runtime::block_on(manager.cleanup_all());

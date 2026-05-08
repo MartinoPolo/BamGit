@@ -8,4 +8,4 @@ import type { UsageStats } from "./UsageStats";
 /**
  * Full dashboard data returned by get_usage_dashboard.
  */
-export type UsageDashboardData = { stats: UsageStats, daily_costs: Array<DailyCost>, activity_breakdown: Array<ActivityBreakdown>, top_sessions: Array<TopSession>, tool_usage: Array<ToolUsageBreakdown>, };
+export type UsageDashboardData = { stats: UsageStats, daily_costs: Array<DailyCost>, activity_breakdown: Array<ActivityBreakdown>, top_sessions: Array<TopSession>, tool_usage: Array<ToolUsageBreakdown>, pricing_available: boolean, };

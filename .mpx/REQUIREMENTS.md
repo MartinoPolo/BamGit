@@ -312,7 +312,7 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 - Cross-platform (Tauri notification plugin + rodio sound + window attention)
 - Frontend passes translated title/body to Rust dispatch command (Rust does not generate user-facing text)
 - Per-event configuration stored in SQLite
-- Sound formats: WAV (bundled) + OGG (user packs) via rodio. No MP3
+- Sound formats: WAV (bundled) + OGG (user packs) + MP3 (via rodio `minimp3` feature, MIT licensed)
 - CESP/peon-ping manifest format for sound pack import (`openpeon.json`); native `grovekeeper.json` manifest for full 15-event packs
 - Bundled default "Grove" sound pack (10 unique CC0 sounds, all ≤3s)
 - Sound rotation: multiple sounds per event, random selection excluding last played
@@ -327,7 +327,39 @@ Browse past sessions for any issue. Full-text search content with multi-scope (s
 - Issue card avatar placement: bottom-right corner next to action buttons, same rounding as icon-only button
     - Left-click: mute all sounds for that issue (toggle, crossed-out visual)
     - Right-click: dropdown — character list (icon + name), divider, "Play random sound", "Mute" toggle
-- Each character pack provides sounds for all 15 events + a small avatar image
+- Each character pack provides sounds for events + a small avatar image
+- Packs are self-contained: sound files copied into `app_data/sound-packs/<character_name>/`
+- Each sound file assigned to exactly ONE event (no sharing across events)
+- Bundled packs (Grove + og-packs) are read-only; user-created packs are fully editable
+- Language flag shown on character card when multi-language variants exist (CZ, US/GB)
+
+#### Character Creator UI
+
+- Full-page editor for creating and editing character sound packs
+- Entry: Settings → Notifications & Characters → "Create Character" → navigates to full-page editor
+- **Sound pool panel**: Import sounds from folder (native dialog), each sound has play button + drag handle
+- **Event assignment panel**: Event slots grouped by importance tier (critical top, important middle, normal bottom)
+- Drag-and-drop from sound pool to event slots; each event accepts multiple sounds (rotation)
+- Critical events (session.needs-input, session.end) must be filled before character can be activated
+- **Avatar**: Upload PNG/JPG/WebP, stored as 128x128 WebP. Generic silhouette placeholder if none.
+- **Validation**: Name (required, unique) + critical sounds filled. Incomplete characters auto-disabled.
+- **Edit/Delete**: User packs fully editable. Delete shows issue count, resets to default Grove pack.
+
+#### Bulk Import Wizard
+
+- Scans structured folders (e.g. `Faction/UnitName/*.wav`), auto-detects characters from subfolders
+- Auto-maps sounds to events by filename pattern (WC3 conventions: What→needs-input/end, Yes→acknowledge, Death→error, Ready→start, Pissed→resource.limit, YesAttack→complete)
+- Shows proposed assignments with full manual override before batch-creating packs
+- Accessed via "Import Folder" in Settings → Notifications & Characters
+
+#### Character List (Settings)
+
+- Horizontal cards: avatar 48px + name + language flag + status badge + enabled toggle + kebab menu
+- Status: "Ready" (green, critical events filled) or "Incomplete" (amber)
+- Enabled/disabled toggle controls inclusion in random assignment pool
+- Incomplete characters auto-disabled, can't be toggled on
+- Kebab: Edit, Duplicate, Export, Delete (bundled packs: lock icon, read-only)
+- Bundled packs: Grove + peon (EN) + peon_cz (CZ) + peasant (EN) + peasant_cz (CZ)
 
 #### Importance Tiers
 

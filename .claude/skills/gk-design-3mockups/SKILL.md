@@ -19,7 +19,7 @@ Generate three distinct self-contained HTML variant mockups from a design brief,
 
 ## Current State
 
-!`echo "=== Briefs ===" && ls claude_design/design_briefs/ 2>/dev/null && echo "=== Existing Variants ===" && ls claude_design/mockups/variants/ 2>/dev/null 2>&1 && echo "=== Final Mockups ===" && ls claude_design/mockups/*.html 2>/dev/null 2>&1`
+!`echo "=== Briefs ===" && ls claude_design/design_briefs/ 2>/dev/null && echo "=== Existing Mockups ===" && for d in claude_design/mockups/*/; do echo "$(basename "$d"): $(ls "$d"variant-*.html 2>/dev/null | wc -l) variants"; done 2>/dev/null`
 
 ## Process
 
@@ -31,7 +31,8 @@ Read `claude_design/tokens.css` for all CSS token definitions — this gets inli
 ### Step 2: Identify Target Briefs
 
 - If argument is a file path: use that single brief.
-- If argument is `all` or omitted: find all briefs in `claude_design/design_briefs/` **without** a leading underscore that don't already have mockup variants in `claude_design/mockups/variants/`.
+- If argument is `all` or omitted: find all briefs in `claude_design/design_briefs/` **without** a leading underscore that don't already have a matching directory with variants in `claude_design/mockups/<brief-name-lowercase>/`.
+    - Brief-to-directory mapping: `SOME_BRIEF_NAME.md` → `claude_design/mockups/some-brief-name/` (lowercase, underscores to hyphens, no extension).
 
 ### Step 3: Discover Reusable Components
 
@@ -48,7 +49,7 @@ For components needed by the brief but missing from the library: spawn `mp-conte
 Create the output directory:
 
 ```
-mkdir -p claude_design/mockups/variants/<brief-name>
+mkdir -p claude_design/mockups/<brief-name>
 ```
 
 Spawn three `mp-ui-variant-generator` agents in parallel — one per variant direction (A, B, C as specified in the brief).
@@ -68,7 +69,7 @@ Each agent receives:
     - Variant label at top using `.gk-eyebrow` styling (e.g., "VARIANT A: DENSE, DEVELOPER-FOCUSED")
     - All required elements from the brief included
 
-Output files: `claude_design/mockups/variants/<brief-name>/variant-{a,b,c}.html`
+Output files: `claude_design/mockups/<brief-name>/variant-{a,b,c}.html`
 
 ### Step 5: Open in Browser
 

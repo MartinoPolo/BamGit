@@ -15,6 +15,7 @@ import type {
 	Session,
 	SyncAllResult,
 	WindowWorkspaceBinding,
+	WorkspaceCommand,
 } from '$lib/types/generated';
 
 // ─── Stable IDs ───────────────────────────────────────────────────────────────
@@ -52,6 +53,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		accent_color: '#62874b',
 		default_shape: 'oak',
 		priorities_enabled: true,
+		status: 'active',
 	},
 	{
 		id: DASHBOARD_PORTFOLIO,
@@ -65,6 +67,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		accent_color: null,
 		default_shape: 'pine',
 		priorities_enabled: true,
+		status: 'active',
 	},
 ];
 
@@ -835,6 +838,7 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 		prd_count: 3,
 		prd_completed_subs: 12,
 		prd_total_subs: 31,
+		status: 'active',
 	},
 	{
 		dashboard_id: 'dash-codeburn',
@@ -857,6 +861,7 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 		prd_count: 2,
 		prd_completed_subs: 8,
 		prd_total_subs: 15,
+		status: 'active',
 	},
 	{
 		dashboard_id: 'dash-orchard-api',
@@ -879,6 +884,7 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 		prd_count: 1,
 		prd_completed_subs: 3,
 		prd_total_subs: 10,
+		status: 'active',
 	},
 	{
 		dashboard_id: 'dash-moss-cli',
@@ -901,6 +907,7 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 		prd_count: 0,
 		prd_completed_subs: 0,
 		prd_total_subs: 0,
+		status: 'active',
 	},
 	{
 		dashboard_id: 'dash-fern-ui',
@@ -923,6 +930,7 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 		prd_count: 0,
 		prd_completed_subs: 0,
 		prd_total_subs: 0,
+		status: 'active',
 	},
 	{
 		dashboard_id: 'dash-sapling',
@@ -945,6 +953,52 @@ export const MOCK_OVERVIEW_DATA: OverviewWorkspaceData[] = [
 		prd_count: 1,
 		prd_completed_subs: 0,
 		prd_total_subs: 6,
+		status: 'active',
+	},
+];
+
+// ─── Workspace Commands ──────────────────────────────────────────────────────
+
+export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
+	{
+		id: 'mock-cmd-dev-server',
+		dashboard_id: DASHBOARD_GROVEKEEPER,
+		category: 'server',
+		name: 'Dev Server',
+		command: 'pnpm tauri dev',
+		port_pattern: 'Local:\\s+http://localhost:(\\d+)',
+		expected_exit_code: 0,
+		sort_order: 0,
+	},
+	{
+		id: 'mock-cmd-frontend-only',
+		dashboard_id: DASHBOARD_GROVEKEEPER,
+		category: 'server',
+		name: 'Frontend Only',
+		command: 'pnpm dev',
+		port_pattern: 'localhost:(\\d+)',
+		expected_exit_code: 0,
+		sort_order: 1,
+	},
+	{
+		id: 'mock-cmd-check-all',
+		dashboard_id: DASHBOARD_GROVEKEEPER,
+		category: 'check',
+		name: 'Full Check',
+		command: 'pnpm check:all',
+		port_pattern: null,
+		expected_exit_code: 0,
+		sort_order: 0,
+	},
+	{
+		id: 'mock-cmd-test',
+		dashboard_id: DASHBOARD_GROVEKEEPER,
+		category: 'check',
+		name: 'Unit Tests',
+		command: 'pnpm test',
+		port_pattern: null,
+		expected_exit_code: 0,
+		sort_order: 1,
 	},
 ];
 
@@ -1048,6 +1102,7 @@ export const MOCK_USAGE_DASHBOARD = {
 		{ tool_name: 'mcp__svelte', call_count: 12 },
 		{ tool_name: 'TaskCreate', call_count: 8 },
 	],
+	pricing_available: true,
 };
 
 export const MOCK_ACHIEVEMENTS = [

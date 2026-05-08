@@ -38,7 +38,7 @@ impl_sql_enum!(ActivityCategory {
 });
 
 /// Time period filter for dashboard queries.
-#[derive(Debug, Clone, Copy, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum MetricsPeriod {
     Today,
@@ -46,38 +46,42 @@ pub enum MetricsPeriod {
     Month,
     ThirtyDays,
     All,
+    Custom { start: String, end: String },
 }
 
 impl MetricsPeriod {
-    pub fn to_sql_date_filter(&self) -> Option<&'static str> {
+    pub fn to_sql_date_filter(&self) -> Option<String> {
         match self {
-            Self::Today => Some("date(started_at) = date('now')"),
-            Self::Week => Some("started_at >= datetime('now', '-7 days')"),
-            Self::ThirtyDays => Some("started_at >= datetime('now', '-30 days')"),
-            Self::Month => Some("started_at >= datetime('now', 'start of month')"),
+            Self::Today => Some("date(started_at) = date('now')".to_string()),
+            Self::Week => Some("started_at >= datetime('now', '-7 days')".to_string()),
+            Self::ThirtyDays => Some("started_at >= datetime('now', '-30 days')".to_string()),
+            Self::Month => Some("started_at >= datetime('now', 'start of month')".to_string()),
             Self::All => None,
+            Self::Custom { start, end } => Some(format!(
+                "date(started_at) >= date('{start}') AND date(started_at) <= date('{end}')"
+            )),
         }
     }
 
-    pub fn previous_period_filter(&self) -> Option<(&'static str, &'static str)> {
+    pub fn previous_period_filter(&self) -> Option<(String, String)> {
         match self {
             Self::Today => Some((
-                "date(started_at) = date('now', '-1 day')",
-                "date(started_at) = date('now')",
+                "date(started_at) = date('now', '-1 day')".to_string(),
+                "date(started_at) = date('now')".to_string(),
             )),
             Self::Week => Some((
-                "started_at >= datetime('now', '-14 days') AND started_at < datetime('now', '-7 days')",
-                "started_at >= datetime('now', '-7 days')",
+                "started_at >= datetime('now', '-14 days') AND started_at < datetime('now', '-7 days')".to_string(),
+                "started_at >= datetime('now', '-7 days')".to_string(),
             )),
             Self::ThirtyDays => Some((
-                "started_at >= datetime('now', '-60 days') AND started_at < datetime('now', '-30 days')",
-                "started_at >= datetime('now', '-30 days')",
+                "started_at >= datetime('now', '-60 days') AND started_at < datetime('now', '-30 days')".to_string(),
+                "started_at >= datetime('now', '-30 days')".to_string(),
             )),
             Self::Month => Some((
-                "started_at >= datetime('now', 'start of month', '-1 month') AND started_at < datetime('now', 'start of month')",
-                "started_at >= datetime('now', 'start of month')",
+                "started_at >= datetime('now', 'start of month', '-1 month') AND started_at < datetime('now', 'start of month')".to_string(),
+                "started_at >= datetime('now', 'start of month')".to_string(),
             )),
-            Self::All => None,
+            Self::All | Self::Custom { .. } => None,
         }
     }
 }
@@ -151,4 +155,5 @@ pub struct UsageDashboardData {
     pub activity_breakdown: Vec<ActivityBreakdown>,
     pub top_sessions: Vec<TopSession>,
     pub tool_usage: Vec<ToolUsageBreakdown>,
+    pub pricing_available: bool,
 }

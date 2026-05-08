@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage Dashboard — Variant A: Compact Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ============================================================
+   GROVEKEEPER DESIGN TOKENS — inlined from tokens.css
+   ============================================================ */
+:root {
+  --moss-50:  oklch(0.972 0.018 130);
+  --moss-100: oklch(0.940 0.034 130);
+  --moss-200: oklch(0.880 0.058 130);
+  --moss-300: oklch(0.795 0.082 130);
+  --moss-400: oklch(0.690 0.098 132);
+  --moss-500: oklch(0.580 0.096 134);
+  --moss-600: oklch(0.480 0.082 138);
+  --moss-700: oklch(0.395 0.066 142);
+  --moss-800: oklch(0.300 0.048 145);
+  --moss-900: oklch(0.215 0.032 148);
+  --moss-950: oklch(0.155 0.024 150);
+
+  --amber-300: oklch(0.840 0.130 78);
+  --amber-400: oklch(0.770 0.150 65);
+  --amber-500: oklch(0.690 0.165 55);
+  --amber-600: oklch(0.595 0.160 48);
+
+  --bark-300: oklch(0.700 0.060 60);
+  --bark-500: oklch(0.500 0.075 55);
+  --bark-700: oklch(0.345 0.055 50);
+
+  --azure-300: oklch(0.750 0.090 230);
+  --azure-400: oklch(0.660 0.120 230);
+  --azure-500: oklch(0.570 0.130 235);
+  --azure-600: oklch(0.490 0.115 240);
+  --azure-700: oklch(0.400 0.095 240);
+
+  --plum-300: oklch(0.720 0.100 320);
+  --plum-400: oklch(0.640 0.130 320);
+  --plum-500: oklch(0.560 0.150 320);
+  --plum-600: oklch(0.480 0.130 320);
+  --plum-700: oklch(0.400 0.110 320);
+
+  --teal-300: oklch(0.780 0.075 195);
+  --teal-400: oklch(0.700 0.095 195);
+  --teal-500: oklch(0.620 0.110 195);
+  --teal-600: oklch(0.540 0.095 195);
+  --teal-700: oklch(0.460 0.080 195);
+
+  --rose-300: oklch(0.800 0.105 15);
+  --rose-400: oklch(0.720 0.135 15);
+  --rose-500: oklch(0.640 0.155 15);
+  --rose-600: oklch(0.560 0.135 15);
+  --rose-700: oklch(0.480 0.115 15);
+
+  --coral-300: oklch(0.780 0.105 30);
+  --coral-400: oklch(0.700 0.135 30);
+  --coral-500: oklch(0.620 0.155 30);
+  --coral-600: oklch(0.540 0.135 30);
+  --coral-700: oklch(0.460 0.115 30);
+
+  --gold-300: oklch(0.810 0.090 90);
+  --gold-400: oklch(0.730 0.115 90);
+  --gold-500: oklch(0.650 0.135 90);
+  --gold-600: oklch(0.570 0.115 90);
+  --gold-700: oklch(0.490 0.095 90);
+
+  --sage-300: oklch(0.760 0.055 160);
+  --sage-400: oklch(0.680 0.070 160);
+  --sage-500: oklch(0.600 0.085 160);
+  --sage-600: oklch(0.520 0.070 160);
+  --sage-700: oklch(0.440 0.060 160);
+
+  --indigo-300: oklch(0.700 0.095 275);
+  --indigo-400: oklch(0.620 0.120 275);
+  --indigo-500: oklch(0.540 0.140 275);
+  --indigo-600: oklch(0.460 0.120 275);
+  --indigo-700: oklch(0.380 0.100 275);
+
+  --fuchsia-300: oklch(0.740 0.105 350);
+  --fuchsia-400: oklch(0.660 0.135 350);
+  --fuchsia-500: oklch(0.580 0.155 350);
+  --fuchsia-600: oklch(0.500 0.135 350);
+  --fuchsia-700: oklch(0.420 0.115 350);
+
+  --sky-light-top: oklch(0.965 0.018 220);
+  --sky-light-bot: oklch(0.940 0.025 130);
+  --sky-dark-top:  oklch(0.225 0.028 240);
+  --sky-dark-bot:  oklch(0.180 0.030 150);
+
+  --status-success: oklch(0.660 0.135 145);
+  --status-warning: oklch(0.770 0.155 75);
+  --status-danger:  oklch(0.620 0.205 25);
+  --status-info:    oklch(0.660 0.105 220);
+  --status-merged:  oklch(0.580 0.140 310);
+
+  --priority-top:    oklch(0.620 0.205 25);
+  --priority-high:   oklch(0.720 0.160 55);
+  --priority-medium: oklch(0.820 0.160 85);
+  --priority-low:    oklch(0.660 0.105 220);
+  --priority-lowest: oklch(0.550 0.020 250);
+
+  --gh-open:   oklch(0.660 0.135 145);
+  --gh-closed: oklch(0.580 0.140 310);
+  --gh-merged: oklch(0.580 0.140 310);
+  --gh-draft:  oklch(0.550 0.020 250);
+
+  --session-running:      oklch(0.660 0.135 145);
+  --session-errored:      oklch(0.620 0.205 25);
+  --session-idle:         oklch(0.660 0.105 220);
+  --session-paused:       oklch(0.550 0.020 250);
+  --session-finished:     oklch(0.450 0.015 250);
+  --session-needs-input:  oklch(0.770 0.155 75);
+  --session-needs-review: oklch(0.660 0.105 220);
+
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --text-2xs: 10.5px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-md:  13px;
+  --text-base:14px;
+  --text-lg:  15px;
+  --text-xl:  17px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.25;
+  --leading-normal: 1.4;
+  --leading-relaxed:1.55;
+  --leading-loose:  1.7;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  --border-width-1: 1px;
+  --border-width-2: 1.5px;
+  --border-width-3: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --size-control-sm: 26px;
+  --size-control-md: 32px;
+  --size-control-lg: 38px;
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+
+  --duration-1: 90ms;
+  --duration-2: 120ms;
+  --duration-3: 160ms;
+  --duration-4: 220ms;
+  --duration-5: 320ms;
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --ease-out:      cubic-bezier(.16,.84,.44,1);
+  --ease-in:       cubic-bezier(.5,0,.75,0);
+
+  --sidebar-width:  240px;
+  --sidebar-width-collapsed: 56px;
+}
+
+.theme-light, [data-theme='light'] {
+  color-scheme: light;
+  --background:        oklch(0.985 0.005 130);
+  --surface:           oklch(1.000 0 0);
+  --surface-2:         oklch(0.965 0.008 130);
+  --surface-hover:     oklch(0.940 0.012 130);
+  --surface-3:         oklch(0.940 0.012 130);
+  --foreground:        oklch(0.205 0.015 145);
+  --foreground-muted:  oklch(0.460 0.015 145);
+  --foreground-subtle: oklch(0.620 0.012 145);
+  --border:            oklch(0.900 0.012 135);
+  --border-strong:     oklch(0.815 0.018 135);
+  --primary:           var(--moss-700);
+  --primary-fg:        oklch(0.985 0.008 130);
+  --primary-soft:      oklch(0.920 0.030 135);
+  --accent:            var(--moss-500);
+  --accent-fg:         oklch(0.985 0.008 130);
+  --ring:              var(--moss-600);
+  --sidebar-bg:        oklch(0.955 0.010 135);
+  --sidebar-fg:        oklch(0.300 0.020 145);
+  --code-bg:           oklch(0.955 0.010 135);
+  --sky-top:           var(--sky-light-top);
+  --sky-bot:           var(--sky-light-bot);
+  --ground-color:      oklch(0.550 0.090 135);
+  --ground-dark:       oklch(0.380 0.060 55);
+}
+
+.theme-dark, [data-theme='dark'] {
+  color-scheme: dark;
+  --background:        oklch(0.155 0.018 150);
+  --surface:           oklch(0.190 0.020 150);
+  --surface-2:         oklch(0.225 0.022 150);
+  --surface-hover:     oklch(0.265 0.024 150);
+  --surface-3:         oklch(0.265 0.024 150);
+  --foreground:        oklch(0.965 0.010 130);
+  --foreground-muted:  oklch(0.730 0.018 135);
+  --foreground-subtle: oklch(0.560 0.020 140);
+  --border:            oklch(0.295 0.022 148);
+  --border-strong:     oklch(0.380 0.028 145);
+  --primary:           var(--moss-400);
+  --primary-fg:        oklch(0.135 0.020 150);
+  --primary-soft:      oklch(0.305 0.045 145);
+  --accent:            var(--moss-400);
+  --accent-fg:         oklch(0.135 0.02 150);
+  --ring:              var(--moss-400);
+  --sidebar-bg:        oklch(0.180 0.022 150);
+  --sidebar-fg:        oklch(0.770 0.020 140);
+  --code-bg:           oklch(0.215 0.020 150);
+  --sky-top:           var(--sky-dark-top);
+  --sky-bot:           var(--sky-dark-bot);
+  --ground-color:      oklch(0.300 0.060 140);
+  --ground-dark:       oklch(0.180 0.040 50);
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+.gk-root {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "ss01", "cv11";
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.gk-root, .gk-root * { box-sizing: border-box; }
+.font-mono { font-family: var(--font-mono); }
+
+/* ── Type ─────────────────────────────────────────────────── */
+.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
+.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
+.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
+.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
+.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.gk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 12px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--duration-2) ease, border-color var(--duration-2) ease, color var(--duration-2) ease, transform var(--duration-1) ease, box-shadow var(--duration-2) ease;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+}
+.gk-btn:active { transform: scale(0.96); }
+.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.gk-btn-primary {
+  background: var(--primary);
+  color: var(--primary-fg);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 85%, oklch(0.9 0 0) 15%); }
+.gk-btn-secondary {
+  background: var(--surface-2);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.gk-btn-ghost {
+  background: transparent;
+  color: var(--foreground-muted);
+}
+.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
+.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
+.gk-btn-icon { padding: 0; width: 32px; }
+.gk-btn-icon.gk-btn-sm { width: 26px; }
+.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+/* ── Card ─────────────────────────────────────────────────── */
+.gk-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.gk-card-padded { padding: 16px; }
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+.gk-tabs {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  gap: 2px;
+}
+.gk-tab {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: all var(--duration-2) ease;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+.gk-tab:hover { color: var(--foreground); }
+.gk-tab.is-active {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+}
+.gk-tab:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.gk-tab:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+/* ── HR ───────────────────────────────────────────────────── */
+.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+
+/* ── Badge ────────────────────────────────────────────────── */
+.gk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--foreground-muted);
+  border: 1px solid var(--border);
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.gk-badge-moss { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+
+/* ── cb-panel / cb-row / etc ──────────────────────────────── */
+.cb-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.cb-panel-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+}
+.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.cb-panel-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+.cb-panel-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--foreground-subtle);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: auto;
+}
+.cb-row {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  padding: 3px 0;
+  min-height: 22px;
+  font-family: var(--font-sans);
+}
+.cb-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  text-align: right;
+  color: var(--foreground);
+}
+.cb-mute {
+  color: var(--foreground-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cb-bar {
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    oklch(0.770 0.155 75) 0%,
+    oklch(0.700 0.180 50) 60%,
+    oklch(0.640 0.205 25) 100%);
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+  min-width: 2px;
+}
+.cb-bar-cool {
+  background: linear-gradient(90deg,
+    oklch(0.700 0.110 200) 0%,
+    oklch(0.620 0.130 230) 60%,
+    oklch(0.560 0.150 260) 100%);
+}
+.cb-bar-moss {
+  background: linear-gradient(90deg, var(--moss-300) 0%, var(--moss-500) 100%);
+  box-shadow: none;
+}
+.cb-tabs { display: inline-flex; gap: 0; font-family: var(--font-mono); font-size: 11.5px; }
+.cb-tab {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: all var(--duration-2) ease;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.cb-tab:hover { color: var(--foreground); background: var(--surface-2); }
+.cb-tab.is-active {
+  color: var(--foreground);
+  background: var(--surface-2);
+  border-color: var(--border);
+  box-shadow: inset 0 -2px 0 oklch(0.770 0.155 75);
+}
+.cb-tab:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.cb-tab:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+.cb-1shot { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 11px; text-align: right; }
+.cb-1shot-good { color: oklch(0.700 0.150 145); }
+.cb-1shot-mid  { color: oklch(0.770 0.155 75); }
+.cb-1shot-bad  { color: oklch(0.640 0.205 25); }
+
+.cb-cat-coding       { color: oklch(0.700 0.150 145); }
+.cb-cat-debugging    { color: oklch(0.640 0.205 25); }
+.cb-cat-refactor     { color: oklch(0.700 0.180 50); }
+.cb-cat-feature      { color: oklch(0.770 0.155 75); }
+.cb-cat-testing      { color: oklch(0.620 0.130 230); }
+.cb-cat-exploration  { color: oklch(0.700 0.110 200); }
+
+.cb-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 5px 14px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--foreground-muted);
+  flex-shrink: 0;
+}
+.cb-key { display: inline-flex; align-items: center; gap: 5px; }
+.cb-keycap {
+  display: inline-block;
+  min-width: 14px;
+  padding: 0 4px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--foreground);
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes gk-spin { to { transform: rotate(360deg); } }
+@keyframes gk-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
+.gk-root ::-webkit-scrollbar-track { background: transparent; }
+.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
+.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+
+/* ============================================================
+   VARIANT-SPECIFIC STYLES — Compact Analytics Layout
+   ============================================================ */
+
+/* Reset body */
+body { margin: 0; padding: 0; }
+
+/* ── Page scaffold ────────────────────────────────────────── */
+.ua-page {
+  min-height: 100vh;
+  padding: 16px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* ── Variant label ────────────────────────────────────────── */
+.ua-variant-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  width: fit-content;
+}
+
+/* ── Page header row ──────────────────────────────────────── */
+.ua-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ua-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.ua-header-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+.ua-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Icon SVGs (inline) ───────────────────────────────────── */
+.icon-sm {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* ── Filter bar ───────────────────────────────────────────── */
+.ua-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ua-scope-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 2px;
+}
+.ua-scope-btn {
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: all var(--duration-2) ease;
+  white-space: nowrap;
+}
+.ua-scope-btn:hover { color: var(--foreground); }
+.ua-scope-btn.is-active {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+}
+.ua-scope-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.ua-scope-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+.ua-groupby {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--foreground-subtle);
+}
+.ua-groupby-select {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  height: 26px;
+  padding: 0 24px 0 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color var(--duration-2) ease, box-shadow var(--duration-2) ease;
+}
+.ua-groupby-select:hover { border-color: var(--border-strong); }
+.ua-groupby-select:focus { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
+
+/* ── KPI strip ────────────────────────────────────────────── */
+.ua-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.ua-kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--duration-2) ease, box-shadow var(--duration-2) ease;
+}
+.ua-kpi-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+
+.ua-kpi-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--foreground-subtle);
+}
+.ua-kpi-value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.ua-kpi-delta {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+.ua-kpi-delta.is-up { color: oklch(0.700 0.155 70); }
+.ua-kpi-delta.is-down { color: oklch(0.700 0.110 200); }
+.ua-kpi-delta.is-neutral { color: var(--foreground-subtle); }
+.ua-kpi-subtext {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--foreground-subtle);
+  margin-top: 1px;
+}
+
+/* ── Cost chart panel ─────────────────────────────────────── */
+.ua-chart-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ua-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.ua-chart-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ua-chart-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.ua-chart-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; }
+.ua-chart-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--foreground-subtle);
+}
+
+/* chart y-axis + bars container */
+.ua-chart-body {
+  display: flex;
+  gap: 8px;
+  height: 140px;
+}
+.ua-chart-yaxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 20px;
+  flex-shrink: 0;
+  width: 24px;
+}
+.ua-chart-ylabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--foreground-subtle);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.ua-chart-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+/* horizontal grid lines */
+.ua-chart-grid {
+  position: absolute;
+  inset: 0;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.ua-chart-gridline {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  opacity: 0.5;
+}
+/* bars row */
+.ua-bars-row {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+.ua-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+.ua-bar-wrap:hover .ua-bar { opacity: 1; filter: brightness(1.12); }
+.ua-bar-wrap:focus-visible { outline: 2px solid var(--ring); border-radius: 2px; }
+.ua-bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  background: var(--primary);
+  transition: opacity var(--duration-2) ease, filter var(--duration-2) ease;
+  min-height: 2px;
+}
+/* x-axis label row */
+.ua-chart-xaxis {
+  display: flex;
+  justify-content: space-between;
+  height: 20px;
+  align-items: flex-end;
+  padding: 0 0 1px;
+}
+.ua-chart-xlabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--foreground-subtle);
+  line-height: 1;
+}
+
+/* ── Tooltip ──────────────────────────────────────────────── */
+.ua-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: oklch(0.12 0.02 150);
+  color: oklch(0.97 0.01 130);
+  border: 1px solid oklch(0.30 0.022 148);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 5px 8px;
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+  line-height: 1.5;
+}
+.ua-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: oklch(0.30 0.022 148);
+}
+
+/* ── Two-column lower section ─────────────────────────────── */
+.ua-lower-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* ── Activity breakdown table ─────────────────────────────── */
+.ua-activity-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ua-activity-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 56px 52px 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  font-size: 12px;
+  transition: background var(--duration-1) ease;
+  border-radius: var(--radius-xs);
+}
+.ua-activity-row:last-child { border-bottom: none; }
+.ua-activity-row:hover { background: var(--surface-hover); }
+.ua-activity-row:focus-visible { outline: 2px solid var(--ring); }
+.ua-activity-cat {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ua-activity-bar-cell {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.ua-activity-bar-track {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.ua-activity-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* ── Top sessions table ───────────────────────────────────── */
+.ua-sessions-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ua-session-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 56px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: background var(--duration-1) ease;
+}
+.ua-session-row:last-child { border-bottom: none; }
+.ua-session-row:hover { background: var(--surface-hover); }
+.ua-session-row:focus-visible { outline: 2px solid var(--ring); }
+.ua-session-issue {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--foreground-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.ua-session-name {
+  font-size: 12px;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ua-session-cost {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-align: right;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Tool calls chart ─────────────────────────────────────── */
+.ua-tool-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ua-tool-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 11.5px;
+}
+.ua-tool-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--foreground-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ua-tool-bar-track {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.ua-tool-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--moss-300) 0%, var(--moss-500) 100%);
+}
+.ua-tool-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: right;
+  color: var(--foreground-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Section header (shared) ──────────────────────────────── */
+.ua-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.ua-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.ua-section-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.ua-section-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; }
+.ua-section-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--foreground-subtle);
+}
+
+/* ── Table header row ─────────────────────────────────────── */
+.ua-col-header {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--foreground-subtle);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .ua-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  .ua-lower-grid { grid-template-columns: 1fr; }
+  .ua-header { gap: 8px; }
+  .ua-filter-bar { gap: 6px; }
+  .ua-activity-row { grid-template-columns: 80px 1fr 48px 44px 40px; }
+}
+
+@media (max-width: 480px) {
+  .ua-page { padding: 12px 12px 20px; }
+  .ua-kpi-strip { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ua-header-actions { gap: 4px; }
+}
+  </style>
+</head>
+<body>
+
+<div class="gk-root theme-dark">
+  <div class="ua-page">
+
+    <!-- Variant label -->
+    <div class="ua-variant-label">
+      <span class="gk-eyebrow">Variant A</span>
+      <span style="width:1px;height:10px;background:var(--border);display:inline-block;"></span>
+      <span class="gk-eyebrow" style="color:var(--foreground-subtle);letter-spacing:0.04em;text-transform:none;font-size:10px;">Compact Analytics</span>
+    </div>
+
+    <!-- ── Page Header ───────────────────────────────────────── -->
+    <div class="ua-header">
+      <div class="ua-header-left">
+        <h1 class="ua-header-title">Usage Analytics</h1>
+      </div>
+
+      <!-- Period tabs -->
+      <div class="gk-tabs" role="tablist" aria-label="Time period">
+        <button class="gk-tab" role="tab" aria-selected="false">Today</button>
+        <button class="gk-tab" role="tab" aria-selected="false">7d</button>
+        <button class="gk-tab is-active" role="tab" aria-selected="true" aria-current="true">30d</button>
+        <button class="gk-tab" role="tab" aria-selected="false">Month</button>
+        <button class="gk-tab" role="tab" aria-selected="false">All</button>
+        <button class="gk-tab" role="tab" aria-selected="false">Custom</button>
+      </div>
+
+      <!-- Header action buttons -->
+      <div class="ua-header-actions">
+        <!-- Palette -->
+        <button class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" title="Accent color" aria-label="Change accent color">
+          <svg class="icon-sm" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M7.5 1a6.5 6.5 0 100 13A6.5 6.5 0 007.5 1z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+            <path d="M7.5 1v13M1 7.5h13M3.1 3.1l8.8 8.8M11.9 3.1L3.1 11.9" stroke="currentColor" stroke-width="1" opacity="0.45"/>
+            <circle cx="7.5" cy="7.5" r="2" fill="currentColor" opacity="0.7"/>
+          </svg>
+        </button>
+
+        <!-- Trophy / achievements -->
+        <button class="gk-btn gk-btn-secondary gk-btn-sm" style="gap:5px;padding:0 9px;" title="Achievements" aria-label="Achievements: 3 of 8 unlocked">
+          <svg class="icon-sm" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M5 1h5v5a2.5 2.5 0 01-5 0V1z" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2 1h3M10 1h3M2 2c0 2 1 3 3 4M13 2c0 2-1 3-3 4M5.5 11.5v2M9.5 11.5v2M4 13.5h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:var(--font-mono);font-size:11px;font-variant-numeric:tabular-nums;">3/8</span>
+        </button>
+
+        <!-- Refresh -->
+        <button class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" title="Refresh data" aria-label="Refresh data">
+          <svg class="icon-sm" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M13 7.5A5.5 5.5 0 012.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M2 7.5A5.5 5.5 0 0112.5 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M2 5v3H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 10v-3h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <!-- Export CSV -->
+        <button class="gk-btn gk-btn-ghost gk-btn-sm" style="gap:5px;padding:0 9px;" title="Export as CSV" aria-label="Export as CSV">
+          <svg class="icon-sm" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 12H2a1 1 0 01-1-1V2a1 1 0 011-1h7l3 3v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 1v3h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7.5 9v5M5 12l2.5 2.5L10 12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span style="font-size:11.5px;">CSV</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Filter bar (scope + group by) ─────────────────────── -->
+    <div class="ua-filter-bar" role="toolbar" aria-label="Filter options">
+      <!-- Scope toggle -->
+      <div class="ua-scope-toggle" role="group" aria-label="Workspace scope">
+        <button class="ua-scope-btn is-active" aria-pressed="true">This workspace</button>
+        <button class="ua-scope-btn" aria-pressed="false">All workspaces</button>
+      </div>
+
+      <!-- Divider -->
+      <span style="width:1px;height:18px;background:var(--border);display:inline-block;flex-shrink:0;"></span>
+
+      <!-- Group by -->
+      <label class="ua-groupby">
+        <span>Group by</span>
+        <select class="ua-groupby-select" aria-label="Group by">
+          <option value="none">None</option>
+          <option value="model">Model</option>
+          <option value="provider">Provider</option>
+          <option value="category">Category</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- ── KPI Strip ─────────────────────────────────────────── -->
+    <div class="ua-kpi-strip" role="region" aria-label="Key metrics">
+
+      <!-- Total Cost -->
+      <div class="ua-kpi-card" tabindex="0" aria-label="Total cost: $47.82, up 12% from previous period">
+        <div class="ua-kpi-label">Total Cost</div>
+        <div class="ua-kpi-value">$47.82</div>
+        <div class="ua-kpi-delta is-up" aria-label="Up 12% vs previous period">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8.5V1.5M1.5 5L5 1.5 8.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          +12% vs prev
+        </div>
+        <div class="ua-kpi-subtext">Apr 8 – May 7</div>
+      </div>
+
+      <!-- Sessions -->
+      <div class="ua-kpi-card" tabindex="0" aria-label="Sessions: 34, down 3 from previous period">
+        <div class="ua-kpi-label">Sessions</div>
+        <div class="ua-kpi-value">34</div>
+        <div class="ua-kpi-delta is-down" aria-label="Down 3 vs previous period">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1.5V8.5M8.5 5L5 8.5 1.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          −3 vs prev
+        </div>
+        <div class="ua-kpi-subtext">346 total turns</div>
+      </div>
+
+      <!-- One-shot rate -->
+      <div class="ua-kpi-card" tabindex="0" aria-label="One-shot rate: 71%, above industry average of 62%">
+        <div class="ua-kpi-label">One-Shot Rate</div>
+        <div class="ua-kpi-value">71%</div>
+        <div class="ua-kpi-delta is-up" aria-label="9 points above industry average">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8.5V1.5M1.5 5L5 1.5 8.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          vs ~62% avg
+        </div>
+        <div class="ua-kpi-subtext">Industry benchmark</div>
+      </div>
+
+      <!-- Cache hit -->
+      <div class="ua-kpi-card" tabindex="0" aria-label="Cache hit rate: 84%, saving approximately $12.40 per month">
+        <div class="ua-kpi-label">Cache Hit</div>
+        <div class="ua-kpi-value">84%</div>
+        <div class="ua-kpi-delta is-up" aria-label="Saving $12.40 per month">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8.5V1.5M1.5 5L5 1.5 8.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ~$12.40/mo saved
+        </div>
+        <div class="ua-kpi-subtext">Prompt cache tokens</div>
+      </div>
+
+    </div>
+
+    <!-- ── Cost Chart ─────────────────────────────────────────── -->
+    <div class="ua-chart-panel" role="region" aria-label="Daily cost chart for past 30 days">
+      <div class="ua-chart-header">
+        <div class="ua-chart-title">Daily Cost</div>
+        <div class="ua-chart-meta">Apr 8 – May 7 · 30 days · $47.82 total</div>
+      </div>
+
+      <div class="ua-chart-body">
+        <!-- Y axis -->
+        <div class="ua-chart-yaxis" aria-hidden="true">
+          <span class="ua-chart-ylabel">$6</span>
+          <span class="ua-chart-ylabel">$4</span>
+          <span class="ua-chart-ylabel">$2</span>
+          <span class="ua-chart-ylabel">$0</span>
+        </div>
+
+        <!-- Chart area -->
+        <div class="ua-chart-area">
+          <!-- Grid lines -->
+          <div class="ua-chart-grid" aria-hidden="true">
+            <div class="ua-chart-gridline"></div>
+            <div class="ua-chart-gridline"></div>
+            <div class="ua-chart-gridline"></div>
+            <div class="ua-chart-gridline"></div>
+          </div>
+
+          <!-- Bars — 30 days, heights approximate real-ish usage pattern -->
+          <div class="ua-bars-row" role="list" aria-label="Daily cost bars">
+            <!--
+              Heights as % of max ($6 ceiling).
+              Days Apr 8 – May 7. Tooltip shown on May 3 bar (day 26).
+              Format: height = (cost / 6) * 100%
+            -->
+            <!-- Apr 8  $0.80 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 8: $0.80, 1 session"><div class="ua-bar" style="height:13%;opacity:0.35;"></div></div>
+            <!-- Apr 9  $2.10 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 9: $2.10, 2 sessions"><div class="ua-bar" style="height:35%;opacity:0.52;"></div></div>
+            <!-- Apr 10 $1.60 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 10: $1.60, 2 sessions"><div class="ua-bar" style="height:27%;opacity:0.43;"></div></div>
+            <!-- Apr 11 $0.40 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 11: $0.40, 1 session"><div class="ua-bar" style="height:7%;opacity:0.30;"></div></div>
+            <!-- Apr 12 $0.00 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 12: $0.00, 0 sessions"><div class="ua-bar" style="height:1%;opacity:0.20;"></div></div>
+            <!-- Apr 13 $3.20 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 13: $3.20, 3 sessions"><div class="ua-bar" style="height:53%;opacity:0.62;"></div></div>
+            <!-- Apr 14 $2.70 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 14: $2.70, 2 sessions"><div class="ua-bar" style="height:45%;opacity:0.57;"></div></div>
+            <!-- Apr 15 $4.10 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 15: $4.10, 4 sessions"><div class="ua-bar" style="height:68%;opacity:0.72;"></div></div>
+            <!-- Apr 16 $1.20 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 16: $1.20, 1 session"><div class="ua-bar" style="height:20%;opacity:0.38;"></div></div>
+            <!-- Apr 17 $2.90 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 17: $2.90, 3 sessions"><div class="ua-bar" style="height:48%;opacity:0.59;"></div></div>
+            <!-- Apr 18 $0.60 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 18: $0.60, 1 session"><div class="ua-bar" style="height:10%;opacity:0.32;"></div></div>
+            <!-- Apr 19 $0.00 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 19: $0.00, 0 sessions"><div class="ua-bar" style="height:1%;opacity:0.20;"></div></div>
+            <!-- Apr 20 $1.80 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 20: $1.80, 2 sessions"><div class="ua-bar" style="height:30%;opacity:0.46;"></div></div>
+            <!-- Apr 21 $3.50 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 21: $3.50, 3 sessions"><div class="ua-bar" style="height:58%;opacity:0.66;"></div></div>
+            <!-- Apr 22 $2.30 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 22: $2.30, 2 sessions"><div class="ua-bar" style="height:38%;opacity:0.54;"></div></div>
+            <!-- Apr 23 $0.90 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 23: $0.90, 1 session"><div class="ua-bar" style="height:15%;opacity:0.36;"></div></div>
+            <!-- Apr 24 $4.70 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 24: $4.70, 4 sessions"><div class="ua-bar" style="height:78%;opacity:0.80;"></div></div>
+            <!-- Apr 25 $0.00 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 25: $0.00, 0 sessions"><div class="ua-bar" style="height:1%;opacity:0.20;"></div></div>
+            <!-- Apr 26 $1.40 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 26: $1.40, 1 session"><div class="ua-bar" style="height:23%;opacity:0.41;"></div></div>
+            <!-- Apr 27 $2.60 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 27: $2.60, 2 sessions"><div class="ua-bar" style="height:43%;opacity:0.56;"></div></div>
+            <!-- Apr 28 $3.80 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 28: $3.80, 3 sessions"><div class="ua-bar" style="height:63%;opacity:0.70;"></div></div>
+            <!-- Apr 29 $1.10 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 29: $1.10, 1 session"><div class="ua-bar" style="height:18%;opacity:0.37;"></div></div>
+            <!-- Apr 30 $0.00 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="Apr 30: $0.00, 0 sessions"><div class="ua-bar" style="height:1%;opacity:0.20;"></div></div>
+            <!-- May 1  $2.20 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 1: $2.20, 2 sessions"><div class="ua-bar" style="height:37%;opacity:0.53;"></div></div>
+            <!-- May 2  $3.10 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 2: $3.10, 3 sessions"><div class="ua-bar" style="height:52%;opacity:0.61;"></div></div>
+
+            <!-- May 3  $4.82 — HOVER STATE WITH TOOLTIP -->
+            <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 3: $4.82, 4 sessions, top category Coding 62%" style="position:relative;">
+              <div class="ua-tooltip" aria-hidden="true">
+                May 3 · <strong>$4.82</strong> · 4 sessions<br>
+                <span style="color:var(--foreground-subtle);">Top: </span><span style="color:oklch(0.700 0.150 145);">Coding</span> <span style="color:var(--foreground-subtle);">(62%)</span>
+              </div>
+              <div class="ua-bar" style="height:80%;opacity:1;filter:brightness(1.15);"></div>
+            </div>
+
+            <!-- May 4  $1.50 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 4: $1.50, 2 sessions"><div class="ua-bar" style="height:25%;opacity:0.42;"></div></div>
+            <!-- May 5  $0.00 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 5: $0.00, 0 sessions"><div class="ua-bar" style="height:1%;opacity:0.20;"></div></div>
+            <!-- May 6  $5.80 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 6: $5.80, 5 sessions"><div class="ua-bar" style="height:97%;opacity:0.95;"></div></div>
+            <!-- May 7  $2.40 --> <div class="ua-bar-wrap" role="listitem" tabindex="0" aria-label="May 7: $2.40, 2 sessions"><div class="ua-bar" style="height:40%;opacity:0.55;"></div></div>
+          </div>
+
+          <!-- X axis -->
+          <div class="ua-chart-xaxis" aria-hidden="true">
+            <span class="ua-chart-xlabel">Apr 8</span>
+            <span class="ua-chart-xlabel">Apr 22</span>
+            <span class="ua-chart-xlabel">May 7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Activity Breakdown — full width ───────────────────── -->
+    <div class="cb-panel" role="region" aria-label="Activity breakdown by category">
+      <div class="cb-panel-title">
+        Activity Breakdown
+        <span class="cb-panel-sub">30d · 6 categories · 346 turns</span>
+      </div>
+
+      <!-- Column headers -->
+      <div class="ua-col-header" style="display:grid;grid-template-columns:100px 1fr 56px 52px 48px;gap:8px;align-items:center;">
+        <span>Category</span>
+        <span>Distribution</span>
+        <span style="text-align:right;">Cost</span>
+        <span style="text-align:right;">Turns</span>
+        <span style="text-align:right;">1-shot</span>
+      </div>
+
+      <div class="ua-activity-rows">
+        <!-- Coding -->
+        <div class="ua-activity-row" tabindex="0" role="row" aria-label="Coding: $18.40, 142 turns, 78% one-shot rate">
+          <span class="ua-activity-cat cb-cat-coding">Coding</span>
+          <div class="ua-activity-bar-cell">
+            <div class="ua-activity-bar-track">
+              <div class="ua-activity-bar-fill" style="width:100%;background:linear-gradient(90deg,oklch(0.700 0.150 145),oklch(0.580 0.120 145));"></div>
+            </div>
+          </div>
+          <span class="cb-num">$18.40</span>
+          <span class="cb-num">142</span>
+          <span class="cb-1shot cb-1shot-good">78%</span>
+        </div>
+
+        <!-- Debugging -->
+        <div class="ua-activity-row" tabindex="0" role="row" aria-label="Debugging: $12.10, 89 turns, 62% one-shot rate">
+          <span class="ua-activity-cat cb-cat-debugging">Debugging</span>
+          <div class="ua-activity-bar-cell">
+            <div class="ua-activity-bar-track">
+              <div class="ua-activity-bar-fill" style="width:66%;background:linear-gradient(90deg,oklch(0.640 0.205 25),oklch(0.560 0.175 25));"></div>
+            </div>
+          </div>
+          <span class="cb-num">$12.10</span>
+          <span class="cb-num">89</span>
+          <span class="cb-1shot cb-1shot-mid">62%</span>
+        </div>
+
+        <!-- Feature -->
+        <div class="ua-activity-row" tabindex="0" role="row" aria-label="Feature: $8.20, 54 turns, 71% one-shot rate">
+          <span class="ua-activity-cat cb-cat-feature">Feature</span>
+          <div class="ua-activity-bar-cell">
+            <div class="ua-activity-bar-track">
+              <div class="ua-activity-bar-fill" style="width:45%;background:linear-gradient(90deg,oklch(0.770 0.155 75),oklch(0.690 0.165 55));"></div>
+            </div>
+          </div>
+          <span class="cb-num">$8.20</span>
+          <span class="cb-num">54</span>
+          <span class="cb-1shot cb-1shot-mid">71%</span>
+        </div>
+
+        <!-- Refactor -->
+        <div class="ua-activity-row" tabindex="0" role="row" aria-label="Refactor: $4.80, 31 turns, 85% one-shot rate">
+          <span class="ua-activity-cat cb-cat-refactor">Refactor</span>
+          <div class="ua-activity-bar-cell">
+            <div class="ua-activity-bar-track">
+              <div class="ua-activity-bar-fill" style="width:26%;background:linear-gradient(90deg,oklch(0.700 0.180 50),oklch(0.620 0.155 50));"></div>
+            </div>
+          </div>
+          <span class="cb-num">$4.80</span>
+          <span class="cb-num">31</span>
+          <span class="cb-1shot cb-1shot-good">85%</span>
+        </div>
+
+        <!-- Testing -->
+        <div class="ua-activity-row" tabindex="0" role="row" aria-label="Testing: $2.90, 18 turns, 91% one-shot rate">
+          <span class="ua-activity-cat cb-cat-testing">Testing</span>
+          <div class="ua-activity-bar-cell">
+            <div class="ua-activity-bar-track">
+              <div class="ua-activity-bar-fill" style="width:16%;background:linear-gradient(90deg,oklch(0.620 0.130 230),oklch(0.560 0.150 260));"></div>
+            </div>
+          </div>
+          <span class="cb-num">$2.90</span>
+          <span class="cb-num">18</span>
+          <span class="cb-1shot cb-1shot-good">91%</span>
+        </div>
+
+        <!-- Exploration -->
+        <div class="ua-activity-row" tabindex="0" role="row" aria-label="Exploration: $1.42, 12 turns, 67% one-shot rate">
+          <span class="ua-activity-cat cb-cat-exploration">Exploration</span>
+          <div class="ua-activity-bar-cell">
+            <div class="ua-activity-bar-track">
+              <div class="ua-activity-bar-fill" style="width:8%;background:linear-gradient(90deg,oklch(0.700 0.110 200),oklch(0.620 0.095 200));"></div>
+            </div>
+          </div>
+          <span class="cb-num">$1.42</span>
+          <span class="cb-num">12</span>
+          <span class="cb-1shot cb-1shot-mid">67%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Lower two-column grid ──────────────────────────────── -->
+    <div class="ua-lower-grid">
+
+      <!-- Top Sessions -->
+      <div class="cb-panel" role="region" aria-label="Top sessions by cost">
+        <div class="cb-panel-title">
+          Top Sessions
+          <span class="cb-panel-sub">by cost · 30d</span>
+        </div>
+
+        <!-- Col headers -->
+        <div class="ua-col-header" style="display:grid;grid-template-columns:52px 1fr 56px;gap:8px;align-items:center;">
+          <span>Issue</span>
+          <span>Name</span>
+          <span style="text-align:right;">Cost</span>
+        </div>
+
+        <div class="ua-sessions-rows">
+          <div class="ua-session-row" tabindex="0" role="row" aria-label="Issue #247: Workspace card redesign, $8.34">
+            <span class="ua-session-issue">#247</span>
+            <span class="ua-session-name">Workspace card redesign</span>
+            <span class="ua-session-cost">$8.34</span>
+          </div>
+          <div class="ua-session-row" tabindex="0" role="row" aria-label="Issue #231: Session state machine, $6.70">
+            <span class="ua-session-issue">#231</span>
+            <span class="ua-session-name">Session state machine</span>
+            <span class="ua-session-cost">$6.70</span>
+          </div>
+          <div class="ua-session-row" tabindex="0" role="row" aria-label="Issue #253: Design brief grilling, $5.18">
+            <span class="ua-session-issue">#253</span>
+            <span class="ua-session-name">Design brief grilling</span>
+            <span class="ua-session-cost">$5.18</span>
+          </div>
+          <div class="ua-session-row" tabindex="0" role="row" aria-label="Issue #238: Tool call deduplication, $4.92">
+            <span class="ua-session-issue">#238</span>
+            <span class="ua-session-name">Tool call deduplication</span>
+            <span class="ua-session-cost">$4.92</span>
+          </div>
+          <div class="ua-session-row" tabindex="0" role="row" aria-label="Issue #241: SQLite schema refactor, $4.11">
+            <span class="ua-session-issue">#241</span>
+            <span class="ua-session-name">SQLite schema refactor</span>
+            <span class="ua-session-cost">$4.11</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool Calls horizontal bar chart -->
+      <div class="cb-panel" role="region" aria-label="Top tool calls by usage count">
+        <div class="cb-panel-title">
+          Tool Calls
+          <span class="cb-panel-sub">top 10 · 30d · 1,847 total</span>
+        </div>
+
+        <div class="ua-tool-rows">
+          <!-- Max is 412 (Read), so widths are (count/412)*100% -->
+          <div class="ua-tool-row" role="row" aria-label="Read: 412 calls">
+            <span class="ua-tool-name">Read</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:100%;"></div></div>
+            <span class="ua-tool-count">412</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="Edit: 287 calls">
+            <span class="ua-tool-name">Edit</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:70%;"></div></div>
+            <span class="ua-tool-count">287</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="Bash: 241 calls">
+            <span class="ua-tool-name">Bash</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:58%;"></div></div>
+            <span class="ua-tool-count">241</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="Grep: 198 calls">
+            <span class="ua-tool-name">Grep</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:48%;"></div></div>
+            <span class="ua-tool-count">198</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="Write: 142 calls">
+            <span class="ua-tool-name">Write</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:34%;"></div></div>
+            <span class="ua-tool-count">142</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="Glob: 118 calls">
+            <span class="ua-tool-name">Glob</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:29%;"></div></div>
+            <span class="ua-tool-count">118</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="invoke: 103 calls">
+            <span class="ua-tool-name">invoke</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:25%;"></div></div>
+            <span class="ua-tool-count">103</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="mcp_svelte: 78 calls">
+            <span class="ua-tool-name">mcp_svelte</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:19%;"></div></div>
+            <span class="ua-tool-count">78</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="context7: 52 calls">
+            <span class="ua-tool-name">context7</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:13%;"></div></div>
+            <span class="ua-tool-count">52</span>
+          </div>
+          <div class="ua-tool-row" role="row" aria-label="TodoWrite: 37 calls">
+            <span class="ua-tool-name">TodoWrite</span>
+            <div class="ua-tool-bar-track"><div class="ua-tool-bar-fill" style="width:9%;"></div></div>
+            <span class="ua-tool-count">37</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end lower grid -->
+
+    <!-- ── Status bar ─────────────────────────────────────────── -->
+    <div class="cb-statusbar" role="contentinfo" aria-label="Dashboard status">
+      <span class="cb-key">
+        <span class="cb-keycap">R</span>
+        refresh
+      </span>
+      <span class="cb-key">
+        <span class="cb-keycap">E</span>
+        export
+      </span>
+      <span class="cb-key">
+        <span class="cb-keycap">?</span>
+        help
+      </span>
+      <span style="margin-left:auto;color:var(--foreground-subtle);">
+        Last updated: May 7 · 14:32
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:4px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--status-success);display:inline-block;"></span>
+        <span style="color:var(--status-success);">claude-sonnet-4-6</span>
+      </span>
+    </div>
+
+  </div><!-- end ua-page -->
+</div><!-- end gk-root -->
+
+</body>
+</html>

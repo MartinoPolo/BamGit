@@ -6,6 +6,7 @@
 	import CodeIcon from '@lucide/svelte/icons/code';
 	import BarChart3Icon from '@lucide/svelte/icons/bar-chart-3';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import WrenchIcon from '@lucide/svelte/icons/wrench';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
@@ -45,6 +46,7 @@
 		sessions: () => m.nav_sessions(),
 		ai_config: () => m.nav_ai_config(),
 		usage: () => 'Usage',
+		workspace_settings: () => 'Workspace Settings',
 		settings: () => m.nav_settings(),
 	} as const;
 
@@ -56,7 +58,11 @@
 		{ href: resolve('/sessions'), icon: CodeIcon, labelKey: 'sessions' as const },
 		{ href: resolve('/ai-config'), icon: SparklesIcon, labelKey: 'ai_config' as const },
 		{ href: resolve('/usage'), icon: BarChart3Icon, labelKey: 'usage' as const },
-		{ href: resolve('/settings'), icon: SettingsIcon, labelKey: 'settings' as const },
+		{
+			href: resolve('/workspace-settings'),
+			icon: WrenchIcon,
+			labelKey: 'workspace_settings' as const,
+		},
 	];
 
 	function isActive(itemHref: string): boolean {
@@ -196,12 +202,32 @@
 			class:flex={collapsed}
 			class:justify-center={collapsed}
 		>
-			<UserAvatar
-				{username}
-				initials={userInitials}
-				activeCount={activeSessionCount}
-				{collapsed}
-			/>
+			{#if collapsed}
+				<SidebarNavItem
+					icon={SettingsIcon}
+					label={NAV_LABELS.settings()}
+					href={resolve('/settings')}
+					active={isActive(resolve('/settings'))}
+					{collapsed}
+				/>
+			{:else}
+				<div class="flex items-center justify-between">
+					<UserAvatar
+						{username}
+						initials={userInitials}
+						activeCount={activeSessionCount}
+						{collapsed}
+					/>
+					<SimpleTooltip text={NAV_LABELS.settings()} side="top">
+						<a
+							href={resolve('/settings')}
+							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+						>
+							<SettingsIcon size={14} />
+						</a>
+					</SimpleTooltip>
+				</div>
+			{/if}
 		</div>
 	</div>
 </aside>

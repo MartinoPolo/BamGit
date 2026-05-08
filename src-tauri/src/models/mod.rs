@@ -19,3 +19,4 @@ pub mod overview;
 pub mod portfolio;
 pub mod session;
 pub mod window_binding;
+pub mod workspace_command;

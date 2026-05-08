@@ -18,6 +18,7 @@ import {
 	MOCK_SYNC_RESULT,
 	MOCK_USAGE_DASHBOARD,
 	MOCK_WINDOW_BINDINGS,
+	MOCK_WORKSPACE_COMMANDS,
 } from './tauri_mock_data.js';
 
 type MockHandler = (args: Record<string, unknown>) => unknown;
@@ -39,6 +40,8 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'update_peacock_color',
 	'pick_folder',
 	'discover_ai_config',
+	'run_workspace_command',
+	'kill_workspace_process',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
@@ -64,6 +67,32 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_actions_for_dashboard: ({ dashboardId }) =>
 		MOCK_ACTIONS.filter((a) => a.dashboard_id === dashboardId),
 	get_action: ({ id }) => MOCK_ACTIONS.find((a) => a.id === id) ?? null,
+
+	// ─── Workspace commands ───────────────────────────────────────────────────
+	get_workspace_commands_for_dashboard: ({ dashboardId }) =>
+		MOCK_WORKSPACE_COMMANDS.filter((c) => c.dashboard_id === dashboardId),
+	create_workspace_command: ({ request }) => ({
+		id: `mock-cmd-${Date.now()}`,
+		dashboard_id: (request as Record<string, unknown>).dashboard_id,
+		category: (request as Record<string, unknown>).category,
+		name: (request as Record<string, unknown>).name,
+		command: (request as Record<string, unknown>).command,
+		port_pattern: (request as Record<string, unknown>).port_pattern ?? null,
+		expected_exit_code: (request as Record<string, unknown>).expected_exit_code ?? 0,
+		sort_order: (request as Record<string, unknown>).sort_order ?? 0,
+	}),
+	update_workspace_command: ({ request }) => request,
+	delete_workspace_command: () => null,
+	reorder_workspace_commands: () => null,
+
+	// ─── Dashboard archive/delete ─────────────────────────────────────────────
+	archive_dashboard: () => null,
+	unarchive_dashboard: () => null,
+
+	// ─── Process management ───────────────────────────────────────────────────
+	get_running_processes: () => [],
+	get_processes_for_issue: () => [],
+	get_process_logs: () => [],
 
 	// ─── Sessions reads ───────────────────────────────────────────────────────
 	get_sessions: () => MOCK_SESSIONS,
@@ -120,6 +149,13 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_usage_dashboard: () => MOCK_USAGE_DASHBOARD,
 	get_achievements: () => MOCK_ACHIEVEMENTS,
 	import_historical_sessions: () => MOCK_IMPORT_SUMMARY,
+	get_exchange_rates: () => ({
+		EUR: 0.92,
+		GBP: 0.79,
+		CZK: 22.5,
+		JPY: 149.8,
+		CAD: 1.36,
+	}),
 
 	// ─── Dialog ──────────────────────────────────────────────────────────────
 	pick_folder: () => 'C:/mock/selected-folder',
