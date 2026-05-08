@@ -1,4 +1,5 @@
 pub mod action_commands;
+pub mod ai_config_commands;
 pub mod color_palette_commands;
 pub mod dashboard_commands;
 pub mod dialog_commands;

@@ -3,18 +3,18 @@ import { findNotificationDotColor } from './notification_helpers.js';
 import type { NotificationEventType } from '$lib/types/generated';
 
 describe('findNotificationDotColor', () => {
-	const dotColors: Record<NotificationEventType, string | null> = {
-		'needs-input': 'bg-amber-400',
-		'needs-review': 'bg-blue-400',
-		errored: 'bg-red-400',
-		finished: null,
-		'pr-ready': null,
+	const dotColors: Partial<Record<NotificationEventType, string | null>> = {
+		'session.needs-input': 'bg-amber-400',
+		'session.error': 'bg-red-400',
+		'session.end': 'bg-green-400',
+		'merge.conflict': 'bg-orange-400',
+		'pr.ready': 'bg-blue-400',
 	};
 
 	it('returns color for first session with a colored pending type', () => {
 		const getPendingType = (id: string) => {
 			if (id === 'session-2') {
-				return 'needs-input' as NotificationEventType;
+				return 'session.needs-input' as NotificationEventType;
 			}
 			return undefined;
 		};
@@ -31,13 +31,13 @@ describe('findNotificationDotColor', () => {
 		expect(findNotificationDotColor([], () => undefined, dotColors)).toBeNull();
 	});
 
-	it('skips pending types with null color', () => {
+	it('skips pending types without a dot color', () => {
 		const getPendingType = (id: string) => {
 			if (id === 'session-1') {
-				return 'finished' as NotificationEventType;
+				return 'task.complete' as NotificationEventType;
 			}
 			if (id === 'session-2') {
-				return 'errored' as NotificationEventType;
+				return 'session.error' as NotificationEventType;
 			}
 			return undefined;
 		};
@@ -47,7 +47,7 @@ describe('findNotificationDotColor', () => {
 	});
 
 	it('returns first matching color in order', () => {
-		const getPendingType = () => 'needs-review' as NotificationEventType;
+		const getPendingType = () => 'pr.ready' as NotificationEventType;
 		expect(findNotificationDotColor(['s1', 's2'], getPendingType, dotColors)).toBe(
 			'bg-blue-400',
 		);

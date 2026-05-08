@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import type { Issue } from '$lib/modules/issues';
+	import { useIssues, type Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import {
 		deriveContextualActions,
@@ -21,6 +21,9 @@
 	import VscodeIcon from './icons/VscodeIcon.svelte';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
+	import Volume2Icon from '@lucide/svelte/icons/volume-2';
+	import VolumeXIcon from '@lucide/svelte/icons/volume-x';
+	import { invoke } from '$lib/tauri.js';
 	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
 	import { PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
 	import type { TreeVisualization } from '$lib/modules/visualization';
@@ -76,6 +79,8 @@
 		onPriorityClick,
 		onQuickActionAssignFolder,
 	}: Props = $props();
+
+	const issuesStore = useIssues();
 
 	const color = $derived(issue.color ?? '#525252');
 	const headerTextColor = $derived(getContrastTextColor(color));
@@ -176,6 +181,16 @@
 		event.stopPropagation();
 		if (onQuickActionAssignFolder) {
 			onQuickActionAssignFolder(issue.id);
+		}
+	}
+
+	async function handleToggleMute(event: MouseEvent) {
+		event.stopPropagation();
+		try {
+			await invoke('toggle_issue_sound_mute', { issueId: issue.id });
+			issuesStore.patchIssueLocal(issue.id, { is_sound_muted: !issue.is_sound_muted });
+		} catch (error) {
+			console.error('Failed to toggle mute:', error);
 		}
 	}
 </script>
@@ -310,15 +325,35 @@
 						<VscodeIcon size={14} />
 					</Button>
 				</SimpleTooltip>
+
+				<!-- Character mute toggle -->
+				<SimpleTooltip
+					text={issue.is_sound_muted
+						? 'Unmute sounds for this issue'
+						: 'Mute sounds for this issue'}
+				>
+					<Button
+						variant="ghost-overlay"
+						size="icon-sm"
+						style="opacity: {issue.is_sound_muted ? 0.35 : 0.6}"
+						onclick={handleToggleMute}
+					>
+						{#if issue.is_sound_muted}
+							<VolumeXIcon size={14} strokeWidth={1.7} />
+						{:else}
+							<Volume2Icon size={14} strokeWidth={1.7} />
+						{/if}
+					</Button>
+				</SimpleTooltip>
 			</div>
 		</div>
 	</div>
 
 	<!-- Body: tree thumbnail | info -->
-	<div class="grid items-start gap-2.5 p-2.5 pr-3" style="grid-template-columns: 72px 1fr;">
+	<div class="grid items-start gap-2.5 p-2.5 pr-3" style="grid-template-columns: 100px 1fr;">
 		<!-- Tree thumbnail -->
 		<div
-			class="relative flex size-[72px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
+			class="relative flex size-[100px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
 			style="background: linear-gradient(180deg, color-mix(in oklch, {color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
 		>
 			{#if notificationDotColor !== null && sessionState === null}
@@ -329,7 +364,10 @@
 				</SimpleTooltip>
 			{/if}
 			{#if visualization}
-				<div class="absolute inset-0">
+				<div
+					class="absolute inset-0"
+					style="transform: scale(1.4); transform-origin: bottom center;"
+				>
 					<TreeThumbnailImage {visualization} />
 				</div>
 			{:else}

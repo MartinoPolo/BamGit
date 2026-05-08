@@ -95,6 +95,9 @@ function createIssue(overrides: Partial<Issue> = {}): Issue {
 		labels: [],
 		sort_order: 0,
 		created_at: '2026-01-01T00:00:00Z',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 		...overrides,
 	};
 }
