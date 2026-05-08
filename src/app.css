@@ -84,6 +84,9 @@
 	--duration-4: 220ms;
 	--duration-5: 320ms;
 	--animate-shimmer: shimmer 1.4s linear infinite;
+	--animate-ws-pulse-ring: ws-pulse-ring 2s ease-in-out infinite;
+	--animate-ws-led: ws-led 2.4s ease-in-out infinite;
+	--animate-ws-breathe: ws-breathe 3.6s ease-in-out infinite;
 }
 
 /* Color scales — non-inline @theme so Tailwind always emits them.
@@ -594,6 +597,60 @@
 
 	50% {
 		opacity: 0.45;
+	}
+}
+
+.gk-card-gradient-tint {
+	position: relative;
+	isolation: isolate;
+}
+
+.gk-card-gradient-tint::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: linear-gradient(
+		180deg,
+		color-mix(in oklch, var(--gk-card-tint-color) 8%, transparent) 0%,
+		transparent 60%
+	);
+	pointer-events: none;
+	z-index: 0;
+}
+
+@keyframes ws-pulse-ring {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	50% {
+		opacity: 0.4;
+		transform: scale(1.3);
+	}
+}
+
+@keyframes ws-led {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.55;
+	}
+}
+
+@keyframes ws-breathe {
+	0%,
+	100% {
+		opacity: 0.7;
+	}
+
+	50% {
+		opacity: 1;
 	}
 }
 
