@@ -32,6 +32,9 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
 - Badges on cards: branch status (active/local/remote-gone/deleted), PR state (open/draft/review-requested/merged/closed/ready-to-merge), GitHub issue state (open/closed), sync status (behind base count), merge conflict indicator
 - Badges are interactive: clicking PR/issue badge opens GitHub URL
 - Badges are responsive: collapse to icon-only when header space is insufficient
+- **GitHub badge row always rendered** with `min-h-[22px]` even when no PR/issue badges exist, so GitHub labels below remain at consistent vertical position
+- **Issue card visual improvements**: reduce header band saturation in dark mode (~20%), subtle gradient tint (8% issue color overlay on background, matching workspace card pattern), take hover/glow/ring/shadow inspiration from workspace cards (consistent border color on hover, glow, tint). Design brief for card redesign variants. No left accent border (reserved for workspace cards).
+- **Issue card status row**: New row showing dev server and check command results as badges (green/red/orange). Click badge → navigate to process log. Generalized for unlimited user-defined commands.
 - One workspace = one dashboard = one GitHub repo
 - **Overview dashboard** (separate window/page): shows all configured workspaces as cards in a responsive grid (`repeat(auto-fill, minmax(320px, 1fr))`). Each workspace card is a living dashboard widget:
     - **Header**: workspace name (bold), accent-color thumbnail (or 2-letter initials placeholder), subtitle line showing repo default branch + active worktree count. Top-right: GitHub icon button (custom fill-based `GithubIcon.svelte`) + folder icon button (Lucide `folder` closed)
@@ -42,10 +45,14 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
     - **Card variants**: default, active (breathing glow when AFK on), needs-attention (amber accent when HITL >0), urgent (red accent when ATTN >0), dormant (desaturated when no activity >24h), empty (placeholder when no issues tracked)
     - **Accent colors**: 12-preset palette (moss, amber, bark, azure, plum, teal, rose, coral, gold, sage, indigo, fuchsia) selected via inline `ColorPickerContent` (2×6 grid) in workspace settings
     - **Card component integration**: derives from base `Card` with `accentBarColor` (3px left border) and `gradientTint` (8% accent overlay) props. State variants handled by WorkspaceCard, not Card
-    - **Icon buttons**: `ghost` variant, `icon-sm` (26px), `text-foreground-subtle` at rest, strokeWidth 1.7. Unassigned state: opacity 0.35, click/right-click opens workspace config wizard
+    - **Icon buttons**: `ghost` variant, `icon-sm` (26px), `text-foreground-subtle` at rest, strokeWidth 1.7. Unassigned state: opacity 0.35, click/right-click opens `DashboardEditDialog`
+    - **Settings gear icon**: ghost `icon-sm` button in header row alongside folder/GitHub buttons. Left-click opens `DashboardEditDialog`. Provides discoverability for touch users.
+    - **Right-click** on workspace card (any area) → opens `DashboardEditDialog` directly (no dropdown context menu)
+    - **Empty card text**: "Newly created — open to track issues" (not "planted")
     - **Add Workspace card**: dashed border, centered + icon, "Add workspace" label (no subtitle). Click opens workspace creation wizard
     - Click any card area (except buttons) → opens/focuses that workspace's window
     - Hover: translateY(-2px) + accent-colored glow + border tint
+- **Overview toolbar**: Header row reused (title+subtitle left, controls right). Right-aligned ghost icon buttons: Sort dropdown (Name, Activity, Issue count, Cost), Filter dropdown (All, Active, Needs Attention, Dormant), Settings gear (opens popover to configure card footer content: today's cost, week cost, total cost, active sessions, last activity)
 - **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle (icon button) | Create Issue (split-button: Add Issue / Add Worktree Issue, persists last-used action)
 - **Bottom panel toolbar** (Issues tab): Always-visible persistent bar with consistent height (no layout shift). Default state (no selection): ghost appearance (no background/border), showing Sort | Filter | Clean Up Worktrees. Selected state: "N selected" count | Batch action buttons (Archive, Unarchive, Delete, Change Priority, Clean Selected Worktrees) | Deselect All (×). Modifier-held state (Ctrl/Shift pressed, nothing selected): toolbar gains selected-state visual styling (bg + border) but keeps default content. "Clean Up Worktrees" changes to "Clean Selected Worktrees" when batch selection is active. All worktree cleanup actions show a confirmation dialog
 - **Batch selection**: Multi-select issue cards/trees for bulk operations. Triggers: right-click context menu "Select" (desktop), long press 500ms (mobile/touch), Ctrl+click (toggle individual), Shift+click (range select with Windows Explorer pattern — range vs individually-selected items tracked separately, shift-clicking to a shorter range deselects items outside the new range while preserving Ctrl+clicked items), Ctrl+A (select all), Escape (deselect all). Selection clears on tab change and Escape; does NOT clear after batch action. Normal click (no modifier) clears batch selection and activates the clicked card. Clicking an already-active card does NOT deactivate it — deactivation only via Escape or clicking empty space in the grid. Batch actions: Archive, Unarchive (context-aware — both show if mixed), Delete, Change Priority. NOT batch: Change Color. Unavailable actions disabled with tooltip; partially applicable actions enabled with info tooltip ("affects 2 of 5")
@@ -57,9 +64,9 @@ Developer who uses Claude Code (and other AI CLIs) for parallel task execution a
     - Selection-ready (Ctrl/Shift held) → violet ring
 - **Issue card context menu**: Right-click opens a bits-ui `ContextMenu` with all actions from the overflow (⋯) menu: Select/Deselect (top, separated), Edit, Rename (standalone only), Priority submenu, Change Color, Setup/Remove Worktree, Archive/Unarchive, Delete. "Select" is the first item with a separator below it. When right-clicking a batch-selected card: show batch actions ("Archive 5 selected", etc.). When right-clicking an unselected card: clear batch selection, activate card, show single-card actions (file manager pattern). The overflow (⋯) button is kept for touch/accessibility but opens the same context menu component programmatically
 - **Forest context menu**: Migrate existing `ForestContextMenu` to bits-ui `ContextMenu` for consistency. Add "Select" action matching card context menu behavior
-- **Forest ↔ card two-way binding**: Selection state syncs between forest trees and issue cards. Hovering/selecting a tree highlights its card and vice versa. Both surfaces use the issue's own color for hover and active glows — forest uses SVG `feGaussianBlur`, cards use CSS `box-shadow` with blur. Selected (batch) uses `--primary` on both surfaces
+- **Forest ↔ card two-way binding**: Selection state syncs between forest trees and issue cards. Hovering/selecting a tree highlights its card and vice versa. Both surfaces use the issue's own color for hover and active glows — forest uses SVG `feGaussianBlur`, cards use CSS `box-shadow` with blur. Selected (batch) uses `--primary` on both surfaces. **Glow exclusivity**: When hovering a different issue than the active one, suppress the active tree's glow (only the hovered tree glows). Active glow returns when hover ends.
 - **Legend**: floating button inside the forest panel, not in the main toolbar
-- "Assigned Issues" panel accessible from dashboard (sidebar widget or collapsible section, quick-access) showing GitHub issues assigned to user (via `gh`) for quick import
+- **"Assigned Issues" tab**: Separate tab in the bottom panel (alongside Issues, Kanban, etc.) showing GitHub issues assigned to user (via `gh`). Supports quick-add (bypass creation wizard) and quick-add-with-worktree. Shows PRD number, issue number, issue title. Visible side-by-side with Issues tab when multi-panel layout is active. Design brief required for final layout.
 - Dashboard-level color palette configuration (vivid, pastel, etc. — 24 colors, 6 hues × 4 rows)
 
 ### Issue Creation
@@ -369,10 +376,36 @@ Rule: `sound_enabled` defaults to `true` only for Critical and Important events.
 
 - All state in SQLite (single file)
 - Export/import configuration as JSON for portability (with schema version for migration)
-- Workspace management: create, edit, delete workspaces; assign color palette
-- Settings UI: General, Appearance, Language, Providers, Notifications, GitHub, Worktrees, Keyboard Shortcuts, About
+- Workspace management: create, edit, archive, delete workspaces; assign color palette
+- **Settings split**: User settings (appearance, language, notifications, keyboard shortcuts, providers, about) accessible from account section in bottom-left sidebar. Workspace settings as a full navigable page from workspace sidebar.
+- **Workspace archive/delete**: Archive is soft and reversible (card hidden, restorable via "Show archived" toggle). Delete only available on already-archived workspaces, requires typing workspace name to confirm (destructive modal). Both are soft-deletes in DB (`status` column: `active`/`archived`/`deleted`).
 - Per-platform terminal/editor configuration
 - Startup behavior: auto-open last workspace OR show overview (configurable)
+
+### Workspace Settings Page
+
+Full settings page accessible from workspace sidebar. Sections:
+
+**General:** workspace name, accent color (ColorPicker), GitHub repository (RepoCombobox), default base branch, local project folder.
+
+**Worktrees:** worktree parent folder, auto-detect existing worktrees toggle.
+
+**Commands:** Two categories, each supporting unlimited entries:
+
+- **Server commands** — name, command string, optional port pattern (regex to parse port from stdout). Multiple dev servers can run simultaneously per issue. Examples: "Frontend" → `pnpm dev`, "Backend" → `cargo run`
+- **Check commands** — name, command string, expected exit code. Examples: "Unit Tests" → `pnpm test`, "E2E" → `pnpm test:e2e`, "Lint" → `pnpm check:fast`
+
+DB schema: `workspace_commands` table (`id, dashboard_id, category, name, command, port_pattern, sort_order`).
+
+The existing `DashboardEditDialog` (compact modal) remains for quick edits (name, accent color, GitHub repo) — accessible via workspace card right-click or gear icon. Does not include dev server/test commands.
+
+### Dev Server & Process Management
+
+- Issue cards get configurable action buttons for running workspace server and check commands
+- **Server processes**: tracked by Grovekeeper (PID, port, stdout/stderr streaming). Running indicator (green dot) + port number displayed on issue card. Click port → opens `http://localhost:{port}` in browser. Right-click port badge → view process logs.
+- **Check processes**: run workspace check commands in issue's worktree. Results shown as status badges (green/red/orange) on issue card in a dedicated status row. Click badge → view process log/results.
+- **Log viewer**: scrollable terminal-like output for running/completed processes
+- Requires Tauri (child process management). Browser mock mode shows "Desktop app required" toast.
 
 ### Cross-Platform
 
@@ -481,14 +514,32 @@ Rule: `sound_enabled` defaults to `true` only for Critical and Important events.
 
 #### Bottom Detail Panel
 
-- Tabbed panel: `Issues | Kanban | Dependencies | Activity | Session`
+- Tabbed panel: `Issues | Kanban | Dependencies | Activity | Session | Assigned Issues`
 - Default content (no selection): PRD/repository overview in Issues tab
 - On tree click: Issue Detail replaces current tab content contextually (auto-promote per #122 REQ-18)
 - On PRD tree click: return to PRD overview
 - Tab behavior types: Replace (Issue Detail, Session), Filter (Activity), Highlight (Dependencies) — all tabs react simultaneously to selection via their behavior type
-- Issues tab has its own toolbar: Sort | Filter | Prune All Terminal
+- Issues tab has its own toolbar: Sort | Filter | Prune icon-only button (tooltip: "Clean up worktrees")
+- **Issues tab list view**: Alternative to card grid — accordion rows with colored background header. Collapsed: priority icon, PRD#/issue#, issue name, git badges, session state chip, action buttons (most behind ⋯). Expanded: full issue detail. Toggle via layout switcher icon in toolbar. Responsive compaction: (1) hide action buttons, (2) compact badges to icon-only, (3) truncate issue name.
 - Kanban tab: board view of the same issues (column-based by stage)
 - Dependencies tab: DAG visualization with AFK/HITL labels, quick-start HITL button, click-to-navigate
+
+#### Multi-Panel Layout
+
+- Bottom panel supports multiple panels side-by-side. Each panel independently selects its view (any tab). Panels can show duplicates.
+- **Layout presets** (7+): Single, Side-by-side (2 horizontal), Quad (4 equal), Top-merged (1 top + 2 bottom), Bottom-merged (2 top + 1 bottom), Left-merged (1 left + 2 right), Right-merged (2 left + 1 right)
+- Switcher: layout icon in bottom panel toolbar opens popover with visual previews of each layout
+- Panels resizable via paneforge
+- Layout choice persists per workspace (stored in DB)
+- **Smart defaults**: Spawning a session auto-opens second panel with Session view (if in single mode, switches to side-by-side). Activating an issue shows Issue Detail in second panel if available.
+
+#### Sort & Filter System
+
+- Reusable `SortFilterControls` component — inline button group (not standalone toolbar), placeable anywhere. Storybook stories required.
+- **Overview page**: Sort by name, activity, issue count, cost. Filter by all, active, needs attention, dormant.
+- **Dashboard Issues tab**: Sort by priority, name, status, creation date. Filter by status, has PR, has worktree, priority level.
+- State persisted to localStorage per-surface.
+- Also needed on: Usage page, AI Config page (filter by category/model).
 
 #### Technology
 
@@ -562,7 +613,6 @@ Rule: `sound_enabled` defaults to `true` only for Critical and Important events.
 - GitHub App for triggering from GitHub UI (using label polling instead)
 - Webhook relay for instant GitHub triggers
 - Built-in code editor (using external VS Code/Cursor)
-- Dev server management / embedded browser preview
 - Embedded terminal (xterm.js) — use external terminal
 - Mobile push notifications
 - RTL language support
