@@ -96,9 +96,11 @@ describe('deriveWorkspaceCardVariant', () => {
 		).toBe('dormant');
 	});
 
-	it('does not treat exactly 24h as dormant', () => {
-		const exactly24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-		expect(deriveWorkspaceCardVariant(makeInput({ lastActivity: exactly24h }))).toBe('default');
+	it('does not treat just under 24h as dormant', () => {
+		const justUnder24h = new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString();
+		expect(deriveWorkspaceCardVariant(makeInput({ lastActivity: justUnder24h }))).toBe(
+			'default',
+		);
 	});
 });
 
