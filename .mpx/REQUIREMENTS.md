@@ -559,10 +559,23 @@ The existing `DashboardEditDialog` (compact modal) remains for quick edits (name
 
 - **Real-time capture:** From session actor as events flow (tokens, cost, tools, duration, turns, model).
 - **Historical import:** One-time scan of Claude Code session directories. Multi-provider (Cursor, Codex as supported).
-- **Usage dashboard:** 4 KPI cards, 30-day cost chart, activity breakdown, top sessions, tool usage, period filters.
-- **Aggregation:** By agent, session, tool, project, PRD, daily/weekly/monthly.
-- **Achievements:** Milestone-based (e.g., "Planted 10 Trees", "Green Thumb", "Cache Master"). Notification on unlock.
-- **Model pricing:** 30+ model variants, LiteLLM cache, user-defined aliases.
+- **Usage dashboard:** Workspace-scoped by default with global toggle. 4 KPI cards, cost chart with adaptive time buckets (hourly/daily/weekly/monthly), activity breakdown, top sessions, tool usage, period filters (today/7d/30d/month/all/custom range).
+- **Chart library:** LayerChart (via shadcn-svelte Chart component). SVG-based, Svelte 5 native, snippet-based custom tooltips, CSS variable theming (`--chart-1` through `--chart-5`).
+- **Cost coloring:** Three configurable themes — Monochrome (primary opacity 30%→100%), Traffic Light (green→amber→red), Gradient (CodeBurn-style 3-stop). Stored as user-level default in `app_settings`, overridable per workspace in `dashboards` table. Shortcut picker button in usage page header.
+- **Custom date range:** Calendar + RangeCalendar components (shadcn-svelte registry, bits-ui primitives, `@internationalized/date`). 6th "Custom" period tab opens Popover with 2-month RangeCalendar. Backend `MetricsPeriod::Custom { start, end }` variant.
+- **Aggregation:** By session, tool, model, provider, workspace, PRD, daily/weekly/monthly. "Group by" dropdown (None/Model/Provider/Category) transforms chart and breakdown views.
+- **Workspace scoping:** `dashboard_id: Option<String>` parameter on all metrics commands. Queries join `session_metrics → sessions → issues` to filter by workspace. Default: current workspace; toggle for global view.
+- **URL state sync:** All filters (period, scope, groupBy, custom date range) synced to URL search params via `pushState` + `page.state`. Back/forward navigation restores filter state. Deep-linking supported.
+- **CostLink component:** Clickable cost text anywhere in the app. Navigates to `/usage` with appropriate filters pre-applied via URL search params. Storybook stories.
+- **RefreshIndicator component:** Compound component wrapping Button with 5 states (idle/loading/fresh/stale/new-data-available). Last-updated relative timestamp. Dot badge for new data. Reusable across pages.
+- **ChartTooltip component:** Rich hover tooltip for chart elements (date, cost, session count, top activity). Uses composable Tooltip.Root/Trigger/Content. Storybook stories.
+- **Achievements:** Milestone-based (10 fixed, single-tier). Display in Dialog (not inline card). Notification on unlock via `achievement.unlocked` event (ties to PRD #95).
+- **Model pricing:** LiteLLM JSON primary (24h TTL, bundled snapshot fallback) → OpenRouter API secondary (free, no auth, real-time) → "Pricing N/A" on miss. Fast mode multiplier configurable in settings (default 6x for Opus). User-defined model aliases and per-model rate overrides stored in `model_pricing_cache` table.
+- **Multi-currency:** Frankfurter API (`api.frankfurter.dev`, free, no auth, 31 ECB currencies including EUR/CZK). Store all costs in USD, convert at display time. Cache full rates map with 24h TTL. Currency preference in user settings.
+- **Export CSV:** Single CSV with sections (Summary, Daily Costs, Activity Breakdown, Top Sessions, Tool Usage). Respects active period filter. Tauri file dialog for save location.
+- **Optimize view:** 10 waste detectors (junk reads, duplicate reads, low read/edit ratio, cache bloat, unused MCP servers, bloated CLAUDE.md, ghost agents/skills/commands, bash output limit). Health score 0-100 with A/B/C/D/F grade. Advisory panel within usage page.
+- **Compare view:** Side-by-side model comparison. 7 metrics: one-shot rate, retry rate, cost/call, cost/edit, output tokens/call, cache hit rate. Category head-to-head. Working style metrics. Minimum 20 calls per model. Triggered from "Group by: Model" view.
+- **Backend wiring:** PricingEngine called during session completion and historical import. Achievement triggers hooked to session completion. `metrics-updated` and `achievement-unlocked` Tauri events. Missing indexes on `turn_metrics(timestamp)` and `tool_usage(timestamp)`.
 
 ### AI Configuration Access
 

@@ -294,7 +294,7 @@ import { Persisted } from '$lib/reactivity/persisted.svelte';
 | `command-palette/`    | `useCommandPalette()`    | `Ctrl+K` palette, fuzzy search, action/navigation/issue items                         |
 | `window/`             | `useWindow()`            | Window type detection, workspace binding, overview vs workspace mode                  |
 | `settings/`           | `useSettings()`          | AI config browser, export/import                                                      |
-| `metrics/`            | `useMetrics()`           | Token/cost tracking, statistics, achievements, aggregation                            |
+| `metrics/`            | `useMetrics()`           | Token/cost tracking, statistics, achievements, aggregation, optimize, compare         |
 | `workflow/`           | `useWorkflow()`          | AFK monitoring loop, HITL session orchestration, label management                     |
 
 ## Rust Backend Modules
@@ -360,6 +360,8 @@ Commands return `Result<T, String>`. Error strings are error keys (e.g., `ERR_PA
 | `discovered-sessions-updated` | `DiscoveredSessionsPayload`  | Discovery polling |
 | `worktree-progress`           | `WorktreeProgressPayload`    | Worktree commands |
 | `worktree-state-change`       | `WorktreeStateChangePayload` | Worktree commands |
+| `metrics-updated`             | `MetricsUpdatedPayload`      | Session actor     |
+| `achievement-unlocked`        | `AchievementUnlockedPayload` | Metrics commands  |
 
 ## Database
 
@@ -381,24 +383,26 @@ Read commands use `state.read()`, write commands use `state.write()`. Mixed comm
 
 Source of truth: `src-tauri/src/database/schema.rs`
 
-| Table                       | Purpose                                                  |
-| --------------------------- | -------------------------------------------------------- |
-| `dashboards`                | Workspace configuration (repo, folder, settings)         |
-| `issues`                    | Core issue records with worktree state, labels, metadata |
-| `sessions`                  | Agent session records with state, cost, tokens           |
-| `color_palettes`            | Color palette definitions                                |
-| `actions`                   | Configurable action button templates                     |
-| `notification_config`       | Per-event notification preferences                       |
-| `git_status_cache`          | Cached git + GitHub state per issue                      |
-| `label_shape_mappings`      | GitHub label → tree shape mapping per dashboard          |
-| `keyboard_shortcuts`        | Custom key bindings per action (overrides defaults)      |
-| `window_workspace_bindings` | Window ↔ workspace mapping with saved geometry           |
-| `app_settings`              | Application-level key-value settings (startup behavior)  |
-| `session_metrics`           | Per-session aggregates (tokens, cost, duration, model)   |
-| `turn_metrics`              | Per-turn details with activity classification            |
-| `tool_usage`                | Individual tool usage records                            |
-| `achievements`              | Unlocked achievements with timestamps                    |
-| `import_history`            | Tracking which historical sessions have been imported    |
+| Table                       | Purpose                                                     |
+| --------------------------- | ----------------------------------------------------------- |
+| `dashboards`                | Workspace configuration (repo, folder, settings)            |
+| `issues`                    | Core issue records with worktree state, labels, metadata    |
+| `sessions`                  | Agent session records with state, cost, tokens              |
+| `color_palettes`            | Color palette definitions                                   |
+| `actions`                   | Configurable action button templates                        |
+| `notification_config`       | Per-event notification preferences                          |
+| `git_status_cache`          | Cached git + GitHub state per issue                         |
+| `label_shape_mappings`      | GitHub label → tree shape mapping per dashboard             |
+| `keyboard_shortcuts`        | Custom key bindings per action (overrides defaults)         |
+| `window_workspace_bindings` | Window ↔ workspace mapping with saved geometry              |
+| `app_settings`              | Application-level key-value settings (startup behavior)     |
+| `session_metrics`           | Per-session aggregates (tokens, cost, duration, model)      |
+| `turn_metrics`              | Per-turn details with activity classification               |
+| `tool_usage`                | Individual tool usage records                               |
+| `achievements`              | Unlocked achievements with timestamps                       |
+| `import_history`            | Tracking which historical sessions have been imported       |
+| `model_pricing_cache`       | User-defined model rate overrides and fast-mode multipliers |
+| `currency_cache`            | Exchange rate cache (Frankfurter API, 24h TTL)              |
 
 ### Type Generation (ts-rs)
 
@@ -414,18 +418,67 @@ Special handling:
 
 ## Architecture Decisions
 
-| Decision             | Choice                                             | Rationale                                                         |
-| -------------------- | -------------------------------------------------- | ----------------------------------------------------------------- |
-| Multi-window         | Tauri `single_instance` + multiple windows         | Shared DB/services, no lock contention, resource efficient        |
-| Type generation      | ts-rs with `serde-compat`                          | Single source of truth in Rust; eliminates type drift             |
-| Database concurrency | r2d2 pool (4 readers + 1 writer)                   | WAL mode supports concurrent reads; eliminates lock contention    |
-| State machine        | Rust-side `resolved_state` field                   | Eliminates duplicate state machine in TypeScript                  |
-| Module location      | `src/lib/modules/<name>/`                          | Preserves `$lib` alias, co-locates with tests                     |
-| GitHub + Git Status  | Unified via `GitStatusCache` type                  | Eliminates `pr_state` type mismatch                               |
-| Module entry point   | `createContext()` from Svelte 5.40+                | Type-safe context without key strings; factory pattern            |
-| i18n                 | Frontend-only (Paraglide), Rust returns error keys | Rust doesn't own user-facing text; single translation source      |
-| Providers            | Rust trait + per-provider implementation           | Extensible; frontend works with `SessionEvent`, never raw formats |
-| Notifications        | Frontend passes translated text to Rust dispatch   | Clean separation; rodio for sound, Tauri for toast                |
+| Decision             | Choice                                             | Rationale                                                            |
+| -------------------- | -------------------------------------------------- | -------------------------------------------------------------------- |
+| Multi-window         | Tauri `single_instance` + multiple windows         | Shared DB/services, no lock contention, resource efficient           |
+| Type generation      | ts-rs with `serde-compat`                          | Single source of truth in Rust; eliminates type drift                |
+| Database concurrency | r2d2 pool (4 readers + 1 writer)                   | WAL mode supports concurrent reads; eliminates lock contention       |
+| State machine        | Rust-side `resolved_state` field                   | Eliminates duplicate state machine in TypeScript                     |
+| Module location      | `src/lib/modules/<name>/`                          | Preserves `$lib` alias, co-locates with tests                        |
+| GitHub + Git Status  | Unified via `GitStatusCache` type                  | Eliminates `pr_state` type mismatch                                  |
+| Module entry point   | `createContext()` from Svelte 5.40+                | Type-safe context without key strings; factory pattern               |
+| i18n                 | Frontend-only (Paraglide), Rust returns error keys | Rust doesn't own user-facing text; single translation source         |
+| Providers            | Rust trait + per-provider implementation           | Extensible; frontend works with `SessionEvent`, never raw formats    |
+| Notifications        | Frontend passes translated text to Rust dispatch   | Clean separation; rodio for sound, Tauri for toast                   |
+| Chart library        | LayerChart via shadcn-svelte Chart component       | Svelte 5 native, snippet tooltips, CSS var theming, ~80-120KB        |
+| Pricing data         | LiteLLM primary → OpenRouter fallback → snapshot   | Broadest coverage + real-time fallback + offline guarantee           |
+| Currency conversion  | Frankfurter API, display-time conversion           | Free, no auth, 31 ECB currencies, 24h TTL cache                      |
+| Metrics scoping      | Workspace-scoped by default, global toggle         | Single page serves both; `dashboard_id` param on all queries         |
+| Cost coloring        | 3 configurable themes in user/workspace settings   | Monochrome/Traffic-Light/Gradient; user default + workspace override |
+
+## Metrics & Pricing Architecture
+
+### Pricing Pipeline
+
+```
+Token counts (protocol_parser.rs)
+  → PricingEngine.calculate_cost() [per-turn, on session events]
+  → cost_usd stored in session_metrics + turn_metrics [always USD]
+  → CurrencyService.convert() [display-time only, per user preference]
+```
+
+### Pricing Data Sources (fallback chain)
+
+1. **LiteLLM JSON** — `raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json` (24h TTL disk cache)
+2. **OpenRouter API** — `GET https://openrouter.ai/api/v1/models` (on-demand for cache misses, no auth)
+3. **Bundled snapshot** — `src-tauri/data/litellm-snapshot.json` (compiled in via `include_str!`, offline fallback)
+4. **User overrides** — `model_pricing_cache` table (admin-configurable per-model rates and multipliers)
+5. **"Pricing N/A"** — surface warning badge on KPI card instead of silently reporting $0
+
+### Currency Conversion
+
+- **Source:** Frankfurter API (`api.frankfurter.dev/v1/latest?from=USD&to=EUR,CZK,...`)
+- **Storage:** `currency-cache.json` in app data dir, full rates map for all supported currencies
+- **TTL:** 24 hours (matches ECB daily publication cadence)
+- **Conversion:** `cost_usd * rate` at render time. User switches currency without touching stored data.
+- **Fallback:** Last known rate if fetch fails; USD (rate=1) as absolute last resort
+
+### Optimize View Architecture
+
+10 waste detectors running against `tool_usage`, `session_metrics`, `turn_metrics` tables + local filesystem access (Tauri has full disk access):
+
+- DB-only detectors: junk reads, duplicate reads, low read/edit ratio, cache bloat
+- Filesystem detectors: unused MCP servers, bloated CLAUDE.md, ghost agents/skills/commands, bash output limit
+- Health score: `max(0, 100 - min(80, penalty))` where penalty = sum of finding impacts (high=15, medium=7, low=3)
+
+### Compare View Architecture
+
+Model comparison using `turn_metrics` + `tool_usage` aggregated per model:
+
+- Performance: one-shot rate, retry rate (self-correction dropped from v1)
+- Efficiency: cost/call, cost/edit, output tokens/call, cache hit rate
+- Category head-to-head: per-category one-shot rate comparison
+- Working style: delegation rate, planning rate, avg tools/turn
 
 ## Provider Abstraction
 
