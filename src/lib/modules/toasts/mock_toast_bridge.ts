@@ -26,22 +26,10 @@ const COMMAND_BODIES: Record<string, string> = {
 	discover_ai_config: 'AI config discovery requires the desktop app',
 };
 
-// ─── Dedup ───────────────────────────────────────────────────────────────────
-
-const DEDUP_MS = 3000;
-const lastShown = new Map<string, number>();
-
 export function showMockToast(command: string): void {
 	if (showFn === null) {
 		return;
 	}
-
-	const now = Date.now();
-	const last = lastShown.get(command) ?? 0;
-	if (now - last < DEDUP_MS) {
-		return;
-	}
-	lastShown.set(command, now);
 
 	const body = COMMAND_BODIES[command] ?? `${command} is simulated in browser mode`;
 	showFn('Desktop app required', body);

@@ -412,28 +412,26 @@
 			</div>
 
 			<!-- Row 2: GitHub issue badge + PR badge -->
-			{#if cache?.github_issue_state != null || cache?.pr_state != null}
-				<div class="flex flex-wrap items-center gap-1">
-					{#if cache?.github_issue_state}
-						<GitHubBadge
-							type="issue"
-							state={cache.github_issue_state}
-							url={issue.github_issue_url}
-							number={issue.github_issue_number}
-							disabled={!ghAvailable}
-						/>
-					{/if}
-					{#if cache?.pr_state}
-						<GitHubBadge
-							type="pr"
-							state={cache.pr_state}
-							url={cache.pr_url}
-							number={cache.pr_number}
-							disabled={!ghAvailable}
-						/>
-					{/if}
-				</div>
-			{/if}
+			<div class="flex min-h-[22px] flex-wrap items-center gap-1">
+				{#if cache?.github_issue_state}
+					<GitHubBadge
+						type="issue"
+						state={cache.github_issue_state}
+						url={issue.github_issue_url}
+						number={issue.github_issue_number}
+						disabled={!ghAvailable}
+					/>
+				{/if}
+				{#if cache?.pr_state}
+					<GitHubBadge
+						type="pr"
+						state={cache.pr_state}
+						url={cache.pr_url}
+						number={cache.pr_number}
+						disabled={!ghAvailable}
+					/>
+				{/if}
+			</div>
 
 			<!-- Row 3: GitHub issue labels (compacted: show first 3 + overflow count) -->
 			{#if issue.labels.length > 0}

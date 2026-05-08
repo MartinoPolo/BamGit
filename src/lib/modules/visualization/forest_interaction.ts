@@ -14,7 +14,20 @@ export interface ResolveGlowOverlayParams {
 
 export function resolveGlowOverlay(params: ResolveGlowOverlayParams): OverlayConfig {
 	// Priority: hover(1) > active(2) > batch-selected(3) > state-driven(4-6)
-	if (params.issueId === params.hoveredIssueId || params.issueId === params.activeIssueId) {
+	if (params.issueId === params.hoveredIssueId) {
+		return {
+			glow: {
+				enabled: true,
+				color: params.issueColor,
+				intensity: INTERACTION_GLOW_INTENSITY,
+				pulse: false,
+			},
+		};
+	}
+	if (
+		params.issueId === params.activeIssueId &&
+		(params.hoveredIssueId === null || params.hoveredIssueId === params.activeIssueId)
+	) {
 		return {
 			glow: {
 				enabled: true,

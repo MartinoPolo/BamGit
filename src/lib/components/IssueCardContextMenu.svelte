@@ -105,16 +105,18 @@
 					<ZapIcon class="size-4" />
 					Actions
 				</ContextMenu.SubTrigger>
-				<ContextMenu.SubContent alignOffset={-5} sideOffset={2}>
-					{#each allContextualActions as action (action.id)}
-						<ContextMenu.Item
-							disabled={action.disabled}
-							onclick={() => onContextualAction!(action.id)}
-						>
-							{ACTION_POOL[action.id].label}
-						</ContextMenu.Item>
-					{/each}
-				</ContextMenu.SubContent>
+				<ContextMenu.Portal>
+					<ContextMenu.SubContent alignOffset={0} sideOffset={10}>
+						{#each allContextualActions as action (action.id)}
+							<ContextMenu.Item
+								disabled={action.disabled}
+								onclick={() => onContextualAction!(action.id)}
+							>
+								{ACTION_POOL[action.id].label}
+							</ContextMenu.Item>
+						{/each}
+					</ContextMenu.SubContent>
+				</ContextMenu.Portal>
 			</ContextMenu.Sub>
 		{/if}
 
@@ -140,18 +142,20 @@
 				<PriorityIcon class="size-4" />
 				Priority
 			</ContextMenu.SubTrigger>
-			<ContextMenu.SubContent alignOffset={-5} sideOffset={2}>
-				{#each PRIORITY_OPTIONS as option (option.value)}
-					<ContextMenu.Item onclick={() => onChangePriority(issue.id, option.value)}>
-						{#if issue.priority === option.value}
-							<CheckIcon class="size-4" />
-						{:else}
-							<span class="inline-flex size-4 shrink-0"></span>
-						{/if}
-						{option.label()}
-					</ContextMenu.Item>
-				{/each}
-			</ContextMenu.SubContent>
+			<ContextMenu.Portal>
+				<ContextMenu.SubContent alignOffset={0} sideOffset={10}>
+					{#each PRIORITY_OPTIONS as option (option.value)}
+						<ContextMenu.Item onclick={() => onChangePriority(issue.id, option.value)}>
+							{#if issue.priority === option.value}
+								<CheckIcon class="size-4" />
+							{:else}
+								<span class="inline-flex size-4 shrink-0"></span>
+							{/if}
+							{option.label()}
+						</ContextMenu.Item>
+					{/each}
+				</ContextMenu.SubContent>
+			</ContextMenu.Portal>
 		</ContextMenu.Sub>
 
 		<!-- Change Color -->

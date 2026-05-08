@@ -176,13 +176,12 @@
 								<Button
 									{...props}
 									variant="ghost"
-									size="sm"
+									size="icon-sm"
 									onclick={onBatchPrune}
 									disabled={!hasActiveWorktrees}
 									aria-label="Clean selected worktrees"
 								>
 									<ScissorsIcon />
-									Clean Selected Worktrees
 								</Button>
 							{/snippet}
 						</Tooltip.Trigger>
@@ -210,12 +209,11 @@
 							<Button
 								{...props}
 								variant="ghost"
-								size="sm"
+								size="icon-sm"
 								onclick={onBatchPrune}
 								aria-label="Clean up worktrees"
 							>
 								<ScissorsIcon />
-								Clean Up Worktrees
 							</Button>
 						{/snippet}
 					</Tooltip.Trigger>
