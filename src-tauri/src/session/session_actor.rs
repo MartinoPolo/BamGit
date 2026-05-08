@@ -152,12 +152,27 @@ fn handle_event(
         SessionEvent::UsageUpdate {
             input_tokens,
             output_tokens,
+            cache_read_tokens,
+            cache_write_tokens,
             cost_usd,
+            duration_ms,
+            num_turns,
         } => {
             update_session_usage(
                 session_id,
                 *cost_usd,
                 (*input_tokens + *output_tokens) as i64,
+                database_connection,
+            );
+            upsert_session_metrics(
+                session_id,
+                *input_tokens,
+                *output_tokens,
+                *cache_read_tokens,
+                *cache_write_tokens,
+                *cost_usd,
+                *duration_ms,
+                *num_turns,
                 database_connection,
             );
         }
@@ -196,9 +211,32 @@ fn fire_notification(
 ) {
     if let Some(event_type) = session_state_to_event_type(state) {
         if let Some(service) = app_handle.try_state::<NotificationService>() {
-            service.notify(event_type, session_id, message, app_handle, database_connection);
+            let issue_id = resolve_session_issue_id(session_id, database_connection);
+            service.notify(
+                event_type,
+                session_id,
+                issue_id.as_deref(),
+                message,
+                app_handle,
+                database_connection,
+            );
         }
     }
+}
+
+fn resolve_session_issue_id(
+    session_id: &str,
+    connection: &std::sync::Arc<StdMutex<Connection>>,
+) -> Option<String> {
+    let connection = connection.lock().ok()?;
+    connection
+        .query_row(
+            "SELECT issue_id FROM sessions WHERE id = ?1",
+            [session_id],
+            |row| row.get::<_, Option<String>>(0),
+        )
+        .ok()
+        .flatten()
 }
 
 // --- DB helpers (lock briefly, never across await) ---
@@ -274,6 +312,49 @@ fn update_last_response_summary(
             rusqlite::params![summary, session_id],
         ) {
             log::error!("Failed to update last_response_summary for {session_id}: {e}");
+        }
+    }
+}
+
+fn upsert_session_metrics(
+    session_id: &str,
+    input_tokens: u64,
+    output_tokens: u64,
+    cache_read_tokens: u64,
+    cache_write_tokens: u64,
+    cost_usd: f64,
+    duration_ms: Option<u64>,
+    num_turns: Option<u32>,
+    connection: &std::sync::Arc<StdMutex<Connection>>,
+) {
+    if let Ok(conn) = connection.lock() {
+        let duration_seconds = duration_ms.map(|ms| ms as f64 / 1000.0);
+        if let Err(e) = conn.execute(
+            "INSERT INTO session_metrics \
+             (session_id, provider, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
+              cost_usd, duration_seconds, turn_count, started_at) \
+             VALUES (?1, \
+                     COALESCE((SELECT provider FROM sessions WHERE id = ?1), 'unknown'), \
+                     ?2, ?3, ?4, ?5, ?6, ?7, COALESCE(?8, 0), \
+                     COALESCE((SELECT started_at FROM sessions WHERE id = ?1), datetime('now'))) \
+             ON CONFLICT(session_id) DO UPDATE SET \
+                 input_tokens = ?2, output_tokens = ?3, \
+                 cache_read_tokens = ?4, cache_write_tokens = ?5, \
+                 cost_usd = ?6, \
+                 duration_seconds = COALESCE(?7, session_metrics.duration_seconds), \
+                 turn_count = COALESCE(?8, session_metrics.turn_count)",
+            rusqlite::params![
+                session_id,
+                input_tokens as i64,
+                output_tokens as i64,
+                cache_read_tokens as i64,
+                cache_write_tokens as i64,
+                cost_usd,
+                duration_seconds,
+                num_turns.map(|n| n as i64),
+            ],
+        ) {
+            log::error!("Failed to upsert session_metrics for {session_id}: {e}");
         }
     }
 }

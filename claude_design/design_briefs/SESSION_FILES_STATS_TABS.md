@@ -116,6 +116,8 @@ Aggregated metrics for the session: how much it cost, how many tokens were used,
 - Diff view can be very tall — virtual scrolling or efficient rendering implied
 - File tree and diff should feel cohesive (same padding, same fonts)
 - Stats tab numbers should use monospace font for alignment
+- **Content column width:** The Chat tab constrains its content to `max-width: 900px` centered. The Stats tab should follow the same 900px column for consistency. The Files tab may use full available width (diffs benefit from horizontal space), but the file summary bar and controls should still align to the 900px column when the sidebar is open — this keeps the header visually consistent across tab switches.
+- All buttons use `.gk-btn-sm` (26px), badges use `.gk-badge` (20px) — no inline height overrides. Matches the standardized sizing established in the session chat view update.
 
 ## Visual References
 

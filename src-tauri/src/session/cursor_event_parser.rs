@@ -293,7 +293,11 @@ impl CursorEventParser {
         vec![SessionEvent::UsageUpdate {
             input_tokens: 0,
             output_tokens: 0,
+            cache_read_tokens: 0,
+            cache_write_tokens: 0,
             cost_usd,
+            duration_ms: None,
+            num_turns: None,
         }]
     }
 
@@ -326,7 +330,11 @@ impl CursorEventParser {
             events.push(SessionEvent::UsageUpdate {
                 input_tokens,
                 output_tokens,
+                cache_read_tokens: 0,
+                cache_write_tokens: 0,
                 cost_usd: 0.0,
+                duration_ms: None,
+                num_turns: None,
             });
         }
 

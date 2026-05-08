@@ -30,13 +30,11 @@
 		archivedIssues: Issue[];
 		showArchived: boolean;
 		isPortfolio: boolean;
-		forceExpanded?: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
 		prioritiesEnabled?: boolean;
 		paletteColors?: string[];
 		usedColors?: string[];
-		isDarkMode?: boolean;
 		dependencies: readonly IssueDependency[];
 		ghSetupBanner?: boolean;
 		ghAvailability?: GhCliAvailability;
@@ -46,7 +44,6 @@
 		getVisualization: (issueId: string) => TreeVisualization | undefined;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
-		getProgressLines?: (issueId: string) => readonly string[];
 		onWizardOpen?: (issue: AssignedIssue) => void;
 		onQuickAddWithWorktree?: (issue: AssignedIssue) => void;
 		onLoadMoreAssignedIssues?: () => void;
@@ -59,13 +56,11 @@
 		archivedIssues,
 		showArchived,
 		isPortfolio,
-		forceExpanded,
 		cacheMap = new Map(),
 		ghAvailable = false,
 		prioritiesEnabled = true,
 		paletteColors = [],
 		usedColors = [],
-		isDarkMode = false,
 		dependencies,
 		ghSetupBanner = false,
 		ghAvailability,
@@ -75,7 +70,6 @@
 		getVisualization,
 		getChildren,
 		getNotificationDotColor,
-		getProgressLines,
 		onArchive,
 		onUnarchive,
 		onEdit,
@@ -180,13 +174,11 @@
 					{archivedIssues}
 					{showArchived}
 					{isPortfolio}
-					{forceExpanded}
 					{cacheMap}
 					{ghAvailable}
 					{prioritiesEnabled}
 					{getChildren}
 					{getNotificationDotColor}
-					{getProgressLines}
 					{getVisualization}
 					{onArchive}
 					{onUnarchive}
@@ -226,7 +218,6 @@
 					{ghAvailable}
 					{paletteColors}
 					{usedColors}
-					{isDarkMode}
 					{onArchive}
 					{onUnarchive}
 					{onEdit}

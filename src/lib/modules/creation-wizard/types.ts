@@ -1,10 +1,4 @@
-import type {
-	CreateIssueRequest,
-	UpdateIssueRequest,
-	SetupWorktreeRequest,
-} from '$lib/modules/issues';
 import type { AssignedIssue, SearchedGithubIssue } from '$lib/types/generated';
-export type { SearchedGithubIssue } from '$lib/types/generated';
 
 export const WIZARD_STEPS = {
 	GITHUB_SEARCH: 'github-search',
@@ -26,18 +20,11 @@ export interface WizardFormData {
 	githubIssueNumber: number | null;
 }
 
-export interface WizardResult {
-	createRequest: CreateIssueRequest;
-	updateRequest: UpdateIssueRequest | null;
-	setupWorktreeRequest: SetupWorktreeRequest | null;
-}
-
 export interface WizardDependencies {
 	dashboardId: string;
 	paletteColors: string[];
 	usedColors: string[];
 	nextAvailableColor: string;
-	isDarkMode: boolean;
 	localFolder: string | null;
 	defaultBaseBranch: string | null;
 	githubRepo: { owner: string; repo: string } | null;

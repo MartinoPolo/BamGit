@@ -211,11 +211,15 @@
 			createdIssue = issue;
 
 			if (data.branchName && data.githubIssueNumber !== null) {
-				await onUpdate({
-					id: issue.id,
-					branch_name: data.branchName,
-					base_branch: deps.defaultBaseBranch,
-				});
+				try {
+					await onUpdate({
+						id: issue.id,
+						branch_name: data.branchName,
+						base_branch: deps.defaultBaseBranch,
+					});
+				} catch (updateError) {
+					console.error('Failed to update branch name:', updateError);
+				}
 			}
 
 			if (data.createWorktree && issue.branch_name !== null) {
@@ -225,6 +229,7 @@
 			}
 		} catch (error) {
 			console.error('Failed to create issue:', error);
+		} finally {
 			isSubmitting = false;
 		}
 	}

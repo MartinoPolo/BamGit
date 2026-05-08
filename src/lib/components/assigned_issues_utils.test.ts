@@ -37,6 +37,9 @@ function makeDashboardIssue(githubNumber: number | null): Issue {
 		labels: [],
 		sort_order: 0,
 		created_at: '2024-01-01',
+		character_pack_id: null,
+		character_avatar: null,
+		is_sound_muted: false,
 	};
 }
 

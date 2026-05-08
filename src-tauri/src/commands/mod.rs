@@ -1,4 +1,5 @@
 pub mod action_commands;
+pub mod ai_config_commands;
 pub mod color_palette_commands;
 pub mod dashboard_commands;
 pub mod dialog_commands;
@@ -8,6 +9,7 @@ pub mod github_commands;
 pub mod issue_commands;
 pub mod keyboard_shortcut_commands;
 pub mod label_shape_mapping_commands;
+pub mod metrics_commands;
 pub mod notification_commands;
 pub mod portfolio_commands;
 pub mod raw_requirements_commands;

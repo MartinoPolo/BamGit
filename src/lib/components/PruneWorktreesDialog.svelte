@@ -5,6 +5,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 
 	interface Props {
 		open: boolean;
@@ -78,16 +79,12 @@
 								</div>
 							</div>
 							<div class="flex items-center gap-1">
-								<span
-									class="rounded bg-purple-900/40 px-1.5 py-0.5 text-[10px] text-purple-400"
+								<Badge variant="merged" size="compact"
+									>{m.prune_badge_merged()}</Badge
 								>
-									{m.prune_badge_merged()}
-								</span>
-								<span
-									class="rounded bg-red-900/40 px-1.5 py-0.5 text-[10px] text-red-400"
+								<Badge variant="danger" size="compact"
+									>{m.prune_badge_closed()}</Badge
 								>
-									{m.prune_badge_closed()}
-								</span>
 							</div>
 						</label>
 					{/each}

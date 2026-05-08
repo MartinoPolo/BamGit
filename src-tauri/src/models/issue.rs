@@ -33,6 +33,9 @@ pub struct Issue {
     #[ts(type = "number")]
     pub sort_order: i64,
     pub created_at: String,
+    pub character_pack_id: Option<String>,
+    pub character_avatar: Option<String>,
+    pub is_sound_muted: bool,
 }
 
 #[derive(Debug, Deserialize)]

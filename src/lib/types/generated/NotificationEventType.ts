@@ -3,4 +3,4 @@
 /**
  * All event types that can trigger notifications.
  */
-export type NotificationEventType = "needs-input" | "needs-review" | "finished" | "errored" | "pr-ready";
+export type NotificationEventType = "session.start" | "session.end" | "session.error" | "session.needs-input" | "task.complete" | "task.acknowledge" | "pr.ready" | "pr.merged" | "pr.review-requested" | "merge.conflict" | "branch.behind-base" | "github.issue-assigned" | "github.trigger-received" | "achievement.unlocked" | "resource.limit";

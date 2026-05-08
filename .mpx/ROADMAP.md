@@ -31,7 +31,7 @@ Last updated: 2026-04-29
 | PRD | Title                          | Blocks        | Status                                    |
 | --- | ------------------------------ | ------------- | ----------------------------------------- |
 | #87 | Design System & Infrastructure | All PRDs      | Not started                               |
-| #89 | Issue Management & Creation    | #88, #90, #91 | Not started                               |
+| #89 | Issue Management & Creation    | #88, #90, #91 | Complete                                  |
 | #88 | Forest View & Visualization    | —             | State mapping grilled, sub-issues pending |
 | #90 | Session Management & Chat UI   | #92, #93      | Not started                               |
 | #91 | Git/GitHub Integration         | #92           | Not started                               |
@@ -60,7 +60,7 @@ Last updated: 2026-04-29
 
 ### Backend (~70% done)
 
-- 13 Tauri IPC commands, 9 DB tables, session actor system
+- 83 Tauri IPC commands, 14 DB tables, session actor system
 - Git/GitHub integration via `gh` CLI + `git2`
 - Stream-JSON protocol parser for Claude Code
 - Notification service (toast + sound + window flash)
@@ -68,9 +68,9 @@ Last updated: 2026-04-29
 
 ### Frontend (UI not wired)
 
-- 7 deep modules (actions, board, issues, notifications, sessions, version-control, visualization)
+- 16 deep modules
 - 34 shadcn-svelte components
-- 3 route pages (issues, sessions, settings — sessions/settings are stubs)
+- 5 route pages (overview, quick-ideas, sessions, settings, root dashboard)
 - ForestView.svelte with low-poly-2d-trees library integration
 - Design tokens in claude_design/ (not yet applied to app)
 

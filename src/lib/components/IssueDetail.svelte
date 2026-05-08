@@ -6,6 +6,7 @@
 	import ColorPicker from './color-picker/ColorPicker.svelte';
 	import GitHubBadge from './GitHubBadge.svelte';
 	import WorktreeStateIcon from './WorktreeStateIcon.svelte';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
@@ -22,7 +23,6 @@
 		ghAvailable?: boolean;
 		paletteColors?: string[];
 		usedColors?: string[];
-		isDarkMode?: boolean;
 	}
 
 	let {
@@ -31,7 +31,6 @@
 		ghAvailable = false,
 		paletteColors = [],
 		usedColors = [],
-		isDarkMode = false,
 		onArchive,
 		onUnarchive,
 		onEdit,
@@ -85,12 +84,13 @@
 				</span>
 				{#if issue.labels.length > 0}
 					{#each issue.labels as label (label.name)}
-						<span
-							class="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none"
-							style="background-color: {label.color}20; color: {label.color}; border: 1px solid {label.color}40;"
+						<Badge
+							size="compact"
+							class="rounded-full"
+							style="background-color: {label.color}20; color: {label.color}; border-color: {label.color}40;"
 						>
 							{label.name}
-						</span>
+						</Badge>
 					{/each}
 				{/if}
 			</div>
@@ -175,7 +175,6 @@
 				selectedColor={issue.color ?? ''}
 				colors={paletteColors}
 				{usedColors}
-				{isDarkMode}
 				displayText="A"
 				side="top"
 				onSelect={handleColorSelect}

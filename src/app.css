@@ -42,6 +42,7 @@
 	--color-status-warning: var(--status-warning);
 	--color-status-danger: var(--status-danger);
 	--color-status-info: var(--status-info);
+	--color-status-merged: var(--status-merged);
 	--color-code-bg: var(--code-bg);
 	--color-priority-top: var(--priority-top);
 	--color-priority-high: var(--priority-high);
@@ -83,6 +84,9 @@
 	--duration-4: 220ms;
 	--duration-5: 320ms;
 	--animate-shimmer: shimmer 1.4s linear infinite;
+	--animate-ws-pulse-ring: ws-pulse-ring 2s ease-in-out infinite;
+	--animate-ws-led: ws-led 2.4s ease-in-out infinite;
+	--animate-ws-breathe: ws-breathe 3.6s ease-in-out infinite;
 }
 
 /* Color scales — non-inline @theme so Tailwind always emits them.
@@ -243,6 +247,7 @@
 	--status-warning: oklch(0.77 0.155 75);
 	--status-danger: oklch(0.62 0.205 25);
 	--status-info: oklch(0.66 0.105 220);
+	--status-merged: var(--gh-merged);
 	--priority-top: oklch(0.62 0.205 25);
 	--priority-high: oklch(0.72 0.16 55);
 	--priority-medium: oklch(0.82 0.16 85);
@@ -595,6 +600,68 @@
 	}
 }
 
+.gk-ws-hover-glow:hover {
+	border-color: color-mix(in srgb, var(--ws-accent) 55%, var(--border));
+	box-shadow:
+		0 4px 6px -1px rgb(0 0 0 / 10%),
+		0 2px 4px -2px rgb(0 0 0 / 10%),
+		0 0 24px color-mix(in oklch, var(--ws-accent) 18%, transparent);
+}
+
+.gk-card-gradient-tint {
+	position: relative;
+	isolation: isolate;
+}
+
+.gk-card-gradient-tint::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: linear-gradient(
+		180deg,
+		color-mix(in oklch, var(--gk-card-tint-color) 8%, transparent) 0%,
+		transparent 60%
+	);
+	pointer-events: none;
+	z-index: 0;
+}
+
+@keyframes ws-pulse-ring {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	50% {
+		opacity: 0.4;
+		transform: scale(1.3);
+	}
+}
+
+@keyframes ws-led {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.55;
+	}
+}
+
+@keyframes ws-breathe {
+	0%,
+	100% {
+		opacity: 0.7;
+	}
+
+	50% {
+		opacity: 1;
+	}
+}
+
 .gk-card-shimmer {
 	position: absolute;
 	inset: 0;
@@ -744,4 +811,12 @@
 	50% {
 		opacity: 0;
 	}
+}
+
+/* ── Disable background interaction during modal dialogs ──────────────── */
+
+body:has([data-dialog-overlay][data-state='open']) main,
+body:has([data-dialog-overlay][data-state='open']) aside,
+body:has([data-dialog-overlay][data-state='open']) [data-slot='sidebar'] {
+	pointer-events: none;
 }

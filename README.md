@@ -151,6 +151,7 @@ src/
     +layout.ts               # SPA config (ssr=false, prerender=true)
     +page.svelte             # Dashboard (list / kanban / forest view modes)
     overview/+page.svelte    # Multi-workspace overview (workspace card grid)
+    quick-ideas/+page.svelte # Quick Ideas full-page view (raw requirements capture)
     sessions/+page.svelte    # Session management
     settings/+page.svelte    # Configuration + keyboard shortcuts
   lib/
@@ -164,6 +165,8 @@ src/
       visualization/         # Tree visualization + forest layout (pure)
       keyboard-shortcuts/    # Global shortcut registry, binding, persistence
       command-palette/       # Ctrl+K palette, search, action/navigation/issue items
+      creation-wizard/       # 5-step keyboard-driven issue creation wizard
+      raw-requirements/      # Quick Ideas capture and markdown parsing
       window/                # Multi-window context, window type detection
     types/generated/         # ts-rs output — DO NOT EDIT
     reactivity/              # Shared primitives (StateRaw, Persisted)

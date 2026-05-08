@@ -8,6 +8,7 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
 	import SessionStateBadge from './SessionStateBadge.svelte';
 
 	interface Props {
@@ -84,7 +85,7 @@
 			<EllipsisVerticalIcon size={14} strokeWidth={2} />
 		</Button>
 
-		<div class="mx-1 h-[18px] w-px bg-border"></div>
+		<Separator orientation="vertical" class="mx-1 h-[18px]" />
 
 		<Tabs.Root>
 			<Tabs.Tab active={activeTab === 'chat'} onclick={() => onTabChange?.('chat')}>

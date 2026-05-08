@@ -59,7 +59,9 @@
 		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
 		void preloadCode(resolve('/settings'));
+		void preloadCode(resolve('/usage'));
 		void preloadCode(resolve('/quick-ideas'));
+		void preloadCode(resolve('/ai-config'));
 		void shortcutsCtx.loadCustomBindings();
 
 		shortcutsCtx.registerShortcut({

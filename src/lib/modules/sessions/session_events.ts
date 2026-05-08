@@ -7,9 +7,9 @@ import type {
 // ─── Notification state mapping ──────────────────────────────────────────────
 
 const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
-	'needs-input': 'needs-input',
-	'needs-review': 'needs-review',
-	errored: 'errored',
+	'needs-input': 'session.needs-input',
+	'needs-review': 'session.needs-input',
+	errored: 'session.error',
 };
 
 // ─── Types ────────────────────────────────────────────────────────────────────

@@ -11,28 +11,38 @@ use crate::models::notification::{
 };
 use crate::models::session::SessionState;
 
+use super::playback_queue::PlaybackQueueHandle;
 use super::sound;
 
 /// Manages notification dispatch across all channels (toast, sound, window attention).
 pub struct NotificationService {
     resource_directory: PathBuf,
+    app_data_directory: PathBuf,
 }
 
 impl NotificationService {
-    pub fn new(resource_directory: PathBuf) -> Self {
-        Self { resource_directory }
+    pub fn new(resource_directory: PathBuf, app_data_directory: PathBuf) -> Self {
+        Self {
+            resource_directory,
+            app_data_directory,
+        }
     }
 
     pub fn resource_directory(&self) -> &PathBuf {
         &self.resource_directory
     }
 
+    pub fn app_data_directory(&self) -> &PathBuf {
+        &self.app_data_directory
+    }
+
     /// Fire notifications for a session state change event.
-    /// Reads config from DB, dispatches to enabled channels.
+    /// If issue_id is provided, checks is_sound_muted on the issue.
     pub fn notify(
         &self,
         event_type: NotificationEventType,
         session_id: &str,
+        issue_id: Option<&str>,
         message: &str,
         app_handle: &AppHandle,
         database_connection: &std::sync::Arc<Mutex<Connection>>,
@@ -48,13 +58,17 @@ impl NotificationService {
             }
         };
 
+        let issue_muted = issue_id
+            .and_then(|id| self.is_issue_sound_muted(id, database_connection))
+            .unwrap_or(false);
+
         if config.toast_enabled {
             self.send_toast(event_type, message, app_handle);
         }
 
-        if config.sound_enabled {
+        if config.sound_enabled && !issue_muted {
             if let Some(ref sound_file) = config.sound_file {
-                self.play_sound(sound_file);
+                self.enqueue_sound(sound_file, event_type, session_id, app_handle, database_connection);
             }
         }
 
@@ -90,13 +104,7 @@ impl NotificationService {
     }
 
     fn send_toast(&self, event_type: NotificationEventType, message: &str, app_handle: &AppHandle) {
-        let title = match event_type {
-            NotificationEventType::NeedsInput => "NOTIFICATION_NEEDS_INPUT",
-            NotificationEventType::NeedsReview => "NOTIFICATION_NEEDS_REVIEW",
-            NotificationEventType::Finished => "NOTIFICATION_FINISHED",
-            NotificationEventType::Errored => "NOTIFICATION_ERRORED",
-            NotificationEventType::PrReady => "NOTIFICATION_PR_READY",
-        };
+        let title = notification_toast_title(event_type);
 
         if let Err(error) = app_handle
             .notification()
@@ -109,32 +117,106 @@ impl NotificationService {
         }
     }
 
-    fn play_sound(&self, sound_file: &str) {
-        // Move path resolution + playback off the async executor entirely.
-        // Both resolve_sound_path (.exists() calls) and play_sound_blocking are blocking I/O.
-        let sound_file = sound_file.to_owned();
-        let resource_directory = self.resource_directory.clone();
+    fn enqueue_sound(
+        &self,
+        sound_file: &str,
+        event_type: NotificationEventType,
+        session_id: &str,
+        app_handle: &AppHandle,
+        database_connection: &std::sync::Arc<Mutex<Connection>>,
+    ) {
+        let global_volume = self.load_global_volume(database_connection);
+        let per_sound_volume = self.load_sound_volume_override(
+            event_type,
+            sound_file,
+            database_connection,
+        );
+        let volume = global_volume * per_sound_volume;
 
-        std::thread::spawn(move || {
-            match sound::resolve_sound_path(&sound_file, &resource_directory) {
-                Some(path) => {
-                    if let Err(error) = sound::play_sound_blocking(&path) {
-                        log::error!("Sound playback failed: {error}");
-                    }
-                }
-                None => {
-                    log::warn!("Sound file not found: {sound_file}");
+        let resolved_path = sound::resolve_sound_path(
+            sound_file,
+            &self.resource_directory,
+            &self.app_data_directory,
+        );
+
+        match resolved_path {
+            Some(path) => {
+                if let Some(queue) = app_handle.try_state::<PlaybackQueueHandle>() {
+                    queue.enqueue(path, volume as f32, event_type, session_id.to_owned());
+                } else {
+                    // Fallback: direct playback on thread (shouldn't happen in normal operation)
+                    let volume_f32 = volume as f32;
+                    std::thread::spawn(move || {
+                        if let Err(error) = sound::play_sound_blocking(&path, volume_f32) {
+                            log::error!("Sound playback failed: {error}");
+                        }
+                    });
                 }
             }
-        });
+            None => {
+                log::warn!("Sound file not found: {sound_file}");
+            }
+        }
+    }
+
+    fn load_global_volume(
+        &self,
+        database_connection: &std::sync::Arc<Mutex<Connection>>,
+    ) -> f64 {
+        let connection = match database_connection.lock() {
+            Ok(conn) => conn,
+            Err(_) => return 0.8,
+        };
+        connection
+            .query_row(
+                "SELECT value FROM app_settings WHERE key = 'notification_volume'",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .ok()
+            .and_then(|value| value.parse::<f64>().ok())
+            .unwrap_or(0.8)
+    }
+
+    fn load_sound_volume_override(
+        &self,
+        event_type: NotificationEventType,
+        sound_file: &str,
+        database_connection: &std::sync::Arc<Mutex<Connection>>,
+    ) -> f64 {
+        let connection = match database_connection.lock() {
+            Ok(conn) => conn,
+            Err(_) => return 1.0,
+        };
+        connection
+            .query_row(
+                "SELECT volume FROM sound_volume_overrides WHERE event_type = ?1 AND sound_file = ?2",
+                rusqlite::params![event_type, sound_file],
+                |row| row.get::<_, f64>(0),
+            )
+            .unwrap_or(1.0)
+    }
+
+    fn is_issue_sound_muted(
+        &self,
+        issue_id: &str,
+        database_connection: &std::sync::Arc<Mutex<Connection>>,
+    ) -> Option<bool> {
+        let connection = database_connection.lock().ok()?;
+        connection
+            .query_row(
+                "SELECT is_sound_muted FROM issues WHERE id = ?1",
+                [issue_id],
+                |row| row.get::<_, bool>(0),
+            )
+            .ok()
     }
 
     fn request_attention(&self, event_type: NotificationEventType, app_handle: &AppHandle) {
-        let attention_type = match event_type {
-            NotificationEventType::NeedsInput | NotificationEventType::Errored => {
-                tauri::UserAttentionType::Critical
-            }
-            _ => tauri::UserAttentionType::Informational,
+        let attention_type = if event_type.is_critical() {
+            tauri::UserAttentionType::Critical
+        } else {
+            tauri::UserAttentionType::Informational
         };
 
         if let Some(window) = app_handle.get_webview_window("main") {
@@ -145,16 +227,34 @@ impl NotificationService {
     }
 }
 
+fn notification_toast_title(event_type: NotificationEventType) -> &'static str {
+    match event_type {
+        NotificationEventType::SessionStart => "NOTIFICATION_SESSION_START",
+        NotificationEventType::SessionEnd => "NOTIFICATION_SESSION_END",
+        NotificationEventType::SessionError => "NOTIFICATION_SESSION_ERROR",
+        NotificationEventType::SessionNeedsInput => "NOTIFICATION_NEEDS_INPUT",
+        NotificationEventType::TaskComplete => "NOTIFICATION_TASK_COMPLETE",
+        NotificationEventType::TaskAcknowledge => "NOTIFICATION_TASK_ACKNOWLEDGE",
+        NotificationEventType::PrReady => "NOTIFICATION_PR_READY",
+        NotificationEventType::PrMerged => "NOTIFICATION_PR_MERGED",
+        NotificationEventType::PrReviewRequested => "NOTIFICATION_PR_REVIEW_REQUESTED",
+        NotificationEventType::MergeConflict => "NOTIFICATION_MERGE_CONFLICT",
+        NotificationEventType::BranchBehindBase => "NOTIFICATION_BRANCH_BEHIND_BASE",
+        NotificationEventType::GithubIssueAssigned => "NOTIFICATION_GITHUB_ISSUE_ASSIGNED",
+        NotificationEventType::GithubTriggerReceived => "NOTIFICATION_GITHUB_TRIGGER_RECEIVED",
+        NotificationEventType::AchievementUnlocked => "NOTIFICATION_ACHIEVEMENT_UNLOCKED",
+        NotificationEventType::ResourceLimit => "NOTIFICATION_RESOURCE_LIMIT",
+    }
+}
+
 /// Map a SessionState to a notification event type.
 /// Returns None for states that should not trigger notifications (e.g. Running, Paused).
-/// Note: PrReady is not mapped here — it will be triggered by a future GitHub
-/// polling hook, not by session state transitions.
 pub fn session_state_to_event_type(state: &SessionState) -> Option<NotificationEventType> {
     match state {
-        SessionState::NeedsInput => Some(NotificationEventType::NeedsInput),
-        SessionState::NeedsReview => Some(NotificationEventType::NeedsReview),
-        SessionState::Finished => Some(NotificationEventType::Finished),
-        SessionState::Errored => Some(NotificationEventType::Errored),
+        SessionState::NeedsInput => Some(NotificationEventType::SessionNeedsInput),
+        SessionState::NeedsReview => Some(NotificationEventType::SessionNeedsInput),
+        SessionState::Finished => Some(NotificationEventType::SessionEnd),
+        SessionState::Errored => Some(NotificationEventType::SessionError),
         SessionState::Running | SessionState::Paused => None,
     }
 }
@@ -167,19 +267,19 @@ mod tests {
     fn session_state_to_event_type_maps_correctly() {
         assert_eq!(
             session_state_to_event_type(&SessionState::NeedsInput),
-            Some(NotificationEventType::NeedsInput)
+            Some(NotificationEventType::SessionNeedsInput)
         );
         assert_eq!(
             session_state_to_event_type(&SessionState::NeedsReview),
-            Some(NotificationEventType::NeedsReview)
+            Some(NotificationEventType::SessionNeedsInput)
         );
         assert_eq!(
             session_state_to_event_type(&SessionState::Finished),
-            Some(NotificationEventType::Finished)
+            Some(NotificationEventType::SessionEnd)
         );
         assert_eq!(
             session_state_to_event_type(&SessionState::Errored),
-            Some(NotificationEventType::Errored)
+            Some(NotificationEventType::SessionError)
         );
     }
 
@@ -191,5 +291,17 @@ mod tests {
     #[test]
     fn session_state_to_event_type_ignores_paused() {
         assert_eq!(session_state_to_event_type(&SessionState::Paused), None);
+    }
+
+    #[test]
+    fn toast_titles_all_prefixed() {
+        for event_type in NotificationEventType::all() {
+            let title = notification_toast_title(*event_type);
+            assert!(
+                title.starts_with("NOTIFICATION_"),
+                "Toast title for {:?} should start with NOTIFICATION_",
+                event_type
+            );
+        }
     }
 }
