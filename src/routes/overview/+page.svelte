@@ -5,6 +5,8 @@
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import WorkspaceCard from '$lib/components/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/AddWorkspaceCard.svelte';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
@@ -12,13 +14,15 @@
 	let workspaces = $state<OverviewWorkspaceData[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	let showArchived = $state(false);
 
 	$effect(() => {
 		void boardStore.dashboards; // re-run when workspace list changes
+		const includeArchived = showArchived;
 		void (async () => {
 			loading = true;
 			try {
-				workspaces = await getOverviewData();
+				workspaces = await getOverviewData(includeArchived);
 				error = null;
 			} catch (err) {
 				error = String(err);
@@ -51,9 +55,15 @@
 </script>
 
 <div class="flex flex-col gap-6 p-8">
-	<div>
-		<h1 class="text-2xl font-bold text-foreground">{m.app_name()}</h1>
-		<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
+	<div class="flex items-end justify-between">
+		<div>
+			<h1 class="text-2xl font-bold text-foreground">{m.app_name()}</h1>
+			<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
+		</div>
+		<div class="flex items-center gap-2">
+			<Switch id="show-archived" bind:checked={showArchived} />
+			<Label for="show-archived" class="text-sm text-muted-foreground">Show archived</Label>
+		</div>
 	</div>
 
 	{#if loading}

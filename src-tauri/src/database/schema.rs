@@ -23,7 +23,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             color_palette_id TEXT REFERENCES color_palettes(id),
             accent_color TEXT,
             default_shape TEXT NOT NULL DEFAULT 'cherry',
-            priorities_enabled INTEGER NOT NULL DEFAULT 1
+            priorities_enabled INTEGER NOT NULL DEFAULT 1,
+            status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted'))
         );
 
         CREATE TABLE IF NOT EXISTS issues (
@@ -227,6 +228,17 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             imported_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
+        CREATE TABLE IF NOT EXISTS workspace_commands (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            category TEXT NOT NULL CHECK (category IN ('server', 'check')),
+            name TEXT NOT NULL,
+            command TEXT NOT NULL,
+            port_pattern TEXT,
+            expected_exit_code INTEGER NOT NULL DEFAULT 0,
+            sort_order INTEGER NOT NULL DEFAULT 0
+        );
+
         CREATE TABLE IF NOT EXISTS model_pricing_cache (
             model_id TEXT PRIMARY KEY,
             input_cost_per_token REAL NOT NULL,
@@ -247,6 +259,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE INDEX IF NOT EXISTS idx_turn_metrics_category ON turn_metrics(category);
         CREATE INDEX IF NOT EXISTS idx_tool_usage_session_id ON tool_usage(session_id);
         CREATE INDEX IF NOT EXISTS idx_tool_usage_tool_name ON tool_usage(tool_name);
+        CREATE INDEX IF NOT EXISTS idx_workspace_commands_dashboard ON workspace_commands(dashboard_id);
 
         COMMIT;
         ",
