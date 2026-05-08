@@ -53,7 +53,7 @@
 					value={command.port_pattern ?? ''}
 					onchange={(e) => {
 						const value = e.currentTarget.value.trim();
-						onUpdate(command.id, 'port_pattern', value || null);
+						onUpdate(command.id, 'port_pattern', value === '' ? null : value);
 					}}
 					placeholder="e.g. localhost:(\d+)"
 					class="h-8 font-mono text-sm"
