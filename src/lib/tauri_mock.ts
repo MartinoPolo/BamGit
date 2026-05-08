@@ -1,11 +1,13 @@
 import { showMockToast } from '$lib/modules/toasts/mock_toast_bridge.js';
 import {
+	MOCK_ACHIEVEMENTS,
 	MOCK_ACTIONS,
 	MOCK_ASSIGNED_ISSUES_RESULT,
 	MOCK_COLOR_PALETTES,
 	MOCK_CUSTOM_BINDINGS,
 	MOCK_DASHBOARDS,
 	MOCK_GIT_STATUSES,
+	MOCK_IMPORT_SUMMARY,
 	MOCK_ISSUE_DEPENDENCIES,
 	MOCK_ISSUES,
 	MOCK_LABEL_SHAPE_MAPPINGS,
@@ -14,6 +16,7 @@ import {
 	MOCK_PRUNABLE_ISSUES,
 	MOCK_SESSIONS,
 	MOCK_SYNC_RESULT,
+	MOCK_USAGE_DASHBOARD,
 	MOCK_WINDOW_BINDINGS,
 } from './tauri_mock_data.js';
 
@@ -98,6 +101,11 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_window_bindings: () => MOCK_WINDOW_BINDINGS,
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
 	get_app_setting: () => null,
+
+	// ─── Metrics reads ───────────────────────────────────────────────────────
+	get_usage_dashboard: () => MOCK_USAGE_DASHBOARD,
+	get_achievements: () => MOCK_ACHIEVEMENTS,
+	import_historical_sessions: () => MOCK_IMPORT_SUMMARY,
 
 	// ─── Dialog ──────────────────────────────────────────────────────────────
 	pick_folder: () => 'C:/mock/selected-folder',

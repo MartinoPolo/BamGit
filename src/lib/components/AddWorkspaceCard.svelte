@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import * as Card from '$lib/components/ui/card/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 
 	interface Props {
@@ -11,13 +10,14 @@
 </script>
 
 <button class="block w-full text-left" {onclick}>
-	<Card.Card
-		padding="none"
-		class="flex h-full min-h-[140px] cursor-pointer items-center justify-center border-2 border-dashed border-border transition-all duration-200 hover:border-border-strong hover:bg-muted/30"
+	<div
+		class="flex min-h-[196px] cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border-[1.5px] border-dashed border-border bg-surface transition-all duration-200 hover:-translate-y-0.5 hover:border-moss-400 hover:bg-[color-mix(in_oklch,var(--moss-400)_6%,var(--surface))] hover:text-moss-300"
 	>
-		<div class="flex flex-col items-center gap-2 text-muted-foreground">
-			<PlusIcon class="size-6" />
-			<span class="text-sm font-medium">{m.workspace_add()}</span>
+		<div class="flex flex-col items-center gap-2.5 text-foreground-muted">
+			<div class="flex size-9 items-center justify-center rounded-full bg-surface-2">
+				<PlusIcon class="size-5" />
+			</div>
+			<span class="text-[13px] font-medium">{m.workspace_add()}</span>
 		</div>
-	</Card.Card>
+	</div>
 </button>

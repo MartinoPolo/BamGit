@@ -3,6 +3,7 @@
 mod commands;
 mod database;
 mod git;
+mod metrics;
 mod models;
 mod notification;
 mod session;
@@ -11,9 +12,9 @@ mod window_manager;
 use commands::{
     action_commands, ai_config_commands, color_palette_commands, dashboard_commands,
     dependency_commands, dialog_commands, git_status_commands, github_commands, issue_commands,
-    keyboard_shortcut_commands, label_shape_mapping_commands, notification_commands,
-    portfolio_commands, raw_requirements_commands, seed_commands, session_commands,
-    terminal_commands, window_commands, worktree_commands,
+    keyboard_shortcut_commands, label_shape_mapping_commands, metrics_commands,
+    notification_commands, portfolio_commands, raw_requirements_commands, seed_commands,
+    session_commands, terminal_commands, window_commands, worktree_commands,
 };
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
@@ -197,6 +198,9 @@ pub fn run() {
             ai_config_commands::discover_ai_config,
             ai_config_commands::get_custom_discovery_paths,
             ai_config_commands::set_custom_discovery_paths,
+            metrics_commands::get_usage_dashboard,
+            metrics_commands::get_achievements,
+            metrics_commands::import_historical_sessions,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
