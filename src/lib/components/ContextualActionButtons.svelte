@@ -64,7 +64,7 @@
 	}
 </script>
 
-<div class="flex items-center gap-0.5">
+<div class="flex items-center gap-1.5">
 	{#if derivedActions.primary}
 		{@const primaryId = derivedActions.primary}
 		<SimpleTooltip text={getLabel(primaryId)}>

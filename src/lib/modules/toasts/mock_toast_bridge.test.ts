@@ -22,27 +22,51 @@ describe('showMockToast', () => {
 		expect(() => showMockToast('setup_worktree')).not.toThrow();
 	});
 
-	it('uses fallback message for unknown commands', () => {
-		const spy = vi.fn();
-		registerMockToastBridge(spy);
-
-		showMockToast('unknown_command');
-
-		expect(spy).toHaveBeenCalledWith(
-			'Desktop app required',
-			'unknown_command is simulated in browser mode',
-		);
-	});
-
-	it('uses correct body for known commands', () => {
+	it('uses command-specific title for known commands', () => {
 		const spy = vi.fn();
 		registerMockToastBridge(spy);
 
 		showMockToast('setup_worktree');
 
 		expect(spy).toHaveBeenCalledWith(
-			'Desktop app required',
+			'Setup worktree is not available',
 			'Worktree setup is simulated in browser mode',
+		);
+	});
+
+	it('uses fallback body for unknown commands', () => {
+		const spy = vi.fn();
+		registerMockToastBridge(spy);
+
+		showMockToast('unknown_command');
+
+		expect(spy).toHaveBeenCalledWith(
+			'Unknown command is not available',
+			'unknown_command is simulated in browser mode',
+		);
+	});
+
+	it('uses action label in title for execute_action with actionId', () => {
+		const spy = vi.fn();
+		registerMockToastBridge(spy);
+
+		showMockToast('execute_action', { actionId: 'commit-and-push' });
+
+		expect(spy).toHaveBeenCalledWith(
+			'Commit and push is not available',
+			'Running actions requires the desktop app',
+		);
+	});
+
+	it('falls back to command title when execute_action has no actionId', () => {
+		const spy = vi.fn();
+		registerMockToastBridge(spy);
+
+		showMockToast('execute_action');
+
+		expect(spy).toHaveBeenCalledWith(
+			'Execute action is not available',
+			'Running actions requires the desktop app',
 		);
 	});
 });

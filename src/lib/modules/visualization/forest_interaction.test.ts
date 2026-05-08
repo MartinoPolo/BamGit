@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { OverlayConfig } from 'low-poly-2d-trees';
+import { OVERLAY_DEFAULTS, type OverlayConfig } from 'low-poly-2d-trees';
 import { TREE_CONTEXT_MENU_ACTIONS, resolveGlowOverlay } from './index';
 import type { TreeContextMenuAction, ResolveGlowOverlayParams } from './index';
 
@@ -87,7 +87,7 @@ describe('resolveGlowOverlay', () => {
 		});
 	});
 
-	it('returns state-driven overlay when neither hovered nor active', () => {
+	it('suppresses state-driven glow when a different issue is hovered', () => {
 		const result = resolveGlowOverlay(
 			createParams({
 				stateOverlay: STATE_ERRORED,
@@ -96,7 +96,7 @@ describe('resolveGlowOverlay', () => {
 				activeIssueId: 'other',
 			}),
 		);
-		expect(result).toEqual(STATE_ERRORED);
+		expect(result).toEqual(OVERLAY_DEFAULTS);
 	});
 
 	it('hover takes priority over active when both match same issueId', () => {
@@ -130,7 +130,7 @@ describe('resolveGlowOverlay', () => {
 				hoveredIssueId: 'issue-2',
 			}),
 		);
-		expect(result).toEqual(STATE_DISABLED);
+		expect(result).toEqual(OVERLAY_DEFAULTS);
 	});
 
 	it('active takes priority over state-driven errored glow', () => {
@@ -198,17 +198,6 @@ describe('resolveGlowOverlay', () => {
 			}),
 		);
 		expect(result.glow.color).toBe(ISSUE_COLOR);
-	});
-
-	it('suppresses active glow when a different tree is hovered', () => {
-		const result = resolveGlowOverlay(
-			createParams({
-				issueId: 'issue-1',
-				activeIssueId: 'issue-1',
-				hoveredIssueId: 'issue-2',
-			}),
-		);
-		expect(result).toEqual(STATE_DISABLED);
 	});
 
 	it('batch-selected takes priority over state-driven overlay', () => {

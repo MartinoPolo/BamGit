@@ -6,7 +6,21 @@ export function registerMockToastBridge(fn: ShowFn): void {
 	showFn = fn;
 }
 
-// ─── Command labels ──────────────────────────────────────────────────────────
+// ─── Label helpers ───────────────────────────────────────────────────────────
+
+function formatCommandLabel(value: string): string {
+	const spaced = value.replace(/[_-]/g, ' ');
+	return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+function resolveTitle(command: string, args?: Record<string, unknown>): string {
+	if (command === 'execute_action' && typeof args?.actionId === 'string') {
+		return `${formatCommandLabel(args.actionId)} is not available`;
+	}
+	return `${formatCommandLabel(command)} is not available`;
+}
+
+// ─── Command descriptions ────────────────────────────────────────────────────
 
 const COMMAND_BODIES: Record<string, string> = {
 	setup_worktree: 'Worktree setup is simulated in browser mode',
@@ -26,11 +40,12 @@ const COMMAND_BODIES: Record<string, string> = {
 	discover_ai_config: 'AI config discovery requires the desktop app',
 };
 
-export function showMockToast(command: string): void {
+export function showMockToast(command: string, args?: Record<string, unknown>): void {
 	if (showFn === null) {
 		return;
 	}
 
+	const title = resolveTitle(command, args);
 	const body = COMMAND_BODIES[command] ?? `${command} is simulated in browser mode`;
-	showFn('Desktop app required', body);
+	showFn(title, body);
 }
