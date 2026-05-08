@@ -26,14 +26,19 @@
 	class={cn(
 		cardVariants({ padding }),
 		stateClass,
-		accentBarColor != null && 'border-l-[3px]',
+		accentBarColor != null && 'overflow-hidden',
 		gradientTint != null && 'gk-card-gradient-tint',
 		className,
 	)}
-	style:border-left-color={accentBarColor}
 	style:--gk-card-tint-color={gradientTint}
 	{...restProps}
 >
+	{#if accentBarColor != null}
+		<div
+			class="absolute inset-y-0 left-0 z-[2] w-[3px]"
+			style:background={accentBarColor}
+		></div>
+	{/if}
 	{@render children?.()}
 	{#if state === 'loading'}
 		<div class="gk-card-shimmer"></div>
