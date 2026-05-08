@@ -16,4 +16,22 @@ pub struct OverviewWorkspaceData {
     pub active_session_count: i64,
     pub last_activity: Option<String>,
     pub total_cost_usd: Option<f64>,
+    #[ts(type = "number")]
+    pub hitl_count: i64,
+    #[ts(type = "number")]
+    pub open_pr_count: i64,
+    #[ts(type = "number")]
+    pub prs_needing_attention: i64,
+    pub afk_loop_status: String,
+    pub default_branch: Option<String>,
+    #[ts(type = "number")]
+    pub worktree_count: i64,
+    #[ts(type = "number")]
+    pub afk_ready_count: i64,
+    #[ts(type = "number")]
+    pub prd_count: i64,
+    #[ts(type = "number")]
+    pub prd_completed_subs: i64,
+    #[ts(type = "number")]
+    pub prd_total_subs: i64,
 }

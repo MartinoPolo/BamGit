@@ -43,6 +43,11 @@
 	function handleFolderClick(localFolder: string) {
 		void openPath(localFolder);
 	}
+
+	function handleConfigWizard(_dashboardId: string) {
+		// TODO: open config wizard for workspace
+		console.info('Config wizard for', _dashboardId);
+	}
 </script>
 
 <div class="flex flex-col gap-6 p-8">
@@ -56,17 +61,19 @@
 	{:else if error !== null}
 		<p class="text-destructive">{m.error_prefix({ message: error })}</p>
 	{:else}
-		<div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
+		<div class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4">
 			{#each workspaces as workspace (workspace.dashboard_id)}
 				<WorkspaceCard
 					{workspace}
 					onclick={() => handleOpenWorkspace(workspace.dashboard_id)}
 					onGithubClick={workspace.github_repo != null
 						? () => handleGithubClick(workspace.github_repo!)
-						: undefined}
+						: () => handleConfigWizard(workspace.dashboard_id)}
 					onFolderClick={workspace.local_folder != null
 						? () => handleFolderClick(workspace.local_folder!)
-						: undefined}
+						: () => handleConfigWizard(workspace.dashboard_id)}
+					onGithubRightClick={() => handleConfigWizard(workspace.dashboard_id)}
+					onFolderRightClick={() => handleConfigWizard(workspace.dashboard_id)}
 				/>
 			{/each}
 			<AddWorkspaceCard onclick={() => (boardStore.showCreateDialog = true)} />
