@@ -122,6 +122,17 @@ describe('resolveGlowOverlay', () => {
 		expect(result.glow.pulse).toBe(false);
 	});
 
+	it('suppresses active glow when a different tree is hovered', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				issueId: 'issue-1',
+				activeIssueId: 'issue-1',
+				hoveredIssueId: 'issue-2',
+			}),
+		);
+		expect(result).toEqual(STATE_DISABLED);
+	});
+
 	it('active takes priority over state-driven errored glow', () => {
 		const result = resolveGlowOverlay(
 			createParams({
@@ -187,6 +198,17 @@ describe('resolveGlowOverlay', () => {
 			}),
 		);
 		expect(result.glow.color).toBe(ISSUE_COLOR);
+	});
+
+	it('suppresses active glow when a different tree is hovered', () => {
+		const result = resolveGlowOverlay(
+			createParams({
+				issueId: 'issue-1',
+				activeIssueId: 'issue-1',
+				hoveredIssueId: 'issue-2',
+			}),
+		);
+		expect(result).toEqual(STATE_DISABLED);
 	});
 
 	it('batch-selected takes priority over state-driven overlay', () => {
