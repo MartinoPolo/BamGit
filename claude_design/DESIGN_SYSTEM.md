@@ -20,7 +20,7 @@ Full token definitions: `claude_design/tokens.css`
 | Radii | xs=4px, sm=6px, md=8px, lg=10px, xl=14px |
 | Palette | Forest Moss — moss, amber, bark, azure scales |
 | Theme class | `gk-root theme-dark` (dark primary) |
-| Accent system | 4 accents (moss/amber/bark/azure) via `data-accent` attribute |
+| Accent system | 12 accents (moss/amber/bark/azure/plum/teal/rose/coral/gold/sage/indigo/fuchsia) via `data-accent` attribute |
 
 ## CSS Component Classes (from tokens.css)
 
@@ -51,7 +51,7 @@ When building Svelte components (not HTML mockups), use Tailwind classes mapped 
 - **Text**: `text-foreground`, `text-foreground-muted`, `text-foreground-subtle`
 - **Interactive**: `bg-primary`, `text-primary-foreground`, `bg-primary-soft`, `bg-accent`, `ring-ring`
 - **Borders**: `border-border`, `border-border-strong`
-- **Status**: `text-status-success`, `text-status-warning`, `bg-status-danger`, `text-status-info`
+- **Status**: `text-status-success`, `text-status-warning`, `bg-status-danger`, `text-status-info`, `text-status-merged`
 - **Scales**: `bg-moss-50`..`bg-moss-950`, `bg-amber-300`..`bg-amber-600`, `bg-bark-300`..`bg-bark-700`, `bg-azure-300`..`bg-azure-700`
 
 Rules: Always use semantic tokens. Never hardcode colors. Dark mode is automatic via `data-theme`.
@@ -64,7 +64,10 @@ src/lib/components/
 ├── chat/            ← ChatMessage, ToolCards
 ├── session/         ← SessionLayout, FloatingInputPanel
 ├── color-picker/    ← Custom color picker
-└── creation-wizard/ ← Multi-step wizard
+├── creation-wizard/ ← Multi-step wizard
+├── icons/           ← Custom SVG icon components
+└── *.svelte         ← Root-level domain components (IssueCard, WorkspaceCard,
+                       SessionCard, ForestView, CommandPalette, TopBar, etc.)
 ```
 
 ### Adding shadcn Components
