@@ -306,12 +306,31 @@ impl ProtocolState {
             .and_then(|u| u.get("output_tokens"))
             .and_then(|v| v.as_u64())
             .unwrap_or(0);
+        let cache_read_tokens = usage
+            .and_then(|u| u.get("cache_read_input_tokens"))
+            .and_then(|v| v.as_u64())
+            .unwrap_or(0);
+        let cache_write_tokens = usage
+            .and_then(|u| u.get("cache_creation_input_tokens"))
+            .and_then(|v| v.as_u64())
+            .unwrap_or(0);
+        let duration_ms = event
+            .get("duration_ms")
+            .and_then(|v| v.as_u64());
+        let num_turns = event
+            .get("num_turns")
+            .and_then(|v| v.as_u64())
+            .map(|v| v as u32);
 
         if input_tokens > 0 || output_tokens > 0 || cost_usd > 0.0 {
             events.push(SessionEvent::UsageUpdate {
                 input_tokens,
                 output_tokens,
+                cache_read_tokens,
+                cache_write_tokens,
                 cost_usd,
+                duration_ms,
+                num_turns,
             });
         }
 
@@ -746,10 +765,14 @@ mod tests {
         assert_event_matches(&events, 0, "usage_update");
         assert_event_matches(&events, 1, "run_state");
 
-        if let SessionEvent::UsageUpdate { input_tokens, output_tokens, cost_usd } = &events[0] {
+        if let SessionEvent::UsageUpdate { input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, duration_ms, num_turns } = &events[0] {
             assert_eq!(*input_tokens, 1234);
             assert_eq!(*output_tokens, 567);
+            assert_eq!(*cache_read_tokens, 0);
+            assert_eq!(*cache_write_tokens, 0);
             assert!((cost_usd - 0.045).abs() < f64::EPSILON);
+            assert_eq!(*duration_ms, Some(4100));
+            assert_eq!(*num_turns, Some(3));
         } else {
             panic!("Expected UsageUpdate");
         }

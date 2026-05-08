@@ -6,6 +6,7 @@
 	"nav_dashboard": "Dashboard",
 	"nav_sessions": "Sessions",
 	"nav_settings": "Settings",
+	"nav_ai_config": "AI Config",
 	"nav_workspace": "Workspace",
 	"nav_navigate": "Navigate",
 
@@ -377,5 +378,19 @@
 	"mock_action_spawn_session": "Spawning sessions requires the desktop app",
 	"mock_action_sync_all_github_state": "GitHub sync requires the desktop app",
 	"mock_action_execute_action": "Running actions requires the desktop app",
-	"mock_action_open_workspace_window": "Opening workspace windows requires the desktop app"
+	"mock_action_open_workspace_window": "Opening workspace windows requires the desktop app",
+	"mock_action_discover_ai_config": "AI config discovery requires the desktop app",
+
+	"ai_config_title": "AI Configuration",
+	"ai_config_search_placeholder": "Search skills, agents, hooks…",
+	"ai_config_refresh": "Refresh",
+	"ai_config_open_file": "Open file",
+	"ai_config_open_folder": "Open folder",
+	"ai_config_no_items": "No items found",
+	"ai_config_discovery_sources": "Discovery Sources",
+	"ai_config_add_folder": "Add folder",
+	"ai_config_remove": "Remove",
+	"ai_config_source_user": "User",
+	"ai_config_source_project": "Project",
+	"ai_config_source_custom": "Custom"
 }

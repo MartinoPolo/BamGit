@@ -23,6 +23,7 @@ const COMMAND_BODIES: Record<string, string> = {
 	update_peacock_color: 'Peacock color sync requires the desktop app',
 	pick_folder: 'Folder picker requires the desktop app',
 	open_path: 'Opening local folders requires the desktop app',
+	discover_ai_config: 'AI config discovery requires the desktop app',
 };
 
 // ─── Dedup ───────────────────────────────────────────────────────────────────
