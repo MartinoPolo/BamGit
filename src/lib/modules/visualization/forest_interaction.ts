@@ -1,4 +1,4 @@
-import type { OverlayConfig } from 'low-poly-2d-trees';
+import { OVERLAY_DEFAULTS, type OverlayConfig } from 'low-poly-2d-trees';
 
 const INTERACTION_GLOW_INTENSITY = 3;
 
@@ -46,6 +46,9 @@ export function resolveGlowOverlay(params: ResolveGlowOverlayParams): OverlayCon
 				pulse: false,
 			},
 		};
+	}
+	if (params.hoveredIssueId !== null) {
+		return OVERLAY_DEFAULTS;
 	}
 	return params.stateOverlay;
 }

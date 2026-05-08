@@ -491,7 +491,7 @@ export async function mockInvoke<T>(command: string, args?: Record<string, unkno
 	}
 	const result = handler(args ?? {}) as T;
 	if (TAURI_ONLY_COMMANDS.has(command)) {
-		showMockToast(command);
+		showMockToast(command, args);
 	}
 	return result;
 }
