@@ -24,6 +24,7 @@ export type StatCellTone = VariantProps<typeof statCellVariants>['tone'];
 export interface StatCellProps {
 	label: string;
 	value: number | string;
+	suffix?: string;
 	tone?: StatCellTone;
 	icon?: Component;
 	pulse?: boolean;

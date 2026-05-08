@@ -1,11 +1,13 @@
 import { showMockToast } from '$lib/modules/toasts/mock_toast_bridge.js';
 import {
+	MOCK_ACHIEVEMENTS,
 	MOCK_ACTIONS,
 	MOCK_ASSIGNED_ISSUES_RESULT,
 	MOCK_COLOR_PALETTES,
 	MOCK_CUSTOM_BINDINGS,
 	MOCK_DASHBOARDS,
 	MOCK_GIT_STATUSES,
+	MOCK_IMPORT_SUMMARY,
 	MOCK_ISSUE_DEPENDENCIES,
 	MOCK_ISSUES,
 	MOCK_LABEL_SHAPE_MAPPINGS,
@@ -14,6 +16,7 @@ import {
 	MOCK_PRUNABLE_ISSUES,
 	MOCK_SESSIONS,
 	MOCK_SYNC_RESULT,
+	MOCK_USAGE_DASHBOARD,
 	MOCK_WINDOW_BINDINGS,
 } from './tauri_mock_data.js';
 
@@ -35,6 +38,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'open_workspace_window',
 	'update_peacock_color',
 	'pick_folder',
+	'discover_ai_config',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
@@ -112,6 +116,11 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
 	get_app_setting: () => null,
 
+	// ─── Metrics reads ───────────────────────────────────────────────────────
+	get_usage_dashboard: () => MOCK_USAGE_DASHBOARD,
+	get_achievements: () => MOCK_ACHIEVEMENTS,
+	import_historical_sessions: () => MOCK_IMPORT_SUMMARY,
+
 	// ─── Dialog ──────────────────────────────────────────────────────────────
 	pick_folder: () => 'C:/mock/selected-folder',
 
@@ -166,6 +175,174 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	// ─── Search ───────────────────────────────────────────────────────────────
 	search_github_issues: () => [],
 	read_raw_requirements: () => '',
+
+	// ─── AI Config reads ─────────────────────────────────────────────────────
+	discover_ai_config: () => ({
+		skills: [
+			{
+				name: 'mp-execute',
+				description: 'Execute work with TDD methodology',
+				file_path: 'C:/Users/snapy/.claude/commands/mp-execute/SKILL.md',
+				source: 'user',
+				argument_hint: '#42 or inline task',
+				allowed_tools: ['Bash', 'Read', 'Write', 'Edit', 'Grep', 'Glob'],
+				disable_model_invocation: false,
+				author: 'MartinP',
+				version: '2.1',
+				category: 'execution',
+				content: '# Execute Work\n\nUnified execution skill with TDD methodology.',
+			},
+			{
+				name: 'mp-hitl',
+				description: 'Resolve human decisions in HITL-labeled issues',
+				file_path: 'C:/Users/snapy/.claude/commands/mp-hitl/SKILL.md',
+				source: 'user',
+				argument_hint: 'PRD number',
+				allowed_tools: ['Bash', 'Read', 'Grep', 'Glob'],
+				disable_model_invocation: false,
+				author: 'MartinP',
+				version: '1.0',
+				category: 'planning',
+				content: '# HITL Resolution\n\nGrill open decisions in GitHub issues.',
+			},
+			{
+				name: 'mp-check-fix',
+				description: 'Run checks and fix failures',
+				file_path: 'C:/Users/snapy/.claude/commands/mp-check-fix/SKILL.md',
+				source: 'user',
+				argument_hint: null,
+				allowed_tools: ['Bash', 'Read', 'Grep', 'Glob'],
+				disable_model_invocation: false,
+				author: 'MartinP',
+				version: '1.2',
+				category: 'quality',
+				content: '# Check & Fix\n\nRun all checks and fix issues.',
+			},
+		],
+		agents: [
+			{
+				name: 'mp-executor',
+				description: 'Executes grouped task chunks with clear scope',
+				file_path: 'C:/Users/snapy/.claude/agents/mp-executor.md',
+				source: 'user',
+				model: 'sonnet',
+				tools: ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
+				color: '#3b82f6',
+				content: '# Executor\n\nImplementation agent for scoped tasks.',
+			},
+			{
+				name: 'mp-reviewer-full',
+				description: 'Thorough read-only code reviewer across six dimensions',
+				file_path: 'C:/Users/snapy/.claude/agents/mp-reviewer-full.md',
+				source: 'user',
+				model: 'sonnet',
+				tools: ['Read', 'Grep', 'Glob', 'Bash'],
+				color: '#f97316',
+				content: '# Full Reviewer\n\nReviews code across quality, security, performance.',
+			},
+		],
+		hooks: [
+			{
+				filename: 'pre-commit-gate.js',
+				file_path: 'C:/Users/snapy/.claude/hooks/pre-commit-gate.js',
+				source: 'user',
+				event_type: 'PreToolUse',
+				matcher: 'Bash|PowerShell',
+				timeout: 10000,
+				description: 'Blocks dangerous commands like rm -rf and force push to main',
+			},
+			{
+				filename: 'post-write-formatter.js',
+				file_path: 'C:/Users/snapy/.claude/hooks/post-write-formatter.js',
+				source: 'user',
+				event_type: 'PostToolUse',
+				matcher: 'Write|Edit',
+				timeout: 5000,
+				description: 'Auto-formats files after write operations',
+			},
+		],
+		mcp_servers: [
+			{
+				name: 'context7',
+				source: 'user',
+				provider: 'claude-code',
+				transport_type: 'stdio',
+				enabled: true,
+				command: 'npx',
+				url: null,
+				args: ['-y', '@anthropic/context7-mcp'],
+				env_var_names: null,
+			},
+			{
+				name: 'chrome-devtools',
+				source: 'project',
+				provider: 'claude-code',
+				transport_type: 'stdio',
+				enabled: true,
+				command: 'npx',
+				url: null,
+				args: ['chrome-devtools-mcp'],
+				env_var_names: null,
+			},
+			{
+				name: 'svelte',
+				source: 'user',
+				provider: 'claude-code',
+				transport_type: 'cloud',
+				enabled: true,
+				command: null,
+				url: null,
+				args: null,
+				env_var_names: null,
+			},
+		],
+		memories: [
+			{
+				name: 'User dev workflow',
+				description: 'Parallel sessions, Peacock, terminal tabs',
+				file_path: 'C:/Users/snapy/.claude/projects/abc123/memory/user_workflow.md',
+				memory_type: 'user',
+				content: 'User prefers parallel Claude Code sessions with Peacock color coding.',
+			},
+			{
+				name: 'No single-line if',
+				description: 'Always use braces + multi-line blocks on if statements',
+				file_path:
+					'C:/Users/snapy/.claude/projects/abc123/memory/feedback_no_single_line_if.md',
+				memory_type: 'feedback',
+				content: 'Always use braces and multi-line blocks for if statements.',
+			},
+			{
+				name: 'PRD Architecture',
+				description: '10-PRD structure, module map, multi-window singleton',
+				file_path:
+					'C:/Users/snapy/.claude/projects/abc123/memory/project_prd_architecture.md',
+				memory_type: 'project',
+				content: 'The project uses a 10-PRD structure with module map.',
+			},
+		],
+		instructions: [
+			{
+				filename: 'CLAUDE.md',
+				file_path: 'C:/projects/grovekeeper/CLAUDE.md',
+				source: 'project',
+				content:
+					'# Project Instructions\n\n## Stack\n\nTauri v2 + SvelteKit + Vite\n\n## Commands\n\n`pnpm tauri dev` -- full dev',
+				file_size: 2048,
+				last_modified: '2026-05-08T10:00:00Z',
+			},
+			{
+				filename: 'AGENTS.md',
+				file_path: 'C:/projects/grovekeeper/AGENTS.md',
+				source: 'project',
+				content: '# Agent Instructions\n\nBe concise. DRY. Verbose naming.',
+				file_size: 512,
+				last_modified: '2026-05-07T14:30:00Z',
+			},
+		],
+	}),
+	get_custom_discovery_paths: () => [],
+	set_custom_discovery_paths: () => null,
 
 	// ─── Write commands (no-ops) ──────────────────────────────────────────────
 	create_dashboard: ({ request }) => ({

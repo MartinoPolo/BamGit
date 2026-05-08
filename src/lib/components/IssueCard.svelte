@@ -350,10 +350,10 @@
 	</div>
 
 	<!-- Body: tree thumbnail | info -->
-	<div class="grid items-start gap-2.5 p-2.5 pr-3" style="grid-template-columns: 72px 1fr;">
+	<div class="grid items-start gap-2.5 p-2.5 pr-3" style="grid-template-columns: 100px 1fr;">
 		<!-- Tree thumbnail -->
 		<div
-			class="relative flex size-[72px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
+			class="relative flex size-[100px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
 			style="background: linear-gradient(180deg, color-mix(in oklch, {color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
 		>
 			{#if notificationDotColor !== null && sessionState === null}
@@ -364,7 +364,10 @@
 				</SimpleTooltip>
 			{/if}
 			{#if visualization}
-				<div class="absolute inset-0">
+				<div
+					class="absolute inset-0"
+					style="transform: scale(1.4); transform-origin: bottom center;"
+				>
 					<TreeThumbnailImage {visualization} />
 				</div>
 			{:else}

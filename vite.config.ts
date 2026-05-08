@@ -47,6 +47,7 @@ export default defineConfig({
 				'./src/routes/sessions/+page.svelte',
 				'./src/routes/settings/+page.svelte',
 				'./src/routes/quick-ideas/+page.svelte',
+				'./src/routes/ai-config/+page.svelte',
 			],
 		},
 	},
