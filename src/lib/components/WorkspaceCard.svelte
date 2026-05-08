@@ -72,7 +72,7 @@
 	const isEmpty = $derived(variant === 'empty');
 	const isDormant = $derived(variant === 'dormant');
 
-	const issuesValue = $derived(`${workspace.afk_ready_count}/${workspace.open_issue_count}`);
+	const issuesSuffix = $derived(`/${workspace.open_issue_count}`);
 
 	const issuesTone = $derived.by(() => {
 		if (workspace.afk_ready_count === 0 && workspace.open_issue_count === 0) {
@@ -183,7 +183,7 @@
 		{gradientTint}
 		class={cn(
 			'group relative isolate h-full cursor-pointer transition-all duration-200',
-			'hover:-translate-y-0.5 hover:shadow-md',
+			'hover:-translate-y-0.5 gk-ws-hover-glow',
 			isDormant && 'opacity-[0.72] saturate-[0.7]',
 		)}
 	>
@@ -194,7 +194,7 @@
 			></div>
 		{/if}
 
-		<div class="relative z-[1] px-3.5 pt-3.5 pb-3">
+		<div class="relative z-[1] flex h-full flex-col px-3.5 pt-3.5 pb-3">
 			<!-- Header: thumbnail + name + subtitle + icon buttons -->
 			<div class="mb-2.5 flex items-start justify-between gap-2">
 				<div class="flex items-center gap-2.5 min-w-0">
@@ -248,95 +248,98 @@
 				</div>
 			</div>
 
-			{#if isEmpty}
-				<!-- Empty placeholder content -->
-				<div
-					class="flex flex-col items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-border px-4 py-6"
-				>
-					<SparklesIcon class="size-5 text-foreground-subtle" />
-					<span class="text-xs font-medium text-foreground-muted">
-						Newly planted — open to track issues
-					</span>
-				</div>
-			{:else}
-				<!-- Health grid: 4 stat cells -->
-				<div class="mb-2 grid grid-cols-4 gap-1.5">
-					<StatCell
-						label="ISSUES"
-						value={issuesValue}
-						tone={issuesTone}
-						icon={ListChecksIcon}
-						onclick={onIssuesClick}
-					/>
-					<StatCell
-						label="PRs"
-						value={workspace.open_pr_count}
-						icon={GitPullRequestIcon}
-						onclick={onPrsClick}
-					/>
-					<StatCell
-						label="ATTN"
-						value={workspace.prs_needing_attention}
-						tone={attnTone}
-						icon={TriangleAlertIcon}
-						pulse={true}
-						onclick={onAttnClick}
-					/>
-					<StatCell
-						label="HITL"
-						value={workspace.hitl_count}
-						tone={hitlTone}
-						icon={UserIcon}
-						pulse={true}
-						onclick={onHitlClick}
-					/>
-				</div>
-
-				<!-- PRD row -->
-				{#if workspace.prd_count > 0}
-					<button
-						type="button"
-						class="mb-1.5 flex w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-border bg-surface-2 px-2.5 py-1.5 hover:border-border-strong"
-						onclick={(event: MouseEvent) => {
-							event.stopPropagation();
-							onPrdClick?.();
-						}}
+			<div class="flex-1">
+				{#if isEmpty}
+					<!-- Empty placeholder content -->
+					<div
+						class="flex h-full flex-col items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-border px-4 py-6"
 					>
-						<ClipboardListIcon
-							class="size-3 shrink-0 text-foreground-subtle"
-							strokeWidth={1.7}
-						/>
-						<span
-							class="text-[11px] font-medium text-foreground-muted whitespace-nowrap"
-						>
-							{workspace.prd_count} PRDs
+						<SparklesIcon class="size-5 text-foreground-subtle" />
+						<span class="text-xs font-medium text-foreground-muted">
+							Newly planted — open to track issues
 						</span>
-						<div
-							class="flex-1 h-1 rounded-full bg-[color-mix(in_oklch,var(--foreground)_10%,transparent)] overflow-hidden"
-						>
-							<div
-								class="h-full rounded-full transition-[width] duration-300 ease-out"
-								style="width: {prdProgressPercent}%; background: var(--ws-accent);"
-							></div>
-						</div>
-						<span
-							class="font-mono text-[10.5px] tabular-nums text-foreground-subtle whitespace-nowrap"
-						>
-							{workspace.prd_completed_subs}/{workspace.prd_total_subs} done
-						</span>
-					</button>
+					</div>
 				{:else}
-					<div class="mb-1.5 h-[30px]"></div>
-				{/if}
+					<!-- Health grid: 4 stat cells -->
+					<div class="mb-2 grid grid-cols-4 gap-1.5">
+						<StatCell
+							label="ISSUES"
+							value={workspace.afk_ready_count}
+							suffix={issuesSuffix}
+							tone={issuesTone}
+							icon={ListChecksIcon}
+							onclick={onIssuesClick}
+						/>
+						<StatCell
+							label="PRs"
+							value={workspace.open_pr_count}
+							icon={GitPullRequestIcon}
+							onclick={onPrsClick}
+						/>
+						<StatCell
+							label="ATTN"
+							value={workspace.prs_needing_attention}
+							tone={attnTone}
+							icon={TriangleAlertIcon}
+							pulse={true}
+							onclick={onAttnClick}
+						/>
+						<StatCell
+							label="HITL"
+							value={workspace.hitl_count}
+							tone={hitlTone}
+							icon={UserIcon}
+							pulse={true}
+							onclick={onHitlClick}
+						/>
+					</div>
 
-				<!-- AFK status row -->
-				<StatusRow
-					active={isAfkOn}
-					label={isAfkOn ? 'AFK loop running' : 'AFK loop off'}
-					meta={afkMeta}
-					onclick={onAfkClick}
-				/>
-			{/if}
+					<!-- PRD row -->
+					{#if workspace.prd_count > 0}
+						<button
+							type="button"
+							class="mb-1.5 flex w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-border bg-surface-2 px-2.5 py-1.5 hover:border-border-strong"
+							onclick={(event: MouseEvent) => {
+								event.stopPropagation();
+								onPrdClick?.();
+							}}
+						>
+							<ClipboardListIcon
+								class="size-3 shrink-0 text-foreground-subtle"
+								strokeWidth={1.7}
+							/>
+							<span
+								class="text-[11px] font-medium text-foreground-muted whitespace-nowrap"
+							>
+								{workspace.prd_count} PRDs
+							</span>
+							<div
+								class="flex-1 h-1 rounded-full bg-[color-mix(in_oklch,var(--foreground)_10%,transparent)] overflow-hidden"
+							>
+								<div
+									class="h-full rounded-full transition-[width] duration-300 ease-out"
+									style="width: {prdProgressPercent}%; background: var(--ws-accent);"
+								></div>
+							</div>
+							<span
+								class="font-mono text-[10.5px] tabular-nums text-foreground-subtle whitespace-nowrap"
+							>
+								{workspace.prd_completed_subs}/{workspace.prd_total_subs} done
+							</span>
+						</button>
+					{:else}
+						<div class="mb-1.5 h-[30px]"></div>
+					{/if}
+
+					<!-- AFK status row -->
+					<StatusRow
+						active={isAfkOn}
+						label={isAfkOn ? 'AFK loop running' : 'AFK loop off'}
+						meta={afkMeta}
+						onclick={onAfkClick}
+					/>
+				{/if}
+			</div>
 
 			<!-- Footer: cost + activity -->
 			<div
@@ -352,6 +355,6 @@
 					{formatRelativeTime(workspace.last_activity)}
 				</span>
 			</div>
-		</div>
-	</Card.Card>
+		</div></Card.Card
+	>
 </button>

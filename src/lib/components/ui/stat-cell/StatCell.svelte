@@ -5,6 +5,7 @@
 	let {
 		label,
 		value,
+		suffix,
 		tone = 'neutral',
 		icon: IconComponent,
 		pulse = false,
@@ -85,14 +86,23 @@
 		{label}
 	</span>
 	<span class="flex items-center gap-1.5">
-		<span
-			class={cn(
-				'font-mono text-[16px] leading-none tabular-nums',
-				valueWeightClass,
-				valueColorClass,
-			)}
-		>
-			{value}
+		<span class="flex items-baseline">
+			<span
+				class={cn(
+					'font-mono text-[16px] leading-none tabular-nums',
+					valueWeightClass,
+					valueColorClass,
+				)}
+			>
+				{value}
+			</span>
+			{#if suffix}
+				<span
+					class="font-mono text-[11px] leading-none tabular-nums text-foreground-muted font-medium"
+				>
+					{suffix}
+				</span>
+			{/if}
 		</span>
 		{#if showPulse}
 			<span
