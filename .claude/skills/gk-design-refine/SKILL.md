@@ -35,11 +35,12 @@ Ask if the variant is missing. Ask what to change if refinements are empty.
 ### Step 3: Inventory Available Components
 
 For every component referenced in the brief or refinements:
+
 - Check `src/lib/components/ui/` for existence
 - Read the `.stories.svelte` to identify available props/variants
 - Note gaps
 
-### Step 4: Adopt Missing Components (if needed)
+### Step 4: Adopt Missing Components (if needed, preferably from shadcn-svelte or Bits UI)
 
 1. Spawn `mp-context7-docs-fetcher` to look up in shadcn-svelte (`/huntabyte/shadcn-svelte`) or Bits UI (`/huntabyte/bits-ui`)
 2. Install: `pnpm dlx shadcn-svelte@latest add <name> --yes --overwrite`
@@ -50,6 +51,7 @@ For every component referenced in the brief or refinements:
 Create `designs/<component-name>/refined.html`.
 
 The refined HTML must:
+
 - Use the chosen variant as visual and structural base
 - Apply **every** refinement requirement
 - Cover all states from the brief (not just the happy path)
@@ -81,16 +83,16 @@ requirements. Key changes from the base variant: [1–3 concise sentences on str
 
 ### Codebase — Use As-Is
 
-| Component | Path                            | Usage                        | Key Props/Variants          |
-| --------- | ------------------------------- | ---------------------------- | --------------------------- |
-| Button    | `src/lib/components/ui/button/` | [where + how]                | `variant="ghost" size="sm"` |
-| Badge     | `src/lib/components/ui/badge/`  | [where + how]                | `variant="success"`         |
+| Component | Path                            | Usage         | Key Props/Variants          |
+| --------- | ------------------------------- | ------------- | --------------------------- |
+| Button    | `src/lib/components/ui/button/` | [where + how] | `variant="ghost" size="sm"` |
+| Badge     | `src/lib/components/ui/badge/`  | [where + how] | `variant="success"`         |
 
 ### Adopt from shadcn-svelte / Bits UI
 
-| Component | Source        | Install command                              | Purpose          |
-| --------- | ------------- | -------------------------------------------- | ---------------- |
-| [name]    | shadcn-svelte | `pnpm dlx shadcn-svelte@latest add [name]`   | [what it covers] |
+| Component | Source        | Install command                            | Purpose          |
+| --------- | ------------- | ------------------------------------------ | ---------------- |
+| [name]    | shadcn-svelte | `pnpm dlx shadcn-svelte@latest add [name]` | [what it covers] |
 
 ### Build Custom
 

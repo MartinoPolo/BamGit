@@ -31,6 +31,7 @@ Generate self-contained HTML mockup(s) from a design brief, using the Grovekeepe
 - `all` / `N all`: generate variants for every component with a brief but no variants.
 
 Examples:
+
 - `gk-mockup` → 1 variant, auto-detect next
 - `gk-mockup 3` → 3 variants, auto-detect next
 - `gk-mockup assigned-issues-panel` → 1 variant for that component
@@ -64,6 +65,7 @@ Output directory: `designs/<component-name>/variants/`
 **N > 1**: Spawn N `mp-ui-variant-generator` agents in parallel. Output: `designs/<component-name>/variants/variant-{a,b,c,...}.html`
 
 Each mockup must:
+
 - `<link rel="stylesheet" href="../../tokens.css">` in `<head>` — never inline tokens
 - Geist / Geist Mono from Google Fonts CDN (with system fallbacks)
 - Root element: `<div class="gk-root theme-dark">`
@@ -76,13 +78,14 @@ Each mockup must:
 #### Container Context (Critical)
 
 If the brief specifies a **Container Context**:
+
 - Show the parent container (tab bar, panel chrome) at reduced opacity as non-editable context
 - The designed component fills only its designated area — no duplicate headers, borders, or footers
 - Standalone components own their full chrome
 
 ### Step 5: Open in Browser
 
-Open each variant via `file:///` URL. Leave tabs open for comparison.
+Open each variant via `file:///` URL (Chrome DevTools MCP). Leave tabs open for comparison.
 
 ### Step 6: Report
 
