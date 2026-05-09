@@ -1,490 +1,576 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CostLink — Variant C: Icon-Appended</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    /* ── Grovekeeper design tokens — Forest Moss palette ────────── */
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CostLink — Variant C: Icon-Appended</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* ── Grovekeeper design tokens — Forest Moss palette ────────── */
 
-    :root {
-      /* Brand greens (deep moss + olive) */
-      --moss-50:  oklch(0.972 0.018 130);
-      --moss-100: oklch(0.940 0.034 130);
-      --moss-200: oklch(0.880 0.058 130);
-      --moss-300: oklch(0.795 0.082 130);
-      --moss-400: oklch(0.690 0.098 132);
-      --moss-500: oklch(0.580 0.096 134);
-      --moss-600: oklch(0.480 0.082 138);
-      --moss-700: oklch(0.395 0.066 142);
-      --moss-800: oklch(0.300 0.048 145);
-      --moss-900: oklch(0.215 0.032 148);
-      --moss-950: oklch(0.155 0.024 150);
+			:root {
+				/* Brand greens (deep moss + olive) */
+				--moss-50: oklch(0.972 0.018 130);
+				--moss-100: oklch(0.94 0.034 130);
+				--moss-200: oklch(0.88 0.058 130);
+				--moss-300: oklch(0.795 0.082 130);
+				--moss-400: oklch(0.69 0.098 132);
+				--moss-500: oklch(0.58 0.096 134);
+				--moss-600: oklch(0.48 0.082 138);
+				--moss-700: oklch(0.395 0.066 142);
+				--moss-800: oklch(0.3 0.048 145);
+				--moss-900: oklch(0.215 0.032 148);
+				--moss-950: oklch(0.155 0.024 150);
 
-      /* Olive / amber accent (autumn fruit) */
-      --amber-300: oklch(0.840 0.130 78);
-      --amber-400: oklch(0.770 0.150 65);
-      --amber-500: oklch(0.690 0.165 55);
-      --amber-600: oklch(0.595 0.160 48);
+				/* Olive / amber accent (autumn fruit) */
+				--amber-300: oklch(0.84 0.13 78);
+				--amber-400: oklch(0.77 0.15 65);
+				--amber-500: oklch(0.69 0.165 55);
+				--amber-600: oklch(0.595 0.16 48);
 
-      /* Bark (warm brown for trunks, secondary accents) */
-      --bark-300: oklch(0.700 0.060 60);
-      --bark-500: oklch(0.500 0.075 55);
-      --bark-700: oklch(0.345 0.055 50);
+				/* Bark (warm brown for trunks, secondary accents) */
+				--bark-300: oklch(0.7 0.06 60);
+				--bark-500: oklch(0.5 0.075 55);
+				--bark-700: oklch(0.345 0.055 50);
 
-      /* Azure (cool blue accent scale) */
-      --azure-300: oklch(0.750 0.090 230);
-      --azure-400: oklch(0.660 0.120 230);
-      --azure-500: oklch(0.570 0.130 235);
-      --azure-600: oklch(0.490 0.115 240);
-      --azure-700: oklch(0.400 0.095 240);
+				/* Azure (cool blue accent scale) */
+				--azure-300: oklch(0.75 0.09 230);
+				--azure-400: oklch(0.66 0.12 230);
+				--azure-500: oklch(0.57 0.13 235);
+				--azure-600: oklch(0.49 0.115 240);
+				--azure-700: oklch(0.4 0.095 240);
 
-      /* Plum (purple accent) */
-      --plum-300: oklch(0.720 0.100 320);
-      --plum-400: oklch(0.640 0.130 320);
-      --plum-500: oklch(0.560 0.150 320);
-      --plum-600: oklch(0.480 0.130 320);
-      --plum-700: oklch(0.400 0.110 320);
+				/* Plum (purple accent) */
+				--plum-300: oklch(0.72 0.1 320);
+				--plum-400: oklch(0.64 0.13 320);
+				--plum-500: oklch(0.56 0.15 320);
+				--plum-600: oklch(0.48 0.13 320);
+				--plum-700: oklch(0.4 0.11 320);
 
-      /* Teal (blue-green accent) */
-      --teal-300: oklch(0.780 0.075 195);
-      --teal-400: oklch(0.700 0.095 195);
-      --teal-500: oklch(0.620 0.110 195);
-      --teal-600: oklch(0.540 0.095 195);
-      --teal-700: oklch(0.460 0.080 195);
+				/* Teal (blue-green accent) */
+				--teal-300: oklch(0.78 0.075 195);
+				--teal-400: oklch(0.7 0.095 195);
+				--teal-500: oklch(0.62 0.11 195);
+				--teal-600: oklch(0.54 0.095 195);
+				--teal-700: oklch(0.46 0.08 195);
 
-      /* Rose (warm pink-red accent) */
-      --rose-300: oklch(0.800 0.105 15);
-      --rose-400: oklch(0.720 0.135 15);
-      --rose-500: oklch(0.640 0.155 15);
-      --rose-600: oklch(0.560 0.135 15);
-      --rose-700: oklch(0.480 0.115 15);
+				/* Rose (warm pink-red accent) */
+				--rose-300: oklch(0.8 0.105 15);
+				--rose-400: oklch(0.72 0.135 15);
+				--rose-500: oklch(0.64 0.155 15);
+				--rose-600: oklch(0.56 0.135 15);
+				--rose-700: oklch(0.48 0.115 15);
 
-      /* Coral (warm orange-red accent) */
-      --coral-300: oklch(0.780 0.105 30);
-      --coral-400: oklch(0.700 0.135 30);
-      --coral-500: oklch(0.620 0.155 30);
-      --coral-600: oklch(0.540 0.135 30);
-      --coral-700: oklch(0.460 0.115 30);
+				/* Coral (warm orange-red accent) */
+				--coral-300: oklch(0.78 0.105 30);
+				--coral-400: oklch(0.7 0.135 30);
+				--coral-500: oklch(0.62 0.155 30);
+				--coral-600: oklch(0.54 0.135 30);
+				--coral-700: oklch(0.46 0.115 30);
 
-      /* Gold (warm yellow accent) */
-      --gold-300: oklch(0.810 0.090 90);
-      --gold-400: oklch(0.730 0.115 90);
-      --gold-500: oklch(0.650 0.135 90);
-      --gold-600: oklch(0.570 0.115 90);
-      --gold-700: oklch(0.490 0.095 90);
+				/* Gold (warm yellow accent) */
+				--gold-300: oklch(0.81 0.09 90);
+				--gold-400: oklch(0.73 0.115 90);
+				--gold-500: oklch(0.65 0.135 90);
+				--gold-600: oklch(0.57 0.115 90);
+				--gold-700: oklch(0.49 0.095 90);
 
-      /* Sage (muted green accent) */
-      --sage-300: oklch(0.760 0.055 160);
-      --sage-400: oklch(0.680 0.070 160);
-      --sage-500: oklch(0.600 0.085 160);
-      --sage-600: oklch(0.520 0.070 160);
-      --sage-700: oklch(0.440 0.060 160);
+				/* Sage (muted green accent) */
+				--sage-300: oklch(0.76 0.055 160);
+				--sage-400: oklch(0.68 0.07 160);
+				--sage-500: oklch(0.6 0.085 160);
+				--sage-600: oklch(0.52 0.07 160);
+				--sage-700: oklch(0.44 0.06 160);
 
-      /* Indigo (deep blue-violet accent) */
-      --indigo-300: oklch(0.700 0.095 275);
-      --indigo-400: oklch(0.620 0.120 275);
-      --indigo-500: oklch(0.540 0.140 275);
-      --indigo-600: oklch(0.460 0.120 275);
-      --indigo-700: oklch(0.380 0.100 275);
+				/* Indigo (deep blue-violet accent) */
+				--indigo-300: oklch(0.7 0.095 275);
+				--indigo-400: oklch(0.62 0.12 275);
+				--indigo-500: oklch(0.54 0.14 275);
+				--indigo-600: oklch(0.46 0.12 275);
+				--indigo-700: oklch(0.38 0.1 275);
 
-      /* Fuchsia (vivid magenta accent) */
-      --fuchsia-300: oklch(0.740 0.105 350);
-      --fuchsia-400: oklch(0.660 0.135 350);
-      --fuchsia-500: oklch(0.580 0.155 350);
-      --fuchsia-600: oklch(0.500 0.135 350);
-      --fuchsia-700: oklch(0.420 0.115 350);
+				/* Fuchsia (vivid magenta accent) */
+				--fuchsia-300: oklch(0.74 0.105 350);
+				--fuchsia-400: oklch(0.66 0.135 350);
+				--fuchsia-500: oklch(0.58 0.155 350);
+				--fuchsia-600: oklch(0.5 0.135 350);
+				--fuchsia-700: oklch(0.42 0.115 350);
 
-      /* Sky (gradient bg for forest view) */
-      --sky-light-top: oklch(0.965 0.018 220);
-      --sky-light-bot: oklch(0.940 0.025 130);
-      --sky-dark-top:  oklch(0.225 0.028 240);
-      --sky-dark-bot:  oklch(0.180 0.030 150);
+				/* Sky (gradient bg for forest view) */
+				--sky-light-top: oklch(0.965 0.018 220);
+				--sky-light-bot: oklch(0.94 0.025 130);
+				--sky-dark-top: oklch(0.225 0.028 240);
+				--sky-dark-bot: oklch(0.18 0.03 150);
 
-      /* Status accents */
-      --status-success: oklch(0.660 0.135 145);
-      --status-warning: oklch(0.770 0.155 75);
-      --status-danger:  oklch(0.620 0.205 25);
-      --status-info:    oklch(0.660 0.105 220);
-      --status-merged:  oklch(0.580 0.140 310);
+				/* Status accents */
+				--status-success: oklch(0.66 0.135 145);
+				--status-warning: oklch(0.77 0.155 75);
+				--status-danger: oklch(0.62 0.205 25);
+				--status-info: oklch(0.66 0.105 220);
+				--status-merged: oklch(0.58 0.14 310);
 
-      /* Priority levels */
-      --priority-top:    oklch(0.620 0.205 25);
-      --priority-high:   oklch(0.720 0.160 55);
-      --priority-medium: oklch(0.820 0.160 85);
-      --priority-low:    oklch(0.660 0.105 220);
-      --priority-lowest: oklch(0.550 0.020 250);
+				/* Priority levels */
+				--priority-top: oklch(0.62 0.205 25);
+				--priority-high: oklch(0.72 0.16 55);
+				--priority-medium: oklch(0.82 0.16 85);
+				--priority-low: oklch(0.66 0.105 220);
+				--priority-lowest: oklch(0.55 0.02 250);
 
-      /* GitHub state colors */
-      --gh-open:   oklch(0.660 0.135 145);
-      --gh-closed: oklch(0.580 0.140 310);
-      --gh-merged: oklch(0.580 0.140 310);
-      --gh-draft:  oklch(0.550 0.020 250);
+				/* GitHub state colors */
+				--gh-open: oklch(0.66 0.135 145);
+				--gh-closed: oklch(0.58 0.14 310);
+				--gh-merged: oklch(0.58 0.14 310);
+				--gh-draft: oklch(0.55 0.02 250);
 
-      /* Session state colors */
-      --session-running:      oklch(0.660 0.135 145);
-      --session-errored:      oklch(0.620 0.205 25);
-      --session-idle:         oklch(0.660 0.105 220);
-      --session-paused:       oklch(0.550 0.020 250);
-      --session-finished:     oklch(0.450 0.015 250);
-      --session-needs-input:  oklch(0.770 0.155 75);
-      --session-needs-review: oklch(0.660 0.105 220);
+				/* Session state colors */
+				--session-running: oklch(0.66 0.135 145);
+				--session-errored: oklch(0.62 0.205 25);
+				--session-idle: oklch(0.66 0.105 220);
+				--session-paused: oklch(0.55 0.02 250);
+				--session-finished: oklch(0.45 0.015 250);
+				--session-needs-input: oklch(0.77 0.155 75);
+				--session-needs-review: oklch(0.66 0.105 220);
 
-      /* ── Typography ─────────────────────────────────────────── */
-      --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-      --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+				/* ── Typography ─────────────────────────────────────────── */
+				--font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+				--font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
 
-      /* Font sizes */
-      --text-2xs: 10.5px;
-      --text-xs:  11px;
-      --text-sm:  12px;
-      --text-md:  13px;
-      --text-base:14px;
-      --text-lg:  15px;
-      --text-xl:  17px;
-      --text-2xl: 22px;
-      --text-3xl: 28px;
-      --text-4xl: 36px;
-      --text-5xl: 48px;
+				/* Font sizes */
+				--text-2xs: 10.5px;
+				--text-xs: 11px;
+				--text-sm: 12px;
+				--text-md: 13px;
+				--text-base: 14px;
+				--text-lg: 15px;
+				--text-xl: 17px;
+				--text-2xl: 22px;
+				--text-3xl: 28px;
+				--text-4xl: 36px;
+				--text-5xl: 48px;
 
-      /* Line heights */
-      --leading-tight:  1.15;
-      --leading-snug:   1.25;
-      --leading-normal: 1.4;
-      --leading-relaxed:1.55;
-      --leading-loose:  1.7;
+				/* Line heights */
+				--leading-tight: 1.15;
+				--leading-snug: 1.25;
+				--leading-normal: 1.4;
+				--leading-relaxed: 1.55;
+				--leading-loose: 1.7;
 
-      /* Font weights */
-      --weight-regular:  400;
-      --weight-medium:   500;
-      --weight-semibold: 600;
-      --weight-bold:     700;
+				/* Font weights */
+				--weight-regular: 400;
+				--weight-medium: 500;
+				--weight-semibold: 600;
+				--weight-bold: 700;
 
-      /* Letter spacing */
-      --tracking-tight:  -0.02em;
-      --tracking-snug:   -0.01em;
-      --tracking-normal: 0;
-      --tracking-wide:   0.04em;
-      --tracking-wider:  0.08em;
+				/* Letter spacing */
+				--tracking-tight: -0.02em;
+				--tracking-snug: -0.01em;
+				--tracking-normal: 0;
+				--tracking-wide: 0.04em;
+				--tracking-wider: 0.08em;
 
-      /* ── Spacing scale (4px base) ───────────────────────────── */
-      --space-0:  0;
-      --space-1:  2px;
-      --space-2:  4px;
-      --space-3:  6px;
-      --space-4:  8px;
-      --space-5:  10px;
-      --space-6:  12px;
-      --space-7:  14px;
-      --space-8:  16px;
-      --space-10: 20px;
-      --space-12: 24px;
-      --space-14: 28px;
-      --space-16: 32px;
-      --space-20: 40px;
-      --space-24: 48px;
-      --space-32: 64px;
+				/* ── Spacing scale (4px base) ───────────────────────────── */
+				--space-0: 0;
+				--space-1: 2px;
+				--space-2: 4px;
+				--space-3: 6px;
+				--space-4: 8px;
+				--space-5: 10px;
+				--space-6: 12px;
+				--space-7: 14px;
+				--space-8: 16px;
+				--space-10: 20px;
+				--space-12: 24px;
+				--space-14: 28px;
+				--space-16: 32px;
+				--space-20: 40px;
+				--space-24: 48px;
+				--space-32: 64px;
 
-      /* ── Radii ──────────────────────────────────────────────── */
-      --radius-none: 0;
-      --radius-xs: 4px;
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-lg: 10px;
-      --radius-xl: 14px;
-      --radius-2xl: 20px;
-      --radius-full: 9999px;
+				/* ── Radii ──────────────────────────────────────────────── */
+				--radius-none: 0;
+				--radius-xs: 4px;
+				--radius-sm: 6px;
+				--radius-md: 8px;
+				--radius-lg: 10px;
+				--radius-xl: 14px;
+				--radius-2xl: 20px;
+				--radius-full: 9999px;
 
-      /* ── Borders ────────────────────────────────────────────── */
-      --border-width-1: 1px;
-      --border-width-2: 1.5px;
-      --border-width-3: 2px;
-      --focus-ring-width: 3px;
-      --focus-ring-offset: 2px;
+				/* ── Borders ────────────────────────────────────────────── */
+				--border-width-1: 1px;
+				--border-width-2: 1.5px;
+				--border-width-3: 2px;
+				--focus-ring-width: 3px;
+				--focus-ring-offset: 2px;
 
-      /* ── Shadows ────────────────────────────────────────────── */
-      --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-      --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-      --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-      --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-      --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+				/* ── Shadows ────────────────────────────────────────────── */
+				--shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+				--shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+				--shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+				--shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.2), 0 4px 12px rgba(20, 30, 22, 0.08);
+				--shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-      /* ── Sizing — control heights ──────────────────────────── */
-      --size-control-sm: 26px;
-      --size-control-md: 32px;
-      --size-control-lg: 38px;
+				/* ── Sizing — control heights ──────────────────────────── */
+				--size-control-sm: 26px;
+				--size-control-md: 32px;
+				--size-control-lg: 38px;
 
-      /* ── Z-index scale ─────────────────────────────────────── */
-      --z-base: 0;
-      --z-raised: 10;
-      --z-dropdown: 20;
-      --z-sticky: 30;
-      --z-overlay: 40;
-      --z-modal: 50;
-      --z-toast: 60;
-      --z-tooltip: 70;
+				/* ── Z-index scale ─────────────────────────────────────── */
+				--z-base: 0;
+				--z-raised: 10;
+				--z-dropdown: 20;
+				--z-sticky: 30;
+				--z-overlay: 40;
+				--z-modal: 50;
+				--z-toast: 60;
+				--z-tooltip: 70;
 
-      /* ── Motion ─────────────────────────────────────────────── */
-      --duration-1: 90ms;
-      --duration-2: 120ms;
-      --duration-3: 160ms;
-      --duration-4: 220ms;
-      --duration-5: 320ms;
-      --ease-standard: cubic-bezier(.2,.7,.3,1);
-      --ease-out:      cubic-bezier(.16,.84,.44,1);
-      --ease-in:       cubic-bezier(.5,0,.75,0);
+				/* ── Motion ─────────────────────────────────────────────── */
+				--duration-1: 90ms;
+				--duration-2: 120ms;
+				--duration-3: 160ms;
+				--duration-4: 220ms;
+				--duration-5: 320ms;
+				--ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
+				--ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);
+				--ease-in: cubic-bezier(0.5, 0, 0.75, 0);
 
-      /* ── Layout ─────────────────────────────────────────────── */
-      --sidebar-width:  240px;
-      --sidebar-width-collapsed: 56px;
-    }
+				/* ── Layout ─────────────────────────────────────────────── */
+				--sidebar-width: 240px;
+				--sidebar-width-collapsed: 56px;
+			}
 
-    /* Dark theme */
-    .theme-dark, [data-theme='dark'] {
-      color-scheme: dark;
-      --background:        oklch(0.155 0.018 150);
-      --surface:           oklch(0.190 0.020 150);
-      --surface-2:         oklch(0.225 0.022 150);
-      --surface-hover:     oklch(0.265 0.024 150);
-      --surface-3:         oklch(0.265 0.024 150);
-      --foreground:        oklch(0.965 0.010 130);
-      --foreground-muted:  oklch(0.730 0.018 135);
-      --foreground-subtle: oklch(0.560 0.020 140);
-      --border:            oklch(0.295 0.022 148);
-      --border-strong:     oklch(0.380 0.028 145);
-      --primary:           var(--moss-400);
-      --primary-fg:        oklch(0.135 0.020 150);
-      --primary-soft:      oklch(0.305 0.045 145);
-      --accent:            var(--moss-400);
-      --accent-fg:         oklch(0.135 0.02 150);
-      --ring:              var(--moss-400);
-      --sidebar-bg:        oklch(0.180 0.022 150);
-      --sidebar-fg:        oklch(0.770 0.020 140);
-      --code-bg:           oklch(0.215 0.020 150);
-      --sky-top:           var(--sky-dark-top);
-      --sky-bot:           var(--sky-dark-bot);
-      --ground-color:      oklch(0.300 0.060 140);
-      --ground-dark:       oklch(0.180 0.040 50);
-    }
+			/* Dark theme */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-    /* Base */
-    .gk-root {
-      font-family: var(--font-sans);
-      color: var(--foreground);
-      background: var(--background);
-      font-feature-settings: "ss01", "cv11";
-      font-synthesis: none;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
 
-    .gk-root, .gk-root * {
-      box-sizing: border-box;
-    }
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-    .font-mono { font-family: var(--font-mono); }
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-    /* Gk type scale */
-    .gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-    .gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-    .gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-    .gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-    .gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-    .gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-    .gk-eyebrow {
-      font-size: var(--text-2xs);
-      font-weight: var(--weight-semibold);
-      color: var(--foreground-subtle);
-      letter-spacing: var(--tracking-wider);
-      text-transform: uppercase;
-      font-family: var(--font-sans);
-    }
+			/* Gk type scale */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				font-family: var(--font-sans);
+			}
 
-    /* Card */
-    .gk-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-    }
-    .gk-card-padded { padding: 16px; }
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-    /* Badges */
-    .gk-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      height: 20px;
-      padding: 0 7px;
-      font-size: 11px;
-      font-weight: 500;
-      border-radius: 999px;
-      background: var(--surface-2);
-      color: var(--foreground-muted);
-      border: 1px solid var(--border);
-      font-family: var(--font-sans);
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-    }
-    .gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-    .gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
 
-    /* Divider */
-    .gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-    /* CodeBurn panel */
-    .cb-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 12px 14px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 0;
-    }
-    .cb-panel-title {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      padding-bottom: 6px;
-      border-bottom: 1px dashed var(--border);
-    }
-    .cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
-    .cb-panel-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
-    .cb-panel-sub {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: 400;
-      color: var(--foreground-subtle);
-      text-transform: none;
-      letter-spacing: 0;
-      margin-left: auto;
-    }
+			/* CodeBurn panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
 
-    /* Tooltip */
-    .gk-tooltip {
-      background: oklch(0.12 0.02 150);
-      color: oklch(0.97 0.01 130);
-      border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
-      font-size: 11px;
-      padding: 5px 8px;
-      border-radius: 6px;
-      box-shadow: var(--shadow-md);
-      font-family: var(--font-sans);
-      position: absolute;
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: var(--z-tooltip);
-    }
+			/* Tooltip */
+			.gk-tooltip {
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+				font-size: 11px;
+				padding: 5px 8px;
+				border-radius: 6px;
+				box-shadow: var(--shadow-md);
+				font-family: var(--font-sans);
+				position: absolute;
+				white-space: nowrap;
+				pointer-events: none;
+				z-index: var(--z-tooltip);
+			}
 
-    /* Scrollbar */
-    .gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-    .gk-root ::-webkit-scrollbar-track { background: transparent; }
-    .gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-    .gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-    /* State showcase cells */
-    .cs-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 14px 14px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      min-height: 88px;
-      position: relative;
-    }
-    .cs-cell-label {
-      font-size: 10px;
-      font-family: var(--font-mono);
-      color: var(--foreground-subtle);
-      letter-spacing: 0.04em;
-      text-transform: lowercase;
-    }
-    .cs-cell-stage {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .cs-cell-grid {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-    .cs-cell-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .cs-cell-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .cs-cell-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			/* State showcase cells */
+			.cs-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				padding: 14px 14px 12px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				min-height: 88px;
+				position: relative;
+			}
+			.cs-cell-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+			.cs-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: flex-start;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.cs-cell-grid {
+				display: grid;
+				gap: 10px;
+				margin-bottom: 18px;
+			}
+			.cs-cell-grid.cols-4 {
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+			}
+			.cs-cell-grid.cols-3 {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+			}
+			.cs-cell-grid.cols-2 {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
 
-    /* ── Page layout ────────────────────────────────────────────── */
-    body {
-      margin: 0;
-      padding: 0;
-    }
+			/* ── Page layout ────────────────────────────────────────────── */
+			body {
+				margin: 0;
+				padding: 0;
+			}
 
-    .page-layout {
-      min-height: 100vh;
-      padding: 40px 48px 64px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+			.page-layout {
+				min-height: 100vh;
+				padding: 40px 48px 64px;
+				max-width: 1100px;
+				margin: 0 auto;
+			}
 
-    .page-header {
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
+			.page-header {
+				margin-bottom: 40px;
+				padding-bottom: 20px;
+				border-bottom: 1px solid var(--border);
+			}
 
-    .page-header .variant-meta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
+			.page-header .variant-meta {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				margin-bottom: 8px;
+			}
 
-    .page-header h1 {
-      margin: 0 0 4px 0;
-    }
+			.page-header h1 {
+				margin: 0 0 4px 0;
+			}
 
-    .page-header p {
-      margin: 0;
-      max-width: 560px;
-    }
+			.page-header p {
+				margin: 0;
+				max-width: 560px;
+			}
 
-    .section {
-      margin-bottom: 40px;
-    }
+			.section {
+				margin-bottom: 40px;
+			}
 
-    .section-title {
-      margin: 0 0 14px 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+			.section-title {
+				margin: 0 0 14px 0;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
 
-    .section-title::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
+			.section-title::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
 
-    /* ── CostLink component ─────────────────────────────────────── */
-    /*
+			/* ── CostLink component ─────────────────────────────────────── */
+			/*
       Variant C: Icon-Appended
       At rest: plain monospaced cost text in foreground-muted
       On hover: arrow-up-right icon fades in to the right, text shifts to primary
@@ -492,1011 +578,1565 @@
       Active: slight scale-down feedback
     */
 
-    .cb-cost-link {
-      /* Inline-flex so it sits naturally in text flow */
-      display: inline-flex;
-      align-items: center;
-      gap: 0;
-      position: relative;
-
-      /* Monospaced for tabular-nums alignment */
-      font-family: var(--font-mono);
-      font-variant-numeric: tabular-nums;
-      font-feature-settings: "tnum";
-
-      /* No underline — navigation is signaled by icon + color, not underline */
-      text-decoration: none;
-      cursor: pointer;
-      outline: none;
-      border: none;
-      background: transparent;
-      padding: 1px 2px;
-      border-radius: var(--radius-xs);
-
-      /* Color at rest: muted, reads as data, not a link */
-      color: var(--foreground-muted);
-
-      /* Transitions */
-      transition:
-        color var(--duration-2) var(--ease-standard),
-        background var(--duration-2) var(--ease-standard);
-
-      /* Prevents layout shift when icon appears */
-      white-space: nowrap;
-    }
-
-    /* Size: sm — 10.5px, matches --text-2xs */
-    .cb-cost-link-sm {
-      font-size: 10.5px;
-      line-height: 14px;
-    }
-
-    /* Size: md — 12px, matches --text-sm */
-    .cb-cost-link-md {
-      font-size: 12px;
-      line-height: 16px;
-    }
-
-    /* The cost text itself — inherits font from parent */
-    .cb-cost-link__text {
-      /* Slight letter-spacing tightening for mono numerics */
-      letter-spacing: -0.01em;
-    }
-
-    /* The arrow icon — hidden at rest */
-    .cb-cost-link__icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 0;
-      overflow: hidden;
-      opacity: 0;
-      /* Slides in from left — compact feel, no layout jump */
-      transform: translateX(-2px) translateY(1px);
-      transition:
-        opacity var(--duration-3) var(--ease-out),
-        width var(--duration-3) var(--ease-out),
-        transform var(--duration-3) var(--ease-out);
-      flex-shrink: 0;
-    }
-
-    /* sm: icon is 8px */
-    .cb-cost-link-sm .cb-cost-link__icon {
-      /* height matches line-height of adjacent text */
-      height: 14px;
-    }
-
-    /* md: icon is 8px, height matches md line-height */
-    .cb-cost-link-md .cb-cost-link__icon {
-      height: 16px;
-    }
-
-    /* ── Hover state ── */
-    .cb-cost-link:hover,
-    .cb-cost-link[data-state="hover"] {
-      color: var(--primary);
-      background: color-mix(in oklch, var(--primary) 8%, transparent);
-    }
-
-    .cb-cost-link:hover .cb-cost-link__icon,
-    .cb-cost-link[data-state="hover"] .cb-cost-link__icon {
-      opacity: 1;
-      width: 10px;  /* slight breathing room */
-      transform: translateX(0) translateY(1px);
-    }
-
-    /* ── Focus state ── */
-    .cb-cost-link:focus-visible,
-    .cb-cost-link[data-state="focus"] {
-      outline: 2px solid var(--ring);
-      outline-offset: 2px;
-      color: var(--primary);
-    }
-
-    .cb-cost-link:focus-visible .cb-cost-link__icon,
-    .cb-cost-link[data-state="focus"] .cb-cost-link__icon {
-      opacity: 1;
-      width: 10px;
-      transform: translateX(0) translateY(1px);
-    }
-
-    /* ── Active / pressed state ── */
-    .cb-cost-link:active,
-    .cb-cost-link[data-state="active"] {
-      color: var(--primary);
-      transform: scale(0.94);
-      background: color-mix(in oklch, var(--primary) 14%, transparent);
-    }
-
-    .cb-cost-link:active .cb-cost-link__icon,
-    .cb-cost-link[data-state="active"] .cb-cost-link__icon {
-      opacity: 1;
-      width: 10px;
-      transform: translateX(0) translateY(1px);
-    }
-
-    /* ── Tooltip wrapper ── */
-    .cb-cost-link-wrapper {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .cb-cost-link-wrapper .cb-cost-link-tooltip {
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: oklch(0.12 0.02 150);
-      color: oklch(0.97 0.01 130);
-      border: 1px solid color-mix(in oklch, oklch(0.32 0.022 148) 80%, transparent);
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      box-shadow: var(--shadow-md);
-      font-family: var(--font-sans);
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: var(--z-tooltip);
-      opacity: 0;
-      transform: translateX(-50%) translateY(4px);
-      transition:
-        opacity var(--duration-3) var(--ease-out),
-        transform var(--duration-3) var(--ease-out);
-    }
-
-    /* Tooltip arrow */
-    .cb-cost-link-wrapper .cb-cost-link-tooltip::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 4px solid transparent;
-      border-top-color: oklch(0.12 0.02 150);
-    }
-
-    .cb-cost-link-wrapper:hover .cb-cost-link-tooltip {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* ── Frozen/locked states for showcase ── */
-    .cb-cost-link[data-state="default"] {
-      /* Plain rest state — explicit */
-      color: var(--foreground-muted);
-      background: transparent;
-    }
-
-    /* Disable live hover on frozen state demos */
-    .cb-cost-link[data-state="default"]:hover,
-    .cb-cost-link[data-state="active"]:hover {
-      /* Let data-state rule win */
-    }
-
-    /* Force active state to show even without real :active */
-    .cb-cost-link[data-state="active"] {
-      color: var(--primary);
-      transform: scale(0.94);
-      background: color-mix(in oklch, var(--primary) 14%, transparent);
-    }
-
-    .cb-cost-link[data-state="active"] .cb-cost-link__icon {
-      opacity: 1;
-      width: 10px;
-      transform: translateX(0) translateY(1px);
-    }
-
-    /* Force hover state for showcase */
-    .cb-cost-link[data-state="hover"] {
-      color: var(--primary);
-      background: color-mix(in oklch, var(--primary) 8%, transparent);
-    }
-
-    .cb-cost-link[data-state="hover"] .cb-cost-link__icon {
-      opacity: 1;
-      width: 10px;
-      transform: translateX(0) translateY(1px);
-    }
-
-    /* Force focus state for showcase */
-    .cb-cost-link[data-state="focus"] {
-      outline: 2px solid var(--ring);
-      outline-offset: 2px;
-      color: var(--primary);
-    }
-
-    .cb-cost-link[data-state="focus"] .cb-cost-link__icon {
-      opacity: 1;
-      width: 10px;
-      transform: translateX(0) translateY(1px);
-    }
-
-    /* ── Context: Workspace Card ────────────────────────────────── */
-    .workspace-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      width: 280px;
-      overflow: hidden;
-    }
-
-    .workspace-card__header {
-      padding: 12px 14px 10px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .workspace-card__name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--foreground);
-      letter-spacing: -0.01em;
-      line-height: 1.2;
-    }
-
-    .workspace-card__path {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--foreground-subtle);
-      margin-top: 2px;
-    }
-
-    .workspace-card__status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--session-running);
-      flex-shrink: 0;
-      margin-top: 4px;
-      box-shadow: 0 0 0 2px color-mix(in oklch, var(--session-running) 20%, transparent);
-    }
-
-    .workspace-card__body {
-      padding: 0 14px 10px;
-    }
-
-    .workspace-card__task {
-      font-size: 11.5px;
-      color: var(--foreground-muted);
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .workspace-card__footer {
-      padding: 8px 14px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: color-mix(in oklch, var(--surface-2) 40%, transparent);
-    }
-
-    .workspace-card__footer-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .workspace-card__footer-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: var(--foreground-subtle);
-      font-family: var(--font-mono);
-    }
-
-    .workspace-card__footer-label {
-      font-size: 10px;
-      color: var(--foreground-subtle);
-      font-family: var(--font-sans);
-    }
-
-    /* ── Context: Session Sidebar ───────────────────────────────── */
-    .session-sidebar {
-      width: 240px;
-      background: var(--sidebar-bg, var(--surface));
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .session-sidebar__header {
-      padding: 10px 12px 8px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .session-sidebar__title {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--foreground-muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      font-family: var(--font-mono);
-    }
-
-    .session-sidebar__running-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--session-running);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .session-sidebar__rows {
-      padding: 8px 0;
-    }
-
-    .session-sidebar__row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 5px 12px;
-      gap: 8px;
-    }
-
-    .session-sidebar__row-label {
-      font-size: 11px;
-      color: var(--foreground-subtle);
-      font-family: var(--font-sans);
-      flex-shrink: 0;
-    }
-
-    .session-sidebar__row-value {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--foreground-muted);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .session-sidebar__divider {
-      height: 1px;
-      background: var(--border);
-      margin: 4px 0;
-    }
-
-    /* ── Standalone inline usage example ───────────────────────── */
-    .inline-usage-example {
-      background: color-mix(in oklch, var(--surface-2) 60%, transparent);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 16px 18px;
-      font-size: 13px;
-      color: var(--foreground-muted);
-      line-height: 1.6;
-    }
-
-    .inline-usage-example .highlight-segment {
-      color: var(--foreground);
-      font-weight: 500;
-    }
-
-    /* ── Size comparison table ──────────────────────────────────── */
-    .size-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .size-table th {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--foreground-subtle);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      text-align: left;
-      padding: 0 12px 8px 0;
-      font-weight: 500;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .size-table td {
-      padding: 10px 12px 10px 0;
-      border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
-      vertical-align: middle;
-    }
-
-    .size-table td:first-child {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      color: var(--foreground-subtle);
-      white-space: nowrap;
-    }
-
-    .size-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* ── Magnitude demo ─────────────────────────────────────────── */
-    .magnitude-row {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .magnitude-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .magnitude-item__label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--foreground-subtle);
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Responsive ─────────────────────────────────────────────── */
-    @media (max-width: 700px) {
-      .page-layout {
-        padding: 24px 20px 40px;
-      }
-
-      .cs-cell-grid.cols-4 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .cs-cell-grid.cols-3 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .context-demos {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-      }
-    }
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="page-layout">
-
-    <!-- Page header -->
-    <div class="page-header">
-      <div class="variant-meta">
-        <span class="gk-eyebrow">Design System</span>
-        <span style="color: var(--border); font-size: 11px;">·</span>
-        <span class="gk-eyebrow" style="color: var(--primary);">Variant C — Icon-Appended</span>
-      </div>
-      <h1 class="gk-h1" style="margin: 0 0 6px 0;">CostLink</h1>
-      <p class="gk-body" style="color: var(--foreground-muted); margin: 0;">
-        Clickable cost value that navigates to the Usage page. At rest: plain monospaced text.
-        On hover: arrow-up-right icon fades in + text shifts to primary. Used inline in workspace
-        cards, session sidebars, and summary rows.
-      </p>
-    </div>
-
-    <!-- Section 1: State showcase -->
-    <div class="section">
-      <h2 class="gk-h3 section-title">States — size md (12px)</h2>
-
-      <div class="cs-cell-grid cols-4">
-        <!-- Default -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">default</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" data-state="default" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hover — icon visible, text primary -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">hover</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" data-state="hover" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Focus -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">focus</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" data-state="focus" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Active / pressed -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">active / pressed</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" data-state="active" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- States — sm -->
-      <h2 class="gk-h3 section-title" style="margin-top: 24px;">States — size sm (10.5px)</h2>
-
-      <div class="cs-cell-grid cols-4">
-        <!-- Default sm -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">default</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" data-state="default" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hover sm -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">hover</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" data-state="hover" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Focus sm -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">focus</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" data-state="focus" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Active sm -->
-        <div class="cs-cell">
-          <span class="cs-cell-label">active / pressed</span>
-          <div class="cs-cell-stage">
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" data-state="active" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 2: Cost magnitudes -->
-    <div class="section">
-      <h2 class="gk-h3 section-title">Cost magnitudes — hover one to see icon</h2>
-
-      <div class="cs-cell" style="padding: 20px 18px;">
-        <div class="magnitude-row">
-          <!-- $0.12 — micro session -->
-          <div class="magnitude-item">
-            <span class="magnitude-item__label">micro session</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" aria-label="$0.12 — View usage details">
-                <span class="cb-cost-link__text">$0.12</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-
-          <!-- $4.82 — typical session -->
-          <div class="magnitude-item">
-            <span class="magnitude-item__label">typical session</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-
-          <!-- $124.50 — heavy workspace -->
-          <div class="magnitude-item">
-            <span class="magnitude-item__label">heavy workspace</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" aria-label="$124.50 — View usage details">
-                <span class="cb-cost-link__text">$124.50</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-
-          <!-- $0.12 sm -->
-          <div class="magnitude-item">
-            <span class="magnitude-item__label">micro · sm</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$0.12 — View usage details">
-                <span class="cb-cost-link__text">$0.12</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-
-          <!-- $124.50 sm -->
-          <div class="magnitude-item">
-            <span class="magnitude-item__label">heavy · sm</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$124.50 — View usage details">
-                <span class="cb-cost-link__text">$124.50</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-
-          <!-- Hover-pinned example -->
-          <div class="magnitude-item">
-            <span class="magnitude-item__label" style="color: var(--primary);">hover pinned ↓</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-md" data-state="hover" tabindex="-1" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip" style="opacity: 1; transform: translateX(-50%) translateY(0);">View usage details</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 3: In-context demos -->
-    <div class="section">
-      <h2 class="gk-h3 section-title">In context</h2>
-
-      <div class="context-demos" style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
-
-        <!-- Workspace card -->
-        <div class="workspace-card">
-          <div class="workspace-card__header">
-            <div>
-              <div class="workspace-card__name">grovekeeper</div>
-              <div class="workspace-card__path">~/projects/grovekeeper</div>
-            </div>
-            <div class="workspace-card__status-dot"></div>
-          </div>
-          <div class="workspace-card__body">
-            <div class="workspace-card__task">
-              Implement session sidebar cost tracking with real-time token usage updates
-            </div>
-          </div>
-          <div class="workspace-card__footer">
-            <div class="workspace-card__footer-meta">
-              <div class="workspace-card__footer-item">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity: 0.5;">
-                  <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.25"/>
-                  <path d="M5 3V5.5L6.5 6.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
-                </svg>
-                <span>2h 14m</span>
-              </div>
-              <div class="workspace-card__footer-item">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity: 0.5;">
-                  <path d="M2 7L4.5 3L7 5.5L8.5 3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span>84k tok</span>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <span class="workspace-card__footer-label">cost</span>
-              <!-- CostLink sm in workspace card footer -->
-              <div class="cb-cost-link-wrapper">
-                <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$4.82 — View usage details">
-                  <span class="cb-cost-link__text">$4.82</span>
-                  <span class="cb-cost-link__icon" aria-hidden="true">
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </span>
-                </a>
-                <div class="cb-cost-link-tooltip">View usage details</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Session sidebar -->
-        <div class="session-sidebar">
-          <div class="session-sidebar__header">
-            <span class="session-sidebar__title">Session</span>
-            <div class="session-sidebar__running-dot"></div>
-          </div>
-          <div class="session-sidebar__rows">
-            <div class="session-sidebar__row">
-              <span class="session-sidebar__row-label">Model</span>
-              <span class="session-sidebar__row-value">claude-sonnet-4-6</span>
-            </div>
-            <div class="session-sidebar__row">
-              <span class="session-sidebar__row-label">Duration</span>
-              <span class="session-sidebar__row-value">47m 12s</span>
-            </div>
-            <div class="session-sidebar__row">
-              <span class="session-sidebar__row-label">Tokens in</span>
-              <span class="session-sidebar__row-value">192,840</span>
-            </div>
-            <div class="session-sidebar__row">
-              <span class="session-sidebar__row-label">Tokens out</span>
-              <span class="session-sidebar__row-value">38,220</span>
-            </div>
-            <div class="session-sidebar__divider"></div>
-            <div class="session-sidebar__row">
-              <span class="session-sidebar__row-label">Cost</span>
-              <!-- CostLink md in session sidebar -->
-              <div class="cb-cost-link-wrapper">
-                <a href="#" class="cb-cost-link cb-cost-link-md" aria-label="$0.12 — View usage details">
-                  <span class="cb-cost-link__text">$0.12</span>
-                  <span class="cb-cost-link__icon" aria-hidden="true">
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </span>
-                </a>
-                <div class="cb-cost-link-tooltip">View usage details</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Inline prose example -->
-        <div class="inline-usage-example" style="flex: 1; min-width: 220px;">
-          <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--foreground-subtle); font-family: var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase;">Inline prose usage</p>
-          <p style="margin: 0; font-size: 13px; line-height: 1.65; color: var(--foreground-muted);">
-            Session <span class="highlight-segment">feat/cost-tracking</span> completed 38 tool calls
-            and consumed <span class="highlight-segment">231k tokens</span> at a total cost of
-            <!-- CostLink inline in text -->
-            <div class="cb-cost-link-wrapper" style="display: inline-flex;">
-              <a href="#" class="cb-cost-link cb-cost-link-md" aria-label="$124.50 — View usage details">
-                <span class="cb-cost-link__text">$124.50</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-            — well within the monthly budget of $200.
-          </p>
-          <p style="margin: 12px 0 0 0; font-size: 12px; color: var(--foreground-subtle); font-style: italic;">
-            Hover the cost value above to see the icon appear.
-          </p>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Section 4: Size comparison -->
-    <div class="section">
-      <h2 class="gk-h3 section-title">Size reference</h2>
-      <div class="cs-cell">
-        <table class="size-table">
-          <thead>
-            <tr>
-              <th>Size</th>
-              <th>Token</th>
-              <th>Font size</th>
-              <th>Use case</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>sm</td>
-              <td><code style="font-family: var(--font-mono); font-size: 10.5px; color: var(--primary);">cb-cost-link-sm</code></td>
-              <td style="font-family: var(--font-mono); font-size: 11px; color: var(--foreground-muted);">10.5px / --text-2xs</td>
-              <td style="font-size: 12px; color: var(--foreground-muted);">Workspace card footer, compact rows</td>
-              <td>
-                <div class="cb-cost-link-wrapper">
-                  <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$4.82">
-                    <span class="cb-cost-link__text">$4.82</span>
-                    <span class="cb-cost-link__icon" aria-hidden="true">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                        <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                  </a>
-                  <div class="cb-cost-link-tooltip">View usage details</div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>md</td>
-              <td><code style="font-family: var(--font-mono); font-size: 10.5px; color: var(--primary);">cb-cost-link-md</code></td>
-              <td style="font-family: var(--font-mono); font-size: 11px; color: var(--foreground-muted);">12px / --text-sm</td>
-              <td style="font-size: 12px; color: var(--foreground-muted);">Session sidebar, inline prose, summary rows</td>
-              <td>
-                <div class="cb-cost-link-wrapper">
-                  <a href="#" class="cb-cost-link cb-cost-link-md" aria-label="$4.82">
-                    <span class="cb-cost-link__text">$4.82</span>
-                    <span class="cb-cost-link__icon" aria-hidden="true">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                        <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                  </a>
-                  <div class="cb-cost-link-tooltip">View usage details</div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Section 5: CodeBurn panel context -->
-    <div class="section">
-      <h2 class="gk-h3 section-title">CodeBurn panel context</h2>
-      <div class="cb-panel" style="max-width: 420px;">
-        <div class="cb-panel-title">
-          Usage summary
-          <span class="cb-panel-sub">May 2026</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 6px;">
-          <!-- Row 1 -->
-          <div style="display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 4px 0; border-bottom: 1px solid color-mix(in oklch, var(--border) 40%, transparent);">
-            <span style="font-size: 12px; color: var(--foreground-muted);">grovekeeper</span>
-            <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle);">842k tok</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$124.50 — View usage details">
-                <span class="cb-cost-link__text">$124.50</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-          <!-- Row 2 -->
-          <div style="display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 4px 0; border-bottom: 1px solid color-mix(in oklch, var(--border) 40%, transparent);">
-            <span style="font-size: 12px; color: var(--foreground-muted);">low-poly-2d-trees</span>
-            <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle);">31k tok</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$4.82 — View usage details">
-                <span class="cb-cost-link__text">$4.82</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-          <!-- Row 3 -->
-          <div style="display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 4px 0;">
-            <span style="font-size: 12px; color: var(--foreground-muted);">dotfiles</span>
-            <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle);">820 tok</span>
-            <div class="cb-cost-link-wrapper">
-              <a href="#" class="cb-cost-link cb-cost-link-sm" aria-label="$0.12 — View usage details">
-                <span class="cb-cost-link__text">$0.12</span>
-                <span class="cb-cost-link__icon" aria-hidden="true">
-                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cb-cost-link-tooltip">View usage details</div>
-            </div>
-          </div>
-        </div>
-        <!-- Total row -->
-        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px dashed var(--border); margin-top: 2px;">
-          <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle); text-transform: uppercase; letter-spacing: 0.06em;">Total</span>
-          <div class="cb-cost-link-wrapper">
-            <a href="#" class="cb-cost-link cb-cost-link-md" style="font-weight: 600; color: var(--foreground);" aria-label="$129.44 — View usage details">
-              <span class="cb-cost-link__text">$129.44</span>
-              <span class="cb-cost-link__icon" aria-hidden="true">
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                  <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cb-cost-link-tooltip">View usage details</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-</body>
+			.cb-cost-link {
+				/* Inline-flex so it sits naturally in text flow */
+				display: inline-flex;
+				align-items: center;
+				gap: 0;
+				position: relative;
+
+				/* Monospaced for tabular-nums alignment */
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-feature-settings: 'tnum';
+
+				/* No underline — navigation is signaled by icon + color, not underline */
+				text-decoration: none;
+				cursor: pointer;
+				outline: none;
+				border: none;
+				background: transparent;
+				padding: 1px 2px;
+				border-radius: var(--radius-xs);
+
+				/* Color at rest: muted, reads as data, not a link */
+				color: var(--foreground-muted);
+
+				/* Transitions */
+				transition:
+					color var(--duration-2) var(--ease-standard),
+					background var(--duration-2) var(--ease-standard);
+
+				/* Prevents layout shift when icon appears */
+				white-space: nowrap;
+			}
+
+			/* Size: sm — 10.5px, matches --text-2xs */
+			.cb-cost-link-sm {
+				font-size: 10.5px;
+				line-height: 14px;
+			}
+
+			/* Size: md — 12px, matches --text-sm */
+			.cb-cost-link-md {
+				font-size: 12px;
+				line-height: 16px;
+			}
+
+			/* The cost text itself — inherits font from parent */
+			.cb-cost-link__text {
+				/* Slight letter-spacing tightening for mono numerics */
+				letter-spacing: -0.01em;
+			}
+
+			/* The arrow icon — hidden at rest */
+			.cb-cost-link__icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 0;
+				overflow: hidden;
+				opacity: 0;
+				/* Slides in from left — compact feel, no layout jump */
+				transform: translateX(-2px) translateY(1px);
+				transition:
+					opacity var(--duration-3) var(--ease-out),
+					width var(--duration-3) var(--ease-out),
+					transform var(--duration-3) var(--ease-out);
+				flex-shrink: 0;
+			}
+
+			/* sm: icon is 8px */
+			.cb-cost-link-sm .cb-cost-link__icon {
+				/* height matches line-height of adjacent text */
+				height: 14px;
+			}
+
+			/* md: icon is 8px, height matches md line-height */
+			.cb-cost-link-md .cb-cost-link__icon {
+				height: 16px;
+			}
+
+			/* ── Hover state ── */
+			.cb-cost-link:hover,
+			.cb-cost-link[data-state='hover'] {
+				color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 8%, transparent);
+			}
+
+			.cb-cost-link:hover .cb-cost-link__icon,
+			.cb-cost-link[data-state='hover'] .cb-cost-link__icon {
+				opacity: 1;
+				width: 10px; /* slight breathing room */
+				transform: translateX(0) translateY(1px);
+			}
+
+			/* ── Focus state ── */
+			.cb-cost-link:focus-visible,
+			.cb-cost-link[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+				color: var(--primary);
+			}
+
+			.cb-cost-link:focus-visible .cb-cost-link__icon,
+			.cb-cost-link[data-state='focus'] .cb-cost-link__icon {
+				opacity: 1;
+				width: 10px;
+				transform: translateX(0) translateY(1px);
+			}
+
+			/* ── Active / pressed state ── */
+			.cb-cost-link:active,
+			.cb-cost-link[data-state='active'] {
+				color: var(--primary);
+				transform: scale(0.94);
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+			}
+
+			.cb-cost-link:active .cb-cost-link__icon,
+			.cb-cost-link[data-state='active'] .cb-cost-link__icon {
+				opacity: 1;
+				width: 10px;
+				transform: translateX(0) translateY(1px);
+			}
+
+			/* ── Tooltip wrapper ── */
+			.cb-cost-link-wrapper {
+				position: relative;
+				display: inline-flex;
+				align-items: center;
+			}
+
+			.cb-cost-link-wrapper .cb-cost-link-tooltip {
+				position: absolute;
+				bottom: calc(100% + 6px);
+				left: 50%;
+				transform: translateX(-50%);
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid color-mix(in oklch, oklch(0.32 0.022 148) 80%, transparent);
+				font-size: 11px;
+				padding: 4px 8px;
+				border-radius: 6px;
+				box-shadow: var(--shadow-md);
+				font-family: var(--font-sans);
+				white-space: nowrap;
+				pointer-events: none;
+				z-index: var(--z-tooltip);
+				opacity: 0;
+				transform: translateX(-50%) translateY(4px);
+				transition:
+					opacity var(--duration-3) var(--ease-out),
+					transform var(--duration-3) var(--ease-out);
+			}
+
+			/* Tooltip arrow */
+			.cb-cost-link-wrapper .cb-cost-link-tooltip::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				border: 4px solid transparent;
+				border-top-color: oklch(0.12 0.02 150);
+			}
+
+			.cb-cost-link-wrapper:hover .cb-cost-link-tooltip {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0);
+			}
+
+			/* ── Frozen/locked states for showcase ── */
+			.cb-cost-link[data-state='default'] {
+				/* Plain rest state — explicit */
+				color: var(--foreground-muted);
+				background: transparent;
+			}
+
+			/* Disable live hover on frozen state demos */
+			.cb-cost-link[data-state='default']:hover,
+			.cb-cost-link[data-state='active']:hover {
+				/* Let data-state rule win */
+			}
+
+			/* Force active state to show even without real :active */
+			.cb-cost-link[data-state='active'] {
+				color: var(--primary);
+				transform: scale(0.94);
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+			}
+
+			.cb-cost-link[data-state='active'] .cb-cost-link__icon {
+				opacity: 1;
+				width: 10px;
+				transform: translateX(0) translateY(1px);
+			}
+
+			/* Force hover state for showcase */
+			.cb-cost-link[data-state='hover'] {
+				color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 8%, transparent);
+			}
+
+			.cb-cost-link[data-state='hover'] .cb-cost-link__icon {
+				opacity: 1;
+				width: 10px;
+				transform: translateX(0) translateY(1px);
+			}
+
+			/* Force focus state for showcase */
+			.cb-cost-link[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+				color: var(--primary);
+			}
+
+			.cb-cost-link[data-state='focus'] .cb-cost-link__icon {
+				opacity: 1;
+				width: 10px;
+				transform: translateX(0) translateY(1px);
+			}
+
+			/* ── Context: Workspace Card ────────────────────────────────── */
+			.workspace-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				width: 280px;
+				overflow: hidden;
+			}
+
+			.workspace-card__header {
+				padding: 12px 14px 10px;
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: 8px;
+			}
+
+			.workspace-card__name {
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--foreground);
+				letter-spacing: -0.01em;
+				line-height: 1.2;
+			}
+
+			.workspace-card__path {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				margin-top: 2px;
+			}
+
+			.workspace-card__status-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				background: var(--session-running);
+				flex-shrink: 0;
+				margin-top: 4px;
+				box-shadow: 0 0 0 2px color-mix(in oklch, var(--session-running) 20%, transparent);
+			}
+
+			.workspace-card__body {
+				padding: 0 14px 10px;
+			}
+
+			.workspace-card__task {
+				font-size: 11.5px;
+				color: var(--foreground-muted);
+				line-height: 1.4;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
+			.workspace-card__footer {
+				padding: 8px 14px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background: color-mix(in oklch, var(--surface-2) 40%, transparent);
+			}
+
+			.workspace-card__footer-meta {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.workspace-card__footer-item {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			.workspace-card__footer-label {
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-sans);
+			}
+
+			/* ── Context: Session Sidebar ───────────────────────────────── */
+			.session-sidebar {
+				width: 240px;
+				background: var(--sidebar-bg, var(--surface));
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				box-shadow: var(--shadow-sm);
+			}
+
+			.session-sidebar__header {
+				padding: 10px 12px 8px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.session-sidebar__title {
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				font-family: var(--font-mono);
+			}
+
+			.session-sidebar__running-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--session-running);
+				animation: pulse-dot 2s ease-in-out infinite;
+			}
+
+			@keyframes pulse-dot {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.4;
+				}
+			}
+
+			.session-sidebar__rows {
+				padding: 8px 0;
+			}
+
+			.session-sidebar__row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 5px 12px;
+				gap: 8px;
+			}
+
+			.session-sidebar__row-label {
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-sans);
+				flex-shrink: 0;
+			}
+
+			.session-sidebar__row-value {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.session-sidebar__divider {
+				height: 1px;
+				background: var(--border);
+				margin: 4px 0;
+			}
+
+			/* ── Standalone inline usage example ───────────────────────── */
+			.inline-usage-example {
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 16px 18px;
+				font-size: 13px;
+				color: var(--foreground-muted);
+				line-height: 1.6;
+			}
+
+			.inline-usage-example .highlight-segment {
+				color: var(--foreground);
+				font-weight: 500;
+			}
+
+			/* ── Size comparison table ──────────────────────────────────── */
+			.size-table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			.size-table th {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				text-align: left;
+				padding: 0 12px 8px 0;
+				font-weight: 500;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.size-table td {
+				padding: 10px 12px 10px 0;
+				border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+				vertical-align: middle;
+			}
+
+			.size-table td:first-child {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+
+			.size-table tr:last-child td {
+				border-bottom: none;
+			}
+
+			/* ── Magnitude demo ─────────────────────────────────────────── */
+			.magnitude-row {
+				display: flex;
+				align-items: center;
+				gap: 24px;
+				flex-wrap: wrap;
+			}
+
+			.magnitude-item {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+
+			.magnitude-item__label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
+
+			/* ── Responsive ─────────────────────────────────────────────── */
+			@media (max-width: 700px) {
+				.page-layout {
+					padding: 24px 20px 40px;
+				}
+
+				.cs-cell-grid.cols-4 {
+					grid-template-columns: repeat(2, 1fr);
+				}
+
+				.cs-cell-grid.cols-3 {
+					grid-template-columns: repeat(2, 1fr);
+				}
+
+				.context-demos {
+					flex-direction: column !important;
+					align-items: flex-start !important;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-layout">
+				<!-- Page header -->
+				<div class="page-header">
+					<div class="variant-meta">
+						<span class="gk-eyebrow">Design System</span>
+						<span style="color: var(--border); font-size: 11px">·</span>
+						<span class="gk-eyebrow" style="color: var(--primary)"
+							>Variant C — Icon-Appended</span
+						>
+					</div>
+					<h1 class="gk-h1" style="margin: 0 0 6px 0">CostLink</h1>
+					<p class="gk-body" style="color: var(--foreground-muted); margin: 0">
+						Clickable cost value that navigates to the Usage page. At rest: plain
+						monospaced text. On hover: arrow-up-right icon fades in + text shifts to
+						primary. Used inline in workspace cards, session sidebars, and summary rows.
+					</p>
+				</div>
+
+				<!-- Section 1: State showcase -->
+				<div class="section">
+					<h2 class="gk-h3 section-title">States — size md (12px)</h2>
+
+					<div class="cs-cell-grid cols-4">
+						<!-- Default -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">default</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										data-state="default"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- Hover — icon visible, text primary -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">hover</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										data-state="hover"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Focus -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">focus</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										data-state="focus"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- Active / pressed -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">active / pressed</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										data-state="active"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- States — sm -->
+					<h2 class="gk-h3 section-title" style="margin-top: 24px">
+						States — size sm (10.5px)
+					</h2>
+
+					<div class="cs-cell-grid cols-4">
+						<!-- Default sm -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">default</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										data-state="default"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- Hover sm -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">hover</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										data-state="hover"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Focus sm -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">focus</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										data-state="focus"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- Active sm -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">active / pressed</span>
+							<div class="cs-cell-stage">
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										data-state="active"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 2: Cost magnitudes -->
+				<div class="section">
+					<h2 class="gk-h3 section-title">Cost magnitudes — hover one to see icon</h2>
+
+					<div class="cs-cell" style="padding: 20px 18px">
+						<div class="magnitude-row">
+							<!-- $0.12 — micro session -->
+							<div class="magnitude-item">
+								<span class="magnitude-item__label">micro session</span>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										aria-label="$0.12 — View usage details"
+									>
+										<span class="cb-cost-link__text">$0.12</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+
+							<!-- $4.82 — typical session -->
+							<div class="magnitude-item">
+								<span class="magnitude-item__label">typical session</span>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+
+							<!-- $124.50 — heavy workspace -->
+							<div class="magnitude-item">
+								<span class="magnitude-item__label">heavy workspace</span>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										aria-label="$124.50 — View usage details"
+									>
+										<span class="cb-cost-link__text">$124.50</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+
+							<!-- $0.12 sm -->
+							<div class="magnitude-item">
+								<span class="magnitude-item__label">micro · sm</span>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										aria-label="$0.12 — View usage details"
+									>
+										<span class="cb-cost-link__text">$0.12</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+
+							<!-- $124.50 sm -->
+							<div class="magnitude-item">
+								<span class="magnitude-item__label">heavy · sm</span>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										aria-label="$124.50 — View usage details"
+									>
+										<span class="cb-cost-link__text">$124.50</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+
+							<!-- Hover-pinned example -->
+							<div class="magnitude-item">
+								<span class="magnitude-item__label" style="color: var(--primary)"
+									>hover pinned ↓</span
+								>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										data-state="hover"
+										tabindex="-1"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div
+										class="cb-cost-link-tooltip"
+										style="
+											opacity: 1;
+											transform: translateX(-50%) translateY(0);
+										"
+									>
+										View usage details
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 3: In-context demos -->
+				<div class="section">
+					<h2 class="gk-h3 section-title">In context</h2>
+
+					<div
+						class="context-demos"
+						style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap"
+					>
+						<!-- Workspace card -->
+						<div class="workspace-card">
+							<div class="workspace-card__header">
+								<div>
+									<div class="workspace-card__name">grovekeeper</div>
+									<div class="workspace-card__path">~/projects/grovekeeper</div>
+								</div>
+								<div class="workspace-card__status-dot"></div>
+							</div>
+							<div class="workspace-card__body">
+								<div class="workspace-card__task">
+									Implement session sidebar cost tracking with real-time token
+									usage updates
+								</div>
+							</div>
+							<div class="workspace-card__footer">
+								<div class="workspace-card__footer-meta">
+									<div class="workspace-card__footer-item">
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+											style="opacity: 0.5"
+										>
+											<circle
+												cx="5"
+												cy="5"
+												r="4"
+												stroke="currentColor"
+												stroke-width="1.25"
+											/>
+											<path
+												d="M5 3V5.5L6.5 6.5"
+												stroke="currentColor"
+												stroke-width="1.25"
+												stroke-linecap="round"
+											/>
+										</svg>
+										<span>2h 14m</span>
+									</div>
+									<div class="workspace-card__footer-item">
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+											style="opacity: 0.5"
+										>
+											<path
+												d="M2 7L4.5 3L7 5.5L8.5 3"
+												stroke="currentColor"
+												stroke-width="1.25"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+										<span>84k tok</span>
+									</div>
+								</div>
+								<div style="display: flex; align-items: center; gap: 5px">
+									<span class="workspace-card__footer-label">cost</span>
+									<!-- CostLink sm in workspace card footer -->
+									<div class="cb-cost-link-wrapper">
+										<a
+											href="#"
+											class="cb-cost-link cb-cost-link-sm"
+											aria-label="$4.82 — View usage details"
+										>
+											<span class="cb-cost-link__text">$4.82</span>
+											<span class="cb-cost-link__icon" aria-hidden="true">
+												<svg
+													width="8"
+													height="8"
+													viewBox="0 0 8 8"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+														stroke="currentColor"
+														stroke-width="1.25"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</span>
+										</a>
+										<div class="cb-cost-link-tooltip">View usage details</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Session sidebar -->
+						<div class="session-sidebar">
+							<div class="session-sidebar__header">
+								<span class="session-sidebar__title">Session</span>
+								<div class="session-sidebar__running-dot"></div>
+							</div>
+							<div class="session-sidebar__rows">
+								<div class="session-sidebar__row">
+									<span class="session-sidebar__row-label">Model</span>
+									<span class="session-sidebar__row-value"
+										>claude-sonnet-4-6</span
+									>
+								</div>
+								<div class="session-sidebar__row">
+									<span class="session-sidebar__row-label">Duration</span>
+									<span class="session-sidebar__row-value">47m 12s</span>
+								</div>
+								<div class="session-sidebar__row">
+									<span class="session-sidebar__row-label">Tokens in</span>
+									<span class="session-sidebar__row-value">192,840</span>
+								</div>
+								<div class="session-sidebar__row">
+									<span class="session-sidebar__row-label">Tokens out</span>
+									<span class="session-sidebar__row-value">38,220</span>
+								</div>
+								<div class="session-sidebar__divider"></div>
+								<div class="session-sidebar__row">
+									<span class="session-sidebar__row-label">Cost</span>
+									<!-- CostLink md in session sidebar -->
+									<div class="cb-cost-link-wrapper">
+										<a
+											href="#"
+											class="cb-cost-link cb-cost-link-md"
+											aria-label="$0.12 — View usage details"
+										>
+											<span class="cb-cost-link__text">$0.12</span>
+											<span class="cb-cost-link__icon" aria-hidden="true">
+												<svg
+													width="8"
+													height="8"
+													viewBox="0 0 8 8"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+														stroke="currentColor"
+														stroke-width="1.25"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</span>
+										</a>
+										<div class="cb-cost-link-tooltip">View usage details</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Inline prose example -->
+						<div class="inline-usage-example" style="flex: 1; min-width: 220px">
+							<p
+								style="
+									margin: 0 0 10px 0;
+									font-size: 12px;
+									color: var(--foreground-subtle);
+									font-family: var(--font-mono);
+									letter-spacing: 0.04em;
+									text-transform: uppercase;
+								"
+							>
+								Inline prose usage
+							</p>
+							<div
+								style="
+									margin: 0;
+									font-size: 13px;
+									line-height: 1.65;
+									color: var(--foreground-muted);
+								"
+							>
+								Session
+								<span class="highlight-segment">feat/cost-tracking</span> completed
+								38 tool calls and consumed
+								<span class="highlight-segment">231k tokens</span> at a total cost
+								of
+								<!-- CostLink inline in text -->
+								<div class="cb-cost-link-wrapper" style="display: inline-flex">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-md"
+										aria-label="$124.50 — View usage details"
+									>
+										<span class="cb-cost-link__text">$124.50</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg
+												width="8"
+												height="8"
+												viewBox="0 0 8 8"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+								— well within the monthly budget of $200.
+							</div>
+							<p
+								style="
+									margin: 12px 0 0 0;
+									font-size: 12px;
+									color: var(--foreground-subtle);
+									font-style: italic;
+								"
+							>
+								Hover the cost value above to see the icon appear.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 4: Size comparison -->
+				<div class="section">
+					<h2 class="gk-h3 section-title">Size reference</h2>
+					<div class="cs-cell">
+						<table class="size-table">
+							<thead>
+								<tr>
+									<th>Size</th>
+									<th>Token</th>
+									<th>Font size</th>
+									<th>Use case</th>
+									<th>Example</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>sm</td>
+									<td>
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 10.5px;
+												color: var(--primary);
+											"
+											>cb-cost-link-sm</code
+										>
+									</td>
+									<td
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-muted);
+										"
+									>
+										10.5px / --text-2xs
+									</td>
+									<td style="font-size: 12px; color: var(--foreground-muted)">
+										Workspace card footer, compact rows
+									</td>
+									<td>
+										<div class="cb-cost-link-wrapper">
+											<a
+												href="#"
+												class="cb-cost-link cb-cost-link-sm"
+												aria-label="$4.82"
+											>
+												<span class="cb-cost-link__text">$4.82</span>
+												<span class="cb-cost-link__icon" aria-hidden="true">
+													<svg
+														width="8"
+														height="8"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+															stroke="currentColor"
+															stroke-width="1.25"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</span>
+											</a>
+											<div class="cb-cost-link-tooltip">
+												View usage details
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>md</td>
+									<td>
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 10.5px;
+												color: var(--primary);
+											"
+											>cb-cost-link-md</code
+										>
+									</td>
+									<td
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-muted);
+										"
+									>
+										12px / --text-sm
+									</td>
+									<td style="font-size: 12px; color: var(--foreground-muted)">
+										Session sidebar, inline prose, summary rows
+									</td>
+									<td>
+										<div class="cb-cost-link-wrapper">
+											<a
+												href="#"
+												class="cb-cost-link cb-cost-link-md"
+												aria-label="$4.82"
+											>
+												<span class="cb-cost-link__text">$4.82</span>
+												<span class="cb-cost-link__icon" aria-hidden="true">
+													<svg
+														width="8"
+														height="8"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+															stroke="currentColor"
+															stroke-width="1.25"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</span>
+											</a>
+											<div class="cb-cost-link-tooltip">
+												View usage details
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- Section 5: CodeBurn panel context -->
+				<div class="section">
+					<h2 class="gk-h3 section-title">CodeBurn panel context</h2>
+					<div class="cb-panel" style="max-width: 420px">
+						<div class="cb-panel-title">
+							Usage summary
+							<span class="cb-panel-sub">May 2026</span>
+						</div>
+						<div style="display: flex; flex-direction: column; gap: 6px">
+							<!-- Row 1 -->
+							<div
+								style="
+									display: grid;
+									grid-template-columns: 1fr auto auto;
+									align-items: center;
+									gap: 10px;
+									padding: 4px 0;
+									border-bottom: 1px solid
+										color-mix(in oklch, var(--border) 40%, transparent);
+								"
+							>
+								<span style="font-size: 12px; color: var(--foreground-muted)"
+									>grovekeeper</span
+								>
+								<span
+									style="
+										font-family: var(--font-mono);
+										font-size: 10.5px;
+										color: var(--foreground-subtle);
+									"
+									>842k tok</span
+								>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										aria-label="$124.50 — View usage details"
+									>
+										<span class="cb-cost-link__text">$124.50</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+							<!-- Row 2 -->
+							<div
+								style="
+									display: grid;
+									grid-template-columns: 1fr auto auto;
+									align-items: center;
+									gap: 10px;
+									padding: 4px 0;
+									border-bottom: 1px solid
+										color-mix(in oklch, var(--border) 40%, transparent);
+								"
+							>
+								<span style="font-size: 12px; color: var(--foreground-muted)"
+									>low-poly-2d-trees</span
+								>
+								<span
+									style="
+										font-family: var(--font-mono);
+										font-size: 10.5px;
+										color: var(--foreground-subtle);
+									"
+									>31k tok</span
+								>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										aria-label="$4.82 — View usage details"
+									>
+										<span class="cb-cost-link__text">$4.82</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+							<!-- Row 3 -->
+							<div
+								style="
+									display: grid;
+									grid-template-columns: 1fr auto auto;
+									align-items: center;
+									gap: 10px;
+									padding: 4px 0;
+								"
+							>
+								<span style="font-size: 12px; color: var(--foreground-muted)"
+									>dotfiles</span
+								>
+								<span
+									style="
+										font-family: var(--font-mono);
+										font-size: 10.5px;
+										color: var(--foreground-subtle);
+									"
+									>820 tok</span
+								>
+								<div class="cb-cost-link-wrapper">
+									<a
+										href="#"
+										class="cb-cost-link cb-cost-link-sm"
+										aria-label="$0.12 — View usage details"
+									>
+										<span class="cb-cost-link__text">$0.12</span>
+										<span class="cb-cost-link__icon" aria-hidden="true">
+											<svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+												<path
+													d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+													stroke="currentColor"
+													stroke-width="1.25"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cb-cost-link-tooltip">View usage details</div>
+								</div>
+							</div>
+						</div>
+						<!-- Total row -->
+						<div
+							style="
+								display: flex;
+								align-items: center;
+								justify-content: space-between;
+								padding-top: 8px;
+								border-top: 1px dashed var(--border);
+								margin-top: 2px;
+							"
+						>
+							<span
+								style="
+									font-family: var(--font-mono);
+									font-size: 10.5px;
+									color: var(--foreground-subtle);
+									text-transform: uppercase;
+									letter-spacing: 0.06em;
+								"
+								>Total</span
+							>
+							<div class="cb-cost-link-wrapper">
+								<a
+									href="#"
+									class="cb-cost-link cb-cost-link-md"
+									style="font-weight: 600; color: var(--foreground)"
+									aria-label="$129.44 — View usage details"
+								>
+									<span class="cb-cost-link__text">$129.44</span>
+									<span class="cb-cost-link__icon" aria-hidden="true">
+										<svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+											<path
+												d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5"
+												stroke="currentColor"
+												stroke-width="1.25"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cb-cost-link-tooltip">View usage details</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
