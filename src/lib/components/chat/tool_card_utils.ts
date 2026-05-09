@@ -60,8 +60,7 @@ export function getToolAccentColor(toolName: string): string {
 	return TOOL_ACCENT_COLORS[toolName] ?? 'var(--foreground-muted)';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TOOL_ICON_MAP: Record<string, Component<any>> = {
+const TOOL_ICON_MAP: Record<string, Component> = {
 	Bash: TerminalIcon,
 	Read: EyeIcon,
 	Write: PencilIcon,
