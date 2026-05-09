@@ -18,6 +18,7 @@
 	import GitBranch from '@lucide/svelte/icons/git-branch';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Check from '@lucide/svelte/icons/check';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { openUrl } from '$lib/opener.js';
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -73,7 +74,7 @@
 	let searchQuery = $state('');
 	let sortColumn = $state<SortColumn>('number');
 	let sortDirection = $state<SortDirection>('desc');
-	let selectedNumbers = $state(new Set<number>());
+	const selectedNumbers = new SvelteSet<number>();
 	let panelElement = $state<HTMLDivElement | null>(null);
 
 	// ─── Derived data ────────────────────────────────────────────────────────
@@ -133,30 +134,33 @@
 		}
 	}
 
+	function replaceSelectedWith(numbers: number[]) {
+		selectedNumbers.clear();
+		for (const n of numbers) {
+			selectedNumbers.add(n);
+		}
+	}
+
 	function toggleGlobalCheckbox() {
 		if (globalCheckboxState.checked || globalCheckboxState.indeterminate) {
-			selectedNumbers = new Set();
+			selectedNumbers.clear();
 		} else {
-			selectedNumbers = new Set(allFiltered.map((issue) => issue.number));
+			replaceSelectedWith(allFiltered.map((issue) => issue.number));
 		}
 	}
 
 	function toggleRowSelection(issueNumber: number) {
-		const next = new Set(selectedNumbers);
-		if (next.has(issueNumber)) {
-			next.delete(issueNumber);
+		if (selectedNumbers.has(issueNumber)) {
+			selectedNumbers.delete(issueNumber);
 		} else {
-			next.add(issueNumber);
+			selectedNumbers.add(issueNumber);
 		}
-		selectedNumbers = next;
 	}
 
 	function selectAllUnlinked() {
-		const next = new Set(selectedNumbers);
 		for (const issue of filteredUnlinked) {
-			next.add(issue.number);
+			selectedNumbers.add(issue.number);
 		}
-		selectedNumbers = next;
 	}
 
 	function handleAddSelected() {
@@ -168,7 +172,7 @@
 				onWizardOpen(issue);
 			}
 		}
-		selectedNumbers = new Set();
+		selectedNumbers.clear();
 	}
 
 	function handleAddSelectedWithWorktree() {
@@ -180,7 +184,7 @@
 				onQuickAddWithWorktree(issue);
 			}
 		}
-		selectedNumbers = new Set();
+		selectedNumbers.clear();
 	}
 
 	function handleRowClick(event: MouseEvent, issueNumber: number) {
@@ -202,7 +206,7 @@
 		}
 		if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
 			event.preventDefault();
-			selectedNumbers = new Set(allFiltered.map((issue) => issue.number));
+			replaceSelectedWith(allFiltered.map((issue) => issue.number));
 		}
 		if (event.key === 'Enter' && selectedUnlinkedCount > 0) {
 			event.preventDefault();
@@ -378,6 +382,7 @@
 								onCheckedChange={() => toggleRowSelection(issue.number)}
 							/>
 						</div>
+						<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub links -->
 						<div class="assigned-prd-col font-mono text-muted-foreground">
 							{#if issue.parent_issue_number !== null}
 								<a
@@ -412,6 +417,7 @@
 								#{issue.number}
 							</a>
 						</div>
+						<!-- eslint-enable svelte/no-navigation-without-resolve -->
 						<div class="min-w-0 truncate" data-no-select>
 							{issue.title}
 						</div>
@@ -489,6 +495,7 @@
 									onCheckedChange={() => toggleRowSelection(issue.number)}
 								/>
 							</div>
+							<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub links -->
 							<div class="assigned-prd-col font-mono text-muted-foreground">
 								{#if issue.parent_issue_number !== null}
 									<a
@@ -521,6 +528,7 @@
 									#{issue.number}
 								</a>
 							</div>
+							<!-- eslint-enable svelte/no-navigation-without-resolve -->
 							<div class="min-w-0 truncate">
 								{issue.title}
 							</div>
