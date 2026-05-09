@@ -6,13 +6,10 @@ Full-page view for creating and editing character sound packs. User imports soun
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. Importance tier colors: `--status-danger` (critical), `--status-warning` (important), `text-foreground-muted` (normal).
 
-## Generate Three Distinct Variants
+## Container Context
 
-**Variant A — Split Panel**: Fixed two-column layout. Left panel (40%) is the sound pool — imported files with play buttons, drag handles, and search/filter. Right panel (60%) is the event assignment area — vertical list of event slots grouped by tier with drop zones. Avatar + name header pinned above both panels. Toolbar at bottom with Save/Cancel.
-
-**Variant B — Kanban-style**: Top bar with avatar + name + metadata. Below: horizontal swimlanes per importance tier (critical left, important center, normal right). Each lane shows event slots as vertical cards. Sound pool lives in a collapsible bottom drawer that slides up. Drag from drawer into lane cards.
-
-**Variant C — Wizard Steps**: Three-step flow: (1) Name + Avatar, (2) Import Sounds with auto-mapping preview, (3) Manual Assignment with full drag-drop grid. Step indicator at top. Each step is a focused full-width view. Step 3 shows a compact event grid with sound chips.
+**Parent**: None — full-page view accessed from Settings → Notifications & Characters
+**This component is standalone** — it owns its full page chrome.
 
 ## Component Purpose
 

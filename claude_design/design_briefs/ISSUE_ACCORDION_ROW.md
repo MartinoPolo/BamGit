@@ -6,15 +6,15 @@ Alternative list view for the Issues tab in the workspace dashboard bottom panel
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-Three structurally different approaches to the accordion row layout. All must include every required element listed below.
+**Parent**: `WorkspaceBottomPanel` — tab content area (the "Issues" tab, alternative list view mode)
+**What parent provides**: Tab bar with tab buttons, panel resizer handle at top, panel border. Also a view-mode toggle (card grid vs accordion list) in the Issues tab toolbar.
+**What this component fills**: The content area below the Issues tab toolbar, full width × remaining height
+**Must NOT include**: Tab bar, panel header, outer border, footer — these belong to the parent panel
 
-**Variant A — Color Band Header**: Each row has a colored background header (issue color, reduced saturation in dark mode) similar to the issue card header band. Expand chevron on the left. Actions on the right.
+**Mockup rendering**: Show the bottom panel shell (tab bar with "Issues" tab active, accordion view selected) as read-only context at ~40% opacity. The designed component fills the content area below.
 
-**Variant B — Minimal Indicator**: Clean neutral rows with a small color dot or thin left indicator. Issue color used sparingly — only on hover glow and expand transition. Maximum information density.
-
-**Variant C — Grouped Sections**: Rows grouped by priority or status with sticky section headers. Each row is minimal but the grouping provides visual structure. Color used in group headers.
 
 ## Row Purpose
 

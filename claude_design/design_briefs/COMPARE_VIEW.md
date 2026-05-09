@@ -6,13 +6,14 @@ Side-by-side comparison of two AI models based on performance, efficiency, and w
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. Use `--chart-1` and `--chart-2` for the two compared models.
 
-## Generate Three Distinct Variants
+## Container Context
 
-**Variant A — Tale of Two Columns**: Two side-by-side columns, one per model. Each column shows the same metrics in the same order. Winner metrics highlighted in green. Shared header with model names. Clean, symmetric, easy to scan.
+**Parent**: Usage Dashboard page — sub-view accessed from "Group by: Model" or compare action
+**What parent provides**: Usage page layout, navigation header, period/scope filters
+**What this component fills**: The main content area of the Usage page, replacing or overlaying the default dashboard view
+**Must NOT include**: Page-level navigation, period filter bar — these belong to the Usage Dashboard page
 
-**Variant B — Versus Table**: Central table with metric names in the middle column, Model A values on the left, Model B values on the right. Winner side gets a subtle background tint. Category head-to-head shown as horizontal opposing bars (bar chart from center).
-
-**Variant C — Dashboard Cards**: Metrics grouped into 4 cards (Performance, Efficiency, Category, Working Style). Each card shows both models' values with inline bar comparisons. Winner indicated by a small trophy or checkmark icon. Cards in a 2x2 grid.
+**Mockup rendering**: Show the Usage page header and filter bar as read-only context at ~40% opacity. The designed component fills the main content area below.
 
 ## Compare View Purpose
 

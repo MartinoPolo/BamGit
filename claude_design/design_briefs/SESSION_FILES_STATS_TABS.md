@@ -6,15 +6,14 @@ Design spec for the **Files** and **Stats** tabs inside the session detail view.
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-Please generate three visual variants. Each should explore a different approach to information layout and visual hierarchy across both tabs. All variants must include every element listed below for both tabs. After I choose one, we will fully design all edge cases.
+**Parent**: Session detail view — tab content area (alongside the "Chat" tab)
+**What parent provides**: Session top bar (title, state badge, git context), tab bar (Chat / Files / Stats), right sidebar (sub-agent tree, provider info)
+**What this component fills**: The content area below the session tab bar, full width (minus sidebar if open) × full height
+**Must NOT include**: Session top bar, tab bar, right sidebar — these belong to the session view layout
 
-**Variant A — Dense, developer-focused**: Files tab mimics GitHub PR Files exactly — sidebar file tree on the left, diff on the right. Stats tab is a compact table/grid, no charts. Maximum data density, minimal whitespace.
-
-**Variant B — Card-based, scannable**: Files tab shows expandable file cards in a single column (no sidebar). Stats tab uses metric cards with prominent numbers and subtle icon decoration. Easier to read at a glance.
-
-**Variant C — Sidebar + summary bar**: Both tabs share a narrow left sidebar. Files tab sidebar = file tree with +/- counts; diff fills the right. Stats tab sidebar = category list (Cost, Tokens, Tools); detail fills the right. Unified layout language across the two tabs.
+**Mockup rendering**: Show the session view shell (top bar + tab bar with the relevant tab active) as read-only context at ~40% opacity. The designed component fills the content area below.
 
 ## Tab Context
 

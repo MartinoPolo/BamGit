@@ -6,15 +6,10 @@ Configurable multi-panel layout for the workspace dashboard bottom panel. Allows
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-Three structurally different approaches to the panel management UI. All must support all 7+ layout presets.
-
-**Variant A — Floating Switcher**: Small floating layout icon in the bottom panel toolbar. Opens a popover grid showing visual thumbnails of each layout preset. Selected layout highlighted. Each panel gets a compact tab bar.
-
-**Variant B — Corner Controls**: Each panel corner has drag handles and split/merge controls. Users can split any panel horizontally or vertically, or merge adjacent panels. Preset layouts available as quick-access but manual adjustment is the primary interaction.
-
-**Variant C — Toolbar Strip**: Dedicated toolbar strip at the top of the bottom panel showing the current layout as a miniature diagram. Click segments to select which view each panel shows. Layout presets as dropdown beside the diagram.
+**Parent**: `WorkspaceDashboardLayout` — the bottom section of the vertical paneforge split
+**This component IS the bottom panel container** — it owns the tab bar, panel chrome, resizer handle, and layout management. Child tab content components (Issues, Session, Assigned Issues, etc.) fill the content area that this component provides.
 
 ## Layout Purpose
 

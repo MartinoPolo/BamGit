@@ -6,15 +6,14 @@ Visual refresh of the issue card component. Cards currently look flat and incons
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-Three structurally different approaches to the card's visual treatment. All must include every required element listed below. Focus on border/shadow/glow treatments, header band refinement, and body layout polish.
+**Parent**: `IssueCardList` inside `WorkspaceBottomPanel` — Issues tab, card grid view
+**What parent provides**: CSS Grid layout (`repeat(auto-fill, minmax(450px, 1fr))`), batch selection toolbar, archived issues section, bottom panel tab bar and chrome
+**What this component fills**: A single grid cell within the issue card grid
+**Must NOT include**: Grid layout, bottom panel chrome, batch toolbar — these belong to parent components
 
-**Variant A — Subtle Glow**: Emphasize hover/active states through expressive `box-shadow` glows and border color transitions inspired by workspace cards. Header band keeps full saturation but gains a softer bottom edge (gradient fade into body).
-
-**Variant B — Tinted Surface**: Subtle gradient tint (8% issue color overlay) on the card body background. Header band saturation reduced in dark mode. Body rows gain more breathing room with refined spacing.
-
-**Variant C — Unified Color Flow**: The issue color flows more broadly through the card — tinted background, colored border on hover, and header band transitions to a more integrated appearance rather than a sharp color block.
+**Mockup rendering**: Show 2-3 cards in a grid context so the viewer sees relative sizing. No panel chrome needed — the card is the focus.
 
 ## Card Purpose
 

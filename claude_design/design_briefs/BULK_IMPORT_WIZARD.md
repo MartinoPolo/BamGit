@@ -6,14 +6,6 @@ Multi-step wizard for importing many characters at once from a structured folder
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. Tier colors: `--status-danger` (critical), `--status-warning` (important). Success: `--status-success`.
 
-## Generate Three Distinct Variants
-
-**Variant A — Progressive Disclosure**: Full-page 3-step wizard with horizontal step indicator. Step 1: folder picker + scan results tree view. Step 2: character checklist with auto-mapping preview (expandable rows). Step 3: batch review summary with final adjustments. Each step replaces the previous.
-
-**Variant B — Master-Detail Split**: Left sidebar shows scanned folder tree with checkboxes (select which characters to import). Right panel shows the currently-selected character's auto-mapping detail — event slots with proposed sounds, editable inline. Bottom toolbar with "Import Selected" batch action. Single page, no steps.
-
-**Variant C — Table-Driven**: After folder scan, show a dense spreadsheet-style table. Rows = detected characters, columns = events. Cells show assigned sound count with click-to-expand. Bulk actions in header: "Select All", "Auto-map All", "Clear". Character name + avatar inline-editable in first column. Compact, power-user oriented.
-
 ## Wizard Purpose
 
 When users have a large collection of organized sound files (like extracted game voice lines), creating characters one-by-one is tedious. The bulk wizard scans a folder structure, auto-detects character names from subfolder names, applies filename-pattern auto-mapping rules, and lets the user review before batch-importing. Designed for the WC3 voice file use case (396 characters, 3028 files in `Faction/Unit/` hierarchy) but works with any organized folder.

@@ -6,13 +6,10 @@ Compound button component that combines a refresh action with data freshness sta
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-**Variant A — Inline Label**: Square icon button with a separate text label to its left showing "Updated 2m ago". New-data state adds a colored dot badge on the button corner. Compact horizontal arrangement.
-
-**Variant B — Tooltip-Revealed**: Square icon button only. Hover tooltip shows last-updated timestamp. New-data state: button border pulses subtly + dot badge. Stale state: icon color fades to muted. Minimal footprint.
-
-**Variant C — Split Indicator**: Two-part component: left section shows relative timestamp text, right section is the icon button. New-data state: left section shows "New data" in primary color with a refresh arrow. Acts as a single clickable unit.
+**Parent**: Embedded in page headers/toolbars (usage page, overview, session list)
+**This component is inline** — it renders as a button/indicator group within an existing toolbar. It does not own any container chrome.
 
 ## Component Purpose
 

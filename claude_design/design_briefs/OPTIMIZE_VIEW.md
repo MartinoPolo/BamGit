@@ -6,13 +6,14 @@ Advisory panel within the usage dashboard that scans session history and workspa
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-**Variant A — Card Grid**: Health score as a large hero card at top (grade letter + score + ring chart). Below: findings as individual cards in a responsive grid, each with impact badge, title, savings estimate, and expandable detail/fix section. Grouped by impact level.
+**Parent**: Usage Dashboard page — advisory section within the dashboard
+**What parent provides**: Usage page layout, navigation header, period/scope filters
+**What this component fills**: A full-width section within the Usage Dashboard scrollable content
+**Must NOT include**: Page-level navigation, period filter bar — these belong to the Usage Dashboard page
 
-**Variant B — Checklist Report**: Health score as a compact header bar (grade + score + breakdown counts). Below: ordered list of findings as expandable accordion items, sorted by urgency. Each item has an impact dot, title, one-line summary, and expand to see detail + fix. Feels like a code review checklist.
-
-**Variant C — Split Detail**: Left column: scrollable findings list (compact rows with impact dot + title + savings). Right column: selected finding detail panel (full explanation, impact analysis, code fix, one-click apply where possible). Health score in a sticky header.
+**Mockup rendering**: Show the Usage page header as read-only context at ~40% opacity. The designed component fills a section within the page content area.
 
 ## Optimize View Purpose
 

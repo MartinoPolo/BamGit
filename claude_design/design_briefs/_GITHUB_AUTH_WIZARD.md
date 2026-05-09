@@ -1,4 +1,4 @@
-> **Final design**: `claude_design/mockups/github-auth-wizard.html`
+> **Final design**: `claude_design/mockups/github-auth-wizard/final.html`
 > **Adopted components**: Alert (shadcn-svelte)
 
 # GitHub Auth Wizard — Design Spec
@@ -8,16 +8,6 @@ Design spec for the GitHub OAuth Device Flow authentication wizard. Replaces the
 ## Design Tokens
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. GitHub brand color `#24292f` / `#f6f8fa` for the GitHub mark/icon only (not as a theme color).
-
-## Generate Three Distinct Variants
-
-Three structurally different approaches to the device flow wizard. All must include every required element below. The core challenge: the wizard has a long "dead time" while polling (up to 15 minutes) where the user is off in their browser authenticating. Each variant should handle this wait differently.
-
-**Variant A — Transforming Dialog**: Compact centered modal that morphs through three phases without navigation buttons. Phase 1: code display + "Open GitHub" CTA. Phase 2: polling state with spinner, the code stays visible (user may need to re-enter it), countdown timer ticks down. Phase 3: success celebration with avatar + username, auto-dismisses after 3s. Single dialog, no steps — the content transforms in place.
-
-**Variant B — Full-Width Inline Card**: No modal. An inline card expands directly within the settings page (or replaces the GhSetupBanner in-place). Left side: large code display with copy button and QR code (scannable by phone). Right side: status area showing instructions → polling spinner → connected state. Feels embedded and non-blocking — user can scroll away and come back.
-
-**Variant C — Side Sheet with Timeline**: Sheet slides in from the right. Vertical timeline showing completed/active/upcoming steps: "Code Generated" → "Waiting for GitHub" → "Connected". The active step is expanded with full detail (code, timer, button). Completed steps collapse to a single line with a checkmark. Feels like a guided checklist.
 
 ## Wizard Purpose
 

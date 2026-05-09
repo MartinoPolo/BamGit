@@ -6,15 +6,11 @@ Design spec for the dialog used to spawn a new AI coding session. This is the en
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-Please generate three layout variants for this dialog. Each should take a fundamentally different structural approach to collecting the spawn configuration. All variants must include every required element listed below. After I choose one, we will fully design all states and edge cases.
+**Parent**: None — modal dialog overlay (centered, 480-600px wide)
+**This component is standalone** — it owns its modal chrome (backdrop, dialog border, close button).
 
-**Variant A — Single-form panel**: All fields on one scrollable form. Provider icons act as a segmented toggle at the top, and fields below update dynamically based on the selection. Compact, fast for experienced users.
-
-**Variant B — Step-by-step wizard**: Multi-step flow: (1) Pick provider, (2) Configure model + mode, (3) Attach context + confirm. Each step is a focused screen with back/next navigation. Good for new users; emphasizes decisions.
-
-**Variant C — Provider-card-first**: Large provider cards dominate the top half. Clicking a card expands its configuration inline (model, mode, path) beneath it without leaving the screen. The bottom half shows context attachment always visible. Feels exploratory and visual.
 
 ## Dialog Purpose
 

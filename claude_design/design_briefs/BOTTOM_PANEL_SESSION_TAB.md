@@ -6,15 +6,14 @@ Design spec for the compact session view inside the bottom panel. When the user 
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
 
-## Generate Three Distinct Variants
+## Container Context
 
-Please generate three layout variants for this panel. Each should take a different approach to showing multiple sessions for one issue in a constrained vertical space. All variants must include every required element. After I choose one, we will fully design all states.
+**Parent**: `WorkspaceBottomPanel` — tab content area (the "Session" tab)
+**What parent provides**: Tab bar with tab buttons, panel resizer handle at top, panel border
+**What this component fills**: The content area below the active "Session" tab button, full width × remaining height after tab bar
+**Must NOT include**: Tab bar, panel header, outer border, footer — these belong to the parent panel
 
-**Variant A — Session tabs + truncated chat**: Horizontal tabs at the top (one per session). Active session shows the last few messages in a truncated chat stream. Quick-action row and input at the bottom. "Open full session ↗" in the top-right corner.
-
-**Variant B — Session selector + status-first**: Dropdown session picker at the top. Below it: a compact status summary card (state badge, model, cost, last message), then a short message preview (last 2-3 messages). No input by default — "Reply" button expands an inline input. "Open full session ↗" prominent below the status card.
-
-**Variant C — Split list + preview**: Left column (~35%): vertical list of sessions for this issue (each: provider icon, state badge, time, cost). Right column (~65%): shows the last few messages of the selected session + input at the bottom. "Open full session ↗" as a button in the right column.
+**Mockup rendering**: Show the bottom panel shell (tab bar with "Session" tab active) as read-only context at ~40% opacity. The designed component fills the content area below.
 
 ## Panel Purpose
 

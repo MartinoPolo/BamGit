@@ -6,13 +6,11 @@ Clickable cost value component used throughout the app. Displays a formatted dol
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist Mono (all cost values use monospace).
 
-## Generate Three Distinct Variants
+## Container Context
 
-**Variant A — Subtle Underline**: Cost text with a dotted underline on hover, cursor-pointer. No visual distinction at rest (looks like normal cost text). Hover reveals interactivity.
+**Parent**: Inline within any text or data display (workspace cards, session sidebar, usage dashboard)
+**This component is inline** — it does not own any container chrome. It renders as an inline text element that enriches cost values with navigation.
 
-**Variant B — Tinted Chip**: Cost text in a small rounded background pill (like a badge). Color indicates cost magnitude per the active color theme. Always looks interactive.
-
-**Variant C — Icon-Appended**: Cost text with a tiny arrow-up-right icon (8px) that appears on hover, indicating navigation. At rest: plain text. On hover: icon fades in + text color shifts to primary.
 
 ## Component Purpose
 

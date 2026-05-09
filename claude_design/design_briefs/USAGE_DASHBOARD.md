@@ -6,13 +6,10 @@ Redesign of the `/usage` analytics dashboard with LayerChart-based visualization
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. Chart colors: `--chart-1` through `--chart-5` CSS variables (to be defined per color theme).
 
-## Generate Three Distinct Variants
+## Container Context
 
-**Variant A — Compact Analytics**: Dense single-column layout. KPI cards in a horizontal strip, chart directly below with integrated axis, all breakdown tables stacked. Period tabs + scope toggle inline with page title. Optimized for scanning without scrolling.
-
-**Variant B — Two-Column Dashboard**: Left column (60%) for time-series chart and activity breakdown. Right column (40%) for KPI cards (vertical stack), top sessions, and tool usage. Period/scope/group-by controls in a dedicated filter bar below the header. More editorial feel.
-
-**Variant C — Tabbed Sections**: Header with KPI cards always visible. Below: tab bar (Overview | Activity | Tools | Sessions) switching content sections. Each tab has its own chart + detail view. Reduces information density per view but allows deeper drill-down per category.
+**Parent**: None — standalone page (`/usage` route)
+**This component is standalone** — it owns its full page chrome including header, filters, and content area.
 
 ## Dashboard Purpose
 
