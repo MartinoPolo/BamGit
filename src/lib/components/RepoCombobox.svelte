@@ -15,6 +15,7 @@
 		id?: string;
 		placeholder?: string;
 		recentRepoNames?: readonly string[];
+		onchange?: () => void;
 	}
 
 	let {
@@ -22,6 +23,7 @@
 		id,
 		placeholder = 'owner/repo',
 		recentRepoNames = [],
+		onchange,
 	}: Props = $props();
 
 	let userRepos = $state<GitHubRepo[]>([]);
@@ -106,6 +108,7 @@
 			const typed = inputRef?.value.trim() ?? '';
 			if (typed !== '' && value !== typed) {
 				value = typed;
+				onchange?.();
 			}
 			searchValue = '';
 			searchResults = [];
@@ -119,6 +122,7 @@
 	{open}
 	onOpenChange={handleOpenChange}
 	onOpenChangeComplete={handleOpenChangeComplete}
+	onValueChange={() => onchange?.()}
 >
 	<div class="relative">
 		<Combobox.Input

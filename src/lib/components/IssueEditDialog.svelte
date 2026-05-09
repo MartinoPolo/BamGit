@@ -66,7 +66,7 @@
 </script>
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
-	<Dialog.Content class="max-w-md">
+	<Dialog.Content class="max-w-md" onEscapeKeydown={(e) => e.stopPropagation()}>
 		{#if issue}
 			<form onsubmit={handleSubmit} class="flex flex-col gap-4">
 				<Dialog.Header>
