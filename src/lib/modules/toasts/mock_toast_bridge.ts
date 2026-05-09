@@ -40,6 +40,8 @@ const COMMAND_BODIES: Record<string, string> = {
 	discover_ai_config: 'AI config discovery requires the desktop app',
 	run_workspace_command: 'Running commands requires the desktop app',
 	kill_workspace_process: 'Killing processes requires the desktop app',
+	github_device_flow_start: 'GitHub authentication requires the desktop app',
+	github_device_flow_poll: 'GitHub authentication requires the desktop app',
 };
 
 export function showMockToast(command: string, args?: Record<string, unknown>): void {

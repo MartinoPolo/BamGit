@@ -2,13 +2,14 @@ use rusqlite::Connection;
 use tauri::State;
 
 use crate::database::connection::DatabaseState;
+use crate::git::github_client::GitHubClient;
 use crate::models::git_status::{
     row_to_git_status_cache, GitStatusCache, GIT_STATUS_CACHE_SELECT_COLUMNS,
 };
 use crate::models::github::{
-    resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, AssignedIssuesResult,
-    GhCliAvailability, GhIssueViewOutput, GhPullRequestOutput, GhReviewOutput, GhReviewRequest,
-    SearchedGithubIssue, SyncAllResult,
+    resolve_github_issue_state, resolve_pull_request_state, AssignedIssue, AssignedIssueLabel,
+    AssignedIssuesResult, GhCliAvailability, GhIssueViewOutput, GhPullRequestOutput,
+    GhReviewOutput, GhReviewRequest, SearchedGithubIssue, SyncAllResult,
 };
 
 use super::dependency_commands;
@@ -79,7 +80,7 @@ fn read_all_caches_for_dashboard(
 }
 
 /// Run a gh CLI command and return stdout. Returns Err on non-zero exit or missing binary.
-async fn run_gh_command(args: &[&str]) -> Result<String, String> {
+pub(crate) async fn run_gh_command(args: &[&str]) -> Result<String, String> {
     let output = tokio::time::timeout(
         std::time::Duration::from_secs(30),
         tokio::process::Command::new("gh")
@@ -202,7 +203,12 @@ pub fn get_all_github_status_caches(
 }
 
 #[tauri::command]
-pub async fn check_gh_availability() -> Result<GhCliAvailability, String> {
+pub async fn check_gh_availability(
+    github_client: State<'_, GitHubClient>,
+) -> Result<GhCliAvailability, String> {
+    if github_client.is_oauth().await {
+        return Ok(GhCliAvailability::Available);
+    }
     match run_gh_command(&["auth", "status"]).await {
         Ok(_) => Ok(GhCliAvailability::Available),
         Err(error) => {
@@ -218,24 +224,31 @@ pub async fn check_gh_availability() -> Result<GhCliAvailability, String> {
 #[tauri::command]
 pub async fn fetch_issue_state(
     state: State<'_, DatabaseState>,
+    github_client: State<'_, GitHubClient>,
     issue_id: String,
     owner: String,
     repo: String,
     issue_number: i64,
 ) -> Result<GitStatusCache, String> {
-    let stdout = run_gh_command(&[
-        "issue",
-        "view",
-        &issue_number.to_string(),
-        "--repo",
-        &format!("{owner}/{repo}"),
-        "--json",
-        "state,url",
-    ])
-    .await?;
-
-    let gh_issue: GhIssueViewOutput =
-        serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
+    let gh_issue: GhIssueViewOutput = if github_client.is_oauth().await {
+        let response = github_client
+            .api_get(&format!("/repos/{owner}/{repo}/issues/{issue_number}"))
+            .await?;
+        GhIssueViewOutput::from_rest_json(&response)?
+    } else {
+        let stdout = run_gh_command(&[
+            "issue",
+            "view",
+            &issue_number.to_string(),
+            "--repo",
+            &format!("{owner}/{repo}"),
+            "--json",
+            "state,url",
+        ])
+        .await?;
+        serde_json::from_str(&stdout)
+            .map_err(|error| format!("Failed to parse gh output: {error}"))?
+    };
 
     let resolved_state = resolve_github_issue_state(&gh_issue.state);
 
@@ -268,27 +281,38 @@ pub async fn fetch_issue_state(
 #[tauri::command]
 pub async fn fetch_pr_for_branch(
     state: State<'_, DatabaseState>,
+    github_client: State<'_, GitHubClient>,
     issue_id: String,
     owner: String,
     repo: String,
     branch_name: String,
 ) -> Result<GitStatusCache, String> {
-    let stdout = run_gh_command(&[
-        "pr",
-        "list",
-        "--head",
-        &branch_name,
-        "--repo",
-        &format!("{owner}/{repo}"),
-        "--json",
-        "number,state,url,isDraft,reviewRequests,latestReviews",
-        "--limit",
-        "1",
-    ])
-    .await?;
-
-    let prs: Vec<GhPullRequestOutput> =
-        serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
+    let prs: Vec<GhPullRequestOutput> = if github_client.is_oauth().await {
+        let response = github_client
+            .api_get(&format!(
+                "/repos/{owner}/{repo}/pulls?head={owner}:{branch_name}&state=all&per_page=1&sort=created&direction=desc"
+            ))
+            .await?;
+        let json_str = serde_json::to_string(&response)
+            .map_err(|error| format!("Failed to serialize PR response: {error}"))?;
+        parse_rest_pull_requests(&json_str)?
+    } else {
+        let stdout = run_gh_command(&[
+            "pr",
+            "list",
+            "--head",
+            &branch_name,
+            "--repo",
+            &format!("{owner}/{repo}"),
+            "--json",
+            "number,state,url,isDraft,reviewRequests,latestReviews",
+            "--limit",
+            "1",
+        ])
+        .await?;
+        serde_json::from_str(&stdout)
+            .map_err(|error| format!("Failed to parse gh output: {error}"))?
+    };
 
     let (pr_state, pr_number, pr_url) = if let Some(pr) = prs.first() {
         (
@@ -326,6 +350,7 @@ pub async fn fetch_pr_for_branch(
 
 #[tauri::command]
 pub async fn fetch_assigned_issues(
+    github_client: State<'_, GitHubClient>,
     owner: String,
     repo: String,
     limit: Option<i64>,
@@ -333,22 +358,36 @@ pub async fn fetch_assigned_issues(
     let effective_limit = limit.unwrap_or(10);
     let fetch_limit = (effective_limit + 1).to_string();
 
-    let stdout = run_gh_command(&[
-        "issue",
-        "list",
-        "--assignee",
-        "@me",
-        "--repo",
-        &format!("{owner}/{repo}"),
-        "--json",
-        "number,title,state,url,labels",
-        "--limit",
-        &fetch_limit,
-    ])
-    .await?;
-
-    let mut issues: Vec<AssignedIssue> =
-        serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
+    let mut issues: Vec<AssignedIssue> = if github_client.is_oauth().await {
+        let login = github_client
+            .current_user_login()
+            .await
+            .ok_or("OAuth active but no user login available")?;
+        let response = github_client
+            .api_get(&format!(
+                "/repos/{owner}/{repo}/issues?assignee={login}&state=all&per_page={fetch_limit}&sort=created&direction=desc"
+            ))
+            .await?;
+        let json_str = serde_json::to_string(&response)
+            .map_err(|error| format!("Failed to serialize issues response: {error}"))?;
+        parse_rest_assigned_issues(&json_str)?
+    } else {
+        let stdout = run_gh_command(&[
+            "issue",
+            "list",
+            "--assignee",
+            "@me",
+            "--repo",
+            &format!("{owner}/{repo}"),
+            "--json",
+            "number,title,state,url,labels",
+            "--limit",
+            &fetch_limit,
+        ])
+        .await?;
+        serde_json::from_str(&stdout)
+            .map_err(|error| format!("Failed to parse gh output: {error}"))?
+    };
 
     let has_more = issues.len() as i64 > effective_limit;
     if has_more {
@@ -397,6 +436,7 @@ pub fn get_deleted_assigned_issue_numbers(
 
 #[tauri::command]
 pub async fn search_github_issues(
+    github_client: State<'_, GitHubClient>,
     owner: String,
     repo: String,
     query: String,
@@ -406,37 +446,61 @@ pub async fn search_github_issues(
         return Ok(vec![]);
     }
 
-    let repo_arg = format!("{owner}/{repo}");
+    let is_oauth = github_client.is_oauth().await;
 
     // If query looks like a number (with or without #), try exact lookup first
     let number_query = trimmed.trim_start_matches('#');
     if number_query.chars().all(|c| c.is_ascii_digit()) && !number_query.is_empty() {
-        match run_gh_command(&[
-            "issue", "view", number_query,
-            "--repo", &repo_arg,
-            "--json", "number,title,state,url",
-        ]).await {
-            Ok(stdout) => {
-                if let Ok(issue) = serde_json::from_str::<SearchedGithubIssue>(&stdout) {
-                    return Ok(vec![issue]);
+        let result = if is_oauth {
+            match github_client
+                .api_get(&format!("/repos/{owner}/{repo}/issues/{number_query}"))
+                .await
+            {
+                Ok(response) => {
+                    let json_str = serde_json::to_string(&response).ok();
+                    json_str.and_then(|s| parse_rest_single_issue(&s).ok())
                 }
+                Err(_) => None,
             }
-            Err(_) => {} // Fall through to search
+        } else {
+            let repo_arg = format!("{owner}/{repo}");
+            match run_gh_command(&[
+                "issue", "view", number_query,
+                "--repo", &repo_arg,
+                "--json", "number,title,state,url",
+            ]).await {
+                Ok(stdout) => serde_json::from_str::<SearchedGithubIssue>(&stdout).ok(),
+                Err(_) => None,
+            }
+        };
+        if let Some(issue) = result {
+            return Ok(vec![issue]);
         }
     }
 
-    let stdout = run_gh_command(&[
-        "issue", "list",
-        "--search", trimmed,
-        "--repo", &repo_arg,
-        "--json", "number,title,state,url",
-        "--limit", "20",
-    ]).await?;
-
-    let issues: Vec<SearchedGithubIssue> = serde_json::from_str(&stdout)
-        .map_err(|error| format!("Failed to parse gh search output: {error}"))?;
-
-    Ok(issues)
+    if is_oauth {
+        let encoded_query = urlencoded(trimmed);
+        let response = github_client
+            .api_get(&format!(
+                "/search/issues?q={encoded_query}+repo:{owner}/{repo}&per_page=20"
+            ))
+            .await?;
+        let json_str = serde_json::to_string(&response)
+            .map_err(|error| format!("Failed to serialize search response: {error}"))?;
+        parse_rest_search_issues(&json_str)
+    } else {
+        let repo_arg = format!("{owner}/{repo}");
+        let stdout = run_gh_command(&[
+            "issue", "list",
+            "--search", trimmed,
+            "--repo", &repo_arg,
+            "--json", "number,title,state,url",
+            "--limit", "20",
+        ]).await?;
+        let issues: Vec<SearchedGithubIssue> = serde_json::from_str(&stdout)
+            .map_err(|error| format!("Failed to parse gh search output: {error}"))?;
+        Ok(issues)
+    }
 }
 
 #[derive(serde::Serialize)]
@@ -448,7 +512,18 @@ pub struct UserRepo {
 }
 
 #[tauri::command]
-pub async fn list_user_repos() -> Result<Vec<UserRepo>, String> {
+pub async fn list_user_repos(
+    github_client: State<'_, GitHubClient>,
+) -> Result<Vec<UserRepo>, String> {
+    if github_client.is_oauth().await {
+        let response = github_client
+            .api_get("/user/repos?per_page=100&sort=pushed&direction=desc")
+            .await?;
+        let json_str = serde_json::to_string(&response)
+            .map_err(|error| format!("Failed to serialize repos response: {error}"))?;
+        return parse_rest_user_repos(&json_str);
+    }
+
     let stdout = run_gh_command(&[
         "repo",
         "list",
@@ -465,24 +540,30 @@ pub async fn list_user_repos() -> Result<Vec<UserRepo>, String> {
         serde_json::from_str(&stdout).map_err(|error| format!("Failed to parse gh output: {error}"))?;
 
     let repos = raw
-        .into_iter()
-        .filter_map(|value| {
-            let name = value.get("name")?.as_str()?.to_string();
-            let owner = value.get("owner")?.get("login")?.as_str()?.to_string();
-            let description = value.get("description").and_then(|d| d.as_str()).map(String::from);
-            let is_private = value.get("isPrivate").and_then(|v| v.as_bool()).unwrap_or(false);
-            Some(UserRepo { name, owner, description, is_private })
-        })
+        .iter()
+        .filter_map(|value| parse_repo_from_json(value, "isPrivate"))
         .collect();
 
     Ok(repos)
 }
 
 #[tauri::command]
-pub async fn search_github_repos(query: String) -> Result<Vec<UserRepo>, String> {
+pub async fn search_github_repos(
+    github_client: State<'_, GitHubClient>,
+    query: String,
+) -> Result<Vec<UserRepo>, String> {
     let trimmed = query.trim();
     if trimmed.is_empty() {
         return Ok(vec![]);
+    }
+
+    if github_client.is_oauth().await {
+        let response = github_client
+            .api_get(&format!("/search/repositories?q={}&per_page=20", urlencoded(trimmed)))
+            .await?;
+        let json_str = serde_json::to_string(&response)
+            .map_err(|error| format!("Failed to serialize search output: {error}"))?;
+        return parse_rest_repo_search(&json_str);
     }
 
     let stdout = run_gh_command(&[
@@ -501,17 +582,156 @@ pub async fn search_github_repos(query: String) -> Result<Vec<UserRepo>, String>
         .unwrap_or_default();
 
     let repos = items
-        .into_iter()
-        .filter_map(|value| {
-            let name = value.get("name")?.as_str()?.to_string();
-            let owner = value.get("owner")?.get("login")?.as_str()?.to_string();
-            let description = value.get("description").and_then(|d| d.as_str()).map(String::from);
-            let is_private = value.get("private").and_then(|v| v.as_bool()).unwrap_or(false);
-            Some(UserRepo { name, owner, description, is_private })
-        })
+        .iter()
+        .filter_map(|value| parse_repo_from_json(value, "private"))
         .collect();
 
     Ok(repos)
+}
+
+fn parse_repo_from_json(value: &serde_json::Value, private_key: &str) -> Option<UserRepo> {
+    let name = value.get("name")?.as_str()?.to_string();
+    let owner = value.get("owner")?.get("login")?.as_str()?.to_string();
+    let description = value
+        .get("description")
+        .and_then(|d| d.as_str())
+        .map(String::from);
+    let is_private = value
+        .get(private_key)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    Some(UserRepo {
+        name,
+        owner,
+        description,
+        is_private,
+    })
+}
+
+// --- REST API response parsers ---
+
+/// Parse a REST API pull requests array into `GhPullRequestOutput` vec.
+/// Normalizes field names: `html_url` → `url`, `draft` → `is_draft`, `state` → uppercase.
+fn parse_rest_pull_requests(json: &str) -> Result<Vec<GhPullRequestOutput>, String> {
+    let raw: Vec<serde_json::Value> =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse PR response: {error}"))?;
+    Ok(raw
+        .iter()
+        .filter_map(|pr| {
+            let review_requests: Vec<GhReviewRequest> = pr
+                .get("requested_reviewers")
+                .and_then(|r| r.as_array())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|r| {
+                            Some(GhReviewRequest {
+                                login: r.get("login").and_then(|l| l.as_str()).map(String::from),
+                                name: r.get("name").and_then(|n| n.as_str()).map(String::from),
+                            })
+                        })
+                        .collect()
+                })
+                .unwrap_or_default();
+
+            Some(GhPullRequestOutput {
+                number: pr.get("number")?.as_i64()?,
+                state: pr.get("state")?.as_str()?.to_uppercase(),
+                url: pr.get("html_url")?.as_str()?.to_string(),
+                is_draft: pr.get("draft").and_then(|d| d.as_bool()).unwrap_or(false),
+                review_requests,
+                latest_reviews: vec![],
+            })
+        })
+        .collect())
+}
+
+/// Parse a REST API issues array into `AssignedIssue` vec.
+fn parse_rest_assigned_issues(json: &str) -> Result<Vec<AssignedIssue>, String> {
+    let raw: Vec<serde_json::Value> =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse issues response: {error}"))?;
+    Ok(raw
+        .iter()
+        .filter_map(|issue| {
+            let labels = issue
+                .get("labels")
+                .and_then(|l| l.as_array())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|label| {
+                            Some(AssignedIssueLabel {
+                                name: label.get("name")?.as_str()?.to_string(),
+                                color: label.get("color")?.as_str()?.to_string(),
+                            })
+                        })
+                        .collect()
+                })
+                .unwrap_or_default();
+            Some(AssignedIssue {
+                number: issue.get("number")?.as_i64()?,
+                title: issue.get("title")?.as_str()?.to_string(),
+                state: issue.get("state")?.as_str()?.to_string(),
+                url: issue.get("html_url")?.as_str()?.to_string(),
+                labels,
+            })
+        })
+        .collect())
+}
+
+/// Parse a REST API search issues response (`{ items: [...] }`) into `SearchedGithubIssue` vec.
+fn parse_rest_search_issues(json: &str) -> Result<Vec<SearchedGithubIssue>, String> {
+    let parsed: serde_json::Value =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse search response: {error}"))?;
+    let items = parsed
+        .get("items")
+        .and_then(|v| v.as_array())
+        .ok_or("Expected items array in search response")?;
+    Ok(items
+        .iter()
+        .filter_map(|issue| {
+            Some(SearchedGithubIssue {
+                number: issue.get("number")?.as_i64()?,
+                title: issue.get("title")?.as_str()?.to_string(),
+                state: issue.get("state")?.as_str()?.to_string(),
+                url: issue.get("html_url")?.as_str()?.to_string(),
+            })
+        })
+        .collect())
+}
+
+/// Parse a single REST API issue response into `SearchedGithubIssue`.
+fn parse_rest_single_issue(json: &str) -> Result<SearchedGithubIssue, String> {
+    let issue: serde_json::Value =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse issue response: {error}"))?;
+    Ok(SearchedGithubIssue {
+        number: issue.get("number").and_then(|n| n.as_i64()).ok_or("Missing number")?,
+        title: issue.get("title").and_then(|t| t.as_str()).ok_or("Missing title")?.to_string(),
+        state: issue.get("state").and_then(|s| s.as_str()).ok_or("Missing state")?.to_string(),
+        url: issue.get("html_url").and_then(|u| u.as_str()).ok_or("Missing html_url")?.to_string(),
+    })
+}
+
+/// Parse REST API user repos (`/user/repos`) into `UserRepo` vec.
+fn parse_rest_user_repos(json: &str) -> Result<Vec<UserRepo>, String> {
+    let raw: Vec<serde_json::Value> =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse repos response: {error}"))?;
+    Ok(raw
+        .iter()
+        .filter_map(|value| parse_repo_from_json(value, "private"))
+        .collect())
+}
+
+/// Parse REST API repo search (`/search/repositories`) into `UserRepo` vec.
+fn parse_rest_repo_search(json: &str) -> Result<Vec<UserRepo>, String> {
+    let parsed: serde_json::Value =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse search output: {error}"))?;
+    let items = parsed
+        .get("items")
+        .and_then(|v| v.as_array())
+        .ok_or("Expected items array in search response")?;
+    Ok(items
+        .iter()
+        .filter_map(|value| parse_repo_from_json(value, "private"))
+        .collect())
 }
 
 fn urlencoded(input: &str) -> String {
@@ -532,6 +752,7 @@ fn urlencoded(input: &str) -> String {
 #[tauri::command]
 pub async fn sync_all_github_state(
     state: State<'_, DatabaseState>,
+    github_client: State<'_, GitHubClient>,
     dashboard_id: String,
     owner: String,
     repo: String,
@@ -578,11 +799,14 @@ pub async fn sync_all_github_state(
     let graphql_query =
         build_bulk_sync_graphql_query(&owner, &repo, &issue_numbers, &branch_names);
 
-    let stdout = run_gh_command(&["api", "graphql", "-f", &format!("query={graphql_query}")])
-        .await?;
-
-    let response: serde_json::Value = serde_json::from_str(&stdout)
-        .map_err(|error| format!("Failed to parse GraphQL response: {error}"))?;
+    let response: serde_json::Value = if github_client.is_oauth().await {
+        github_client.graphql(&graphql_query).await?
+    } else {
+        let stdout = run_gh_command(&["api", "graphql", "-f", &format!("query={graphql_query}")])
+            .await?;
+        serde_json::from_str(&stdout)
+            .map_err(|error| format!("Failed to parse GraphQL response: {error}"))?
+    };
 
     let repository = response
         .get("data")
@@ -988,7 +1212,6 @@ mod tests {
         let json = r#"{"state":"OPEN","url":"https://github.com/owner/repo/issues/42"}"#;
         let parsed: GhIssueViewOutput = serde_json::from_str(json).unwrap();
         assert_eq!(parsed.state, "OPEN");
-        assert_eq!(parsed.url, "https://github.com/owner/repo/issues/42");
     }
 
     #[test]
@@ -1338,5 +1561,221 @@ mod tests {
     fn graphql_query_includes_body_field() {
         let query = build_bulk_sync_graphql_query("owner", "repo", &[1], &[None]);
         assert!(query.contains("body"), "GraphQL query should fetch issue body for dependency parsing");
+    }
+
+    // --- REST API response parsing tests ---
+
+    #[test]
+    fn rest_api_issue_state_normalizes_to_uppercase() {
+        // REST API returns lowercase "open"/"closed", CLI returns "OPEN"/"CLOSED"
+        // resolve_github_issue_state should handle both
+        assert_eq!(resolve_github_issue_state("open"), "open");
+        assert_eq!(resolve_github_issue_state("closed"), "closed");
+        assert_eq!(resolve_github_issue_state("OPEN"), "open");
+        assert_eq!(resolve_github_issue_state("CLOSED"), "closed");
+    }
+
+    #[test]
+    fn rest_api_issue_view_parses_state() {
+        // REST API returns lowercase state; from_rest_json extracts it
+        let json = r#"{"state":"open","html_url":"https://github.com/owner/repo/issues/42","url":"https://api.github.com/repos/owner/repo/issues/42"}"#;
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        let parsed = GhIssueViewOutput::from_rest_json(&value).unwrap();
+        assert_eq!(parsed.state, "open");
+    }
+
+    #[test]
+    fn rest_api_pr_response_maps_to_gh_pr_output() {
+        // REST API uses "draft" not "isDraft", "html_url" not "url"
+        let json = r#"[{
+            "number": 15,
+            "state": "open",
+            "html_url": "https://github.com/o/r/pull/15",
+            "draft": true,
+            "requested_reviewers": [],
+            "requested_teams": []
+        }]"#;
+        let prs = parse_rest_pull_requests(json).unwrap();
+        assert_eq!(prs.len(), 1);
+        assert_eq!(prs[0].number, 15);
+        assert_eq!(prs[0].state, "OPEN");
+        assert_eq!(prs[0].url, "https://github.com/o/r/pull/15");
+        assert!(prs[0].is_draft);
+    }
+
+    #[test]
+    fn rest_api_pr_response_non_draft_open() {
+        let json = r#"[{
+            "number": 20,
+            "state": "open",
+            "html_url": "https://github.com/o/r/pull/20",
+            "draft": false,
+            "requested_reviewers": [{"login": "alice"}],
+            "requested_teams": []
+        }]"#;
+        let prs = parse_rest_pull_requests(json).unwrap();
+        assert_eq!(prs[0].state, "OPEN");
+        assert!(!prs[0].is_draft);
+        assert_eq!(prs[0].review_requests.len(), 1);
+    }
+
+    #[test]
+    fn rest_api_pr_empty_array_returns_empty_vec() {
+        let json = "[]";
+        let prs = parse_rest_pull_requests(json).unwrap();
+        assert!(prs.is_empty());
+    }
+
+    #[test]
+    fn rest_api_assigned_issues_parsing() {
+        let json = r#"[
+            {
+                "number": 1,
+                "title": "Bug fix",
+                "state": "open",
+                "html_url": "https://github.com/o/r/issues/1",
+                "labels": [{"name": "bug", "color": "d73a4a"}]
+            },
+            {
+                "number": 2,
+                "title": "Feature",
+                "state": "closed",
+                "html_url": "https://github.com/o/r/issues/2",
+                "labels": []
+            }
+        ]"#;
+        let issues = parse_rest_assigned_issues(json).unwrap();
+        assert_eq!(issues.len(), 2);
+        assert_eq!(issues[0].number, 1);
+        assert_eq!(issues[0].state, "open");
+        assert_eq!(issues[0].url, "https://github.com/o/r/issues/1");
+        assert_eq!(issues[0].labels.len(), 1);
+        assert_eq!(issues[0].labels[0].name, "bug");
+        assert_eq!(issues[1].state, "closed");
+        assert!(issues[1].labels.is_empty());
+    }
+
+    #[test]
+    fn rest_api_search_issues_parsing() {
+        // /search/issues returns { items: [...] }
+        let json = r#"{
+            "items": [
+                {
+                    "number": 42,
+                    "title": "Fix login",
+                    "state": "open",
+                    "html_url": "https://github.com/o/r/issues/42"
+                },
+                {
+                    "number": 43,
+                    "title": "Add tests",
+                    "state": "closed",
+                    "html_url": "https://github.com/o/r/issues/43"
+                }
+            ]
+        }"#;
+        let issues = parse_rest_search_issues(json).unwrap();
+        assert_eq!(issues.len(), 2);
+        assert_eq!(issues[0].number, 42);
+        assert_eq!(issues[0].state, "open");
+        assert_eq!(issues[0].url, "https://github.com/o/r/issues/42");
+        assert_eq!(issues[1].number, 43);
+        assert_eq!(issues[1].state, "closed");
+    }
+
+    #[test]
+    fn rest_api_single_issue_view_parsing() {
+        // GET /repos/{owner}/{repo}/issues/{number} returns a single object
+        let json = r#"{
+            "number": 99,
+            "title": "Critical bug",
+            "state": "open",
+            "html_url": "https://github.com/o/r/issues/99"
+        }"#;
+        let issue = parse_rest_single_issue(json).unwrap();
+        assert_eq!(issue.number, 99);
+        assert_eq!(issue.title, "Critical bug");
+        assert_eq!(issue.state, "open");
+        assert_eq!(issue.url, "https://github.com/o/r/issues/99");
+    }
+
+    #[test]
+    fn rest_api_user_repos_parsing() {
+        // REST uses "private" not "isPrivate", "owner" is an object
+        let json = r#"[
+            {
+                "name": "my-repo",
+                "owner": {"login": "octocat"},
+                "description": "A great repo",
+                "private": true
+            },
+            {
+                "name": "public-repo",
+                "owner": {"login": "octocat"},
+                "description": null,
+                "private": false
+            }
+        ]"#;
+        let repos = parse_rest_user_repos(json).unwrap();
+        assert_eq!(repos.len(), 2);
+        assert_eq!(repos[0].name, "my-repo");
+        assert_eq!(repos[0].owner, "octocat");
+        assert_eq!(repos[0].description.as_deref(), Some("A great repo"));
+        assert!(repos[0].is_private);
+        assert_eq!(repos[1].name, "public-repo");
+        assert!(repos[1].description.is_none());
+        assert!(!repos[1].is_private);
+    }
+
+    #[test]
+    fn rest_api_repo_search_parsing() {
+        // Same format as current gh api /search/repositories
+        let json = r#"{
+            "items": [
+                {
+                    "name": "found-repo",
+                    "owner": {"login": "someone"},
+                    "description": "Found it",
+                    "private": false
+                }
+            ]
+        }"#;
+        let repos = parse_rest_repo_search(json).unwrap();
+        assert_eq!(repos.len(), 1);
+        assert_eq!(repos[0].name, "found-repo");
+        assert_eq!(repos[0].owner, "someone");
+        assert!(!repos[0].is_private);
+    }
+
+    // --- current_user_login tests ---
+
+    #[tokio::test]
+    async fn current_user_login_returns_login_when_oauth() {
+        let client = GitHubClient::new();
+        client
+            .set_auth_mode(crate::git::github_client::AuthMode::OAuth {
+                token: "tok".to_string(),
+                user: crate::models::github::GitHubUser {
+                    login: "testuser".to_string(),
+                    avatar_url: "https://example.com/a.png".to_string(),
+                },
+            })
+            .await;
+        assert_eq!(client.current_user_login().await, Some("testuser".to_string()));
+    }
+
+    #[tokio::test]
+    async fn current_user_login_returns_none_when_cli() {
+        let client = GitHubClient::new();
+        client
+            .set_auth_mode(crate::git::github_client::AuthMode::Cli)
+            .await;
+        assert_eq!(client.current_user_login().await, None);
+    }
+
+    #[tokio::test]
+    async fn current_user_login_returns_none_when_not_connected() {
+        let client = GitHubClient::new();
+        assert_eq!(client.current_user_login().await, None);
     }
 }

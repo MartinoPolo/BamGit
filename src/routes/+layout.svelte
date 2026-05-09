@@ -41,7 +41,7 @@
 	const notificationsCtx = setNotificationsContext();
 	const sessionStore = setSessionsContext(notificationsCtx);
 	setIssuesContext();
-	setVersionControlContext();
+	const versionControlCtx = setVersionControlContext();
 	setActionsContext();
 	const shortcutsCtx = setKeyboardShortcutsContext();
 	const commandPaletteCtx = setCommandPaletteContext();
@@ -64,6 +64,7 @@
 		void preloadCode(resolve('/quick-ideas'));
 		void preloadCode(resolve('/ai-config'));
 		void shortcutsCtx.loadCustomBindings();
+		void versionControlCtx.checkAuthStatus();
 
 		shortcutsCtx.registerShortcut({
 			id: 'command-palette',

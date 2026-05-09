@@ -37,6 +37,38 @@ pub enum GhCliAvailability {
     NotAuthenticated,
 }
 
+/// Response from GitHub POST /login/device/code.
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct DeviceFlowStartResult {
+    pub device_code: String,
+    pub user_code: String,
+    pub verification_uri: String,
+    #[ts(type = "number")]
+    pub expires_in: u64,
+    #[ts(type = "number")]
+    pub interval: u64,
+}
+
+/// GitHub user profile (subset of GET /user response).
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct GitHubUser {
+    pub login: String,
+    pub avatar_url: String,
+}
+
+/// Authentication status reported to the frontend.
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+#[serde(tag = "status", rename_all = "kebab-case")]
+pub enum GhAuthStatus {
+    NotConnected,
+    #[serde(rename = "oauth-connected")]
+    OAuthConnected { user: GitHubUser },
+    CliConnected,
+}
+
 /// A label on a GitHub issue (name + hex color).
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
@@ -85,12 +117,20 @@ pub struct SyncAllResult {
     pub errors: Vec<String>,
 }
 
-/// Deserialization target for `gh issue view --json state,url`.
+/// Deserialization target for `gh issue view --json state`.
+/// Only `state` is used in production; the url field from the CLI response is ignored by serde.
 #[derive(Debug, Deserialize)]
-#[allow(dead_code)] // Fields read by serde, not all accessed in Rust
 pub struct GhIssueViewOutput {
     pub state: String,
-    pub url: String,
+}
+
+impl GhIssueViewOutput {
+    /// Parse from a REST API JSON value, mapping the lowercase state.
+    pub fn from_rest_json(value: &serde_json::Value) -> Result<Self, String> {
+        Ok(Self {
+            state: value.get("state").and_then(|s| s.as_str()).ok_or("Missing state")?.to_string(),
+        })
+    }
 }
 
 /// Deserialization target for `gh pr list --json number,state,url,isDraft,reviewRequests,latestReviews`.
@@ -147,9 +187,10 @@ pub fn resolve_pull_request_state(pr: &GhPullRequestOutput) -> PullRequestState 
     }
 }
 
-/// Maps gh CLI issue state to our internal state string (lowercase).
+/// Maps GitHub issue state to our internal state string (lowercase).
+/// Handles both CLI format ("OPEN"/"CLOSED") and REST API format ("open"/"closed").
 pub fn resolve_github_issue_state(gh_state: &str) -> &'static str {
-    match gh_state {
+    match gh_state.to_uppercase().as_str() {
         "CLOSED" => "closed",
         _ => "open",
     }
@@ -240,5 +281,126 @@ mod tests {
         assert_eq!(deserialized, PullRequestState::ReviewRequested);
         let serialized = serde_json::to_string(&deserialized).unwrap();
         assert_eq!(serialized, "\"review-requested\"");
+    }
+
+    // ─── Device Flow type tests ──────────────────────────────────────────────
+
+    #[test]
+    fn device_flow_start_result_deserializes_from_github_response() {
+        let json = r#"{
+            "device_code": "3584d83530557fdd4b50c4c855bc37a4d0eec9b9",
+            "user_code": "WDJB-MJHT",
+            "verification_uri": "https://github.com/login/device",
+            "expires_in": 900,
+            "interval": 5
+        }"#;
+        let result: DeviceFlowStartResult = serde_json::from_str(json).unwrap();
+        assert_eq!(result.user_code, "WDJB-MJHT");
+        assert_eq!(result.verification_uri, "https://github.com/login/device");
+        assert_eq!(result.expires_in, 900);
+        assert_eq!(result.interval, 5);
+    }
+
+    #[test]
+    fn github_user_deserializes_from_api_response() {
+        let json = r#"{
+            "login": "octocat",
+            "avatar_url": "https://avatars.githubusercontent.com/u/1?v=4",
+            "id": 1,
+            "name": "The Octocat"
+        }"#;
+        let user: GitHubUser = serde_json::from_str(json).unwrap();
+        assert_eq!(user.login, "octocat");
+        assert_eq!(
+            user.avatar_url,
+            "https://avatars.githubusercontent.com/u/1?v=4"
+        );
+    }
+
+    #[test]
+    fn gh_auth_status_not_connected_serializes_correctly() {
+        let status = GhAuthStatus::NotConnected;
+        let json = serde_json::to_string(&status).unwrap();
+        assert_eq!(json, r#"{"status":"not-connected"}"#);
+    }
+
+    #[test]
+    fn gh_auth_status_oauth_connected_serializes_correctly() {
+        let status = GhAuthStatus::OAuthConnected {
+            user: GitHubUser {
+                login: "testuser".to_string(),
+                avatar_url: "https://example.com/avatar.png".to_string(),
+            },
+        };
+        let json = serde_json::to_string(&status).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed["status"], "oauth-connected");
+        assert_eq!(parsed["user"]["login"], "testuser");
+    }
+
+    #[test]
+    fn gh_auth_status_cli_connected_serializes_correctly() {
+        let status = GhAuthStatus::CliConnected;
+        let json = serde_json::to_string(&status).unwrap();
+        assert_eq!(json, r#"{"status":"cli-connected"}"#);
+    }
+
+    #[test]
+    fn gh_auth_status_round_trip() {
+        let original = GhAuthStatus::OAuthConnected {
+            user: GitHubUser {
+                login: "user".to_string(),
+                avatar_url: "https://example.com/a.png".to_string(),
+            },
+        };
+        let json = serde_json::to_string(&original).unwrap();
+        let deserialized: GhAuthStatus = serde_json::from_str(&json).unwrap();
+        match deserialized {
+            GhAuthStatus::OAuthConnected { user } => {
+                assert_eq!(user.login, "user");
+            }
+            _ => panic!("Expected OAuthConnected"),
+        }
+    }
+
+    #[test]
+    fn device_flow_poll_success_response_parses() {
+        let json = r#"{
+            "access_token": "gho_16C7e42F292c6912E7710c838347Ae178B4a",
+            "token_type": "bearer",
+            "scope": "repo read:org read:user"
+        }"#;
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        let token = value["access_token"].as_str().unwrap();
+        assert!(token.starts_with("gho_"));
+        assert!(value.get("error").is_none());
+    }
+
+    #[test]
+    fn device_flow_poll_authorization_pending_parses() {
+        let json = r#"{"error": "authorization_pending"}"#;
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        assert_eq!(value["error"].as_str().unwrap(), "authorization_pending");
+    }
+
+    #[test]
+    fn device_flow_poll_slow_down_parses() {
+        let json = r#"{"error": "slow_down"}"#;
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        assert_eq!(value["error"].as_str().unwrap(), "slow_down");
+    }
+
+    #[test]
+    fn device_flow_poll_expired_token_parses() {
+        let json = r#"{"error": "expired_token"}"#;
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        assert_eq!(value["error"].as_str().unwrap(), "expired_token");
+    }
+
+    #[test]
+    fn device_flow_poll_access_denied_parses() {
+        let json = r#"{"error": "access_denied"}"#;
+        let value: serde_json::Value = serde_json::from_str(json).unwrap();
+        assert_eq!(value["error"].as_str().unwrap(), "access_denied");
     }
 }

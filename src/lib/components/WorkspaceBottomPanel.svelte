@@ -3,9 +3,9 @@
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
 	import type {
 		AssignedIssue,
+		GhAuthStatus,
 		GitStatusCache,
 		IssueDependency,
-		GhCliAvailability,
 	} from '$lib/types/generated';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import {
@@ -36,8 +36,8 @@
 		paletteColors?: string[];
 		usedColors?: string[];
 		dependencies: readonly IssueDependency[];
-		ghSetupBanner?: boolean;
-		ghAvailability?: GhCliAvailability;
+		authStatus?: GhAuthStatus;
+		onconnect?: () => void;
 		assignedIssues?: AssignedIssue[];
 		assignedIssuesHasMore?: boolean;
 		deletedAssignedIssueNumbers?: readonly number[];
@@ -62,8 +62,8 @@
 		paletteColors = [],
 		usedColors = [],
 		dependencies,
-		ghSetupBanner = false,
-		ghAvailability,
+		authStatus,
+		onconnect,
 		assignedIssues = [],
 		assignedIssuesHasMore = false,
 		deletedAssignedIssueNumbers = [],
@@ -165,8 +165,8 @@
 			/>
 		{:else if defaultTab === BOTTOM_PANEL_TABS.issues}
 			<div class="flex flex-col gap-4 px-5 pt-3 pb-5">
-				{#if ghSetupBanner && ghAvailability}
-					<GhSetupBanner availability={ghAvailability} />
+				{#if authStatus && authStatus.status === 'not-connected'}
+					<GhSetupBanner {authStatus} {onconnect} />
 				{/if}
 
 				<IssueCardList
