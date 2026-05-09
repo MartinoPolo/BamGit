@@ -136,7 +136,7 @@
 
 	<Combobox.Portal>
 		<Combobox.Content
-			class="z-[var(--z-popover)] mt-1 max-h-[240px] w-[var(--bits-combobox-anchor-width)] overflow-y-auto rounded-md border border-border bg-surface-3 shadow-md"
+			class="z-[var(--z-tooltip)] mt-1 max-h-[240px] w-[var(--bits-combobox-anchor-width)] overflow-y-auto rounded-md border border-border bg-surface-3 shadow-md"
 			sideOffset={4}
 		>
 			{#if loadingUserRepos || searchingRemote}
