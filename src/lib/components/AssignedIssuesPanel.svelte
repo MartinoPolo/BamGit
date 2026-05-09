@@ -200,6 +200,7 @@
 		toggleRowSelection(issueNumber);
 	}
 
+	// fallow-ignore-next-line complexity
 	function handleKeydown(event: KeyboardEvent) {
 		if (panelElement === null || !panelElement.contains(document.activeElement)) {
 			return;

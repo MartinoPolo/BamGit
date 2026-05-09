@@ -68,6 +68,25 @@ function createVersionControlContext() {
 		}
 	}
 
+	async function fetchAssignedIssuesBatch(owner: string, repo: string) {
+		try {
+			assignedIssuesLoading = true;
+			const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
+				owner,
+				repo,
+				limit: assignedIssuesLimit,
+			});
+			assignedIssues = result.issues;
+			assignedIssuesHasMore = result.has_more;
+			assignedIssuesLastSynced = new Date();
+		} catch (err) {
+			error = String(err);
+			console.error('Failed to load assigned issues:', err);
+		} finally {
+			assignedIssuesLoading = false;
+		}
+	}
+
 	return {
 		get stateMap() {
 			return stateMap;
@@ -205,43 +224,13 @@ function createVersionControlContext() {
 		},
 
 		async loadAssignedIssues(owner: string, repo: string) {
-			try {
-				assignedIssuesLoading = true;
-				assignedIssuesLimit = 50;
-				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
-					owner,
-					repo,
-					limit: assignedIssuesLimit,
-				});
-				assignedIssues = result.issues;
-				assignedIssuesHasMore = result.has_more;
-				assignedIssuesLastSynced = new Date();
-			} catch (err) {
-				error = String(err);
-				console.error('Failed to load assigned issues:', err);
-			} finally {
-				assignedIssuesLoading = false;
-			}
+			assignedIssuesLimit = 50;
+			await fetchAssignedIssuesBatch(owner, repo);
 		},
 
 		async loadMoreAssignedIssues(owner: string, repo: string) {
-			try {
-				assignedIssuesLoading = true;
-				assignedIssuesLimit += 50;
-				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
-					owner,
-					repo,
-					limit: assignedIssuesLimit,
-				});
-				assignedIssues = result.issues;
-				assignedIssuesHasMore = result.has_more;
-				assignedIssuesLastSynced = new Date();
-			} catch (err) {
-				error = String(err);
-				console.error('Failed to load more assigned issues:', err);
-			} finally {
-				assignedIssuesLoading = false;
-			}
+			assignedIssuesLimit += 50;
+			await fetchAssignedIssuesBatch(owner, repo);
 		},
 
 		clear() {
