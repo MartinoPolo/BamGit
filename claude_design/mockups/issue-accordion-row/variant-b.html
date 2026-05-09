@@ -432,6 +432,11 @@ html, body {
   box-shadow: var(--shadow-lg);
 }
 
+.context-shell {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 .issues-panel-header {
   display: flex;
   align-items: center;
@@ -936,6 +941,8 @@ html, body {
     <!-- Issues panel -->
     <div class="issues-panel">
 
+      <div class="gk-eyebrow" style="color: var(--foreground-subtle); margin-bottom: 4px; font-size: 9px;">↓ PARENT CONTEXT (bottom panel) — not part of this design</div>
+      <div class="context-shell">
       <!-- Panel header -->
       <div class="issues-panel-header">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color: var(--foreground-subtle); flex-shrink:0;">
@@ -957,6 +964,7 @@ html, body {
           </svg>
         </button>
       </div>
+      </div><!-- /.context-shell -->
 
       <!-- ════════════════════════════════════════════════════════
            ROW 1 — Running session, Azure issue color, HOVERED

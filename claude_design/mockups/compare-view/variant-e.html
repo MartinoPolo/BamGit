@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compare View — Variant E: Timeline Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ── Grovekeeper design tokens — Forest Moss palette ─────────── */
+:root {
+  --moss-50:  oklch(0.972 0.018 130);
+  --moss-100: oklch(0.940 0.034 130);
+  --moss-200: oklch(0.880 0.058 130);
+  --moss-300: oklch(0.795 0.082 130);
+  --moss-400: oklch(0.690 0.098 132);
+  --moss-500: oklch(0.580 0.096 134);
+  --moss-600: oklch(0.480 0.082 138);
+  --moss-700: oklch(0.395 0.066 142);
+  --moss-800: oklch(0.300 0.048 145);
+  --moss-900: oklch(0.215 0.032 148);
+  --moss-950: oklch(0.155 0.024 150);
+
+  --amber-300: oklch(0.840 0.130 78);
+  --amber-400: oklch(0.770 0.150 65);
+  --amber-500: oklch(0.690 0.165 55);
+  --amber-600: oklch(0.595 0.160 48);
+
+  --bark-300: oklch(0.700 0.060 60);
+  --bark-500: oklch(0.500 0.075 55);
+  --bark-700: oklch(0.345 0.055 50);
+
+  --azure-300: oklch(0.750 0.090 230);
+  --azure-400: oklch(0.660 0.120 230);
+  --azure-500: oklch(0.570 0.130 235);
+  --azure-600: oklch(0.490 0.115 240);
+  --azure-700: oklch(0.400 0.095 240);
+
+  --plum-300: oklch(0.720 0.100 320);
+  --plum-400: oklch(0.640 0.130 320);
+  --plum-500: oklch(0.560 0.150 320);
+  --plum-600: oklch(0.480 0.130 320);
+  --plum-700: oklch(0.400 0.110 320);
+
+  --teal-300: oklch(0.780 0.075 195);
+  --teal-400: oklch(0.700 0.095 195);
+  --teal-500: oklch(0.620 0.110 195);
+  --teal-600: oklch(0.540 0.095 195);
+  --teal-700: oklch(0.460 0.080 195);
+
+  --rose-300: oklch(0.800 0.105 15);
+  --rose-400: oklch(0.720 0.135 15);
+  --rose-500: oklch(0.640 0.155 15);
+  --rose-600: oklch(0.560 0.135 15);
+  --rose-700: oklch(0.480 0.115 15);
+
+  --coral-300: oklch(0.780 0.105 30);
+  --coral-400: oklch(0.700 0.135 30);
+  --coral-500: oklch(0.620 0.155 30);
+  --coral-600: oklch(0.540 0.135 30);
+  --coral-700: oklch(0.460 0.115 30);
+
+  --gold-300: oklch(0.810 0.090 90);
+  --gold-400: oklch(0.730 0.115 90);
+  --gold-500: oklch(0.650 0.135 90);
+  --gold-600: oklch(0.570 0.115 90);
+  --gold-700: oklch(0.490 0.095 90);
+
+  --sage-300: oklch(0.760 0.055 160);
+  --sage-400: oklch(0.680 0.070 160);
+  --sage-500: oklch(0.600 0.085 160);
+  --sage-600: oklch(0.520 0.070 160);
+  --sage-700: oklch(0.440 0.060 160);
+
+  --indigo-300: oklch(0.700 0.095 275);
+  --indigo-400: oklch(0.620 0.120 275);
+  --indigo-500: oklch(0.540 0.140 275);
+  --indigo-600: oklch(0.460 0.120 275);
+  --indigo-700: oklch(0.380 0.100 275);
+
+  --fuchsia-300: oklch(0.740 0.105 350);
+  --fuchsia-400: oklch(0.660 0.135 350);
+  --fuchsia-500: oklch(0.580 0.155 350);
+  --fuchsia-600: oklch(0.500 0.135 350);
+  --fuchsia-700: oklch(0.420 0.115 350);
+
+  --sky-light-top: oklch(0.965 0.018 220);
+  --sky-light-bot: oklch(0.940 0.025 130);
+  --sky-dark-top:  oklch(0.225 0.028 240);
+  --sky-dark-bot:  oklch(0.180 0.030 150);
+
+  --status-success: oklch(0.660 0.135 145);
+  --status-warning: oklch(0.770 0.155 75);
+  --status-danger:  oklch(0.620 0.205 25);
+  --status-info:    oklch(0.660 0.105 220);
+  --status-merged:  oklch(0.580 0.140 310);
+
+  --priority-top:    oklch(0.620 0.205 25);
+  --priority-high:   oklch(0.720 0.160 55);
+  --priority-medium: oklch(0.820 0.160 85);
+  --priority-low:    oklch(0.660 0.105 220);
+  --priority-lowest: oklch(0.550 0.020 250);
+
+  --gh-open:   oklch(0.660 0.135 145);
+  --gh-closed: oklch(0.580 0.140 310);
+  --gh-merged: oklch(0.580 0.140 310);
+  --gh-draft:  oklch(0.550 0.020 250);
+
+  --session-running:      oklch(0.660 0.135 145);
+  --session-errored:      oklch(0.620 0.205 25);
+  --session-idle:         oklch(0.660 0.105 220);
+  --session-paused:       oklch(0.550 0.020 250);
+  --session-finished:     oklch(0.450 0.015 250);
+  --session-needs-input:  oklch(0.770 0.155 75);
+  --session-needs-review: oklch(0.660 0.105 220);
+
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --text-2xs: 10.5px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-md:  13px;
+  --text-base:14px;
+  --text-lg:  15px;
+  --text-xl:  17px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.25;
+  --leading-normal: 1.4;
+  --leading-relaxed:1.55;
+  --leading-loose:  1.7;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  --border-width-1: 1px;
+  --border-width-2: 1.5px;
+  --border-width-3: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --size-control-sm: 26px;
+  --size-control-md: 32px;
+  --size-control-lg: 38px;
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+
+  --duration-1: 90ms;
+  --duration-2: 120ms;
+  --duration-3: 160ms;
+  --duration-4: 220ms;
+  --duration-5: 320ms;
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --ease-out:      cubic-bezier(.16,.84,.44,1);
+  --ease-in:       cubic-bezier(.5,0,.75,0);
+
+  --sidebar-width:  240px;
+  --sidebar-width-collapsed: 56px;
+
+  /* Timeline-specific: model colors */
+  --model-1: var(--moss-400);
+  --model-1-area: oklch(0.690 0.098 132 / 0.15);
+  --model-2: var(--azure-400);
+  --model-2-area: oklch(0.660 0.120 230 / 0.15);
+  --model-3: var(--amber-400);
+  --model-3-area: oklch(0.770 0.150 65 / 0.12);
+}
+
+/* Dark theme */
+.theme-dark, [data-theme='dark'] {
+  color-scheme: dark;
+  --background:        oklch(0.155 0.018 150);
+  --surface:           oklch(0.190 0.020 150);
+  --surface-2:         oklch(0.225 0.022 150);
+  --surface-hover:     oklch(0.265 0.024 150);
+  --surface-3:         oklch(0.265 0.024 150);
+  --foreground:        oklch(0.965 0.010 130);
+  --foreground-muted:  oklch(0.730 0.018 135);
+  --foreground-subtle: oklch(0.560 0.020 140);
+  --border:            oklch(0.295 0.022 148);
+  --border-strong:     oklch(0.380 0.028 145);
+  --primary:           var(--moss-400);
+  --primary-fg:        oklch(0.135 0.020 150);
+  --primary-soft:      oklch(0.305 0.045 145);
+  --accent:            var(--moss-400);
+  --accent-fg:         oklch(0.135 0.02 150);
+  --ring:              var(--moss-400);
+  --sidebar-bg:        oklch(0.180 0.022 150);
+  --sidebar-fg:        oklch(0.770 0.020 140);
+  --code-bg:           oklch(0.215 0.020 150);
+  --sky-top:           var(--sky-dark-top);
+  --sky-bot:           var(--sky-dark-bot);
+  --ground-color:      oklch(0.300 0.060 140);
+  --ground-dark:       oklch(0.180 0.040 50);
+}
+
+/* Base */
+.gk-root {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "ss01", "cv11";
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.gk-root, .gk-root * { box-sizing: border-box; }
+.font-mono { font-family: var(--font-mono); }
+
+/* Type scale */
+.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
+.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
+.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
+.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
+.gk-eyebrow {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground-subtle);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* Buttons */
+.gk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 12px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--duration-2) ease, border-color var(--duration-2) ease, color var(--duration-2) ease, transform var(--duration-1) ease, box-shadow var(--duration-2) ease;
+  white-space: nowrap;
+  user-select: none;
+}
+.gk-btn:active { transform: scale(0.96); }
+.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+.gk-btn-secondary {
+  background: var(--surface-2);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.gk-btn-secondary:active { transform: scale(0.96); filter: brightness(0.92); }
+
+.gk-btn-ghost {
+  background: transparent;
+  color: var(--foreground-muted);
+  border-color: transparent;
+}
+.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
+.gk-btn-ghost:active { transform: scale(0.96); }
+
+.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
+.gk-btn-icon { padding: 0; width: 32px; }
+.gk-btn-icon.gk-btn-sm { width: 26px; }
+
+/* Badge */
+.gk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--foreground-muted);
+  border: 1px solid var(--border);
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
+.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+.gk-badge-moss    { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
+
+/* Card */
+.gk-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.gk-card-padded { padding: 16px; }
+
+/* Divider */
+.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+
+/* Scrollbar */
+.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
+.gk-root ::-webkit-scrollbar-track { background: transparent; }
+.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
+.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+
+/* CodeBurn panel */
+.cb-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.cb-panel-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+}
+.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.cb-panel-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+.cb-panel-sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--foreground-subtle);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: auto;
+}
+.cb-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  text-align: right;
+  color: var(--foreground);
+}
+.cb-mute {
+  color: var(--foreground-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* Tabs */
+.cb-tabs { display: inline-flex; gap: 0; font-family: var(--font-mono); font-size: 11.5px; }
+.cb-tab {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: all 120ms ease;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.cb-tab:hover { color: var(--foreground); background: var(--surface-2); }
+.cb-tab.is-active {
+  color: var(--foreground);
+  background: var(--surface-2);
+  border-color: var(--border);
+  box-shadow: inset 0 -2px 0 oklch(0.770 0.155 75);
+}
+
+/* ── Layout shell ───────────────────────────────────────────── */
+.page-shell {
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--background);
+}
+
+/* ── Ghost page header (40% opacity context) ─────────────────── */
+.page-header-ghost {
+  opacity: 0.4;
+  pointer-events: none;
+  margin-bottom: var(--space-10);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--border);
+}
+.page-header-ghost .ph-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+.page-header-ghost .ph-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+.page-header-ghost .ph-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+.ph-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--foreground-muted);
+}
+
+/* ── Variant label row ───────────────────────────────────────── */
+.tl-variant-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+  gap: var(--space-8);
+}
+.tl-variant-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* ── Timeline controls bar ───────────────────────────────────── */
+.tl-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-8);
+  gap: var(--space-8);
+}
+.tl-controls-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+.tl-controls-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Model legend */
+.tl-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+.tl-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  transition: background var(--duration-2) ease;
+}
+.tl-legend-item:hover {
+  background: var(--surface-2);
+  color: var(--foreground);
+}
+.tl-legend-swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.tl-legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Section headers ───────────────────────────────────────── */
+.tl-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0 8px;
+}
+.tl-section-header:first-child {
+  padding-top: 0;
+}
+.tl-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--foreground-subtle);
+  white-space: nowrap;
+}
+.tl-section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Sparkline row ─────────────────────────────────────────── */
+.tl-sparkrow {
+  display: grid;
+  grid-template-columns: 140px 1fr 180px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 40%, transparent);
+  transition: background var(--duration-2) ease;
+}
+.tl-sparkrow:hover {
+  background: color-mix(in oklch, var(--surface-hover) 30%, transparent);
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: var(--radius-sm);
+}
+.tl-sparkrow:last-child {
+  border-bottom: none;
+}
+
+/* Metric label */
+.tl-metric-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tl-metric-name {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+.tl-metric-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--foreground-subtle);
+  letter-spacing: 0.02em;
+}
+
+/* SVG chart area */
+.tl-chart-wrap {
+  position: relative;
+  height: 48px;
+  width: 100%;
+}
+.tl-chart-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Current values column */
+.tl-values {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.tl-val-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  background: color-mix(in oklch, var(--surface-2) 80%, transparent);
+  white-space: nowrap;
+}
+.tl-val-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Trend arrow */
+.tl-trend {
+  font-size: 9px;
+  margin-left: 1px;
+}
+.tl-trend-up { color: var(--status-success); }
+.tl-trend-down { color: var(--status-danger); }
+.tl-trend-flat { color: var(--foreground-subtle); }
+
+/* ── Date axis ─────────────────────────────────────────────── */
+.tl-date-axis {
+  display: grid;
+  grid-template-columns: 140px 1fr 180px;
+  gap: 12px;
+  padding: 4px 0 0;
+}
+.tl-date-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--foreground-subtle);
+  letter-spacing: 0.02em;
+}
+
+/* ── Summary row ─────────────────────────────────────────────── */
+.tl-summary-strip {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 16px;
+  background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--foreground-subtle);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+.tl-summary-strip span + span::before {
+  content: none;
+}
+.tl-summary-val {
+  color: var(--foreground-muted);
+}
+.tl-summary-spacer {
+  flex: 1;
+}
+
+/* ── Trend badge ──────────────────────────────────────────── */
+.tl-trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+.tl-trend-badge-up {
+  background: color-mix(in oklch, var(--status-success) 12%, transparent);
+  color: var(--status-success);
+}
+.tl-trend-badge-down {
+  background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+  color: var(--status-danger);
+}
+
+/* ── Crosshair tooltip (shown on hover) ───────────────────── */
+.tl-crosshair-demo {
+  position: absolute;
+  top: -6px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--foreground);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+.tl-crosshair-line {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--border-strong);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ── Style no-winner indicator ───────────────────────────────── */
+.tl-neutral-indicator {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--foreground-subtle);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page-shell { padding: 12px; }
+  .tl-sparkrow {
+    grid-template-columns: 100px 1fr 120px;
+    gap: 8px;
+  }
+  .tl-variant-bar { flex-direction: column; align-items: flex-start; }
+  .tl-controls { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .tl-legend { flex-wrap: wrap; gap: 4px; }
+  .tl-val-chip { font-size: 10px; padding: 2px 4px; }
+}
+
+@media (max-width: 480px) {
+  .tl-sparkrow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .tl-values {
+    justify-content: flex-start;
+  }
+  .tl-date-axis {
+    grid-template-columns: 1fr;
+  }
+}
+  </style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+  <div class="page-shell">
+
+    <!-- ── Ghost page header (40% opacity context) ────────────── -->
+    <div class="page-header-ghost">
+      <div class="ph-row">
+        <div class="ph-title">Usage Dashboard</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="ph-filter-pill">grovekeeper</div>
+          <div class="ph-filter-pill">All sessions</div>
+        </div>
+      </div>
+      <div class="ph-filters">
+        <div class="ph-filter-pill" style="background: var(--surface-3); border-color: var(--border-strong);">Group by: Model</div>
+        <div class="ph-filter-pill">May 3 -- May 9, 2026</div>
+        <div class="ph-filter-pill">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 2H2M10 6H4M10 10H6"/></svg>
+          Filters
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Variant label ─────────────────────────────────────── -->
+    <div class="tl-variant-bar">
+      <div class="tl-variant-label">
+        <span class="gk-eyebrow">Compare View</span>
+        <span class="gk-badge gk-badge-moss">Variant E -- Timeline Comparison</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <button class="gk-btn gk-btn-ghost gk-btn-sm" style="gap: 4px; font-size: 11px;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 1v7M3.5 5.5L6 8l2.5-2.5"/>
+            <path d="M2 9.5v1h8v-1"/>
+          </svg>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Timeline controls ─────────────────────────────────── -->
+    <div class="tl-controls">
+      <div class="tl-controls-left">
+        <!-- Period selector tabs -->
+        <div class="cb-tabs">
+          <button class="cb-tab">3d</button>
+          <button class="cb-tab is-active">7d</button>
+          <button class="cb-tab">14d</button>
+          <button class="cb-tab">30d</button>
+        </div>
+
+        <div style="width: 1px; height: 18px; background: var(--border);"></div>
+
+        <!-- Model legend -->
+        <div class="tl-legend">
+          <div class="tl-legend-item">
+            <div class="tl-legend-swatch" style="background: var(--model-1);"></div>
+            <span>Sonnet 4</span>
+            <span class="cb-mute" style="font-size: 10px;">341 calls</span>
+          </div>
+          <div class="tl-legend-item">
+            <div class="tl-legend-swatch" style="background: var(--model-2);"></div>
+            <span>Opus 4</span>
+            <span class="cb-mute" style="font-size: 10px;">128 calls</span>
+          </div>
+          <div class="tl-legend-item">
+            <div class="tl-legend-swatch" style="background: var(--model-3);"></div>
+            <span>Haiku 4</span>
+            <span class="cb-mute" style="font-size: 10px;">89 calls</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-controls-right">
+        <button class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" title="Toggle area fill">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="1" width="12" height="12" rx="2" />
+            <path d="M1 10 L4 6 L7 8 L10 4 L13 6" />
+            <path d="M1 10 L4 6 L7 8 L10 4 L13 6 L13 13 L1 13 Z" fill="currentColor" opacity="0.2"/>
+          </svg>
+        </button>
+        <button class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon" title="Normalize scales">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <path d="M2 12V2M12 12V2M2 7h10"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Main sparkline panel ───────────────────────────────── -->
+    <div class="cb-panel" style="padding: 16px 20px 0; gap: 0;">
+
+      <!-- ── PERFORMANCE section ─────────────────────────────── -->
+      <div class="tl-section-header" style="padding-top: 0;">
+        <span class="tl-section-label">Performance</span>
+        <div class="tl-section-line"></div>
+        <span class="tl-section-label" style="color: var(--foreground-subtle); font-weight: 400; font-size: 9px; letter-spacing: 0.04em;">higher is better</span>
+      </div>
+
+      <!-- One-shot rate -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">One-shot rate</div>
+          <div class="tl-metric-sub">no retry needed</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <!-- Grid lines -->
+            <line x1="0" y1="12" x2="400" y2="12" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="0" y1="36" x2="400" y2="36" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <!-- Day separators -->
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Model 1 (Sonnet) area + line: starts mid, dips, recovers strong -->
+            <path d="M0,20 L57,22 L114,28 L171,18 L228,14 L285,12 L342,10 L400,8" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,20 L57,22 L114,28 L171,18 L228,14 L285,12 L342,10 L400,8 L400,48 L0,48 Z" fill="var(--model-1-area)"/>
+            <!-- Model 2 (Opus) area + line: consistently high -->
+            <path d="M0,14 L57,12 L114,16 L171,10 L228,8 L285,10 L342,6 L400,4" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,14 L57,12 L114,16 L171,10 L228,8 L285,10 L342,6 L400,4 L400,48 L0,48 Z" fill="var(--model-2-area)"/>
+            <!-- Model 3 (Haiku) area + line: lower, volatile -->
+            <path d="M0,32 L57,36 L114,34 L171,38 L228,30 L285,34 L342,28 L400,26" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,32 L57,36 L114,34 L171,38 L228,30 L285,34 L342,28 L400,26 L400,48 L0,48 Z" fill="var(--model-3-area)"/>
+            <!-- End-point dots -->
+            <circle cx="400" cy="8" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="4" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="26" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            76%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            71%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            58%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retry rate -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Retry rate</div>
+          <div class="tl-metric-sub">lower is better</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="12" x2="400" y2="12" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="0" y1="36" x2="400" y2="36" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Sonnet: low retry, dips to great -->
+            <path d="M0,28 L57,30 L114,24 L171,26 L228,22 L285,20 L342,22 L400,18" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,28 L57,30 L114,24 L171,26 L228,22 L285,20 L342,22 L400,18 L400,48 L0,48 Z" fill="var(--model-1-area)"/>
+            <!-- Opus: moderate retry -->
+            <path d="M0,20 L57,22 L114,18 L171,24 L228,20 L285,16 L342,14 L400,12" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,20 L57,22 L114,18 L171,24 L228,20 L285,16 L342,14 L400,12 L400,48 L0,48 Z" fill="var(--model-2-area)"/>
+            <!-- Haiku: higher retry -->
+            <path d="M0,12 L57,8 L114,14 L171,10 L228,16 L285,12 L342,18 L400,14" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,12 L57,8 L114,14 L171,10 L228,16 L285,12 L342,18 L400,14 L400,48 L0,48 Z" fill="var(--model-3-area)"/>
+            <circle cx="400" cy="18" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="12" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="14" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            9%
+            <span class="tl-trend tl-trend-down">&#9660;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            15%
+            <span class="tl-trend tl-trend-down">&#9660;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            22%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache hit rate -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Cache hit rate</div>
+          <div class="tl-metric-sub">prompt caching</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="12" x2="400" y2="12" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="0" y1="36" x2="400" y2="36" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Sonnet: high cache hits, rising -->
+            <path d="M0,18 L57,16 L114,14 L171,12 L228,10 L285,8 L342,8 L400,6" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,18 L57,16 L114,14 L171,12 L228,10 L285,8 L342,8 L400,6 L400,48 L0,48 Z" fill="var(--model-1-area)"/>
+            <!-- Opus: moderate -->
+            <path d="M0,30 L57,28 L114,32 L171,26 L228,24 L285,28 L342,22 L400,20" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,30 L57,28 L114,32 L171,26 L228,24 L285,28 L342,22 L400,20 L400,48 L0,48 Z" fill="var(--model-2-area)"/>
+            <!-- Haiku: good cache -->
+            <path d="M0,14 L57,20 L114,16 L171,18 L228,14 L285,12 L342,10 L400,10" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,14 L57,20 L114,16 L171,18 L228,14 L285,12 L342,10 L400,10 L400,48 L0,48 Z" fill="var(--model-3-area)"/>
+            <circle cx="400" cy="6" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="20" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="10" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            67%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            62%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            44%
+            <span class="tl-trend tl-trend-up">&#9650;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date axis for performance section -->
+      <div class="tl-date-axis">
+        <div></div>
+        <div class="tl-date-labels">
+          <span>May 3</span>
+          <span>May 4</span>
+          <span>May 5</span>
+          <span>May 6</span>
+          <span>May 7</span>
+          <span>May 8</span>
+          <span>May 9</span>
+        </div>
+        <div></div>
+      </div>
+
+      <!-- ── EFFICIENCY section ──────────────────────────────── -->
+      <div class="tl-section-header">
+        <span class="tl-section-label">Efficiency</span>
+        <div class="tl-section-line"></div>
+        <span class="tl-section-label" style="color: var(--foreground-subtle); font-weight: 400; font-size: 9px; letter-spacing: 0.04em;">lower is better</span>
+      </div>
+
+      <!-- Cost per call -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Cost per call</div>
+          <div class="tl-metric-sub">avg incl. cache</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="12" x2="400" y2="12" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="0" y1="36" x2="400" y2="36" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Opus: expensive, high up in chart (inverted: high value = top) -->
+            <path d="M0,6 L57,8 L114,4 L171,10 L228,6 L285,8 L342,4 L400,6" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,6 L57,8 L114,4 L171,10 L228,6 L285,8 L342,4 L400,6 L400,48 L0,48 Z" fill="var(--model-2-area)"/>
+            <!-- Sonnet: cheap -->
+            <path d="M0,36 L57,38 L114,34 L171,36 L228,32 L285,34 L342,30 L400,32" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,36 L57,38 L114,34 L171,36 L228,32 L285,34 L342,30 L400,32 L400,48 L0,48 Z" fill="var(--model-1-area)"/>
+            <!-- Haiku: cheapest -->
+            <path d="M0,42 L57,40 L114,44 L171,42 L228,40 L285,42 L342,38 L400,40" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,42 L57,40 L114,44 L171,42 L228,40 L285,42 L342,38 L400,40 L400,48 L0,48 Z" fill="var(--model-3-area)"/>
+            <circle cx="400" cy="6" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="32" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="40" r="3" fill="var(--model-3)" />
+          </svg>
+          <!-- Crosshair demo on day 5 (May 7) -->
+          <div class="tl-crosshair-line" style="left: 66.5%;"></div>
+          <div class="tl-crosshair-demo" style="left: 68%; top: 0;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="color: var(--foreground-subtle); font-size: 9px;">May 7</span>
+              <span><span style="color: var(--model-2); margin-right: 3px;">&#9679;</span>$0.138</span>
+              <span><span style="color: var(--model-1); margin-right: 3px;">&#9679;</span>$0.019</span>
+              <span><span style="color: var(--model-3); margin-right: 3px;">&#9679;</span>$0.004</span>
+            </div>
+          </div>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            $0.004
+            <span class="tl-trend tl-trend-flat">&#8212;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            $0.021
+            <span class="tl-trend tl-trend-down">&#9660;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            $0.146
+            <span class="tl-trend tl-trend-flat">&#8212;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost per edit -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Cost per edit</div>
+          <div class="tl-metric-sub">file write events</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="12" x2="400" y2="12" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="0" y1="36" x2="400" y2="36" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Opus: expensive per edit -->
+            <path d="M0,8 L57,6 L114,12 L171,4 L228,10 L285,8 L342,6 L400,8" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,8 L57,6 L114,12 L171,4 L228,10 L285,8 L342,6 L400,8 L400,48 L0,48 Z" fill="var(--model-2-area)"/>
+            <!-- Sonnet: moderate -->
+            <path d="M0,30 L57,34 L114,28 L171,32 L228,26 L285,28 L342,24 L400,26" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,30 L57,34 L114,28 L171,32 L228,26 L285,28 L342,24 L400,26 L400,48 L0,48 Z" fill="var(--model-1-area)"/>
+            <!-- Haiku: cheapest -->
+            <path d="M0,40 L57,38 L114,42 L171,36 L228,38 L285,40 L342,36 L400,38" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,40 L57,38 L114,42 L171,36 L228,38 L285,40 L342,36 L400,38 L400,48 L0,48 Z" fill="var(--model-3-area)"/>
+            <circle cx="400" cy="8" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="26" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="38" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            $0.009
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            $0.044
+            <span class="tl-trend tl-trend-down">&#9660;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            $0.312
+          </div>
+        </div>
+      </div>
+
+      <!-- Output tokens per call -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Output tokens</div>
+          <div class="tl-metric-sub">per call, avg</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="12" x2="400" y2="12" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="0" y1="36" x2="400" y2="36" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Opus: verbose, lots of output -->
+            <path d="M0,10 L57,8 L114,14 L171,6 L228,12 L285,10 L342,8 L400,10" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,10 L57,8 L114,14 L171,6 L228,12 L285,10 L342,8 L400,10 L400,48 L0,48 Z" fill="var(--model-2-area)"/>
+            <!-- Sonnet: moderate -->
+            <path d="M0,26 L57,24 L114,28 L171,22 L228,24 L285,20 L342,22 L400,20" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,26 L57,24 L114,28 L171,22 L228,24 L285,20 L342,22 L400,20 L400,48 L0,48 Z" fill="var(--model-1-area)"/>
+            <!-- Haiku: concise -->
+            <path d="M0,38 L57,36 L114,40 L171,34 L228,36 L285,38 L342,34 L400,36" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0,38 L57,36 L114,40 L171,34 L228,36 L285,38 L342,34 L400,36 L400,48 L0,48 Z" fill="var(--model-3-area)"/>
+            <circle cx="400" cy="10" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="20" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="36" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            680
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            1,340
+            <span class="tl-trend tl-trend-down">&#9660;</span>
+          </div>
+          <div class="tl-val-chip">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            2,240
+          </div>
+        </div>
+      </div>
+
+      <!-- Date axis for efficiency section -->
+      <div class="tl-date-axis">
+        <div></div>
+        <div class="tl-date-labels">
+          <span>May 3</span>
+          <span>May 4</span>
+          <span>May 5</span>
+          <span>May 6</span>
+          <span>May 7</span>
+          <span>May 8</span>
+          <span>May 9</span>
+        </div>
+        <div></div>
+      </div>
+
+      <!-- ── WORKING STYLE section ───────────────────────────── -->
+      <div class="tl-section-header">
+        <span class="tl-section-label">Working Style</span>
+        <div class="tl-section-line"></div>
+        <span class="tl-neutral-indicator">no winner -- style indicators</span>
+      </div>
+
+      <!-- Delegation rate -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Delegation rate</div>
+          <div class="tl-metric-sub">agent spawns / turns</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="24" x2="400" y2="24" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Opus: high delegation, trending up -->
+            <path d="M0,18 L57,14 L114,20 L171,12 L228,10 L285,8 L342,6 L400,4" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Sonnet: moderate delegation -->
+            <path d="M0,28 L57,26 L114,30 L171,24 L228,26 L285,22 L342,20 L400,18" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Haiku: low delegation -->
+            <path d="M0,40 L57,38 L114,42 L171,36 L228,38 L285,40 L342,36 L400,38" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="400" cy="4" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="18" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="38" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            61%
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            36%
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            12%
+          </div>
+        </div>
+      </div>
+
+      <!-- Planning rate -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Planning rate</div>
+          <div class="tl-metric-sub">planning / turns</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="24" x2="400" y2="24" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Opus: plans frequently -->
+            <path d="M0,14 L57,12 L114,18 L171,10 L228,14 L285,8 L342,12 L400,10" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Sonnet: moderate -->
+            <path d="M0,30 L57,28 L114,32 L171,26 L228,30 L285,24 L342,28 L400,26" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Haiku: rarely plans -->
+            <path d="M0,42 L57,44 L114,40 L171,42 L228,38 L285,42 L342,40 L400,42" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="400" cy="10" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="26" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="42" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            42%
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            22%
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            8%
+          </div>
+        </div>
+      </div>
+
+      <!-- Avg tools per turn -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Avg tools / turn</div>
+          <div class="tl-metric-sub">tool calls per turn</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="24" x2="400" y2="24" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Opus: uses many tools -->
+            <path d="M0,12 L57,10 L114,16 L171,8 L228,14 L285,10 L342,12 L400,8" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Sonnet: moderate tooling -->
+            <path d="M0,24 L57,22 L114,26 L171,20 L228,24 L285,22 L342,20 L400,22" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Haiku: minimal tooling -->
+            <path d="M0,38 L57,36 L114,40 L171,34 L228,36 L285,38 L342,34 L400,36" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="400" cy="8" r="3" fill="var(--model-2)" />
+            <circle cx="400" cy="22" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="36" r="3" fill="var(--model-3)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            5.1
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            3.4
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            2.1
+          </div>
+        </div>
+      </div>
+
+      <!-- Fast mode usage -->
+      <div class="tl-sparkrow">
+        <div class="tl-metric-label">
+          <div class="tl-metric-name">Fast mode usage</div>
+          <div class="tl-metric-sub">fast / total calls</div>
+        </div>
+        <div class="tl-chart-wrap">
+          <svg viewBox="0 0 400 48" preserveAspectRatio="none">
+            <line x1="0" y1="24" x2="400" y2="24" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.4"/>
+            <line x1="57" y1="0" x2="57" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="114" y1="0" x2="114" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="171" y1="0" x2="171" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="228" y1="0" x2="228" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="285" y1="0" x2="285" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <line x1="342" y1="0" x2="342" y2="48" stroke="var(--border)" stroke-width="0.5" opacity="0.2"/>
+            <!-- Sonnet: lots of fast mode -->
+            <path d="M0,10 L57,8 L114,12 L171,6 L228,10 L285,8 L342,6 L400,8" fill="none" stroke="var(--model-1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Haiku: moderate fast mode -->
+            <path d="M0,22 L57,20 L114,24 L171,18 L228,22 L285,20 L342,18 L400,20" fill="none" stroke="var(--model-3)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Opus: rarely fast mode -->
+            <path d="M0,38 L57,36 L114,40 L171,34 L228,38 L285,36 L342,38 L400,36" fill="none" stroke="var(--model-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="400" cy="8" r="3" fill="var(--model-1)" />
+            <circle cx="400" cy="20" r="3" fill="var(--model-3)" />
+            <circle cx="400" cy="36" r="3" fill="var(--model-2)" />
+          </svg>
+        </div>
+        <div class="tl-values">
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-1);"></div>
+            74%
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-3);"></div>
+            48%
+          </div>
+          <div class="tl-val-chip" style="opacity: 0.7;">
+            <div class="tl-val-dot" style="background: var(--model-2);"></div>
+            18%
+          </div>
+        </div>
+      </div>
+
+      <!-- Date axis for working style section -->
+      <div class="tl-date-axis" style="padding-bottom: 4px;">
+        <div></div>
+        <div class="tl-date-labels">
+          <span>May 3</span>
+          <span>May 4</span>
+          <span>May 5</span>
+          <span>May 6</span>
+          <span>May 7</span>
+          <span>May 8</span>
+          <span>May 9</span>
+        </div>
+        <div></div>
+      </div>
+
+      <!-- ── Summary strip ─────────────────────────────────────── -->
+      <div class="tl-summary-strip">
+        <span>Period: <span class="tl-summary-val">May 3--9, 2026</span></span>
+        <span>Total calls: <span class="tl-summary-val">558</span></span>
+        <span>Total spend: <span class="tl-summary-val">$24.18</span></span>
+        <span>Models: <span class="tl-summary-val">3</span></span>
+        <div class="tl-summary-spacer"></div>
+        <span>Sonnet trending
+          <span class="tl-trend-badge tl-trend-badge-up">&#9650; quality</span>
+        </span>
+        <span>Opus
+          <span class="tl-trend-badge tl-trend-badge-down">&#9660; cost</span>
+        </span>
+      </div>
+
+    </div>
+    <!-- end cb-panel -->
+
+  </div>
+  <!-- end page-shell -->
+</div>
+<!-- end gk-root -->
+</body>
+</html>

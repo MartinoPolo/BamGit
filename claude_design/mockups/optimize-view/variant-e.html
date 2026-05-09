@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optimize View — Variant E: Before/After Projection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ============================================================
+   DESIGN TOKENS — inlined from tokens.css
+   ============================================================ */
+
+:root {
+  --moss-50:  oklch(0.972 0.018 130);
+  --moss-100: oklch(0.940 0.034 130);
+  --moss-200: oklch(0.880 0.058 130);
+  --moss-300: oklch(0.795 0.082 130);
+  --moss-400: oklch(0.690 0.098 132);
+  --moss-500: oklch(0.580 0.096 134);
+  --moss-600: oklch(0.480 0.082 138);
+  --moss-700: oklch(0.395 0.066 142);
+  --moss-800: oklch(0.300 0.048 145);
+  --moss-900: oklch(0.215 0.032 148);
+  --moss-950: oklch(0.155 0.024 150);
+
+  --amber-300: oklch(0.840 0.130 78);
+  --amber-400: oklch(0.770 0.150 65);
+  --amber-500: oklch(0.690 0.165 55);
+  --amber-600: oklch(0.595 0.160 48);
+
+  --bark-300: oklch(0.700 0.060 60);
+  --bark-500: oklch(0.500 0.075 55);
+  --bark-700: oklch(0.345 0.055 50);
+
+  --azure-300: oklch(0.750 0.090 230);
+  --azure-400: oklch(0.660 0.120 230);
+  --azure-500: oklch(0.570 0.130 235);
+  --azure-600: oklch(0.490 0.115 240);
+  --azure-700: oklch(0.400 0.095 240);
+
+  --plum-300: oklch(0.720 0.100 320);
+  --plum-400: oklch(0.640 0.130 320);
+  --plum-500: oklch(0.560 0.150 320);
+  --plum-600: oklch(0.480 0.130 320);
+  --plum-700: oklch(0.400 0.110 320);
+
+  --teal-300: oklch(0.780 0.075 195);
+  --teal-400: oklch(0.700 0.095 195);
+  --teal-500: oklch(0.620 0.110 195);
+  --teal-600: oklch(0.540 0.095 195);
+  --teal-700: oklch(0.460 0.080 195);
+
+  --rose-300: oklch(0.800 0.105 15);
+  --rose-400: oklch(0.720 0.135 15);
+  --rose-500: oklch(0.640 0.155 15);
+  --rose-600: oklch(0.560 0.135 15);
+  --rose-700: oklch(0.480 0.115 15);
+
+  --coral-300: oklch(0.780 0.105 30);
+  --coral-400: oklch(0.700 0.135 30);
+  --coral-500: oklch(0.620 0.155 30);
+  --coral-600: oklch(0.540 0.135 30);
+  --coral-700: oklch(0.460 0.115 30);
+
+  --gold-300: oklch(0.810 0.090 90);
+  --gold-400: oklch(0.730 0.115 90);
+  --gold-500: oklch(0.650 0.135 90);
+  --gold-600: oklch(0.570 0.115 90);
+  --gold-700: oklch(0.490 0.095 90);
+
+  --sage-300: oklch(0.760 0.055 160);
+  --sage-400: oklch(0.680 0.070 160);
+  --sage-500: oklch(0.600 0.085 160);
+  --sage-600: oklch(0.520 0.070 160);
+  --sage-700: oklch(0.440 0.060 160);
+
+  --indigo-300: oklch(0.700 0.095 275);
+  --indigo-400: oklch(0.620 0.120 275);
+  --indigo-500: oklch(0.540 0.140 275);
+  --indigo-600: oklch(0.460 0.120 275);
+  --indigo-700: oklch(0.380 0.100 275);
+
+  --fuchsia-300: oklch(0.740 0.105 350);
+  --fuchsia-400: oklch(0.660 0.135 350);
+  --fuchsia-500: oklch(0.580 0.155 350);
+  --fuchsia-600: oklch(0.500 0.135 350);
+  --fuchsia-700: oklch(0.420 0.115 350);
+
+  --sky-light-top: oklch(0.965 0.018 220);
+  --sky-light-bot: oklch(0.940 0.025 130);
+  --sky-dark-top:  oklch(0.225 0.028 240);
+  --sky-dark-bot:  oklch(0.180 0.030 150);
+
+  --status-success: oklch(0.660 0.135 145);
+  --status-warning: oklch(0.770 0.155 75);
+  --status-danger:  oklch(0.620 0.205 25);
+  --status-info:    oklch(0.660 0.105 220);
+  --status-merged:  oklch(0.580 0.140 310);
+
+  --priority-top:    oklch(0.620 0.205 25);
+  --priority-high:   oklch(0.720 0.160 55);
+  --priority-medium: oklch(0.820 0.160 85);
+  --priority-low:    oklch(0.660 0.105 220);
+  --priority-lowest: oklch(0.550 0.020 250);
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --text-2xs: 10.5px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-md:  13px;
+  --text-base:14px;
+  --text-lg:  15px;
+  --text-xl:  17px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.25;
+  --leading-normal: 1.4;
+  --leading-relaxed:1.55;
+  --leading-loose:  1.7;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  --border-width-1: 1px;
+  --border-width-2: 1.5px;
+  --border-width-3: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --size-control-sm: 26px;
+  --size-control-md: 32px;
+  --size-control-lg: 38px;
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-tooltip: 70;
+
+  --duration-1: 90ms;
+  --duration-2: 120ms;
+  --duration-3: 160ms;
+  --duration-4: 220ms;
+  --duration-5: 320ms;
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --ease-out:      cubic-bezier(.16,.84,.44,1);
+  --ease-in:       cubic-bezier(.5,0,.75,0);
+
+  --sidebar-width:  240px;
+  --sidebar-width-collapsed: 56px;
+}
+
+/* Dark theme */
+.theme-dark, [data-theme='dark'] {
+  color-scheme: dark;
+  --background:        oklch(0.155 0.018 150);
+  --surface:           oklch(0.190 0.020 150);
+  --surface-2:         oklch(0.225 0.022 150);
+  --surface-hover:     oklch(0.265 0.024 150);
+  --surface-3:         oklch(0.265 0.024 150);
+  --foreground:        oklch(0.965 0.010 130);
+  --foreground-muted:  oklch(0.730 0.018 135);
+  --foreground-subtle: oklch(0.560 0.020 140);
+  --border:            oklch(0.295 0.022 148);
+  --border-strong:     oklch(0.380 0.028 145);
+  --primary:           var(--moss-400);
+  --primary-fg:        oklch(0.135 0.020 150);
+  --primary-soft:      oklch(0.305 0.045 145);
+  --accent:            var(--moss-400);
+  --accent-fg:         oklch(0.135 0.02 150);
+  --ring:              var(--moss-400);
+  --sidebar-bg:        oklch(0.180 0.022 150);
+  --sidebar-fg:        oklch(0.770 0.020 140);
+  --code-bg:           oklch(0.215 0.020 150);
+  --sky-top:           var(--sky-dark-top);
+  --sky-bot:           var(--sky-dark-bot);
+  --ground-color:      oklch(0.300 0.060 140);
+  --ground-dark:       oklch(0.180 0.040 50);
+}
+
+/* Base */
+.gk-root {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "ss01", "cv11";
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.gk-root, .gk-root * { box-sizing: border-box; }
+.font-mono { font-family: var(--font-mono); }
+
+/* Type scale */
+.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
+.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
+.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
+.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
+.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+
+/* Badges */
+.gk-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 20px; padding: 0 7px;
+  font-size: 11px; font-weight: 500;
+  border-radius: 999px;
+  background: var(--surface-2); color: var(--foreground-muted);
+  border: 1px solid var(--border);
+  font-family: var(--font-sans); letter-spacing: 0.01em; white-space: nowrap;
+}
+.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
+.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
+.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
+.gk-badge-moss    { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+
+/* Buttons */
+.gk-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
+  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background var(--duration-2) ease, border-color var(--duration-2) ease,
+              color var(--duration-2) ease, transform var(--duration-1) ease,
+              box-shadow var(--duration-2) ease;
+  white-space: nowrap; user-select: none;
+}
+.gk-btn:active { transform: scale(0.96); }
+.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+.gk-btn-primary {
+  background: var(--primary); color: var(--primary-fg);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
+.gk-btn-primary:active { background: color-mix(in oklch, var(--primary) 80%, black 20%); }
+
+.gk-btn-secondary {
+  background: var(--surface-2); color: var(--foreground); border-color: var(--border);
+}
+.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.gk-btn-secondary:active { background: var(--surface-3); }
+
+.gk-btn-ghost { background: transparent; color: var(--foreground-muted); }
+.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
+.gk-btn-ghost:active { background: var(--surface-3); }
+
+.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
+
+/* Card */
+.gk-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+}
+
+/* Divider */
+.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+
+/* Scrollbar */
+.gk-root ::-webkit-scrollbar { width: 6px; }
+.gk-root ::-webkit-scrollbar-track { background: transparent; }
+.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+/* cb-panel */
+.cb-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px 14px 10px;
+  display: flex; flex-direction: column; gap: 8px; min-width: 0;
+}
+.cb-panel-title {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--foreground-muted); text-transform: uppercase; letter-spacing: 0.08em;
+  display: flex; align-items: baseline; gap: 8px;
+  padding-bottom: 6px; border-bottom: 1px dashed var(--border);
+}
+.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.cb-panel-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+.cb-panel-sub { font-family: var(--font-mono); font-size: 10.5px; font-weight: 400; color: var(--foreground-subtle); text-transform: none; letter-spacing: 0; margin-left: auto; }
+
+/* cb-finding */
+.cb-finding {
+  border-left: 2px solid var(--border);
+  padding: 8px 10px 9px 10px;
+  background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.cb-finding.is-high { border-left-color: oklch(0.640 0.205 25); }
+.cb-finding.is-med  { border-left-color: oklch(0.770 0.155 75); }
+.cb-finding.is-low  { border-left-color: oklch(0.700 0.110 200); }
+.cb-pri-high { color: oklch(0.640 0.205 25); }
+.cb-pri-med  { color: oklch(0.770 0.155 75); }
+.cb-pri-low  { color: oklch(0.700 0.110 200); }
+
+/* Status bar */
+.cb-statusbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 5px 14px; background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-muted);
+  flex-shrink: 0;
+}
+.cb-key { display: inline-flex; align-items: center; gap: 5px; }
+.cb-keycap {
+  display: inline-block; min-width: 14px; padding: 0 4px;
+  text-align: center; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 3px;
+  font-size: 10px; line-height: 14px; color: var(--foreground);
+}
+
+/* Animations */
+@keyframes gk-spin { to { transform: rotate(360deg); } }
+@keyframes gk-flash {
+  0%   { background: var(--surface-2); }
+  20%  { background: color-mix(in oklch, var(--status-success) 24%, transparent); }
+  100% { background: var(--surface-2); }
+}
+.gk-flash { animation: gk-flash 800ms ease-out; }
+
+/* ============================================================
+   VARIANT E: BEFORE / AFTER PROJECTION
+   ============================================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.optimize-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--background);
+}
+
+/* ── Usage page header (read-only context at 40% opacity) ── */
+.page-header-context {
+  opacity: 0.4;
+  pointer-events: none;
+  padding: var(--space-8) var(--space-10) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-header-context h1 {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.03em;
+  line-height: var(--leading-tight);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.page-header-nav {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 3px;
+  border-radius: var(--radius-md);
+}
+
+.page-header-nav-item {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  color: var(--foreground-muted);
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+}
+
+.page-header-nav-item.is-active {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Variant label ── */
+.variant-label {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+  border: 1px solid color-mix(in oklch, var(--primary) 28%, transparent);
+  border-radius: var(--radius-xs);
+  padding: 2px 7px;
+  display: inline-block;
+  margin-bottom: var(--space-8);
+}
+
+/* ── Main content area ── */
+.optimize-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-10) var(--space-10) var(--space-24);
+  max-width: 840px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Projection Summary Banner ── */
+.projection-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-10);
+  margin-bottom: var(--space-10);
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle gradient accent on left edge */
+.projection-banner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    oklch(0.640 0.205 25) 0%,
+    oklch(0.770 0.155 75) 50%,
+    oklch(0.660 0.135 145) 100%
+  );
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+.projection-grade-block {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+}
+
+.grade-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.grade-ring svg {
+  transform: rotate(-90deg);
+}
+
+.grade-ring .grade-letter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: oklch(0.770 0.155 75);
+  letter-spacing: -0.03em;
+}
+
+.grade-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.grade-score {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+.grade-score span {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--foreground-subtle);
+}
+
+.grade-penalties {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--foreground-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.grade-penalties .p-high { color: oklch(0.640 0.205 25); font-weight: 600; }
+.grade-penalties .p-med  { color: oklch(0.770 0.155 75); font-weight: 600; }
+.grade-penalties .p-low  { color: oklch(0.700 0.110 200); font-weight: 600; }
+.grade-penalties .p-sep  { color: var(--border-strong); }
+
+/* The cost projection display */
+.projection-cost-display {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.projection-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.projection-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--foreground-subtle);
+  min-width: 72px;
+}
+
+.projection-amount {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.projection-amount.is-current {
+  color: var(--foreground-muted);
+}
+
+.projection-amount.is-projected {
+  color: var(--status-success);
+}
+
+.projection-arrow-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+}
+
+.projection-arrow {
+  color: var(--foreground-subtle);
+  display: flex;
+  align-items: center;
+}
+
+.projection-savings-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--status-success);
+  background: color-mix(in oklch, var(--status-success) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--status-success) 24%, transparent);
+  border-radius: var(--radius-full);
+  padding: 3px 10px 3px 8px;
+}
+
+.projection-savings-chip svg {
+  flex-shrink: 0;
+}
+
+/* Banner right: period & actions */
+.projection-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.projection-period {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--foreground-subtle);
+  text-align: right;
+  line-height: var(--leading-normal);
+}
+
+/* ── Section heading ── */
+.findings-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.findings-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.findings-section-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.findings-section-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; }
+
+.findings-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--foreground-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 1px 6px;
+}
+
+.findings-sort-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--foreground-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Finding Card ── */
+.finding-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  transition: border-color var(--duration-2) ease, box-shadow var(--duration-2) ease;
+  overflow: hidden;
+}
+
+.finding-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.finding-card-main {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-6);
+  padding: var(--space-7) var(--space-8);
+  align-items: start;
+}
+
+.finding-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.finding-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.finding-card-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+  letter-spacing: var(--tracking-snug);
+  line-height: var(--leading-snug);
+}
+
+.finding-card-desc {
+  font-size: var(--text-sm);
+  color: var(--foreground-muted);
+  line-height: var(--leading-normal);
+}
+
+/* Impact dot */
+.impact-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.impact-dot.is-high { background: oklch(0.640 0.205 25); box-shadow: 0 0 6px oklch(0.640 0.205 25 / 0.5); }
+.impact-dot.is-med  { background: oklch(0.770 0.155 75); box-shadow: 0 0 6px oklch(0.770 0.155 75 / 0.4); }
+.impact-dot.is-low  { background: oklch(0.700 0.110 200); box-shadow: 0 0 6px oklch(0.700 0.110 200 / 0.35); }
+
+/* Before/after cost strip */
+.finding-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  min-width: 180px;
+}
+
+.cost-comparison {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cost-before {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--foreground-muted);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in oklch, var(--foreground-subtle) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-arrow {
+  color: var(--foreground-subtle);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cost-after {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--status-success);
+  font-variant-numeric: tabular-nums;
+}
+
+.savings-amount {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--status-success);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.savings-amount svg {
+  flex-shrink: 0;
+}
+
+.savings-tokens {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--foreground-subtle);
+  text-align: right;
+}
+
+/* ── Finding expandable detail ── */
+.finding-card-detail {
+  border-top: 1px solid var(--border);
+  padding: var(--space-6) var(--space-8);
+  background: color-mix(in oklch, var(--surface-2) 40%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.finding-detail-text {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--foreground-muted);
+}
+
+.finding-detail-text strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.finding-code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.finding-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+}
+
+.finding-code-filename {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--foreground-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.finding-code-filename::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: color-mix(in oklch, var(--primary) 60%, transparent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.finding-code-pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--foreground-muted);
+  padding: var(--space-5);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.code-comment { color: var(--foreground-subtle); }
+.code-path    { color: var(--primary); }
+
+/* Copy button */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 0 8px;
+  height: 22px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground-muted);
+  cursor: pointer;
+  transition: background var(--duration-2) ease, border-color var(--duration-2) ease, color var(--duration-2) ease;
+}
+.copy-btn:hover { background: var(--surface-2); border-color: var(--border-strong); color: var(--foreground); }
+.copy-btn:active { transform: scale(0.97); }
+.copy-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.copy-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+/* Finding action row */
+.finding-action-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-top: var(--space-2);
+}
+
+/* ── Running total bar at bottom of findings ── */
+.running-total-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-4);
+}
+
+.running-total-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.running-total-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--foreground-subtle);
+}
+
+.running-total-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--status-success);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Savings bar visual */
+.savings-bar-container {
+  flex: 1;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0 var(--space-8);
+}
+
+.savings-bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.savings-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--status-success), oklch(0.700 0.150 145));
+  transition: width 600ms var(--ease-out);
+}
+
+.savings-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--foreground-subtle);
+}
+
+/* ── TUI status bar ── */
+.optimize-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 5px 14px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--foreground-muted);
+  flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 680px) {
+  .optimize-content {
+    padding: var(--space-6);
+  }
+
+  .projection-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+
+  .projection-grade-block {
+    gap: var(--space-4);
+  }
+
+  .projection-amount {
+    font-size: var(--text-2xl);
+  }
+
+  .projection-actions {
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .finding-card-main {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .finding-card-right {
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .running-total-bar {
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: stretch;
+  }
+
+  .savings-bar-container {
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 375px) {
+  .page-header-context {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .page-header-context h1 {
+    font-size: var(--text-xl);
+  }
+
+  .page-header-nav {
+    display: none;
+  }
+}
+  </style>
+</head>
+<body>
+<div class="gk-root theme-dark optimize-root">
+
+  <!-- ── Usage page header (read-only context) ── -->
+  <div class="page-header-context">
+    <h1>Usage Dashboard</h1>
+    <nav class="page-header-nav">
+      <span class="page-header-nav-item">Overview</span>
+      <span class="page-header-nav-item">Activity</span>
+      <span class="page-header-nav-item">Sessions</span>
+      <span class="page-header-nav-item is-active">Optimize</span>
+      <span class="page-header-nav-item">Providers</span>
+    </nav>
+  </div>
+
+  <!-- ── Main scrollable content ── -->
+  <div class="optimize-content">
+
+    <span class="variant-label">VARIANT E: BEFORE/AFTER PROJECTION</span>
+
+    <!-- ════════════════════════════════════════════════════════
+         PROJECTION SUMMARY BANNER
+         ════════════════════════════════════════════════════════ -->
+    <div class="projection-banner">
+
+      <!-- Grade ring -->
+      <div class="projection-grade-block">
+        <div class="grade-ring" title="Health grade: C -- 72/100">
+          <svg width="56" height="56" viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="23"
+              fill="none"
+              stroke="oklch(0.295 0.022 148)"
+              stroke-width="4" />
+            <!-- 72/100 * 2*pi*23 = 72/100 * 144.51 = 104.05 -->
+            <circle cx="28" cy="28" r="23"
+              fill="none"
+              stroke="oklch(0.770 0.155 75)"
+              stroke-width="4"
+              stroke-linecap="round"
+              stroke-dasharray="104.05 144.51" />
+          </svg>
+          <div class="grade-letter">C</div>
+        </div>
+
+        <div class="grade-meta">
+          <div class="grade-score">72<span>&thinsp;/&thinsp;100</span></div>
+          <div class="grade-penalties">
+            <span class="p-high">1 high</span>
+            <span class="p-sep">&middot;</span>
+            <span class="p-med">1 medium</span>
+            <span class="p-sep">&middot;</span>
+            <span class="p-low">2 low</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost projection: current -> projected -->
+      <div class="projection-cost-display">
+        <div class="projection-row">
+          <span class="projection-label">Current</span>
+          <span class="projection-amount is-current">$847</span>
+          <span style="font-family:var(--font-mono);font-size:var(--text-sm);color:var(--foreground-subtle);align-self:flex-end;margin-bottom:4px;">/mo</span>
+        </div>
+        <div class="projection-arrow-row" style="padding-left:76px;">
+          <span class="projection-arrow">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3v10"/>
+              <path d="M4 9l4 4 4-4"/>
+            </svg>
+          </span>
+          <span class="projection-savings-chip">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            28% savings
+          </span>
+        </div>
+        <div class="projection-row">
+          <span class="projection-label">Projected</span>
+          <span class="projection-amount is-projected">$612</span>
+          <span style="font-family:var(--font-mono);font-size:var(--text-sm);color:var(--foreground-subtle);align-self:flex-end;margin-bottom:4px;">/mo</span>
+        </div>
+      </div>
+
+      <div class="projection-actions">
+        <div class="projection-period">
+          across 14 sessions<br/>
+          last 30 days
+        </div>
+        <button class="gk-btn gk-btn-secondary gk-btn-sm" title="Refresh analysis">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1.5 8A6.5 6.5 0 0 1 13.1 4.5" />
+            <path d="M14.5 8A6.5 6.5 0 0 1 2.9 11.5" />
+            <path d="M11 2l2.5 2.5L11 7" />
+            <path d="M5 9l-2.5 2.5L5 14" />
+          </svg>
+          Re-analyze
+        </button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         FINDINGS LIST — sorted by savings magnitude (desc)
+         ════════════════════════════════════════════════════════ -->
+    <div class="findings-section-header">
+      <div class="findings-section-title">
+        Findings
+        <span class="findings-count">7</span>
+      </div>
+      <div class="findings-sort-label">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6l4-4 4 4"/>
+          <path d="M4 10l4 4 4-4"/>
+        </svg>
+        sorted by savings
+      </div>
+    </div>
+
+    <!-- ── Finding 1: Cache Bloat ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-high"></span>
+            <span class="gk-badge gk-badge-danger" style="height:18px;font-size:10px;">HIGH</span>
+            <span class="finding-card-title">Cache creation bloat</span>
+          </div>
+          <div class="finding-card-desc">
+            Median cache_creation_tokens is 2.4x the baseline. Sessions re-cache unchanged context, driving up write costs.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$312</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$198</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$114/mo
+          </div>
+          <div class="savings-tokens">~380k tokens/session saved</div>
+        </div>
+      </div>
+      <!-- Expandable detail (shown for first card as demo) -->
+      <div class="finding-card-detail">
+        <div class="finding-detail-text">
+          Claude caches system prompts and context on first use. When your <strong>CLAUDE.md</strong> frequently changes between sessions, the entire cache is invalidated and rebuilt at the full write rate ($3.75/MTok vs $0.30/MTok read).
+          Stabilizing your instructions file and pinning <strong>@-imports</strong> reduces re-caching by ~60%.
+        </div>
+        <div class="finding-code-block">
+          <div class="finding-code-header">
+            <div class="finding-code-filename">CLAUDE.md</div>
+            <button class="copy-btn" onclick="copyCode(this, 'code-1')">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="5" width="9" height="9" rx="1"/>
+                <path d="M11 5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h2"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre class="finding-code-pre" id="code-1"><span class="code-comment"># Pin imports to stable references</span>
+<span class="code-comment"># Avoid dynamic content that changes every session</span>
+
+<span class="code-path">@AGENTS.md</span>         <span class="code-comment"># stable project rules</span>
+<span class="code-path">@docs/ARCH.md</span>      <span class="code-comment"># architecture ref (rarely changes)</span>
+
+<span class="code-comment"># Remove or move to session-scoped context:</span>
+<span class="code-comment"># - git status output</span>
+<span class="code-comment"># - dynamic file listings</span>
+<span class="code-comment"># - current branch info</span></pre>
+        </div>
+        <div class="finding-action-row">
+          <button class="gk-btn gk-btn-primary gk-btn-sm">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 8l3.5 3.5 6.5-7"/>
+            </svg>
+            Apply Optimization
+          </button>
+          <button class="gk-btn gk-btn-ghost gk-btn-sm">View Affected Sessions</button>
+          <button class="gk-btn gk-btn-ghost gk-btn-sm" style="margin-left:auto;">Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Finding 2: Junk Directory Reads ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-med"></span>
+            <span class="gk-badge gk-badge-warning" style="height:18px;font-size:10px;">MEDIUM</span>
+            <span class="finding-card-title">Reading junk directories</span>
+          </div>
+          <div class="finding-card-desc">
+            18 reads into node_modules/, .git/, and dist/ detected across recent sessions. These inflate context with irrelevant dependency code.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$147</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$89</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$58/mo
+          </div>
+          <div class="savings-tokens">~9,200 tokens/session saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Finding 3: Duplicate File Reads ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-low"></span>
+            <span class="gk-badge gk-badge-info" style="height:18px;font-size:10px;">LOW</span>
+            <span class="finding-card-title">Duplicate file reads</span>
+          </div>
+          <div class="finding-card-desc">
+            src/lib/utils.ts read 4 times per session on average. Claude re-reads files it already has in context when conversations grow long.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$96</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$68</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$28/mo
+          </div>
+          <div class="savings-tokens">~4,800 tokens/session saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Finding 4: Bloated CLAUDE.md ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-med"></span>
+            <span class="gk-badge gk-badge-warning" style="height:18px;font-size:10px;">MEDIUM</span>
+            <span class="finding-card-title">Bloated CLAUDE.md instructions</span>
+          </div>
+          <div class="finding-card-desc">
+            CLAUDE.md expands to 1,840 lines with @-imports. Instructions above 600 lines show diminishing returns and increase cache write cost.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$83</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$62</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$21/mo
+          </div>
+          <div class="savings-tokens">~3,400 tokens/session saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Finding 5: Ghost MCP Servers ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-low"></span>
+            <span class="gk-badge gk-badge-info" style="height:18px;font-size:10px;">LOW</span>
+            <span class="finding-card-title">Unused MCP servers configured</span>
+          </div>
+          <div class="finding-card-desc">
+            3 MCP servers in settings.json have zero invocations in the last 30 days: playwright, filesystem, memory. Each adds tool definitions to context.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$67</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$54</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$13/mo
+          </div>
+          <div class="savings-tokens">~2,100 tokens/session saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Finding 6: Ghost Custom Slash Commands ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-low"></span>
+            <span class="gk-badge gk-badge-info" style="height:18px;font-size:10px;">LOW</span>
+            <span class="finding-card-title">Ghost slash commands</span>
+          </div>
+          <div class="finding-card-desc">
+            5 custom commands in ~/.claude/commands/ were never invoked. Each is loaded into the system prompt on session start.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$54</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$48</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$6/mo
+          </div>
+          <div class="savings-tokens">~950 tokens/session saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Finding 7: Bash Output Limit ── -->
+    <div class="finding-card">
+      <div class="finding-card-main">
+        <div class="finding-card-left">
+          <div class="finding-card-header">
+            <span class="impact-dot is-low"></span>
+            <span class="gk-badge" style="height:18px;font-size:10px;">HINT</span>
+            <span class="finding-card-title">No bash output truncation</span>
+          </div>
+          <div class="finding-card-desc">
+            Shell profile lacks output limit. Long command outputs (test suites, build logs) consume context without truncation.
+          </div>
+        </div>
+        <div class="finding-card-right">
+          <div class="cost-comparison">
+            <span class="cost-before">$88</span>
+            <span class="cost-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10"/>
+                <path d="M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+            <span class="cost-after">$83</span>
+          </div>
+          <div class="savings-amount">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4L4 12"/>
+              <path d="M4 4v8h8"/>
+            </svg>
+            -$5/mo
+          </div>
+          <div class="savings-tokens">~820 tokens/session saved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         RUNNING TOTAL
+         ════════════════════════════════════════════════════════ -->
+    <div class="running-total-bar">
+      <div class="running-total-left">
+        <div class="running-total-label">Total projected savings</div>
+        <div class="running-total-value">-$245/mo</div>
+      </div>
+
+      <div class="savings-bar-container">
+        <div class="savings-bar-track">
+          <div class="savings-bar-fill" style="width: 28%;"></div>
+        </div>
+        <div class="savings-bar-labels">
+          <span>$0</span>
+          <span>$612 projected</span>
+          <span>$847 current</span>
+        </div>
+      </div>
+
+      <button class="gk-btn gk-btn-primary gk-btn-sm">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8l3.5 3.5 6.5-7"/>
+        </svg>
+        Apply All Fixes
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Status bar -->
+  <div class="optimize-statusbar">
+    <span class="cb-key">
+      <kbd class="cb-keycap">J</kbd>
+      <kbd class="cb-keycap">K</kbd>
+      navigate
+    </span>
+    <span class="cb-key">
+      <kbd class="cb-keycap">Enter</kbd>
+      expand
+    </span>
+    <span class="cb-key">
+      <kbd class="cb-keycap">A</kbd>
+      apply
+    </span>
+    <span class="cb-key">
+      <kbd class="cb-keycap">D</kbd>
+      dismiss
+    </span>
+    <span style="margin-left:auto;">
+      7 findings &middot; potential:
+      <strong style="color:var(--status-success);font-family:var(--font-mono);">-$245/mo</strong>
+    </span>
+  </div>
+
+</div>
+
+<script>
+  // Toggle finding card detail expansion
+  document.querySelectorAll('.finding-card-main').forEach(function(main) {
+    main.style.cursor = 'pointer';
+    main.addEventListener('click', function() {
+      var card = main.closest('.finding-card');
+      var detail = card.querySelector('.finding-card-detail');
+      if (!detail) { return; }
+      var isOpen = detail.style.display !== 'none';
+      // Close all
+      document.querySelectorAll('.finding-card-detail').forEach(function(d) {
+        d.style.display = 'none';
+      });
+      if (!isOpen) {
+        detail.style.display = 'flex';
+      }
+    });
+  });
+
+  // Initially show first finding's detail, hide the rest
+  document.querySelectorAll('.finding-card-detail').forEach(function(d, i) {
+    d.style.display = i === 0 ? 'flex' : 'none';
+  });
+
+  function copyCode(btn, codeId) {
+    var pre = document.getElementById(codeId);
+    if (!pre) { return; }
+    var text = pre.textContent || pre.innerText;
+    navigator.clipboard.writeText(text).then(function() {
+      var original = btn.innerHTML;
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l3.5 3.5 6.5-7"/></svg> Copied';
+      btn.style.color = 'oklch(0.660 0.135 145)';
+      btn.style.borderColor = 'color-mix(in oklch, oklch(0.660 0.135 145) 30%, transparent)';
+      btn.classList.add('gk-flash');
+      setTimeout(function() {
+        btn.innerHTML = original;
+        btn.style.color = '';
+        btn.style.borderColor = '';
+        btn.classList.remove('gk-flash');
+      }, 2200);
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    var cards = Array.from(document.querySelectorAll('.finding-card'));
+    var currentIndex = cards.findIndex(function(c) {
+      var detail = c.querySelector('.finding-card-detail');
+      return detail && detail.style.display !== 'none';
+    });
+
+    if (e.key === 'j' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      var nextIndex = Math.min(currentIndex + 1, cards.length - 1);
+      cards[nextIndex].querySelector('.finding-card-main').click();
+      cards[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else if (e.key === 'k' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      var prevIndex = Math.max(currentIndex - 1, 0);
+      cards[prevIndex].querySelector('.finding-card-main').click();
+      cards[prevIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+</script>
+
+</body>
+</html>

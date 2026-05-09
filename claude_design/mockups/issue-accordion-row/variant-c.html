@@ -497,6 +497,11 @@ body {
     0 1px 3px rgba(10, 18, 12, 0.18);
 }
 
+.context-shell {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 /* Panel header — tab bar */
 .panel-header {
   display: flex;
@@ -1043,6 +1048,8 @@ body {
   <!-- Issues panel -->
   <div class="issues-panel">
 
+    <div class="gk-eyebrow" style="color: var(--foreground-subtle); margin-bottom: 4px; font-size: 9px;">↓ PARENT CONTEXT (bottom panel) — not part of this design</div>
+    <div class="context-shell">
     <!-- Tab bar header -->
     <div class="panel-header">
       <button class="panel-tab">PRDs <span class="panel-tab-count">10</span></button>
@@ -1072,6 +1079,7 @@ body {
         </button>
       </div>
     </div>
+    </div><!-- /.context-shell -->
 
     <!-- Issues list -->
     <div class="issues-list">

@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compare View — Variant D: Radar Chart Overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ─── Grovekeeper design tokens — Forest Moss palette ──────── */
+:root {
+  --moss-50:  oklch(0.972 0.018 130);
+  --moss-100: oklch(0.940 0.034 130);
+  --moss-200: oklch(0.880 0.058 130);
+  --moss-300: oklch(0.795 0.082 130);
+  --moss-400: oklch(0.690 0.098 132);
+  --moss-500: oklch(0.580 0.096 134);
+  --moss-600: oklch(0.480 0.082 138);
+  --moss-700: oklch(0.395 0.066 142);
+  --moss-800: oklch(0.300 0.048 145);
+  --moss-900: oklch(0.215 0.032 148);
+  --moss-950: oklch(0.155 0.024 150);
+
+  --amber-300: oklch(0.840 0.130 78);
+  --amber-400: oklch(0.770 0.150 65);
+  --amber-500: oklch(0.690 0.165 55);
+  --amber-600: oklch(0.595 0.160 48);
+
+  --bark-300: oklch(0.700 0.060 60);
+  --bark-500: oklch(0.500 0.075 55);
+  --bark-700: oklch(0.345 0.055 50);
+
+  --azure-300: oklch(0.750 0.090 230);
+  --azure-400: oklch(0.660 0.120 230);
+  --azure-500: oklch(0.570 0.130 235);
+  --azure-600: oklch(0.490 0.115 240);
+  --azure-700: oklch(0.400 0.095 240);
+
+  --plum-300: oklch(0.720 0.100 320);
+  --plum-400: oklch(0.640 0.130 320);
+  --plum-500: oklch(0.560 0.150 320);
+  --plum-600: oklch(0.480 0.130 320);
+  --plum-700: oklch(0.400 0.110 320);
+
+  --teal-300: oklch(0.780 0.075 195);
+  --teal-400: oklch(0.700 0.095 195);
+  --teal-500: oklch(0.620 0.110 195);
+  --teal-600: oklch(0.540 0.095 195);
+  --teal-700: oklch(0.460 0.080 195);
+
+  --rose-300: oklch(0.800 0.105 15);
+  --rose-400: oklch(0.720 0.135 15);
+  --rose-500: oklch(0.640 0.155 15);
+  --rose-600: oklch(0.560 0.135 15);
+  --rose-700: oklch(0.480 0.115 15);
+
+  --coral-300: oklch(0.780 0.105 30);
+  --coral-400: oklch(0.700 0.135 30);
+  --coral-500: oklch(0.620 0.155 30);
+  --coral-600: oklch(0.540 0.135 30);
+  --coral-700: oklch(0.460 0.115 30);
+
+  --gold-300: oklch(0.810 0.090 90);
+  --gold-400: oklch(0.730 0.115 90);
+  --gold-500: oklch(0.650 0.135 90);
+  --gold-600: oklch(0.570 0.115 90);
+  --gold-700: oklch(0.490 0.095 90);
+
+  --sage-300: oklch(0.760 0.055 160);
+  --sage-400: oklch(0.680 0.070 160);
+  --sage-500: oklch(0.600 0.085 160);
+  --sage-600: oklch(0.520 0.070 160);
+  --sage-700: oklch(0.440 0.060 160);
+
+  --indigo-300: oklch(0.700 0.095 275);
+  --indigo-400: oklch(0.620 0.120 275);
+  --indigo-500: oklch(0.540 0.140 275);
+  --indigo-600: oklch(0.460 0.120 275);
+  --indigo-700: oklch(0.380 0.100 275);
+
+  --fuchsia-300: oklch(0.740 0.105 350);
+  --fuchsia-400: oklch(0.660 0.135 350);
+  --fuchsia-500: oklch(0.580 0.155 350);
+  --fuchsia-600: oklch(0.500 0.135 350);
+  --fuchsia-700: oklch(0.420 0.115 350);
+
+  --sky-light-top: oklch(0.965 0.018 220);
+  --sky-light-bot: oklch(0.940 0.025 130);
+  --sky-dark-top:  oklch(0.225 0.028 240);
+  --sky-dark-bot:  oklch(0.180 0.030 150);
+
+  --status-success: oklch(0.660 0.135 145);
+  --status-warning: oklch(0.770 0.155 75);
+  --status-danger:  oklch(0.620 0.205 25);
+  --status-info:    oklch(0.660 0.105 220);
+  --status-merged:  oklch(0.580 0.140 310);
+
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --text-2xs: 10.5px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-md:  13px;
+  --text-base:14px;
+  --text-lg:  15px;
+  --text-xl:  17px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.25;
+  --leading-normal: 1.4;
+  --leading-relaxed:1.55;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  --border-width-1: 1px;
+  --border-width-2: 1.5px;
+  --border-width-3: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --size-control-sm: 26px;
+  --size-control-md: 32px;
+  --size-control-lg: 38px;
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 20;
+
+  --duration-1: 90ms;
+  --duration-2: 120ms;
+  --duration-3: 160ms;
+  --duration-4: 220ms;
+  --duration-5: 320ms;
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --ease-out:      cubic-bezier(.16,.84,.44,1);
+  --ease-in:       cubic-bezier(.5,0,.75,0);
+
+  --sidebar-width:  240px;
+  --sidebar-width-collapsed: 56px;
+
+  /* Chart model colors */
+  --chart-model-1: oklch(0.690 0.098 132); /* moss-400 */
+  --chart-model-2: oklch(0.660 0.120 230); /* azure-400 */
+  --chart-model-3: oklch(0.770 0.155 75);  /* amber-400 */
+}
+
+.theme-dark, [data-theme='dark'] {
+  color-scheme: dark;
+  --background:        oklch(0.155 0.018 150);
+  --surface:           oklch(0.190 0.020 150);
+  --surface-2:         oklch(0.225 0.022 150);
+  --surface-hover:     oklch(0.265 0.024 150);
+  --surface-3:         oklch(0.265 0.024 150);
+  --foreground:        oklch(0.965 0.010 130);
+  --foreground-muted:  oklch(0.730 0.018 135);
+  --foreground-subtle: oklch(0.560 0.020 140);
+  --border:            oklch(0.295 0.022 148);
+  --border-strong:     oklch(0.380 0.028 145);
+  --primary:           var(--moss-400);
+  --primary-fg:        oklch(0.135 0.020 150);
+  --primary-soft:      oklch(0.305 0.045 145);
+  --accent:            var(--moss-400);
+  --accent-fg:         oklch(0.135 0.02 150);
+  --ring:              var(--moss-400);
+  --sidebar-bg:        oklch(0.180 0.022 150);
+  --sidebar-fg:        oklch(0.770 0.020 140);
+  --code-bg:           oklch(0.215 0.020 150);
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+.gk-root {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "ss01", "cv11";
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.gk-root, .gk-root * { box-sizing: border-box; }
+.font-mono { font-family: var(--font-mono); }
+
+/* ── Type scale ─────────────────────────────────────────── */
+.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
+.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
+.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
+.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
+.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
+.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+
+/* ── Buttons ────────────────────────────────────────────── */
+.gk-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; font-family: var(--font-sans); font-weight: 500; font-size: 13px;
+  line-height: 1; padding: 0 12px; height: 32px; border-radius: var(--radius-md);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background var(--duration-2) ease, border-color var(--duration-2) ease,
+              color var(--duration-2) ease, transform var(--duration-1) ease,
+              box-shadow var(--duration-2) ease;
+  white-space: nowrap; user-select: none;
+}
+.gk-btn:active { transform: scale(0.96); }
+.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+.gk-btn-primary {
+  background: var(--primary); color: var(--primary-fg);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
+.gk-btn-primary:active { background: color-mix(in oklch, var(--primary) 80%, black 20%); }
+
+.gk-btn-secondary {
+  background: var(--surface-2); color: var(--foreground); border-color: var(--border);
+}
+.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.gk-btn-secondary:active { background: var(--surface-hover); }
+
+.gk-btn-ghost { background: transparent; color: var(--foreground-muted); border-color: var(--border); }
+.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); border-color: var(--border-strong); }
+.gk-btn-ghost:active { background: var(--surface-3); }
+
+.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
+.gk-btn-icon { padding: 0; width: 32px; }
+.gk-btn-icon.gk-btn-sm { width: 26px; }
+
+/* ── Inputs & Selects ───────────────────────────────────── */
+.gk-select {
+  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); color: var(--foreground);
+  outline: none; transition: border-color var(--duration-2) ease, box-shadow var(--duration-2) ease;
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='oklch(0.560 0.020 140)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+}
+.gk-select:hover { border-color: var(--border-strong); }
+.gk-select:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+}
+
+/* ── Badges ─────────────────────────────────────────────── */
+.gk-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 20px; padding: 0 7px; font-size: 11px; font-weight: 500;
+  border-radius: 999px; background: var(--surface-2);
+  color: var(--foreground-muted); border: 1px solid var(--border);
+  font-family: var(--font-sans); letter-spacing: 0.01em; white-space: nowrap;
+}
+.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
+.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: var(--status-warning); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+.gk-badge-info { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
+.gk-badge-moss { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+
+/* ── Divider ─────────────────────────────────────────────── */
+.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+
+/* ── Card ────────────────────────────────────────────────── */
+.gk-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
+.gk-root ::-webkit-scrollbar-track { background: transparent; }
+.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
+.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+
+/* ── CodeBurn panel primitives ──────────────────────────── */
+.cb-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px 10px;
+  display: flex; flex-direction: column; gap: 8px; min-width: 0;
+}
+.cb-panel-title {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--foreground-muted); text-transform: uppercase; letter-spacing: 0.08em;
+  display: flex; align-items: baseline; gap: 8px;
+  padding-bottom: 6px; border-bottom: 1px dashed var(--border);
+}
+.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.cb-panel-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+.cb-panel-sub {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 400;
+  color: var(--foreground-subtle); text-transform: none; letter-spacing: 0; margin-left: auto;
+}
+
+.cb-row {
+  display: grid; align-items: center; gap: 10px;
+  font-size: 12px; padding: 3px 0; min-height: 22px; font-family: var(--font-sans);
+}
+.cb-num {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: 11.5px; text-align: right; color: var(--foreground);
+}
+.cb-mute { color: var(--foreground-subtle); font-family: var(--font-mono); font-size: 11px; }
+
+.cb-statusbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 5px 14px; background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-muted);
+  flex-shrink: 0;
+}
+.cb-key { display: inline-flex; align-items: center; gap: 5px; }
+.cb-keycap {
+  display: inline-block; min-width: 14px; padding: 0 4px; text-align: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 3px; font-size: 10px; line-height: 14px; color: var(--foreground);
+}
+
+.cb-tabs { display: inline-flex; gap: 0; font-family: var(--font-mono); font-size: 11.5px; }
+.cb-tab {
+  padding: 5px 12px; background: transparent; border: 1px solid transparent;
+  border-radius: 4px; color: var(--foreground-muted); cursor: pointer;
+  transition: all 120ms ease; font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap;
+}
+.cb-tab:hover { color: var(--foreground); background: var(--surface-2); }
+.cb-tab.is-active {
+  color: var(--foreground); background: var(--surface-2);
+  border-color: var(--border); box-shadow: inset 0 -2px 0 oklch(0.770 0.155 75);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COMPARE VIEW — VARIANT D: RADAR CHART OVERLAY
+   ───────────────────────────────────────────────────────────── */
+
+.cv-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+}
+
+/* Ghosted page header at ~40% opacity */
+.cv-ghost-header {
+  opacity: 0.4;
+  pointer-events: none;
+  user-select: none;
+  padding: 12px 20px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.cv-ghost-breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--foreground-subtle);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cv-ghost-breadcrumb-sep { color: var(--border-strong); }
+.cv-ghost-breadcrumb-current { color: var(--foreground-muted); font-weight: 500; }
+.cv-ghost-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Main content scroll */
+.cv-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Variant eyebrow + page heading ─────────────────────── */
+.cv-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+.cv-page-title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  color: var(--foreground);
+}
+.cv-page-desc {
+  font-size: var(--text-sm);
+  color: var(--foreground-muted);
+}
+
+/* ── Model selection row ────────────────────────────────── */
+.cv-model-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cv-model-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: default;
+  transition: border-color var(--duration-2) ease;
+}
+.cv-model-chip:hover { border-color: var(--border-strong); }
+.cv-model-chip-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.cv-model-chip-name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+}
+.cv-model-chip-sub {
+  font-size: var(--text-xs);
+  color: var(--foreground-subtle);
+  font-family: var(--font-mono);
+}
+.cv-model-chip-calls {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--foreground-subtle);
+  margin-left: 4px;
+}
+.cv-model-add-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px; background: transparent;
+  border: 1px dashed var(--border); border-radius: var(--radius-md);
+  color: var(--foreground-subtle); cursor: pointer;
+  font-family: var(--font-sans); font-size: var(--text-sm);
+  transition: all var(--duration-2) ease;
+}
+.cv-model-add-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--foreground-muted);
+  background: var(--surface);
+}
+.cv-model-add-btn:active { transform: scale(0.97); }
+.cv-model-add-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* ── Radar chart container ──────────────────────────────── */
+.cv-radar-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cv-radar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cv-radar-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.cv-radar-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; margin-right: 2px; }
+.cv-radar-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-left: 2px; }
+
+.cv-radar-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+}
+.cv-radar-chart-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+  position: relative;
+}
+.cv-radar-svg {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+}
+
+/* Radar grid rings */
+.cv-radar-ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 0.5;
+}
+.cv-radar-ring-outer {
+  stroke: var(--border-strong);
+  stroke-width: 0.75;
+}
+.cv-radar-axis {
+  stroke: var(--border);
+  stroke-width: 0.5;
+  stroke-dasharray: 3 3;
+}
+.cv-radar-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--foreground-muted);
+  letter-spacing: 0.02em;
+}
+.cv-radar-label-value {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--foreground-subtle);
+}
+
+/* Model polygons */
+.cv-radar-poly {
+  fill-opacity: 0.08;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  transition: fill-opacity var(--duration-3) ease, stroke-width var(--duration-3) ease;
+}
+.cv-radar-poly:hover {
+  fill-opacity: 0.18;
+  stroke-width: 2.4;
+}
+.cv-radar-poly-1 { stroke: var(--chart-model-1); fill: var(--chart-model-1); }
+.cv-radar-poly-2 { stroke: var(--chart-model-2); fill: var(--chart-model-2); }
+.cv-radar-poly-3 { stroke: var(--chart-model-3); fill: var(--chart-model-3); }
+
+/* Data point dots on the polygon vertices */
+.cv-radar-dot {
+  r: 3.5;
+  stroke-width: 1.5;
+  transition: r var(--duration-2) ease;
+  cursor: pointer;
+}
+.cv-radar-dot:hover { r: 5; }
+.cv-radar-dot-1 { fill: var(--background); stroke: var(--chart-model-1); }
+.cv-radar-dot-2 { fill: var(--background); stroke: var(--chart-model-2); }
+.cv-radar-dot-3 { fill: var(--background); stroke: var(--chart-model-3); }
+
+/* ── Legend (right of chart) ────────────────────────────── */
+.cv-radar-legend {
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+}
+.cv-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-2) ease;
+}
+.cv-legend-item:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+.cv-legend-item.is-active {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+.cv-legend-swatch {
+  width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
+}
+.cv-legend-swatch-1 { background: var(--chart-model-1); }
+.cv-legend-swatch-2 { background: var(--chart-model-2); }
+.cv-legend-swatch-3 { background: var(--chart-model-3); }
+.cv-legend-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+  line-height: var(--leading-tight);
+}
+.cv-legend-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--foreground-subtle);
+}
+.cv-legend-wins {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--foreground-subtle);
+}
+.cv-legend-wins-count {
+  color: var(--status-success);
+  font-weight: var(--weight-semibold);
+}
+
+/* ── Metric axis annotation markers (ring value labels) ── */
+.cv-radar-ring-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  fill: var(--foreground-subtle);
+  opacity: 0.6;
+}
+
+/* ── Summary Table ──────────────────────────────────────── */
+.cv-summary-table-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.cv-summary-title {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--foreground-muted); text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 12px 16px 10px;
+  border-bottom: 1px dashed var(--border);
+  display: flex; align-items: baseline; gap: 8px;
+}
+.cv-summary-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
+.cv-summary-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+
+.cv-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.cv-summary-table thead th {
+  text-align: left;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--foreground-subtle);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+}
+.cv-summary-table thead th:not(:first-child) {
+  text-align: right;
+}
+.cv-summary-table tbody td {
+  padding: 9px 16px;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  color: var(--foreground-muted);
+}
+.cv-summary-table tbody tr:last-child td { border-bottom: none; }
+.cv-summary-table tbody tr:hover { background: var(--surface-hover); }
+.cv-summary-table tbody td:not(:first-child) {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+}
+.cv-summary-table .cv-metric-name {
+  font-weight: var(--weight-medium);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cv-summary-table .cv-direction-hint {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--foreground-subtle);
+  font-weight: 400;
+}
+
+/* Cell winner/loser styling */
+.cv-cell-winner {
+  color: var(--status-success) !important;
+  font-weight: var(--weight-semibold);
+}
+.cv-cell-loser {
+  color: var(--foreground-subtle) !important;
+  font-weight: var(--weight-regular);
+}
+
+/* Model column header with colored dot */
+.cv-th-model {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: flex-end;
+}
+.cv-th-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* ── Working Style section ──────────────────────────────── */
+.cv-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.cv-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 2px 8px;
+}
+.cv-section-title {
+  font-family: var(--font-mono);
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--foreground-subtle);
+}
+.cv-section-rule {
+  flex: 1; height: 1px; background: var(--border);
+}
+.cv-section-note {
+  font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle);
+}
+
+/* Working style inline table */
+.cv-style-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.cv-style-table table {
+  width: 100%; border-collapse: collapse;
+}
+.cv-style-table thead th {
+  text-align: left;
+  padding: 8px 16px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: var(--foreground-subtle); letter-spacing: 0.06em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+}
+.cv-style-table thead th:not(:first-child) { text-align: right; }
+.cv-style-table tbody td {
+  padding: 9px 16px;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  color: var(--foreground-muted);
+}
+.cv-style-table tbody tr:last-child td { border-bottom: none; }
+.cv-style-table tbody tr:hover { background: var(--surface-hover); }
+.cv-style-table tbody td:not(:first-child) {
+  text-align: right;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 11.5px;
+}
+.cv-style-table .cv-metric-name {
+  font-weight: var(--weight-medium); color: var(--foreground);
+}
+
+/* ── Context Panel (bottom stats) ───────────────────────── */
+.cv-context-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.cv-context-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cv-context-card-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+}
+.cv-context-card-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.cv-context-card-model {
+  font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--foreground-muted);
+}
+.cv-context-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.cv-context-stat {
+  display: flex; flex-direction: column; gap: 1px;
+}
+.cv-context-stat-label {
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--foreground-subtle); letter-spacing: 0.05em; text-transform: uppercase;
+}
+.cv-context-stat-value {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--foreground);
+}
+.cv-context-stat-unit {
+  font-size: var(--text-xs); font-weight: var(--weight-regular); color: var(--foreground-subtle);
+}
+
+/* ── Tooltip (on hover over radar dots) ─────────────────── */
+.cv-radar-tooltip {
+  position: absolute;
+  background: oklch(0.12 0.02 150);
+  color: oklch(0.97 0.01 130);
+  border: 1px solid var(--border-strong);
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-mono);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 70;
+  opacity: 0;
+  transition: opacity var(--duration-2) ease;
+}
+.cv-radar-tooltip.is-visible { opacity: 1; }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .cv-radar-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .cv-radar-legend {
+    min-width: 0;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 0;
+  }
+  .cv-legend-item {
+    flex: 1;
+    min-width: 160px;
+  }
+  .cv-context-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .cv-content { padding: 12px; gap: 12px; }
+  .cv-radar-wrapper { padding: 14px; }
+  .cv-model-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .cv-radar-chart-area { min-height: 280px; }
+  .cv-context-grid { grid-template-columns: 1fr; }
+  .cv-summary-table thead th,
+  .cv-summary-table tbody td {
+    padding: 6px 10px;
+    font-size: 10.5px;
+  }
+}
+
+/* ── Animate polygon draw-in ────────────────────────────── */
+@keyframes cv-poly-in {
+  from { stroke-dashoffset: 1200; opacity: 0; }
+  to   { stroke-dashoffset: 0; opacity: 1; }
+}
+.cv-radar-poly {
+  stroke-dasharray: 1200;
+  animation: cv-poly-in 1.2s var(--ease-out) forwards;
+}
+.cv-radar-poly-2 { animation-delay: 150ms; }
+.cv-radar-poly-3 { animation-delay: 300ms; }
+
+/* ── Animate dots fade in ───────────────────────────────── */
+@keyframes cv-dot-in {
+  from { opacity: 0; r: 0; }
+  to   { opacity: 1; }
+}
+.cv-radar-dot {
+  opacity: 0;
+  animation: cv-dot-in 0.4s var(--ease-out) forwards;
+  animation-delay: 0.8s;
+}
+
+/* Scrollbar for content */
+.cv-content::-webkit-scrollbar { width: 8px; }
+.cv-content::-webkit-scrollbar-track { background: transparent; }
+.cv-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+  <div class="cv-page">
+
+    <!-- Ghosted Usage page header (read-only context at 40% opacity) -->
+    <header class="cv-ghost-header">
+      <div class="cv-ghost-breadcrumb">
+        <span>Usage</span>
+        <span class="cv-ghost-breadcrumb-sep">/</span>
+        <span class="cv-ghost-breadcrumb-current">Compare</span>
+      </div>
+      <div class="cv-ghost-filters">
+        <div class="cb-tabs">
+          <button class="cb-tab">7d</button>
+          <button class="cb-tab is-active">30d</button>
+          <button class="cb-tab">90d</button>
+          <button class="cb-tab">all</button>
+        </div>
+        <button class="gk-btn gk-btn-ghost gk-btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable content -->
+    <main class="cv-content">
+
+      <!-- Variant label + heading -->
+      <div class="cv-page-header">
+        <div class="gk-eyebrow" style="margin-bottom: 4px;">Variant D — Radar Chart Overlay</div>
+        <div class="cv-page-title">Model Comparison</div>
+        <div class="cv-page-desc">Holistic profile overlay of 3 models across 6 performance axes. Hover chart vertices for exact values.</div>
+      </div>
+
+      <!-- Model chip bar (3 models) -->
+      <div class="cv-model-bar">
+        <div class="cv-model-chip">
+          <div class="cv-model-chip-dot" style="background: var(--chart-model-1);"></div>
+          <div>
+            <div class="cv-model-chip-name">Sonnet 4</div>
+            <div class="cv-model-chip-sub">claude-sonnet-4-20260514</div>
+          </div>
+          <span class="cv-model-chip-calls">847 calls</span>
+        </div>
+
+        <div class="cv-model-chip">
+          <div class="cv-model-chip-dot" style="background: var(--chart-model-2);"></div>
+          <div>
+            <div class="cv-model-chip-name">Opus 4</div>
+            <div class="cv-model-chip-sub">claude-opus-4-20260514</div>
+          </div>
+          <span class="cv-model-chip-calls">312 calls</span>
+        </div>
+
+        <div class="cv-model-chip">
+          <div class="cv-model-chip-dot" style="background: var(--chart-model-3);"></div>
+          <div>
+            <div class="cv-model-chip-name">Haiku 3.5</div>
+            <div class="cv-model-chip-sub">claude-3-5-haiku-20241022</div>
+          </div>
+          <span class="cv-model-chip-calls">1,204 calls</span>
+        </div>
+
+        <button class="cv-model-add-btn" title="Add another model">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add model
+        </button>
+      </div>
+
+      <!-- ── RADAR CHART ──────────────────────────────────── -->
+      <div class="cv-radar-wrapper">
+        <div class="cv-radar-header">
+          <div class="cv-radar-title">Performance Profile</div>
+          <span class="cb-panel-sub">30-day window  ·  normalized 0-100</span>
+        </div>
+
+        <div class="cv-radar-layout">
+          <!-- SVG Radar Chart -->
+          <div class="cv-radar-chart-area">
+            <svg class="cv-radar-svg" viewBox="0 0 500 440" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <style>
+                  /* SVG-scoped text styling */
+                  text { font-family: "Geist Mono", ui-monospace, monospace; }
+                </style>
+              </defs>
+
+              <g transform="translate(250, 210)">
+                <!-- Concentric grid rings at 25%, 50%, 75%, 100% -->
+                <polygon class="cv-radar-ring" points="0,-45 39,-22.5 39,22.5 0,45 -39,22.5 -39,-22.5" />
+                <polygon class="cv-radar-ring" points="0,-90 78,-45 78,45 0,90 -78,45 -78,-45" />
+                <polygon class="cv-radar-ring" points="0,-135 117,-67.5 117,67.5 0,135 -117,67.5 -117,-67.5" />
+                <polygon class="cv-radar-ring cv-radar-ring-outer" points="0,-180 156,-90 156,90 0,180 -156,90 -156,-90" />
+
+                <!-- Axis lines (center to each vertex) -->
+                <line class="cv-radar-axis" x1="0" y1="0" x2="0" y2="-180" />
+                <line class="cv-radar-axis" x1="0" y1="0" x2="156" y2="-90" />
+                <line class="cv-radar-axis" x1="0" y1="0" x2="156" y2="90" />
+                <line class="cv-radar-axis" x1="0" y1="0" x2="0" y2="180" />
+                <line class="cv-radar-axis" x1="0" y1="0" x2="-156" y2="90" />
+                <line class="cv-radar-axis" x1="0" y1="0" x2="-156" y2="-90" />
+
+                <!-- Ring value labels (along top axis) -->
+                <text class="cv-radar-ring-label" x="6" y="-42" text-anchor="start">25</text>
+                <text class="cv-radar-ring-label" x="6" y="-87" text-anchor="start">50</text>
+                <text class="cv-radar-ring-label" x="6" y="-132" text-anchor="start">75</text>
+                <text class="cv-radar-ring-label" x="6" y="-177" text-anchor="start">100</text>
+
+                <!-- Axis labels (positioned outside the chart) -->
+                <!-- Top: One-Shot Rate -->
+                <text class="cv-radar-label" x="0" y="-196" text-anchor="middle">ONE-SHOT RATE</text>
+                <!-- Top-right: Cache Hit -->
+                <text class="cv-radar-label" x="174" y="-104" text-anchor="start">CACHE HIT</text>
+                <!-- Bottom-right: Speed -->
+                <text class="cv-radar-label" x="174" y="104" text-anchor="start">SPEED</text>
+                <!-- Bottom: Token Efficiency -->
+                <text class="cv-radar-label" x="0" y="204" text-anchor="middle">TOKEN EFF.</text>
+                <!-- Bottom-left: Cost / Call -->
+                <text class="cv-radar-label" x="-174" y="104" text-anchor="end">COST / CALL</text>
+                <!-- Top-left: Low Retry -->
+                <text class="cv-radar-label" x="-174" y="-104" text-anchor="end">LOW RETRY</text>
+
+                <!--
+                  DATA — 6 axes, normalized to 0-100 scale:
+                  Axes order: one-shot, cache-hit, speed, token-eff, cost/call, low-retry
+                  For "lower is better" metrics, we invert: score = 100 - raw_pct
+
+                  Sonnet 4:  one-shot=68, cache=61, speed=82, token-eff=78, cost=92, low-retry=84
+                  Opus 4:    one-shot=74, cache=66, speed=48, token-eff=52, cost=38, low-retry=72
+                  Haiku 3.5: one-shot=55, cache=58, speed=96, token-eff=91, cost=97, low-retry=66
+
+                  Coordinate formula for hexagon (regular, flat-top):
+                  axis_i angle = -90 + i*60 degrees (i=0..5)
+                  x = r * cos(angle), y = r * sin(angle), where r = value/100 * 180
+
+                  Pre-computed coordinates:
+                  Axis 0 (top,      -90deg): x=0,    y=-r
+                  Axis 1 (top-rt,   -30deg): x=r*0.866, y=-r*0.5
+                  Axis 2 (bot-rt,    30deg): x=r*0.866, y=r*0.5
+                  Axis 3 (bottom,    90deg): x=0,    y=r
+                  Axis 4 (bot-lt,   150deg): x=-r*0.866, y=r*0.5
+                  Axis 5 (top-lt,   210deg): x=-r*0.866, y=-r*0.5
+                -->
+
+                <!-- Sonnet 4 polygon (moss) -->
+                <!-- 68: 0,-122.4 | 61: 95.1,-54.9 | 82: 127.8,73.8 | 78: 0,140.4 | 92: -143.3,82.8 | 84: -130.9,-75.6 -->
+                <polygon class="cv-radar-poly cv-radar-poly-1"
+                  points="0,-122.4 95.1,-54.9 127.8,73.8 0,140.4 -143.3,82.8 -130.9,-75.6" />
+
+                <!-- Opus 4 polygon (azure) -->
+                <!-- 74: 0,-133.2 | 66: 102.9,-59.4 | 48: 74.8,43.2 | 52: 0,93.6 | 38: -59.2,34.2 | 72: -112.2,-64.8 -->
+                <polygon class="cv-radar-poly cv-radar-poly-2"
+                  points="0,-133.2 102.9,-59.4 74.8,43.2 0,93.6 -59.2,34.2 -112.2,-64.8" />
+
+                <!-- Haiku 3.5 polygon (amber) -->
+                <!-- 55: 0,-99 | 58: 90.4,-52.2 | 96: 149.6,86.4 | 91: 0,163.8 | 97: -151.2,87.3 | 66: -102.9,-59.4 -->
+                <polygon class="cv-radar-poly cv-radar-poly-3"
+                  points="0,-99 90.4,-52.2 149.6,86.4 0,163.8 -151.2,87.3 -102.9,-59.4" />
+
+                <!-- Data point dots — Sonnet 4 -->
+                <circle class="cv-radar-dot cv-radar-dot-1" cx="0" cy="-122.4" data-label="One-shot: 68%" />
+                <circle class="cv-radar-dot cv-radar-dot-1" cx="95.1" cy="-54.9" data-label="Cache hit: 61%" />
+                <circle class="cv-radar-dot cv-radar-dot-1" cx="127.8" cy="73.8" data-label="Speed: 82" />
+                <circle class="cv-radar-dot cv-radar-dot-1" cx="0" cy="140.4" data-label="Token eff: 78" />
+                <circle class="cv-radar-dot cv-radar-dot-1" cx="-143.3" cy="82.8" data-label="Cost/call: $0.018" />
+                <circle class="cv-radar-dot cv-radar-dot-1" cx="-130.9" cy="-75.6" data-label="Retry: 8.4%" />
+
+                <!-- Data point dots — Opus 4 -->
+                <circle class="cv-radar-dot cv-radar-dot-2" cx="0" cy="-133.2" data-label="One-shot: 74%" />
+                <circle class="cv-radar-dot cv-radar-dot-2" cx="102.9" cy="-59.4" data-label="Cache hit: 66%" />
+                <circle class="cv-radar-dot cv-radar-dot-2" cx="74.8" cy="43.2" data-label="Speed: 48" />
+                <circle class="cv-radar-dot cv-radar-dot-2" cx="0" cy="93.6" data-label="Token eff: 52" />
+                <circle class="cv-radar-dot cv-radar-dot-2" cx="-59.2" cy="34.2" data-label="Cost/call: $0.142" />
+                <circle class="cv-radar-dot cv-radar-dot-2" cx="-112.2" cy="-64.8" data-label="Retry: 11.5%" />
+
+                <!-- Data point dots — Haiku 3.5 -->
+                <circle class="cv-radar-dot cv-radar-dot-3" cx="0" cy="-99" data-label="One-shot: 55%" />
+                <circle class="cv-radar-dot cv-radar-dot-3" cx="90.4" cy="-52.2" data-label="Cache hit: 58%" />
+                <circle class="cv-radar-dot cv-radar-dot-3" cx="149.6" cy="86.4" data-label="Speed: 96" />
+                <circle class="cv-radar-dot cv-radar-dot-3" cx="0" cy="163.8" data-label="Token eff: 91" />
+                <circle class="cv-radar-dot cv-radar-dot-3" cx="-151.2" cy="87.3" data-label="Cost/call: $0.004" />
+                <circle class="cv-radar-dot cv-radar-dot-3" cx="-102.9" cy="-59.4" data-label="Retry: 14.2%" />
+              </g>
+            </svg>
+
+            <!-- Tooltip (positioned via JS) -->
+            <div class="cv-radar-tooltip" id="radarTooltip"></div>
+          </div>
+
+          <!-- Legend -->
+          <div class="cv-radar-legend">
+            <div class="cv-legend-item is-active" data-model="1">
+              <div class="cv-legend-swatch cv-legend-swatch-1"></div>
+              <div>
+                <div class="cv-legend-label">Sonnet 4</div>
+                <div class="cv-legend-meta">847 calls  ·  $15.25</div>
+              </div>
+              <div class="cv-legend-wins">
+                <span class="cv-legend-wins-count">3</span> wins
+              </div>
+            </div>
+
+            <div class="cv-legend-item is-active" data-model="2">
+              <div class="cv-legend-swatch cv-legend-swatch-2"></div>
+              <div>
+                <div class="cv-legend-label">Opus 4</div>
+                <div class="cv-legend-meta">312 calls  ·  $44.30</div>
+              </div>
+              <div class="cv-legend-wins">
+                <span class="cv-legend-wins-count">2</span> wins
+              </div>
+            </div>
+
+            <div class="cv-legend-item is-active" data-model="3">
+              <div class="cv-legend-swatch cv-legend-swatch-3"></div>
+              <div>
+                <div class="cv-legend-label">Haiku 3.5</div>
+                <div class="cv-legend-meta">1,204 calls  ·  $4.82</div>
+              </div>
+              <div class="cv-legend-wins">
+                <span class="cv-legend-wins-count">3</span> wins
+              </div>
+            </div>
+
+            <!-- Insights mini-card -->
+            <div style="margin-top: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); border-left-width: 2px; border-left-color: var(--status-info); background: color-mix(in oklch, var(--surface-2) 60%, transparent);">
+              <div style="font-family: var(--font-mono); font-size: 10px; color: var(--status-info); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px;">Insight</div>
+              <div style="font-size: 11.5px; color: var(--foreground-muted); line-height: 1.45;">
+                Opus excels at accuracy-critical work. Haiku dominates throughput-heavy tasks. Sonnet balances both at moderate cost.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RAW NUMBERS TABLE ────────────────────────────── -->
+      <div class="cv-summary-table-wrapper">
+        <div class="cv-summary-title">
+          Raw Metrics
+          <span class="cb-panel-sub">exact values behind the radar axes</span>
+        </div>
+        <table class="cv-summary-table">
+          <thead>
+            <tr>
+              <th style="width: 200px;">Metric</th>
+              <th>
+                <span class="cv-th-model">
+                  <span class="cv-th-dot" style="background: var(--chart-model-1);"></span>
+                  Sonnet 4
+                </span>
+              </th>
+              <th>
+                <span class="cv-th-model">
+                  <span class="cv-th-dot" style="background: var(--chart-model-2);"></span>
+                  Opus 4
+                </span>
+              </th>
+              <th>
+                <span class="cv-th-model">
+                  <span class="cv-th-dot" style="background: var(--chart-model-3);"></span>
+                  Haiku 3.5
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cv-metric-name">One-shot rate <span class="cv-direction-hint">higher</span></span></td>
+              <td class="cv-cell-loser">68%</td>
+              <td class="cv-cell-winner">74%</td>
+              <td class="cv-cell-loser">55%</td>
+            </tr>
+            <tr>
+              <td><span class="cv-metric-name">Retry rate <span class="cv-direction-hint">lower</span></span></td>
+              <td class="cv-cell-winner">8.4%</td>
+              <td class="cv-cell-loser">11.5%</td>
+              <td class="cv-cell-loser">14.2%</td>
+            </tr>
+            <tr>
+              <td><span class="cv-metric-name">Cache hit rate <span class="cv-direction-hint">higher</span></span></td>
+              <td>61%</td>
+              <td class="cv-cell-winner">66%</td>
+              <td class="cv-cell-loser">58%</td>
+            </tr>
+            <tr>
+              <td><span class="cv-metric-name">Cost per call <span class="cv-direction-hint">lower</span></span></td>
+              <td>$0.018</td>
+              <td class="cv-cell-loser">$0.142</td>
+              <td class="cv-cell-winner">$0.004</td>
+            </tr>
+            <tr>
+              <td><span class="cv-metric-name">Output tokens / call <span class="cv-direction-hint">lower</span></span></td>
+              <td>1,240</td>
+              <td class="cv-cell-loser">2,190</td>
+              <td class="cv-cell-winner">680</td>
+            </tr>
+            <tr>
+              <td><span class="cv-metric-name">Cost per edit <span class="cv-direction-hint">lower</span></span></td>
+              <td>$0.031</td>
+              <td class="cv-cell-loser">$0.184</td>
+              <td class="cv-cell-winner">$0.009</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── WORKING STYLE ────────────────────────────────── -->
+      <div class="cv-section">
+        <div class="cv-section-header">
+          <span class="cv-section-title">Working Style</span>
+          <div class="cv-section-rule"></div>
+          <span class="cv-section-note">informational, no winner scoring</span>
+        </div>
+
+        <div class="cv-style-table">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 200px;">Behavior</th>
+                <th>
+                  <span class="cv-th-model">
+                    <span class="cv-th-dot" style="background: var(--chart-model-1);"></span>
+                    Sonnet 4
+                  </span>
+                </th>
+                <th>
+                  <span class="cv-th-model">
+                    <span class="cv-th-dot" style="background: var(--chart-model-2);"></span>
+                    Opus 4
+                  </span>
+                </th>
+                <th>
+                  <span class="cv-th-model">
+                    <span class="cv-th-dot" style="background: var(--chart-model-3);"></span>
+                    Haiku 3.5
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="cv-metric-name">Delegation rate</span></td>
+                <td>38%</td>
+                <td>52%</td>
+                <td>12%</td>
+              </tr>
+              <tr>
+                <td><span class="cv-metric-name">Planning rate</span></td>
+                <td>22%</td>
+                <td>41%</td>
+                <td>8%</td>
+              </tr>
+              <tr>
+                <td><span class="cv-metric-name">Avg tools / turn</span></td>
+                <td>3.1</td>
+                <td>4.7</td>
+                <td>2.3</td>
+              </tr>
+              <tr>
+                <td><span class="cv-metric-name">Fast mode usage</span></td>
+                <td>84%</td>
+                <td>29%</td>
+                <td>96%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── CONTEXT CARDS ────────────────────────────────── -->
+      <div class="cv-section">
+        <div class="cv-section-header">
+          <span class="cv-section-title">Context</span>
+          <div class="cv-section-rule"></div>
+          <span class="cv-section-note">data volume behind this comparison</span>
+        </div>
+
+        <div class="cv-context-grid">
+          <!-- Sonnet 4 -->
+          <div class="cv-context-card">
+            <div class="cv-context-card-head">
+              <div class="cv-context-card-dot" style="background: var(--chart-model-1);"></div>
+              <span class="cv-context-card-model">Sonnet 4</span>
+              <span class="gk-badge gk-badge-moss" style="margin-left: auto; height: 18px; font-size: 10px;">Primary</span>
+            </div>
+            <div class="cv-context-stats">
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Calls</div>
+                <div class="cv-context-stat-value">847</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Total cost</div>
+                <div class="cv-context-stat-value">$15.25</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Edit turns</div>
+                <div class="cv-context-stat-value">492</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Days</div>
+                <div class="cv-context-stat-value">30</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opus 4 -->
+          <div class="cv-context-card">
+            <div class="cv-context-card-head">
+              <div class="cv-context-card-dot" style="background: var(--chart-model-2);"></div>
+              <span class="cv-context-card-model">Opus 4</span>
+            </div>
+            <div class="cv-context-stats">
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Calls</div>
+                <div class="cv-context-stat-value">312</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Total cost</div>
+                <div class="cv-context-stat-value">$44.30</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Edit turns</div>
+                <div class="cv-context-stat-value">241</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Days</div>
+                <div class="cv-context-stat-value">30</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Haiku 3.5 -->
+          <div class="cv-context-card">
+            <div class="cv-context-card-head">
+              <div class="cv-context-card-dot" style="background: var(--chart-model-3);"></div>
+              <span class="cv-context-card-model">Haiku 3.5</span>
+            </div>
+            <div class="cv-context-stats">
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Calls</div>
+                <div class="cv-context-stat-value">1,204</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Total cost</div>
+                <div class="cv-context-stat-value">$4.82</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Edit turns</div>
+                <div class="cv-context-stat-value">638</div>
+              </div>
+              <div class="cv-context-stat">
+                <div class="cv-context-stat-label">Days</div>
+                <div class="cv-context-stat-value">30</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom spacer -->
+      <div style="height: 8px;"></div>
+
+    </main>
+
+    <!-- Status bar -->
+    <footer class="cb-statusbar">
+      <span class="cb-key">
+        <span class="cb-keycap">Ctrl</span>
+        <span class="cb-keycap">K</span>
+        <span>command palette</span>
+      </span>
+      <span class="cb-key">
+        <span class="cb-keycap">Ctrl</span>
+        <span class="cb-keycap">S</span>
+        <span>save snapshot</span>
+      </span>
+      <span style="margin-left:auto; display:flex; align-items:center; gap:6px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--status-success);display:inline-block;"></span>
+        data current  ·  refreshed 4m ago
+      </span>
+    </footer>
+
+  </div>
+</div>
+
+<script>
+  /* Tab switching for period selector */
+  document.querySelectorAll('.cb-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tab.closest('.cb-tabs').querySelectorAll('.cb-tab').forEach(t => t.classList.remove('is-active'));
+      tab.classList.add('is-active');
+    });
+  });
+
+  /* Legend toggle — click to show/hide a model polygon */
+  document.querySelectorAll('.cv-legend-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const modelIdx = item.dataset.model;
+      const isActive = item.classList.toggle('is-active');
+      const poly = document.querySelector(`.cv-radar-poly-${modelIdx}`);
+      const dots = document.querySelectorAll(`.cv-radar-dot-${modelIdx}`);
+      if (poly) {
+        poly.style.opacity = isActive ? '' : '0';
+        poly.style.pointerEvents = isActive ? '' : 'none';
+      }
+      dots.forEach(d => {
+        d.style.opacity = isActive ? '' : '0';
+        d.style.pointerEvents = isActive ? '' : 'none';
+      });
+    });
+  });
+
+  /* Tooltip on radar dot hover */
+  const tooltip = document.getElementById('radarTooltip');
+  const chartArea = document.querySelector('.cv-radar-chart-area');
+
+  document.querySelectorAll('.cv-radar-dot').forEach(dot => {
+    dot.addEventListener('mouseenter', (e) => {
+      const label = dot.getAttribute('data-label');
+      if (!label) { return; }
+      tooltip.textContent = label;
+      tooltip.classList.add('is-visible');
+
+      const svg = document.querySelector('.cv-radar-svg');
+      const svgRect = svg.getBoundingClientRect();
+      const areaRect = chartArea.getBoundingClientRect();
+
+      const cx = parseFloat(dot.getAttribute('cx'));
+      const cy = parseFloat(dot.getAttribute('cy'));
+
+      /* Transform SVG coords (relative to g transform="translate(250,210)") to page coords */
+      const viewBox = svg.viewBox.baseVal;
+      const scaleX = svgRect.width / viewBox.width;
+      const scaleY = svgRect.height / viewBox.height;
+
+      const pageX = svgRect.left + (250 + cx) * scaleX - areaRect.left;
+      const pageY = svgRect.top + (210 + cy) * scaleY - areaRect.top;
+
+      tooltip.style.left = pageX + 'px';
+      tooltip.style.top = (pageY - 28) + 'px';
+      tooltip.style.transform = 'translateX(-50%)';
+    });
+
+    dot.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('is-visible');
+    });
+  });
+</script>
+</body>
+</html>
