@@ -1,11 +1,11 @@
 ---
 name: gk-design-refine
-description: 'Apply refinement requirements to a chosen variant, produce refined.html + SUMMARY.md, update brief, link to GitHub issue. Use when: "refine design", "accept variant", "polish design", "select variant", "apply refinements", "refine variant B"'
-argument-hint: '<variant-letter> [refinement requirements...]'
+description: 'Apply refinement requirements to a chosen variant, produce refined.html + SUMMARY.md, update brief, link to GitHub issue. Use when: "refine design", "accept variant", "polish design", "select variant", "apply refinements", "refine variant B", "refine all"'
+argument-hint: 'all | <variant-letter> [refinement requirements...]'
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir *), Bash(pnpm dlx shadcn-svelte*), Bash(gh *), Agent
 metadata:
     author: MartinoPolo
-    version: '0.4'
+    version: '0.5'
     category: design
 ---
 
@@ -13,9 +13,18 @@ metadata:
 
 Apply refinement requirements to a chosen variant. Produces `refined.html` and `SUMMARY.md`, updates the design brief, and links to the GitHub issue.
 
+Supports two modes:
+
+- **Single**: refine a specific variant for the active design folder
+- **Batch (`all`)**: scan every design subfolder for unprocessed DECISION.md files and refine each one in sequence
+
 ## Process
 
 ### Step 1: Parse Arguments
+
+**If the argument is `all`** → switch to [Batch Mode](#batch-mode-all) below.
+
+Otherwise (single mode):
 
 - **Variant**: first token — letter (A–Z) identifying the variant (case-insensitive)
 - **Refinements**: everything after the variant — requirements to apply
@@ -24,6 +33,60 @@ Example: `B make header sticky, use Badge for status, add empty state`
 → Variant B + 3 refinements
 
 Ask if the variant is missing. Ask what to change if refinements are empty.
+
+---
+
+## Batch Mode (all)
+
+When the argument is `all`, run the following discovery loop **before** any refinement work, then process each eligible folder sequentially using the normal Steps 2–9.
+
+### Batch Step A: Discover eligible design folders
+
+Scan every direct subfolder of `designs/` (exclude `designs/DESIGN_SYSTEM.md` and `designs/tokens.css`).
+
+For each folder, check **all three** conditions:
+
+1. `designs/<name>/variants/DECISION.md` **exists**
+2. `designs/<name>/SUMMARY.md` does **not** exist
+3. `designs/<name>/refined.html` does **not** exist
+
+Collect every folder that meets all three conditions. If none qualify, report "No unprocessed DECISION.md folders found" and stop.
+
+### Batch Step B: Parse each DECISION.md
+
+For each eligible folder, read its `DECISION.md` and extract:
+
+- **Chosen variant letter** — look for explicit phrases like "Let's refine Variant E", "go with B", "I prefer C", "accept variant A", etc. (case-insensitive). If ambiguous, pick the last mentioned variant.
+- **Refinement requirements** — the full body of the DECISION.md (after any variant-selection sentence) is the refinement spec. Pass it verbatim as the refinements for that folder.
+
+### Batch Step C: Report plan and confirm
+
+Before processing, print a summary table:
+
+| Folder | Variant | Refinement preview (first 80 chars) |
+| ------ | ------- | ----------------------------------- |
+| …      | …       | …                                   |
+
+Ask the user: "Proceed with refining all N folders above?" — wait for confirmation before continuing.
+
+### Batch Step D: Process sequentially via sub-agents
+
+For each eligible folder in order, spawn a dedicated **`mp-executor`** sub-agent to handle that folder end-to-end. Pass the sub-agent:
+
+- The target folder path (`designs/<name>/`)
+- The chosen variant letter and full refinement requirements extracted in Batch Step B
+- The full text of this skill's Steps 2–9 as the task specification
+- Instruction to skip Step 8 (GitHub issue comment) — issue comments are collected at the end
+
+Wait for each sub-agent to complete before spawning the next (sequential, not parallel) to avoid file-system conflicts and to keep token usage predictable.
+
+After each sub-agent completes, print a one-line status: ✓ `<folder>` refined (Variant X).
+
+If a sub-agent fails or reports an error, log the failure, skip to the next folder, and include the failure in the final summary.
+
+At the end, print a summary table of all folders processed, any that were skipped (with reasons), and any failures. Then, if issue numbers are known, post all GitHub issue comments in one pass (Step 8) for each successfully refined folder.
+
+---
 
 ### Step 2: Locate Source Files
 
