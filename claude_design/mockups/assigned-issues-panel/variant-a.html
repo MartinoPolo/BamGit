@@ -886,6 +886,7 @@ body {
    SVG ICON HELPERS
    ============================================================ */
 svg { display: inline-block; vertical-align: middle; }
+.context-shell { opacity: 0.4; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -898,6 +899,8 @@ svg { display: inline-block; vertical-align: middle; }
       <span style="font-size:10.5px; color: var(--foreground-subtle); font-family: var(--font-mono);">Compact List · Dense GitHub issue rows · Group by repo</span>
     </div>
 
+    <div class="gk-eyebrow" style="color: var(--foreground-subtle); margin-bottom: 4px; font-size: 9px;">&#x2193; PARENT CONTEXT (bottom panel) &mdash; not part of this design</div>
+    <div class="context-shell">
     <!-- Panel tab bar -->
     <div class="panel-tabbar" role="tablist" aria-label="Bottom panel tabs">
       <button class="panel-tab" role="tab" aria-selected="false">Terminal</button>
@@ -908,6 +911,7 @@ svg { display: inline-block; vertical-align: middle; }
         <span class="panel-tab-count">11</span>
       </button>
       <button class="panel-tab" role="tab" aria-selected="false">Context</button>
+    </div>
     </div>
 
     <!-- Assigned Issues Panel -->
