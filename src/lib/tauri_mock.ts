@@ -44,6 +44,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'kill_workspace_process',
 	'github_device_flow_start',
 	'github_device_flow_poll',
+	'test_notification_sound',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {

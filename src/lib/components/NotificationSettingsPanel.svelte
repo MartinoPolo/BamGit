@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { NotificationEventType } from '$lib/types/generated';
 	import { useNotifications, groupConfigsByTier } from '$lib/modules/notifications';
+	import { useToasts } from '$lib/modules/toasts/index.js';
 	import { onMount } from 'svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -13,6 +14,7 @@
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 
 	const notificationStore = useNotifications();
+	const toasts = useToasts();
 
 	const EVENT_LABELS: Record<NotificationEventType, () => string> = {
 		'session.start': () => m.notification_event_session_start(),
@@ -85,7 +87,11 @@
 		try {
 			await notificationStore.testNotificationSound(eventType);
 		} catch (error) {
-			console.error('Failed to test sound:', error);
+			toasts.show({
+				tone: 'danger',
+				title: 'Sound playback failed',
+				body: String(error),
+			});
 		}
 	}
 

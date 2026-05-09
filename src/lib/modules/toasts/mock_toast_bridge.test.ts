@@ -69,4 +69,12 @@ describe('showMockToast', () => {
 			'Running actions requires the desktop app',
 		);
 	});
+
+	it('shows toast for test_notification_sound', () => {
+		const calls: Array<{ title: string; body: string }> = [];
+		registerMockToastBridge((title, body) => calls.push({ title, body }));
+		showMockToast('test_notification_sound');
+		expect(calls).toHaveLength(1);
+		expect(calls[0].body).toContain('desktop app');
+	});
 });

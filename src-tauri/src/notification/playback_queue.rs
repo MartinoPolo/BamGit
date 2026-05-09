@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::sync::OnceLock;
 use std::time::Instant;
 
 use tauri::async_runtime;
@@ -21,7 +22,7 @@ struct QueuedSound {
 
 enum QueueMessage {
     Enqueue {
-        path: PathBuf,
+        candidates: Vec<PathBuf>,
         volume: f32,
         event_type: NotificationEventType,
         session_id: String,
@@ -30,46 +31,133 @@ enum QueueMessage {
 }
 
 /// Handle to enqueue sounds into the playback queue.
-pub struct PlaybackQueueHandle {
+struct PlaybackQueueHandle {
     sender: mpsc::UnboundedSender<QueueMessage>,
 }
 
 impl PlaybackQueueHandle {
-    pub fn enqueue(
+    fn enqueue(
         &self,
-        path: PathBuf,
+        candidates: Vec<PathBuf>,
         volume: f32,
         event_type: NotificationEventType,
         session_id: String,
     ) {
         let _ = self.sender.send(QueueMessage::Enqueue {
-            path,
+            candidates,
             volume,
             event_type,
             session_id,
         });
     }
 
-    pub fn shutdown(&self) {
+    fn shutdown(&self) {
         let _ = self.sender.send(QueueMessage::Shutdown);
     }
 }
 
+/// Lazily-initialized playback queue that defers Tokio runtime access until first use.
+/// Safe to construct during Tauri setup (before the async runtime is available).
+pub struct LazyPlaybackQueue {
+    inner: OnceLock<PlaybackQueueHandle>,
+}
+
+impl LazyPlaybackQueue {
+    pub fn new() -> Self {
+        Self {
+            inner: OnceLock::new(),
+        }
+    }
+
+    pub fn enqueue(
+        &self,
+        candidates: Vec<PathBuf>,
+        volume: f32,
+        event_type: NotificationEventType,
+        session_id: String,
+    ) {
+        let handle = self.inner.get_or_init(start_playback_queue);
+        handle.enqueue(candidates, volume, event_type, session_id);
+    }
+
+    pub fn shutdown(&self) {
+        if let Some(handle) = self.inner.get() {
+            handle.shutdown();
+        }
+    }
+}
+
 /// Start the playback queue actor. Returns a handle for enqueuing sounds.
-pub fn start_playback_queue() -> PlaybackQueueHandle {
+fn start_playback_queue() -> PlaybackQueueHandle {
     let (sender, receiver) = mpsc::unbounded_channel();
     async_runtime::spawn(playback_queue_actor(receiver));
     PlaybackQueueHandle { sender }
 }
 
+fn pick_sound_index(candidate_count: usize, last_played: Option<usize>) -> usize {
+    if candidate_count <= 1 {
+        return 0;
+    }
+    let seed = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos() as usize;
+    match last_played {
+        Some(excluded) => {
+            let idx = seed % (candidate_count - 1);
+            if idx >= excluded {
+                idx + 1
+            } else {
+                idx
+            }
+        }
+        None => seed % candidate_count,
+    }
+}
+
+/// Extract pack prefix from the first candidate path (e.g. "grove" from ".../sounds/grove/file.wav").
+fn extract_pack_prefix(candidates: &[PathBuf]) -> String {
+    candidates
+        .first()
+        .and_then(|path| {
+            // Walk up from file to find a recognizable pack folder name
+            path.parent().and_then(|parent| {
+                parent
+                    .file_name()
+                    .map(|name| name.to_string_lossy().into_owned())
+            })
+        })
+        .unwrap_or_default()
+}
+
+fn pick_from_candidates(
+    candidates: &[PathBuf],
+    event_type: NotificationEventType,
+    rotation_map: &mut HashMap<(NotificationEventType, String), usize>,
+) -> Option<PathBuf> {
+    if candidates.is_empty() {
+        return None;
+    }
+    if candidates.len() == 1 {
+        return Some(candidates[0].clone());
+    }
+    let pack_prefix = extract_pack_prefix(candidates);
+    let rotation_key = (event_type, pack_prefix);
+    let last_played = rotation_map.get(&rotation_key).copied();
+    let selected = pick_sound_index(candidates.len(), last_played);
+    rotation_map.insert(rotation_key, selected);
+    Some(candidates[selected].clone())
+}
+
 async fn playback_queue_actor(mut receiver: mpsc::UnboundedReceiver<QueueMessage>) {
     let mut debounce_map: HashMap<(String, NotificationEventType), Instant> = HashMap::new();
+    let mut rotation_map: HashMap<(NotificationEventType, String), usize> = HashMap::new();
 
     while let Some(message) = receiver.recv().await {
         match message {
             QueueMessage::Shutdown => break,
             QueueMessage::Enqueue {
-                path,
+                candidates,
                 volume,
                 event_type,
                 session_id,
@@ -95,12 +183,18 @@ async fn playback_queue_actor(mut receiver: mpsc::UnboundedReceiver<QueueMessage
                     debounce_map.insert(debounce_key, now);
                 }
 
+                // Pick from candidates using rotation
+                let path = match pick_from_candidates(&candidates, event_type, &mut rotation_map) {
+                    Some(path) => path,
+                    None => continue,
+                };
+
                 // Collect any queued sounds into a batch
                 let mut batch = vec![QueuedSound { path, volume }];
                 while batch.len() < MAX_QUEUE_SIZE {
                     match receiver.try_recv() {
                         Ok(QueueMessage::Enqueue {
-                            path,
+                            candidates: next_candidates,
                             volume,
                             event_type: next_event_type,
                             session_id: next_session_id,
@@ -118,7 +212,13 @@ async fn playback_queue_actor(mut receiver: mpsc::UnboundedReceiver<QueueMessage
                                 }
                                 debounce_map.insert(debounce_key, now);
                             }
-                            batch.push(QueuedSound { path, volume });
+                            if let Some(path) = pick_from_candidates(
+                                &next_candidates,
+                                next_event_type,
+                                &mut rotation_map,
+                            ) {
+                                batch.push(QueuedSound { path, volume });
+                            }
                         }
                         Ok(QueueMessage::Shutdown) => return,
                         Err(_) => break,
@@ -172,6 +272,34 @@ fn debounce_window_for(event_type: NotificationEventType) -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn lazy_playback_queue_creation_does_not_panic() {
+        let _queue = LazyPlaybackQueue::new();
+        // No Tokio runtime exists — this must not panic
+    }
+
+    #[test]
+    fn pick_sound_index_single_candidate_returns_zero() {
+        assert_eq!(pick_sound_index(1, None), 0);
+    }
+
+    #[test]
+    fn pick_sound_index_excludes_last_played() {
+        for _ in 0..50 {
+            let picked = pick_sound_index(3, Some(1));
+            assert_ne!(picked, 1, "Should never repeat last-played index");
+            assert!(picked < 3);
+        }
+    }
+
+    #[test]
+    fn pick_sound_index_no_exclusion_returns_valid_index() {
+        for _ in 0..50 {
+            let picked = pick_sound_index(5, None);
+            assert!(picked < 5);
+        }
+    }
 
     #[test]
     fn debounce_windows_correct() {
