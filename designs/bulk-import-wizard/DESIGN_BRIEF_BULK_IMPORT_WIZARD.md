@@ -1,12 +1,21 @@
-# Bulk Import Wizard — Design Spec
+# Bulk Import Wizard — Design Brief
 
 Multi-step wizard for importing many characters at once from a structured folder (e.g. WC3 voice files organized as `Faction/UnitName/*.wav`). Scans folder hierarchy, proposes characters with auto-mapped sounds, lets user review and adjust before batch-creating packs. Accessed via "Import Folder" button in Settings → Notifications & Characters. Hand this to a designer for visual exploration.
 
 ## Design Tokens
 
-Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. Tier colors: `--status-danger` (critical), `--status-warning` (important). Success: `--status-success`.
+Use the Grovekeeper Forest Moss palette from `designs/tokens.css`. Font: Geist / Geist Mono. Tier colors: `--status-danger` (critical), `--status-warning` (important). Success: `--status-success`.
 
-## Wizard Purpose
+## Container Context
+
+**Parent**: Standalone
+**What parent provides**: Modal backdrop and overlay — the wizard owns its entire chrome including title, steps, navigation, and footer.
+**What this component fills**: Full modal content area — a centered, max-width wizard container (`max-w-4xl`) with multi-step progression.
+**Must NOT include**: Application-level chrome (app frame, main nav) — these belong to the host application.
+
+**Mockup rendering**: Show the wizard as a standalone modal with backdrop. The component owns the step indicator, all step content, and navigation footer. Launched from Settings → Notifications & Characters via "Import Folder" button.
+
+## Purpose
 
 When users have a large collection of organized sound files (like extracted game voice lines), creating characters one-by-one is tedious. The bulk wizard scans a folder structure, auto-detects character names from subfolder names, applies filename-pattern auto-mapping rules, and lets the user review before batch-importing. Designed for the WC3 voice file use case (396 characters, 3028 files in `Faction/Unit/` hierarchy) but works with any organized folder.
 
@@ -17,14 +26,14 @@ When users have a large collection of organized sound files (like extracted game
 - **Folder picker**: `.gk-btn-primary` "Select Folder" button — opens native directory dialog
 - **Selected path display**: Monospace path text + "Change" link
 - **Scan results summary**: After scanning:
-  - "{N} characters detected in {M} folders"
-  - "{T} total sound files"
-  - Folder tree preview showing top-level structure (faction names) with character counts per faction
+    - "{N} characters detected in {M} folders"
+    - "{T} total sound files"
+    - Folder tree preview showing top-level structure (faction names) with character counts per faction
 - **Character checklist**: Each detected character as a row:
-  - Checkbox (checked by default)
-  - Character name (derived from subfolder name, editable inline)
-  - Sound count (`.gk-badge`)
-  - Auto-map quality indicator: green check (critical events fillable), amber warning (missing critical), red X (too few sounds)
+    - Checkbox (checked by default)
+    - Character name (derived from subfolder name, editable inline)
+    - Sound count (`.gk-badge`)
+    - Auto-map quality indicator: green check (critical events fillable), amber warning (missing critical), red X (too few sounds)
 - **"Select All" / "Deselect All"** toggle in header
 - **Filter/search**: `.gk-input` to filter character list by name
 
@@ -42,18 +51,18 @@ When users have a large collection of organized sound files (like extracted game
   | `Pissed*` | resource.limit |
 
 - **Per-character review**: Expandable accordion rows for each selected character:
-  - Header: character name + sound count + mapping status badge (Ready/Incomplete)
-  - Expanded: shows event → sound assignments (same layout as character creator event slots, but compact)
-  - Inline play buttons on each sound
-  - Drag-and-drop to reassign between events
-  - Unassigned sounds shown in a "Pool" section within the row
+    - Header: character name + sound count + mapping status badge (Ready/Incomplete)
+    - Expanded: shows event → sound assignments (same layout as character creator event slots, but compact)
+    - Inline play buttons on each sound
+    - Drag-and-drop to reassign between events
+    - Unassigned sounds shown in a "Pool" section within the row
 - **Batch status bar**: "{N} ready, {M} incomplete, {K} skipped" summary
 
 ### Step 3: Confirmation & Import
 
 - **Import summary**: Card listing all characters to be created:
-  - Character name, sound count, event coverage fraction
-  - Status: Ready (green) or Incomplete — will be saved but disabled (amber)
+    - Character name, sound count, event coverage fraction
+    - Status: Ready (green) or Incomplete — will be saved but disabled (amber)
 - **Avatar notice**: "No avatars detected — characters will use placeholder. You can add avatars later via Edit."
 - **Storage estimate**: "~{X} MB will be copied to app data"
 - **Import button**: `.gk-btn-primary` "Import {N} Characters"
@@ -94,13 +103,16 @@ When users have a large collection of organized sound files (like extracted game
 - Character row height: 44px collapsed, variable expanded
 - Import progress card: centered, `max-w-md`
 
-## States to Explore in Variants
+## States
+
+### Primary States (for initial variants)
 
 - Step 1: folder selected, scan complete, 20+ characters detected with mixed quality indicators
 - Step 2: 3-4 characters expanded showing auto-mapped sounds with one incomplete character
 - Step 3: import in progress at 60%
 
-States to design after variant selection:
+### Additional States (to design after variant selection)
+
 - Empty scan result (folder has no valid sound files)
 - Very large scan (100+ characters — virtualized list?)
 - Scan in progress (spinner + "Scanning...")

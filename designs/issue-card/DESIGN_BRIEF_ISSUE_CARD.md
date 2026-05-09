@@ -1,10 +1,19 @@
-# Issue Card — Design Spec
+# Issue Card — Design Brief
 
 Design spec for the primary issue representation used throughout Grovekeeper. Issue cards appear in the bottom panel Issues tab, Kanban views, and wherever issues are listed. This is a redesign — the current implementation is a placeholder. Hand this to a designer for visual exploration.
 
 ## Design Tokens
 
-Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
+Use the Grovekeeper Forest Moss palette from `designs/tokens.css`. Font: Geist / Geist Mono.
+
+## Container Context
+
+**Parent**: Issue List Container (within panel tab content area) or Kanban Column
+**What parent provides**: Tab bar, panel border, scrolling viewport, grid layout container, persistent action toolbar
+**What this component fills**: Individual card slot within the responsive grid (450px min-width, auto-fills columns)
+**Must NOT include**: Panel header, tab bar, outer scrolling container, grid container itself — these belong to the parent
+
+**Mockup rendering**: Show multiple cards in a two-column grid context at reduced opacity to demonstrate responsive layout. The card design fills only its slot within the grid. Parent chrome (tab bar, toolbar) should be visible but de-emphasized.
 
 ## Chosen Variant: Banner
 
@@ -76,12 +85,14 @@ Button style: small icon-only buttons (~18-20px), subtle background matching the
 Three badge variants, all matching `Issue Card States.html` exactly:
 
 **Mini badge** (`ic-mini-badge`): For status indicators (PR state, issue state, branch status, sync, conflict)
+
 - Height: 18px, padding: 0 6px, border-radius: 4px
 - Font: `var(--font-mono)`, 10.5px, weight 500
 - Border: 1px solid, background + color via `color-mix(in oklch, ...)` per status variant
 - Status variants: success (green), warn (amber), danger (red), info (blue), purple, amber, moss
 
 **Label pill** (`ic-label-pill`): For GitHub labels
+
 - Height: 18px, padding: 0 7px, border-radius: 999px (fully rounded)
 - Font: `var(--font-sans)`, 10.5px, weight 500
 - Background: `color-mix(in oklch, var(--lbl) 14%, transparent)`
@@ -89,6 +100,7 @@ Three badge variants, all matching `Issue Card States.html` exactly:
 - Border: `1px solid color-mix(in oklch, var(--lbl) 30%, transparent)`
 
 **Priority chip** (`ic-pri-chip`): For priority indicator in header
+
 - Height: 18px, padding: 0 6px, border-radius: 4px
 - Font: `var(--font-mono)`, 9px, weight 700, uppercase, letter-spacing 0.06em
 - Background: `rgba(0,0,0,0.18)` on light-text headers, `rgba(255,255,255,0.22)` on dark-text headers
@@ -99,6 +111,7 @@ Three badge variants, all matching `Issue Card States.html` exactly:
 Built with bits-ui `ContextMenu` (WAI-ARIA menu pattern, focus trapping, submenus, separators). Two trigger mechanisms: right-click on card, or click the overflow (⋯) button (same component, programmatic open).
 
 **Menu structure:**
+
 1. **Select / Deselect** — top item, separator below (mode-switching action)
 2. Edit
 3. Rename (standalone issues only)
@@ -159,6 +172,27 @@ The card should have two states:
 - `isLastChild` affects connector line height
 - Slight left indent to show hierarchy
 
+## Reusable Components
+
+Specify which existing Grovekeeper components and classes to use:
+
+- **LowPolyTree**: 92px tree component from `@mp/low-poly-2d-trees` library — renders tree thumbnail with stage-based morphology and hue-tinted canopy
+- **WorktreeProgressIndicator**: Shows setup progress when worktree is being created
+- **Buttons**: `.gk-btn-sm` for action buttons (22px height variant), `.gk-btn-icon` for quick-action icons
+- **Custom badge classes** (from design HTML):
+    - `.ic-mini-badge` for status indicators (18px height, mono font, color variants)
+    - `.ic-label-pill` for GitHub labels (18px height, fully rounded)
+    - `.ic-pri-chip` for priority indicator in header (9px uppercase mono)
+    - `.ic-action-btn` for contextual action buttons (22px height, 5px radius)
+- **Typography**: `.gk-h3` for issue name, `.gk-small` for metadata, `.font-mono` for issue numbers and branch names
+- **Color utility**: `getContrastTextColor()` from `color-picker/color_utils.ts` — WCAG luminance-based text color selection
+
+## Components to Adopt
+
+shadcn-svelte or Bits UI components to install if needed:
+
+- **ContextMenu** from bits-ui — WAI-ARIA menu pattern with focus trapping, submenus, and separators. Used for right-click actions and overflow (⋯) button menu
+
 ## Layout Constraints
 
 - Grid layout: tree thumbnail (72px) | metadata (1fr)
@@ -199,6 +233,7 @@ All interactive states must be **clearly distinguishable from each other** at a 
 5. **Selection-ready** (Ctrl/Shift held): `ring-1` blue `#4a9eff` — same color as selected but thinner ring, less intense glow. Cursor remains `pointer`. Card-level hover suppresses element-level interactions (Shift+click on PR badge selects card, not badge). Forest glow: blue `#4a9eff` at reduced intensity
 
 **Key distinction rules:**
+
 - All states distinguished by color alone — no halo vs ring shape differences needed
 - Hover = yellow ring (warm, attention-drawing)
 - Active = green ring (nature/growth metaphor, "inspecting this one")
@@ -217,6 +252,7 @@ The toolbar is **always visible** with consistent height — no layout shift bet
 **Selected state:** Select All checkbox (tri-state) | "N selected" count | batch actions | Deselect All (×)
 
 Batch actions:
+
 - **Archive** / **Unarchive** — context-aware: if both active and archived issues are selected, both buttons show. Archive only affects active issues, Unarchive only affects archived.
 - **Delete** — with confirmation
 - **Change Priority** — submenu
@@ -264,6 +300,19 @@ The design page must show all of these states:
 - Monospace font for issue numbers, branch names, code references
 - Compact, information-dense layout (developer tool, not consumer app)
 - Color contrast utility: `getContrastTextColor()` from `color-picker/color_utils.ts` — already handles WCAG luminance thresholds
+
+## UI Freedom
+
+Areas where the designer has creative latitude:
+
+- **Exact badge spacing and alignment** — layout constraints are specified, but micro-spacing adjustments are at designer's discretion
+- **Card shadow depth and layers** — subtle elevation effects, hover lift amount
+- **Transition timing and easing** — smooth state changes (hover, selection, expansion)
+- **Tree thumbnail background treatment** — solid color, gradient, or transparent behind the tree component
+- **Header texture or subtle patterns** — vivid color headers could have subtle grain or noise overlay (must maintain WCAG contrast)
+- **Ring animation on selection** — pulse effect, fade-in timing
+- **Loading shimmer style** — skeleton animation pattern and speed
+- **Collapsed vs expanded animation** — slide, fade, or height transition curve
 
 ## Not Included in This Design
 

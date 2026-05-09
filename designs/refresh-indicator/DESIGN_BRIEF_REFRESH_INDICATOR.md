@@ -1,4 +1,4 @@
-# RefreshIndicator — Design Spec
+# RefreshIndicator — Design Brief
 
 Compound button component that combines a refresh action with data freshness status. Wraps the existing `Button` component with additional state indicators. Reusable across any page with manual-refresh data (usage, sessions, overview). Hand this to a designer for visual exploration.
 
@@ -8,12 +8,28 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 
 ## Container Context
 
-**Parent**: Embedded in page headers/toolbars (usage page, overview, session list)
-**This component is inline** — it renders as a button/indicator group within an existing toolbar. It does not own any container chrome.
+**Parent**: Page header/toolbar (usage page, overview, session list)
+**What parent provides**: Toolbar container, background, spacing
+**What this component fills**: Inline button position within toolbar (26-120px width)
+**Must NOT include**: Toolbar container, header layout, page chrome — these belong to the parent
 
-## Component Purpose
+**Mockup rendering**: Show the parent toolbar at reduced opacity as read-only context. The designed component fills only its button/indicator area within the toolbar.
+
+## Purpose
 
 Show users when data was last refreshed and whether new data is available, without requiring them to manually check. The component must be glanceable — a quick look tells you if the data is fresh or stale.
+
+## States
+
+The component supports five distinct states:
+
+- **Idle**: Initial, no data loaded
+- **Loading**: Refresh in progress (spinning icon, disabled interaction)
+- **Fresh**: Data loaded <30s ago (subtle success indication)
+- **Stale**: Data loaded >2min ago (visual fade toward muted)
+- **New data**: Backend event fired, new data available (colored dot badge)
+
+See detailed state specifications in Required Elements below.
 
 ## Required Elements
 
@@ -25,13 +41,13 @@ Show users when data was last refreshed and whether new data is available, witho
 
 ### States (5 total)
 
-| State | Trigger | Icon | Label/Tooltip | Badge | Visual |
-|---|---|---|---|---|---|
-| **Idle** | Initial, no data loaded | Static RefreshCw | "Refresh metrics" | None | Default secondary button |
-| **Loading** | Click or auto-refresh triggered | Spinning RefreshCw (CSS animation) | "Refreshing..." | None | Slightly muted, non-interactive |
-| **Fresh** | Data loaded <30s ago | Static RefreshCw | "Updated just now" | None | Subtle green tint or checkmark flash |
-| **Stale** | Data loaded >2min ago | Static RefreshCw | "Updated {N}m ago" | None | Text/icon fades toward muted-foreground |
-| **New data** | metrics-updated event received | Static RefreshCw | "New data available" | Colored dot (top-right) | Primary-colored dot badge, optional subtle pulse |
+| State        | Trigger                         | Icon                               | Label/Tooltip        | Badge                   | Visual                                           |
+| ------------ | ------------------------------- | ---------------------------------- | -------------------- | ----------------------- | ------------------------------------------------ |
+| **Idle**     | Initial, no data loaded         | Static RefreshCw                   | "Refresh metrics"    | None                    | Default secondary button                         |
+| **Loading**  | Click or auto-refresh triggered | Spinning RefreshCw (CSS animation) | "Refreshing..."      | None                    | Slightly muted, non-interactive                  |
+| **Fresh**    | Data loaded <30s ago            | Static RefreshCw                   | "Updated just now"   | None                    | Subtle green tint or checkmark flash             |
+| **Stale**    | Data loaded >2min ago           | Static RefreshCw                   | "Updated {N}m ago"   | None                    | Text/icon fades toward muted-foreground          |
+| **New data** | metrics-updated event received  | Static RefreshCw                   | "New data available" | Colored dot (top-right) | Primary-colored dot badge, optional subtle pulse |
 
 ### Timestamp Display
 
@@ -80,6 +96,7 @@ None — built entirely from existing primitives.
 - Loading spin animation
 
 States to design after variant selection:
+
 - Dark mode appearance for all states
 - Hover states for each base state
 - Disabled state (during page transition)

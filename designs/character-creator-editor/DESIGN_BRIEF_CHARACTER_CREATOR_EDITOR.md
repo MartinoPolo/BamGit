@@ -1,4 +1,4 @@
-# Character Creator/Editor — Design Spec
+# Character Creator/Editor — Design Brief
 
 Full-page view for creating and editing character sound packs. User imports sound files into a pool, then drag-drops them onto notification event slots grouped by importance tier. Includes avatar upload, inline sound preview, and validation gating. Entry point: Settings → Notifications & Characters → "Create Character" button. Hand this to a designer for visual exploration.
 
@@ -11,7 +11,7 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 **Parent**: None — full-page view accessed from Settings → Notifications & Characters
 **This component is standalone** — it owns its full page chrome.
 
-## Component Purpose
+## Purpose
 
 The character creator is the primary way users build custom notification character packs. A character maps sound files to Grovekeeper's 15 notification events (grouped into critical/important/normal tiers). Users import WAV/MP3/OGG files, preview them, and assign each to exactly one event slot. Critical events must be filled before the character can be activated.
 
@@ -35,11 +35,11 @@ The character creator is the primary way users build custom notification charact
 - **Import button**: `.gk-btn-secondary` with folder icon — "Import Sounds" — opens native folder picker, imports all WAV/MP3/OGG files from selected folder
 - **Pool header**: "{N} sounds imported" counter + "Clear All" ghost button
 - **Sound list**: Scrollable list of imported sound files, each row:
-  - Drag handle (grip dots icon, `text-foreground-subtle`)
-  - Filename (truncated, `gk-body`)
-  - Duration (right-aligned, `gk-small font-mono text-foreground-muted`, e.g. "1.2s")
-  - Play button (`.gk-btn-icon` ghost, speaker icon → animated while playing)
-  - Status indicator: unassigned (default), assigned (green dot + target event name as `.gk-badge-success gk-tiny`)
+    - Drag handle (grip dots icon, `text-foreground-subtle`)
+    - Filename (truncated, `gk-body`)
+    - Duration (right-aligned, `gk-small font-mono text-foreground-muted`, e.g. "1.2s")
+    - Play button (`.gk-btn-icon` ghost, speaker icon → animated while playing)
+    - Status indicator: unassigned (default), assigned (green dot + target event name as `.gk-badge-success gk-tiny`)
 - **Search/filter**: `.gk-input` with search icon for filtering by filename
 - **Empty state**: Dashed border area with folder icon + "Import sounds from a folder" text
 
@@ -48,19 +48,23 @@ The character creator is the primary way users build custom notification charact
 Events grouped into three visual tiers, each with a header:
 
 **Critical Events** (must be filled)
+
 - Section header: `.gk-eyebrow` with `text-status-danger` color + filled circle indicator
 - Background: subtle `bg-status-danger/5` tint on the section
 - Events: `session.needs-input`, `session.end`
 
 **Important Events**
+
 - Section header: `.gk-eyebrow` with `text-status-warning` color
 - Events: `session.error`, `task.error`, `merge.conflict`, `resource.limit`, `pr.ready`, `pr.review-requested`
 
 **Normal Events**
+
 - Section header: `.gk-eyebrow` with `text-foreground-muted` color
 - Events: `session.start`, `task.complete`, `task.acknowledge`, `pr.merged`, `branch.behind-base`, `github.issue-assigned`, `github.trigger-received`, `achievement.unlocked`
 
 **Each event slot**:
+
 - Event name (`.gk-body font-semibold`) + one-line description (`.gk-small text-foreground-muted`)
 - Drop zone: dashed border area, highlights on drag-over (`border-primary bg-primary/5`)
 - When sound assigned: shows sound chip (filename + play button + remove X button)
@@ -70,10 +74,30 @@ Events grouped into three visual tiers, each with a header:
 ### Validation Footer
 
 - **Validation summary**: inline at bottom, shows missing requirements
-  - "2 critical events need sounds" — `text-status-danger`
-  - "Ready to save" — `text-status-success` with check icon
+    - "2 critical events need sounds" — `text-status-danger`
+    - "Ready to save" — `text-status-success` with check icon
 - **Save**: `.gk-btn-primary`, disabled with tooltip when validation fails
 - **Cancel**: `.gk-btn-ghost`
+
+## States
+
+List every state that must be designed:
+
+- **Empty state**: No sounds imported, no character name, all event slots empty
+- **Mid-assignment**: Some sounds in pool, some assigned to events, at least one critical event empty
+- **Drag in progress**: Sound being dragged from pool over an event slot (show drop zone highlight)
+- **Drag-over accept**: Drop zone with `border-primary bg-primary/5` when valid drop target
+- **Complete & valid**: All critical events filled, name provided, save button enabled
+- **Edit mode**: Pre-populated with existing character data, all fields editable
+- **Sound playing**: Animated speaker icon on the currently playing sound
+- **File import in progress**: Loading spinner in sound pool during folder import
+- **Validation error**: Name input with error styling (duplicate character name)
+- **Unsaved changes**: Confirmation dialog shown on cancel/back when changes exist
+- **Avatar hover**: Upload area hover state with camera/upload icon overlay
+- **Avatar uploading**: Loading indicator during avatar file upload
+- **Event slot overflow**: Event with 5+ assigned sounds (scroll or wrap behavior)
+- **Save disabled**: Save button disabled with tooltip explaining missing requirements
+- **Empty critical slot**: Warning border styling on unfilled critical event slots
 
 ## Reusable Components
 
@@ -101,23 +125,6 @@ Events grouped into three visual tiers, each with a header:
 - Sound item height: 36px (compact rows)
 - Event slot min-height: 48px (comfortable drop target)
 - Avatar: 96px upload area, stored as 128x128 WebP
-
-## States to Explore in Variants
-
-- Empty state (no sounds imported, no name)
-- Mid-assignment (some sounds assigned, some in pool, one critical event empty)
-- Drag in progress (sound being dragged over an event slot)
-- Complete & valid (all critical events filled, save button enabled)
-
-States to design after variant selection:
-- Edit mode (pre-populated with existing character data)
-- Sound playing state (animated speaker icon)
-- Drag-over accept vs reject visual
-- File import in progress (loading spinner)
-- Validation error on name (duplicate)
-- Unsaved changes confirmation dialog on cancel/back
-- Avatar hover/upload states
-- Maximum sounds assigned (event slot with 5+ sound chips — scroll or wrap?)
 
 ## Visual References
 

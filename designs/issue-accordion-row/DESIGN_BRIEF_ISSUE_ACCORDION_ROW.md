@@ -1,4 +1,4 @@
-# Issue Accordion Row — Design Spec
+# Issue Accordion Row — Design Brief
 
 Alternative list view for the Issues tab in the workspace dashboard bottom panel. Replaces the card grid with compact expandable accordion rows. Inspired by the Grovekeeper Obsidian plugin overview. Hand this to a designer for visual exploration.
 
@@ -15,8 +15,7 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 
 **Mockup rendering**: Show the bottom panel shell (tab bar with "Issues" tab active, accordion view selected) as read-only context at ~40% opacity. The designed component fills the content area below.
 
-
-## Row Purpose
+## Purpose
 
 Compact issue overview optimized for scanning many issues quickly. Users toggle between this and the card grid via a layout switcher. Should feel like a professional task list, not a simplified card.
 
@@ -25,6 +24,7 @@ Compact issue overview optimized for scanning many issues quickly. Users toggle 
 ### Collapsed Row (single line, ~40-44px height)
 
 Left to right:
+
 - Priority icon (if non-medium)
 - PRD number (if sub-issue, e.g. `PRD#87`)
 - Issue number (`#123`, monospace)
@@ -47,6 +47,7 @@ Left to right:
 ### Responsive Compaction (narrowing viewport)
 
 Progressive stages:
+
 1. Hide action buttons (accessible via right-click context menu)
 2. Compact GitHub badges to icon-only
 3. Truncate issue name more aggressively
@@ -72,14 +73,16 @@ Progressive stages:
 - Must work in multi-panel layout (panels can be narrow)
 - Reference: `.gk-btn-sm` (26px), `.gk-badge` (20px)
 
-## States to Explore in Variants
+## States
 
 Initial variants should show:
+
 - List of 6-8 issues with mixed states (some expanded, most collapsed)
 - Hover state on collapsed row
 - Dark mode
 
 States to design after variant selection:
+
 - Active (selected for detail) row treatment
 - Batch-selected rows
 - Running session visual indicator

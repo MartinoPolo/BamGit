@@ -1,4 +1,4 @@
-# Bottom Panel Session Tab — Design Spec
+# Bottom Panel Session Tab — Design Brief
 
 Design spec for the compact session view inside the bottom panel. When the user is on an issue page, a "Session" tab in the bottom panel shows ongoing and past sessions for that issue without navigating away from the issue view. Hand this to a designer for visual exploration.
 
@@ -15,7 +15,7 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 
 **Mockup rendering**: Show the bottom panel shell (tab bar with "Session" tab active) as read-only context at ~40% opacity. The designed component fills the content area below.
 
-## Panel Purpose
+## Purpose
 
 The bottom panel is always visible when an issue is selected. The Session tab gives a quick-access view of the issue's sessions — checking on progress, sending a quick reply, or jumping to the full session. It is intentionally compact and not a replacement for the full session view.
 
@@ -63,6 +63,40 @@ Shows the tail end of the session — enough to see what happened recently:
 - Opens the full session view (navigates to the session page with full chat, tabs, sidebar)
 - Should feel like an obvious escape hatch, not a buried action
 
+## States
+
+For the initial three variants, show:
+
+- Two sessions for the issue (one active/running, one completed)
+- Active session in "running" state with 2 recent messages visible
+- Session cost and model shown
+
+After variant selection, we will design:
+
+- No sessions yet (empty state with "Spawn session" CTA)
+- Single session (no multi-session selector needed)
+- Needs-input state (approval card visible in the preview)
+- Errored session
+- Session finished (input disabled, results summary shown)
+- Long session (many turns — preview still shows only the tail)
+- Minimized / hidden panel (tab is clickable to expand)
+
+## Reusable Components
+
+Specify which existing components to use:
+
+- Button: `.gk-btn-sm` for all actions (26px height)
+- Badge: `.gk-badge-success` for running sessions, `.gk-badge-warning` for needs-input, `.gk-badge-danger` for errors, `.gk-badge-info` for completed/stopped (20px height)
+- Input: `.gk-input` for chat input field (32px height)
+- Tabs: Use existing `Tabs` component from shadcn-svelte (already used in `WorkspaceBottomPanel.svelte`)
+- Typography: `.gk-body` for message text, `.gk-small` for timestamps and metadata, `.font-mono` for technical identifiers
+
+## Components to Adopt
+
+shadcn-svelte or Bits UI components to install if needed:
+
+- None currently required. The panel uses existing tab system and standard components from `tokens.css`.
+
 ## Layout Constraints
 
 - Panel height: approximately 250-350px (user-resizable, but design for this range)
@@ -72,29 +106,30 @@ Shows the tail end of the session — enough to see what happened recently:
 - Dark theme primary
 - All buttons use `.gk-btn-sm` (26px height), badges use `.gk-badge` (20px height), inputs use `.gk-input` (32px height) — no inline height overrides. Matches the standardized sizing from the session chat view update.
 
-## States to Explore in Variants
-
-For the initial three variants, show:
-- Two sessions for the issue (one active/running, one completed)
-- Active session in "running" state with 2 recent messages visible
-- Session cost and model shown
-
-After variant selection, we will design:
-- No sessions yet (empty state with "Spawn session" CTA)
-- Single session (no multi-session selector needed)
-- Needs-input state (approval card visible in the preview)
-- Errored session
-- Session finished (input disabled, results summary shown)
-- Long session (many turns — preview still shows only the tail)
-- Minimized / hidden panel (tab is clickable to expand)
-
 ## Visual References
 
 - Grovekeeper Forest Moss palette — all colors from `tokens.css`
 - Should feel like a compact "preview window" into the full session view — same visual language, smaller scale
 - The bottom panel tab system is shared with other tabs (e.g., terminal, output) — the Session tab must coexist with that styling
 
-## Not Included in This Design
+## UI Freedom
+
+Designer has creative latitude in:
+
+- Exact layout arrangement of session status elements (provider icon, model name, cost, timestamp — as long as all are visible without scrolling)
+- How to visually handle the session selector when multiple sessions exist (dropdown, horizontal tabs, vertical list)
+- Message preview styling and truncation approach (single-line clip vs. 2-line fade)
+- Visual treatment of the "dimmed history" effect for earlier messages (opacity level, transition timing)
+- Spacing and visual hierarchy within the compact preview area
+- Styling of the "Open Full Session" link (button vs. text link, placement)
+
+Designer must preserve:
+
+- Standard component heights from `tokens.css` (buttons 26px, badges 20px, input 32px)
+- Container context boundaries (no duplicate tab bars or panel chrome)
+- All required elements must be visible without scrolling (except message history scrolls)
+
+## Not Included
 
 - Full session view → `SESSION_CHAT_VIEW.md`
 - Session spawning dialog → `SESSION_SPAWNING_DIALOG.md`

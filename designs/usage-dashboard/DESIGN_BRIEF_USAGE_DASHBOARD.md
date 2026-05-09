@@ -11,7 +11,7 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 **Parent**: None — standalone page (`/usage` route)
 **This component is standalone** — it owns its full page chrome including header, filters, and content area.
 
-## Dashboard Purpose
+## Purpose
 
 Primary metrics and analytics surface for tracking AI usage costs, session patterns, and tool efficiency. Users check this to understand spending trends, identify expensive sessions, evaluate one-shot success rates, and spot optimization opportunities.
 
@@ -21,33 +21,34 @@ Primary metrics and analytics surface for tracking AI usage costs, session patte
 
 - **Title**: "Usage Analytics" (text-2xl, font-bold)
 - **Right-side button group** (all `icon-sm` size, `secondary` variant):
-  - Color theme shortcut (palette icon) — opens Popover with 3 theme options
-  - Trophy button — `{unlockedCount}/{total}` — opens Achievements Dialog
-  - RefreshIndicator component (see separate brief)
-  - Export CSV button (download icon)
+    - Color theme shortcut (palette icon) — opens Popover with 3 theme options
+    - Trophy button — `{unlockedCount}/{total}` — opens Achievements Dialog
+    - RefreshIndicator component (see separate brief)
+    - Export CSV button (download icon)
 
 ### Filter Bar
 
 - **Period tabs**: today | 7d | 30d | Month | All | Custom
-  - Active tab: `bg-background text-foreground shadow-sm`
-  - Inactive: `text-muted-foreground hover:text-foreground`
-  - "Custom" tab opens Popover with RangeCalendar (2-month, `@internationalized/date`)
+    - Active tab: `bg-background text-foreground shadow-sm`
+    - Inactive: `text-muted-foreground hover:text-foreground`
+    - "Custom" tab opens Popover with RangeCalendar (2-month, `@internationalized/date`)
 - **Scope toggle**: "This workspace" | "All workspaces" (ToggleGroup or Select)
 - **Group by dropdown**: None | Model | Provider | Category (Select component)
 
 ### KPI Cards (4 cards)
 
 Each card uses `Card.Card` with internal padding. Content:
+
 - Label: `text-sm text-muted-foreground`
 - Value: `text-2xl font-bold` (Geist Mono for numbers)
 - Subtitle: `text-xs` with delta indicator or context info
 
-| Card | Value | Delta/Context |
-|---|---|---|
-| Total cost | `$X.XX` | `+/-N% vs prev period` (green if down, amber if up) |
-| Sessions | `N` | `+/-N vs prev period` |
-| One-shot rate | `N%` | `industry avg ~62%` |
-| Cache hit | `N%` | `saving ~$X.XX/mo` |
+| Card          | Value   | Delta/Context                                       |
+| ------------- | ------- | --------------------------------------------------- |
+| Total cost    | `$X.XX` | `+/-N% vs prev period` (green if down, amber if up) |
+| Sessions      | `N`     | `+/-N vs prev period`                               |
+| One-shot rate | `N%`    | `industry avg ~62%`                                 |
+| Cache hit     | `N%`    | `saving ~$X.XX/mo`                                  |
 
 ### Cost Chart (LayerChart)
 
@@ -56,9 +57,9 @@ Each card uses `Card.Card` with internal padding. Content:
 - **Y-axis**: 3-4 gridlines with dollar amounts (`$0`, `$2`, `$4`, `$6`)
 - **X-axis**: Date/time labels at start and end, tick marks at gridlines
 - **Bar coloring**: Per selected theme:
-  - Monochrome: `bg-primary` with `opacity` 30%-100% based on relative cost
-  - Traffic Light: green (<33% max) / amber (33-66%) / red (>66%)
-  - Gradient: 3-stop positional (blue-cyan -> yellow-orange -> red-orange)
+    - Monochrome: `bg-primary` with `opacity` 30%-100% based on relative cost
+    - Traffic Light: green (<33% max) / amber (33-66%) / red (>66%)
+    - Gradient: 3-stop positional (blue-cyan -> yellow-orange -> red-orange)
 - **Hover**: ChartTooltip component (see below) via `{#snippet tooltip()}` on LayerChart
 - **When grouped** (by Model/Provider): stacked or grouped bars using `--chart-1` through `--chart-5`
 - **Container**: `Card.Card` with title "Cost per day" (adapts label: "Cost per hour", "Cost per week")
@@ -69,6 +70,7 @@ Each card uses `Card.Card` with internal padding. Content:
 Rich hover tooltip anchored to chart elements. Uses `Tooltip.Root` + `Tooltip.Trigger` + `Tooltip.Content` primitives.
 
 Content layout:
+
 ```
 Date/time label          (font-semibold, 11px)
 $X.XX · N sessions       (10.5px, leading-relaxed)
@@ -104,6 +106,7 @@ Top: Category (N%)       (10.5px, text-muted-foreground)
 ### Color Theme Picker (Popover)
 
 Triggered by palette icon button in header. Popover content:
+
 - 3 radio options with visual preview swatch per theme
 - "Monochrome" — green opacity scale preview
 - "Traffic Light" — red/amber/green dot preview
@@ -117,6 +120,24 @@ Triggered by palette icon button in header. Popover content:
 - 2-column grid of achievement cards
 - Each card: icon area (TrophyIcon, primary when unlocked, muted when locked), name, description, progress bar
 - Unlocked: `border-primary/30 bg-primary/5`, locked: `opacity-50`
+
+## States
+
+List every state that must be designed:
+
+- **Default loaded state**: 30d period, workspace scope, data populated
+- **"Today" period**: hourly bars in cost chart
+- **"Custom" period**: date range popover open with RangeCalendar
+- **Grouped by Model**: stacked/grouped bars with legend in cost chart
+- **Global scope**: all workspaces selected
+- **Empty state**: no data for selected period (show illustration + message)
+- **Loading state**: skeleton loaders for KPI cards, chart area, and tables
+- **Color theme variants**: Monochrome, Traffic Light, Gradient applied to same data
+- **Hover states**: chart bars showing ChartTooltip, button hover states
+- **Popover open states**: Color theme picker popover, custom date range popover
+- **Dialog open state**: Achievements Dialog displayed
+- **Export in progress**: CSV export button showing loading indicator
+- **RefreshIndicator states**: All 5 states from RefreshIndicator component
 
 ## Reusable Components
 
@@ -144,23 +165,6 @@ Triggered by palette icon button in header. Popover content:
 - Chart area: minimum 128px height, maximum 200px
 - Activity + right column: `grid-cols-[1.4fr_1fr] gap-4`
 - All number values use `tabular-nums` for alignment
-
-## States to Explore in Variants
-
-- Default loaded state (30d period, workspace scope)
-- "Today" period with hourly bars
-- "Custom" period with date range popover open
-- Grouped by Model (stacked/grouped bars with legend)
-- Global scope (all workspaces)
-- Empty state (no data for selected period)
-- Loading skeleton state
-
-States to design after variant selection:
-- Each color theme applied to the same data
-- RefreshIndicator in all 5 states
-- Achievements Dialog open
-- Color theme picker popover open
-- Export in progress
 
 ## Visual References
 

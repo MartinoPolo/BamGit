@@ -1,7 +1,7 @@
 > **Final design**: `claude_design/mockups/github-auth-wizard/final.html`
 > **Adopted components**: Alert (shadcn-svelte)
 
-# GitHub Auth Wizard — Design Spec
+# GitHub Auth Wizard — Design Brief
 
 Design spec for the GitHub OAuth Device Flow authentication wizard. Replaces the `gh` CLI install requirement with a browser-based code entry flow. The wizard launches from the GhSetupBanner or Settings page and walks the user through: see code → open GitHub → wait for confirmation → connected. Hand this to a designer for visual exploration.
 
@@ -9,7 +9,16 @@ Design spec for the GitHub OAuth Device Flow authentication wizard. Replaces the
 
 Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. GitHub brand color `#24292f` / `#f6f8fa` for the GitHub mark/icon only (not as a theme color).
 
-## Wizard Purpose
+## Container Context
+
+**Parent**: Standalone (for modal/sheet variants) or Settings page (for inline card variant)
+**What parent provides**: For modal/sheet variants, the wizard owns its full chrome including backdrop, header, and dismiss controls. For the inline card variant, the Settings page provides the overall page layout and section structure.
+**What this component fills**: Modal/sheet variants render as full-featured dialogs with their own dismiss affordances. The inline card variant fills a designated area within the Settings page's GitHub section.
+**Must NOT include**: For inline card variant: page-level navigation, settings page header, or other settings sections — these belong to the parent Settings page.
+
+**Mockup rendering**: Show the component as a standalone modal/sheet with backdrop for Variants A and C. For Variant B (inline card), show it embedded within a minimal Settings page container at reduced opacity for context.
+
+## Purpose
 
 GitHub authentication is a one-time setup that unlocks all GitHub features (issues, PRs, repo sync). Non-technical users should never see a terminal command or CLI install prompt. The Device Flow is inherently simple — show a code, send user to a URL, poll until done — but the UX must handle the awkward polling wait gracefully. The user leaves the app, authenticates in their browser, and returns. The wizard must feel alive during this wait and celebrate success clearly.
 
@@ -67,9 +76,26 @@ GitHub authentication is a one-time setup that unlocks all GitHub features (issu
 ### Settings Integration
 
 - Settings page shows a "GitHub" section with:
-  - **Not connected**: "Connect to GitHub" `.gk-btn-primary` launches the wizard
-  - **Connected**: avatar + username + "Connected via OAuth" badge + "Disconnect" button
-  - **Toggle**: `.gk-toggle` "Use gh CLI instead of built-in auth" for power users (hidden when `gh` CLI not detected)
+    - **Not connected**: "Connect to GitHub" `.gk-btn-primary` launches the wizard
+    - **Connected**: avatar + username + "Connected via OAuth" badge + "Disconnect" button
+    - **Toggle**: `.gk-toggle` "Use gh CLI instead of built-in auth" for power users (hidden when `gh` CLI not detected)
+
+## States
+
+List every state that must be designed:
+
+- **Initial state**: code just generated, timer at full duration (~15 min), no polling started yet, "Open GitHub" button prominent
+- **Polling state**: code displayed, timer counting down (healthy >5 min), spinner active, "Waiting for you to enter the code on GitHub..." status text
+- **Timer warning**: countdown showing 2-5 minutes remaining, `--status-warning` color applied to timer
+- **Timer danger**: countdown showing <2 minutes remaining, `--status-danger` color applied to timer
+- **Code expired**: timer at 0:00, polling stopped, "Code expired" message with "Get New Code" button
+- **Success state**: authentication complete, avatar + username displayed, `.gk-badge-success` with "OAuth" or "Connected", celebration visual, "Done" button to dismiss
+- **Access denied**: user clicked "Cancel" on GitHub's auth page, error message with "Try Again" button
+- **Network error**: polling request failed, "Connection error — retrying..." message with auto-retry indicator
+- **Scope error**: token received but missing required permissions, error message with explanation + "Try Again"
+- **Settings: not connected**: GitHub section showing "Connect to GitHub" button
+- **Settings: connected (OAuth)**: avatar + username + "Connected via OAuth" badge + "Disconnect" button
+- **Settings: connected (gh CLI)**: avatar + username + "Connected via gh CLI" + toggle option for "Use gh CLI instead of built-in auth"
 
 ## Reusable Components
 
@@ -102,6 +128,7 @@ GitHub authentication is a one-time setup that unlocks all GitHub features (issu
 ## States to Explore in Variants
 
 For the initial three variants, show the **polling state** — this is the most common view (user is away authenticating):
+
 - Code `ABCD-1234` displayed prominently
 - Timer at ~12:30 remaining (healthy)
 - Spinner active
@@ -110,6 +137,7 @@ For the initial three variants, show the **polling state** — this is the most 
 - Cancel button visible
 
 States to design after variant selection:
+
 - Initial state (code just generated, timer full, no polling yet)
 - Timer warning state (<2 min remaining, danger colors)
 - Code expired state (timer at 0, "Get New Code" button)

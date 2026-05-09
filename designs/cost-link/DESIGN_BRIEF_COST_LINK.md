@@ -1,18 +1,21 @@
-# CostLink — Design Spec
+# CostLink — Design Brief
 
 Clickable cost value component used throughout the app. Displays a formatted dollar amount that navigates to the Usage page with appropriate filters pre-applied. Used in workspace cards, session sidebars, and any surface showing cost data. Hand this to a designer for visual exploration.
 
 ## Design Tokens
 
-Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist Mono (all cost values use monospace).
+Use the Grovekeeper Forest Moss palette from `designs/tokens.css`. Font: Geist / Geist Mono.
 
 ## Container Context
 
-**Parent**: Inline within any text or data display (workspace cards, session sidebar, usage dashboard)
-**This component is inline** — it does not own any container chrome. It renders as an inline text element that enriches cost values with navigation.
+**Parent**: Inline element (embedded within workspace cards, session sidebar, usage dashboard, or any text/data display)
+**What parent provides**: Text flow context, background color, surrounding layout
+**What this component fills**: Inline text space — renders as an enriched text element within the parent's content flow
+**Must NOT include**: Container chrome, borders, background panels, standalone positioning — this is an inline element that inherits typographic context from its parent
 
+**Mockup rendering**: Show multiple usage contexts at reduced opacity (workspace card footer, session sidebar, usage table). The designed component appears inline within those contexts as a clickable text element.
 
-## Component Purpose
+## Purpose
 
 Make cost values discoverable navigation points. Users see a cost number, want more detail, and can click to jump to the usage page with the right filters already set. Must not look like a button — it should feel like enriched text.
 
@@ -51,6 +54,20 @@ Make cost values discoverable navigation points. Users see a cost number, want m
 - `aria-label`: "View usage for $X.XX, {period} period"
 - Keyboard: focusable, Enter/Space activates
 
+## States
+
+List every state that must be designed:
+
+- Default (at rest)
+- Hover
+- Focus (keyboard navigation)
+- Active (pressed)
+- Disabled (no usage data available)
+- With currency symbol other than $ (EUR, CZK)
+- Inside a dark card background (workspace card footer)
+- Inside a light surface (settings page)
+- Different cost magnitudes ($0.12, $4.82, $124.50)
+
 ## Reusable Components
 
 - `SimpleTooltip`: hover explanation
@@ -67,20 +84,6 @@ None — pure component built from HTML primitives.
 - Size sm: `text-xs` (~10.5px), Size md: `text-sm` (~12px)
 - No minimum width — adapts to content
 - Padding: none at rest, minimal on hover (underline offset only)
-
-## States to Explore in Variants
-
-- Default (at rest)
-- Hover
-- Focus (keyboard navigation)
-- Active (pressed)
-- Different cost magnitudes ($0.12, $4.82, $124.50)
-
-States to design after variant selection:
-- With currency symbol other than $ (EUR, CZK)
-- Inside a dark card background (workspace card footer)
-- Inside a light surface (settings page)
-- Disabled state (no usage data available)
 
 ## Visual References
 

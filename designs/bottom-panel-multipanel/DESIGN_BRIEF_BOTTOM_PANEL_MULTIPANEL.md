@@ -1,4 +1,4 @@
-# Bottom Panel Multi-Panel Layout — Design Spec
+# Bottom Panel Multi-Panel Layout — Design Brief
 
 Configurable multi-panel layout for the workspace dashboard bottom panel. Allows displaying multiple views side-by-side (Issues + Issue Detail, Issues + Session, etc.). Hand this to a designer for visual exploration.
 
@@ -11,7 +11,7 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 **Parent**: `WorkspaceDashboardLayout` — the bottom section of the vertical paneforge split
 **This component IS the bottom panel container** — it owns the tab bar, panel chrome, resizer handle, and layout management. Child tab content components (Issues, Session, Assigned Issues, etc.) fill the content area that this component provides.
 
-## Layout Purpose
+## Purpose
 
 Enable viewing multiple perspectives simultaneously — e.g., issue list on the left while inspecting issue detail on the right, or watching a session while browsing dependencies. Reduces tab-switching friction.
 
@@ -19,15 +19,15 @@ Enable viewing multiple perspectives simultaneously — e.g., issue list on the 
 
 ### Layout Presets (7+)
 
-| Preset | Description | Panel Count |
-|--------|-------------|-------------|
-| Single | One full-width panel | 1 |
-| Side-by-side | Two horizontal panels | 2 |
-| Quad | Four equal panels (2×2) | 4 |
-| Top-merged | One panel top, two bottom | 3 |
-| Bottom-merged | Two panels top, one bottom | 3 |
-| Left-merged | One panel left, two right | 3 |
-| Right-merged | Two panels left, one right | 3 |
+| Preset        | Description                | Panel Count |
+| ------------- | -------------------------- | ----------- |
+| Single        | One full-width panel       | 1           |
+| Side-by-side  | Two horizontal panels      | 2           |
+| Quad          | Four equal panels (2×2)    | 4           |
+| Top-merged    | One panel top, two bottom  | 3           |
+| Bottom-merged | Two panels top, one bottom | 3           |
+| Left-merged   | One panel left, two right  | 3           |
+| Right-merged  | Two panels left, one right | 3           |
 
 ### Per-Panel Controls
 
@@ -54,6 +54,17 @@ Enable viewing multiple perspectives simultaneously — e.g., issue list on the 
 - Remembers which view each panel was showing
 - Restores on workspace reopen
 
+## States
+
+List every state that must be designed:
+
+- **Layout states**: single panel (default), side-by-side, quad, top-merged, bottom-merged, left-merged, right-merged
+- **Per-panel states**: active tab, inactive tabs, hover on tab, empty panel (no view selected)
+- **Resizing states**: drag handle hover, drag handle active (dragging), panel at minimum size
+- **Responsive states**: narrow viewport where multi-panel layouts become impractical
+- **Transition states**: layout switch animation (optional)
+- **Loading states**: panel content loading
+
 ## Reusable Components
 
 - PaneForge `PaneGroup` + `Pane` + `PaneResizer` for resizable splits
@@ -76,11 +87,13 @@ Enable viewing multiple perspectives simultaneously — e.g., issue list on the 
 ## States to Explore in Variants
 
 Initial variants should show:
+
 - Side-by-side layout (most common use case)
 - Layout switcher popover/UI
 - Dark mode
 
 States to design after variant selection:
+
 - Quad layout with 4 different views
 - Three-panel layouts (all 4 merge variants)
 - Panel being resized (drag state)

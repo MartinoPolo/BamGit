@@ -1,8 +1,6 @@
-# Assigned Issues Panel — Design Spec
+# Assigned Issues Panel — Design Brief
 
 Dedicated tab in the workspace bottom panel showing GitHub issues assigned to the current user. Enables quick-import into Grovekeeper with or without a worktree, bypassing the full creation wizard.
-
-**Status**: Variant E (Batch Action Bar) selected and refined. See `mockups/assigned-issues-panel/variant-e.html` for the approved direction.
 
 ## Design Tokens
 
@@ -18,13 +16,14 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 
 **Mockup rendering**: Show the bottom panel shell (tab bar with "Assigned Issues" tab active) as read-only context at ~40% opacity. The designed component fills the content area below.
 
-## Panel Purpose
+## Purpose
 
 Quick import of GitHub-assigned issues into the Grovekeeper workspace. The user sees what's assigned to them and can create a Grovekeeper issue (with or without worktree) in one click, bypassing the full creation wizard.
 
 ## Tab Badge
 
 The "Assigned Issues" tab shows a count badge of **suitable-for-linking** issues only:
+
 - Suitable = assigned to current user **AND** not closed **AND** not already linked in Grovekeeper
 - Example: `Assigned Issues` tab with badge `8` means 8 unlinked open issues remain
 
@@ -54,14 +53,14 @@ Two collapsible sections. No "Deleted" concept — an issue is either linked or 
 
 All columns support sort (ascending / descending). Active sort shown with filled sort arrow. Columns:
 
-| Column | Width | Notes |
-|--------|-------|-------|
-| Checkbox | 28px | Global checkbox lives here; no column label |
-| PRD | 56px | Mono. Sort by PRD number. Empty shown as `—` |
-| Issue # | 54px | Mono. Sort by number |
-| Title | 1fr | Sort alphabetically |
-| Labels | ~200px | Filter/sort by label presence. Show as many as possible |
-| Actions | 72px | Not sortable. Pinned right. Always visible |
+| Column   | Width  | Notes                                                   |
+| -------- | ------ | ------------------------------------------------------- |
+| Checkbox | 28px   | Global checkbox lives here; no column label             |
+| PRD      | 56px   | Mono. Sort by PRD number. Empty shown as `—`            |
+| Issue #  | 54px   | Mono. Sort by number                                    |
+| Title    | 1fr    | Sort alphabetically                                     |
+| Labels   | ~200px | Filter/sort by label presence. Show as many as possible |
+| Actions  | 72px   | Not sortable. Pinned right. Always visible              |
 
 ### Per Issue Row
 
@@ -71,9 +70,9 @@ All columns support sort (ascending / descending). Active sort shown with filled
 - **Issue title**: Full text, truncated with ellipsis. **Not** a click target for row selection.
 - **GitHub labels**: Show as many as possible, prioritized: `afk`/`hitl` first → `design-needed` → everything else.
 - **Quick actions** (always visible, pinned right):
-  - Plus icon: Quick-add to workspace (no worktree)
-  - GitBranch icon: Quick-add with worktree
-  - For **linked rows**: show a small "✓" linked indicator instead (no add buttons)
+    - Plus icon: Quick-add to workspace (no worktree)
+    - GitBranch icon: Quick-add with worktree
+    - For **linked rows**: show a small "✓" linked indicator instead (no add buttons)
 
 ### Row Click Behavior
 
@@ -97,24 +96,9 @@ Clicking anywhere in a row **except** the checkbox, PRD number link, issue numbe
 - Both bypass the creation wizard entirely.
 - Contextual batch behavior: if a mix of linked and unlinked rows is selected, batch "Add Selected" and "Add + Worktree" silently skip linked rows.
 
-## Components to Use
+## States
 
-- **Table layout**: Custom CSS grid table (same pattern as Variant E). Consider extracting as a reusable component or adopting shadcn-svelte Table when available.
-- **Batch action bar**: Reference `BatchActionToolbar.svelte` for styling conventions; implement a custom version with the tri-state global checkbox and the two quick-add actions.
-- **Search input**: `src/lib/components/ui/search-field/` or `input/`.
-- **Buttons**: `Button` component from `ui/button/` — size `sm` for quick-add, `icon-sm` for row actions.
-- **Badges**: `Badge` from `ui/badge/` or `.gk-badge` CSS class for GitHub labels.
-- **Tabs**: Existing bottom panel tab system. Add count badge using `.tab-count` pattern.
-- **Tab overflow**: On narrow widths, tabs that don't fit should collapse behind a "…" overflow button (dropdown or scroll).
-
-## Layout Constraints
-
-- Tab content area: full width of its panel in multi-panel layout
-- Issue row height: 38px (compact)
-- Must work in narrow panels (multi-panel side-by-side)
-- On narrow widths: hide Labels column first, then PRD column. Always show checkbox, Issue #, Title, Actions.
-
-## States to Implement
+### Global States
 
 - **Default**: Unlinked section expanded, linked collapsed, no selection, search empty
 - **Selection active**: Batch bar populated, global checkbox indeterminate or checked, action buttons enabled
@@ -123,6 +107,37 @@ Clicking anywhere in a row **except** the checkbox, PRD number link, issue numbe
 - **Loading**: Fetching from GitHub — spinner in refresh indicator area
 - **Error**: GitHub not authenticated or API failure
 - **Post quick-add**: Issue animates out of Unlinked, reappears in Linked
+
+### Interactive Element States
+
+- **Hover**: Issue rows, action buttons, checkboxes, links, collapsible section headers
+- **Focus**: Search input, checkboxes, action buttons (keyboard navigation)
+- **Active**: Pressed state for buttons; selected state for checkboxes
+- **Disabled**: Action buttons when 0 selected; refresh button during active sync
+
+## Reusable Components
+
+Specify which existing Grovekeeper components to use:
+
+- **Button**: `Button` component from `ui/button/` — size `sm` for quick-add, `icon-sm` for row actions
+- **Badge**: `Badge` from `ui/badge/` or `.gk-badge` CSS class for GitHub labels
+- **Search input**: Use existing search field from `src/lib/components/ui/search-field/` or `input/`
+- **Batch action bar**: Reference `BatchActionToolbar.svelte` for styling conventions; implement a custom version with the tri-state global checkbox and the two quick-add actions
+- **Tabs**: Existing bottom panel tab system. Add count badge using `.tab-count` pattern
+- **Tab overflow**: On narrow widths, tabs that don't fit should collapse behind a "…" overflow button (dropdown or scroll)
+
+## Components to Adopt
+
+shadcn-svelte or Bits UI components to install if needed:
+
+- **Table** from shadcn-svelte — Consider adopting for consistent table layout patterns. Current implementation uses custom CSS grid table (Variant E pattern). Evaluate whether shadcn Table provides better maintainability.
+
+## Layout Constraints
+
+- Tab content area: full width of its panel in multi-panel layout
+- Issue row height: 38px (compact)
+- Must work in narrow panels (multi-panel side-by-side)
+- On narrow widths: hide Labels column first, then PRD column. Always show checkbox, Issue #, Title, Actions.
 
 ## Visual References
 
@@ -133,6 +148,17 @@ Clicking anywhere in a row **except** the checkbox, PRD number link, issue numbe
 - Action button placement (hover-reveal vs always visible)
 - Animation on quick-add (issue sliding to linked section)
 - Whether to show issue body preview on hover/expand
+
+## UI Freedom
+
+Areas where the designer has creative latitude:
+
+- **Visual hierarchy of action buttons**: Hover-reveal vs always visible; icon-only vs icon+label
+- **Row selection feedback**: Background tint, left border accent, checkbox fill style
+- **Animation style**: Slide, fade, or crossfade when issues move from Unlinked to Linked
+- **Empty state illustration**: Icon, text, or custom graphic for "no assigned issues"
+- **Label overflow strategy**: Truncate with +N indicator, scroll horizontally, or wrap
+- **Collapsible section indicators**: Chevron placement, rotation animation, header styling
 
 ## Not Included
 

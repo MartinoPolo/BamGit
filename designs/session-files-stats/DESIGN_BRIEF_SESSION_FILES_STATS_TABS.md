@@ -15,6 +15,15 @@ Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist M
 
 **Mockup rendering**: Show the session view shell (top bar + tab bar with the relevant tab active) as read-only context at ~40% opacity. The designed component fills the content area below.
 
+## Purpose
+
+These two tabs provide visibility into session activity beyond the conversation:
+
+- **Files tab**: Code review surface — shows all files changed during the session with GitHub-style diffs, enabling users to review agent edits without leaving Grovekeeper
+- **Stats tab**: Session analytics — aggregates cost, token usage, tool calls, and efficiency metrics so users understand what the agent spent time and resources on
+
+Both tabs support the session detail view's goal of full transparency into AI agent behavior.
+
 ## Tab Context
 
 Both tabs live inside the session view alongside the Chat tab. They are full-height within the session view's content area. The right sidebar (sub-agent tree) can be open or collapsed independently.
@@ -108,6 +117,52 @@ Aggregated metrics for the session: how much it cost, how many tokens were used,
 
 ---
 
+## States
+
+Both tabs must handle these states:
+
+### Files Tab States
+
+- **Empty**: "No files changed yet" (session just started or read-only session)
+- **Loading**: Initial load or refreshing diffs
+- **Large diff**: Many files (100+), file list scrolls independently
+- **Binary file**: "Binary file changed — cannot display diff"
+- **Deleted file**: All lines shown as removed
+- **Sidebar open/closed**: Content area adjusts width accordingly
+
+### Stats Tab States
+
+- **Mid-session (running)**: Costs and token counts update in real-time
+- **Empty**: Session spawned but no turns yet
+- **Completed session**: All metrics finalized, shows end timestamp
+- **Long session**: Many tool types, scrollable list
+- **Sidebar open/closed**: Content area adjusts width accordingly
+
+---
+
+## Reusable Components
+
+Use these existing Grovekeeper components:
+
+- **Button**: `.gk-btn-sm` for filter/sort actions, expand/collapse controls
+- **Badge**: `.gk-badge-success` (additions), `.gk-badge-danger` (deletions), `.gk-badge-info` (file status indicators)
+- **Typography**: `.gk-h2` for tab section headers (e.g., "Cost", "Token Usage"), `.gk-body` for file paths and stats, `.font-mono` for numbers and code paths
+- **Card**: `.gk-card` for stats section groupings (Cost, Tokens, Activity, Tool Usage)
+- **Divider**: `.gk-hr` between stats sections
+- **Text styles**: `.cb-num` for numeric values (cost, tokens), `.cb-mute` for secondary labels
+
+---
+
+## Components to Adopt
+
+Consider these shadcn-svelte or Bits UI components if needed:
+
+- **Collapsible** from Bits UI — for expandable diff sections in Files tab
+- **Table** from shadcn-svelte — for tool usage breakdown in Stats tab
+- **Progress** from shadcn-svelte — for context window utilization bar
+
+---
+
 ## Layout Constraints
 
 - Full height within the session view content area
@@ -123,6 +178,20 @@ Aggregated metrics for the session: how much it cost, how many tokens were used,
 - GitHub PR Files view — primary reference for the Files tab diff display
 - Linear issue activity sidebar — inspiration for compact stats layout
 - Grovekeeper Forest Moss palette — green for additions, red for removals (override token colors)
+
+## UI Freedom
+
+Designers have creative latitude in:
+
+- **Files tab**: Layout between file list and diff viewer (split view, stacked, or full-width with inline navigation)
+- **Stats tab**: Visual treatment of metrics (cards vs table vs dashboard tiles)
+- **Diff rendering**: Syntax highlighting color choices (within Forest Moss palette bounds)
+- **Tool usage visualization**: Table, bar chart, or compact list with icons
+- **Empty states**: Illustration style and messaging tone
+- **Filter/sort controls**: Positioning and visual style (dropdowns, tabs, buttons)
+- **Diff expander UI**: Visual treatment for "Show N hidden lines" controls
+
+Must preserve: Forest Moss palette adherence, 26px button height (`.gk-btn-sm`), 900px content column for Stats tab, monospace fonts for numbers.
 
 ## Not Included in This Design
 
