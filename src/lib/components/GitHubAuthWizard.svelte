@@ -106,6 +106,7 @@
 		}, pollInterval * 1000);
 	}
 
+	// fallow-ignore-next-line complexity
 	async function doPoll() {
 		if (phase === null || phase.kind !== 'polling') {
 			return;
