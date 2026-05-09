@@ -120,7 +120,7 @@ pub fn run() {
                 resource_directory,
                 app_data_directory.clone(),
             ));
-            app.manage(playback_queue::start_playback_queue());
+            app.manage(playback_queue::LazyPlaybackQueue::new());
 
             // Auto-start discovery polling (3-second interval)
             let poller = app.state::<DiscoveryPoller>();
@@ -259,7 +259,7 @@ pub fn run() {
                 let poller = app_handle.state::<DiscoveryPoller>();
                 poller.stop();
 
-                let queue = app_handle.state::<playback_queue::PlaybackQueueHandle>();
+                let queue = app_handle.state::<playback_queue::LazyPlaybackQueue>();
                 queue.shutdown();
 
                 let pm = app_handle.state::<ProcessManager>();

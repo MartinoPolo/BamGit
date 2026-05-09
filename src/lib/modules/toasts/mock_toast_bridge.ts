@@ -42,6 +42,7 @@ const COMMAND_BODIES: Record<string, string> = {
 	kill_workspace_process: 'Killing processes requires the desktop app',
 	github_device_flow_start: 'GitHub authentication requires the desktop app',
 	github_device_flow_poll: 'GitHub authentication requires the desktop app',
+	test_notification_sound: 'Sound testing requires the desktop app',
 };
 
 export function showMockToast(command: string, args?: Record<string, unknown>): void {
