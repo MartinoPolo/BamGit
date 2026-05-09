@@ -4,6 +4,7 @@ import { invoke } from '$lib/tauri.js';
 import type {
 	AssignedIssue,
 	AssignedIssuesResult,
+	GhAuthStatus,
 	GhCliAvailability,
 	GitStatusCache,
 	SyncAllResult,
@@ -41,6 +42,7 @@ function replaceStateMap(
 
 function createVersionControlContext() {
 	const stateMap = new SvelteMap<string, GitStatusCache>();
+	let authStatus = $state<GhAuthStatus>({ status: 'not-connected' });
 	let ghAvailability = $state<GhCliAvailability>('not-installed');
 	let syncing = $state(false);
 	let syncError = $state<string | null>(null);
@@ -51,11 +53,26 @@ function createVersionControlContext() {
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
-	const isGhAvailable = $derived(ghAvailability === 'available');
+	const isGhAvailable = $derived(
+		authStatus.status === 'oauth-connected' ||
+			authStatus.status === 'cli-connected' ||
+			ghAvailability === 'available',
+	);
+
+	async function checkAuthStatus() {
+		try {
+			authStatus = await invoke<GhAuthStatus>('github_auth_status');
+		} catch {
+			authStatus = { status: 'not-connected' };
+		}
+	}
 
 	return {
 		get stateMap() {
 			return stateMap;
+		},
+		get authStatus() {
+			return authStatus;
 		},
 		get ghAvailability() {
 			return ghAvailability;
@@ -172,8 +189,11 @@ function createVersionControlContext() {
 			}
 		},
 
+		checkAuthStatus,
+
 		async checkAvailability() {
 			try {
+				await checkAuthStatus();
 				ghAvailability = await invoke<GhCliAvailability>('check_gh_availability');
 			} catch {
 				ghAvailability = 'not-installed';

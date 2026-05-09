@@ -13,6 +13,7 @@
 	import PathInput from './PathInput.svelte';
 	import RepoCombobox from './RepoCombobox.svelte';
 	import GhSetupBanner from './GhSetupBanner.svelte';
+	import GitHubAuthWizard from './GitHubAuthWizard.svelte';
 	import { buildUpdateDashboardRequest } from './dialog_helpers.js';
 
 	interface Props {
@@ -32,6 +33,7 @@
 	let defaultBaseBranch = $state('');
 	let worktreeParentFolder = $state('');
 	let accentColor = $state(WORKSPACE_ACCENT_PALETTE[0]);
+	let authWizardOpen = $state(false);
 	let confirmDelete = $state(false);
 
 	const open = $derived(dashboard !== null);
@@ -111,7 +113,10 @@
 					</div>
 
 					{#if dashboard.type === 'repo'}
-						<GhSetupBanner availability={versionControl.ghAvailability} />
+						<GhSetupBanner
+							authStatus={versionControl.authStatus}
+							onconnect={() => (authWizardOpen = true)}
+						/>
 
 						<div class="flex flex-col gap-1.5">
 							<Label for="edit-dashboard-github-repo"
@@ -164,3 +169,8 @@
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>
+
+<GitHubAuthWizard
+	bind:open={authWizardOpen}
+	onconnected={() => void versionControl.checkAuthStatus()}
+/>

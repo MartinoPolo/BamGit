@@ -12,16 +12,17 @@ mod window_manager;
 
 use commands::{
     action_commands, ai_config_commands, color_palette_commands, dashboard_commands,
-    dependency_commands, dialog_commands, git_status_commands, github_commands, issue_commands,
-    keyboard_shortcut_commands, label_shape_mapping_commands, metrics_commands,
-    notification_commands, portfolio_commands, raw_requirements_commands, seed_commands,
-    process_commands, session_commands, terminal_commands, window_commands,
+    dependency_commands, dialog_commands, git_status_commands, github_auth_commands,
+    github_commands, issue_commands, keyboard_shortcut_commands, label_shape_mapping_commands,
+    metrics_commands, notification_commands, portfolio_commands, raw_requirements_commands,
+    seed_commands, process_commands, session_commands, terminal_commands, window_commands,
     workspace_command_commands, worktree_commands,
 };
 use std::sync::Arc;
 
 use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
+use git::github_client::GitHubClient;
 use metrics::pricing::PricingEngine;
 use models::app_setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
 use notification::playback_queue;
@@ -113,6 +114,7 @@ pub fn run() {
             app.manage(SessionManager::new());
             app.manage(ProcessManager::new());
             app.manage(FetchCoordinator::new());
+            app.manage(GitHubClient::new());
             app.manage(DiscoveryPoller::new());
             app.manage(NotificationService::new(
                 resource_directory,
@@ -228,6 +230,10 @@ pub fn run() {
             dialog_commands::pick_folder,
             github_commands::list_user_repos,
             github_commands::search_github_repos,
+            github_auth_commands::github_device_flow_start,
+            github_auth_commands::github_device_flow_poll,
+            github_auth_commands::github_auth_status,
+            github_auth_commands::github_logout,
             ai_config_commands::discover_ai_config,
             ai_config_commands::get_custom_discovery_paths,
             ai_config_commands::set_custom_discovery_paths,

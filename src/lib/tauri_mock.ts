@@ -42,6 +42,8 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'discover_ai_config',
 	'run_workspace_command',
 	'kill_workspace_process',
+	'github_device_flow_start',
+	'github_device_flow_poll',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
@@ -116,6 +118,8 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 			fetched_at: null,
 		},
 	check_gh_availability: () => 'available',
+	github_auth_status: () => ({ status: 'not-connected' }),
+	github_logout: () => null,
 	fetch_assigned_issues: () => MOCK_ASSIGNED_ISSUES_RESULT,
 	get_deleted_assigned_issue_numbers: () => [],
 	sync_all_github_state: () => MOCK_SYNC_RESULT,

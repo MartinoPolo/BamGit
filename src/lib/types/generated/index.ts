@@ -18,12 +18,16 @@ export type { CustomDiscoveryPath } from './CustomDiscoveryPath';
 export type { DailyCost } from './DailyCost';
 export type { Dashboard } from './Dashboard';
 export type { DashboardStatus } from './DashboardStatus';
+export type { DeviceFlowStartResult } from './DeviceFlowStartResult';
+
 export type { DashboardType } from './DashboardType';
 export type { DiscoveredSession } from './DiscoveredSession';
 export type { DiscoveredSessionsPayload } from './DiscoveredSessionsPayload';
 export type { DiscoveredSessionStatus } from './DiscoveredSessionStatus';
 export type { ExecutionPhase } from './ExecutionPhase';
+export type { GhAuthStatus } from './GhAuthStatus';
 export type { GhCliAvailability } from './GhCliAvailability';
+export type { GitHubUser } from './GitHubUser';
 export type { GitStatusCache } from './GitStatusCache';
 export type { GrovekeeperManifest } from './GrovekeeperManifest';
 export type { HookConfig } from './HookConfig';

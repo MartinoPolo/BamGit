@@ -37,6 +37,7 @@
 	import ColorChangeDialog from '$lib/components/ColorChangeDialog.svelte';
 	import type { AssignedIssue, PrunableIssue } from '$lib/types/generated';
 	import { invoke } from '$lib/tauri.js';
+	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
 
 	const boardStore = useBoard();
 	const issueStore = useIssues();
@@ -72,6 +73,7 @@
 	let deleteTargetIssue = $state<Issue | null>(null);
 	let renameTargetIssue = $state<Issue | null>(null);
 	let colorChangeTargetIssue = $state<Issue | null>(null);
+	let authWizardOpen = $state(false);
 
 	const archiveUnfinishedSessionCount = $derived.by(() => {
 		if (archiveTargetIssue === null) {
@@ -571,9 +573,8 @@
 						paletteColors={activePaletteColors}
 						{usedColors}
 						dependencies={issueStore.dependencies}
-						ghSetupBanner={githubRepoParts !== null &&
-							versionControlStore.ghAvailability !== 'available'}
-						ghAvailability={versionControlStore.ghAvailability}
+						authStatus={versionControlStore.authStatus}
+						onconnect={() => (authWizardOpen = true)}
 						assignedIssues={versionControlStore.assignedIssues}
 						assignedIssuesHasMore={versionControlStore.assignedIssuesHasMore}
 						deletedAssignedIssueNumbers={versionControlStore.deletedAssignedIssueNumbers}
@@ -654,5 +655,10 @@
 		{usedColors}
 		onClose={() => (colorChangeTargetIssue = null)}
 		onChangeColor={handleChangeColor}
+	/>
+
+	<GitHubAuthWizard
+		bind:open={authWizardOpen}
+		onconnected={() => versionControlStore.checkAuthStatus()}
 	/>
 {/if}

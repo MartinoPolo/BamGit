@@ -5,6 +5,7 @@ pub mod dashboard_commands;
 pub mod dialog_commands;
 pub mod dependency_commands;
 pub mod git_status_commands;
+pub mod github_auth_commands;
 pub mod github_commands;
 pub mod issue_commands;
 pub mod keyboard_shortcut_commands;
