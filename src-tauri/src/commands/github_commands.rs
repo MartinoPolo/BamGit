@@ -511,12 +511,19 @@ pub async fn list_user_repos(
     github_client: State<'_, GitHubClient>,
 ) -> Result<Vec<UserRepo>, String> {
     if github_client.is_oauth().await {
-        let response = github_client
+        match github_client
             .api_get("/user/repos?per_page=100&sort=pushed&direction=desc")
-            .await?;
-        let json_str = serde_json::to_string(&response)
-            .map_err(|error| format!("Failed to serialize repos response: {error}"))?;
-        return parse_rest_user_repos(&json_str);
+            .await
+        {
+            Ok(response) => {
+                let json_str = serde_json::to_string(&response)
+                    .map_err(|error| format!("Failed to serialize repos response: {error}"))?;
+                return parse_rest_user_repos(&json_str);
+            }
+            Err(error) => {
+                log::warn!("OAuth repo list failed, falling back to gh CLI: {error}");
+            }
+        }
     }
 
     let stdout = run_gh_command(&[
@@ -553,12 +560,19 @@ pub async fn search_github_repos(
     }
 
     if github_client.is_oauth().await {
-        let response = github_client
+        match github_client
             .api_get(&format!("/search/repositories?q={}&per_page=20", urlencoded(trimmed)))
-            .await?;
-        let json_str = serde_json::to_string(&response)
-            .map_err(|error| format!("Failed to serialize search output: {error}"))?;
-        return parse_rest_repo_search(&json_str);
+            .await
+        {
+            Ok(response) => {
+                let json_str = serde_json::to_string(&response)
+                    .map_err(|error| format!("Failed to serialize search output: {error}"))?;
+                return parse_rest_repo_search(&json_str);
+            }
+            Err(error) => {
+                log::warn!("OAuth repo search failed, falling back to gh CLI: {error}");
+            }
+        }
     }
 
     let stdout = run_gh_command(&[

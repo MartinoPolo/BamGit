@@ -139,21 +139,21 @@
 		} catch (error) {
 			const errorMessage = String(error);
 
-			if (errorMessage === 'authorization_pending') {
+			if (errorMessage.includes('authorization_pending')) {
 				schedulePoll();
 				return;
 			}
-			if (errorMessage === 'slow_down') {
+			if (errorMessage.includes('slow_down')) {
 				pollInterval += 5;
 				schedulePoll();
 				return;
 			}
-			if (errorMessage === 'expired_token') {
+			if (errorMessage.includes('expired_token')) {
 				clearAllTimers();
 				phase = { kind: 'expired' };
 				return;
 			}
-			if (errorMessage === 'access_denied') {
+			if (errorMessage.includes('access_denied')) {
 				clearAllTimers();
 				phase = {
 					kind: 'error',
@@ -163,6 +163,7 @@
 				return;
 			}
 
+			console.error('[GitHubAuthWizard] poll error:', error, '| stringified:', errorMessage);
 			clearAllTimers();
 			phase = {
 				kind: 'error',
