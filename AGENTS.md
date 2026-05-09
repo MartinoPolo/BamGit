@@ -51,6 +51,10 @@ On startup: `schema::create_tables()` (IF NOT EXISTS) then `defaults::seed_defau
 
 `pnpm dev` renders the full app in a browser without Tauri — `src/lib/tauri_mock.ts` intercepts all `invoke()` calls and returns fixture data from `src/lib/tauri_mock_data.ts`. When adding a new Tauri command, always add a corresponding mock handler in `tauri_mock.ts`; if the command requires the native backend (worktree, terminal, session, git ops), also add it to `TAURI_ONLY_COMMANDS` in `src/lib/modules/toasts/mock_toast_bridge.ts` so a warning toast fires in browser mode. Navigation, theming, issue display, and layout work fully; write operations return mock responses but don't persist; native ops (worktree setup, session spawn, terminal, git sync) are no-ops that show "Desktop app required" toasts.
 
+## Pre-existing Errors
+
+Always fix unrelated errors you encounter (merge artifacts, stale imports, broken references, prior bugs) — they accumulate if ignored. Commit fixes separately from main work. If a fix fails after two attempts, revert and continue with the main task. Always notify user — both for fixes made and problems left unresolved.
+
 ## Testing
 
 - TDD: write tests first, then implement.
