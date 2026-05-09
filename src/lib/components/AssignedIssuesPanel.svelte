@@ -599,6 +599,7 @@
 		.assigned-labels-col {
 			display: none;
 		}
+
 		.assigned-table-grid {
 			grid-template-columns: 28px 56px 54px 1fr 72px;
 		}
@@ -608,6 +609,7 @@
 		.assigned-prd-col {
 			display: none;
 		}
+
 		.assigned-table-grid {
 			grid-template-columns: 28px 54px 1fr 72px;
 		}
