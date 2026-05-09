@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { DeviceFlowStartResult, GhAuthStatus, GitHubUser } from '$lib/types/generated';
 	import type { WizardPhase } from './github_auth_wizard.svelte.js';
 	import { formatRemainingTime, getTimerUrgency } from './github_auth_wizard.svelte.js';
 	import { invoke } from '$lib/tauri.js';
+	import { MockDesktopOnlyError } from '$lib/mock_desktop_only_error.js';
 	import { openUrl } from '$lib/opener.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -66,6 +68,10 @@
 			pollInterval = result.interval;
 			startCountdown();
 		} catch (error) {
+			if (error instanceof MockDesktopOnlyError) {
+				handleClose();
+				return;
+			}
 			phase = {
 				kind: 'error',
 				errorType: 'network_error',
@@ -204,7 +210,7 @@
 	}
 
 	$effect(() => {
-		if (open && phase === null) {
+		if (open && untrack(() => phase) === null) {
 			void startDeviceFlow();
 		}
 

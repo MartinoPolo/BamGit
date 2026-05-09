@@ -1,4 +1,5 @@
 import { showMockToast } from '$lib/modules/toasts/mock_toast_bridge.js';
+import { MockDesktopOnlyError } from '$lib/mock_desktop_only_error.js';
 import {
 	MOCK_ACHIEVEMENTS,
 	MOCK_ACTIONS,
@@ -483,6 +484,8 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	set_app_setting: () => null,
 	open_terminal: () => null,
 	update_peacock_color: () => null,
+	run_workspace_command: () => null,
+	kill_workspace_process: () => null,
 	write_raw_requirements: () => null,
 	seed_demo_workspace: () => null,
 	delete_demo_workspace: () => null,
@@ -490,13 +493,16 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 
 export async function mockInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
 	const handler = MOCK_COMMAND_HANDLERS[command];
+	if (TAURI_ONLY_COMMANDS.has(command)) {
+		showMockToast(command, args);
+		if (handler === undefined) {
+			throw new MockDesktopOnlyError(command);
+		}
+		return handler(args ?? {}) as T;
+	}
 	if (handler === undefined) {
 		console.warn(`[tauri-mock] Unhandled command: "${command}"`, args);
 		return undefined as T;
 	}
-	const result = handler(args ?? {}) as T;
-	if (TAURI_ONLY_COMMANDS.has(command)) {
-		showMockToast(command, args);
-	}
-	return result;
+	return handler(args ?? {}) as T;
 }
