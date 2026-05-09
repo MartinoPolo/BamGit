@@ -103,25 +103,9 @@ pub async fn test_notification_sound(
     let resource_directory = service.resource_directory().clone();
     let app_data_directory = service.app_data_directory().clone();
 
-    let global_volume: f64 = connection
-        .query_row(
-            "SELECT value FROM app_settings WHERE key = 'notification_volume'",
-            [],
-            |row| row.get::<_, String>(0),
-        )
-        .ok()
-        .and_then(|v| v.parse().ok())
-        .unwrap_or(0.8);
-
-    let per_sound_volume: f64 = connection
-        .query_row(
-            "SELECT volume FROM sound_volume_overrides WHERE event_type = ?1 AND sound_file = ?2",
-            rusqlite::params![event_type, &sound_file],
-            |row| row.get(0),
-        )
-        .unwrap_or(1.0);
-
-    let volume = (global_volume * per_sound_volume) as f32;
+    let volume =
+        crate::notification::volume::compute_effective_volume(&connection, event_type, &sound_file)
+            as f32;
     drop(connection);
 
     let resolved_path = crate::notification::sound::resolve_sound_path(
@@ -175,13 +159,8 @@ pub fn get_sound_volume_override(
     sound_file: String,
 ) -> Result<f64, String> {
     let connection = state.read()?;
-    let volume = connection
-        .query_row(
-            "SELECT volume FROM sound_volume_overrides WHERE event_type = ?1 AND sound_file = ?2",
-            rusqlite::params![event_type, sound_file],
-            |row| row.get::<_, f64>(0),
-        )
-        .unwrap_or(1.0);
+    let volume =
+        crate::notification::volume::load_sound_volume_override(&connection, event_type, &sound_file);
     Ok(volume)
 }
 
