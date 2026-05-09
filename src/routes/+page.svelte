@@ -138,7 +138,6 @@
 			if (githubRepoParts) {
 				versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
 			}
-			versionControlStore.loadDeletedAssignedIssueNumbers(dashboardId);
 		});
 	});
 
@@ -309,6 +308,13 @@
 			githubRepoParts.owner,
 			githubRepoParts.repo,
 		);
+	}
+
+	function handleRefreshAssignedIssues() {
+		if (githubRepoParts === null) {
+			return;
+		}
+		void versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);
 	}
 
 	async function handleUnarchiveIssue(id: string) {
@@ -577,7 +583,8 @@
 						onconnect={() => (authWizardOpen = true)}
 						assignedIssues={versionControlStore.assignedIssues}
 						assignedIssuesHasMore={versionControlStore.assignedIssuesHasMore}
-						deletedAssignedIssueNumbers={versionControlStore.deletedAssignedIssueNumbers}
+						assignedIssuesLoading={versionControlStore.assignedIssuesLoading}
+						assignedIssuesLastSynced={versionControlStore.assignedIssuesLastSynced}
 						{getVisualization}
 						getChildren={issueStore.getChildren}
 						{getNotificationDotColor}
@@ -598,6 +605,7 @@
 						onWizardOpen={handleWizardOpenWithIssue}
 						onQuickAddWithWorktree={handleQuickAddWithWorktree}
 						onLoadMoreAssignedIssues={handleLoadMoreAssignedIssues}
+						onRefreshAssignedIssues={handleRefreshAssignedIssues}
 					/>
 				{/snippet}
 			</WorkspaceDashboardLayout>
