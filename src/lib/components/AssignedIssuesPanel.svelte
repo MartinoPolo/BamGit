@@ -1,30 +1,43 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import type { AssignedIssue } from '$lib/types/generated';
 	import type { Issue } from '$lib/modules/issues';
-	import { categorizeAssignedIssues } from './assigned_issues_utils.js';
-	import CircleDot from '@lucide/svelte/icons/circle-dot';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import {
+		categorizeAssignedIssues,
+		filterAssignedIssues,
+		sortAssignedIssues,
+		sortLabelsByPriority,
+		type SortColumn,
+		type SortDirection,
+	} from './assigned_issues_utils.js';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import ArrowUpDown from '@lucide/svelte/icons/arrow-up-down';
+	import ArrowUp from '@lucide/svelte/icons/arrow-up';
+	import ArrowDown from '@lucide/svelte/icons/arrow-down';
 	import Plus from '@lucide/svelte/icons/plus';
 	import GitBranch from '@lucide/svelte/icons/git-branch';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Check from '@lucide/svelte/icons/check';
 	import { openUrl } from '$lib/opener.js';
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import { SearchField } from '$lib/components/ui/search-field/index.js';
 	import { cn } from '$lib/utils.js';
 
 	interface Props {
 		issues: AssignedIssue[];
 		dashboardIssues: readonly Issue[];
-		deletedIssueNumbers: readonly number[];
 		hasMore: boolean;
+		loading?: boolean;
+		lastSynced?: Date | null;
 		disabled?: boolean;
 		onWizardOpen?: (issue: AssignedIssue) => void;
 		onQuickAddWithWorktree?: (issue: AssignedIssue) => void;
 		onLoadMore?: () => void;
+		onRefresh?: () => void;
 	}
 
 	function isBoolean(value: unknown): value is boolean {
@@ -34,147 +47,561 @@
 	let {
 		issues,
 		dashboardIssues,
-		deletedIssueNumbers,
 		hasMore,
+		loading = false,
+		lastSynced = null,
 		disabled = false,
 		onWizardOpen,
 		onQuickAddWithWorktree,
 		onLoadMore,
+		onRefresh,
 	}: Props = $props();
 
-	const collapsed = new Persisted<boolean>({
-		key: 'grovekeeper_assigned_panel_collapsed',
+	// ─── Persisted section collapse state ────────────────────────────────────
+	const unlinkedCollapsed = new Persisted<boolean>({
+		key: 'grovekeeper_assigned_unlinked_collapsed',
 		serde: jsonSerde(isBoolean),
 		defaultValue: false,
 	});
+	const linkedCollapsed = new Persisted<boolean>({
+		key: 'grovekeeper_assigned_linked_collapsed',
+		serde: jsonSerde(isBoolean),
+		defaultValue: true,
+	});
 
-	const categorized = $derived(
-		categorizeAssignedIssues(issues, dashboardIssues, deletedIssueNumbers),
+	// ─── Search, sort, selection state ────────────────────────────────────────
+	let searchQuery = $state('');
+	let sortColumn = $state<SortColumn>('number');
+	let sortDirection = $state<SortDirection>('desc');
+	let selectedNumbers = $state(new Set<number>());
+	let panelElement = $state<HTMLDivElement | null>(null);
+
+	// ─── Derived data ────────────────────────────────────────────────────────
+	const categorized = $derived(categorizeAssignedIssues(issues, dashboardIssues));
+
+	const filteredUnlinked = $derived(
+		sortAssignedIssues(
+			filterAssignedIssues(categorized.unlinked, searchQuery),
+			sortColumn,
+			sortDirection,
+		),
+	);
+	const filteredLinked = $derived(
+		sortAssignedIssues(
+			filterAssignedIssues(categorized.linked, searchQuery),
+			sortColumn,
+			sortDirection,
+		),
+	);
+	const allFiltered = $derived([...filteredUnlinked, ...filteredLinked]);
+
+	const selectedCount = $derived(selectedNumbers.size);
+	const selectedUnlinkedCount = $derived(
+		filteredUnlinked.filter((issue) => selectedNumbers.has(issue.number)).length,
 	);
 
-	async function handleClick(url: string) {
-		if (!disabled) {
-			await openUrl(url);
+	const globalCheckboxState = $derived.by(() => {
+		if (selectedCount === 0) {
+			return { checked: false, indeterminate: false };
 		}
+		const allSelected = allFiltered.every((issue) => selectedNumbers.has(issue.number));
+		if (allSelected) {
+			return { checked: true, indeterminate: false };
+		}
+		return { checked: false, indeterminate: true };
+	});
+
+	const syncAgoText = $derived.by(() => {
+		if (lastSynced === null) {
+			return 'never synced';
+		}
+		const seconds = Math.floor((Date.now() - lastSynced.getTime()) / 1000);
+		if (seconds < 60) {
+			return `synced ${seconds}s ago`;
+		}
+		const minutes = Math.floor(seconds / 60);
+		return `synced ${minutes}m ago`;
+	});
+
+	// ─── Handlers ────────────────────────────────────────────────────────────
+	function toggleSort(column: SortColumn) {
+		if (sortColumn === column) {
+			sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+		} else {
+			sortColumn = column;
+			sortDirection = 'asc';
+		}
+	}
+
+	function toggleGlobalCheckbox() {
+		if (globalCheckboxState.checked || globalCheckboxState.indeterminate) {
+			selectedNumbers = new Set();
+		} else {
+			selectedNumbers = new Set(allFiltered.map((issue) => issue.number));
+		}
+	}
+
+	function toggleRowSelection(issueNumber: number) {
+		const next = new Set(selectedNumbers);
+		if (next.has(issueNumber)) {
+			next.delete(issueNumber);
+		} else {
+			next.add(issueNumber);
+		}
+		selectedNumbers = next;
+	}
+
+	function selectAllUnlinked() {
+		const next = new Set(selectedNumbers);
+		for (const issue of filteredUnlinked) {
+			next.add(issue.number);
+		}
+		selectedNumbers = next;
+	}
+
+	function handleAddSelected() {
+		if (onWizardOpen === undefined) {
+			return;
+		}
+		for (const issue of filteredUnlinked) {
+			if (selectedNumbers.has(issue.number)) {
+				onWizardOpen(issue);
+			}
+		}
+		selectedNumbers = new Set();
+	}
+
+	function handleAddSelectedWithWorktree() {
+		if (onQuickAddWithWorktree === undefined) {
+			return;
+		}
+		for (const issue of filteredUnlinked) {
+			if (selectedNumbers.has(issue.number)) {
+				onQuickAddWithWorktree(issue);
+			}
+		}
+		selectedNumbers = new Set();
+	}
+
+	function handleRowClick(event: MouseEvent, issueNumber: number) {
+		const target = event.target as HTMLElement;
+		if (
+			target.closest('a') !== null ||
+			target.closest('button') !== null ||
+			target.closest('[data-slot="checkbox"]') !== null ||
+			target.closest('[data-no-select]') !== null
+		) {
+			return;
+		}
+		toggleRowSelection(issueNumber);
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (panelElement === null || !panelElement.contains(document.activeElement)) {
+			return;
+		}
+		if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+			event.preventDefault();
+			selectedNumbers = new Set(allFiltered.map((issue) => issue.number));
+		}
+		if (event.key === 'Enter' && selectedUnlinkedCount > 0) {
+			event.preventDefault();
+			handleAddSelected();
+		}
+	}
+
+	function handleLinkClick(event: MouseEvent, url: string) {
+		event.preventDefault();
+		if (!disabled) {
+			void openUrl(url);
+		}
+	}
+
+	function sortIcon(column: SortColumn): typeof ArrowUpDown {
+		if (sortColumn !== column) {
+			return ArrowUpDown;
+		}
+		return sortDirection === 'asc' ? ArrowUp : ArrowDown;
 	}
 </script>
 
-{#snippet issueRow(issue: AssignedIssue, variant: 'unlinked' | 'linked' | 'deleted')}
-	<div class="group flex items-center gap-0.5">
-		<Button
-			variant="ghost"
-			size="sm"
-			onclick={() => handleClick(issue.url)}
-			class={cn(
-				'flex min-w-0 flex-1 justify-start rounded px-2 py-1 text-left text-xs',
-				disabled && 'cursor-not-allowed opacity-50',
-				variant !== 'deleted' ? 'text-muted-foreground' : 'text-status-warning',
-			)}
-			{disabled}
-		>
-			{#if issue.state === 'OPEN'}
-				<CircleDot size={12} class="shrink-0 text-gh-open" />
-			{:else}
-				<CircleCheck size={12} class="shrink-0 text-gh-closed" />
-			{/if}
-			<span class="min-w-0 truncate">#{issue.number} {issue.title}</span>
-			{#if issue.labels.length > 0}
-				<span class="flex shrink-0 items-center gap-1">
-					{#each issue.labels as label (label.name)}
-						<Badge
-							size="compact"
-							class="rounded-full"
-							style="background-color: {label.color}20; color: {label.color}; border-color: {label.color}40;"
-						>
-							{label.name}
-						</Badge>
-					{/each}
-				</span>
-			{/if}
-		</Button>
-		{#if variant === 'unlinked' || variant === 'deleted'}
-			{#if onWizardOpen}
-				<SimpleTooltip text={m.assigned_wizard_open()}>
-					<Button
-						variant="ghost"
-						size="icon-sm"
-						onclick={() => onWizardOpen(issue)}
-						class="shrink-0 opacity-0 group-hover:opacity-100"
-					>
-						<Plus size={12} />
-					</Button>
-				</SimpleTooltip>
-			{/if}
-			{#if onQuickAddWithWorktree}
-				<SimpleTooltip text={m.assigned_quick_worktree()}>
-					<Button
-						variant="ghost"
-						size="icon-sm"
-						onclick={() => onQuickAddWithWorktree(issue)}
-						class="shrink-0 opacity-0 group-hover:opacity-100"
-					>
-						<GitBranch size={12} />
-					</Button>
-				</SimpleTooltip>
-			{/if}
-		{/if}
-	</div>
+{#snippet sortIndicator(column: SortColumn)}
+	{@const Icon = sortIcon(column)}
+	<Icon size={10} />
 {/snippet}
 
-{#if issues.length > 0}
-	<div class="flex flex-col gap-1">
-		<Button
-			variant="ghost"
-			size="sm"
-			onclick={() => (collapsed.current = !collapsed.current)}
-			class="flex items-center gap-1 px-0 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 hover:bg-transparent hover:text-muted-foreground"
-		>
-			{#if collapsed.current}
-				<ChevronRight size={12} />
+<svelte:window onkeydown={handleKeydown} />
+
+<div bind:this={panelElement} class="flex h-full flex-col gap-0 px-3 pt-2 pb-3" tabindex="-1">
+	<!-- Toolbar: Search + Refresh -->
+	<div class="flex items-center gap-2 pb-2">
+		<SearchField
+			bind:value={searchQuery}
+			placeholder="Search issues..."
+			class="h-7 flex-1 text-xs"
+		/>
+		<div class="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+			<span class="whitespace-nowrap">{syncAgoText}</span>
+			<SimpleTooltip text="Refresh assigned issues">
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					disabled={loading}
+					onclick={() => onRefresh?.()}
+				>
+					<RefreshCw size={13} class={loading ? 'animate-spin' : ''} />
+				</Button>
+			</SimpleTooltip>
+		</div>
+	</div>
+
+	<!-- Selection Bar -->
+	<div
+		class="flex min-h-[34px] items-center gap-2 rounded-[var(--radius-md)] border px-2 py-1 text-xs"
+		style="background: {selectedCount > 0
+			? 'color-mix(in oklch, var(--primary) 10%, var(--surface))'
+			: 'transparent'}; border-color: {selectedCount > 0
+			? 'color-mix(in oklch, var(--primary) 30%, var(--border))'
+			: 'var(--border)'};"
+	>
+		<Checkbox
+			checked={globalCheckboxState.checked}
+			indeterminate={globalCheckboxState.indeterminate}
+			onCheckedChange={toggleGlobalCheckbox}
+		/>
+		<span class="text-muted-foreground">
+			{#if selectedCount > 0}
+				{selectedCount} selected
 			{:else}
-				<ChevronDown size={12} />
+				No issues selected
 			{/if}
-			{m.assigned_title({ count: issues.length })}
-		</Button>
+		</span>
+		{#if selectedCount > 0 && selectedCount < filteredUnlinked.length}
+			<button
+				class="text-primary underline-offset-2 hover:underline"
+				onclick={selectAllUnlinked}
+			>
+				Select all {filteredUnlinked.length} unlinked
+			</button>
+		{/if}
+		<div class="flex-1"></div>
+		{#if selectedUnlinkedCount > 0}
+			<Button variant="primary" size="sm" class="h-6 text-xs" onclick={handleAddSelected}>
+				<Plus size={12} />
+				Add Selected
+			</Button>
+			<Button
+				variant="secondary"
+				size="sm"
+				class="h-6 text-xs"
+				onclick={handleAddSelectedWithWorktree}
+			>
+				<GitBranch size={12} />
+				Add + Worktree
+			</Button>
+		{/if}
+	</div>
 
-		{#if !collapsed.current}
-			<div class="flex flex-col gap-0.5">
-				{#each categorized.unlinked as issue (issue.number)}
-					{@render issueRow(issue, 'unlinked')}
+	<!-- Table -->
+	<div class="mt-1 flex-1 overflow-auto">
+		<!-- Table Header -->
+		<div
+			class="assigned-table-grid sticky top-0 z-10 border-b border-border bg-surface text-[11px] font-medium uppercase tracking-wider text-muted-foreground"
+		>
+			<div class="flex items-center justify-center py-1"></div>
+			<button
+				class="flex items-center gap-0.5 py-1 hover:text-foreground"
+				onclick={() => toggleSort('prd')}
+			>
+				PRD
+				{@render sortIndicator('prd')}
+			</button>
+			<button
+				class="flex items-center gap-0.5 py-1 hover:text-foreground"
+				onclick={() => toggleSort('number')}
+			>
+				Issue
+				{@render sortIndicator('number')}
+			</button>
+			<button
+				class="flex items-center gap-0.5 py-1 hover:text-foreground"
+				onclick={() => toggleSort('title')}
+			>
+				Title
+				{@render sortIndicator('title')}
+			</button>
+			<button
+				class="assigned-labels-col flex items-center gap-0.5 py-1 hover:text-foreground"
+				onclick={() => toggleSort('labels')}
+			>
+				Labels
+				{@render sortIndicator('labels')}
+			</button>
+			<div class="py-1 text-right">Actions</div>
+		</div>
+
+		<!-- Unlinked Section -->
+		<div class="mt-1">
+			<button
+				class="flex w-full items-center gap-1 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground"
+				onclick={() => (unlinkedCollapsed.current = !unlinkedCollapsed.current)}
+			>
+				{#if unlinkedCollapsed.current}
+					<ChevronRight size={12} />
+				{:else}
+					<ChevronDown size={12} />
+				{/if}
+				Unlinked ({filteredUnlinked.length})
+			</button>
+
+			{#if !unlinkedCollapsed.current}
+				{#each filteredUnlinked as issue (issue.number)}
+					<div
+						class={cn(
+							'assigned-table-grid cursor-pointer items-center border-b border-border/40 text-xs transition-colors hover:bg-accent/40',
+							selectedNumbers.has(issue.number) && 'bg-primary/5',
+						)}
+						style="height: 38px;"
+						onclick={(event) => handleRowClick(event, issue.number)}
+						role="row"
+						tabindex="0"
+						onkeydown={(event) => {
+							if (event.key === ' ') {
+								event.preventDefault();
+								toggleRowSelection(issue.number);
+							}
+						}}
+					>
+						<div class="flex items-center justify-center">
+							<Checkbox
+								checked={selectedNumbers.has(issue.number)}
+								onCheckedChange={() => toggleRowSelection(issue.number)}
+							/>
+						</div>
+						<div class="assigned-prd-col font-mono text-muted-foreground">
+							{#if issue.parent_issue_number !== null}
+								<a
+									href={issue.url.replace(
+										/\/issues\/\d+$/,
+										`/issues/${issue.parent_issue_number}`,
+									)}
+									data-no-select
+									class="hover:text-primary hover:underline"
+									onclick={(event) =>
+										handleLinkClick(
+											event,
+											issue.url.replace(
+												/\/issues\/\d+$/,
+												`/issues/${issue.parent_issue_number}`,
+											),
+										)}
+								>
+									#{issue.parent_issue_number}
+								</a>
+							{:else}
+								<span class="text-muted-foreground/40">—</span>
+							{/if}
+						</div>
+						<div class="font-mono">
+							<a
+								href={issue.url}
+								data-no-select
+								class="text-foreground hover:text-primary hover:underline"
+								onclick={(event) => handleLinkClick(event, issue.url)}
+							>
+								#{issue.number}
+							</a>
+						</div>
+						<div class="min-w-0 truncate" data-no-select>
+							{issue.title}
+						</div>
+						<div class="assigned-labels-col flex items-center gap-1 overflow-hidden">
+							{#each sortLabelsByPriority(issue.labels) as label (label.name)}
+								<Badge
+									size="compact"
+									class="shrink-0 rounded-full"
+									style="background-color: #{label.color}20; color: #{label.color}; border-color: #{label.color}40;"
+								>
+									{label.name}
+								</Badge>
+							{/each}
+						</div>
+						<div class="flex items-center justify-end gap-0.5">
+							{#if onWizardOpen}
+								<SimpleTooltip text="Add to dashboard">
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										onclick={(event) => {
+											event.stopPropagation();
+											onWizardOpen(issue);
+										}}
+									>
+										<Plus size={12} />
+									</Button>
+								</SimpleTooltip>
+							{/if}
+							{#if onQuickAddWithWorktree}
+								<SimpleTooltip text="Add with worktree">
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										onclick={(event) => {
+											event.stopPropagation();
+											onQuickAddWithWorktree(issue);
+										}}
+									>
+										<GitBranch size={12} />
+									</Button>
+								</SimpleTooltip>
+							{/if}
+						</div>
+					</div>
 				{/each}
+			{/if}
+		</div>
 
-				{#if categorized.deleted.length > 0}
-					{#each categorized.deleted as issue (issue.number)}
-						{@render issueRow(issue, 'deleted')}
+		<!-- Linked Section -->
+		{#if filteredLinked.length > 0}
+			<div class="mt-2">
+				<button
+					class="flex w-full items-center gap-1 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground"
+					onclick={() => (linkedCollapsed.current = !linkedCollapsed.current)}
+				>
+					{#if linkedCollapsed.current}
+						<ChevronRight size={12} />
+					{:else}
+						<ChevronDown size={12} />
+					{/if}
+					Linked ({filteredLinked.length})
+				</button>
+
+				{#if !linkedCollapsed.current}
+					{#each filteredLinked as issue (issue.number)}
+						<div
+							class="assigned-table-grid items-center border-b border-border/40 text-xs opacity-45"
+							style="height: 38px;"
+							role="row"
+						>
+							<div class="flex items-center justify-center">
+								<Checkbox
+									checked={selectedNumbers.has(issue.number)}
+									onCheckedChange={() => toggleRowSelection(issue.number)}
+								/>
+							</div>
+							<div class="assigned-prd-col font-mono text-muted-foreground">
+								{#if issue.parent_issue_number !== null}
+									<a
+										href={issue.url.replace(
+											/\/issues\/\d+$/,
+											`/issues/${issue.parent_issue_number}`,
+										)}
+										class="hover:text-primary hover:underline"
+										onclick={(event) =>
+											handleLinkClick(
+												event,
+												issue.url.replace(
+													/\/issues\/\d+$/,
+													`/issues/${issue.parent_issue_number}`,
+												),
+											)}
+									>
+										#{issue.parent_issue_number}
+									</a>
+								{:else}
+									<span class="text-muted-foreground/40">—</span>
+								{/if}
+							</div>
+							<div class="font-mono">
+								<a
+									href={issue.url}
+									class="text-foreground hover:text-primary hover:underline"
+									onclick={(event) => handleLinkClick(event, issue.url)}
+								>
+									#{issue.number}
+								</a>
+							</div>
+							<div class="min-w-0 truncate">
+								{issue.title}
+							</div>
+							<div
+								class="assigned-labels-col flex items-center gap-1 overflow-hidden"
+							>
+								{#each sortLabelsByPriority(issue.labels) as label (label.name)}
+									<Badge
+										size="compact"
+										class="shrink-0 rounded-full"
+										style="background-color: #{label.color}20; color: #{label.color}; border-color: #{label.color}40;"
+									>
+										{label.name}
+									</Badge>
+								{/each}
+							</div>
+							<div class="flex items-center justify-end">
+								<SimpleTooltip text="Already linked">
+									<span class="text-muted-foreground">
+										<Check size={14} />
+									</span>
+								</SimpleTooltip>
+							</div>
+						</div>
 					{/each}
 				{/if}
 			</div>
+		{/if}
 
-			{#if categorized.linked.length > 0}
-				<div class="border-t border-border pt-1">
-					<p
-						class="px-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/40"
-					>
-						{m.assigned_linked_heading()}
-					</p>
-					<div class="flex flex-col gap-0.5">
-						{#each categorized.linked as issue (issue.number)}
-							{@render issueRow(issue, 'linked')}
-						{/each}
-					</div>
-				</div>
-			{/if}
-
-			{#if hasMore && onLoadMore}
+		<!-- Load More -->
+		{#if hasMore && onLoadMore}
+			<div class="mt-2 text-center">
 				<Button
 					variant="ghost"
 					size="sm"
 					onclick={onLoadMore}
 					class="text-muted-foreground/60"
 				>
-					{m.assigned_load_more()}
+					Load more
 				</Button>
-			{/if}
+			</div>
+		{/if}
+
+		<!-- Empty State -->
+		{#if issues.length === 0 && !loading}
+			<div
+				class="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground"
+			>
+				<p class="text-sm">No assigned issues found</p>
+				<p class="text-xs text-muted-foreground/60">
+					Issues assigned to you on GitHub will appear here
+				</p>
+			</div>
 		{/if}
 	</div>
-{/if}
+</div>
+
+<style>
+	.assigned-table-grid {
+		display: grid;
+		grid-template-columns: 28px 56px 54px 1fr 200px 72px;
+		gap: 0;
+		padding-inline: 4px;
+		align-items: center;
+	}
+
+	@container (max-width: 600px) {
+		.assigned-labels-col {
+			display: none;
+		}
+		.assigned-table-grid {
+			grid-template-columns: 28px 56px 54px 1fr 72px;
+		}
+	}
+
+	@container (max-width: 400px) {
+		.assigned-prd-col {
+			display: none;
+		}
+		.assigned-table-grid {
+			grid-template-columns: 28px 54px 1fr 72px;
+		}
+	}
+</style>

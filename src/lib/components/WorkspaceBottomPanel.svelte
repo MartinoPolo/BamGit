@@ -22,6 +22,7 @@
 	import IssueDetail from './IssueDetail.svelte';
 	import GhSetupBanner from './GhSetupBanner.svelte';
 	import AssignedIssuesPanel from './AssignedIssuesPanel.svelte';
+	import { categorizeAssignedIssues } from './assigned_issues_utils.js';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -40,13 +41,15 @@
 		onconnect?: () => void;
 		assignedIssues?: AssignedIssue[];
 		assignedIssuesHasMore?: boolean;
-		deletedAssignedIssueNumbers?: readonly number[];
+		assignedIssuesLoading?: boolean;
+		assignedIssuesLastSynced?: Date | null;
 		getVisualization: (issueId: string) => TreeVisualization | undefined;
 		getChildren: (parentId: string) => Issue[];
 		getNotificationDotColor?: (issueId: string) => string | null;
 		onWizardOpen?: (issue: AssignedIssue) => void;
 		onQuickAddWithWorktree?: (issue: AssignedIssue) => void;
 		onLoadMoreAssignedIssues?: () => void;
+		onRefreshAssignedIssues?: () => void;
 		onPrune?: () => void;
 	}
 
@@ -66,7 +69,8 @@
 		onconnect,
 		assignedIssues = [],
 		assignedIssuesHasMore = false,
-		deletedAssignedIssueNumbers = [],
+		assignedIssuesLoading = false,
+		assignedIssuesLastSynced = null,
 		getVisualization,
 		getChildren,
 		getNotificationDotColor,
@@ -83,6 +87,7 @@
 		onWizardOpen,
 		onQuickAddWithWorktree,
 		onLoadMoreAssignedIssues,
+		onRefreshAssignedIssues,
 		onPrune,
 	}: Props = $props();
 
@@ -121,6 +126,12 @@
 		return computeStageCounts(visualizations);
 	});
 
+	const unlinkedCount = $derived(
+		categorizeAssignedIssues(assignedIssues, issues).unlinked.filter(
+			(issue) => issue.state !== 'CLOSED',
+		).length,
+	);
+
 	function handleTabClick(tab: BottomPanelTab) {
 		if (selection.activeTab === tab) {
 			selection.setActiveTab(null);
@@ -140,7 +151,8 @@
 	const shouldShowPrdOverview = $derived(
 		selection.showPrdOverview &&
 			defaultTab !== BOTTOM_PANEL_TABS.issues &&
-			defaultTab !== BOTTOM_PANEL_TABS.kanban,
+			defaultTab !== BOTTOM_PANEL_TABS.kanban &&
+			defaultTab !== BOTTOM_PANEL_TABS.assignedIssues,
 	);
 </script>
 
@@ -150,6 +162,13 @@
 			{#each tabValues as tab (tab)}
 				<Tabs.Tab active={defaultTab === tab} onclick={() => handleTabClick(tab)}>
 					{BOTTOM_PANEL_TAB_LABELS[tab]}
+					{#if tab === BOTTOM_PANEL_TABS.assignedIssues && unlinkedCount > 0}
+						<span
+							class="ml-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary px-1.5 py-0 font-mono text-[10px] leading-[16px] text-primary-foreground"
+						>
+							{unlinkedCount}
+						</span>
+					{/if}
 				</Tabs.Tab>
 			{/each}
 		</Tabs.Root>
@@ -192,19 +211,6 @@
 					{onChangeColor}
 					onBatchPrune={onPrune ? () => onPrune!() : undefined}
 				/>
-
-				{#if assignedIssues.length > 0}
-					<AssignedIssuesPanel
-						issues={assignedIssues}
-						dashboardIssues={issues}
-						deletedIssueNumbers={deletedAssignedIssueNumbers}
-						hasMore={assignedIssuesHasMore}
-						disabled={!ghAvailable}
-						{onWizardOpen}
-						{onQuickAddWithWorktree}
-						onLoadMore={onLoadMoreAssignedIssues}
-					/>
-				{/if}
 			</div>
 		{:else if defaultTab === BOTTOM_PANEL_TABS.kanban}
 			<div class="p-4">
@@ -243,6 +249,19 @@
 			<div class="p-4">
 				<p class="text-sm text-muted-foreground">Session view coming soon</p>
 			</div>
+		{:else if defaultTab === BOTTOM_PANEL_TABS.assignedIssues}
+			<AssignedIssuesPanel
+				issues={assignedIssues}
+				dashboardIssues={issues}
+				hasMore={assignedIssuesHasMore}
+				loading={assignedIssuesLoading}
+				lastSynced={assignedIssuesLastSynced}
+				disabled={!ghAvailable}
+				{onWizardOpen}
+				{onQuickAddWithWorktree}
+				onLoadMore={onLoadMoreAssignedIssues}
+				onRefresh={onRefreshAssignedIssues}
+			/>
 		{/if}
 	</div>
 </div>

@@ -88,6 +88,9 @@ pub struct AssignedIssue {
     pub url: String,
     #[serde(default)]
     pub labels: Vec<AssignedIssueLabel>,
+    #[serde(default)]
+    #[ts(type = "number | null")]
+    pub parent_issue_number: Option<i64>,
 }
 
 /// Paginated result from fetch_assigned_issues.
