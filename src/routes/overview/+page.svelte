@@ -1,12 +1,13 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { openPath } from '$lib/opener.js';
+	import { invoke } from '$lib/tauri.js';
 	import { useBoard } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import WorkspaceCard from '$lib/components/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/AddWorkspaceCard.svelte';
-	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
+	import GitHubStatusCard from '$lib/components/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
@@ -72,9 +73,14 @@
 		</div>
 	</div>
 
-	<GhSetupBanner
+	<GitHubStatusCard
 		authStatus={versionControl.authStatus}
+		ghAvailability={versionControl.ghAvailability}
 		onconnect={() => (authWizardOpen = true)}
+		ondisconnect={async () => {
+			await invoke('github_logout');
+			await versionControl.checkAvailability();
+		}}
 	/>
 
 	{#if loading}
@@ -105,6 +111,6 @@
 {#if authWizardOpen}
 	<GitHubAuthWizard
 		bind:open={authWizardOpen}
-		onconnected={() => void versionControl.checkAuthStatus()}
+		onconnected={() => void versionControl.checkAvailability()}
 	/>
 {/if}

@@ -120,7 +120,10 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 			fetched_at: null,
 		},
 	check_gh_availability: () => 'available',
-	github_auth_status: () => ({ status: 'not-connected' }),
+	github_auth_status: () => ({
+		status: 'oauth-connected',
+		user: { login: 'MockUser', avatar_url: 'https://avatars.githubusercontent.com/u/0?v=4' },
+	}),
 	github_logout: () => null,
 	fetch_assigned_issues: () => MOCK_ASSIGNED_ISSUES_RESULT,
 	get_deleted_assigned_issue_numbers: () => [],

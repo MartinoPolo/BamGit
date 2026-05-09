@@ -203,12 +203,7 @@ pub fn get_all_github_status_caches(
 }
 
 #[tauri::command]
-pub async fn check_gh_availability(
-    github_client: State<'_, GitHubClient>,
-) -> Result<GhCliAvailability, String> {
-    if github_client.is_oauth().await {
-        return Ok(GhCliAvailability::Available);
-    }
+pub async fn check_gh_availability() -> Result<GhCliAvailability, String> {
     match run_gh_command(&["auth", "status"]).await {
         Ok(_) => Ok(GhCliAvailability::Available),
         Err(error) => {
