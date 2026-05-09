@@ -5,97 +5,85 @@ argument-hint: '[component-name]'
 allowed-tools: Read, Write, Glob, Grep, Agent
 metadata:
     author: MartinoPolo
-    version: '0.2'
+    version: '0.3'
     category: design
 ---
 
 # Design Brief Creation
 
-Guide the creation of a design brief for a Grovekeeper UI component. Specify which existing components to reuse while leaving room for design creativity in layout and interaction patterns.
+Guide the creation of a design brief for a Grovekeeper UI component.
 
 ## Available UI Components
 
 !`ls src/lib/components/ui/ 2>/dev/null | sort`
 
-## Existing Briefs
+## Existing Designs
 
-!`ls claude_design/design_briefs/ 2>/dev/null`
+!`ls designs/ 2>/dev/null`
 
 ## Process
 
 ### Step 1: Read Design System & Existing Briefs
 
-Read `claude_design/DESIGN_SYSTEM.md` for design system reference.
-Read 1-2 existing briefs from `claude_design/design_briefs/` to match the established format and quality bar.
+Read `designs/DESIGN_SYSTEM.md` for design system reference.
+Read 1-2 existing briefs from `designs/<any-component>/DESIGN_BRIEF_*.md` to match the established format.
 
 ### Step 2: Determine Container Context
 
 Before writing the brief, determine whether this component lives inside an existing container:
 
-- **Bottom panel tab content**: Component fills a tab content area in the bottom panel. The tab bar, panel chrome, and resizer belong to the parent (`WorkspaceBottomPanel`). The component must NOT include its own header, tab bar, outer border, or footer — it only fills the content area below the tab bar.
-- **Session view tab content**: Component fills a tab in the session view header. The session chrome (top bar, tab bar, sidebar) belongs to the parent. The component fills only the content area.
-- **Modal / Dialog**: Component is a standalone modal. It owns its own chrome.
-- **Standalone page**: Component owns the full viewport area.
-- **Card / Inline**: Component is embedded inline in a list or grid. It owns its own boundary.
+- **Bottom panel tab content**: Component fills a tab content area. Tab bar/chrome belong to parent — component must NOT include its own header, tab bar, outer border, or footer.
+- **Session view tab content**: Session chrome (top bar, tab bar, sidebar) belongs to parent; component fills only the content area.
+- **Modal / Dialog**: Component owns its own chrome.
+- **Standalone page**: Component owns the full viewport.
+- **Card / Inline**: Embedded in a list or grid; owns its own boundary.
 
-To identify the container, check:
-
-1. Where is this component mounted in the existing codebase? (`grep -r "ComponentName" src/`)
+To identify the container:
+1. Where is this component mounted? (`grep -r "ComponentName" src/`)
 2. Which layout component wraps it?
-3. What chrome (headers, tabs, borders, footers) does the parent already provide?
+3. What chrome does the parent already provide?
 
-**Read the parent component** if one exists to understand exactly what the parent provides (tab bar style, border treatment, padding).
+Read the parent component if one exists to understand what it provides (tab bar style, border treatment, padding).
 
 ### Step 3: Inventory Available Components
 
-Scan Storybook stories for a full component inventory:
+Scan Storybook stories: `ls src/lib/components/**/*.stories.svelte`
 
-```
-ls src/lib/components/**/*.stories.svelte
-```
-
-For each component relevant to the feature, read the story to understand available variants and props.
+For each component relevant to the feature, read the story for available variants and props.
 
 ### Step 4: Research Missing Primitives
 
 If the feature needs UI patterns not in the inventory:
-
 - Spawn `mp-context7-docs-fetcher` to check shadcn-svelte (`/huntabyte/shadcn-svelte`) and Bits UI (`/huntabyte/bits-ui`)
-- Note which components could be adopted
-- Include as "Components to Adopt" recommendations in the brief
+- Include as "Components to Adopt" in the brief
 
 ### Step 5: Draft the Brief
 
-Save to `claude_design/design_briefs/COMPONENT_NAME.md`. Follow this structure:
+**Folder**: `designs/<component-name>/` (kebab-case)
+**File**: `designs/<component-name>/DESIGN_BRIEF_<COMPONENT_NAME>.md` (screaming snake case)
 
 ```markdown
-# Component Name — Design Spec
+# Component Name — Design Brief
 
-[Purpose. What it does, why it matters. "Hand this to a designer for visual exploration."]
+[Purpose. What it does, why it matters.]
 
 ## Design Tokens
 
-Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
+Use the Grovekeeper Forest Moss palette from `designs/tokens.css`. Font: Geist / Geist Mono.
 
 ## Container Context
 
-[CRITICAL — determines what the mockup must and must not include]
+**Parent**: [parent component name, or "Standalone"]
+**What parent provides**: [tab bar, panel border, resizer, etc.]
+**What this component fills**: [e.g., "content area below the active tab, full width × remaining height"]
+**Must NOT include**: [e.g., "tab bar, panel header, outer border — these belong to the parent"]
 
-**Parent**: [parent component name, e.g., "WorkspaceBottomPanel tab content area"]
-**What parent provides**: [list: tab bar, panel border, resizer handle, etc.]
-**What this component fills**: [e.g., "the content area below the active tab, full width × remaining height"]
-**Must NOT include**: [e.g., "tab bar, panel header, outer border, footer — these belong to the parent"]
+**Mockup rendering**: Show the parent container at reduced opacity as read-only context. The
+designed component fills only its designated area. Standalone components own their full chrome.
 
-**Mockup rendering**: Show the parent container (tab bar with correct tab active, panel border) as
-read-only context at reduced opacity. The designed component fills its designated area within that
-context. This lets the viewer see where the component lives without confusing parent chrome with
-component design.
+## Purpose
 
-[If standalone/modal: "This component is standalone — it owns its full chrome."]
-
-## [Feature Area] Purpose
-
-[What this section does and why]
+[What this component does and why it matters]
 
 ## Required Elements
 
@@ -103,38 +91,36 @@ component design.
 
 - [Detailed requirements as bullet points]
 
+## States
+
+List every state that must be designed:
+
+- Default / loading / empty
+- Hover / focus / active / disabled
+- Error / warning / success
+- [component-specific states]
+
 ## Reusable Components
 
-[Specify which existing components to use, with variants/props]
+Specify which existing components to use:
 
 - Button: `.gk-btn-sm` for inline actions, `.gk-btn-primary` for CTAs
 - Badge: `.gk-badge-success/warning/danger` for status indicators
-- Card: `.gk-card` for content containers
-- Input: `.gk-input` (32px) for text fields
-- [component]: [specific usage guidance]
+- [component]: [specific usage + props/variants]
 
 ## Components to Adopt
 
-[shadcn/Bits UI components to install if needed]
+shadcn-svelte or Bits UI components to install if needed:
 
-- Consider: [component] from shadcn-svelte for [purpose]
+- [component] from shadcn-svelte — [purpose]
 
 ## Layout Constraints
 
 [Sizing, spacing, responsive behavior]
-[Reference: .gk-btn-sm (26px), .gk-badge (20px), .gk-input (32px)]
-
-## States to Explore in Variants
-
-[States to show in initial variants]
-
-[States to design after variant selection:]
-
-- [Full state enumeration for later]
 
 ## Visual References
 
-[Existing components to match, external inspiration]
+[Existing components to feel consistent with; external inspiration]
 
 ## UI Freedom
 
@@ -142,20 +128,16 @@ component design.
 
 ## Not Included
 
-[Explicit scope boundaries]
+[Explicit scope exclusions]
 ```
 
 ### Key Principles
 
-- **Specify components, not appearance**: Say "use `.gk-badge-success`" not "green pill shape"
-- **Leave structural choices open**: Specify WHAT elements exist, let variants explore HOW to arrange them
-- **Enumerate all states**: Every interactive element needs states listed (even if designed later)
-- **Reference existing patterns**: Point to other components that should feel consistent
-- **Three variants must be structurally distinct**: Different layouts, not just color/spacing variations
-- **Container context is mandatory**: Every brief must specify its parent container. Mockups that duplicate parent chrome (adding tab bars, borders, footers that belong to the parent) create misleading designs that won't translate to implementation.
+- **Specify components, not appearance**: Say "use `.gk-badge-success`" not "green pill"
+- **Leave structural choices open**: Specify WHAT exists, let variants explore HOW to arrange it
+- **Enumerate all states**: Every interactive element needs states listed
+- **Container context is mandatory**: Always specify parent container to prevent chrome duplication
 
 ### Step 6: Save & Proceed
 
-Save the brief. The brief is a working document — any issues will surface during mockup review and can be corrected then.
-
-After saving, automatically invoke `/gk-mockup` to generate visual variant(s) from this brief.
+Save the brief. After saving, automatically invoke `/gk-mockup` to generate visual variant(s).
