@@ -8,7 +8,7 @@
 		"**/*.stories.svelte",
 		"src/lib/reactivity/*.svelte.ts"
 	],
-	"ignorePatterns": ["src/lib/types/generated/**", "claude_design/**"],
+	"ignorePatterns": ["src/lib/types/generated/**", "claude_design/**", "designs/**"],
 	"ignoreDependencies": [
 		"@typescript-eslint/parser",
 		"vitest-browser-svelte",

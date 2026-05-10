@@ -1,8 +1,8 @@
 {
 	"schema_version": 1,
 	"fallow_version": "2.48.4",
-	"timestamp": "2026-05-05T00:00:00Z",
-	"git_sha": "94fca2b",
+	"timestamp": "2026-05-09T00:00:00Z",
+	"git_sha": "e90cb0a",
 	"check": {
 		"total_issues": 2,
 		"unused_files": 0,
