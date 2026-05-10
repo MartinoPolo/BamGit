@@ -1,1364 +1,1704 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RefreshIndicator — Variant C: Split Indicator</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ─── Grovekeeper design tokens — Forest Moss palette ─────────────────── */
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>RefreshIndicator — Variant C: Split Indicator</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* Light theme */
+			.theme-light,
+			[data-theme='light'] {
+				color-scheme: light;
+				--background: oklch(0.985 0.005 130);
+				--surface: oklch(1 0 0);
+				--surface-2: oklch(0.965 0.008 130);
+				--surface-hover: oklch(0.94 0.012 130);
+				--surface-3: oklch(0.94 0.012 130);
+				--foreground: oklch(0.205 0.015 145);
+				--foreground-muted: oklch(0.46 0.015 145);
+				--foreground-subtle: oklch(0.62 0.012 145);
+				--border: oklch(0.9 0.012 135);
+				--border-strong: oklch(0.815 0.018 135);
+				--primary: var(--moss-700);
+				--primary-fg: oklch(0.985 0.008 130);
+				--primary-soft: oklch(0.92 0.03 135);
+				--accent: var(--moss-500);
+				--accent-fg: oklch(0.985 0.008 130);
+				--ring: var(--moss-600);
+				--sidebar-bg: oklch(0.955 0.01 135);
+				--sidebar-fg: oklch(0.3 0.02 145);
+				--code-bg: oklch(0.955 0.01 135);
+				--sky-top: var(--sky-light-top);
+				--sky-bot: var(--sky-light-bot);
+				--ground-color: oklch(0.55 0.09 135);
+				--ground-dark: oklch(0.38 0.06 55);
+			}
 
-:root {
-  /* Brand greens (deep moss + olive) */
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
+			/* Dark theme — the primary mode for a Tauri dev tool */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-  /* Olive / amber accent (autumn fruit) */
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
 
-  /* Bark (warm brown for trunks, secondary accents) */
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-  /* Azure (cool blue accent scale) */
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-  /* Plum (purple accent) */
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
+			/* Grovekeeper component primitives */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, white 12%);
+			}
+			.theme-dark .gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
 
-  /* Teal (blue-green accent) */
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
+			/* Inputs */
+			.gk-input,
+			.gk-select,
+			.gk-textarea {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
 
-  /* Rose (warm pink-red accent) */
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-  /* Coral (warm orange-red accent) */
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
 
-  /* Gold (warm yellow accent) */
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-  /* Sage (muted green accent) */
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
+			/* Type scale */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-  /* Indigo (deep blue-violet accent) */
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
+			/* Animations */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
 
-  /* Fuchsia (vivid magenta accent) */
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-  /* Sky (gradient bg for forest view) */
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-  /* Status accents */
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
+			/* State-showcase locking */
+			.cs-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				padding: 14px 14px 12px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				min-height: 88px;
+				position: relative;
+			}
+			.cs-cell .cs-cell-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+			.cs-cell .cs-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: flex-start;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.cs-cell-grid {
+				display: grid;
+				gap: 10px;
+				margin-bottom: 18px;
+			}
+			.cs-cell-grid.cols-5 {
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+			}
 
-  /* Priority levels */
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
+			/* ─── Page Chrome ───────────────────────────────────────────────────────── */
+			body {
+				margin: 0;
+				padding: 0;
+			}
 
-  /* GitHub state colors */
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
+			.page-wrapper {
+				min-height: 100vh;
+				padding: 40px 48px;
+				display: flex;
+				flex-direction: column;
+				gap: 48px;
+			}
 
-  /* Session state colors */
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
+			/* ─── Section titles ──────────────────────────────────────────────────── */
+			.section-header {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				margin-bottom: 20px;
+			}
+			.section-title {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-muted);
+				font-family: var(--font-sans);
+				letter-spacing: var(--tracking-snug);
+			}
 
-  /* ── Typography ─────────────────────────────────────────── */
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-
-  /* Font sizes */
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-
-  /* Line heights */
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-
-  /* Font weights */
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-
-  /* Letter spacing */
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-
-  /* ── Spacing scale (4px base) ───────────────────────────── */
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-
-  /* ── Radii ──────────────────────────────────────────────── */
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  /* ── Borders ────────────────────────────────────────────── */
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-
-  /* ── Shadows ────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  /* ── Sizing — control heights ──────────────────────────── */
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  /* ── Z-index scale ─────────────────────────────────────── */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-
-  /* ── Motion ─────────────────────────────────────────────── */
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-
-  /* ── Layout ─────────────────────────────────────────────── */
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
-
-/* Light theme */
-.theme-light, [data-theme='light'] {
-  color-scheme: light;
-  --background:        oklch(0.985 0.005 130);
-  --surface:           oklch(1.000 0 0);
-  --surface-2:         oklch(0.965 0.008 130);
-  --surface-hover:     oklch(0.940 0.012 130);
-  --surface-3:         oklch(0.940 0.012 130);
-  --foreground:        oklch(0.205 0.015 145);
-  --foreground-muted:  oklch(0.460 0.015 145);
-  --foreground-subtle: oklch(0.620 0.012 145);
-  --border:            oklch(0.900 0.012 135);
-  --border-strong:     oklch(0.815 0.018 135);
-  --primary:           var(--moss-700);
-  --primary-fg:        oklch(0.985 0.008 130);
-  --primary-soft:      oklch(0.920 0.030 135);
-  --accent:            var(--moss-500);
-  --accent-fg:         oklch(0.985 0.008 130);
-  --ring:              var(--moss-600);
-  --sidebar-bg:        oklch(0.955 0.010 135);
-  --sidebar-fg:        oklch(0.300 0.020 145);
-  --code-bg:           oklch(0.955 0.010 135);
-  --sky-top:           var(--sky-light-top);
-  --sky-bot:           var(--sky-light-bot);
-  --ground-color:      oklch(0.550 0.090 135);
-  --ground-dark:       oklch(0.380 0.060 55);
-}
-
-/* Dark theme — the primary mode for a Tauri dev tool */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
-
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.gk-root, .gk-root * {
-  box-sizing: border-box;
-}
-
-.font-mono { font-family: var(--font-mono); }
-
-/* Grovekeeper component primitives */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap;
-  user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.gk-btn-primary {
-  background: var(--primary);
-  color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, white 12%); }
-.theme-dark .gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost {
-  background: transparent;
-  color: var(--foreground-muted);
-}
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-danger {
-  background: transparent;
-  color: var(--status-danger);
-  border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
-}
-.gk-btn-danger:hover { background: color-mix(in oklch, var(--status-danger) 12%, transparent); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-
-/* Inputs */
-.gk-input,
-.gk-select,
-.gk-textarea {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--foreground);
-  width: 100%;
-  outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-
-/* Card */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-.gk-card-padded { padding: 16px; }
-
-/* Badges */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-
-/* Divider */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
-
-/* Type scale */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-
-/* Animations */
-@keyframes gk-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-.gk-pulse { animation: gk-pulse 1.8s ease-in-out infinite; }
-
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
-
-/* State-showcase locking */
-.cs-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px 14px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  min-height: 88px;
-  position: relative;
-}
-.cs-cell .cs-cell-label {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
-}
-.cs-cell .cs-cell-stage {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.cs-cell-grid {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.cs-cell-grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-
-/* ─── Page Chrome ───────────────────────────────────────────────────────── */
-body { margin: 0; padding: 0; }
-
-.page-wrapper {
-  min-height: 100vh;
-  padding: 40px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
-
-/* ─── Section titles ──────────────────────────────────────────────────── */
-.section-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 20px;
-}
-.section-title {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-muted);
-  font-family: var(--font-sans);
-  letter-spacing: var(--tracking-snug);
-}
-
-/* ─── RefreshIndicator component ────────────────────────────────────────
+			/* ─── RefreshIndicator component ────────────────────────────────────────
    Two-part pill: [text-left | divider | icon-right]
    Unified border + background. Entire unit is a single <button>.
    ──────────────────────────────────────────────────────────────────── */
 
-.ri-pill {
-  /* Resets */
-  appearance: none;
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  /* Layout */
-  display: inline-flex;
-  align-items: stretch;
-  height: var(--size-control-sm); /* 26px */
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  overflow: hidden;
-  /* Transitions */
-  transition:
-    border-color var(--duration-2) var(--ease-standard),
-    background var(--duration-2) var(--ease-standard),
-    box-shadow var(--duration-2) var(--ease-standard);
-  /* Text */
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  outline: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Whole-unit hover */
-.ri-pill:hover:not(.ri-is-loading):not(.ri-is-disabled) {
-  border-color: var(--border-strong);
-  background: var(--surface-3);
-}
-
-/* Focus ring */
-.ri-pill:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-/* Active / pressed */
-.ri-pill:active:not(.ri-is-loading):not(.ri-is-disabled) {
-  transform: scale(0.97);
-  filter: brightness(0.96);
-}
-
-/* Disabled state */
-.ri-pill.ri-is-disabled {
-  opacity: 0.42;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Loading state — non-interactive */
-.ri-pill.ri-is-loading {
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Left text section */
-.ri-text {
-  display: flex;
-  align-items: center;
-  padding: 0 8px 0 9px;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs); /* 11px */
-  font-weight: var(--weight-medium);
-  line-height: 1;
-  color: var(--foreground-muted);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  transition: color var(--duration-2) var(--ease-standard);
-}
-
-/* Separator between text and icon */
-.ri-sep {
-  width: 1px;
-  background: var(--border);
-  flex-shrink: 0;
-  align-self: stretch;
-  transition: background var(--duration-2) var(--ease-standard);
-}
-
-/* Right icon button section */
-.ri-icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  flex-shrink: 0;
-  color: var(--foreground-subtle);
-  transition: color var(--duration-2) var(--ease-standard);
-  position: relative;
-}
-
-.ri-icon-btn svg {
-  width: 13px;
-  height: 13px;
-  stroke-width: 1.85;
-  flex-shrink: 0;
-}
-
-/* "New data" dot on the icon */
-.ri-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 1.5px solid var(--surface-2);
-  flex-shrink: 0;
-}
-
-/* ── State variants ─────────────────────────────────────────────────── */
-
-/* Idle — default secondary look */
-.ri-pill.ri-state-idle .ri-text {
-  color: var(--foreground-muted);
-}
-.ri-pill.ri-state-idle .ri-icon-btn {
-  color: var(--foreground-subtle);
-}
-
-/* Loading */
-.ri-pill.ri-state-loading .ri-text {
-  color: var(--foreground-subtle);
-}
-.ri-pill.ri-state-loading .ri-icon-btn {
-  color: var(--foreground-subtle);
-}
-.ri-pill.ri-state-loading .ri-spinner {
-  animation: gk-spin 0.7s linear infinite;
-  transform-origin: center;
-}
-
-/* Fresh — brief green confirmation */
-.ri-pill.ri-state-fresh {
-  border-color: color-mix(in oklch, var(--status-success) 35%, var(--border));
-  background: color-mix(in oklch, var(--status-success) 7%, var(--surface-2));
-}
-.ri-pill.ri-state-fresh .ri-text {
-  color: var(--status-success);
-}
-.ri-pill.ri-state-fresh .ri-icon-btn {
-  color: color-mix(in oklch, var(--status-success) 70%, var(--foreground-subtle));
-}
-.ri-pill.ri-state-fresh .ri-sep {
-  background: color-mix(in oklch, var(--status-success) 30%, var(--border));
-}
-
-/* Stale — faded, very muted appearance */
-.ri-pill.ri-state-stale {
-  opacity: 0.72;
-}
-.ri-pill.ri-state-stale .ri-text {
-  color: var(--foreground-subtle);
-}
-.ri-pill.ri-state-stale .ri-icon-btn {
-  color: var(--foreground-subtle);
-  opacity: 0.7;
-}
-
-/* New data — primary highlight, acts as CTA */
-.ri-pill.ri-state-new-data {
-  border-color: color-mix(in oklch, var(--primary) 50%, var(--border));
-  background: color-mix(in oklch, var(--primary) 10%, var(--surface-2));
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 18%, transparent);
-}
-.ri-pill.ri-state-new-data .ri-text {
-  color: var(--primary);
-  font-weight: var(--weight-semibold);
-}
-.ri-pill.ri-state-new-data .ri-icon-btn {
-  color: var(--primary);
-}
-.ri-pill.ri-state-new-data .ri-sep {
-  background: color-mix(in oklch, var(--primary) 35%, var(--border));
-}
-
-/* Hover simulation for "idle" demo card */
-.ri-demo-hover .ri-pill.ri-state-idle {
-  border-color: var(--border-strong);
-  background: var(--surface-3);
-}
-
-/* Active / pressed simulation */
-.ri-demo-active .ri-pill {
-  transform: scale(0.97);
-  filter: brightness(0.94);
-}
-
-/* Focus simulation */
-.ri-demo-focus .ri-pill {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-/* Disabled visual (static, no pointer-events removed here) */
-.ri-demo-disabled .ri-pill {
-  opacity: 0.42;
-  cursor: not-allowed;
-}
-
-/* ─── Page header context demo ──────────────────────────────────────── */
-.demo-page-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 48px;
-  padding: 0 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.demo-page-title {
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-tight);
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.demo-page-breadcrumb {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-
-.demo-header-sep {
-  width: 1px;
-  height: 18px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-.demo-header-spacer {
-  flex: 1;
-}
-
-.demo-header-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-/* Small ghost icon buttons for the header chrome */
-.demo-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  transition: background var(--duration-2), color var(--duration-2), border-color var(--duration-2);
-}
-.demo-icon-btn:hover {
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border-color: var(--border);
-}
-.demo-icon-btn svg {
-  width: 13px;
-  height: 13px;
-  stroke-width: 1.75;
-}
-
-/* Badge in header */
-.demo-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 18px;
-  padding: 0 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: var(--weight-medium);
-  border-radius: var(--radius-full);
-  background: color-mix(in oklch, var(--status-success) 12%, transparent);
-  color: var(--status-success);
-  border: 1px solid color-mix(in oklch, var(--status-success) 28%, transparent);
-}
-.demo-badge-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-/* ─── State showcase grid ───────────────────────────────────────────── */
-.state-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-}
-
-@media (max-width: 900px) {
-  .state-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .state-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .page-wrapper {
-    padding: 24px 20px;
-  }
-}
-
-/* State cell */
-.state-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px 12px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  min-height: 84px;
-}
-.state-cell-label {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
-}
-.state-cell-stage {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-/* Button interaction states row (4 states for idle variant) */
-.interaction-states-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-@media (max-width: 560px) {
-  .interaction-states-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* ─── Annotation sub-labels ─────────────────────────────────────────── */
-.anno {
-  font-size: 9.5px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.03em;
-  opacity: 0.7;
-}
-
-  </style>
-</head>
-<body>
-
-<div class="gk-root theme-dark">
-  <div class="page-wrapper">
-
-    <!-- ── Variant label ────────────────────────────────────────── -->
-    <div>
-      <div class="gk-eyebrow" style="margin-bottom: 4px;">RefreshIndicator</div>
-      <div style="font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground);">Variant C — Split Indicator</div>
-      <div class="gk-small" style="margin-top: 6px; max-width: 560px;">Two-part pill combining a mono timestamp label on the left with an icon trigger on the right. A hairline separator divides the two sections. The entire unit is a single <code style="font-family: var(--font-mono); font-size: 11px; color: var(--foreground-muted);">&lt;button&gt;</code> for full keyboard and pointer accessibility.</div>
-    </div>
-
-    <!-- ── 1. All 5 content states ───────────────────────────────── -->
-    <div>
-      <div class="section-header">
-        <div class="gk-eyebrow">States</div>
-        <div class="section-title">All 5 content states</div>
-      </div>
-
-      <div class="state-grid">
-
-        <!-- IDLE -->
-        <div class="state-cell">
-          <div class="state-cell-label">idle</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-idle" type="button" aria-label="Refresh data">
-              <span class="ri-text">Refresh</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <!-- RefreshCw icon -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-          <div class="anno">muted text · subtle icon</div>
-        </div>
-
-        <!-- LOADING -->
-        <div class="state-cell">
-          <div class="state-cell-label">loading</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-loading ri-is-loading" type="button" aria-label="Refreshing data" aria-busy="true" disabled>
-              <span class="ri-text">Refreshing…</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg class="ri-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-          <div class="anno">spinning icon · non-interactive</div>
-        </div>
-
-        <!-- FRESH -->
-        <div class="state-cell">
-          <div class="state-cell-label">fresh</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-fresh" type="button" aria-label="Data is current. Refresh again">
-              <span class="ri-text">Just now</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-          <div class="anno">green tint · confirmation flash</div>
-        </div>
-
-        <!-- STALE -->
-        <div class="state-cell">
-          <div class="state-cell-label">stale</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-stale" type="button" aria-label="Data is 5 minutes old. Click to refresh">
-              <span class="ri-text">5m ago</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-          <div class="anno">very muted · faded unit</div>
-        </div>
-
-        <!-- NEW DATA -->
-        <div class="state-cell">
-          <div class="state-cell-label">new data</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-new-data" type="button" aria-label="New data available. Click to refresh">
-              <span class="ri-text">New data</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true" style="position: relative;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-                <span class="ri-dot" aria-hidden="true"></span>
-              </span>
-            </button>
-          </div>
-          <div class="anno">primary moss color · dot badge · CTA</div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── 2. Idle button — all 4 interaction states ─────────────── -->
-    <div>
-      <div class="section-header">
-        <div class="gk-eyebrow">Interaction States</div>
-        <div class="section-title">Idle state — all 4 button states</div>
-      </div>
-
-      <div class="interaction-states-row">
-
-        <!-- Default -->
-        <div class="state-cell">
-          <div class="state-cell-label">default</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-idle" type="button" aria-label="Refresh data">
-              <span class="ri-text">Refresh</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Hover -->
-        <div class="state-cell ri-demo-hover">
-          <div class="state-cell-label">hover</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-idle" type="button" style="border-color: var(--border-strong); background: var(--surface-3);" aria-label="Refresh data">
-              <span class="ri-text" style="color: var(--foreground-muted);">Refresh</span>
-              <span class="ri-sep" aria-hidden="true" style="background: var(--border-strong);"></span>
-              <span class="ri-icon-btn" aria-hidden="true" style="color: var(--foreground-subtle);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Active / Pressed -->
-        <div class="state-cell ri-demo-active">
-          <div class="state-cell-label">active / pressed</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-idle" type="button" style="transform: scale(0.97); filter: brightness(0.94); border-color: var(--border-strong); background: var(--surface-3);" aria-label="Refresh data">
-              <span class="ri-text">Refresh</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Disabled -->
-        <div class="state-cell ri-demo-disabled">
-          <div class="state-cell-label">disabled</div>
-          <div class="state-cell-stage">
-            <button class="ri-pill ri-state-idle ri-is-disabled" type="button" disabled aria-label="Refresh unavailable">
-              <span class="ri-text">Refresh</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── 3. Focus ring state ─────────────────────────────────────── -->
-    <div>
-      <div class="section-header">
-        <div class="gk-eyebrow">Accessibility</div>
-        <div class="section-title">Focus ring — keyboard navigation</div>
-      </div>
-
-      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
-        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
-          <div class="anno" style="opacity: 1;">idle · focused</div>
-          <button class="ri-pill ri-state-idle" type="button"
-            style="outline: 2px solid var(--ring); outline-offset: 2px;"
-            aria-label="Refresh data">
-            <span class="ri-text">Refresh</span>
-            <span class="ri-sep" aria-hidden="true"></span>
-            <span class="ri-icon-btn" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-            </span>
-          </button>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
-          <div class="anno" style="opacity: 1;">new data · focused</div>
-          <button class="ri-pill ri-state-new-data" type="button"
-            style="outline: 2px solid var(--ring); outline-offset: 2px;"
-            aria-label="New data available. Click to refresh">
-            <span class="ri-text">New data</span>
-            <span class="ri-sep" aria-hidden="true"></span>
-            <span class="ri-icon-btn" aria-hidden="true" style="position: relative;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-              <span class="ri-dot" aria-hidden="true"></span>
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── 4. In-context: page header placement ───────────────────── -->
-    <div>
-      <div class="section-header">
-        <div class="gk-eyebrow">In Context</div>
-        <div class="section-title">Placement in a page header — three state examples</div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-
-        <!-- Header with IDLE state -->
-        <div>
-          <div class="anno" style="opacity: 1; margin-bottom: 6px;">header · idle</div>
-          <header class="demo-page-header">
-            <span class="demo-page-breadcrumb">workspace /</span>
-            <h1 class="demo-page-title">Active Sessions</h1>
-            <span class="demo-header-sep" aria-hidden="true"></span>
-            <span class="demo-badge">
-              <span class="demo-badge-dot"></span>
-              3 running
-            </span>
-            <span class="demo-header-spacer"></span>
-            <!-- RefreshIndicator: idle -->
-            <button class="ri-pill ri-state-idle" type="button" aria-label="Refresh sessions">
-              <span class="ri-text">Refresh</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-            <!-- Other header controls -->
-            <button class="demo-icon-btn" type="button" aria-label="Filter">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-              </svg>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Settings">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-              </svg>
-            </button>
-          </header>
-        </div>
-
-        <!-- Header with NEW DATA state -->
-        <div>
-          <div class="anno" style="opacity: 1; margin-bottom: 6px;">header · new data — draws the eye</div>
-          <header class="demo-page-header">
-            <span class="demo-page-breadcrumb">workspace /</span>
-            <h1 class="demo-page-title">Active Sessions</h1>
-            <span class="demo-header-sep" aria-hidden="true"></span>
-            <span class="demo-badge">
-              <span class="demo-badge-dot"></span>
-              3 running
-            </span>
-            <span class="demo-header-spacer"></span>
-            <!-- RefreshIndicator: new data -->
-            <button class="ri-pill ri-state-new-data" type="button" aria-label="New session data available. Click to refresh">
-              <span class="ri-text">New data</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true" style="position: relative;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-                <span class="ri-dot" aria-hidden="true"></span>
-              </span>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Filter">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-              </svg>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Settings">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-              </svg>
-            </button>
-          </header>
-        </div>
-
-        <!-- Header with LOADING state -->
-        <div>
-          <div class="anno" style="opacity: 1; margin-bottom: 6px;">header · loading — after click</div>
-          <header class="demo-page-header">
-            <span class="demo-page-breadcrumb">workspace /</span>
-            <h1 class="demo-page-title">Active Sessions</h1>
-            <span class="demo-header-sep" aria-hidden="true"></span>
-            <span class="demo-badge">
-              <span class="demo-badge-dot"></span>
-              3 running
-            </span>
-            <span class="demo-header-spacer"></span>
-            <!-- RefreshIndicator: loading -->
-            <button class="ri-pill ri-state-loading ri-is-loading" type="button" disabled aria-label="Refreshing sessions" aria-busy="true">
-              <span class="ri-text">Refreshing…</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg class="ri-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Filter">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-              </svg>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Settings">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-              </svg>
-            </button>
-          </header>
-        </div>
-
-        <!-- Header with FRESH state -->
-        <div>
-          <div class="anno" style="opacity: 1; margin-bottom: 6px;">header · fresh — post-refresh confirmation</div>
-          <header class="demo-page-header">
-            <span class="demo-page-breadcrumb">workspace /</span>
-            <h1 class="demo-page-title">Active Sessions</h1>
-            <span class="demo-header-sep" aria-hidden="true"></span>
-            <span class="demo-badge">
-              <span class="demo-badge-dot"></span>
-              3 running
-            </span>
-            <span class="demo-header-spacer"></span>
-            <!-- RefreshIndicator: fresh -->
-            <button class="ri-pill ri-state-fresh" type="button" aria-label="Sessions just refreshed. Click to refresh again">
-              <span class="ri-text">Just now</span>
-              <span class="ri-sep" aria-hidden="true"></span>
-              <span class="ri-icon-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </span>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Filter">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-              </svg>
-            </button>
-            <button class="demo-icon-btn" type="button" aria-label="Settings">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-              </svg>
-            </button>
-          </header>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── 5. Anatomy callout ─────────────────────────────────────── -->
-    <div>
-      <div class="section-header">
-        <div class="gk-eyebrow">Anatomy</div>
-        <div class="section-title">Component structure</div>
-      </div>
-
-      <div style="display: inline-flex; flex-direction: column; gap: 20px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);">
-
-        <!-- Enlarged anatomy view -->
-        <div style="display: flex; align-items: stretch; height: 36px; border-radius: var(--radius-md); border: 1.5px dashed var(--border-strong); overflow: hidden; background: var(--surface-2);">
-          <div style="display: flex; align-items: center; padding: 0 12px 0 13px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--foreground-muted);">5m ago</div>
-          <div style="width: 1px; background: var(--border); flex-shrink: 0;"></div>
-          <div style="display: flex; align-items: center; justify-content: center; width: 36px; color: var(--foreground-subtle);">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-              <path d="M21 3v5h-5"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-              <path d="M8 16H3v5"/>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Annotations -->
-        <div style="display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; font-size: 11px; font-family: var(--font-mono);">
-          <div style="display: flex; flex-direction: column; gap: 4px; padding-right: 16px;">
-            <div style="color: var(--foreground-muted); font-weight: 500;">.ri-text</div>
-            <div style="color: var(--foreground-subtle); font-size: 10px; line-height: 1.5;">Geist Mono 11px<br>Relative timestamp<br>Changes per state</div>
-          </div>
-          <div style="background: var(--border);"></div>
-          <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 16px;">
-            <div style="color: var(--foreground-muted); font-weight: 500;">.ri-icon-btn</div>
-            <div style="color: var(--foreground-subtle); font-size: 10px; line-height: 1.5;">26×26px zone<br>RefreshCw 13px<br>Spins on loading</div>
-          </div>
-        </div>
-
-        <!-- Overall dimensions note -->
-        <div style="font-size: 10px; font-family: var(--font-mono); color: var(--foreground-subtle); border-top: 1px solid var(--border); padding-top: 12px; line-height: 1.7;">
-          <span style="color: var(--foreground-muted);">height:</span> 26px (--size-control-sm)
-          &nbsp;&nbsp;
-          <span style="color: var(--foreground-muted);">width:</span> auto (~88–110px)
-          &nbsp;&nbsp;
-          <span style="color: var(--foreground-muted);">radius:</span> --radius-sm (6px)
-          &nbsp;&nbsp;
-          <span style="color: var(--foreground-muted);">border:</span> 1px solid --border
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-</body>
+			.ri-pill {
+				/* Resets */
+				appearance: none;
+				border: none;
+				background: none;
+				padding: 0;
+				margin: 0;
+				cursor: pointer;
+				/* Layout */
+				display: inline-flex;
+				align-items: stretch;
+				height: var(--size-control-sm); /* 26px */
+				border-radius: var(--radius-sm);
+				border: 1px solid var(--border);
+				background: var(--surface-2);
+				overflow: hidden;
+				/* Transitions */
+				transition:
+					border-color var(--duration-2) var(--ease-standard),
+					background var(--duration-2) var(--ease-standard),
+					box-shadow var(--duration-2) var(--ease-standard);
+				/* Text */
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				outline: none;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			/* Whole-unit hover */
+			.ri-pill:hover:not(.ri-is-loading):not(.ri-is-disabled) {
+				border-color: var(--border-strong);
+				background: var(--surface-3);
+			}
+
+			/* Focus ring */
+			.ri-pill:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			/* Active / pressed */
+			.ri-pill:active:not(.ri-is-loading):not(.ri-is-disabled) {
+				transform: scale(0.97);
+				filter: brightness(0.96);
+			}
+
+			/* Disabled state */
+			.ri-pill.ri-is-disabled {
+				opacity: 0.42;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Loading state — non-interactive */
+			.ri-pill.ri-is-loading {
+				cursor: default;
+				pointer-events: none;
+			}
+
+			/* Left text section */
+			.ri-text {
+				display: flex;
+				align-items: center;
+				padding: 0 8px 0 9px;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs); /* 11px */
+				font-weight: var(--weight-medium);
+				line-height: 1;
+				color: var(--foreground-muted);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+				transition: color var(--duration-2) var(--ease-standard);
+			}
+
+			/* Separator between text and icon */
+			.ri-sep {
+				width: 1px;
+				background: var(--border);
+				flex-shrink: 0;
+				align-self: stretch;
+				transition: background var(--duration-2) var(--ease-standard);
+			}
+
+			/* Right icon button section */
+			.ri-icon-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 26px;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+				transition: color var(--duration-2) var(--ease-standard);
+				position: relative;
+			}
+
+			.ri-icon-btn svg {
+				width: 13px;
+				height: 13px;
+				stroke-width: 1.85;
+				flex-shrink: 0;
+			}
+
+			/* "New data" dot on the icon */
+			.ri-dot {
+				position: absolute;
+				top: 4px;
+				right: 4px;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--primary);
+				border: 1.5px solid var(--surface-2);
+				flex-shrink: 0;
+			}
+
+			/* ── State variants ─────────────────────────────────────────────────── */
+
+			/* Idle — default secondary look */
+			.ri-pill.ri-state-idle .ri-text {
+				color: var(--foreground-muted);
+			}
+			.ri-pill.ri-state-idle .ri-icon-btn {
+				color: var(--foreground-subtle);
+			}
+
+			/* Loading */
+			.ri-pill.ri-state-loading .ri-text {
+				color: var(--foreground-subtle);
+			}
+			.ri-pill.ri-state-loading .ri-icon-btn {
+				color: var(--foreground-subtle);
+			}
+			.ri-pill.ri-state-loading .ri-spinner {
+				animation: gk-spin 0.7s linear infinite;
+				transform-origin: center;
+			}
+
+			/* Fresh — brief green confirmation */
+			.ri-pill.ri-state-fresh {
+				border-color: color-mix(in oklch, var(--status-success) 35%, var(--border));
+				background: color-mix(in oklch, var(--status-success) 7%, var(--surface-2));
+			}
+			.ri-pill.ri-state-fresh .ri-text {
+				color: var(--status-success);
+			}
+			.ri-pill.ri-state-fresh .ri-icon-btn {
+				color: color-mix(in oklch, var(--status-success) 70%, var(--foreground-subtle));
+			}
+			.ri-pill.ri-state-fresh .ri-sep {
+				background: color-mix(in oklch, var(--status-success) 30%, var(--border));
+			}
+
+			/* Stale — faded, very muted appearance */
+			.ri-pill.ri-state-stale {
+				opacity: 0.72;
+			}
+			.ri-pill.ri-state-stale .ri-text {
+				color: var(--foreground-subtle);
+			}
+			.ri-pill.ri-state-stale .ri-icon-btn {
+				color: var(--foreground-subtle);
+				opacity: 0.7;
+			}
+
+			/* New data — primary highlight, acts as CTA */
+			.ri-pill.ri-state-new-data {
+				border-color: color-mix(in oklch, var(--primary) 50%, var(--border));
+				background: color-mix(in oklch, var(--primary) 10%, var(--surface-2));
+				box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 18%, transparent);
+			}
+			.ri-pill.ri-state-new-data .ri-text {
+				color: var(--primary);
+				font-weight: var(--weight-semibold);
+			}
+			.ri-pill.ri-state-new-data .ri-icon-btn {
+				color: var(--primary);
+			}
+			.ri-pill.ri-state-new-data .ri-sep {
+				background: color-mix(in oklch, var(--primary) 35%, var(--border));
+			}
+
+			/* Hover simulation for "idle" demo card */
+			.ri-demo-hover .ri-pill.ri-state-idle {
+				border-color: var(--border-strong);
+				background: var(--surface-3);
+			}
+
+			/* Active / pressed simulation */
+			.ri-demo-active .ri-pill {
+				transform: scale(0.97);
+				filter: brightness(0.94);
+			}
+
+			/* Focus simulation */
+			.ri-demo-focus .ri-pill {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			/* Disabled visual (static, no pointer-events removed here) */
+			.ri-demo-disabled .ri-pill {
+				opacity: 0.42;
+				cursor: not-allowed;
+			}
+
+			/* ─── Page header context demo ──────────────────────────────────────── */
+			.demo-page-header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				height: 48px;
+				padding: 0 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.demo-page-title {
+				font-family: var(--font-sans);
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				margin: 0;
+				flex-shrink: 0;
+			}
+
+			.demo-page-breadcrumb {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			.demo-header-sep {
+				width: 1px;
+				height: 18px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+
+			.demo-header-spacer {
+				flex: 1;
+			}
+
+			.demo-header-controls {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+
+			/* Small ghost icon buttons for the header chrome */
+			.demo-icon-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background var(--duration-2),
+					color var(--duration-2),
+					border-color var(--duration-2);
+			}
+			.demo-icon-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border-color: var(--border);
+			}
+			.demo-icon-btn svg {
+				width: 13px;
+				height: 13px;
+				stroke-width: 1.75;
+			}
+
+			/* Badge in header */
+			.demo-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 18px;
+				padding: 0 6px;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: var(--weight-medium);
+				border-radius: var(--radius-full);
+				background: color-mix(in oklch, var(--status-success) 12%, transparent);
+				color: var(--status-success);
+				border: 1px solid color-mix(in oklch, var(--status-success) 28%, transparent);
+			}
+			.demo-badge-dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: currentColor;
+			}
+
+			/* ─── State showcase grid ───────────────────────────────────────────── */
+			.state-grid {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: 10px;
+			}
+
+			@media (max-width: 900px) {
+				.state-grid {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+			}
+
+			@media (max-width: 560px) {
+				.state-grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.page-wrapper {
+					padding: 24px 20px;
+				}
+			}
+
+			/* State cell */
+			.state-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				padding: 14px 12px 12px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				min-height: 84px;
+			}
+			.state-cell-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+			.state-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: flex-start;
+			}
+
+			/* Button interaction states row (4 states for idle variant) */
+			.interaction-states-row {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 10px;
+			}
+
+			@media (max-width: 560px) {
+				.interaction-states-row {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+
+			/* ─── Annotation sub-labels ─────────────────────────────────────────── */
+			.anno {
+				font-size: 9.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.03em;
+				opacity: 0.7;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrapper">
+				<!-- ── Variant label ────────────────────────────────────────── -->
+				<div>
+					<div class="gk-eyebrow" style="margin-bottom: 4px">RefreshIndicator</div>
+					<div
+						style="
+							font-size: var(--text-xl);
+							font-weight: var(--weight-semibold);
+							letter-spacing: var(--tracking-snug);
+							line-height: var(--leading-tight);
+							color: var(--foreground);
+						"
+					>
+						Variant C — Split Indicator
+					</div>
+					<div class="gk-small" style="margin-top: 6px; max-width: 560px">
+						Two-part pill combining a mono timestamp label on the left with an icon
+						trigger on the right. A hairline separator divides the two sections. The
+						entire unit is a single
+						<code
+							style="
+								font-family: var(--font-mono);
+								font-size: 11px;
+								color: var(--foreground-muted);
+							"
+							>&lt;button&gt;</code
+						>
+						for full keyboard and pointer accessibility.
+					</div>
+				</div>
+
+				<!-- ── 1. All 5 content states ───────────────────────────────── -->
+				<div>
+					<div class="section-header">
+						<div class="gk-eyebrow">States</div>
+						<div class="section-title">All 5 content states</div>
+					</div>
+
+					<div class="state-grid">
+						<!-- IDLE -->
+						<div class="state-cell">
+							<div class="state-cell-label">idle</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-idle"
+									type="button"
+									aria-label="Refresh data"
+								>
+									<span class="ri-text">Refresh</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<!-- RefreshCw icon -->
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+							<div class="anno">muted text · subtle icon</div>
+						</div>
+
+						<!-- LOADING -->
+						<div class="state-cell">
+							<div class="state-cell-label">loading</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-loading ri-is-loading"
+									type="button"
+									aria-label="Refreshing data"
+									aria-busy="true"
+									disabled
+								>
+									<span class="ri-text">Refreshing…</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											class="ri-spinner"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+							<div class="anno">spinning icon · non-interactive</div>
+						</div>
+
+						<!-- FRESH -->
+						<div class="state-cell">
+							<div class="state-cell-label">fresh</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-fresh"
+									type="button"
+									aria-label="Data is current. Refresh again"
+								>
+									<span class="ri-text">Just now</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+							<div class="anno">green tint · confirmation flash</div>
+						</div>
+
+						<!-- STALE -->
+						<div class="state-cell">
+							<div class="state-cell-label">stale</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-stale"
+									type="button"
+									aria-label="Data is 5 minutes old. Click to refresh"
+								>
+									<span class="ri-text">5m ago</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+							<div class="anno">very muted · faded unit</div>
+						</div>
+
+						<!-- NEW DATA -->
+						<div class="state-cell">
+							<div class="state-cell-label">new data</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-new-data"
+									type="button"
+									aria-label="New data available. Click to refresh"
+								>
+									<span class="ri-text">New data</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span
+										class="ri-icon-btn"
+										aria-hidden="true"
+										style="position: relative"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+										<span class="ri-dot" aria-hidden="true"></span>
+									</span>
+								</button>
+							</div>
+							<div class="anno">primary moss color · dot badge · CTA</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── 2. Idle button — all 4 interaction states ─────────────── -->
+				<div>
+					<div class="section-header">
+						<div class="gk-eyebrow">Interaction States</div>
+						<div class="section-title">Idle state — all 4 button states</div>
+					</div>
+
+					<div class="interaction-states-row">
+						<!-- Default -->
+						<div class="state-cell">
+							<div class="state-cell-label">default</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-idle"
+									type="button"
+									aria-label="Refresh data"
+								>
+									<span class="ri-text">Refresh</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+						</div>
+
+						<!-- Hover -->
+						<div class="state-cell ri-demo-hover">
+							<div class="state-cell-label">hover</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-idle"
+									type="button"
+									style="
+										border-color: var(--border-strong);
+										background: var(--surface-3);
+									"
+									aria-label="Refresh data"
+								>
+									<span class="ri-text" style="color: var(--foreground-muted)"
+										>Refresh</span
+									>
+									<span
+										class="ri-sep"
+										aria-hidden="true"
+										style="background: var(--border-strong)"
+									></span>
+									<span
+										class="ri-icon-btn"
+										aria-hidden="true"
+										style="color: var(--foreground-subtle)"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+						</div>
+
+						<!-- Active / Pressed -->
+						<div class="state-cell ri-demo-active">
+							<div class="state-cell-label">active / pressed</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-idle"
+									type="button"
+									style="
+										transform: scale(0.97);
+										filter: brightness(0.94);
+										border-color: var(--border-strong);
+										background: var(--surface-3);
+									"
+									aria-label="Refresh data"
+								>
+									<span class="ri-text">Refresh</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+						</div>
+
+						<!-- Disabled -->
+						<div class="state-cell ri-demo-disabled">
+							<div class="state-cell-label">disabled</div>
+							<div class="state-cell-stage">
+								<button
+									class="ri-pill ri-state-idle ri-is-disabled"
+									type="button"
+									disabled
+									aria-label="Refresh unavailable"
+								>
+									<span class="ri-text">Refresh</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── 3. Focus ring state ─────────────────────────────────────── -->
+				<div>
+					<div class="section-header">
+						<div class="gk-eyebrow">Accessibility</div>
+						<div class="section-title">Focus ring — keyboard navigation</div>
+					</div>
+
+					<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center">
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								gap: 8px;
+								align-items: flex-start;
+							"
+						>
+							<div class="anno" style="opacity: 1">idle · focused</div>
+							<button
+								class="ri-pill ri-state-idle"
+								type="button"
+								style="outline: 2px solid var(--ring); outline-offset: 2px"
+								aria-label="Refresh data"
+							>
+								<span class="ri-text">Refresh</span>
+								<span class="ri-sep" aria-hidden="true"></span>
+								<span class="ri-icon-btn" aria-hidden="true">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+								</span>
+							</button>
+						</div>
+
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								gap: 8px;
+								align-items: flex-start;
+							"
+						>
+							<div class="anno" style="opacity: 1">new data · focused</div>
+							<button
+								class="ri-pill ri-state-new-data"
+								type="button"
+								style="outline: 2px solid var(--ring); outline-offset: 2px"
+								aria-label="New data available. Click to refresh"
+							>
+								<span class="ri-text">New data</span>
+								<span class="ri-sep" aria-hidden="true"></span>
+								<span
+									class="ri-icon-btn"
+									aria-hidden="true"
+									style="position: relative"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+									<span class="ri-dot" aria-hidden="true"></span>
+								</span>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── 4. In-context: page header placement ───────────────────── -->
+				<div>
+					<div class="section-header">
+						<div class="gk-eyebrow">In Context</div>
+						<div class="section-title">
+							Placement in a page header — three state examples
+						</div>
+					</div>
+
+					<div style="display: flex; flex-direction: column; gap: 12px">
+						<!-- Header with IDLE state -->
+						<div>
+							<div class="anno" style="opacity: 1; margin-bottom: 6px">
+								header · idle
+							</div>
+							<header class="demo-page-header">
+								<span class="demo-page-breadcrumb">workspace /</span>
+								<h1 class="demo-page-title">Active Sessions</h1>
+								<span class="demo-header-sep" aria-hidden="true"></span>
+								<span class="demo-badge">
+									<span class="demo-badge-dot"></span>
+									3 running
+								</span>
+								<span class="demo-header-spacer"></span>
+								<!-- RefreshIndicator: idle -->
+								<button
+									class="ri-pill ri-state-idle"
+									type="button"
+									aria-label="Refresh sessions"
+								>
+									<span class="ri-text">Refresh</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+								<!-- Other header controls -->
+								<button class="demo-icon-btn" type="button" aria-label="Filter">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polygon
+											points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+										/>
+									</svg>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Settings">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="12" cy="12" r="3" />
+										<path
+											d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"
+										/>
+									</svg>
+								</button>
+							</header>
+						</div>
+
+						<!-- Header with NEW DATA state -->
+						<div>
+							<div class="anno" style="opacity: 1; margin-bottom: 6px">
+								header · new data — draws the eye
+							</div>
+							<header class="demo-page-header">
+								<span class="demo-page-breadcrumb">workspace /</span>
+								<h1 class="demo-page-title">Active Sessions</h1>
+								<span class="demo-header-sep" aria-hidden="true"></span>
+								<span class="demo-badge">
+									<span class="demo-badge-dot"></span>
+									3 running
+								</span>
+								<span class="demo-header-spacer"></span>
+								<!-- RefreshIndicator: new data -->
+								<button
+									class="ri-pill ri-state-new-data"
+									type="button"
+									aria-label="New session data available. Click to refresh"
+								>
+									<span class="ri-text">New data</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span
+										class="ri-icon-btn"
+										aria-hidden="true"
+										style="position: relative"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+										<span class="ri-dot" aria-hidden="true"></span>
+									</span>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Filter">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polygon
+											points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+										/>
+									</svg>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Settings">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="12" cy="12" r="3" />
+										<path
+											d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"
+										/>
+									</svg>
+								</button>
+							</header>
+						</div>
+
+						<!-- Header with LOADING state -->
+						<div>
+							<div class="anno" style="opacity: 1; margin-bottom: 6px">
+								header · loading — after click
+							</div>
+							<header class="demo-page-header">
+								<span class="demo-page-breadcrumb">workspace /</span>
+								<h1 class="demo-page-title">Active Sessions</h1>
+								<span class="demo-header-sep" aria-hidden="true"></span>
+								<span class="demo-badge">
+									<span class="demo-badge-dot"></span>
+									3 running
+								</span>
+								<span class="demo-header-spacer"></span>
+								<!-- RefreshIndicator: loading -->
+								<button
+									class="ri-pill ri-state-loading ri-is-loading"
+									type="button"
+									disabled
+									aria-label="Refreshing sessions"
+									aria-busy="true"
+								>
+									<span class="ri-text">Refreshing…</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											class="ri-spinner"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Filter">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polygon
+											points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+										/>
+									</svg>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Settings">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="12" cy="12" r="3" />
+										<path
+											d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"
+										/>
+									</svg>
+								</button>
+							</header>
+						</div>
+
+						<!-- Header with FRESH state -->
+						<div>
+							<div class="anno" style="opacity: 1; margin-bottom: 6px">
+								header · fresh — post-refresh confirmation
+							</div>
+							<header class="demo-page-header">
+								<span class="demo-page-breadcrumb">workspace /</span>
+								<h1 class="demo-page-title">Active Sessions</h1>
+								<span class="demo-header-sep" aria-hidden="true"></span>
+								<span class="demo-badge">
+									<span class="demo-badge-dot"></span>
+									3 running
+								</span>
+								<span class="demo-header-spacer"></span>
+								<!-- RefreshIndicator: fresh -->
+								<button
+									class="ri-pill ri-state-fresh"
+									type="button"
+									aria-label="Sessions just refreshed. Click to refresh again"
+								>
+									<span class="ri-text">Just now</span>
+									<span class="ri-sep" aria-hidden="true"></span>
+									<span class="ri-icon-btn" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</span>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Filter">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polygon
+											points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+										/>
+									</svg>
+								</button>
+								<button class="demo-icon-btn" type="button" aria-label="Settings">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="12" cy="12" r="3" />
+										<path
+											d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"
+										/>
+									</svg>
+								</button>
+							</header>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── 5. Anatomy callout ─────────────────────────────────────── -->
+				<div>
+					<div class="section-header">
+						<div class="gk-eyebrow">Anatomy</div>
+						<div class="section-title">Component structure</div>
+					</div>
+
+					<div
+						style="
+							display: inline-flex;
+							flex-direction: column;
+							gap: 20px;
+							padding: 24px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-lg);
+						"
+					>
+						<!-- Enlarged anatomy view -->
+						<div
+							style="
+								display: flex;
+								align-items: stretch;
+								height: 36px;
+								border-radius: var(--radius-md);
+								border: 1.5px dashed var(--border-strong);
+								overflow: hidden;
+								background: var(--surface-2);
+							"
+						>
+							<div
+								style="
+									display: flex;
+									align-items: center;
+									padding: 0 12px 0 13px;
+									font-family: var(--font-mono);
+									font-size: 12px;
+									font-weight: 500;
+									color: var(--foreground-muted);
+								"
+							>
+								5m ago
+							</div>
+							<div
+								style="width: 1px; background: var(--border); flex-shrink: 0"
+							></div>
+							<div
+								style="
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									width: 36px;
+									color: var(--foreground-subtle);
+								"
+							>
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.85"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+									<path d="M21 3v5h-5" />
+									<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+									<path d="M8 16H3v5" />
+								</svg>
+							</div>
+						</div>
+
+						<!-- Annotations -->
+						<div
+							style="
+								display: grid;
+								grid-template-columns: 1fr 1px 1fr;
+								gap: 0;
+								font-size: 11px;
+								font-family: var(--font-mono);
+							"
+						>
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									padding-right: 16px;
+								"
+							>
+								<div style="color: var(--foreground-muted); font-weight: 500">
+									.ri-text
+								</div>
+								<div
+									style="
+										color: var(--foreground-subtle);
+										font-size: 10px;
+										line-height: 1.5;
+									"
+								>
+									Geist Mono 11px<br />Relative timestamp<br />Changes per state
+								</div>
+							</div>
+							<div style="background: var(--border)"></div>
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									padding-left: 16px;
+								"
+							>
+								<div style="color: var(--foreground-muted); font-weight: 500">
+									.ri-icon-btn
+								</div>
+								<div
+									style="
+										color: var(--foreground-subtle);
+										font-size: 10px;
+										line-height: 1.5;
+									"
+								>
+									26×26px zone<br />RefreshCw 13px<br />Spins on loading
+								</div>
+							</div>
+						</div>
+
+						<!-- Overall dimensions note -->
+						<div
+							style="
+								font-size: 10px;
+								font-family: var(--font-mono);
+								color: var(--foreground-subtle);
+								border-top: 1px solid var(--border);
+								padding-top: 12px;
+								line-height: 1.7;
+							"
+						>
+							<span style="color: var(--foreground-muted)">height:</span> 26px
+							(--size-control-sm) &nbsp;&nbsp;
+							<span style="color: var(--foreground-muted)">width:</span> auto
+							(~88–110px) &nbsp;&nbsp;
+							<span style="color: var(--foreground-muted)">radius:</span> --radius-sm
+							(6px) &nbsp;&nbsp;
+							<span style="color: var(--foreground-muted)">border:</span> 1px solid
+							--border
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

@@ -6,7 +6,8 @@
 		"src/lib/modules/*/index.ts",
 		"src/lib/i18n/index.ts",
 		"**/*.stories.svelte",
-		"src/lib/reactivity/*.svelte.ts"
+		"src/lib/reactivity/*.svelte.ts",
+		"designs/*"
 	],
 	"ignorePatterns": ["src/lib/types/generated/**", "claude_design/**", "designs/**"],
 	"ignoreDependencies": [

@@ -1,1695 +1,2617 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bulk Import Wizard — Variant E: Live Preview Pipeline</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ── Grovekeeper tokens (inlined) ─────────────────────────── */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --space-1:  2px;  --space-2:  4px;  --space-3:  6px;
-  --space-4:  8px;  --space-5:  10px; --space-6:  12px;
-  --space-7:  14px; --space-8:  16px; --space-10: 20px;
-  --space-12: 24px; --space-14: 28px; --space-16: 32px;
-  --space-20: 40px; --space-24: 48px;
-  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 8px;
-  --radius-lg: 10px; --radius-xl: 14px; --radius-full: 9999px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-}
-
-.theme-dark {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --ring:              var(--moss-400);
-  --code-bg:           oklch(0.215 0.020 150);
-}
-
-/* ── Base reset ──────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { margin: 0; background: oklch(0.12 0.015 150); }
-
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.font-mono { font-family: var(--font-mono); }
-
-/* ── Component classes ───────────────────────────────────── */
-.gk-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
-  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
-  border: 1px solid transparent; cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, box-shadow 120ms ease;
-  white-space: nowrap; user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary { background: var(--primary); color: var(--primary-fg); box-shadow: var(--shadow-sm), var(--shadow-inset); }
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost { background: transparent; color: var(--foreground-muted); border-color: transparent; }
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled, .gk-btn[data-state="disabled"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-
-.gk-input {
-  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  color: var(--foreground); width: 100%; outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.gk-input::placeholder { color: var(--foreground-subtle); }
-.gk-input:focus { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
-
-.gk-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  height: 20px; padding: 0 7px; font-size: 11px; font-weight: 500;
-  border-radius: 999px; background: var(--surface-2); color: var(--foreground-muted);
-  border: 1px solid var(--border); font-family: var(--font-sans);
-  letter-spacing: 0.01em; white-space: nowrap;
-}
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-
-.gk-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
-}
-
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: 1.4; color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
-
-.cb-panel-title {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-  color: var(--foreground-muted); text-transform: uppercase;
-  letter-spacing: 0.08em; display: flex; align-items: baseline; gap: 8px;
-}
-.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
-.cb-panel-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; }
-
-/* ── Animations ──────────────────────────────────────────── */
-@keyframes gk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
-.gk-pulse { animation: gk-pulse 1.8s ease-in-out infinite; }
-
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-
-@keyframes flow-particle {
-  0%   { left: -6px; opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { left: calc(100% + 6px); opacity: 0; }
-}
-
-@keyframes shimmer-scan {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes processing-glow {
-  0%, 100% { box-shadow: 0 0 8px color-mix(in oklch, var(--amber-400) 30%, transparent); }
-  50%      { box-shadow: 0 0 18px color-mix(in oklch, var(--amber-400) 50%, transparent); }
-}
-
-@keyframes check-pop {
-  0%   { transform: scale(0.6); opacity: 0; }
-  60%  { transform: scale(1.15); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes progress-fill {
-  from { width: 0; }
-}
-
-/* ── Layout ──────────────────────────────────────────────── */
-.wizard-backdrop {
-  position: fixed; inset: 0;
-  background: color-mix(in oklch, oklch(0.10 0.02 150) 60%, transparent);
-  backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 50;
-}
-
-.wizard-dialog {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  width: calc(100vw - 48px);
-  max-width: 1280px;
-  height: calc(100vh - 64px);
-  max-height: 820px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ── Header ──────────────────────────────────────────────── */
-.wizard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-}
-
-.wizard-header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.wizard-header-title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-}
-
-.variant-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  padding: 2px 8px;
-  border-radius: var(--radius-xs);
-}
-
-.wizard-header-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.close-btn {
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: 1px solid transparent;
-  border-radius: var(--radius-sm); cursor: pointer;
-  color: var(--foreground-subtle);
-  transition: all 120ms ease;
-}
-.close-btn:hover { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
-
-/* ── Pipeline strip (horizontal stage indicator) ─────────── */
-.pipeline-strip {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in oklch, var(--surface) 50%, var(--background));
-  flex-shrink: 0;
-}
-
-.pipeline-stage-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--foreground-subtle);
-  transition: all 200ms ease;
-}
-.pipeline-stage-indicator.is-active {
-  background: var(--primary-soft);
-  color: var(--foreground);
-}
-.pipeline-stage-indicator.is-complete {
-  color: var(--status-success);
-}
-
-.pipeline-stage-num {
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--foreground-subtle);
-}
-.pipeline-stage-indicator.is-active .pipeline-stage-num {
-  background: var(--primary);
-  color: var(--primary-fg);
-  border-color: var(--primary);
-}
-.pipeline-stage-indicator.is-complete .pipeline-stage-num {
-  background: color-mix(in oklch, var(--status-success) 18%, transparent);
-  border-color: color-mix(in oklch, var(--status-success) 40%, transparent);
-  color: var(--status-success);
-}
-
-.pipeline-connector {
-  flex: 1;
-  height: 2px;
-  background: var(--border);
-  position: relative;
-  margin: 0 4px;
-  overflow: hidden;
-  border-radius: 1px;
-}
-.pipeline-connector.is-active {
-  background: linear-gradient(90deg, var(--status-success), var(--primary));
-}
-.pipeline-connector.is-active::after {
-  content: "";
-  position: absolute;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
-  top: -2px;
-  animation: flow-particle 2s linear infinite;
-  box-shadow: 0 0 6px var(--primary);
-}
-.pipeline-connector.is-complete {
-  background: var(--status-success);
-}
-
-/* ── Main content: three-column pipeline ─────────────────── */
-.pipeline-body {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 280px 1fr 320px;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* Stage panels */
-.stage-panel {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border);
-  min-height: 0;
-  overflow: hidden;
-}
-.stage-panel:last-child { border-right: none; }
-
-.stage-header {
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-}
-
-.stage-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.stage-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.stage-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 14px;
-}
-
-/* ── Stage 1: Folder Scanner ─────────────────────────────── */
-.folder-path-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  margin-bottom: 12px;
-}
-
-.folder-icon {
-  color: var(--amber-400);
-  flex-shrink: 0;
-}
-
-.folder-path-text {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-}
-
-.scan-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-.scan-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-}
-
-.scan-stat-value {
-  font-family: var(--font-mono);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.scan-stat-label {
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.folder-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.folder-tree-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  border-radius: var(--radius-xs);
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  cursor: default;
-}
-
-.folder-tree-item.is-faction {
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-}
-
-.folder-tree-item .tree-indent {
-  width: 14px;
-  height: 1px;
-  background: var(--border);
-  margin-left: 6px;
-  flex-shrink: 0;
-}
-
-.folder-tree-count {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  margin-left: auto;
-}
-
-/* ── Stage 2: Auto-Mapping Engine ────────────────────────── */
-.mapping-queue {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mapping-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  transition: border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.mapping-card.is-processing {
-  border-color: color-mix(in oklch, var(--amber-400) 50%, var(--border));
-  animation: processing-glow 2s ease-in-out infinite;
-}
-
-.mapping-card.is-complete {
-  border-color: color-mix(in oklch, var(--status-success) 40%, var(--border));
-}
-
-.mapping-card.is-waiting {
-  opacity: 0.55;
-}
-
-.mapping-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  cursor: pointer;
-}
-.mapping-card-header:hover {
-  background: var(--surface-2);
-}
-
-.mapping-avatar {
-  width: 32px; height: 32px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 15px;
-}
-
-.mapping-card-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.mapping-card-name {
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mapping-card-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 2px;
-}
-
-.mapping-card-meta-text {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-.mapping-status-icon {
-  width: 20px; height: 20px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.mapping-status-icon.is-success {
-  color: var(--status-success);
-  animation: check-pop 300ms ease-out forwards;
-}
-.mapping-status-icon.is-processing {
-  color: var(--amber-400);
-}
-.mapping-status-icon.is-waiting {
-  color: var(--foreground-subtle);
-}
-
-/* Processing spinner */
-.mapping-spinner {
-  width: 16px; height: 16px;
-  border: 2px solid color-mix(in oklch, var(--amber-400) 25%, transparent);
-  border-top-color: var(--amber-400);
-  border-radius: 50%;
-  animation: gk-spin 0.8s linear infinite;
-}
-
-/* Expanded detail: event mapping slots */
-.mapping-detail {
-  border-top: 1px solid var(--border);
-  padding: 10px 12px;
-  background: color-mix(in oklch, var(--surface-2) 50%, transparent);
-}
-
-.event-slot-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.event-slot-row {
-  display: grid;
-  grid-template-columns: 110px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 6px;
-  border-radius: var(--radius-xs);
-  font-size: var(--text-xs);
-}
-.event-slot-row:hover {
-  background: var(--surface-hover);
-}
-
-.event-slot-name {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-muted);
-  white-space: nowrap;
-}
-
-.event-slot-file {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.event-slot-file.is-mapped {
-  color: var(--status-success);
-}
-
-.event-slot-play {
-  width: 18px; height: 18px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: none; cursor: pointer;
-  color: var(--foreground-subtle); border-radius: 50%;
-  transition: all 120ms ease;
-}
-.event-slot-play:hover {
-  background: var(--surface-3);
-  color: var(--foreground);
-}
-
-/* Mapping progress bar */
-.mapping-progress-bar {
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-
-.mapping-progress-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 600ms var(--ease-out);
-}
-.mapping-progress-fill.is-complete {
-  background: var(--status-success);
-}
-.mapping-progress-fill.is-processing {
-  background: linear-gradient(90deg, var(--amber-400), var(--amber-300));
-  background-size: 200% 100%;
-  animation: shimmer-scan 1.4s linear infinite;
-}
-
-/* ── Stage 3: Import Queue ───────────────────────────────── */
-.import-queue {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.import-queue-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-.import-queue-item:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-}
-.import-queue-item.is-selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 18%, transparent);
-}
-.import-queue-item.is-pending {
-  border-style: dashed;
-  opacity: 0.5;
-}
-
-.import-queue-avatar {
-  width: 36px; height: 36px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  flex-shrink: 0;
-}
-
-.import-queue-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.import-queue-name {
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-}
-
-.import-queue-details {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 3px;
-}
-
-.import-queue-detail {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-.import-queue-coverage {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.coverage-bar {
-  width: 40px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.coverage-fill {
-  height: 100%;
-  border-radius: 2px;
-}
-.coverage-fill.is-high { background: var(--status-success); }
-.coverage-fill.is-mid { background: var(--status-warning); }
-
-.coverage-text {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  font-variant-numeric: tabular-nums;
-}
-
-.import-queue-status-icon {
-  flex-shrink: 0;
-  width: 18px; height: 18px;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* ── Bottom detail panel ─────────────────────────────────── */
-.detail-panel {
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-}
-
-.detail-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.detail-panel-header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.detail-avatar-large {
-  width: 40px; height: 40px;
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-.detail-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.detail-char-name {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.02em;
-  color: var(--foreground);
-}
-
-.detail-char-path {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-.detail-panel-body {
-  padding: 12px 20px 14px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-}
-
-.detail-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.detail-section-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding-bottom: 4px;
-  border-bottom: 1px dashed var(--border);
-}
-
-.detail-event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.detail-event-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-}
-
-.detail-event-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.detail-event-dot.is-mapped { background: var(--status-success); }
-.detail-event-dot.is-unmapped { background: var(--border-strong); }
-
-.detail-event-name {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-muted);
-  flex: 1;
-}
-
-.detail-event-file {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.detail-stat-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.detail-stat-card {
-  padding: 8px 10px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.detail-stat-val {
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.detail-stat-lbl {
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-/* ── Footer ──────────────────────────────────────────────── */
-.wizard-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  border-top: 1px solid var(--border);
-  background: var(--surface-2);
-  flex-shrink: 0;
-}
-
-.footer-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.footer-stat {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-}
-
-.footer-stat-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-}
-
-.footer-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ── Flow arrows between stages ──────────────────────────── */
-.stage-panel {
-  position: relative;
-}
-
-.flow-arrow {
-  position: absolute;
-  right: -13px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  width: 24px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  color: var(--foreground-subtle);
-}
-.flow-arrow.is-active {
-  border-color: color-mix(in oklch, var(--primary) 50%, var(--border));
-  color: var(--primary);
-  background: var(--background);
-}
-
-/* ── Mapping rules tooltip ───────────────────────────────── */
-.rules-panel {
-  margin-bottom: 10px;
-  padding: 8px 10px;
-  background: color-mix(in oklch, var(--azure-700) 12%, var(--surface));
-  border: 1px solid color-mix(in oklch, var(--azure-500) 20%, var(--border));
-  border-radius: var(--radius-sm);
-}
-
-.rules-panel-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--azure-400);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.rules-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.rule-row {
-  display: grid;
-  grid-template-columns: 80px 14px 1fr;
-  align-items: center;
-  gap: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-}
-
-.rule-pattern { color: var(--foreground-muted); }
-.rule-arrow { color: var(--foreground-subtle); text-align: center; }
-.rule-event { color: var(--foreground-subtle); }
-
-/* ── Responsive ──────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .pipeline-body {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-  }
-  .stage-panel {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    max-height: 240px;
-  }
-  .stage-panel:last-child {
-    border-bottom: none;
-  }
-  .flow-arrow { display: none; }
-  .detail-panel-body {
-    grid-template-columns: 1fr;
-  }
-  .wizard-dialog {
-    width: calc(100vw - 16px);
-    height: calc(100vh - 32px);
-    max-height: none;
-    border-radius: var(--radius-md);
-  }
-}
-
-@media (max-width: 600px) {
-  .pipeline-strip { flex-wrap: wrap; gap: 4px; }
-  .pipeline-connector { display: none; }
-  .scan-stats { grid-template-columns: 1fr; }
-  .wizard-header { padding: 10px 14px; }
-  .wizard-footer { flex-direction: column; gap: 10px; padding: 12px 14px; }
-  .footer-left { flex-wrap: wrap; }
-}
-</style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-
-<div class="wizard-backdrop">
-<div class="wizard-dialog">
-
-  <!-- ═══ Header ═══ -->
-  <div class="wizard-header">
-    <div class="wizard-header-left">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
-        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
-      </svg>
-      <span class="wizard-header-title">Bulk Import</span>
-      <span class="variant-label">VARIANT E: LIVE PREVIEW PIPELINE</span>
-    </div>
-    <div class="wizard-header-meta">
-      <span class="gk-badge gk-badge-info">
-        <span class="gk-badge-dot"></span>
-        Processing
-      </span>
-      <button class="close-btn" title="Close">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- ═══ Pipeline strip ═══ -->
-  <div class="pipeline-strip">
-    <div class="pipeline-stage-indicator is-complete">
-      <span class="pipeline-stage-num">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </span>
-      <span>Scan Folder</span>
-    </div>
-    <div class="pipeline-connector is-complete"></div>
-    <div class="pipeline-stage-indicator is-active">
-      <span class="pipeline-stage-num">2</span>
-      <span>Auto-Map</span>
-    </div>
-    <div class="pipeline-connector is-active"></div>
-    <div class="pipeline-stage-indicator">
-      <span class="pipeline-stage-num">3</span>
-      <span>Import Queue</span>
-    </div>
-  </div>
-
-  <!-- ═══ Pipeline body: three columns ═══ -->
-  <div class="pipeline-body">
-
-    <!-- ──── Stage 1: Folder Scanner (complete) ──── -->
-    <div class="stage-panel">
-      <div class="stage-header">
-        <div class="stage-header-row">
-          <span class="stage-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align: -2px; margin-right: 4px; color: var(--status-success);">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            Scanned
-          </span>
-          <span class="gk-badge gk-badge-success" style="height: 18px; font-size: 10px;">Complete</span>
-        </div>
-      </div>
-      <div class="stage-body">
-        <!-- Folder path -->
-        <div class="folder-path-display">
-          <span class="folder-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-          </span>
-          <span class="folder-path-text" title="D:\Games\WC3\Sounds\Units">D:\Games\WC3\Sounds\Units</span>
-        </div>
-
-        <!-- Stats -->
-        <div class="scan-stats">
-          <div class="scan-stat">
-            <span class="scan-stat-value">5</span>
-            <span class="scan-stat-label">Characters</span>
-          </div>
-          <div class="scan-stat">
-            <span class="scan-stat-value">47</span>
-            <span class="scan-stat-label">Sound files</span>
-          </div>
-        </div>
-
-        <!-- Folder tree -->
-        <div style="margin-bottom: 6px;">
-          <span class="gk-eyebrow" style="margin-bottom: 6px; display: block;">Folder Structure</span>
-        </div>
-        <div class="folder-tree">
-          <div class="folder-tree-item is-faction">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--amber-400);"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-            Human
-            <span class="folder-tree-count">2 units</span>
-          </div>
-          <div class="folder-tree-item">
-            <span class="tree-indent"></span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--foreground-subtle);"><circle cx="12" cy="12" r="10"/></svg>
-            Archmage
-            <span class="folder-tree-count">12</span>
-          </div>
-          <div class="folder-tree-item">
-            <span class="tree-indent"></span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--foreground-subtle);"><circle cx="12" cy="12" r="10"/></svg>
-            Rifleman
-            <span class="folder-tree-count">8</span>
-          </div>
-          <div class="folder-tree-item is-faction" style="margin-top: 4px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--amber-400);"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-            Orc
-            <span class="folder-tree-count">2 units</span>
-          </div>
-          <div class="folder-tree-item">
-            <span class="tree-indent"></span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--foreground-subtle);"><circle cx="12" cy="12" r="10"/></svg>
-            Blademaster
-            <span class="folder-tree-count">11</span>
-          </div>
-          <div class="folder-tree-item">
-            <span class="tree-indent"></span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--foreground-subtle);"><circle cx="12" cy="12" r="10"/></svg>
-            Grunt
-            <span class="folder-tree-count">9</span>
-          </div>
-          <div class="folder-tree-item is-faction" style="margin-top: 4px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--amber-400);"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-            Undead
-            <span class="folder-tree-count">1 unit</span>
-          </div>
-          <div class="folder-tree-item">
-            <span class="tree-indent"></span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--foreground-subtle);"><circle cx="12" cy="12" r="10"/></svg>
-            Death Knight
-            <span class="folder-tree-count">7</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Flow arrow between stage 1 and 2 -->
-      <div class="flow-arrow is-active">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- ──── Stage 2: Auto-Mapping Engine (active) ──── -->
-    <div class="stage-panel">
-      <div class="stage-header">
-        <div class="stage-header-row">
-          <span class="stage-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align: -2px; margin-right: 4px; color: var(--amber-400);">
-              <path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.3-6.7-2.1 2.1M8.4 15.6l-2.1 2.1m0-11.4 2.1 2.1m7.2 7.2 2.1 2.1"/>
-            </svg>
-            Auto-Mapping
-          </span>
-          <span class="gk-badge gk-badge-warning" style="height: 18px; font-size: 10px;">3 of 5</span>
-        </div>
-      </div>
-      <div class="stage-body">
-        <!-- Rules info panel -->
-        <div class="rules-panel">
-          <div class="rules-panel-title">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            Active Rules
-          </div>
-          <div class="rules-list">
-            <div class="rule-row">
-              <span class="rule-pattern">Ready*</span>
-              <span class="rule-arrow">&rarr;</span>
-              <span class="rule-event">session.start</span>
-            </div>
-            <div class="rule-row">
-              <span class="rule-pattern">What1-2</span>
-              <span class="rule-arrow">&rarr;</span>
-              <span class="rule-event">needs-input</span>
-            </div>
-            <div class="rule-row">
-              <span class="rule-pattern">YesAttack*</span>
-              <span class="rule-arrow">&rarr;</span>
-              <span class="rule-event">task.complete</span>
-            </div>
-            <div class="rule-row">
-              <span class="rule-pattern">Pissed*</span>
-              <span class="rule-arrow">&rarr;</span>
-              <span class="rule-event">resource.limit</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mapping queue -->
-        <div class="mapping-queue">
-
-          <!-- Character 1: Archmage — COMPLETE -->
-          <div class="mapping-card is-complete">
-            <div class="mapping-card-header">
-              <div class="mapping-avatar">&#x1F9D9;</div>
-              <div class="mapping-card-info">
-                <div class="mapping-card-name">Archmage</div>
-                <div class="mapping-card-meta">
-                  <span class="mapping-card-meta-text">12 files</span>
-                  <span style="color: var(--foreground-subtle);">&middot;</span>
-                  <span class="mapping-card-meta-text" style="color: var(--status-success);">7/7 mapped</span>
-                </div>
-              </div>
-              <div class="mapping-status-icon is-success">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-            </div>
-            <div class="mapping-progress-bar">
-              <div class="mapping-progress-fill is-complete" style="width: 100%;"></div>
-            </div>
-          </div>
-
-          <!-- Character 2: Rifleman — COMPLETE -->
-          <div class="mapping-card is-complete">
-            <div class="mapping-card-header">
-              <div class="mapping-avatar">&#x1F3F9;</div>
-              <div class="mapping-card-info">
-                <div class="mapping-card-name">Rifleman</div>
-                <div class="mapping-card-meta">
-                  <span class="mapping-card-meta-text">8 files</span>
-                  <span style="color: var(--foreground-subtle);">&middot;</span>
-                  <span class="mapping-card-meta-text" style="color: var(--status-success);">5/7 mapped</span>
-                </div>
-              </div>
-              <div class="mapping-status-icon is-success">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-            </div>
-            <div class="mapping-progress-bar">
-              <div class="mapping-progress-fill is-complete" style="width: 100%;"></div>
-            </div>
-          </div>
-
-          <!-- Character 3: Blademaster — PROCESSING (expanded) -->
-          <div class="mapping-card is-processing">
-            <div class="mapping-card-header">
-              <div class="mapping-avatar" style="border-color: color-mix(in oklch, var(--amber-400) 40%, var(--border));">&#x2694;&#xFE0F;</div>
-              <div class="mapping-card-info">
-                <div class="mapping-card-name">Blademaster</div>
-                <div class="mapping-card-meta">
-                  <span class="mapping-card-meta-text">11 files</span>
-                  <span style="color: var(--foreground-subtle);">&middot;</span>
-                  <span class="mapping-card-meta-text gk-pulse" style="color: var(--amber-400);">Mapping...</span>
-                </div>
-              </div>
-              <div class="mapping-status-icon is-processing">
-                <div class="mapping-spinner"></div>
-              </div>
-            </div>
-            <div class="mapping-detail">
-              <div class="event-slot-grid">
-                <div class="event-slot-row">
-                  <span class="event-slot-name">session.start</span>
-                  <span class="event-slot-file is-mapped">Ready1.wav</span>
-                  <button class="event-slot-play">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  </button>
-                </div>
-                <div class="event-slot-row">
-                  <span class="event-slot-name">needs-input</span>
-                  <span class="event-slot-file is-mapped">What1.wav</span>
-                  <button class="event-slot-play">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  </button>
-                </div>
-                <div class="event-slot-row">
-                  <span class="event-slot-name">task.complete</span>
-                  <span class="event-slot-file is-mapped">YesAttack1.wav</span>
-                  <button class="event-slot-play">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  </button>
-                </div>
-                <div class="event-slot-row">
-                  <span class="event-slot-name">task.error</span>
-                  <span class="event-slot-file" style="color: var(--amber-400);">scanning...</span>
-                  <span style="width: 18px;"></span>
-                </div>
-                <div class="event-slot-row" style="opacity: 0.4;">
-                  <span class="event-slot-name">task.ack</span>
-                  <span class="event-slot-file">pending</span>
-                  <span style="width: 18px;"></span>
-                </div>
-                <div class="event-slot-row" style="opacity: 0.4;">
-                  <span class="event-slot-name">session.end</span>
-                  <span class="event-slot-file">pending</span>
-                  <span style="width: 18px;"></span>
-                </div>
-                <div class="event-slot-row" style="opacity: 0.4;">
-                  <span class="event-slot-name">resource.limit</span>
-                  <span class="event-slot-file">pending</span>
-                  <span style="width: 18px;"></span>
-                </div>
-              </div>
-            </div>
-            <div class="mapping-progress-bar">
-              <div class="mapping-progress-fill is-processing" style="width: 45%;"></div>
-            </div>
-          </div>
-
-          <!-- Character 4: Grunt — WAITING -->
-          <div class="mapping-card is-waiting">
-            <div class="mapping-card-header">
-              <div class="mapping-avatar">&#x1FA93;</div>
-              <div class="mapping-card-info">
-                <div class="mapping-card-name">Grunt</div>
-                <div class="mapping-card-meta">
-                  <span class="mapping-card-meta-text">9 files</span>
-                  <span style="color: var(--foreground-subtle);">&middot;</span>
-                  <span class="mapping-card-meta-text">Queued</span>
-                </div>
-              </div>
-              <div class="mapping-status-icon is-waiting">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Character 5: Death Knight — WAITING -->
-          <div class="mapping-card is-waiting">
-            <div class="mapping-card-header">
-              <div class="mapping-avatar">&#x1F480;</div>
-              <div class="mapping-card-info">
-                <div class="mapping-card-name">Death Knight</div>
-                <div class="mapping-card-meta">
-                  <span class="mapping-card-meta-text">7 files</span>
-                  <span style="color: var(--foreground-subtle);">&middot;</span>
-                  <span class="mapping-card-meta-text">Queued</span>
-                </div>
-              </div>
-              <div class="mapping-status-icon is-waiting">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Flow arrow between stage 2 and 3 -->
-      <div class="flow-arrow">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- ──── Stage 3: Import Queue ──── -->
-    <div class="stage-panel">
-      <div class="stage-header">
-        <div class="stage-header-row">
-          <span class="stage-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align: -2px; margin-right: 4px;">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Import Queue
-          </span>
-          <span class="gk-badge" style="height: 18px; font-size: 10px;">2 ready</span>
-        </div>
-      </div>
-      <div class="stage-body">
-        <div class="import-queue">
-
-          <!-- Queued character 1: Archmage — ready -->
-          <div class="import-queue-item is-selected">
-            <div class="import-queue-avatar">&#x1F9D9;</div>
-            <div class="import-queue-info">
-              <div class="import-queue-name">Archmage</div>
-              <div class="import-queue-details">
-                <span class="import-queue-detail">12 sounds</span>
-                <div class="import-queue-coverage">
-                  <div class="coverage-bar">
-                    <div class="coverage-fill is-high" style="width: 100%;"></div>
-                  </div>
-                  <span class="coverage-text">7/7</span>
-                </div>
-              </div>
-            </div>
-            <div class="import-queue-status-icon" style="color: var(--status-success);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-          </div>
-
-          <!-- Queued character 2: Rifleman — ready, partial mapping -->
-          <div class="import-queue-item">
-            <div class="import-queue-avatar">&#x1F3F9;</div>
-            <div class="import-queue-info">
-              <div class="import-queue-name">Rifleman</div>
-              <div class="import-queue-details">
-                <span class="import-queue-detail">8 sounds</span>
-                <div class="import-queue-coverage">
-                  <div class="coverage-bar">
-                    <div class="coverage-fill is-mid" style="width: 71%;"></div>
-                  </div>
-                  <span class="coverage-text">5/7</span>
-                </div>
-              </div>
-            </div>
-            <div class="import-queue-status-icon" style="color: var(--status-warning);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-          </div>
-
-          <!-- Pending placeholders -->
-          <div class="import-queue-item is-pending">
-            <div class="import-queue-avatar" style="opacity: 0.4;">&#x2694;&#xFE0F;</div>
-            <div class="import-queue-info">
-              <div class="import-queue-name" style="color: var(--foreground-subtle);">Blademaster</div>
-              <div class="import-queue-details">
-                <span class="import-queue-detail">Mapping in progress...</span>
-              </div>
-            </div>
-            <div class="mapping-spinner" style="width: 14px; height: 14px; border-width: 1.5px;"></div>
-          </div>
-
-          <div class="import-queue-item is-pending">
-            <div class="import-queue-avatar" style="opacity: 0.4;">&#x1FA93;</div>
-            <div class="import-queue-info">
-              <div class="import-queue-name" style="color: var(--foreground-subtle);">Grunt</div>
-              <div class="import-queue-details">
-                <span class="import-queue-detail">Waiting for auto-map</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="import-queue-item is-pending">
-            <div class="import-queue-avatar" style="opacity: 0.4;">&#x1F480;</div>
-            <div class="import-queue-info">
-              <div class="import-queue-name" style="color: var(--foreground-subtle);">Death Knight</div>
-              <div class="import-queue-details">
-                <span class="import-queue-detail">Waiting for auto-map</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Storage estimate at bottom -->
-        <div style="margin-top: 16px; padding: 8px 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-subtle); text-transform: uppercase; letter-spacing: 0.06em;">Est. Storage</span>
-            <span style="font-family: var(--font-mono); font-size: var(--text-sm); color: var(--foreground-muted); font-variant-numeric: tabular-nums;">~4.2 MB</span>
-          </div>
-        </div>
-
-        <!-- Avatar notice -->
-        <div style="margin-top: 8px; padding: 6px 8px; border-radius: var(--radius-xs); font-size: var(--text-2xs); color: var(--foreground-subtle); line-height: 1.4; display: flex; align-items: flex-start; gap: 6px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px;">
-            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
-          </svg>
-          <span>No avatars detected. Characters will use placeholders. Editable after import.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ Bottom detail panel ═══ -->
-  <div class="detail-panel">
-    <div class="detail-panel-header">
-      <div class="detail-panel-header-left">
-        <div class="detail-avatar-large">&#x1F9D9;</div>
-        <div class="detail-title-group">
-          <span class="detail-char-name">Archmage</span>
-          <span class="detail-char-path">Human / Archmage / 12 files</span>
-        </div>
-        <span class="gk-badge gk-badge-success" style="margin-left: 4px;">
-          <span class="gk-badge-dot"></span>
-          Ready
-        </span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <button class="gk-btn gk-btn-ghost gk-btn-sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit Name
-        </button>
-        <button class="gk-btn gk-btn-ghost gk-btn-sm" style="color: var(--status-danger);">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          Remove
-        </button>
-      </div>
-    </div>
-    <div class="detail-panel-body">
-      <!-- Event mappings -->
-      <div class="detail-section">
-        <div class="detail-section-title">Event Mapping</div>
-        <div class="detail-event-list">
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">session.start</span>
-            <span class="detail-event-file">Ready1.wav</span>
-          </div>
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">needs-input</span>
-            <span class="detail-event-file">What1.wav</span>
-          </div>
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">session.end</span>
-            <span class="detail-event-file">What3.wav</span>
-          </div>
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">task.error</span>
-            <span class="detail-event-file">Death1.wav</span>
-          </div>
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">task.ack</span>
-            <span class="detail-event-file">Yes1.wav</span>
-          </div>
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">task.complete</span>
-            <span class="detail-event-file">YesAttack1.wav</span>
-          </div>
-          <div class="detail-event-row">
-            <div class="detail-event-dot is-mapped"></div>
-            <span class="detail-event-name">resource.limit</span>
-            <span class="detail-event-file">Pissed1.wav</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- File breakdown -->
-      <div class="detail-section">
-        <div class="detail-section-title">Sound Files</div>
-        <div style="display: flex; flex-direction: column; gap: 3px;">
-          <div style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-success)" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-muted);">Ready1.wav</span>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-subtle); margin-left: auto;">42 KB</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-success)" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-muted);">What1.wav</span>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-subtle); margin-left: auto;">38 KB</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-success)" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-muted);">What3.wav</span>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-subtle); margin-left: auto;">35 KB</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--status-success)" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-muted);">Death1.wav</span>
-            <span style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-subtle); margin-left: auto;">51 KB</span>
-          </div>
-          <div style="font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--foreground-subtle); padding: 2px 0;">
-            +8 more files (5 unassigned in pool)
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats summary -->
-      <div class="detail-section">
-        <div class="detail-section-title">Summary</div>
-        <div class="detail-stat-grid">
-          <div class="detail-stat-card">
-            <span class="detail-stat-val" style="color: var(--status-success);">7/7</span>
-            <span class="detail-stat-lbl">Events Mapped</span>
-          </div>
-          <div class="detail-stat-card">
-            <span class="detail-stat-val">12</span>
-            <span class="detail-stat-lbl">Total Files</span>
-          </div>
-          <div class="detail-stat-card">
-            <span class="detail-stat-val">5</span>
-            <span class="detail-stat-lbl">Pool (extra)</span>
-          </div>
-          <div class="detail-stat-card">
-            <span class="detail-stat-val">~0.5</span>
-            <span class="detail-stat-lbl">Size (MB)</span>
-          </div>
-        </div>
-
-        <div style="margin-top: 10px; padding: 6px 8px; background: color-mix(in oklch, var(--status-success) 8%, transparent); border: 1px solid color-mix(in oklch, var(--status-success) 20%, transparent); border-radius: var(--radius-xs);">
-          <span style="font-size: var(--text-2xs); color: var(--status-success); display: flex; align-items: center; gap: 5px;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            All critical events covered
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ Footer ═══ -->
-  <div class="wizard-footer">
-    <div class="footer-left">
-      <div class="footer-stat">
-        <span class="footer-stat-dot" style="background: var(--status-success);"></span>
-        2 ready
-      </div>
-      <div class="footer-stat">
-        <span class="footer-stat-dot" style="background: var(--amber-400);"></span>
-        1 mapping
-      </div>
-      <div class="footer-stat">
-        <span class="footer-stat-dot" style="background: var(--foreground-subtle);"></span>
-        2 queued
-      </div>
-    </div>
-    <div class="footer-right">
-      <button class="gk-btn gk-btn-ghost">Cancel</button>
-      <button class="gk-btn gk-btn-primary" disabled>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Import 5 Characters
-      </button>
-    </div>
-  </div>
-
-</div><!-- wizard-dialog -->
-</div><!-- wizard-backdrop -->
-
-</div><!-- gk-root -->
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Bulk Import Wizard — Variant E: Live Preview Pipeline</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* ── Grovekeeper tokens (inlined) ─────────────────────────── */
+
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+
+			/* ── Base reset ──────────────────────────────────────────── */
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				margin: 0;
+				background: oklch(0.12 0.015 150);
+			}
+
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ── Component classes ───────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+				border-color: transparent;
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: 1.4;
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+
+			/* ── Animations ──────────────────────────────────────────── */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			@keyframes flow-particle {
+				0% {
+					left: -6px;
+					opacity: 0;
+				}
+				10% {
+					opacity: 1;
+				}
+				90% {
+					opacity: 1;
+				}
+				100% {
+					left: calc(100% + 6px);
+					opacity: 0;
+				}
+			}
+
+			@keyframes shimmer-scan {
+				0% {
+					background-position: 200% 0;
+				}
+				100% {
+					background-position: -200% 0;
+				}
+			}
+
+			@keyframes processing-glow {
+				0%,
+				100% {
+					box-shadow: 0 0 8px color-mix(in oklch, var(--amber-400) 30%, transparent);
+				}
+				50% {
+					box-shadow: 0 0 18px color-mix(in oklch, var(--amber-400) 50%, transparent);
+				}
+			}
+
+			@keyframes check-pop {
+				0% {
+					transform: scale(0.6);
+					opacity: 0;
+				}
+				60% {
+					transform: scale(1.15);
+				}
+				100% {
+					transform: scale(1);
+					opacity: 1;
+				}
+			}
+
+			@keyframes progress-fill {
+				from {
+					width: 0;
+				}
+			}
+
+			/* ── Layout ──────────────────────────────────────────────── */
+			.wizard-backdrop {
+				position: fixed;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.1 0.02 150) 60%, transparent);
+				backdrop-filter: blur(4px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 50;
+			}
+
+			.wizard-dialog {
+				background: var(--background);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-xl);
+				width: calc(100vw - 48px);
+				max-width: 1280px;
+				height: calc(100vh - 64px);
+				max-height: 820px;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			/* ── Header ──────────────────────────────────────────────── */
+			.wizard-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 14px 20px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+
+			.wizard-header-left {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+			}
+
+			.wizard-header-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: -0.025em;
+				line-height: 1.15;
+			}
+
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 2px 8px;
+				border-radius: var(--radius-xs);
+			}
+
+			.wizard-header-meta {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.close-btn {
+				width: 28px;
+				height: 28px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				transition: all 120ms ease;
+			}
+			.close-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+
+			/* ── Pipeline strip (horizontal stage indicator) ─────────── */
+			.pipeline-strip {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				padding: 10px 20px;
+				border-bottom: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 50%, var(--background));
+				flex-shrink: 0;
+			}
+
+			.pipeline-stage-indicator {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 14px;
+				border-radius: var(--radius-md);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-subtle);
+				transition: all 200ms ease;
+			}
+			.pipeline-stage-indicator.is-active {
+				background: var(--primary-soft);
+				color: var(--foreground);
+			}
+			.pipeline-stage-indicator.is-complete {
+				color: var(--status-success);
+			}
+
+			.pipeline-stage-num {
+				width: 22px;
+				height: 22px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-semibold);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				color: var(--foreground-subtle);
+			}
+			.pipeline-stage-indicator.is-active .pipeline-stage-num {
+				background: var(--primary);
+				color: var(--primary-fg);
+				border-color: var(--primary);
+			}
+			.pipeline-stage-indicator.is-complete .pipeline-stage-num {
+				background: color-mix(in oklch, var(--status-success) 18%, transparent);
+				border-color: color-mix(in oklch, var(--status-success) 40%, transparent);
+				color: var(--status-success);
+			}
+
+			.pipeline-connector {
+				flex: 1;
+				height: 2px;
+				background: var(--border);
+				position: relative;
+				margin: 0 4px;
+				overflow: hidden;
+				border-radius: 1px;
+			}
+			.pipeline-connector.is-active {
+				background: linear-gradient(90deg, var(--status-success), var(--primary));
+			}
+			.pipeline-connector.is-active::after {
+				content: '';
+				position: absolute;
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--primary);
+				top: -2px;
+				animation: flow-particle 2s linear infinite;
+				box-shadow: 0 0 6px var(--primary);
+			}
+			.pipeline-connector.is-complete {
+				background: var(--status-success);
+			}
+
+			/* ── Main content: three-column pipeline ─────────────────── */
+			.pipeline-body {
+				flex: 1;
+				display: grid;
+				grid-template-columns: 280px 1fr 320px;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* Stage panels */
+			.stage-panel {
+				display: flex;
+				flex-direction: column;
+				border-right: 1px solid var(--border);
+				min-height: 0;
+				overflow: hidden;
+			}
+			.stage-panel:last-child {
+				border-right: none;
+			}
+
+			.stage-header {
+				padding: 12px 16px 10px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+
+			.stage-header-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+			}
+
+			.stage-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+
+			.stage-body {
+				flex: 1;
+				overflow-y: auto;
+				padding: 12px 14px;
+			}
+
+			/* ── Stage 1: Folder Scanner ─────────────────────────────── */
+			.folder-path-display {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 10px;
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				margin-bottom: 12px;
+			}
+
+			.folder-icon {
+				color: var(--amber-400);
+				flex-shrink: 0;
+			}
+
+			.folder-path-text {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				flex: 1;
+			}
+
+			.scan-stats {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 6px;
+				margin-bottom: 14px;
+			}
+
+			.scan-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				padding: 6px 8px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+			}
+
+			.scan-stat-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.scan-stat-label {
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+
+			.folder-tree {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.folder-tree-item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 6px;
+				border-radius: var(--radius-xs);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				cursor: default;
+			}
+
+			.folder-tree-item.is-faction {
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+			}
+
+			.folder-tree-item .tree-indent {
+				width: 14px;
+				height: 1px;
+				background: var(--border);
+				margin-left: 6px;
+				flex-shrink: 0;
+			}
+
+			.folder-tree-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
+
+			/* ── Stage 2: Auto-Mapping Engine ────────────────────────── */
+			.mapping-queue {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.mapping-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				transition:
+					border-color 200ms ease,
+					box-shadow 200ms ease;
+			}
+
+			.mapping-card.is-processing {
+				border-color: color-mix(in oklch, var(--amber-400) 50%, var(--border));
+				animation: processing-glow 2s ease-in-out infinite;
+			}
+
+			.mapping-card.is-complete {
+				border-color: color-mix(in oklch, var(--status-success) 40%, var(--border));
+			}
+
+			.mapping-card.is-waiting {
+				opacity: 0.55;
+			}
+
+			.mapping-card-header {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 12px;
+				cursor: pointer;
+			}
+			.mapping-card-header:hover {
+				background: var(--surface-2);
+			}
+
+			.mapping-avatar {
+				width: 32px;
+				height: 32px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				font-size: 15px;
+			}
+
+			.mapping-card-info {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.mapping-card-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.mapping-card-meta {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-top: 2px;
+			}
+
+			.mapping-card-meta-text {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.mapping-status-icon {
+				width: 20px;
+				height: 20px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+
+			.mapping-status-icon.is-success {
+				color: var(--status-success);
+				animation: check-pop 300ms ease-out forwards;
+			}
+			.mapping-status-icon.is-processing {
+				color: var(--amber-400);
+			}
+			.mapping-status-icon.is-waiting {
+				color: var(--foreground-subtle);
+			}
+
+			/* Processing spinner */
+			.mapping-spinner {
+				width: 16px;
+				height: 16px;
+				border: 2px solid color-mix(in oklch, var(--amber-400) 25%, transparent);
+				border-top-color: var(--amber-400);
+				border-radius: 50%;
+				animation: gk-spin 0.8s linear infinite;
+			}
+
+			/* Expanded detail: event mapping slots */
+			.mapping-detail {
+				border-top: 1px solid var(--border);
+				padding: 10px 12px;
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+
+			.event-slot-grid {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+
+			.event-slot-row {
+				display: grid;
+				grid-template-columns: 110px 1fr auto;
+				align-items: center;
+				gap: 8px;
+				padding: 4px 6px;
+				border-radius: var(--radius-xs);
+				font-size: var(--text-xs);
+			}
+			.event-slot-row:hover {
+				background: var(--surface-hover);
+			}
+
+			.event-slot-name {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-muted);
+				white-space: nowrap;
+			}
+
+			.event-slot-file {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.event-slot-file.is-mapped {
+				color: var(--status-success);
+			}
+
+			.event-slot-play {
+				width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				border-radius: 50%;
+				transition: all 120ms ease;
+			}
+			.event-slot-play:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+			}
+
+			/* Mapping progress bar */
+			.mapping-progress-bar {
+				height: 3px;
+				background: var(--border);
+				border-radius: 2px;
+				overflow: hidden;
+				margin-top: 6px;
+			}
+
+			.mapping-progress-fill {
+				height: 100%;
+				border-radius: 2px;
+				transition: width 600ms var(--ease-out);
+			}
+			.mapping-progress-fill.is-complete {
+				background: var(--status-success);
+			}
+			.mapping-progress-fill.is-processing {
+				background: linear-gradient(90deg, var(--amber-400), var(--amber-300));
+				background-size: 200% 100%;
+				animation: shimmer-scan 1.4s linear infinite;
+			}
+
+			/* ── Stage 3: Import Queue ───────────────────────────────── */
+			.import-queue {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+
+			.import-queue-item {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 12px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				cursor: pointer;
+				transition: all 150ms ease;
+			}
+			.import-queue-item:hover {
+				border-color: var(--border-strong);
+				background: var(--surface-2);
+			}
+			.import-queue-item.is-selected {
+				border-color: var(--primary);
+				box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 18%, transparent);
+			}
+			.import-queue-item.is-pending {
+				border-style: dashed;
+				opacity: 0.5;
+			}
+
+			.import-queue-avatar {
+				width: 36px;
+				height: 36px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 17px;
+				flex-shrink: 0;
+			}
+
+			.import-queue-info {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.import-queue-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+			}
+
+			.import-queue-details {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-top: 3px;
+			}
+
+			.import-queue-detail {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.import-queue-coverage {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.coverage-bar {
+				width: 40px;
+				height: 4px;
+				background: var(--border);
+				border-radius: 2px;
+				overflow: hidden;
+			}
+
+			.coverage-fill {
+				height: 100%;
+				border-radius: 2px;
+			}
+			.coverage-fill.is-high {
+				background: var(--status-success);
+			}
+			.coverage-fill.is-mid {
+				background: var(--status-warning);
+			}
+
+			.coverage-text {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.import-queue-status-icon {
+				flex-shrink: 0;
+				width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			/* ── Bottom detail panel ─────────────────────────────────── */
+			.detail-panel {
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+
+			.detail-panel-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 10px 20px;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.detail-panel-header-left {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.detail-avatar-large {
+				width: 40px;
+				height: 40px;
+				border-radius: var(--radius-md);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 20px;
+			}
+
+			.detail-title-group {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.detail-char-name {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: -0.02em;
+				color: var(--foreground);
+			}
+
+			.detail-char-path {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.detail-panel-body {
+				padding: 12px 20px 14px;
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				gap: 16px;
+			}
+
+			.detail-section {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+
+			.detail-section-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				padding-bottom: 4px;
+				border-bottom: 1px dashed var(--border);
+			}
+
+			.detail-event-list {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+
+			.detail-event-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 3px 0;
+			}
+
+			.detail-event-dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.detail-event-dot.is-mapped {
+				background: var(--status-success);
+			}
+			.detail-event-dot.is-unmapped {
+				background: var(--border-strong);
+			}
+
+			.detail-event-name {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-muted);
+				flex: 1;
+			}
+
+			.detail-event-file {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				max-width: 140px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.detail-stat-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+			}
+
+			.detail-stat-card {
+				padding: 8px 10px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.detail-stat-val {
+				font-family: var(--font-mono);
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.detail-stat-lbl {
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Footer ──────────────────────────────────────────────── */
+			.wizard-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 10px 20px;
+				border-top: 1px solid var(--border);
+				background: var(--surface-2);
+				flex-shrink: 0;
+			}
+
+			.footer-left {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+			}
+
+			.footer-stat {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+
+			.footer-stat-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+			}
+
+			.footer-right {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			/* ── Flow arrows between stages ──────────────────────────── */
+			.stage-panel {
+				position: relative;
+			}
+
+			.flow-arrow {
+				position: absolute;
+				right: -13px;
+				top: 50%;
+				transform: translateY(-50%);
+				z-index: 2;
+				width: 24px;
+				height: 24px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: 50%;
+				color: var(--foreground-subtle);
+			}
+			.flow-arrow.is-active {
+				border-color: color-mix(in oklch, var(--primary) 50%, var(--border));
+				color: var(--primary);
+				background: var(--background);
+			}
+
+			/* ── Mapping rules tooltip ───────────────────────────────── */
+			.rules-panel {
+				margin-bottom: 10px;
+				padding: 8px 10px;
+				background: color-mix(in oklch, var(--azure-700) 12%, var(--surface));
+				border: 1px solid color-mix(in oklch, var(--azure-500) 20%, var(--border));
+				border-radius: var(--radius-sm);
+			}
+
+			.rules-panel-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--azure-400);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				margin-bottom: 6px;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+			}
+
+			.rules-list {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+
+			.rule-row {
+				display: grid;
+				grid-template-columns: 80px 14px 1fr;
+				align-items: center;
+				gap: 0;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+			}
+
+			.rule-pattern {
+				color: var(--foreground-muted);
+			}
+			.rule-arrow {
+				color: var(--foreground-subtle);
+				text-align: center;
+			}
+			.rule-event {
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Responsive ──────────────────────────────────────────── */
+			@media (max-width: 900px) {
+				.pipeline-body {
+					grid-template-columns: 1fr;
+					grid-template-rows: auto auto auto;
+				}
+				.stage-panel {
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+					max-height: 240px;
+				}
+				.stage-panel:last-child {
+					border-bottom: none;
+				}
+				.flow-arrow {
+					display: none;
+				}
+				.detail-panel-body {
+					grid-template-columns: 1fr;
+				}
+				.wizard-dialog {
+					width: calc(100vw - 16px);
+					height: calc(100vh - 32px);
+					max-height: none;
+					border-radius: var(--radius-md);
+				}
+			}
+
+			@media (max-width: 600px) {
+				.pipeline-strip {
+					flex-wrap: wrap;
+					gap: 4px;
+				}
+				.pipeline-connector {
+					display: none;
+				}
+				.scan-stats {
+					grid-template-columns: 1fr;
+				}
+				.wizard-header {
+					padding: 10px 14px;
+				}
+				.wizard-footer {
+					flex-direction: column;
+					gap: 10px;
+					padding: 12px 14px;
+				}
+				.footer-left {
+					flex-wrap: wrap;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="wizard-backdrop">
+				<div class="wizard-dialog">
+					<!-- ═══ Header ═══ -->
+					<div class="wizard-header">
+						<div class="wizard-header-left">
+							<svg
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								style="color: var(--primary)"
+							>
+								<path
+									d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+								/>
+							</svg>
+							<span class="wizard-header-title">Bulk Import</span>
+							<span class="variant-label">VARIANT E: LIVE PREVIEW PIPELINE</span>
+						</div>
+						<div class="wizard-header-meta">
+							<span class="gk-badge gk-badge-info">
+								<span class="gk-badge-dot"></span>
+								Processing
+							</span>
+							<button class="close-btn" title="Close">
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="18" y1="6" x2="6" y2="18" />
+									<line x1="6" y1="6" x2="18" y2="18" />
+								</svg>
+							</button>
+						</div>
+					</div>
+
+					<!-- ═══ Pipeline strip ═══ -->
+					<div class="pipeline-strip">
+						<div class="pipeline-stage-indicator is-complete">
+							<span class="pipeline-stage-num">
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="3"
+									stroke-linecap="round"
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</svg>
+							</span>
+							<span>Scan Folder</span>
+						</div>
+						<div class="pipeline-connector is-complete"></div>
+						<div class="pipeline-stage-indicator is-active">
+							<span class="pipeline-stage-num">2</span>
+							<span>Auto-Map</span>
+						</div>
+						<div class="pipeline-connector is-active"></div>
+						<div class="pipeline-stage-indicator">
+							<span class="pipeline-stage-num">3</span>
+							<span>Import Queue</span>
+						</div>
+					</div>
+
+					<!-- ═══ Pipeline body: three columns ═══ -->
+					<div class="pipeline-body">
+						<!-- ──── Stage 1: Folder Scanner (complete) ──── -->
+						<div class="stage-panel">
+							<div class="stage-header">
+								<div class="stage-header-row">
+									<span class="stage-title">
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="
+												vertical-align: -2px;
+												margin-right: 4px;
+												color: var(--status-success);
+											"
+										>
+											<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+											<polyline points="22 4 12 14.01 9 11.01" />
+										</svg>
+										Scanned
+									</span>
+									<span
+										class="gk-badge gk-badge-success"
+										style="height: 18px; font-size: 10px"
+										>Complete</span
+									>
+								</div>
+							</div>
+							<div class="stage-body">
+								<!-- Folder path -->
+								<div class="folder-path-display">
+									<span class="folder-icon">
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path
+												d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+											/>
+										</svg>
+									</span>
+									<span class="folder-path-text" title="D:\Games\WC3\Sounds\Units"
+										>D:\Games\WC3\Sounds\Units</span
+									>
+								</div>
+
+								<!-- Stats -->
+								<div class="scan-stats">
+									<div class="scan-stat">
+										<span class="scan-stat-value">5</span>
+										<span class="scan-stat-label">Characters</span>
+									</div>
+									<div class="scan-stat">
+										<span class="scan-stat-value">47</span>
+										<span class="scan-stat-label">Sound files</span>
+									</div>
+								</div>
+
+								<!-- Folder tree -->
+								<div style="margin-bottom: 6px">
+									<span
+										class="gk-eyebrow"
+										style="margin-bottom: 6px; display: block"
+										>Folder Structure</span
+									>
+								</div>
+								<div class="folder-tree">
+									<div class="folder-tree-item is-faction">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--amber-400)"
+										>
+											<path
+												d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+											/>
+										</svg>
+										Human
+										<span class="folder-tree-count">2 units</span>
+									</div>
+									<div class="folder-tree-item">
+										<span class="tree-indent"></span>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle cx="12" cy="12" r="10" />
+										</svg>
+										Archmage
+										<span class="folder-tree-count">12</span>
+									</div>
+									<div class="folder-tree-item">
+										<span class="tree-indent"></span>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle cx="12" cy="12" r="10" />
+										</svg>
+										Rifleman
+										<span class="folder-tree-count">8</span>
+									</div>
+									<div
+										class="folder-tree-item is-faction"
+										style="margin-top: 4px"
+									>
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--amber-400)"
+										>
+											<path
+												d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+											/>
+										</svg>
+										Orc
+										<span class="folder-tree-count">2 units</span>
+									</div>
+									<div class="folder-tree-item">
+										<span class="tree-indent"></span>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle cx="12" cy="12" r="10" />
+										</svg>
+										Blademaster
+										<span class="folder-tree-count">11</span>
+									</div>
+									<div class="folder-tree-item">
+										<span class="tree-indent"></span>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle cx="12" cy="12" r="10" />
+										</svg>
+										Grunt
+										<span class="folder-tree-count">9</span>
+									</div>
+									<div
+										class="folder-tree-item is-faction"
+										style="margin-top: 4px"
+									>
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--amber-400)"
+										>
+											<path
+												d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+											/>
+										</svg>
+										Undead
+										<span class="folder-tree-count">1 unit</span>
+									</div>
+									<div class="folder-tree-item">
+										<span class="tree-indent"></span>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle cx="12" cy="12" r="10" />
+										</svg>
+										Death Knight
+										<span class="folder-tree-count">7</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Flow arrow between stage 1 and 2 -->
+							<div class="flow-arrow is-active">
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="9 18 15 12 9 6" />
+								</svg>
+							</div>
+						</div>
+
+						<!-- ──── Stage 2: Auto-Mapping Engine (active) ──── -->
+						<div class="stage-panel">
+							<div class="stage-header">
+								<div class="stage-header-row">
+									<span class="stage-title">
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="
+												vertical-align: -2px;
+												margin-right: 4px;
+												color: var(--amber-400);
+											"
+										>
+											<path
+												d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.3-6.7-2.1 2.1M8.4 15.6l-2.1 2.1m0-11.4 2.1 2.1m7.2 7.2 2.1 2.1"
+											/>
+										</svg>
+										Auto-Mapping
+									</span>
+									<span
+										class="gk-badge gk-badge-warning"
+										style="height: 18px; font-size: 10px"
+										>3 of 5</span
+									>
+								</div>
+							</div>
+							<div class="stage-body">
+								<!-- Rules info panel -->
+								<div class="rules-panel">
+									<div class="rules-panel-title">
+										<svg
+											width="11"
+											height="11"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<circle cx="12" cy="12" r="10" />
+											<path d="M12 16v-4" />
+											<path d="M12 8h.01" />
+										</svg>
+										Active Rules
+									</div>
+									<div class="rules-list">
+										<div class="rule-row">
+											<span class="rule-pattern">Ready*</span>
+											<span class="rule-arrow">&rarr;</span>
+											<span class="rule-event">session.start</span>
+										</div>
+										<div class="rule-row">
+											<span class="rule-pattern">What1-2</span>
+											<span class="rule-arrow">&rarr;</span>
+											<span class="rule-event">needs-input</span>
+										</div>
+										<div class="rule-row">
+											<span class="rule-pattern">YesAttack*</span>
+											<span class="rule-arrow">&rarr;</span>
+											<span class="rule-event">task.complete</span>
+										</div>
+										<div class="rule-row">
+											<span class="rule-pattern">Pissed*</span>
+											<span class="rule-arrow">&rarr;</span>
+											<span class="rule-event">resource.limit</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Mapping queue -->
+								<div class="mapping-queue">
+									<!-- Character 1: Archmage — COMPLETE -->
+									<div class="mapping-card is-complete">
+										<div class="mapping-card-header">
+											<div class="mapping-avatar">&#x1F9D9;</div>
+											<div class="mapping-card-info">
+												<div class="mapping-card-name">Archmage</div>
+												<div class="mapping-card-meta">
+													<span class="mapping-card-meta-text"
+														>12 files</span
+													>
+													<span style="color: var(--foreground-subtle)"
+														>&middot;</span
+													>
+													<span
+														class="mapping-card-meta-text"
+														style="color: var(--status-success)"
+														>7/7 mapped</span
+													>
+												</div>
+											</div>
+											<div class="mapping-status-icon is-success">
+												<svg
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+												>
+													<polyline points="20 6 9 17 4 12" />
+												</svg>
+											</div>
+										</div>
+										<div class="mapping-progress-bar">
+											<div
+												class="mapping-progress-fill is-complete"
+												style="width: 100%"
+											></div>
+										</div>
+									</div>
+
+									<!-- Character 2: Rifleman — COMPLETE -->
+									<div class="mapping-card is-complete">
+										<div class="mapping-card-header">
+											<div class="mapping-avatar">&#x1F3F9;</div>
+											<div class="mapping-card-info">
+												<div class="mapping-card-name">Rifleman</div>
+												<div class="mapping-card-meta">
+													<span class="mapping-card-meta-text"
+														>8 files</span
+													>
+													<span style="color: var(--foreground-subtle)"
+														>&middot;</span
+													>
+													<span
+														class="mapping-card-meta-text"
+														style="color: var(--status-success)"
+														>5/7 mapped</span
+													>
+												</div>
+											</div>
+											<div class="mapping-status-icon is-success">
+												<svg
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+												>
+													<polyline points="20 6 9 17 4 12" />
+												</svg>
+											</div>
+										</div>
+										<div class="mapping-progress-bar">
+											<div
+												class="mapping-progress-fill is-complete"
+												style="width: 100%"
+											></div>
+										</div>
+									</div>
+
+									<!-- Character 3: Blademaster — PROCESSING (expanded) -->
+									<div class="mapping-card is-processing">
+										<div class="mapping-card-header">
+											<div
+												class="mapping-avatar"
+												style="
+													border-color: color-mix(
+														in oklch,
+														var(--amber-400) 40%,
+														var(--border)
+													);
+												"
+											>
+												&#x2694;&#xFE0F;
+											</div>
+											<div class="mapping-card-info">
+												<div class="mapping-card-name">Blademaster</div>
+												<div class="mapping-card-meta">
+													<span class="mapping-card-meta-text"
+														>11 files</span
+													>
+													<span style="color: var(--foreground-subtle)"
+														>&middot;</span
+													>
+													<span
+														class="mapping-card-meta-text gk-pulse"
+														style="color: var(--amber-400)"
+														>Mapping...</span
+													>
+												</div>
+											</div>
+											<div class="mapping-status-icon is-processing">
+												<div class="mapping-spinner"></div>
+											</div>
+										</div>
+										<div class="mapping-detail">
+											<div class="event-slot-grid">
+												<div class="event-slot-row">
+													<span class="event-slot-name"
+														>session.start</span
+													>
+													<span class="event-slot-file is-mapped"
+														>Ready1.wav</span
+													>
+													<button class="event-slot-play">
+														<svg
+															width="10"
+															height="10"
+															viewBox="0 0 24 24"
+															fill="currentColor"
+														>
+															<polygon points="5 3 19 12 5 21 5 3" />
+														</svg>
+													</button>
+												</div>
+												<div class="event-slot-row">
+													<span class="event-slot-name">needs-input</span>
+													<span class="event-slot-file is-mapped"
+														>What1.wav</span
+													>
+													<button class="event-slot-play">
+														<svg
+															width="10"
+															height="10"
+															viewBox="0 0 24 24"
+															fill="currentColor"
+														>
+															<polygon points="5 3 19 12 5 21 5 3" />
+														</svg>
+													</button>
+												</div>
+												<div class="event-slot-row">
+													<span class="event-slot-name"
+														>task.complete</span
+													>
+													<span class="event-slot-file is-mapped"
+														>YesAttack1.wav</span
+													>
+													<button class="event-slot-play">
+														<svg
+															width="10"
+															height="10"
+															viewBox="0 0 24 24"
+															fill="currentColor"
+														>
+															<polygon points="5 3 19 12 5 21 5 3" />
+														</svg>
+													</button>
+												</div>
+												<div class="event-slot-row">
+													<span class="event-slot-name">task.error</span>
+													<span
+														class="event-slot-file"
+														style="color: var(--amber-400)"
+														>scanning...</span
+													>
+													<span style="width: 18px"></span>
+												</div>
+												<div class="event-slot-row" style="opacity: 0.4">
+													<span class="event-slot-name">task.ack</span>
+													<span class="event-slot-file">pending</span>
+													<span style="width: 18px"></span>
+												</div>
+												<div class="event-slot-row" style="opacity: 0.4">
+													<span class="event-slot-name">session.end</span>
+													<span class="event-slot-file">pending</span>
+													<span style="width: 18px"></span>
+												</div>
+												<div class="event-slot-row" style="opacity: 0.4">
+													<span class="event-slot-name"
+														>resource.limit</span
+													>
+													<span class="event-slot-file">pending</span>
+													<span style="width: 18px"></span>
+												</div>
+											</div>
+										</div>
+										<div class="mapping-progress-bar">
+											<div
+												class="mapping-progress-fill is-processing"
+												style="width: 45%"
+											></div>
+										</div>
+									</div>
+
+									<!-- Character 4: Grunt — WAITING -->
+									<div class="mapping-card is-waiting">
+										<div class="mapping-card-header">
+											<div class="mapping-avatar">&#x1FA93;</div>
+											<div class="mapping-card-info">
+												<div class="mapping-card-name">Grunt</div>
+												<div class="mapping-card-meta">
+													<span class="mapping-card-meta-text"
+														>9 files</span
+													>
+													<span style="color: var(--foreground-subtle)"
+														>&middot;</span
+													>
+													<span class="mapping-card-meta-text"
+														>Queued</span
+													>
+												</div>
+											</div>
+											<div class="mapping-status-icon is-waiting">
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<circle cx="12" cy="12" r="10" />
+													<polyline points="12 6 12 12 16 14" />
+												</svg>
+											</div>
+										</div>
+									</div>
+
+									<!-- Character 5: Death Knight — WAITING -->
+									<div class="mapping-card is-waiting">
+										<div class="mapping-card-header">
+											<div class="mapping-avatar">&#x1F480;</div>
+											<div class="mapping-card-info">
+												<div class="mapping-card-name">Death Knight</div>
+												<div class="mapping-card-meta">
+													<span class="mapping-card-meta-text"
+														>7 files</span
+													>
+													<span style="color: var(--foreground-subtle)"
+														>&middot;</span
+													>
+													<span class="mapping-card-meta-text"
+														>Queued</span
+													>
+												</div>
+											</div>
+											<div class="mapping-status-icon is-waiting">
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<circle cx="12" cy="12" r="10" />
+													<polyline points="12 6 12 12 16 14" />
+												</svg>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Flow arrow between stage 2 and 3 -->
+							<div class="flow-arrow">
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="9 18 15 12 9 6" />
+								</svg>
+							</div>
+						</div>
+
+						<!-- ──── Stage 3: Import Queue ──── -->
+						<div class="stage-panel">
+							<div class="stage-header">
+								<div class="stage-header-row">
+									<span class="stage-title">
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="vertical-align: -2px; margin-right: 4px"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Import Queue
+									</span>
+									<span class="gk-badge" style="height: 18px; font-size: 10px"
+										>2 ready</span
+									>
+								</div>
+							</div>
+							<div class="stage-body">
+								<div class="import-queue">
+									<!-- Queued character 1: Archmage — ready -->
+									<div class="import-queue-item is-selected">
+										<div class="import-queue-avatar">&#x1F9D9;</div>
+										<div class="import-queue-info">
+											<div class="import-queue-name">Archmage</div>
+											<div class="import-queue-details">
+												<span class="import-queue-detail">12 sounds</span>
+												<div class="import-queue-coverage">
+													<div class="coverage-bar">
+														<div
+															class="coverage-fill is-high"
+															style="width: 100%"
+														></div>
+													</div>
+													<span class="coverage-text">7/7</span>
+												</div>
+											</div>
+										</div>
+										<div
+											class="import-queue-status-icon"
+											style="color: var(--status-success)"
+										>
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+												<polyline points="22 4 12 14.01 9 11.01" />
+											</svg>
+										</div>
+									</div>
+
+									<!-- Queued character 2: Rifleman — ready, partial mapping -->
+									<div class="import-queue-item">
+										<div class="import-queue-avatar">&#x1F3F9;</div>
+										<div class="import-queue-info">
+											<div class="import-queue-name">Rifleman</div>
+											<div class="import-queue-details">
+												<span class="import-queue-detail">8 sounds</span>
+												<div class="import-queue-coverage">
+													<div class="coverage-bar">
+														<div
+															class="coverage-fill is-mid"
+															style="width: 71%"
+														></div>
+													</div>
+													<span class="coverage-text">5/7</span>
+												</div>
+											</div>
+										</div>
+										<div
+											class="import-queue-status-icon"
+											style="color: var(--status-warning)"
+										>
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<path
+													d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+												/>
+												<line x1="12" y1="9" x2="12" y2="13" />
+												<line x1="12" y1="17" x2="12.01" y2="17" />
+											</svg>
+										</div>
+									</div>
+
+									<!-- Pending placeholders -->
+									<div class="import-queue-item is-pending">
+										<div class="import-queue-avatar" style="opacity: 0.4">
+											&#x2694;&#xFE0F;
+										</div>
+										<div class="import-queue-info">
+											<div
+												class="import-queue-name"
+												style="color: var(--foreground-subtle)"
+											>
+												Blademaster
+											</div>
+											<div class="import-queue-details">
+												<span class="import-queue-detail"
+													>Mapping in progress...</span
+												>
+											</div>
+										</div>
+										<div
+											class="mapping-spinner"
+											style="width: 14px; height: 14px; border-width: 1.5px"
+										></div>
+									</div>
+
+									<div class="import-queue-item is-pending">
+										<div class="import-queue-avatar" style="opacity: 0.4">
+											&#x1FA93;
+										</div>
+										<div class="import-queue-info">
+											<div
+												class="import-queue-name"
+												style="color: var(--foreground-subtle)"
+											>
+												Grunt
+											</div>
+											<div class="import-queue-details">
+												<span class="import-queue-detail"
+													>Waiting for auto-map</span
+												>
+											</div>
+										</div>
+									</div>
+
+									<div class="import-queue-item is-pending">
+										<div class="import-queue-avatar" style="opacity: 0.4">
+											&#x1F480;
+										</div>
+										<div class="import-queue-info">
+											<div
+												class="import-queue-name"
+												style="color: var(--foreground-subtle)"
+											>
+												Death Knight
+											</div>
+											<div class="import-queue-details">
+												<span class="import-queue-detail"
+													>Waiting for auto-map</span
+												>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Storage estimate at bottom -->
+								<div
+									style="
+										margin-top: 16px;
+										padding: 8px 10px;
+										background: var(--surface-2);
+										border: 1px solid var(--border);
+										border-radius: var(--radius-sm);
+									"
+								>
+									<div
+										style="
+											display: flex;
+											align-items: center;
+											justify-content: space-between;
+										"
+									>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-subtle);
+												text-transform: uppercase;
+												letter-spacing: 0.06em;
+											"
+											>Est. Storage</span
+										>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-sm);
+												color: var(--foreground-muted);
+												font-variant-numeric: tabular-nums;
+											"
+											>~4.2 MB</span
+										>
+									</div>
+								</div>
+
+								<!-- Avatar notice -->
+								<div
+									style="
+										margin-top: 8px;
+										padding: 6px 8px;
+										border-radius: var(--radius-xs);
+										font-size: var(--text-2xs);
+										color: var(--foreground-subtle);
+										line-height: 1.4;
+										display: flex;
+										align-items: flex-start;
+										gap: 6px;
+									"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										style="flex-shrink: 0; margin-top: 1px"
+									>
+										<circle cx="12" cy="12" r="10" />
+										<path d="M12 16v-4" />
+										<path d="M12 8h.01" />
+									</svg>
+									<span
+										>No avatars detected. Characters will use placeholders.
+										Editable after import.</span
+									>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══ Bottom detail panel ═══ -->
+					<div class="detail-panel">
+						<div class="detail-panel-header">
+							<div class="detail-panel-header-left">
+								<div class="detail-avatar-large">&#x1F9D9;</div>
+								<div class="detail-title-group">
+									<span class="detail-char-name">Archmage</span>
+									<span class="detail-char-path"
+										>Human / Archmage / 12 files</span
+									>
+								</div>
+								<span class="gk-badge gk-badge-success" style="margin-left: 4px">
+									<span class="gk-badge-dot"></span>
+									Ready
+								</span>
+							</div>
+							<div style="display: flex; align-items: center; gap: 8px">
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<path
+											d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+										/>
+										<path
+											d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+										/>
+									</svg>
+									Edit Name
+								</button>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									style="color: var(--status-danger)"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<polyline points="3 6 5 6 21 6" />
+										<path
+											d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+										/>
+									</svg>
+									Remove
+								</button>
+							</div>
+						</div>
+						<div class="detail-panel-body">
+							<!-- Event mappings -->
+							<div class="detail-section">
+								<div class="detail-section-title">Event Mapping</div>
+								<div class="detail-event-list">
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">session.start</span>
+										<span class="detail-event-file">Ready1.wav</span>
+									</div>
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">needs-input</span>
+										<span class="detail-event-file">What1.wav</span>
+									</div>
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">session.end</span>
+										<span class="detail-event-file">What3.wav</span>
+									</div>
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">task.error</span>
+										<span class="detail-event-file">Death1.wav</span>
+									</div>
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">task.ack</span>
+										<span class="detail-event-file">Yes1.wav</span>
+									</div>
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">task.complete</span>
+										<span class="detail-event-file">YesAttack1.wav</span>
+									</div>
+									<div class="detail-event-row">
+										<div class="detail-event-dot is-mapped"></div>
+										<span class="detail-event-name">resource.limit</span>
+										<span class="detail-event-file">Pissed1.wav</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- File breakdown -->
+							<div class="detail-section">
+								<div class="detail-section-title">Sound Files</div>
+								<div style="display: flex; flex-direction: column; gap: 3px">
+									<div
+										style="
+											display: flex;
+											align-items: center;
+											gap: 6px;
+											padding: 2px 0;
+										"
+									>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--status-success)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-muted);
+											"
+											>Ready1.wav</span
+										>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-subtle);
+												margin-left: auto;
+											"
+											>42 KB</span
+										>
+									</div>
+									<div
+										style="
+											display: flex;
+											align-items: center;
+											gap: 6px;
+											padding: 2px 0;
+										"
+									>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--status-success)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-muted);
+											"
+											>What1.wav</span
+										>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-subtle);
+												margin-left: auto;
+											"
+											>38 KB</span
+										>
+									</div>
+									<div
+										style="
+											display: flex;
+											align-items: center;
+											gap: 6px;
+											padding: 2px 0;
+										"
+									>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--status-success)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-muted);
+											"
+											>What3.wav</span
+										>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-subtle);
+												margin-left: auto;
+											"
+											>35 KB</span
+										>
+									</div>
+									<div
+										style="
+											display: flex;
+											align-items: center;
+											gap: 6px;
+											padding: 2px 0;
+										"
+									>
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--status-success)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-muted);
+											"
+											>Death1.wav</span
+										>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: var(--text-2xs);
+												color: var(--foreground-subtle);
+												margin-left: auto;
+											"
+											>51 KB</span
+										>
+									</div>
+									<div
+										style="
+											font-family: var(--font-mono);
+											font-size: var(--text-2xs);
+											color: var(--foreground-subtle);
+											padding: 2px 0;
+										"
+									>
+										+8 more files (5 unassigned in pool)
+									</div>
+								</div>
+							</div>
+
+							<!-- Stats summary -->
+							<div class="detail-section">
+								<div class="detail-section-title">Summary</div>
+								<div class="detail-stat-grid">
+									<div class="detail-stat-card">
+										<span
+											class="detail-stat-val"
+											style="color: var(--status-success)"
+											>7/7</span
+										>
+										<span class="detail-stat-lbl">Events Mapped</span>
+									</div>
+									<div class="detail-stat-card">
+										<span class="detail-stat-val">12</span>
+										<span class="detail-stat-lbl">Total Files</span>
+									</div>
+									<div class="detail-stat-card">
+										<span class="detail-stat-val">5</span>
+										<span class="detail-stat-lbl">Pool (extra)</span>
+									</div>
+									<div class="detail-stat-card">
+										<span class="detail-stat-val">~0.5</span>
+										<span class="detail-stat-lbl">Size (MB)</span>
+									</div>
+								</div>
+
+								<div
+									style="
+										margin-top: 10px;
+										padding: 6px 8px;
+										background: color-mix(
+											in oklch,
+											var(--status-success) 8%,
+											transparent
+										);
+										border: 1px solid
+											color-mix(
+												in oklch,
+												var(--status-success) 20%,
+												transparent
+											);
+										border-radius: var(--radius-xs);
+									"
+								>
+									<span
+										style="
+											font-size: var(--text-2xs);
+											color: var(--status-success);
+											display: flex;
+											align-items: center;
+											gap: 5px;
+										"
+									>
+										<svg
+											width="11"
+											height="11"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+										All critical events covered
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══ Footer ═══ -->
+					<div class="wizard-footer">
+						<div class="footer-left">
+							<div class="footer-stat">
+								<span
+									class="footer-stat-dot"
+									style="background: var(--status-success)"
+								></span>
+								2 ready
+							</div>
+							<div class="footer-stat">
+								<span
+									class="footer-stat-dot"
+									style="background: var(--amber-400)"
+								></span>
+								1 mapping
+							</div>
+							<div class="footer-stat">
+								<span
+									class="footer-stat-dot"
+									style="background: var(--foreground-subtle)"
+								></span>
+								2 queued
+							</div>
+						</div>
+						<div class="footer-right">
+							<button class="gk-btn gk-btn-ghost">Cancel</button>
+							<button class="gk-btn gk-btn-primary" disabled>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+									<polyline points="7 10 12 15 17 10" />
+									<line x1="12" y1="15" x2="12" y2="3" />
+								</svg>
+								Import 5 Characters
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- wizard-dialog -->
+			</div>
+			<!-- wizard-backdrop -->
+		</div>
+		<!-- gk-root -->
+	</body>
 </html>

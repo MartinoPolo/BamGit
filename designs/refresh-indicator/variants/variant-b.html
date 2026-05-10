@@ -1,1148 +1,1191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RefreshIndicator — Variant B: Tooltip-Revealed</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>RefreshIndicator — Variant B: Tooltip-Revealed</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* ============================================================
    Grovekeeper design tokens — Forest Moss palette (inlined)
    ============================================================ */
 
-:root {
-  /* Brand greens (deep moss + olive) */
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
+			/* Dark theme — the primary mode for a Tauri dev tool */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-  /* Olive / amber accent (autumn fruit) */
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			/* ── Base ──────────────────────────────────────────────────── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-  /* Bark (warm brown for trunks, secondary accents) */
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+			/* ── Typography ────────────────────────────────────────────── */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
 
-  /* Azure (cool blue accent scale) */
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+			/* ── Buttons ────────────────────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: var(--weight-medium);
+				font-size: var(--text-md);
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					transform var(--duration-1) var(--ease-standard),
+					box-shadow var(--duration-2) var(--ease-standard);
+				white-space: nowrap;
+				user-select: none;
+				position: relative;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-sm {
+				height: var(--size-control-sm);
+				padding: 0 9px;
+				font-size: var(--text-sm);
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.38;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-  /* Plum (purple accent) */
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
+			/* ── Tooltip (base) ────────────────────────────────────────── */
+			.gk-tooltip {
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+				font-size: 11px;
+				padding: 5px 8px;
+				border-radius: 6px;
+				box-shadow: var(--shadow-md);
+				font-family: var(--font-sans);
+				position: relative;
+				white-space: nowrap;
+			}
 
-  /* Teal (blue-green accent) */
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
+			/* ── Divider ────────────────────────────────────────────────── */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-  /* Rose (warm pink-red accent) */
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
+			/* ── Card ────────────────────────────────────────────────────── */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-  /* Coral (warm orange-red accent) */
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
-
-  /* Gold (warm yellow accent) */
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
-
-  /* Sage (muted green accent) */
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
-
-  /* Indigo (deep blue-violet accent) */
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
-
-  /* Fuchsia (vivid magenta accent) */
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
-
-  /* Sky (gradient bg for forest view) */
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
-
-  /* Status accents */
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
-
-  /* Priority levels */
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
-
-  /* GitHub state colors */
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
-
-  /* Session state colors */
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
-
-  /* ── Typography ─────────────────────────────────────────── */
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-
-  /* Font sizes — minor-third-ish scale, tuned for a desktop dev tool */
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-
-  /* Line heights */
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-
-  /* Font weights */
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-
-  /* Letter spacing */
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-
-  /* ── Spacing scale (4px base) ───────────────────────────── */
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-
-  /* ── Radii ──────────────────────────────────────────────── */
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  /* ── Borders ────────────────────────────────────────────── */
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-
-  /* ── Shadows ────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  /* ── Sizing — control heights ──────────────────────────── */
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  /* ── Z-index scale ─────────────────────────────────────── */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-
-  /* ── Motion ─────────────────────────────────────────────── */
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-
-  /* ── Layout ─────────────────────────────────────────────── */
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
-
-/* Dark theme — the primary mode for a Tauri dev tool */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
-
-/* ── Base ──────────────────────────────────────────────────── */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-
-/* ── Typography ────────────────────────────────────────────── */
-.gk-eyebrow {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
-.gk-h2 {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-}
-.gk-h3 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-}
-.gk-small {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
-.gk-tiny {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wide);
-}
-
-/* ── Buttons ────────────────────────────────────────────────── */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-md);
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition:
-    background var(--duration-2) var(--ease-standard),
-    border-color var(--duration-2) var(--ease-standard),
-    color var(--duration-2) var(--ease-standard),
-    transform var(--duration-1) var(--ease-standard),
-    box-shadow var(--duration-2) var(--ease-standard);
-  white-space: nowrap;
-  user-select: none;
-  position: relative;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-}
-.gk-btn-sm {
-  height: var(--size-control-sm);
-  padding: 0 9px;
-  font-size: var(--text-sm);
-  border-radius: var(--radius-sm);
-}
-.gk-btn-icon {
-  padding: 0;
-  width: 32px;
-}
-.gk-btn-icon.gk-btn-sm {
-  width: 26px;
-}
-.gk-btn:disabled,
-.gk-btn[data-state="disabled"] {
-  opacity: 0.38;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* ── Tooltip (base) ────────────────────────────────────────── */
-.gk-tooltip {
-  background: oklch(0.12 0.02 150);
-  color: oklch(0.97 0.01 130);
-  border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
-  font-size: 11px;
-  padding: 5px 8px;
-  border-radius: 6px;
-  box-shadow: var(--shadow-md);
-  font-family: var(--font-sans);
-  position: relative;
-  white-space: nowrap;
-}
-
-/* ── Divider ────────────────────────────────────────────────── */
-.gk-hr {
-  height: 1px;
-  background: var(--border);
-  border: none;
-  margin: 0;
-}
-
-/* ── Card ────────────────────────────────────────────────────── */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-/* ============================================================
+			/* ============================================================
    RefreshIndicator — component-specific styles
    Variant B: Tooltip-Revealed
    ============================================================ */
 
-/* Wrapper that creates the tooltip positioning context */
-.ri-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+			/* Wrapper that creates the tooltip positioning context */
+			.ri-wrap {
+				position: relative;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+			}
 
-/* ── The square icon button ──────────────────────────────── */
-.ri-btn {
-  /* Inherits .gk-btn .gk-btn-secondary .gk-btn-sm .gk-btn-icon */
-  position: relative;
-  flex-shrink: 0;
-  /* Override default secondary background slightly for icon-only context */
-  background: transparent;
-  border-color: var(--border);
-  color: var(--foreground-muted);
-}
-.ri-btn:hover {
-  background: var(--surface-2);
-  border-color: var(--border-strong);
-  color: var(--foreground);
-}
-.ri-btn:active {
-  transform: scale(0.94);
-}
-.ri-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.ri-btn:disabled,
-.ri-btn[data-state="disabled"] {
-  opacity: 0.38;
-  cursor: not-allowed;
-  pointer-events: none;
-  color: var(--foreground-subtle);
-}
+			/* ── The square icon button ──────────────────────────────── */
+			.ri-btn {
+				/* Inherits .gk-btn .gk-btn-secondary .gk-btn-sm .gk-btn-icon */
+				position: relative;
+				flex-shrink: 0;
+				/* Override default secondary background slightly for icon-only context */
+				background: transparent;
+				border-color: var(--border);
+				color: var(--foreground-muted);
+			}
+			.ri-btn:hover {
+				background: var(--surface-2);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.ri-btn:active {
+				transform: scale(0.94);
+			}
+			.ri-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.ri-btn:disabled,
+			.ri-btn[data-state='disabled'] {
+				opacity: 0.38;
+				cursor: not-allowed;
+				pointer-events: none;
+				color: var(--foreground-subtle);
+			}
 
-/* ── Icon inside button ──────────────────────────────────── */
-.ri-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  display: block;
-}
+			/* ── Icon inside button ──────────────────────────────────── */
+			.ri-icon {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+				display: block;
+			}
 
-/* ── Dot badge (top-right of button) ────────────────────── */
-.ri-badge {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--status-success);
-  border: 1.5px solid var(--background);
-  display: block;
-  z-index: 1;
-}
+			/* ── Dot badge (top-right of button) ────────────────────── */
+			.ri-badge {
+				position: absolute;
+				top: -3px;
+				right: -3px;
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				background: var(--status-success);
+				border: 1.5px solid var(--background);
+				display: block;
+				z-index: 1;
+			}
 
-/* ── Tooltip positioned above ────────────────────────────── */
-.ri-tooltip {
-  position: absolute;
-  bottom: calc(100% + 7px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: var(--z-tooltip);
-  pointer-events: none;
-  white-space: nowrap;
-}
-/* Arrow pointing down */
-.ri-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-top-color: oklch(0.12 0.02 150);
-}
+			/* ── Tooltip positioned above ────────────────────────────── */
+			.ri-tooltip {
+				position: absolute;
+				bottom: calc(100% + 7px);
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: var(--z-tooltip);
+				pointer-events: none;
+				white-space: nowrap;
+			}
+			/* Arrow pointing down */
+			.ri-tooltip::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				border: 4px solid transparent;
+				border-top-color: oklch(0.12 0.02 150);
+			}
 
-/* Tooltip timestamp (mono, secondary line) */
-.ri-tooltip-ts {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: oklch(0.65 0.015 140);
-  margin-top: 2px;
-  letter-spacing: 0.01em;
-}
+			/* Tooltip timestamp (mono, secondary line) */
+			.ri-tooltip-ts {
+				display: block;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: oklch(0.65 0.015 140);
+				margin-top: 2px;
+				letter-spacing: 0.01em;
+			}
 
-/* ── STATE: idle ─────────────────────────────────────────── */
-.ri-state-idle .ri-btn {
-  color: var(--foreground-subtle);
-  border-color: var(--border);
-  background: transparent;
-}
+			/* ── STATE: idle ─────────────────────────────────────────── */
+			.ri-state-idle .ri-btn {
+				color: var(--foreground-subtle);
+				border-color: var(--border);
+				background: transparent;
+			}
 
-/* ── STATE: loading ──────────────────────────────────────── */
-.ri-state-loading .ri-btn {
-  color: var(--foreground-subtle);
-  border-color: var(--border);
-  background: transparent;
-  cursor: default;
-  pointer-events: none;
-}
-/* Spinning animation for the loading icon */
-@keyframes ri-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-.ri-state-loading .ri-icon {
-  animation: ri-spin 900ms linear infinite;
-  transform-origin: center center;
-  color: var(--foreground-subtle);
-}
+			/* ── STATE: loading ──────────────────────────────────────── */
+			.ri-state-loading .ri-btn {
+				color: var(--foreground-subtle);
+				border-color: var(--border);
+				background: transparent;
+				cursor: default;
+				pointer-events: none;
+			}
+			/* Spinning animation for the loading icon */
+			@keyframes ri-spin {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			.ri-state-loading .ri-icon {
+				animation: ri-spin 900ms linear infinite;
+				transform-origin: center center;
+				color: var(--foreground-subtle);
+			}
 
-/* ── STATE: fresh ────────────────────────────────────────── */
-.ri-state-fresh .ri-btn {
-  color: var(--status-success);
-  border-color: color-mix(in oklch, var(--status-success) 28%, var(--border));
-  background: color-mix(in oklch, var(--status-success) 7%, transparent);
-}
+			/* ── STATE: fresh ────────────────────────────────────────── */
+			.ri-state-fresh .ri-btn {
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 28%, var(--border));
+				background: color-mix(in oklch, var(--status-success) 7%, transparent);
+			}
 
-/* Flash animation fires once on mount (shown frozen in mockup) */
-@keyframes ri-fresh-flash {
-  0%   { background: color-mix(in oklch, var(--status-success) 18%, transparent); }
-  60%  { background: color-mix(in oklch, var(--status-success) 10%, transparent); }
-  100% { background: color-mix(in oklch, var(--status-success) 7%, transparent); }
-}
+			/* Flash animation fires once on mount (shown frozen in mockup) */
+			@keyframes ri-fresh-flash {
+				0% {
+					background: color-mix(in oklch, var(--status-success) 18%, transparent);
+				}
+				60% {
+					background: color-mix(in oklch, var(--status-success) 10%, transparent);
+				}
+				100% {
+					background: color-mix(in oklch, var(--status-success) 7%, transparent);
+				}
+			}
 
-/* ── STATE: stale ────────────────────────────────────────── */
-.ri-state-stale .ri-btn {
-  color: var(--foreground-subtle);
-  border-color: var(--border);
-  background: transparent;
-  opacity: 0.6;
-}
+			/* ── STATE: stale ────────────────────────────────────────── */
+			.ri-state-stale .ri-btn {
+				color: var(--foreground-subtle);
+				border-color: var(--border);
+				background: transparent;
+				opacity: 0.6;
+			}
 
-/* ── STATE: new-data ─────────────────────────────────────── */
-.ri-state-new-data .ri-btn {
-  color: var(--foreground-muted);
-  background: transparent;
-}
+			/* ── STATE: new-data ─────────────────────────────────────── */
+			.ri-state-new-data .ri-btn {
+				color: var(--foreground-muted);
+				background: transparent;
+			}
 
-/* Border pulse animation for new-data state */
-@keyframes ri-border-pulse {
-  0%, 100% {
-    border-color: var(--border);
-    box-shadow: none;
-  }
-  50% {
-    border-color: color-mix(in oklch, var(--status-success) 55%, var(--border));
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--status-success) 14%, transparent);
-  }
-}
-.ri-state-new-data .ri-btn {
-  animation: ri-border-pulse 2s var(--ease-standard) infinite;
-}
+			/* Border pulse animation for new-data state */
+			@keyframes ri-border-pulse {
+				0%,
+				100% {
+					border-color: var(--border);
+					box-shadow: none;
+				}
+				50% {
+					border-color: color-mix(in oklch, var(--status-success) 55%, var(--border));
+					box-shadow: 0 0 0 2px
+						color-mix(in oklch, var(--status-success) 14%, transparent);
+				}
+			}
+			.ri-state-new-data .ri-btn {
+				animation: ri-border-pulse 2s var(--ease-standard) infinite;
+			}
 
-/* Dot badge pulse for new-data */
-@keyframes ri-dot-pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%       { transform: scale(1.55); opacity: 0.5; }
-}
-.ri-state-new-data .ri-badge {
-  animation: ri-dot-pulse 1.6s var(--ease-standard) 2;
-}
+			/* Dot badge pulse for new-data */
+			@keyframes ri-dot-pulse {
+				0%,
+				100% {
+					transform: scale(1);
+					opacity: 1;
+				}
+				50% {
+					transform: scale(1.55);
+					opacity: 0.5;
+				}
+			}
+			.ri-state-new-data .ri-badge {
+				animation: ri-dot-pulse 1.6s var(--ease-standard) 2;
+			}
 
-/* ============================================================
+			/* ============================================================
    PAGE LAYOUT — showcase scaffold
    ============================================================ */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
 
-body {
-  background: var(--background);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  padding: 0;
-}
+			body {
+				background: var(--background);
+				font-family: var(--font-sans);
+				min-height: 100vh;
+				padding: 0;
+			}
 
-.page-root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+			.page-root {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
 
-/* ── Showcase wrapper ─────────────────────────────────────── */
-.showcase-wrap {
-  flex: 1;
-  padding: 40px 48px 60px;
-  max-width: 960px;
-  margin: 0 auto;
-  width: 100%;
-}
+			/* ── Showcase wrapper ─────────────────────────────────────── */
+			.showcase-wrap {
+				flex: 1;
+				padding: 40px 48px 60px;
+				max-width: 960px;
+				margin: 0 auto;
+				width: 100%;
+			}
 
-/* ── Section header ───────────────────────────────────────── */
-.section-header {
-  margin-bottom: 32px;
-}
-.section-header h1 {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-  color: var(--foreground);
-  margin-top: 8px;
-}
-.section-header p {
-  font-size: var(--text-md);
-  color: var(--foreground-muted);
-  line-height: var(--leading-relaxed);
-  margin-top: 6px;
-  max-width: 540px;
-}
+			/* ── Section header ───────────────────────────────────────── */
+			.section-header {
+				margin-bottom: 32px;
+			}
+			.section-header h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: -0.025em;
+				line-height: 1.15;
+				color: var(--foreground);
+				margin-top: 8px;
+			}
+			.section-header p {
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+				margin-top: 6px;
+				max-width: 540px;
+			}
 
-/* ── States grid ──────────────────────────────────────────── */
-.states-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 40px;
-}
+			/* ── States grid ──────────────────────────────────────────── */
+			.states-grid {
+				display: grid;
+				grid-template-columns: repeat(5, 1fr);
+				gap: 10px;
+				margin-bottom: 40px;
+			}
 
-@media (max-width: 680px) {
-  .states-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+			@media (max-width: 680px) {
+				.states-grid {
+					grid-template-columns: repeat(3, 1fr);
+				}
+			}
 
-@media (max-width: 420px) {
-  .states-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+			@media (max-width: 420px) {
+				.states-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
 
-/* ── State cell ───────────────────────────────────────────── */
-.state-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 18px 14px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  min-height: 120px;
-}
-.state-cell-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
-}
-.state-cell-stage {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
+			/* ── State cell ───────────────────────────────────────────── */
+			.state-cell {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 10px;
+				padding: 18px 14px 14px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				min-height: 120px;
+			}
+			.state-cell-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+			.state-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				padding-top: 16px;
+				padding-bottom: 16px;
+			}
 
-/* ── Anatomy callouts ─────────────────────────────────────── */
-.anatomy-section {
-  margin-bottom: 40px;
-}
-.anatomy-section h2 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  color: var(--foreground);
-  margin-bottom: 16px;
-}
+			/* ── Anatomy callouts ─────────────────────────────────────── */
+			.anatomy-section {
+				margin-bottom: 40px;
+			}
+			.anatomy-section h2 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+				margin-bottom: 16px;
+			}
 
-.anatomy-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+			.anatomy-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+			}
 
-@media (max-width: 560px) {
-  .anatomy-grid { grid-template-columns: 1fr; }
-}
+			@media (max-width: 560px) {
+				.anatomy-grid {
+					grid-template-columns: 1fr;
+				}
+			}
 
-.anatomy-cell {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-.anatomy-cell-icon {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--foreground-muted);
-  margin-top: 1px;
-}
-.anatomy-cell-text strong {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  margin-bottom: 3px;
-}
-.anatomy-cell-text span {
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-  line-height: var(--leading-relaxed);
-}
+			.anatomy-cell {
+				display: flex;
+				align-items: flex-start;
+				gap: 12px;
+				padding: 14px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+			}
+			.anatomy-cell-icon {
+				flex-shrink: 0;
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--foreground-muted);
+				margin-top: 1px;
+			}
+			.anatomy-cell-text strong {
+				display: block;
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				margin-bottom: 3px;
+			}
+			.anatomy-cell-text span {
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
 
-/* ── In-context section ──────────────────────────────────── */
-.context-section {
-  margin-bottom: 0;
-}
-.context-section h2 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  color: var(--foreground);
-  margin-bottom: 16px;
-}
+			/* ── In-context section ──────────────────────────────────── */
+			.context-section {
+				margin-bottom: 0;
+			}
+			.context-section h2 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+				margin-bottom: 16px;
+			}
 
-/* Simulated page with toolbar */
-.context-page {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-.context-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 16px;
-  height: 40px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-.context-toolbar-title {
-  font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-}
-.context-toolbar-spacer { flex: 1; }
-.context-toolbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+			/* Simulated page with toolbar */
+			.context-page {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+			}
+			.context-toolbar {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 0 16px;
+				height: 40px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+			}
+			.context-toolbar-title {
+				font-size: var(--text-md);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+			}
+			.context-toolbar-spacer {
+				flex: 1;
+			}
+			.context-toolbar-actions {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
 
-/* Toolbar icon buttons — ghost style, consistent with nav patterns */
-.tb-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--foreground-muted);
-  cursor: pointer;
-  transition:
-    background var(--duration-2) var(--ease-standard),
-    color var(--duration-2) var(--ease-standard),
-    border-color var(--duration-2) var(--ease-standard);
-  padding: 0;
-  flex-shrink: 0;
-}
-.tb-btn:hover {
-  background: var(--surface-2);
-  color: var(--foreground);
-}
-.tb-divider {
-  width: 1px;
-  height: 16px;
-  background: var(--border);
-  margin: 0 2px;
-  flex-shrink: 0;
-}
+			/* Toolbar icon buttons — ghost style, consistent with nav patterns */
+			.tb-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard);
+				padding: 0;
+				flex-shrink: 0;
+			}
+			.tb-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.tb-divider {
+				width: 1px;
+				height: 16px;
+				background: var(--border);
+				margin: 0 2px;
+				flex-shrink: 0;
+			}
 
-/* Fake panel body */
-.context-body {
-  padding: 20px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.context-row-skeleton {
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  opacity: 0.7;
-}
-.context-row-skeleton:nth-child(2) { width: 82%; opacity: 0.5; }
-.context-row-skeleton:nth-child(3) { width: 68%; opacity: 0.35; }
-.context-row-skeleton:nth-child(4) { width: 88%; opacity: 0.25; }
+			/* Fake panel body */
+			.context-body {
+				padding: 20px 16px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+			.context-row-skeleton {
+				height: 28px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				opacity: 0.7;
+			}
+			.context-row-skeleton:nth-child(2) {
+				width: 82%;
+				opacity: 0.5;
+			}
+			.context-row-skeleton:nth-child(3) {
+				width: 68%;
+				opacity: 0.35;
+			}
+			.context-row-skeleton:nth-child(4) {
+				width: 88%;
+				opacity: 0.25;
+			}
 
-/* ── Behavior notes ──────────────────────────────────────── */
-.notes-section {
-  margin-top: 40px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
-}
-.notes-section h2 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  color: var(--foreground);
-  margin-bottom: 14px;
-}
-.notes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  list-style: none;
-}
-.notes-list li {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-relaxed);
-}
-.notes-list li::before {
-  content: "—";
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 10px;
-}
-.notes-list strong {
-  color: var(--foreground);
-  font-weight: var(--weight-medium);
-}
+			/* ── Behavior notes ──────────────────────────────────────── */
+			.notes-section {
+				margin-top: 40px;
+				padding-top: 32px;
+				border-top: 1px solid var(--border);
+			}
+			.notes-section h2 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+				margin-bottom: 14px;
+			}
+			.notes-list {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				list-style: none;
+			}
+			.notes-list li {
+				display: flex;
+				align-items: baseline;
+				gap: 10px;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
+			.notes-list li::before {
+				content: '—';
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				font-family: var(--font-mono);
+				font-size: 10px;
+			}
+			.notes-list strong {
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark page-root">
+			<div class="showcase-wrap">
+				<!-- ── Variant label ───────────────────────────────────── -->
+				<div class="section-header">
+					<div class="gk-eyebrow">RefreshIndicator · Variant B</div>
+					<h1>Tooltip-Revealed</h1>
+					<p>
+						Square icon-only button. Freshness context lives in the tooltip — zero
+						footprint until hover. Five distinct states communicate data currency at a
+						glance.
+					</p>
+				</div>
 
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark page-root">
-  <div class="showcase-wrap">
+				<!-- ── All 5 states side-by-side ──────────────────────── -->
+				<div class="states-grid">
+					<!-- 1. Idle -->
+					<div class="state-cell">
+						<span class="state-cell-label">idle</span>
+						<div class="state-cell-stage">
+							<div class="ri-wrap ri-state-idle">
+								<button
+									class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
+									type="button"
+									aria-label="Refresh metrics"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+										<polyline points="2 9 4 12.2 7.5 10" />
+									</svg>
+								</button>
+								<!-- Tooltip — frozen open for mockup -->
+								<div class="ri-tooltip gk-tooltip" aria-hidden="true">
+									Refresh metrics
+								</div>
+							</div>
+						</div>
+					</div>
 
-    <!-- ── Variant label ───────────────────────────────────── -->
-    <div class="section-header">
-      <div class="gk-eyebrow">RefreshIndicator · Variant B</div>
-      <h1>Tooltip-Revealed</h1>
-      <p>Square icon-only button. Freshness context lives in the tooltip — zero footprint until hover. Five distinct states communicate data currency at a glance.</p>
-    </div>
+					<!-- 2. Loading -->
+					<div class="state-cell">
+						<span class="state-cell-label">loading</span>
+						<div class="state-cell-stage">
+							<div class="ri-wrap ri-state-loading">
+								<button
+									class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
+									type="button"
+									disabled
+									aria-label="Refreshing"
+									aria-busy="true"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+										<polyline points="2 9 4 12.2 7.5 10" />
+									</svg>
+								</button>
+								<div class="ri-tooltip gk-tooltip" aria-hidden="true">
+									Refreshing&hellip;
+								</div>
+							</div>
+						</div>
+					</div>
 
-    <!-- ── All 5 states side-by-side ──────────────────────── -->
-    <div class="states-grid">
+					<!-- 3. Fresh -->
+					<div class="state-cell">
+						<span class="state-cell-label">fresh</span>
+						<div class="state-cell-stage">
+							<div class="ri-wrap ri-state-fresh">
+								<button
+									class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
+									type="button"
+									aria-label="Refresh metrics"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+										<polyline points="2 9 4 12.2 7.5 10" />
+									</svg>
+								</button>
+								<div class="ri-tooltip gk-tooltip" aria-hidden="true">
+									Updated just now
+								</div>
+							</div>
+						</div>
+					</div>
 
-      <!-- 1. Idle -->
-      <div class="state-cell">
-        <span class="state-cell-label">idle</span>
-        <div class="state-cell-stage">
-          <div class="ri-wrap ri-state-idle">
-            <button
-              class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
-              type="button"
-              aria-label="Refresh metrics"
-            >
-              <svg class="ri-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/>
-                <polyline points="2 9 4 12.2 7.5 10"/>
-              </svg>
-            </button>
-            <!-- Tooltip — frozen open for mockup -->
-            <div class="ri-tooltip gk-tooltip" aria-hidden="true">
-              Refresh metrics
-            </div>
-          </div>
-        </div>
-      </div>
+					<!-- 4. Stale -->
+					<div class="state-cell">
+						<span class="state-cell-label">stale</span>
+						<div class="state-cell-stage">
+							<div class="ri-wrap ri-state-stale">
+								<button
+									class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
+									type="button"
+									aria-label="Refresh metrics — data is stale"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+										<polyline points="2 9 4 12.2 7.5 10" />
+									</svg>
+								</button>
+								<div class="ri-tooltip gk-tooltip" aria-hidden="true">
+									Updated 5m ago
+									<span class="ri-tooltip-ts">09:17 · may possibly be stale</span>
+								</div>
+							</div>
+						</div>
+					</div>
 
-      <!-- 2. Loading -->
-      <div class="state-cell">
-        <span class="state-cell-label">loading</span>
-        <div class="state-cell-stage">
-          <div class="ri-wrap ri-state-loading">
-            <button
-              class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
-              type="button"
-              disabled
-              aria-label="Refreshing"
-              aria-busy="true"
-            >
-              <svg class="ri-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/>
-                <polyline points="2 9 4 12.2 7.5 10"/>
-              </svg>
-            </button>
-            <div class="ri-tooltip gk-tooltip" aria-hidden="true">
-              Refreshing&hellip;
-            </div>
-          </div>
-        </div>
-      </div>
+					<!-- 5. New data -->
+					<div class="state-cell">
+						<span class="state-cell-label">new data</span>
+						<div class="state-cell-stage">
+							<div class="ri-wrap ri-state-new-data">
+								<button
+									class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
+									type="button"
+									aria-label="New data available — click to refresh"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+										<polyline points="2 9 4 12.2 7.5 10" />
+									</svg>
+									<!-- Dot badge -->
+									<span class="ri-badge" aria-hidden="true"></span>
+								</button>
+								<div class="ri-tooltip gk-tooltip" aria-hidden="true">
+									New data available
+									<span class="ri-tooltip-ts">click to refresh</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /states-grid -->
 
-      <!-- 3. Fresh -->
-      <div class="state-cell">
-        <span class="state-cell-label">fresh</span>
-        <div class="state-cell-stage">
-          <div class="ri-wrap ri-state-fresh">
-            <button
-              class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
-              type="button"
-              aria-label="Refresh metrics"
-            >
-              <svg class="ri-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/>
-                <polyline points="2 9 4 12.2 7.5 10"/>
-              </svg>
-            </button>
-            <div class="ri-tooltip gk-tooltip" aria-hidden="true">
-              Updated just now
-            </div>
-          </div>
-        </div>
-      </div>
+				<hr class="gk-hr" style="margin-bottom: 40px" />
 
-      <!-- 4. Stale -->
-      <div class="state-cell">
-        <span class="state-cell-label">stale</span>
-        <div class="state-cell-stage">
-          <div class="ri-wrap ri-state-stale">
-            <button
-              class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
-              type="button"
-              aria-label="Refresh metrics — data is stale"
-            >
-              <svg class="ri-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/>
-                <polyline points="2 9 4 12.2 7.5 10"/>
-              </svg>
-            </button>
-            <div class="ri-tooltip gk-tooltip" aria-hidden="true">
-              Updated 5m ago
-              <span class="ri-tooltip-ts">09:17 · may possibly be stale</span>
-            </div>
-          </div>
-        </div>
-      </div>
+				<!-- ── Anatomy notes ───────────────────────────────────── -->
+				<div class="anatomy-section">
+					<h2 class="gk-h3">Anatomy</h2>
+					<div class="anatomy-grid">
+						<div class="anatomy-cell">
+							<div class="anatomy-cell-icon">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.6"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+									<polyline points="2 9 4 12.2 7.5 10" />
+								</svg>
+							</div>
+							<div class="anatomy-cell-text">
+								<strong>Icon button — 26 &times; 26px</strong>
+								<span
+									>Secondary ghost variant. Transparent bg at rest,
+									<code style="font-family: var(--font-mono); font-size: 10px"
+										>surface-2</code
+									>
+									on hover. No label — tooltip carries all context.</span
+								>
+							</div>
+						</div>
 
-      <!-- 5. New data -->
-      <div class="state-cell">
-        <span class="state-cell-label">new data</span>
-        <div class="state-cell-stage">
-          <div class="ri-wrap ri-state-new-data">
-            <button
-              class="gk-btn gk-btn-sm gk-btn-icon gk-btn-secondary ri-btn"
-              type="button"
-              aria-label="New data available — click to refresh"
-            >
-              <svg class="ri-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/>
-                <polyline points="2 9 4 12.2 7.5 10"/>
-              </svg>
-              <!-- Dot badge -->
-              <span class="ri-badge" aria-hidden="true"></span>
-            </button>
-            <div class="ri-tooltip gk-tooltip" aria-hidden="true">
-              New data available
-              <span class="ri-tooltip-ts">click to refresh</span>
-            </div>
-          </div>
-        </div>
-      </div>
+						<div class="anatomy-cell">
+							<div class="anatomy-cell-icon" style="color: oklch(0.97 0.01 130)">
+								<svg width="12" height="12" viewBox="0 0 16 4" fill="none">
+									<rect
+										x="0"
+										y="0"
+										width="16"
+										height="4"
+										rx="2"
+										fill="oklch(0.12 0.02 150)"
+										opacity="0.9"
+									/>
+								</svg>
+							</div>
+							<div class="anatomy-cell-text">
+								<strong>Tooltip — above, centered</strong>
+								<span
+									>Appears on hover. Dark pill on dark bg for maximum contrast.
+									Optional second line carries mono timestamp or sub-label.</span
+								>
+							</div>
+						</div>
 
-    </div><!-- /states-grid -->
+						<div class="anatomy-cell">
+							<div class="anatomy-cell-icon">
+								<span
+									style="
+										display: block;
+										width: 7px;
+										height: 7px;
+										border-radius: 50%;
+										background: var(--status-success);
+										box-shadow: 0 0 0 1.5px var(--surface);
+									"
+								></span>
+							</div>
+							<div class="anatomy-cell-text">
+								<strong>Dot badge — 7px, top-right</strong>
+								<span
+									>Shown only in <em>new-data</em> state. Green fill, 1.5px border
+									separating it from button corner. Pulses twice then
+									settles.</span
+								>
+							</div>
+						</div>
 
-    <hr class="gk-hr" style="margin-bottom: 40px;" />
+						<div class="anatomy-cell">
+							<div class="anatomy-cell-icon">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="var(--foreground-subtle)"
+									stroke-width="1.5"
+									stroke-dasharray="3 2"
+								>
+									<rect x="1" y="1" width="14" height="14" rx="5" />
+								</svg>
+							</div>
+							<div class="anatomy-cell-text">
+								<strong>Border pulse — new-data state</strong>
+								<span
+									>Subtle breathing animation on the border, looping indefinitely.
+									Paired with a faint green box-shadow at 50% of cycle.</span
+								>
+							</div>
+						</div>
+					</div>
+				</div>
 
-    <!-- ── Anatomy notes ───────────────────────────────────── -->
-    <div class="anatomy-section">
-      <h2 class="gk-h3">Anatomy</h2>
-      <div class="anatomy-grid">
+				<hr class="gk-hr" style="margin-bottom: 40px" />
 
-        <div class="anatomy-cell">
-          <div class="anatomy-cell-icon">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/><polyline points="2 9 4 12.2 7.5 10"/>
-            </svg>
-          </div>
-          <div class="anatomy-cell-text">
-            <strong>Icon button — 26 &times; 26px</strong>
-            <span>Secondary ghost variant. Transparent bg at rest, <code style="font-family:var(--font-mono);font-size:10px;">surface-2</code> on hover. No label — tooltip carries all context.</span>
-          </div>
-        </div>
+				<!-- ── In-context usage ────────────────────────────────── -->
+				<div class="context-section">
+					<h2 class="gk-h3">In-context — Usage view toolbar</h2>
 
-        <div class="anatomy-cell">
-          <div class="anatomy-cell-icon" style="color: oklch(0.97 0.01 130);">
-            <svg width="12" height="12" viewBox="0 0 16 4" fill="none">
-              <rect x="0" y="0" width="16" height="4" rx="2" fill="oklch(0.12 0.02 150)" opacity="0.9"/>
-            </svg>
-          </div>
-          <div class="anatomy-cell-text">
-            <strong>Tooltip — above, centered</strong>
-            <span>Appears on hover. Dark pill on dark bg for maximum contrast. Optional second line carries mono timestamp or sub-label.</span>
-          </div>
-        </div>
+					<div class="context-page">
+						<!-- Simulated page toolbar -->
+						<div class="context-toolbar">
+							<span class="context-toolbar-title">Usage</span>
 
-        <div class="anatomy-cell">
-          <div class="anatomy-cell-icon">
-            <span style="display:block;width:7px;height:7px;border-radius:50%;background:var(--status-success);box-shadow:0 0 0 1.5px var(--surface);"></span>
-          </div>
-          <div class="anatomy-cell-text">
-            <strong>Dot badge — 7px, top-right</strong>
-            <span>Shown only in <em>new-data</em> state. Green fill, 1.5px border separating it from button corner. Pulses twice then settles.</span>
-          </div>
-        </div>
+							<!-- Breadcrumb hint -->
+							<span
+								style="
+									font-size: 11px;
+									color: var(--foreground-subtle);
+									font-family: var(--font-mono);
+									margin-left: 4px;
+								"
+								>/ this-week</span
+							>
 
-        <div class="anatomy-cell">
-          <div class="anatomy-cell-icon">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--foreground-subtle)" stroke-width="1.5" stroke-dasharray="3 2">
-              <rect x="1" y="1" width="14" height="14" rx="5"/>
-            </svg>
-          </div>
-          <div class="anatomy-cell-text">
-            <strong>Border pulse — new-data state</strong>
-            <span>Subtle breathing animation on the border, looping indefinitely. Paired with a faint green box-shadow at 50% of cycle.</span>
-          </div>
-        </div>
+							<div class="context-toolbar-spacer"></div>
 
-      </div>
-    </div>
+							<!-- Right-side actions -->
+							<div class="context-toolbar-actions">
+								<!-- Period switcher tabs (compact) -->
+								<div
+									style="
+										display: inline-flex;
+										gap: 1px;
+										background: var(--surface-2);
+										border: 1px solid var(--border);
+										border-radius: var(--radius-sm);
+										padding: 2px;
+									"
+								>
+									<button
+										class="tb-btn"
+										style="
+											width: auto;
+											padding: 0 8px;
+											font-size: 11px;
+											font-family: var(--font-mono);
+											color: var(--foreground-subtle);
+										"
+									>
+										7d
+									</button>
+									<button
+										class="tb-btn"
+										style="
+											width: auto;
+											padding: 0 8px;
+											font-size: 11px;
+											font-family: var(--font-mono);
+											background: var(--surface);
+											border: 1px solid var(--border);
+											border-radius: 4px;
+											color: var(--foreground);
+										"
+									>
+										30d
+									</button>
+									<button
+										class="tb-btn"
+										style="
+											width: auto;
+											padding: 0 8px;
+											font-size: 11px;
+											font-family: var(--font-mono);
+											color: var(--foreground-subtle);
+										"
+									>
+										90d
+									</button>
+								</div>
 
-    <hr class="gk-hr" style="margin-bottom: 40px;" />
+								<div class="tb-divider"></div>
 
-    <!-- ── In-context usage ────────────────────────────────── -->
-    <div class="context-section">
-      <h2 class="gk-h3">In-context — Usage view toolbar</h2>
+								<!-- Export button — ghost -->
+								<button
+									class="tb-btn"
+									type="button"
+									title="Export CSV"
+									aria-label="Export CSV"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M3 12h10M8 3v7m0 0-3-3m3 3 3-3" />
+									</svg>
+								</button>
 
-      <div class="context-page">
-        <!-- Simulated page toolbar -->
-        <div class="context-toolbar">
-          <span class="context-toolbar-title">Usage</span>
+								<!-- Filter -->
+								<button
+									class="tb-btn"
+									type="button"
+									title="Filter"
+									aria-label="Filter"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M2 4h12M4 8h8M6 12h4" />
+									</svg>
+								</button>
 
-          <!-- Breadcrumb hint -->
-          <span style="font-size:11px;color:var(--foreground-subtle);font-family:var(--font-mono);margin-left:4px;">/ this-week</span>
+								<div class="tb-divider"></div>
 
-          <div class="context-toolbar-spacer"></div>
+								<!-- RefreshIndicator — new-data state, showing dot badge in-context -->
+								<div class="ri-wrap ri-state-new-data" style="position: relative">
+									<button
+										class="gk-btn gk-btn-sm gk-btn-icon ri-btn"
+										type="button"
+										aria-label="New data available — click to refresh"
+									>
+										<svg
+											class="ri-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.6"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2" />
+											<polyline points="2 9 4 12.2 7.5 10" />
+										</svg>
+										<span class="ri-badge" aria-hidden="true"></span>
+									</button>
+									<!-- Tooltip visible to show in-context look -->
+									<div class="ri-tooltip gk-tooltip" aria-hidden="true">
+										New data available
+										<span class="ri-tooltip-ts">click to refresh</span>
+									</div>
+								</div>
+							</div>
+						</div>
 
-          <!-- Right-side actions -->
-          <div class="context-toolbar-actions">
+						<!-- Fake panel body -->
+						<div class="context-body">
+							<div class="context-row-skeleton"></div>
+							<div class="context-row-skeleton"></div>
+							<div class="context-row-skeleton"></div>
+							<div class="context-row-skeleton"></div>
+						</div>
+					</div>
+				</div>
 
-            <!-- Period switcher tabs (compact) -->
-            <div style="display:inline-flex;gap:1px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px;">
-              <button class="tb-btn" style="width:auto;padding:0 8px;font-size:11px;font-family:var(--font-mono);color:var(--foreground-subtle);">7d</button>
-              <button class="tb-btn" style="width:auto;padding:0 8px;font-size:11px;font-family:var(--font-mono);background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--foreground);">30d</button>
-              <button class="tb-btn" style="width:auto;padding:0 8px;font-size:11px;font-family:var(--font-mono);color:var(--foreground-subtle);">90d</button>
-            </div>
-
-            <div class="tb-divider"></div>
-
-            <!-- Export button — ghost -->
-            <button class="tb-btn" type="button" title="Export CSV" aria-label="Export CSV">
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12h10M8 3v7m0 0-3-3m3 3 3-3"/>
-              </svg>
-            </button>
-
-            <!-- Filter -->
-            <button class="tb-btn" type="button" title="Filter" aria-label="Filter">
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 4h12M4 8h8M6 12h4"/>
-              </svg>
-            </button>
-
-            <div class="tb-divider"></div>
-
-            <!-- RefreshIndicator — new-data state, showing dot badge in-context -->
-            <div class="ri-wrap ri-state-new-data" style="position:relative;">
-              <button
-                class="gk-btn gk-btn-sm gk-btn-icon ri-btn"
-                type="button"
-                aria-label="New data available — click to refresh"
-              >
-                <svg class="ri-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M13.5 2.5A6.5 6.5 0 1 1 4 12.2"/>
-                  <polyline points="2 9 4 12.2 7.5 10"/>
-                </svg>
-                <span class="ri-badge" aria-hidden="true"></span>
-              </button>
-              <!-- Tooltip visible to show in-context look -->
-              <div class="ri-tooltip gk-tooltip" aria-hidden="true">
-                New data available
-                <span class="ri-tooltip-ts">click to refresh</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Fake panel body -->
-        <div class="context-body">
-          <div class="context-row-skeleton"></div>
-          <div class="context-row-skeleton"></div>
-          <div class="context-row-skeleton"></div>
-          <div class="context-row-skeleton"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Behavior notes ────────────────────────────────── -->
-    <div class="notes-section">
-      <h2 class="gk-h3">Behavior notes</h2>
-      <ul class="notes-list">
-        <li><span><strong>Idle</strong> — transparent bg, <code style="font-family:var(--font-mono);font-size:10.5px;">foreground-subtle</code> icon. Tooltip reads "Refresh metrics". Full hover/active states apply.</span></li>
-        <li><span><strong>Loading</strong> — icon spins at 900 ms/rev. Button is <code style="font-family:var(--font-mono);font-size:10.5px;">disabled</code>, pointer-events none. Tooltip reads "Refreshing…".</span></li>
-        <li><span><strong>Fresh</strong> — icon tinted <code style="font-family:var(--font-mono);font-size:10.5px;">status-success</code>, border adopts faint green. A one-shot background flash fires on mount. Settles to low-opacity green bg.</span></li>
-        <li><span><strong>Stale</strong> — whole button fades to 60% opacity. Icon color reverts to <code style="font-family:var(--font-mono);font-size:10.5px;">foreground-subtle</code>. Tooltip shows elapsed time + mono timestamp on a second line.</span></li>
-        <li><span><strong>New data</strong> — dot badge appears top-right, pulses twice (scale 1 → 1.55) then settles. Border breathes with a 2s pulse loop. Tooltip urgent: "New data available / click to refresh".</span></li>
-        <li><span><strong>Tooltip</strong> — never shown simultaneously with another tooltip. Delay 400 ms on enter, 100 ms on leave. Positioned above center; flips to below if insufficient viewport space.</span></li>
-      </ul>
-    </div>
-
-  </div><!-- /showcase-wrap -->
-</div><!-- /gk-root -->
-</body>
+				<!-- ── Behavior notes ────────────────────────────────── -->
+				<div class="notes-section">
+					<h2 class="gk-h3">Behavior notes</h2>
+					<ul class="notes-list">
+						<li>
+							<span
+								><strong>Idle</strong> — transparent bg,
+								<code style="font-family: var(--font-mono); font-size: 10.5px"
+									>foreground-subtle</code
+								>
+								icon. Tooltip reads "Refresh metrics". Full hover/active states
+								apply.</span
+							>
+						</li>
+						<li>
+							<span
+								><strong>Loading</strong> — icon spins at 900 ms/rev. Button is
+								<code style="font-family: var(--font-mono); font-size: 10.5px"
+									>disabled</code
+								>, pointer-events none. Tooltip reads "Refreshing…".</span
+							>
+						</li>
+						<li>
+							<span
+								><strong>Fresh</strong> — icon tinted
+								<code style="font-family: var(--font-mono); font-size: 10.5px"
+									>status-success</code
+								>, border adopts faint green. A one-shot background flash fires on
+								mount. Settles to low-opacity green bg.</span
+							>
+						</li>
+						<li>
+							<span
+								><strong>Stale</strong> — whole button fades to 60% opacity. Icon
+								color reverts to
+								<code style="font-family: var(--font-mono); font-size: 10.5px"
+									>foreground-subtle</code
+								>. Tooltip shows elapsed time + mono timestamp on a second
+								line.</span
+							>
+						</li>
+						<li>
+							<span
+								><strong>New data</strong> — dot badge appears top-right, pulses
+								twice (scale 1 → 1.55) then settles. Border breathes with a 2s pulse
+								loop. Tooltip urgent: "New data available / click to refresh".</span
+							>
+						</li>
+						<li>
+							<span
+								><strong>Tooltip</strong> — never shown simultaneously with another
+								tooltip. Delay 400 ms on enter, 100 ms on leave. Positioned above
+								center; flips to below if insufficient viewport space.</span
+							>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /showcase-wrap -->
+		</div>
+		<!-- /gk-root -->
+	</body>
 </html>

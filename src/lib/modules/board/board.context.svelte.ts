@@ -105,10 +105,8 @@ function createBoardContext() {
 	});
 
 	$effect.pre(() => {
-		if (browser) {
-			document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-			document.documentElement.dataset.accent = accentColor.current;
-		}
+		document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+		document.documentElement.dataset.accent = accentColor.current;
 	});
 
 	// ── Public interface ───────────────────────────────────────────────────

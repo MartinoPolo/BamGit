@@ -1,1445 +1,2312 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CostLink — Variant B: Tinted Chip</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ── Grovekeeper design tokens — Forest Moss palette ─────────────────── */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CostLink — Variant B: Tinted Chip</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* Dark theme */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-/* Dark theme */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
+			/* Type */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
 
-/* Type */
-.gk-eyebrow {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
-.gk-h2 {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-}
-.gk-h3 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-}
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny  { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-/* Card */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-.gk-card-padded { padding: 16px; }
+			/* Badge / chip base */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
 
-/* Badge / chip base */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-.gk-badge-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0;
-}
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-/* Divider */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+			/* Tooltip */
+			.gk-tooltip {
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+				font-size: 11px;
+				padding: 5px 8px;
+				border-radius: 6px;
+				box-shadow: var(--shadow-md);
+				font-family: var(--font-sans);
+				position: relative;
+				white-space: nowrap;
+			}
 
-/* Tooltip */
-.gk-tooltip {
-  background: oklch(0.12 0.02 150);
-  color: oklch(0.97 0.01 130);
-  border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
-  font-size: 11px;
-  padding: 5px 8px;
-  border-radius: 6px;
-  box-shadow: var(--shadow-md);
-  font-family: var(--font-sans);
-  position: relative;
-  white-space: nowrap;
-}
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+			/* cb-panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+			.cb-row {
+				display: grid;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				padding: 3px 0;
+				min-height: 22px;
+				font-family: var(--font-sans);
+			}
+			.cb-num {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11.5px;
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-mute {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
 
-/* cb-panel */
-.cb-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-.cb-panel-title {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--foreground-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed var(--border);
-}
-.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
-.cb-panel-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
-.cb-panel-sub {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 400;
-  color: var(--foreground-subtle);
-  text-transform: none;
-  letter-spacing: 0;
-  margin-left: auto;
-}
-.cb-row {
-  display: grid;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  padding: 3px 0;
-  min-height: 22px;
-  font-family: var(--font-sans);
-}
-.cb-num {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 11.5px;
-  text-align: right;
-  color: var(--foreground);
-}
-.cb-mute {
-  color: var(--foreground-subtle);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-
-/* ──────────────────────────────────────────────────────────────
+			/* ──────────────────────────────────────────────────────────────
    CostLink — Variant B: Tinted Chip
    ────────────────────────────────────────────────────────────── */
 
-/*
+			/*
   Cost magnitude bands:
   - low    (<$1):    moss-green tint
   - medium ($1–$20): amber tint
   - high   (>$20):   coral/rose tint
 */
 
-.cost-link {
-  /* Reset anchor styling */
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  text-decoration: none;
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  border-radius: var(--radius-full);
-  outline: none;
-  position: relative;
-  /* Transitions for all state changes */
-  transition:
-    background var(--duration-2) var(--ease-out),
-    border-color var(--duration-2) var(--ease-out),
-    box-shadow var(--duration-2) var(--ease-out),
-    transform var(--duration-1) var(--ease-out),
-    filter var(--duration-2) var(--ease-out);
-  user-select: none;
-}
-
-/* ── Size: sm (10.5px) ── */
-.cost-link-sm {
-  font-size: var(--text-2xs); /* 10.5px */
-  padding: 2px 7px;
-  height: 20px;
-  border-width: 1px;
-  border-style: solid;
-  letter-spacing: 0.01em;
-}
-
-/* ── Size: md (12px) ── */
-.cost-link-md {
-  font-size: var(--text-sm); /* 12px */
-  padding: 3px 9px;
-  height: 24px;
-  border-width: 1px;
-  border-style: solid;
-  letter-spacing: 0.01em;
-}
-
-/* Arrow icon inside the chip */
-.cost-link-icon {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  opacity: 0.55;
-  transition: opacity var(--duration-2) var(--ease-out), transform var(--duration-2) var(--ease-out);
-}
-.cost-link:hover .cost-link-icon,
-.cost-link[data-state="hover"] .cost-link-icon {
-  opacity: 0.9;
-  transform: translateX(1px);
-}
-
-/* ── Magnitude: LOW (< $1) — moss green ── */
-.cost-link-low {
-  --chip-fg:       oklch(0.760 0.105 142);
-  --chip-bg:       oklch(0.225 0.040 145);
-  --chip-border:   oklch(0.310 0.060 142);
-  --chip-fg-hover: oklch(0.820 0.120 138);
-  --chip-bg-hover: oklch(0.255 0.052 143);
-  --chip-border-hover: oklch(0.390 0.080 140);
-  --chip-ring:     oklch(0.580 0.096 134);
-}
-
-/* ── Magnitude: MEDIUM ($1–$20) — amber ── */
-.cost-link-medium {
-  --chip-fg:       oklch(0.790 0.145 68);
-  --chip-bg:       oklch(0.228 0.048 62);
-  --chip-border:   oklch(0.315 0.072 60);
-  --chip-fg-hover: oklch(0.850 0.160 65);
-  --chip-bg-hover: oklch(0.260 0.065 60);
-  --chip-border-hover: oklch(0.400 0.095 58);
-  --chip-ring:     oklch(0.690 0.165 55);
-}
-
-/* ── Magnitude: HIGH (> $20) — coral/rose ── */
-.cost-link-high {
-  --chip-fg:       oklch(0.740 0.130 22);
-  --chip-bg:       oklch(0.222 0.044 20);
-  --chip-border:   oklch(0.308 0.068 18);
-  --chip-fg-hover: oklch(0.800 0.148 18);
-  --chip-bg-hover: oklch(0.255 0.060 18);
-  --chip-border-hover: oklch(0.390 0.090 16);
-  --chip-ring:     oklch(0.620 0.155 30);
-}
-
-/* Apply the chip colors */
-.cost-link-low,
-.cost-link-medium,
-.cost-link-high {
-  color: var(--chip-fg);
-  background: var(--chip-bg);
-  border-color: var(--chip-border);
-}
-
-/* ── Hover state ── */
-.cost-link-low:hover,
-.cost-link-medium:hover,
-.cost-link-high:hover,
-.cost-link-low[data-state="hover"],
-.cost-link-medium[data-state="hover"],
-.cost-link-high[data-state="hover"] {
-  color: var(--chip-fg-hover);
-  background: var(--chip-bg-hover);
-  border-color: var(--chip-border-hover);
-  box-shadow: 0 2px 8px color-mix(in oklch, var(--chip-ring) 22%, transparent);
-}
-
-/* ── Focus state ── */
-.cost-link:focus-visible,
-.cost-link[data-state="focus"] {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--background),
-    0 0 0 4px var(--chip-ring);
-}
-
-/* ── Active / pressed state ── */
-.cost-link:active,
-.cost-link[data-state="active"] {
-  transform: scale(0.94);
-  filter: brightness(0.88);
-}
-
-/* ── Disabled state ── */
-.cost-link[data-state="disabled"],
-.cost-link:disabled,
-.cost-link[aria-disabled="true"] {
-  opacity: 0.38;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* ── Tooltip wrapper ── */
-.cost-link-wrapper {
-  position: relative;
-  display: inline-flex;
-}
-
-.cost-link-tooltip {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: oklch(0.12 0.02 150);
-  color: oklch(0.97 0.01 130);
-  border: 1px solid oklch(0.28 0.022 148);
-  font-size: 11px;
-  font-family: var(--font-sans);
-  padding: 4px 8px;
-  border-radius: 6px;
-  box-shadow: var(--shadow-md);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-50%) translateY(3px);
-  transition:
-    opacity var(--duration-2) var(--ease-out),
-    transform var(--duration-2) var(--ease-out);
-  z-index: var(--z-tooltip);
-}
-
-.cost-link-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-top-color: oklch(0.12 0.02 150);
-}
-
-.cost-link-wrapper:hover .cost-link-tooltip,
-.cost-link-wrapper:focus-within .cost-link-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* ── Showcase page layout ── */
-.showcase-page {
-  min-height: 100vh;
-  padding: 40px 48px 80px;
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-.showcase-header {
-  margin-bottom: 48px;
-}
-
-.showcase-section {
-  margin-bottom: 48px;
-}
-
-.showcase-section-title {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.showcase-section-title::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* State grid */
-.state-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-@media (max-width: 600px) {
-  .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .showcase-page { padding: 24px 20px 60px; }
-}
-
-.state-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.state-cell-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
-}
-
-.state-cell-stage {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* Magnitude row */
-.magnitude-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: 10px;
-}
-
-.magnitude-label {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  min-width: 56px;
-}
-
-/* Context: workspace card */
-.workspace-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  width: 280px;
-  transition: border-color var(--duration-2), box-shadow var(--duration-2);
-}
-
-.workspace-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
-}
-
-.workspace-card-accent {
-  height: 3px;
-  background: linear-gradient(90deg, var(--moss-500) 0%, var(--moss-400) 100%);
-}
-
-.workspace-card-body {
-  padding: 14px 14px 10px;
-}
-
-.workspace-card-name {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  margin-bottom: 2px;
-}
-
-.workspace-card-meta {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  font-family: var(--font-mono);
-  margin-bottom: 10px;
-}
-
-.workspace-card-stats {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 12px;
-}
-
-.workspace-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.workspace-stat-value {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.workspace-stat-label {
-  font-size: 10px;
-  color: var(--foreground-subtle);
-}
-
-.workspace-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  border-top: 1px solid var(--border);
-  background: color-mix(in oklch, var(--surface-2) 50%, transparent);
-}
-
-.workspace-footer-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--foreground-subtle);
-  font-family: var(--font-mono);
-}
-
-.session-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--session-running);
-  flex-shrink: 0;
-}
-
-/* Context: session sidebar */
-.sidebar-panel {
-  width: 260px;
-  background: var(--sidebar-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.sidebar-header {
-  padding: 12px 14px 10px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sidebar-header-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--primary-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.sidebar-header-title {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  line-height: var(--leading-snug);
-}
-
-.sidebar-header-sub {
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  font-family: var(--font-mono);
-}
-
-.sidebar-section {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.sidebar-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: var(--text-xs);
-}
-
-.sidebar-row-label {
-  color: var(--foreground-subtle);
-  font-family: var(--font-mono);
-}
-
-.sidebar-row-value {
-  color: var(--foreground-muted);
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Standalone context */
-.standalone-demo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 16px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.standalone-label {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-}
-
-/* Context row layout */
-.context-row {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
-/* Size comparison */
-.size-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  flex-wrap: wrap;
-}
-
-.size-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-start;
-}
-
-.size-group-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.05em;
-}
-
-.size-chips {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Separator */
-.size-sep {
-  width: 1px;
-  height: 40px;
-  background: var(--border);
-  align-self: center;
-}
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="showcase-page">
-
-    <!-- ── Header ── -->
-    <div class="showcase-header">
-      <div class="gk-eyebrow" style="margin-bottom: 10px;">Variant B &nbsp;·&nbsp; Tinted Chip</div>
-      <h1 class="gk-h2" style="margin-bottom: 6px;">CostLink</h1>
-      <p class="gk-small" style="max-width: 540px; line-height: var(--leading-relaxed);">
-        Clickable cost value rendered as a tinted pill. Color magnitude communicates spend level at a glance. Always reads as interactive — navigates to Usage page with pre-applied filters.
-      </p>
-    </div>
-
-    <!-- ── Section 1: Magnitudes × Sizes ── -->
-    <div class="showcase-section">
-      <div class="showcase-section-title">Magnitudes &amp; Sizes</div>
-
-      <!-- Low cost -->
-      <div class="magnitude-row">
-        <span class="magnitude-label">low &lt; $1</span>
-        <div class="size-chips" style="gap: 10px; align-items: center;">
-          <div class="cost-link-wrapper">
-            <a class="cost-link cost-link-sm cost-link-low" href="#" role="button" aria-label="$0.12 — View cost breakdown">
-              <span>$0.12</span>
-              <span class="cost-link-icon">
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                  <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cost-link-tooltip">View cost breakdown</div>
-          </div>
-          <div class="cost-link-wrapper">
-            <a class="cost-link cost-link-md cost-link-low" href="#" role="button" aria-label="$0.12 — View cost breakdown">
-              <span>$0.12</span>
-              <span class="cost-link-icon">
-                <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                  <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cost-link-tooltip">View cost breakdown</div>
-          </div>
-          <span class="gk-tiny" style="margin-left: 4px;">sm · md</span>
-        </div>
-      </div>
-
-      <!-- Medium cost -->
-      <div class="magnitude-row">
-        <span class="magnitude-label">mid $1–$20</span>
-        <div class="size-chips" style="gap: 10px; align-items: center;">
-          <div class="cost-link-wrapper">
-            <a class="cost-link cost-link-sm cost-link-medium" href="#" role="button" aria-label="$4.82 — View cost breakdown">
-              <span>$4.82</span>
-              <span class="cost-link-icon">
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                  <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cost-link-tooltip">View cost breakdown</div>
-          </div>
-          <div class="cost-link-wrapper">
-            <a class="cost-link cost-link-md cost-link-medium" href="#" role="button" aria-label="$4.82 — View cost breakdown">
-              <span>$4.82</span>
-              <span class="cost-link-icon">
-                <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                  <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cost-link-tooltip">View cost breakdown</div>
-          </div>
-          <span class="gk-tiny" style="margin-left: 4px;">sm · md</span>
-        </div>
-      </div>
-
-      <!-- High cost -->
-      <div class="magnitude-row">
-        <span class="magnitude-label">high &gt; $20</span>
-        <div class="size-chips" style="gap: 10px; align-items: center;">
-          <div class="cost-link-wrapper">
-            <a class="cost-link cost-link-sm cost-link-high" href="#" role="button" aria-label="$124.50 — View cost breakdown">
-              <span>$124.50</span>
-              <span class="cost-link-icon">
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                  <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cost-link-tooltip">View cost breakdown</div>
-          </div>
-          <div class="cost-link-wrapper">
-            <a class="cost-link cost-link-md cost-link-high" href="#" role="button" aria-label="$124.50 — View cost breakdown">
-              <span>$124.50</span>
-              <span class="cost-link-icon">
-                <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                  <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </a>
-            <div class="cost-link-tooltip">View cost breakdown</div>
-          </div>
-          <span class="gk-tiny" style="margin-left: 4px;">sm · md</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Section 2: Interactive States ── -->
-    <div class="showcase-section">
-      <div class="showcase-section-title">States — Medium Cost ($4.82)</div>
-      <div class="state-grid">
-
-        <!-- Default -->
-        <div class="state-cell">
-          <div class="state-cell-label">default</div>
-          <div class="state-cell-stage">
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-medium is-frozen" href="#" tabindex="-1" aria-label="$4.82">
-                <span>$4.82</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hover -->
-        <div class="state-cell">
-          <div class="state-cell-label">hover</div>
-          <div class="state-cell-stage">
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-medium" data-state="hover" href="#" tabindex="-1" aria-label="$4.82">
-                <span>$4.82</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cost-link-tooltip" style="opacity: 1; transform: translateX(-50%) translateY(0);">View cost breakdown</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Focus -->
-        <div class="state-cell">
-          <div class="state-cell-label">focus</div>
-          <div class="state-cell-stage">
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-medium" data-state="focus" href="#" tabindex="-1" aria-label="$4.82">
-                <span>$4.82</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Active/Pressed -->
-        <div class="state-cell">
-          <div class="state-cell-label">active / pressed</div>
-          <div class="state-cell-stage">
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-medium" data-state="active" href="#" tabindex="-1" aria-label="$4.82">
-                <span>$4.82</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Disabled row — all magnitudes -->
-      <div style="margin-top: 10px;">
-        <div class="state-cell" style="flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; min-height: auto;">
-          <div class="state-cell-label" style="min-width: 70px;">disabled</div>
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-low" data-state="disabled" aria-disabled="true" href="#" tabindex="-1" aria-label="$0.12 disabled">
-                <span>$0.12</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-medium" data-state="disabled" aria-disabled="true" href="#" tabindex="-1" aria-label="$4.82 disabled">
-                <span>$4.82</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-high" data-state="disabled" aria-disabled="true" href="#" tabindex="-1" aria-label="$124.50 disabled">
-                <span>$124.50</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Section 3: In-Context Usage ── -->
-    <div class="showcase-section">
-      <div class="showcase-section-title">In Context</div>
-      <div class="context-row">
-
-        <!-- Workspace Card -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="gk-tiny">workspace card footer</div>
-          <div class="workspace-card">
-            <div class="workspace-card-accent"></div>
-            <div class="workspace-card-body">
-              <div class="workspace-card-name">grovekeeper</div>
-              <div class="workspace-card-meta">~/dev/grovekeeper &nbsp;·&nbsp; main</div>
-              <div class="workspace-card-stats">
-                <div class="workspace-stat">
-                  <div class="workspace-stat-value">7</div>
-                  <div class="workspace-stat-label">sessions</div>
-                </div>
-                <div class="workspace-stat">
-                  <div class="workspace-stat-value">3</div>
-                  <div class="workspace-stat-label">active</div>
-                </div>
-                <div class="workspace-stat">
-                  <div class="workspace-stat-value">24</div>
-                  <div class="workspace-stat-label">issues</div>
-                </div>
-              </div>
-            </div>
-            <div class="workspace-card-footer">
-              <div class="workspace-footer-left">
-                <span class="session-dot"></span>
-                <span>3 running</span>
-              </div>
-              <div class="cost-link-wrapper">
-                <a class="cost-link cost-link-sm cost-link-medium" href="#" aria-label="$4.82 today — View cost breakdown">
-                  <span>$4.82</span>
-                  <span class="cost-link-icon">
-                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                      <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </span>
-                </a>
-                <div class="cost-link-tooltip">View cost breakdown</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Session Sidebar -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="gk-tiny">session sidebar panel</div>
-          <div class="sidebar-panel">
-            <div class="sidebar-header">
-              <div class="sidebar-header-icon">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <rect x="2" y="3" width="12" height="9" rx="2" stroke="var(--primary)" stroke-width="1.4"/>
-                  <path d="M5 13h6" stroke="var(--primary)" stroke-width="1.4" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div>
-                <div class="sidebar-header-title">PRD-97 · metrics v2</div>
-                <div class="sidebar-header-sub">claude-sonnet-4-5 &nbsp;·&nbsp; running</div>
-              </div>
-            </div>
-            <div class="sidebar-section">
-              <div class="sidebar-row">
-                <span class="sidebar-row-label">tokens in</span>
-                <span class="sidebar-row-value">284,391</span>
-              </div>
-              <div class="sidebar-row">
-                <span class="sidebar-row-label">tokens out</span>
-                <span class="sidebar-row-value">41,822</span>
-              </div>
-              <div class="sidebar-row">
-                <span class="sidebar-row-label">tool calls</span>
-                <span class="sidebar-row-value">138</span>
-              </div>
-              <div class="sidebar-row" style="padding-top: 8px; margin-top: 4px; border-top: 1px dashed var(--border);">
-                <span class="sidebar-row-label">session cost</span>
-                <div class="cost-link-wrapper">
-                  <a class="cost-link cost-link-sm cost-link-medium" href="#" aria-label="$4.82 — View cost breakdown">
-                    <span>$4.82</span>
-                    <span class="cost-link-icon">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                        <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                  </a>
-                  <div class="cost-link-tooltip">View cost breakdown</div>
-                </div>
-              </div>
-              <div class="sidebar-row">
-                <span class="sidebar-row-label">workspace total</span>
-                <div class="cost-link-wrapper">
-                  <a class="cost-link cost-link-sm cost-link-high" href="#" aria-label="$124.50 — View cost breakdown">
-                    <span>$124.50</span>
-                    <span class="cost-link-icon">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                        <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </span>
-                  </a>
-                  <div class="cost-link-tooltip">View cost breakdown</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Standalone inline -->
-        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 200px;">
-          <div class="gk-tiny">standalone / inline</div>
-          <div class="standalone-demo">
-            <span class="standalone-label">Today's spend</span>
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-low" href="#" aria-label="$0.12 — View cost breakdown">
-                <span>$0.12</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cost-link-tooltip">View cost breakdown</div>
-            </div>
-          </div>
-          <div class="standalone-demo">
-            <span class="standalone-label">This session</span>
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-medium" href="#" aria-label="$4.82 — View cost breakdown">
-                <span>$4.82</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cost-link-tooltip">View cost breakdown</div>
-            </div>
-          </div>
-          <div class="standalone-demo">
-            <span class="standalone-label">MTD total</span>
-            <div class="cost-link-wrapper">
-              <a class="cost-link cost-link-md cost-link-high" href="#" aria-label="$124.50 — View cost breakdown">
-                <span>$124.50</span>
-                <span class="cost-link-icon">
-                  <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                    <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </a>
-              <div class="cost-link-tooltip">View cost breakdown</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── Section 4: All States × All Magnitudes ── -->
-    <div class="showcase-section">
-      <div class="showcase-section-title">Full Matrix — All States × Magnitudes (md)</div>
-      <div style="overflow-x: auto;">
-        <table style="border-collapse: collapse; width: 100%; min-width: 560px;">
-          <thead>
-            <tr>
-              <th style="text-align: left; padding: 8px 14px 8px 0; font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500;">State</th>
-              <th style="padding: 8px 14px; font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500; text-align: center;">low &lt; $1</th>
-              <th style="padding: 8px 14px; font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500; text-align: center;">mid $1–$20</th>
-              <th style="padding: 8px 14px; font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle); letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500; text-align: center;">high &gt; $20</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Default -->
-            <tr>
-              <td style="padding: 10px 14px 10px 0; font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle); border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);">default</td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-low is-frozen" href="#" tabindex="-1">$0.12
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-medium is-frozen" href="#" tabindex="-1">$4.82
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-high is-frozen" href="#" tabindex="-1">$124.50
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <!-- Hover -->
-            <tr>
-              <td style="padding: 10px 14px 10px 0; font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle); border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);">hover</td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-low" data-state="hover" href="#" tabindex="-1">$0.12
-                    <span class="cost-link-icon" style="opacity: 0.9; transform: translateX(1px);"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-medium" data-state="hover" href="#" tabindex="-1">$4.82
-                    <span class="cost-link-icon" style="opacity: 0.9; transform: translateX(1px);"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-high" data-state="hover" href="#" tabindex="-1">$124.50
-                    <span class="cost-link-icon" style="opacity: 0.9; transform: translateX(1px);"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <!-- Focus -->
-            <tr>
-              <td style="padding: 10px 14px 10px 0; font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle); border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);">focus</td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-low" data-state="focus" href="#" tabindex="-1">$0.12
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-medium" data-state="focus" href="#" tabindex="-1">$4.82
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-high" data-state="focus" href="#" tabindex="-1">$124.50
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <!-- Active -->
-            <tr>
-              <td style="padding: 10px 14px 10px 0; font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle); border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);">active</td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-low" data-state="active" href="#" tabindex="-1">$0.12
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-medium" data-state="active" href="#" tabindex="-1">$4.82
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent); text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-high" data-state="active" href="#" tabindex="-1">$124.50
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <!-- Disabled -->
-            <tr>
-              <td style="padding: 10px 14px 10px 0; font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle);">disabled</td>
-              <td style="padding: 10px 14px; text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-low" data-state="disabled" aria-disabled="true" href="#" tabindex="-1">$0.12
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-medium" data-state="disabled" aria-disabled="true" href="#" tabindex="-1">$4.82
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-              <td style="padding: 10px 14px; text-align: center;">
-                <div class="cost-link-wrapper" style="justify-content: center;">
-                  <a class="cost-link cost-link-md cost-link-high" data-state="disabled" aria-disabled="true" href="#" tabindex="-1">$124.50
-                    <span class="cost-link-icon"><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── Section 5: Live interactive demo ── -->
-    <div class="showcase-section">
-      <div class="showcase-section-title">Live — Click &amp; Tab to Test</div>
-      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; padding: 20px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);">
-        <span class="gk-small">Try keyboard navigation:</span>
-        <div class="cost-link-wrapper">
-          <a class="cost-link cost-link-md cost-link-low" href="#" aria-label="$0.12 today — View cost breakdown">
-            <span>$0.12</span>
-            <span class="cost-link-icon">
-              <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-          </a>
-          <div class="cost-link-tooltip">View cost breakdown</div>
-        </div>
-        <div class="cost-link-wrapper">
-          <a class="cost-link cost-link-md cost-link-medium" href="#" aria-label="$4.82 today — View cost breakdown">
-            <span>$4.82</span>
-            <span class="cost-link-icon">
-              <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-          </a>
-          <div class="cost-link-tooltip">View cost breakdown</div>
-        </div>
-        <div class="cost-link-wrapper">
-          <a class="cost-link cost-link-md cost-link-high" href="#" aria-label="$124.50 today — View cost breakdown">
-            <span>$124.50</span>
-            <span class="cost-link-icon">
-              <svg width="9" height="9" viewBox="0 0 8 8" fill="none" aria-hidden="true">
-                <path d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-          </a>
-          <div class="cost-link-tooltip">View cost breakdown</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /showcase-page -->
-</div><!-- /gk-root -->
-</body>
+			.cost-link {
+				/* Reset anchor styling */
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				text-decoration: none;
+				cursor: pointer;
+				border: none;
+				background: none;
+				padding: 0;
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				border-radius: var(--radius-full);
+				outline: none;
+				position: relative;
+				/* Transitions for all state changes */
+				transition:
+					background var(--duration-2) var(--ease-out),
+					border-color var(--duration-2) var(--ease-out),
+					box-shadow var(--duration-2) var(--ease-out),
+					transform var(--duration-1) var(--ease-out),
+					filter var(--duration-2) var(--ease-out);
+				user-select: none;
+			}
+
+			/* ── Size: sm (10.5px) ── */
+			.cost-link-sm {
+				font-size: var(--text-2xs); /* 10.5px */
+				padding: 2px 7px;
+				height: 20px;
+				border-width: 1px;
+				border-style: solid;
+				letter-spacing: 0.01em;
+			}
+
+			/* ── Size: md (12px) ── */
+			.cost-link-md {
+				font-size: var(--text-sm); /* 12px */
+				padding: 3px 9px;
+				height: 24px;
+				border-width: 1px;
+				border-style: solid;
+				letter-spacing: 0.01em;
+			}
+
+			/* Arrow icon inside the chip */
+			.cost-link-icon {
+				display: inline-flex;
+				align-items: center;
+				flex-shrink: 0;
+				opacity: 0.55;
+				transition:
+					opacity var(--duration-2) var(--ease-out),
+					transform var(--duration-2) var(--ease-out);
+			}
+			.cost-link:hover .cost-link-icon,
+			.cost-link[data-state='hover'] .cost-link-icon {
+				opacity: 0.9;
+				transform: translateX(1px);
+			}
+
+			/* ── Magnitude: LOW (< $1) — moss green ── */
+			.cost-link-low {
+				--chip-fg: oklch(0.76 0.105 142);
+				--chip-bg: oklch(0.225 0.04 145);
+				--chip-border: oklch(0.31 0.06 142);
+				--chip-fg-hover: oklch(0.82 0.12 138);
+				--chip-bg-hover: oklch(0.255 0.052 143);
+				--chip-border-hover: oklch(0.39 0.08 140);
+				--chip-ring: oklch(0.58 0.096 134);
+			}
+
+			/* ── Magnitude: MEDIUM ($1–$20) — amber ── */
+			.cost-link-medium {
+				--chip-fg: oklch(0.79 0.145 68);
+				--chip-bg: oklch(0.228 0.048 62);
+				--chip-border: oklch(0.315 0.072 60);
+				--chip-fg-hover: oklch(0.85 0.16 65);
+				--chip-bg-hover: oklch(0.26 0.065 60);
+				--chip-border-hover: oklch(0.4 0.095 58);
+				--chip-ring: oklch(0.69 0.165 55);
+			}
+
+			/* ── Magnitude: HIGH (> $20) — coral/rose ── */
+			.cost-link-high {
+				--chip-fg: oklch(0.74 0.13 22);
+				--chip-bg: oklch(0.222 0.044 20);
+				--chip-border: oklch(0.308 0.068 18);
+				--chip-fg-hover: oklch(0.8 0.148 18);
+				--chip-bg-hover: oklch(0.255 0.06 18);
+				--chip-border-hover: oklch(0.39 0.09 16);
+				--chip-ring: oklch(0.62 0.155 30);
+			}
+
+			/* Apply the chip colors */
+			.cost-link-low,
+			.cost-link-medium,
+			.cost-link-high {
+				color: var(--chip-fg);
+				background: var(--chip-bg);
+				border-color: var(--chip-border);
+			}
+
+			/* ── Hover state ── */
+			.cost-link-low:hover,
+			.cost-link-medium:hover,
+			.cost-link-high:hover,
+			.cost-link-low[data-state='hover'],
+			.cost-link-medium[data-state='hover'],
+			.cost-link-high[data-state='hover'] {
+				color: var(--chip-fg-hover);
+				background: var(--chip-bg-hover);
+				border-color: var(--chip-border-hover);
+				box-shadow: 0 2px 8px color-mix(in oklch, var(--chip-ring) 22%, transparent);
+			}
+
+			/* ── Focus state ── */
+			.cost-link:focus-visible,
+			.cost-link[data-state='focus'] {
+				outline: none;
+				box-shadow:
+					0 0 0 2px var(--background),
+					0 0 0 4px var(--chip-ring);
+			}
+
+			/* ── Active / pressed state ── */
+			.cost-link:active,
+			.cost-link[data-state='active'] {
+				transform: scale(0.94);
+				filter: brightness(0.88);
+			}
+
+			/* ── Disabled state ── */
+			.cost-link[data-state='disabled'],
+			.cost-link:disabled,
+			.cost-link[aria-disabled='true'] {
+				opacity: 0.38;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── Tooltip wrapper ── */
+			.cost-link-wrapper {
+				position: relative;
+				display: inline-flex;
+			}
+
+			.cost-link-tooltip {
+				position: absolute;
+				bottom: calc(100% + 6px);
+				left: 50%;
+				transform: translateX(-50%);
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid oklch(0.28 0.022 148);
+				font-size: 11px;
+				font-family: var(--font-sans);
+				padding: 4px 8px;
+				border-radius: 6px;
+				box-shadow: var(--shadow-md);
+				white-space: nowrap;
+				pointer-events: none;
+				opacity: 0;
+				transform: translateX(-50%) translateY(3px);
+				transition:
+					opacity var(--duration-2) var(--ease-out),
+					transform var(--duration-2) var(--ease-out);
+				z-index: var(--z-tooltip);
+			}
+
+			.cost-link-tooltip::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				border: 4px solid transparent;
+				border-top-color: oklch(0.12 0.02 150);
+			}
+
+			.cost-link-wrapper:hover .cost-link-tooltip,
+			.cost-link-wrapper:focus-within .cost-link-tooltip {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0);
+			}
+
+			/* ── Showcase page layout ── */
+			.showcase-page {
+				min-height: 100vh;
+				padding: 40px 48px 80px;
+				max-width: 960px;
+				margin: 0 auto;
+			}
+
+			.showcase-header {
+				margin-bottom: 48px;
+			}
+
+			.showcase-section {
+				margin-bottom: 48px;
+			}
+
+			.showcase-section-title {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				margin-bottom: 16px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.showcase-section-title::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* State grid */
+			.state-grid {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 12px;
+			}
+
+			@media (max-width: 600px) {
+				.state-grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.showcase-page {
+					padding: 24px 20px 60px;
+				}
+			}
+
+			.state-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				padding: 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+			}
+
+			.state-cell-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+
+			.state-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			/* Magnitude row */
+			.magnitude-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-wrap: wrap;
+				padding: 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				margin-bottom: 10px;
+			}
+
+			.magnitude-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				min-width: 56px;
+			}
+
+			/* Context: workspace card */
+			.workspace-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				width: 280px;
+				transition:
+					border-color var(--duration-2),
+					box-shadow var(--duration-2);
+			}
+
+			.workspace-card:hover {
+				border-color: var(--border-strong);
+				box-shadow: var(--shadow-md);
+			}
+
+			.workspace-card-accent {
+				height: 3px;
+				background: linear-gradient(90deg, var(--moss-500) 0%, var(--moss-400) 100%);
+			}
+
+			.workspace-card-body {
+				padding: 14px 14px 10px;
+			}
+
+			.workspace-card-name {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				margin-bottom: 2px;
+			}
+
+			.workspace-card-meta {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				margin-bottom: 10px;
+			}
+
+			.workspace-card-stats {
+				display: flex;
+				gap: 14px;
+				margin-bottom: 12px;
+			}
+
+			.workspace-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+			}
+
+			.workspace-stat-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.workspace-stat-label {
+				font-size: 10px;
+				color: var(--foreground-subtle);
+			}
+
+			.workspace-card-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 8px 14px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+
+			.workspace-footer-left {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			.session-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--session-running);
+				flex-shrink: 0;
+			}
+
+			/* Context: session sidebar */
+			.sidebar-panel {
+				width: 260px;
+				background: var(--sidebar-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+			}
+
+			.sidebar-header {
+				padding: 12px 14px 10px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.sidebar-header-icon {
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				background: var(--primary-soft);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+
+			.sidebar-header-title {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				line-height: var(--leading-snug);
+			}
+
+			.sidebar-header-sub {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			.sidebar-section {
+				padding: 10px 14px;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.sidebar-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 4px 0;
+				font-size: var(--text-xs);
+			}
+
+			.sidebar-row-label {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			.sidebar-row-value {
+				color: var(--foreground-muted);
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Standalone context */
+			.standalone-demo {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				flex-wrap: wrap;
+				padding: 16px 20px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+			}
+
+			.standalone-label {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			/* Context row layout */
+			.context-row {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+				align-items: flex-start;
+			}
+
+			/* Size comparison */
+			.size-row {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				padding: 14px 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				flex-wrap: wrap;
+			}
+
+			.size-group {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				align-items: flex-start;
+			}
+
+			.size-group-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.05em;
+			}
+
+			.size-chips {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			/* Separator */
+			.size-sep {
+				width: 1px;
+				height: 40px;
+				background: var(--border);
+				align-self: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="showcase-page">
+				<!-- ── Header ── -->
+				<div class="showcase-header">
+					<div class="gk-eyebrow" style="margin-bottom: 10px">
+						Variant B &nbsp;·&nbsp; Tinted Chip
+					</div>
+					<h1 class="gk-h2" style="margin-bottom: 6px">CostLink</h1>
+					<p
+						class="gk-small"
+						style="max-width: 540px; line-height: var(--leading-relaxed)"
+					>
+						Clickable cost value rendered as a tinted pill. Color magnitude communicates
+						spend level at a glance. Always reads as interactive — navigates to Usage
+						page with pre-applied filters.
+					</p>
+				</div>
+
+				<!-- ── Section 1: Magnitudes × Sizes ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Magnitudes &amp; Sizes</div>
+
+					<!-- Low cost -->
+					<div class="magnitude-row">
+						<span class="magnitude-label">low &lt; $1</span>
+						<div class="size-chips" style="gap: 10px; align-items: center">
+							<div class="cost-link-wrapper">
+								<a
+									class="cost-link cost-link-sm cost-link-low"
+									href="#"
+									role="button"
+									aria-label="$0.12 — View cost breakdown"
+								>
+									<span>$0.12</span>
+									<span class="cost-link-icon">
+										<svg
+											width="8"
+											height="8"
+											viewBox="0 0 8 8"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cost-link-tooltip">View cost breakdown</div>
+							</div>
+							<div class="cost-link-wrapper">
+								<a
+									class="cost-link cost-link-md cost-link-low"
+									href="#"
+									role="button"
+									aria-label="$0.12 — View cost breakdown"
+								>
+									<span>$0.12</span>
+									<span class="cost-link-icon">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 8 8"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cost-link-tooltip">View cost breakdown</div>
+							</div>
+							<span class="gk-tiny" style="margin-left: 4px">sm · md</span>
+						</div>
+					</div>
+
+					<!-- Medium cost -->
+					<div class="magnitude-row">
+						<span class="magnitude-label">mid $1–$20</span>
+						<div class="size-chips" style="gap: 10px; align-items: center">
+							<div class="cost-link-wrapper">
+								<a
+									class="cost-link cost-link-sm cost-link-medium"
+									href="#"
+									role="button"
+									aria-label="$4.82 — View cost breakdown"
+								>
+									<span>$4.82</span>
+									<span class="cost-link-icon">
+										<svg
+											width="8"
+											height="8"
+											viewBox="0 0 8 8"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cost-link-tooltip">View cost breakdown</div>
+							</div>
+							<div class="cost-link-wrapper">
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									href="#"
+									role="button"
+									aria-label="$4.82 — View cost breakdown"
+								>
+									<span>$4.82</span>
+									<span class="cost-link-icon">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 8 8"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cost-link-tooltip">View cost breakdown</div>
+							</div>
+							<span class="gk-tiny" style="margin-left: 4px">sm · md</span>
+						</div>
+					</div>
+
+					<!-- High cost -->
+					<div class="magnitude-row">
+						<span class="magnitude-label">high &gt; $20</span>
+						<div class="size-chips" style="gap: 10px; align-items: center">
+							<div class="cost-link-wrapper">
+								<a
+									class="cost-link cost-link-sm cost-link-high"
+									href="#"
+									role="button"
+									aria-label="$124.50 — View cost breakdown"
+								>
+									<span>$124.50</span>
+									<span class="cost-link-icon">
+										<svg
+											width="8"
+											height="8"
+											viewBox="0 0 8 8"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cost-link-tooltip">View cost breakdown</div>
+							</div>
+							<div class="cost-link-wrapper">
+								<a
+									class="cost-link cost-link-md cost-link-high"
+									href="#"
+									role="button"
+									aria-label="$124.50 — View cost breakdown"
+								>
+									<span>$124.50</span>
+									<span class="cost-link-icon">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 8 8"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</span>
+								</a>
+								<div class="cost-link-tooltip">View cost breakdown</div>
+							</div>
+							<span class="gk-tiny" style="margin-left: 4px">sm · md</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 2: Interactive States ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">States — Medium Cost ($4.82)</div>
+					<div class="state-grid">
+						<!-- Default -->
+						<div class="state-cell">
+							<div class="state-cell-label">default</div>
+							<div class="state-cell-stage">
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-medium is-frozen"
+										href="#"
+										tabindex="-1"
+										aria-label="$4.82"
+									>
+										<span>$4.82</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- Hover -->
+						<div class="state-cell">
+							<div class="state-cell-label">hover</div>
+							<div class="state-cell-stage">
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-medium"
+										data-state="hover"
+										href="#"
+										tabindex="-1"
+										aria-label="$4.82"
+									>
+										<span>$4.82</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div
+										class="cost-link-tooltip"
+										style="
+											opacity: 1;
+											transform: translateX(-50%) translateY(0);
+										"
+									>
+										View cost breakdown
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Focus -->
+						<div class="state-cell">
+							<div class="state-cell-label">focus</div>
+							<div class="state-cell-stage">
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-medium"
+										data-state="focus"
+										href="#"
+										tabindex="-1"
+										aria-label="$4.82"
+									>
+										<span>$4.82</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- Active/Pressed -->
+						<div class="state-cell">
+							<div class="state-cell-label">active / pressed</div>
+							<div class="state-cell-stage">
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-medium"
+										data-state="active"
+										href="#"
+										tabindex="-1"
+										aria-label="$4.82"
+									>
+										<span>$4.82</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Disabled row — all magnitudes -->
+					<div style="margin-top: 10px">
+						<div
+							class="state-cell"
+							style="
+								flex-direction: row;
+								align-items: center;
+								justify-content: space-between;
+								flex-wrap: wrap;
+								gap: 12px;
+								min-height: auto;
+							"
+						>
+							<div class="state-cell-label" style="min-width: 70px">disabled</div>
+							<div
+								style="
+									display: flex;
+									gap: 10px;
+									align-items: center;
+									flex-wrap: wrap;
+								"
+							>
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-low"
+										data-state="disabled"
+										aria-disabled="true"
+										href="#"
+										tabindex="-1"
+										aria-label="$0.12 disabled"
+									>
+										<span>$0.12</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-medium"
+										data-state="disabled"
+										aria-disabled="true"
+										href="#"
+										tabindex="-1"
+										aria-label="$4.82 disabled"
+									>
+										<span>$4.82</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-high"
+										data-state="disabled"
+										aria-disabled="true"
+										href="#"
+										tabindex="-1"
+										aria-label="$124.50 disabled"
+									>
+										<span>$124.50</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 3: In-Context Usage ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">In Context</div>
+					<div class="context-row">
+						<!-- Workspace Card -->
+						<div style="display: flex; flex-direction: column; gap: 8px">
+							<div class="gk-tiny">workspace card footer</div>
+							<div class="workspace-card">
+								<div class="workspace-card-accent"></div>
+								<div class="workspace-card-body">
+									<div class="workspace-card-name">grovekeeper</div>
+									<div class="workspace-card-meta">
+										~/dev/grovekeeper &nbsp;·&nbsp; main
+									</div>
+									<div class="workspace-card-stats">
+										<div class="workspace-stat">
+											<div class="workspace-stat-value">7</div>
+											<div class="workspace-stat-label">sessions</div>
+										</div>
+										<div class="workspace-stat">
+											<div class="workspace-stat-value">3</div>
+											<div class="workspace-stat-label">active</div>
+										</div>
+										<div class="workspace-stat">
+											<div class="workspace-stat-value">24</div>
+											<div class="workspace-stat-label">issues</div>
+										</div>
+									</div>
+								</div>
+								<div class="workspace-card-footer">
+									<div class="workspace-footer-left">
+										<span class="session-dot"></span>
+										<span>3 running</span>
+									</div>
+									<div class="cost-link-wrapper">
+										<a
+											class="cost-link cost-link-sm cost-link-medium"
+											href="#"
+											aria-label="$4.82 today — View cost breakdown"
+										>
+											<span>$4.82</span>
+											<span class="cost-link-icon">
+												<svg
+													width="8"
+													height="8"
+													viewBox="0 0 8 8"
+													fill="none"
+													aria-hidden="true"
+												>
+													<path
+														d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+														stroke="currentColor"
+														stroke-width="1.2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</span>
+										</a>
+										<div class="cost-link-tooltip">View cost breakdown</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Session Sidebar -->
+						<div style="display: flex; flex-direction: column; gap: 8px">
+							<div class="gk-tiny">session sidebar panel</div>
+							<div class="sidebar-panel">
+								<div class="sidebar-header">
+									<div class="sidebar-header-icon">
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="9"
+												rx="2"
+												stroke="var(--primary)"
+												stroke-width="1.4"
+											/>
+											<path
+												d="M5 13h6"
+												stroke="var(--primary)"
+												stroke-width="1.4"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</div>
+									<div>
+										<div class="sidebar-header-title">PRD-97 · metrics v2</div>
+										<div class="sidebar-header-sub">
+											claude-sonnet-4-5 &nbsp;·&nbsp; running
+										</div>
+									</div>
+								</div>
+								<div class="sidebar-section">
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">tokens in</span>
+										<span class="sidebar-row-value">284,391</span>
+									</div>
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">tokens out</span>
+										<span class="sidebar-row-value">41,822</span>
+									</div>
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">tool calls</span>
+										<span class="sidebar-row-value">138</span>
+									</div>
+									<div
+										class="sidebar-row"
+										style="
+											padding-top: 8px;
+											margin-top: 4px;
+											border-top: 1px dashed var(--border);
+										"
+									>
+										<span class="sidebar-row-label">session cost</span>
+										<div class="cost-link-wrapper">
+											<a
+												class="cost-link cost-link-sm cost-link-medium"
+												href="#"
+												aria-label="$4.82 — View cost breakdown"
+											>
+												<span>$4.82</span>
+												<span class="cost-link-icon">
+													<svg
+														width="8"
+														height="8"
+														viewBox="0 0 8 8"
+														fill="none"
+														aria-hidden="true"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</span>
+											</a>
+											<div class="cost-link-tooltip">View cost breakdown</div>
+										</div>
+									</div>
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">workspace total</span>
+										<div class="cost-link-wrapper">
+											<a
+												class="cost-link cost-link-sm cost-link-high"
+												href="#"
+												aria-label="$124.50 — View cost breakdown"
+											>
+												<span>$124.50</span>
+												<span class="cost-link-icon">
+													<svg
+														width="8"
+														height="8"
+														viewBox="0 0 8 8"
+														fill="none"
+														aria-hidden="true"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</span>
+											</a>
+											<div class="cost-link-tooltip">View cost breakdown</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Standalone inline -->
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								gap: 8px;
+								flex: 1;
+								min-width: 200px;
+							"
+						>
+							<div class="gk-tiny">standalone / inline</div>
+							<div class="standalone-demo">
+								<span class="standalone-label">Today's spend</span>
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-low"
+										href="#"
+										aria-label="$0.12 — View cost breakdown"
+									>
+										<span>$0.12</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cost-link-tooltip">View cost breakdown</div>
+								</div>
+							</div>
+							<div class="standalone-demo">
+								<span class="standalone-label">This session</span>
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-medium"
+										href="#"
+										aria-label="$4.82 — View cost breakdown"
+									>
+										<span>$4.82</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cost-link-tooltip">View cost breakdown</div>
+								</div>
+							</div>
+							<div class="standalone-demo">
+								<span class="standalone-label">MTD total</span>
+								<div class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md cost-link-high"
+										href="#"
+										aria-label="$124.50 — View cost breakdown"
+									>
+										<span>$124.50</span>
+										<span class="cost-link-icon">
+											<svg
+												width="9"
+												height="9"
+												viewBox="0 0 8 8"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</span>
+									</a>
+									<div class="cost-link-tooltip">View cost breakdown</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 4: All States × All Magnitudes ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Full Matrix — All States × Magnitudes (md)
+					</div>
+					<div style="overflow-x: auto">
+						<table style="border-collapse: collapse; width: 100%; min-width: 560px">
+							<thead>
+								<tr>
+									<th
+										style="
+											text-align: left;
+											padding: 8px 14px 8px 0;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+										"
+									>
+										State
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										low &lt; $1
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										mid $1–$20
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										high &gt; $20
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Default -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										default
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low is-frozen"
+												href="#"
+												tabindex="-1"
+												>$0.12
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium is-frozen"
+												href="#"
+												tabindex="-1"
+												>$4.82
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high is-frozen"
+												href="#"
+												tabindex="-1"
+												>$124.50
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+								</tr>
+								<!-- Hover -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										hover
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="hover"
+												href="#"
+												tabindex="-1"
+												>$0.12
+												<span
+													class="cost-link-icon"
+													style="opacity: 0.9; transform: translateX(1px)"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="hover"
+												href="#"
+												tabindex="-1"
+												>$4.82
+												<span
+													class="cost-link-icon"
+													style="opacity: 0.9; transform: translateX(1px)"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="hover"
+												href="#"
+												tabindex="-1"
+												>$124.50
+												<span
+													class="cost-link-icon"
+													style="opacity: 0.9; transform: translateX(1px)"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+								</tr>
+								<!-- Focus -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										focus
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="focus"
+												href="#"
+												tabindex="-1"
+												>$0.12
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="focus"
+												href="#"
+												tabindex="-1"
+												>$4.82
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="focus"
+												href="#"
+												tabindex="-1"
+												>$124.50
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+								</tr>
+								<!-- Active -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										active
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="active"
+												href="#"
+												tabindex="-1"
+												>$0.12
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="active"
+												href="#"
+												tabindex="-1"
+												>$4.82
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="active"
+												href="#"
+												tabindex="-1"
+												>$124.50
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+								</tr>
+								<!-- Disabled -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+										"
+									>
+										disabled
+									</td>
+									<td style="padding: 10px 14px; text-align: center">
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="disabled"
+												aria-disabled="true"
+												href="#"
+												tabindex="-1"
+												>$0.12
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td style="padding: 10px 14px; text-align: center">
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="disabled"
+												aria-disabled="true"
+												href="#"
+												tabindex="-1"
+												>$4.82
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+									<td style="padding: 10px 14px; text-align: center">
+										<div
+											class="cost-link-wrapper"
+											style="justify-content: center"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="disabled"
+												aria-disabled="true"
+												href="#"
+												tabindex="-1"
+												>$124.50
+												<span class="cost-link-icon"
+													><svg
+														width="9"
+														height="9"
+														viewBox="0 0 8 8"
+														fill="none"
+													>
+														<path
+															d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/></svg
+												></span>
+											</a>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- ── Section 5: Live interactive demo ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Live — Click &amp; Tab to Test</div>
+					<div
+						style="
+							display: flex;
+							gap: 16px;
+							flex-wrap: wrap;
+							align-items: center;
+							padding: 20px 24px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-md);
+						"
+					>
+						<span class="gk-small">Try keyboard navigation:</span>
+						<div class="cost-link-wrapper">
+							<a
+								class="cost-link cost-link-md cost-link-low"
+								href="#"
+								aria-label="$0.12 today — View cost breakdown"
+							>
+								<span>$0.12</span>
+								<span class="cost-link-icon">
+									<svg
+										width="9"
+										height="9"
+										viewBox="0 0 8 8"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</span>
+							</a>
+							<div class="cost-link-tooltip">View cost breakdown</div>
+						</div>
+						<div class="cost-link-wrapper">
+							<a
+								class="cost-link cost-link-md cost-link-medium"
+								href="#"
+								aria-label="$4.82 today — View cost breakdown"
+							>
+								<span>$4.82</span>
+								<span class="cost-link-icon">
+									<svg
+										width="9"
+										height="9"
+										viewBox="0 0 8 8"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</span>
+							</a>
+							<div class="cost-link-tooltip">View cost breakdown</div>
+						</div>
+						<div class="cost-link-wrapper">
+							<a
+								class="cost-link cost-link-md cost-link-high"
+								href="#"
+								aria-label="$124.50 today — View cost breakdown"
+							>
+								<span>$124.50</span>
+								<span class="cost-link-icon">
+									<svg
+										width="9"
+										height="9"
+										viewBox="0 0 8 8"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M1.5 4h5M4.5 1.5 7 4l-2.5 2.5"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</span>
+							</a>
+							<div class="cost-link-tooltip">View cost breakdown</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /showcase-page -->
+		</div>
+		<!-- /gk-root -->
+	</body>
 </html>

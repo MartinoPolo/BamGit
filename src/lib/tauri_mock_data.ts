@@ -789,6 +789,7 @@ const MOCK_ASSIGNED_ISSUES: AssignedIssue[] = [
 		state: 'open',
 		url: 'https://github.com/MartinoPolo/Grovekeeper/issues/42',
 		labels: [{ name: 'auth', color: 'ef4444' }],
+		parent_issue_number: 89,
 	},
 	{
 		number: 55,
@@ -799,6 +800,7 @@ const MOCK_ASSIGNED_ISSUES: AssignedIssue[] = [
 			{ name: 'ui', color: '8b5cf6' },
 			{ name: 'theme', color: '6366f1' },
 		],
+		parent_issue_number: 254,
 	},
 	{
 		number: 78,
@@ -806,6 +808,37 @@ const MOCK_ASSIGNED_ISSUES: AssignedIssue[] = [
 		state: 'open',
 		url: 'https://github.com/MartinoPolo/Grovekeeper/issues/78',
 		labels: [{ name: 'ui', color: '8b5cf6' }],
+		parent_issue_number: null,
+	},
+	{
+		number: 101,
+		title: 'Wire notification event triggers from source points',
+		state: 'open',
+		url: 'https://github.com/MartinoPolo/Grovekeeper/issues/101',
+		labels: [
+			{ name: 'AFK', color: '1D76DB' },
+			{ name: 'task', color: '0E8A16' },
+		],
+		parent_issue_number: 95,
+	},
+	{
+		number: 135,
+		title: 'Build character pack creator with sound assignment',
+		state: 'open',
+		url: 'https://github.com/MartinoPolo/Grovekeeper/issues/135',
+		labels: [
+			{ name: 'design-needed', color: 'E8820C' },
+			{ name: 'HITL', color: 'FBCA04' },
+		],
+		parent_issue_number: 95,
+	},
+	{
+		number: 200,
+		title: 'Fix sound engine: Tokio crash and MP3 support',
+		state: 'open',
+		url: 'https://github.com/MartinoPolo/Grovekeeper/issues/200',
+		labels: [{ name: 'bug', color: 'd73a4a' }],
+		parent_issue_number: null,
 	},
 ];
 
@@ -1115,16 +1148,16 @@ export const MOCK_ACHIEVEMENTS = [
 		unlocked_at: '2026-04-01T10:00:00Z',
 	},
 	{
-		kind: 'planted-10-trees',
-		display_name: 'Planted 10 Trees',
+		kind: 'created-10-trees',
+		display_name: 'Created 10 Trees',
 		description: 'Created 10 issues',
 		threshold: 10,
 		progress: 12,
 		unlocked_at: '2026-04-15T14:00:00Z',
 	},
 	{
-		kind: 'planted-50-trees',
-		display_name: 'Planted 50 Trees',
+		kind: 'created-50-trees',
+		display_name: 'Created 50 Trees',
 		description: 'Created 50 issues',
 		threshold: 50,
 		progress: 12,

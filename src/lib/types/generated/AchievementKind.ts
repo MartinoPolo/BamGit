@@ -3,4 +3,4 @@
 /**
  * All possible achievement types.
  */
-export type AchievementKind = "first-seed" | "planted10-trees" | "planted50-trees" | "green-thumb" | "forest-keeper" | "conflict-resolver" | "one-shot-wonder" | "cache-master" | "big-spender" | "speed-runner";
+export type AchievementKind = "first-seed" | "created10-trees" | "created50-trees" | "green-thumb" | "forest-keeper" | "conflict-resolver" | "one-shot-wonder" | "cache-master" | "big-spender" | "speed-runner";

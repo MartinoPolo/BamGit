@@ -7,8 +7,8 @@ use ts_rs::TS;
 #[serde(rename_all = "kebab-case")]
 pub enum AchievementKind {
     FirstSeed,
-    Planted10Trees,
-    Planted50Trees,
+    Created10Trees,
+    Created50Trees,
     GreenThumb,
     ForestKeeper,
     ConflictResolver,
@@ -20,8 +20,8 @@ pub enum AchievementKind {
 
 impl_sql_enum!(AchievementKind {
     FirstSeed => "first-seed",
-    Planted10Trees => "planted-10-trees",
-    Planted50Trees => "planted-50-trees",
+    Created10Trees => "created-10-trees",
+    Created50Trees => "created-50-trees",
     GreenThumb => "green-thumb",
     ForestKeeper => "forest-keeper",
     ConflictResolver => "conflict-resolver",
@@ -35,8 +35,8 @@ impl AchievementKind {
     pub fn threshold(&self) -> i64 {
         match self {
             Self::FirstSeed => 1,
-            Self::Planted10Trees => 10,
-            Self::Planted50Trees => 50,
+            Self::Created10Trees => 10,
+            Self::Created50Trees => 50,
             Self::GreenThumb => 10,
             Self::ForestKeeper => 5,
             Self::ConflictResolver => 3,
@@ -50,8 +50,8 @@ impl AchievementKind {
     pub fn display_name(&self) -> &'static str {
         match self {
             Self::FirstSeed => "First Seed",
-            Self::Planted10Trees => "Planted 10 Trees",
-            Self::Planted50Trees => "Planted 50 Trees",
+            Self::Created10Trees => "Created 10 Trees",
+            Self::Created50Trees => "Created 50 Trees",
             Self::GreenThumb => "Green Thumb",
             Self::ForestKeeper => "Forest Keeper",
             Self::ConflictResolver => "Conflict Resolver",
@@ -65,8 +65,8 @@ impl AchievementKind {
     pub fn description(&self) -> &'static str {
         match self {
             Self::FirstSeed => "Created your first issue",
-            Self::Planted10Trees => "Created 10 issues",
-            Self::Planted50Trees => "Created 50 issues",
+            Self::Created10Trees => "Created 10 issues",
+            Self::Created50Trees => "Created 50 issues",
             Self::GreenThumb => "Completed 10 sessions via Grovekeeper",
             Self::ForestKeeper => "Resolved 5 HITL issues",
             Self::ConflictResolver => "Auto-resolved 3 merge conflicts",
@@ -80,8 +80,8 @@ impl AchievementKind {
     pub fn all() -> &'static [AchievementKind] {
         &[
             Self::FirstSeed,
-            Self::Planted10Trees,
-            Self::Planted50Trees,
+            Self::Created10Trees,
+            Self::Created50Trees,
             Self::GreenThumb,
             Self::ForestKeeper,
             Self::ConflictResolver,

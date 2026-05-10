@@ -1,20 +1,6 @@
 import type { PullRequestState } from '$lib/types/generated';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GITHUB_BADGE_VARIANTS = [
-	'success',
-	'danger',
-	'warning',
-	'orange',
-	'info',
-	'emerald',
-	'purple',
-	'neutral',
-] as const;
-
-type GitHubBadgeVariant = (typeof GITHUB_BADGE_VARIANTS)[number];
-
-export const VARIANT_CLASSES: Record<GitHubBadgeVariant, string> = {
+export const VARIANT_CLASSES = {
 	success:
 		'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700/50',
 	danger: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700/50',
@@ -27,7 +13,9 @@ export const VARIANT_CLASSES: Record<GitHubBadgeVariant, string> = {
 	purple: 'bg-[color-mix(in_oklch,var(--status-merged)_14%,transparent)] text-status-merged border-[color-mix(in_oklch,var(--status-merged)_30%,transparent)]',
 	neutral:
 		'bg-neutral-50 text-neutral-600 border-neutral-200 dark:bg-neutral-800/40 dark:text-neutral-400 dark:border-neutral-600/50',
-};
+} as const satisfies Record<string, string>;
+
+type GitHubBadgeVariant = keyof typeof VARIANT_CLASSES;
 
 export interface StateConfig {
 	variant: GitHubBadgeVariant;

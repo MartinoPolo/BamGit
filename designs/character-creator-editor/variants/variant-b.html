@@ -1,1213 +1,1872 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Character Creator/Editor — Variant B: Kanban Swimlanes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ── Grovekeeper tokens (inlined) ─────────────────────────── */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Character Creator/Editor — Variant B: Kanban Swimlanes</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* ── Grovekeeper tokens (inlined) ─────────────────────────── */
 
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			/* Dark theme */
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
 
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+			/* ── Base reset ───────────────────────────────────────────── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
 
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
 
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
+			/* ── Scrollbar ────────────────────────────────────────────── */
+			.gk-root ::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
+			/* ── Typography ───────────────────────────────────────────── */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-normal);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
+			/* ── Buttons ──────────────────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
+			/* ── Inputs ───────────────────────────────────────────────── */
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
 
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
+			/* ── Badges ───────────────────────────────────────────────── */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
 
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
+			/* ── Cards ────────────────────────────────────────────────── */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-full: 9999px;
+			/* ── Variant label ────────────────────────────────────────── */
+			.variant-label {
+				position: fixed;
+				top: 12px;
+				right: 16px;
+				z-index: 100;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 4px 10px;
+			}
 
-  --border-width-1: 1px;
-  --focus-ring-width: 3px;
-
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-}
-
-/* Dark theme */
-.theme-dark {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --ring:              var(--moss-400);
-  --code-bg:           oklch(0.215 0.020 150);
-}
-
-/* ── Base reset ───────────────────────────────────────────── */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.gk-root, .gk-root * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-.font-mono { font-family: var(--font-mono); }
-
-/* ── Scrollbar ────────────────────────────────────────────── */
-.gk-root ::-webkit-scrollbar { width: 8px; height: 8px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
-
-/* ── Typography ───────────────────────────────────────────── */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-normal); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-
-/* ── Buttons ──────────────────────────────────────────────── */
-.gk-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
-  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
-  border: 1px solid transparent; cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, box-shadow 120ms ease;
-  white-space: nowrap; user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary { background: var(--primary); color: var(--primary-fg); box-shadow: var(--shadow-sm), var(--shadow-inset); }
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost { background: transparent; color: var(--foreground-muted); }
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-
-/* ── Inputs ───────────────────────────────────────────────── */
-.gk-input {
-  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  color: var(--foreground); width: 100%; outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.gk-input::placeholder { color: var(--foreground-subtle); }
-.gk-input:focus { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
-
-/* ── Badges ───────────────────────────────────────────────── */
-.gk-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  height: 20px; padding: 0 7px; font-size: 11px; font-weight: 500;
-  border-radius: 999px; background: var(--surface-2); color: var(--foreground-muted);
-  border: 1px solid var(--border); font-family: var(--font-sans);
-  letter-spacing: 0.01em; white-space: nowrap;
-}
-.gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.gk-badge-danger { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-info { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-mono { font-family: var(--font-mono); font-size: 10.5px; }
-
-/* ── Cards ────────────────────────────────────────────────── */
-.gk-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
-
-/* ── Variant label ────────────────────────────────────────── */
-.variant-label {
-  position: fixed; top: 12px; right: 16px; z-index: 100;
-  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--foreground-subtle); background: var(--surface-2);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 4px 10px;
-}
-
-/* ══════════════════════════════════════════════════════════════
+			/* ══════════════════════════════════════════════════════════════
    VARIANT B: KANBAN SWIMLANES
    ══════════════════════════════════════════════════════════════ */
 
-.page-shell {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* ── Top Header Bar ───────────────────────────────────────── */
-.top-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-6) var(--space-12);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  min-height: 56px;
-}
-
-.back-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: var(--text-sm); color: var(--foreground-muted);
-  text-decoration: none; cursor: pointer;
-  transition: color 120ms;
-}
-.back-link:hover { color: var(--foreground); }
-.back-link svg { width: 14px; height: 14px; }
-
-.top-bar-divider {
-  width: 1px; height: 24px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-.identity-group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  flex: 1;
-  min-width: 0;
-}
-
-.avatar-upload {
-  width: 40px; height: 40px;
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  border: 1.5px dashed var(--border-strong);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0;
-  transition: border-color 160ms, background 160ms;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-upload:hover {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
-.avatar-upload svg { width: 18px; height: 18px; color: var(--foreground-subtle); }
-.avatar-upload:hover svg { color: var(--primary); }
-.avatar-upload img {
-  width: 100%; height: 100%; object-fit: cover;
-  border-radius: calc(var(--radius-md) - 2px);
-}
-
-.name-input-wrap {
-  flex: 1;
-  max-width: 280px;
-}
-.name-input-wrap .gk-input {
-  background: var(--background);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-base);
-  height: 36px;
-}
-
-.top-bar-actions {
-  display: flex; align-items: center; gap: var(--space-4);
-  margin-left: auto; flex-shrink: 0;
-}
-
-/* ── Swimlane Area ────────────────────────────────────────── */
-.swimlane-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-  padding: var(--space-10) var(--space-12) var(--space-16);
-}
-
-.swimlane {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  margin-bottom: var(--space-8);
-  overflow: hidden;
-}
-
-.swimlane-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-5) var(--space-8);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-}
-
-.swimlane-indicator {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.swimlane-indicator--critical { background: var(--status-danger); box-shadow: 0 0 8px color-mix(in oklch, var(--status-danger) 50%, transparent); }
-.swimlane-indicator--important { background: var(--status-warning); box-shadow: 0 0 8px color-mix(in oklch, var(--status-warning) 40%, transparent); }
-.swimlane-indicator--normal { background: var(--foreground-muted); }
-
-.swimlane-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
-.swimlane-title--critical { color: var(--status-danger); }
-.swimlane-title--important { color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground)); }
-.swimlane-title--normal { color: var(--foreground-muted); }
-
-.swimlane-count {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  margin-left: 2px;
-}
-
-.swimlane-meta {
-  margin-left: auto;
-  display: flex; align-items: center; gap: var(--space-4);
-}
-
-.swimlane-body {
-  display: flex;
-  gap: var(--space-6);
-  padding: var(--space-6) var(--space-8);
-  overflow-x: auto;
-  min-height: 120px;
-}
-
-/* ── Event Slot Cards ─────────────────────────────────────── */
-.event-slot {
-  min-width: 220px;
-  max-width: 260px;
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--background);
-  display: flex;
-  flex-direction: column;
-  transition: border-color 160ms, box-shadow 160ms;
-}
-
-.event-slot:hover {
-  border-color: var(--border-strong);
-}
-
-.event-slot-header {
-  padding: var(--space-5) var(--space-6) var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.event-slot-name {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.event-slot-desc {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  line-height: var(--leading-normal);
-}
-
-.event-slot-body {
-  padding: 0 var(--space-6) var(--space-5);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-/* Drop zone — empty */
-.drop-zone {
-  border: 1.5px dashed var(--border-strong);
-  border-radius: var(--radius-sm);
-  padding: var(--space-5) var(--space-4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  min-height: 40px;
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  transition: border-color 160ms, background 160ms;
-  cursor: default;
-}
-.drop-zone:hover {
-  border-color: var(--primary);
-  background: color-mix(in oklch, var(--primary) 6%, transparent);
-}
-
-.drop-zone--critical-empty {
-  border-color: color-mix(in oklch, var(--status-danger) 40%, transparent);
-  background: color-mix(in oklch, var(--status-danger) 4%, transparent);
-}
-.drop-zone--critical-empty:hover {
-  border-color: var(--status-danger);
-  background: color-mix(in oklch, var(--status-danger) 8%, transparent);
-}
-
-.drop-zone svg { width: 14px; height: 14px; flex-shrink: 0; }
-
-/* Drop zone — active drag over */
-.drop-zone--drag-over {
-  border-color: var(--primary);
-  border-style: solid;
-  background: color-mix(in oklch, var(--primary) 10%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 20%, transparent);
-}
-
-/* ── Sound Chip (assigned sound) ──────────────────────────── */
-.sound-chip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  color: var(--foreground);
-  transition: background 120ms, border-color 120ms;
-  cursor: grab;
-  min-height: 30px;
-}
-.sound-chip:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-}
-
-.sound-chip-icon {
-  width: 14px; height: 14px;
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-.sound-chip-name {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: var(--weight-medium);
-}
-.sound-chip-dur {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-.sound-chip-play {
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: none; cursor: pointer;
-  color: var(--foreground-subtle); border-radius: var(--radius-xs);
-  transition: background 100ms, color 100ms;
-  flex-shrink: 0;
-}
-.sound-chip-play:hover { background: var(--surface-hover); color: var(--foreground); }
-.sound-chip-play svg { width: 12px; height: 12px; }
-.sound-chip-remove {
-  width: 18px; height: 18px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: none; cursor: pointer;
-  color: var(--foreground-subtle); border-radius: var(--radius-xs);
-  transition: background 100ms, color 100ms;
-  flex-shrink: 0;
-}
-.sound-chip-remove:hover { background: color-mix(in oklch, var(--status-danger) 15%, transparent); color: var(--status-danger); }
-.sound-chip-remove svg { width: 10px; height: 10px; }
-
-/* ── Sound Pool Drawer ────────────────────────────────────── */
-.drawer-backdrop {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.drawer {
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  flex-direction: column;
-  max-height: 260px;
-  transition: max-height 320ms var(--ease-out);
-}
-.drawer--collapsed { max-height: 44px; }
-
-.drawer-handle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-5) var(--space-12);
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-  flex-shrink: 0;
-  min-height: 44px;
-}
-.drawer-handle:hover { background: var(--surface-3); }
-
-.drawer-handle-grip {
-  width: 32px; height: 4px;
-  border-radius: 2px;
-  background: var(--border-strong);
-  flex-shrink: 0;
-}
-
-.drawer-handle-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--foreground-muted);
-}
-
-.drawer-handle-count {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-.drawer-handle-actions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.drawer-handle-chevron {
-  width: 16px; height: 16px;
-  color: var(--foreground-subtle);
-  transition: transform 220ms var(--ease-out);
-  flex-shrink: 0;
-}
-.drawer--open .drawer-handle-chevron { transform: rotate(180deg); }
-
-.drawer-body {
-  display: flex;
-  gap: var(--space-4);
-  padding: var(--space-6) var(--space-12);
-  overflow-x: auto;
-  overflow-y: hidden;
-  flex: 1;
-}
-
-.drawer-search {
-  width: 200px;
-  flex-shrink: 0;
-}
-.drawer-search .gk-input {
-  height: 28px;
-  font-size: var(--text-xs);
-  background: var(--background);
-}
-
-/* ── Pool Sound Item (in drawer) ──────────────────────────── */
-.pool-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  min-width: 180px;
-  max-width: 220px;
-  flex-shrink: 0;
-  cursor: grab;
-  transition: border-color 160ms, box-shadow 160ms, transform 120ms;
-}
-.pool-item:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-sm);
-}
-.pool-item:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-md);
-  cursor: grabbing;
-}
-
-.pool-item--assigned { opacity: 0.5; }
-
-.pool-grip {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-.pool-grip-dot {
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.pool-grip-row {
-  display: flex; gap: 2px;
-}
-
-.pool-item-name {
-  flex: 1;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-
-.pool-item-dur {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-
-.pool-item-play {
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: none; cursor: pointer;
-  color: var(--foreground-subtle); border-radius: var(--radius-xs);
-  transition: background 100ms, color 100ms;
-  flex-shrink: 0;
-}
-.pool-item-play:hover { background: var(--surface-2); color: var(--foreground); }
-.pool-item-play svg { width: 12px; height: 12px; }
-
-.pool-item-assigned-badge {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--status-success);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.pool-item-assigned-badge::before {
-  content: "";
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--status-success);
-}
-
-/* ── Validation Bar ───────────────────────────────────────── */
-.validation-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-4) var(--space-12);
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  min-height: 40px;
-}
-
-.validation-msg {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-sm);
-}
-.validation-msg svg { width: 14px; height: 14px; flex-shrink: 0; }
-.validation-msg--error { color: var(--status-danger); }
-.validation-msg--success { color: var(--status-success); }
-
-.validation-spacer { flex: 1; }
-
-/* ── Responsive ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .top-bar {
-    flex-wrap: wrap;
-    padding: var(--space-4) var(--space-6);
-    gap: var(--space-4);
-  }
-  .top-bar-divider { display: none; }
-  .identity-group { order: 2; width: 100%; }
-  .name-input-wrap { max-width: none; }
-  .top-bar-actions { order: 1; margin-left: auto; }
-
-  .swimlane-area { padding: var(--space-4) var(--space-6) var(--space-8); }
-  .swimlane-body { padding: var(--space-4) var(--space-6); }
-  .event-slot { min-width: 180px; }
-
-  .drawer-body { padding: var(--space-4) var(--space-6); }
-  .drawer-handle { padding: var(--space-5) var(--space-6); }
-  .validation-bar { padding: var(--space-4) var(--space-6); }
-}
-
-/* ── Animations ───────────────────────────────────────────── */
-@keyframes gk-pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--status-danger) 40%, transparent); }
-  50% { box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-danger) 0%, transparent); }
-}
-.pulse-ring { animation: gk-pulse-ring 2s ease-in-out infinite; }
-
-@keyframes slide-up {
-  from { transform: translateY(8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.slide-up { animation: slide-up 220ms var(--ease-out); }
-
-/* SVG icon helper */
-svg { display: block; }
-</style>
-</head>
-
-<body>
-<div class="gk-root theme-dark">
-
-  <!-- Variant label -->
-  <div class="variant-label">VARIANT B: KANBAN SWIMLANES</div>
-
-  <div class="page-shell">
-
-    <!-- ═══ TOP BAR: Avatar + Name + Actions ═══ -->
-    <header class="top-bar">
-      <a class="back-link" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to Settings
-      </a>
-
-      <div class="top-bar-divider"></div>
-
-      <div class="identity-group">
-        <!-- Avatar -->
-        <div class="avatar-upload" title="Upload avatar image">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </div>
-
-        <!-- Name -->
-        <div class="name-input-wrap">
-          <input class="gk-input" type="text" value="Orc Peon" placeholder="e.g. Footman, Orc Peon" />
-        </div>
-
-        <!-- Language badge -->
-        <span class="gk-badge gk-badge-mono" style="height: 24px;">
-          <span style="font-size: 13px;">🏴</span> None
-        </span>
-      </div>
-
-      <div class="top-bar-actions">
-        <button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
-        <button class="gk-btn gk-btn-secondary gk-btn-sm">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Import Sounds
-        </button>
-        <button class="gk-btn gk-btn-primary gk-btn-sm" disabled>Save Character</button>
-      </div>
-    </header>
-
-    <!-- ═══ SWIMLANES ═══ -->
-    <div class="swimlane-area">
-
-      <!-- ── CRITICAL TIER ────────────────────── -->
-      <div class="swimlane slide-up">
-        <div class="swimlane-header">
-          <div class="swimlane-indicator swimlane-indicator--critical pulse-ring"></div>
-          <span class="swimlane-title swimlane-title--critical">Critical</span>
-          <span class="swimlane-count">2 events</span>
-          <div class="swimlane-meta">
-            <span class="gk-badge gk-badge-danger" style="height: 18px; font-size: 10px;">1 missing</span>
-          </div>
-        </div>
-        <div class="swimlane-body">
-
-          <!-- Event: session.needs-input — FILLED -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-danger);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--status-danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                session.needs-input
-              </div>
-              <div class="event-slot-desc">Agent needs your approval or input</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="sound-chip">
-                <svg class="sound-chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                <span class="sound-chip-name">work_work.wav</span>
-                <span class="sound-chip-dur">0.8s</span>
-                <button class="sound-chip-play" title="Preview">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </button>
-                <button class="sound-chip-remove" title="Remove">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
-              <div class="drop-zone" style="min-height: 32px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add another
-              </div>
-            </div>
-          </div>
-
-          <!-- Event: session.end — EMPTY (critical warning) -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-danger);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--status-danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
-                session.end
-              </div>
-              <div class="event-slot-desc">Coding session finished or stopped</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone drop-zone--critical-empty">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound here (required)
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── IMPORTANT TIER ───────────────────── -->
-      <div class="swimlane slide-up" style="animation-delay: 60ms;">
-        <div class="swimlane-header">
-          <div class="swimlane-indicator swimlane-indicator--important"></div>
-          <span class="swimlane-title swimlane-title--important">Important</span>
-          <span class="swimlane-count">5 events</span>
-          <div class="swimlane-meta">
-            <span class="gk-badge gk-badge-warning" style="height: 18px; font-size: 10px;">2 assigned</span>
-          </div>
-        </div>
-        <div class="swimlane-body">
-
-          <!-- session.error — FILLED -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-warning);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="color-mix(in oklch, var(--status-warning) 80%, var(--foreground))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                session.error
-              </div>
-              <div class="event-slot-desc">Session encountered a critical error</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="sound-chip">
-                <svg class="sound-chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                <span class="sound-chip-name">stop_poking_me.ogg</span>
-                <span class="sound-chip-dur">1.4s</span>
-                <button class="sound-chip-play" title="Preview">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </button>
-                <button class="sound-chip-remove" title="Remove">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- merge.conflict — FILLED -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-warning);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">merge.conflict</div>
-              <div class="event-slot-desc">Git merge conflict detected</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="sound-chip">
-                <svg class="sound-chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                <span class="sound-chip-name">me_not_that_kind.mp3</span>
-                <span class="sound-chip-dur">1.1s</span>
-                <button class="sound-chip-play" title="Preview">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </button>
-                <button class="sound-chip-remove" title="Remove">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- task.error — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-warning);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">task.error</div>
-              <div class="event-slot-desc">Task failed with error output</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-
-          <!-- resource.limit — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-warning);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">resource.limit</div>
-              <div class="event-slot-desc">API rate limit or quota reached</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-
-          <!-- pr.ready — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--status-warning);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">pr.ready</div>
-              <div class="event-slot-desc">Pull request is ready for review</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── NORMAL TIER ──────────────────────── -->
-      <div class="swimlane slide-up" style="animation-delay: 120ms;">
-        <div class="swimlane-header">
-          <div class="swimlane-indicator swimlane-indicator--normal"></div>
-          <span class="swimlane-title swimlane-title--normal">Normal</span>
-          <span class="swimlane-count">8 events</span>
-          <div class="swimlane-meta">
-            <span class="gk-badge" style="height: 18px; font-size: 10px;">1 assigned</span>
-          </div>
-        </div>
-        <div class="swimlane-body">
-
-          <!-- session.start — FILLED -->
-          <div class="event-slot" style="border-left: 2px solid var(--foreground-subtle);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">session.start</div>
-              <div class="event-slot-desc">New coding session begins</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="sound-chip">
-                <svg class="sound-chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                <span class="sound-chip-name">ready_to_work.wav</span>
-                <span class="sound-chip-dur">0.6s</span>
-                <button class="sound-chip-play" title="Preview">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </button>
-                <button class="sound-chip-remove" title="Remove">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- task.complete — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--foreground-subtle);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">task.complete</div>
-              <div class="event-slot-desc">Task finished successfully</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-
-          <!-- pr.merged — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--foreground-subtle);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">pr.merged</div>
-              <div class="event-slot-desc">Pull request was merged</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-
-          <!-- achievement.unlocked — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--foreground-subtle);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">achievement.unlocked</div>
-              <div class="event-slot-desc">Skill or milestone unlocked</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-
-          <!-- github.issue-assigned — EMPTY -->
-          <div class="event-slot" style="border-left: 2px solid var(--foreground-subtle);">
-            <div class="event-slot-header">
-              <div class="event-slot-name">github.issue-assigned</div>
-              <div class="event-slot-desc">Issue assigned to you on GitHub</div>
-            </div>
-            <div class="event-slot-body">
-              <div class="drop-zone">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Drop sound
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /swimlane-area -->
-
-    <!-- ═══ SOUND POOL DRAWER (partially open) ═══ -->
-    <div class="drawer-backdrop">
-      <div class="drawer drawer--open">
-        <div class="drawer-handle">
-          <div class="drawer-handle-grip"></div>
-          <span class="drawer-handle-title">Sound Pool</span>
-          <span class="drawer-handle-count">8 sounds imported</span>
-          <div class="drawer-handle-actions">
-            <div class="drawer-search">
-              <input class="gk-input" type="text" placeholder="Filter sounds..." />
-            </div>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm" style="font-size: 11px; height: 24px; padding: 0 8px;">Clear All</button>
-          </div>
-          <!-- Chevron down/up -->
-          <svg class="drawer-handle-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        <div class="drawer-body">
-          <!-- Pool items — mix of assigned and unassigned -->
-          <div class="pool-item pool-item--assigned">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">work_work.wav</span>
-            <span class="pool-item-dur">0.8s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-            <span class="pool-item-assigned-badge">assigned</span>
-          </div>
-
-          <div class="pool-item pool-item--assigned">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">stop_poking_me.ogg</span>
-            <span class="pool-item-dur">1.4s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-            <span class="pool-item-assigned-badge">assigned</span>
-          </div>
-
-          <div class="pool-item pool-item--assigned">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">me_not_that_kind.mp3</span>
-            <span class="pool-item-dur">1.1s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-            <span class="pool-item-assigned-badge">assigned</span>
-          </div>
-
-          <div class="pool-item pool-item--assigned">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">ready_to_work.wav</span>
-            <span class="pool-item-dur">0.6s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-            <span class="pool-item-assigned-badge">assigned</span>
-          </div>
-
-          <div class="pool-item">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">something_need_doing.wav</span>
-            <span class="pool-item-dur">1.2s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-          </div>
-
-          <div class="pool-item">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">dabu.mp3</span>
-            <span class="pool-item-dur">0.4s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-          </div>
-
-          <div class="pool-item">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">zug_zug.ogg</span>
-            <span class="pool-item-dur">0.5s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-          </div>
-
-          <div class="pool-item">
-            <div class="pool-grip">
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-              <div class="pool-grip-row"><div class="pool-grip-dot"></div><div class="pool-grip-dot"></div></div>
-            </div>
-            <span class="pool-item-name">be_happy_to.wav</span>
-            <span class="pool-item-dur">0.9s</span>
-            <button class="pool-item-play" title="Preview">
-              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ VALIDATION BAR ═══ -->
-    <div class="validation-bar">
-      <div class="validation-msg validation-msg--error">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        1 critical event needs a sound
-      </div>
-      <span class="gk-tiny" style="margin-left: var(--space-8);">4 of 15 events assigned</span>
-      <div class="validation-spacer"></div>
-    </div>
-
-  </div><!-- /page-shell -->
-
-</div><!-- /gk-root -->
-</body>
+			.page-shell {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			/* ── Top Header Bar ───────────────────────────────────────── */
+			.top-bar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-6) var(--space-12);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+				min-height: 56px;
+			}
+
+			.back-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				text-decoration: none;
+				cursor: pointer;
+				transition: color 120ms;
+			}
+			.back-link:hover {
+				color: var(--foreground);
+			}
+			.back-link svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			.top-bar-divider {
+				width: 1px;
+				height: 24px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+
+			.identity-group {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex: 1;
+				min-width: 0;
+			}
+
+			.avatar-upload {
+				width: 40px;
+				height: 40px;
+				border-radius: var(--radius-md);
+				background: var(--surface-2);
+				border: 1.5px dashed var(--border-strong);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				transition:
+					border-color 160ms,
+					background 160ms;
+				position: relative;
+				overflow: hidden;
+			}
+			.avatar-upload:hover {
+				border-color: var(--primary);
+				background: var(--primary-soft);
+			}
+			.avatar-upload svg {
+				width: 18px;
+				height: 18px;
+				color: var(--foreground-subtle);
+			}
+			.avatar-upload:hover svg {
+				color: var(--primary);
+			}
+			.avatar-upload img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: calc(var(--radius-md) - 2px);
+			}
+
+			.name-input-wrap {
+				flex: 1;
+				max-width: 280px;
+			}
+			.name-input-wrap .gk-input {
+				background: var(--background);
+				font-weight: var(--weight-medium);
+				font-size: var(--text-base);
+				height: 36px;
+			}
+
+			.top-bar-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-left: auto;
+				flex-shrink: 0;
+			}
+
+			/* ── Swimlane Area ────────────────────────────────────────── */
+			.swimlane-area {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+				overflow-y: auto;
+				padding: var(--space-10) var(--space-12) var(--space-16);
+			}
+
+			.swimlane {
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				margin-bottom: var(--space-8);
+				overflow: hidden;
+			}
+
+			.swimlane-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+			}
+
+			.swimlane-indicator {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.swimlane-indicator--critical {
+				background: var(--status-danger);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--status-danger) 50%, transparent);
+			}
+			.swimlane-indicator--important {
+				background: var(--status-warning);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--status-warning) 40%, transparent);
+			}
+			.swimlane-indicator--normal {
+				background: var(--foreground-muted);
+			}
+
+			.swimlane-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.swimlane-title--critical {
+				color: var(--status-danger);
+			}
+			.swimlane-title--important {
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
+			}
+			.swimlane-title--normal {
+				color: var(--foreground-muted);
+			}
+
+			.swimlane-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				margin-left: 2px;
+			}
+
+			.swimlane-meta {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+
+			.swimlane-body {
+				display: flex;
+				gap: var(--space-6);
+				padding: var(--space-6) var(--space-8);
+				overflow-x: auto;
+				min-height: 120px;
+			}
+
+			/* ── Event Slot Cards ─────────────────────────────────────── */
+			.event-slot {
+				min-width: 220px;
+				max-width: 260px;
+				flex-shrink: 0;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				background: var(--background);
+				display: flex;
+				flex-direction: column;
+				transition:
+					border-color 160ms,
+					box-shadow 160ms;
+			}
+
+			.event-slot:hover {
+				border-color: var(--border-strong);
+			}
+
+			.event-slot-header {
+				padding: var(--space-5) var(--space-6) var(--space-3);
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.event-slot-name {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+
+			.event-slot-desc {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				line-height: var(--leading-normal);
+			}
+
+			.event-slot-body {
+				padding: 0 var(--space-6) var(--space-5);
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-3);
+			}
+
+			/* Drop zone — empty */
+			.drop-zone {
+				border: 1.5px dashed var(--border-strong);
+				border-radius: var(--radius-sm);
+				padding: var(--space-5) var(--space-4);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--space-3);
+				min-height: 40px;
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				transition:
+					border-color 160ms,
+					background 160ms;
+				cursor: default;
+			}
+			.drop-zone:hover {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 6%, transparent);
+			}
+
+			.drop-zone--critical-empty {
+				border-color: color-mix(in oklch, var(--status-danger) 40%, transparent);
+				background: color-mix(in oklch, var(--status-danger) 4%, transparent);
+			}
+			.drop-zone--critical-empty:hover {
+				border-color: var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 8%, transparent);
+			}
+
+			.drop-zone svg {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+
+			/* Drop zone — active drag over */
+			.drop-zone--drag-over {
+				border-color: var(--primary);
+				border-style: solid;
+				background: color-mix(in oklch, var(--primary) 10%, transparent);
+				box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 20%, transparent);
+			}
+
+			/* ── Sound Chip (assigned sound) ──────────────────────────── */
+			.sound-chip {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				font-size: var(--text-xs);
+				color: var(--foreground);
+				transition:
+					background 120ms,
+					border-color 120ms;
+				cursor: grab;
+				min-height: 30px;
+			}
+			.sound-chip:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+
+			.sound-chip-icon {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.sound-chip-name {
+				flex: 1;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				font-weight: var(--weight-medium);
+			}
+			.sound-chip-dur {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.sound-chip-play {
+				width: 22px;
+				height: 22px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				border-radius: var(--radius-xs);
+				transition:
+					background 100ms,
+					color 100ms;
+				flex-shrink: 0;
+			}
+			.sound-chip-play:hover {
+				background: var(--surface-hover);
+				color: var(--foreground);
+			}
+			.sound-chip-play svg {
+				width: 12px;
+				height: 12px;
+			}
+			.sound-chip-remove {
+				width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				border-radius: var(--radius-xs);
+				transition:
+					background 100ms,
+					color 100ms;
+				flex-shrink: 0;
+			}
+			.sound-chip-remove:hover {
+				background: color-mix(in oklch, var(--status-danger) 15%, transparent);
+				color: var(--status-danger);
+			}
+			.sound-chip-remove svg {
+				width: 10px;
+				height: 10px;
+			}
+
+			/* ── Sound Pool Drawer ────────────────────────────────────── */
+			.drawer-backdrop {
+				position: relative;
+				flex-shrink: 0;
+			}
+
+			.drawer {
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				display: flex;
+				flex-direction: column;
+				max-height: 260px;
+				transition: max-height 320ms var(--ease-out);
+			}
+			.drawer--collapsed {
+				max-height: 44px;
+			}
+
+			.drawer-handle {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-12);
+				cursor: pointer;
+				user-select: none;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+				flex-shrink: 0;
+				min-height: 44px;
+			}
+			.drawer-handle:hover {
+				background: var(--surface-3);
+			}
+
+			.drawer-handle-grip {
+				width: 32px;
+				height: 4px;
+				border-radius: 2px;
+				background: var(--border-strong);
+				flex-shrink: 0;
+			}
+
+			.drawer-handle-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-muted);
+			}
+
+			.drawer-handle-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.drawer-handle-actions {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+
+			.drawer-handle-chevron {
+				width: 16px;
+				height: 16px;
+				color: var(--foreground-subtle);
+				transition: transform 220ms var(--ease-out);
+				flex-shrink: 0;
+			}
+			.drawer--open .drawer-handle-chevron {
+				transform: rotate(180deg);
+			}
+
+			.drawer-body {
+				display: flex;
+				gap: var(--space-4);
+				padding: var(--space-6) var(--space-12);
+				overflow-x: auto;
+				overflow-y: hidden;
+				flex: 1;
+			}
+
+			.drawer-search {
+				width: 200px;
+				flex-shrink: 0;
+			}
+			.drawer-search .gk-input {
+				height: 28px;
+				font-size: var(--text-xs);
+				background: var(--background);
+			}
+
+			/* ── Pool Sound Item (in drawer) ──────────────────────────── */
+			.pool-item {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-3) var(--space-5);
+				background: var(--background);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				min-width: 180px;
+				max-width: 220px;
+				flex-shrink: 0;
+				cursor: grab;
+				transition:
+					border-color 160ms,
+					box-shadow 160ms,
+					transform 120ms;
+			}
+			.pool-item:hover {
+				border-color: var(--border-strong);
+				box-shadow: var(--shadow-sm);
+			}
+			.pool-item:active {
+				transform: scale(0.97);
+				box-shadow: var(--shadow-md);
+				cursor: grabbing;
+			}
+
+			.pool-item--assigned {
+				opacity: 0.5;
+			}
+
+			.pool-grip {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.pool-grip-dot {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: currentColor;
+			}
+			.pool-grip-row {
+				display: flex;
+				gap: 2px;
+			}
+
+			.pool-item-name {
+				flex: 1;
+				font-size: var(--text-xs);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+			}
+
+			.pool-item-dur {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			.pool-item-play {
+				width: 22px;
+				height: 22px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				border-radius: var(--radius-xs);
+				transition:
+					background 100ms,
+					color 100ms;
+				flex-shrink: 0;
+			}
+			.pool-item-play:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.pool-item-play svg {
+				width: 12px;
+				height: 12px;
+			}
+
+			.pool-item-assigned-badge {
+				font-family: var(--font-mono);
+				font-size: 9px;
+				color: var(--status-success);
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				gap: 3px;
+			}
+			.pool-item-assigned-badge::before {
+				content: '';
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--status-success);
+			}
+
+			/* ── Validation Bar ───────────────────────────────────────── */
+			.validation-bar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-4) var(--space-12);
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+				min-height: 40px;
+			}
+
+			.validation-msg {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+			}
+			.validation-msg svg {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+			.validation-msg--error {
+				color: var(--status-danger);
+			}
+			.validation-msg--success {
+				color: var(--status-success);
+			}
+
+			.validation-spacer {
+				flex: 1;
+			}
+
+			/* ── Responsive ───────────────────────────────────────────── */
+			@media (max-width: 768px) {
+				.top-bar {
+					flex-wrap: wrap;
+					padding: var(--space-4) var(--space-6);
+					gap: var(--space-4);
+				}
+				.top-bar-divider {
+					display: none;
+				}
+				.identity-group {
+					order: 2;
+					width: 100%;
+				}
+				.name-input-wrap {
+					max-width: none;
+				}
+				.top-bar-actions {
+					order: 1;
+					margin-left: auto;
+				}
+
+				.swimlane-area {
+					padding: var(--space-4) var(--space-6) var(--space-8);
+				}
+				.swimlane-body {
+					padding: var(--space-4) var(--space-6);
+				}
+				.event-slot {
+					min-width: 180px;
+				}
+
+				.drawer-body {
+					padding: var(--space-4) var(--space-6);
+				}
+				.drawer-handle {
+					padding: var(--space-5) var(--space-6);
+				}
+				.validation-bar {
+					padding: var(--space-4) var(--space-6);
+				}
+			}
+
+			/* ── Animations ───────────────────────────────────────────── */
+			@keyframes gk-pulse-ring {
+				0%,
+				100% {
+					box-shadow: 0 0 0 0 color-mix(in oklch, var(--status-danger) 40%, transparent);
+				}
+				50% {
+					box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-danger) 0%, transparent);
+				}
+			}
+			.pulse-ring {
+				animation: gk-pulse-ring 2s ease-in-out infinite;
+			}
+
+			@keyframes slide-up {
+				from {
+					transform: translateY(8px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+			.slide-up {
+				animation: slide-up 220ms var(--ease-out);
+			}
+
+			/* SVG icon helper */
+			svg {
+				display: block;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="gk-root theme-dark">
+			<!-- Variant label -->
+			<div class="variant-label">VARIANT B: KANBAN SWIMLANES</div>
+
+			<div class="page-shell">
+				<!-- ═══ TOP BAR: Avatar + Name + Actions ═══ -->
+				<header class="top-bar">
+					<a class="back-link" href="#">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M19 12H5" />
+							<path d="m12 19-7-7 7-7" />
+						</svg>
+						Back to Settings
+					</a>
+
+					<div class="top-bar-divider"></div>
+
+					<div class="identity-group">
+						<!-- Avatar -->
+						<div class="avatar-upload" title="Upload avatar image">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+								/>
+								<circle cx="12" cy="13" r="4" />
+							</svg>
+						</div>
+
+						<!-- Name -->
+						<div class="name-input-wrap">
+							<input
+								class="gk-input"
+								type="text"
+								value="Orc Peon"
+								placeholder="e.g. Footman, Orc Peon"
+							/>
+						</div>
+
+						<!-- Language badge -->
+						<span class="gk-badge gk-badge-mono" style="height: 24px">
+							<span style="font-size: 13px">🏴</span> None
+						</span>
+					</div>
+
+					<div class="top-bar-actions">
+						<button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
+						<button class="gk-btn gk-btn-secondary gk-btn-sm">
+							<svg
+								width="13"
+								height="13"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+								/>
+							</svg>
+							Import Sounds
+						</button>
+						<button class="gk-btn gk-btn-primary gk-btn-sm" disabled>
+							Save Character
+						</button>
+					</div>
+				</header>
+
+				<!-- ═══ SWIMLANES ═══ -->
+				<div class="swimlane-area">
+					<!-- ── CRITICAL TIER ────────────────────── -->
+					<div class="swimlane slide-up">
+						<div class="swimlane-header">
+							<div
+								class="swimlane-indicator swimlane-indicator--critical pulse-ring"
+							></div>
+							<span class="swimlane-title swimlane-title--critical">Critical</span>
+							<span class="swimlane-count">2 events</span>
+							<div class="swimlane-meta">
+								<span
+									class="gk-badge gk-badge-danger"
+									style="height: 18px; font-size: 10px"
+									>1 missing</span
+								>
+							</div>
+						</div>
+						<div class="swimlane-body">
+							<!-- Event: session.needs-input — FILLED -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-danger)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--status-danger)"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="12" cy="12" r="10" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" />
+										</svg>
+										session.needs-input
+									</div>
+									<div class="event-slot-desc">
+										Agent needs your approval or input
+									</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="sound-chip">
+										<svg
+											class="sound-chip-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+											<path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+										</svg>
+										<span class="sound-chip-name">work_work.wav</span>
+										<span class="sound-chip-dur">0.8s</span>
+										<button class="sound-chip-play" title="Preview">
+											<svg viewBox="0 0 24 24" fill="currentColor">
+												<polygon points="5 3 19 12 5 21 5 3" />
+											</svg>
+										</button>
+										<button class="sound-chip-remove" title="Remove">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<line x1="18" y1="6" x2="6" y2="18" />
+												<line x1="6" y1="6" x2="18" y2="18" />
+											</svg>
+										</button>
+									</div>
+									<div class="drop-zone" style="min-height: 32px">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<line x1="12" y1="5" x2="12" y2="19" />
+											<line x1="5" y1="12" x2="19" y2="12" />
+										</svg>
+										Add another
+									</div>
+								</div>
+							</div>
+
+							<!-- Event: session.end — EMPTY (critical warning) -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-danger)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--status-danger)"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<rect x="2" y="2" width="20" height="20" rx="5" />
+											<line x1="9" y1="9" x2="15" y2="15" />
+											<line x1="15" y1="9" x2="9" y2="15" />
+										</svg>
+										session.end
+									</div>
+									<div class="event-slot-desc">
+										Coding session finished or stopped
+									</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone drop-zone--critical-empty">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound here (required)
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ── IMPORTANT TIER ───────────────────── -->
+					<div class="swimlane slide-up" style="animation-delay: 60ms">
+						<div class="swimlane-header">
+							<div class="swimlane-indicator swimlane-indicator--important"></div>
+							<span class="swimlane-title swimlane-title--important">Important</span>
+							<span class="swimlane-count">5 events</span>
+							<div class="swimlane-meta">
+								<span
+									class="gk-badge gk-badge-warning"
+									style="height: 18px; font-size: 10px"
+									>2 assigned</span
+								>
+							</div>
+						</div>
+						<div class="swimlane-body">
+							<!-- session.error — FILLED -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-warning)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="color-mix(in oklch, var(--status-warning) 80%, var(--foreground))"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+											/>
+											<line x1="12" y1="9" x2="12" y2="13" />
+											<line x1="12" y1="17" x2="12.01" y2="17" />
+										</svg>
+										session.error
+									</div>
+									<div class="event-slot-desc">
+										Session encountered a critical error
+									</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="sound-chip">
+										<svg
+											class="sound-chip-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+											<path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+										</svg>
+										<span class="sound-chip-name">stop_poking_me.ogg</span>
+										<span class="sound-chip-dur">1.4s</span>
+										<button class="sound-chip-play" title="Preview">
+											<svg viewBox="0 0 24 24" fill="currentColor">
+												<polygon points="5 3 19 12 5 21 5 3" />
+											</svg>
+										</button>
+										<button class="sound-chip-remove" title="Remove">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<line x1="18" y1="6" x2="6" y2="18" />
+												<line x1="6" y1="6" x2="18" y2="18" />
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- merge.conflict — FILLED -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-warning)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">merge.conflict</div>
+									<div class="event-slot-desc">Git merge conflict detected</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="sound-chip">
+										<svg
+											class="sound-chip-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+											<path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+										</svg>
+										<span class="sound-chip-name">me_not_that_kind.mp3</span>
+										<span class="sound-chip-dur">1.1s</span>
+										<button class="sound-chip-play" title="Preview">
+											<svg viewBox="0 0 24 24" fill="currentColor">
+												<polygon points="5 3 19 12 5 21 5 3" />
+											</svg>
+										</button>
+										<button class="sound-chip-remove" title="Remove">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<line x1="18" y1="6" x2="6" y2="18" />
+												<line x1="6" y1="6" x2="18" y2="18" />
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- task.error — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-warning)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">task.error</div>
+									<div class="event-slot-desc">Task failed with error output</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+
+							<!-- resource.limit — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-warning)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">resource.limit</div>
+									<div class="event-slot-desc">
+										API rate limit or quota reached
+									</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+
+							<!-- pr.ready — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--status-warning)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">pr.ready</div>
+									<div class="event-slot-desc">
+										Pull request is ready for review
+									</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ── NORMAL TIER ──────────────────────── -->
+					<div class="swimlane slide-up" style="animation-delay: 120ms">
+						<div class="swimlane-header">
+							<div class="swimlane-indicator swimlane-indicator--normal"></div>
+							<span class="swimlane-title swimlane-title--normal">Normal</span>
+							<span class="swimlane-count">8 events</span>
+							<div class="swimlane-meta">
+								<span class="gk-badge" style="height: 18px; font-size: 10px"
+									>1 assigned</span
+								>
+							</div>
+						</div>
+						<div class="swimlane-body">
+							<!-- session.start — FILLED -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--foreground-subtle)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">session.start</div>
+									<div class="event-slot-desc">New coding session begins</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="sound-chip">
+										<svg
+											class="sound-chip-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+											<path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+										</svg>
+										<span class="sound-chip-name">ready_to_work.wav</span>
+										<span class="sound-chip-dur">0.6s</span>
+										<button class="sound-chip-play" title="Preview">
+											<svg viewBox="0 0 24 24" fill="currentColor">
+												<polygon points="5 3 19 12 5 21 5 3" />
+											</svg>
+										</button>
+										<button class="sound-chip-remove" title="Remove">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<line x1="18" y1="6" x2="6" y2="18" />
+												<line x1="6" y1="6" x2="18" y2="18" />
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- task.complete — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--foreground-subtle)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">task.complete</div>
+									<div class="event-slot-desc">Task finished successfully</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+
+							<!-- pr.merged — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--foreground-subtle)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">pr.merged</div>
+									<div class="event-slot-desc">Pull request was merged</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+
+							<!-- achievement.unlocked — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--foreground-subtle)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">achievement.unlocked</div>
+									<div class="event-slot-desc">Skill or milestone unlocked</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+
+							<!-- github.issue-assigned — EMPTY -->
+							<div
+								class="event-slot"
+								style="border-left: 2px solid var(--foreground-subtle)"
+							>
+								<div class="event-slot-header">
+									<div class="event-slot-name">github.issue-assigned</div>
+									<div class="event-slot-desc">
+										Issue assigned to you on GitHub
+									</div>
+								</div>
+								<div class="event-slot-body">
+									<div class="drop-zone">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										>
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										Drop sound
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /swimlane-area -->
+
+				<!-- ═══ SOUND POOL DRAWER (partially open) ═══ -->
+				<div class="drawer-backdrop">
+					<div class="drawer drawer--open">
+						<div class="drawer-handle">
+							<div class="drawer-handle-grip"></div>
+							<span class="drawer-handle-title">Sound Pool</span>
+							<span class="drawer-handle-count">8 sounds imported</span>
+							<div class="drawer-handle-actions">
+								<div class="drawer-search">
+									<input
+										class="gk-input"
+										type="text"
+										placeholder="Filter sounds..."
+									/>
+								</div>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									style="font-size: 11px; height: 24px; padding: 0 8px"
+								>
+									Clear All
+								</button>
+							</div>
+							<!-- Chevron down/up -->
+							<svg
+								class="drawer-handle-chevron"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<polyline points="6 9 12 15 18 9" />
+							</svg>
+						</div>
+
+						<div class="drawer-body">
+							<!-- Pool items — mix of assigned and unassigned -->
+							<div class="pool-item pool-item--assigned">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">work_work.wav</span>
+								<span class="pool-item-dur">0.8s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+								<span class="pool-item-assigned-badge">assigned</span>
+							</div>
+
+							<div class="pool-item pool-item--assigned">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">stop_poking_me.ogg</span>
+								<span class="pool-item-dur">1.4s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+								<span class="pool-item-assigned-badge">assigned</span>
+							</div>
+
+							<div class="pool-item pool-item--assigned">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">me_not_that_kind.mp3</span>
+								<span class="pool-item-dur">1.1s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+								<span class="pool-item-assigned-badge">assigned</span>
+							</div>
+
+							<div class="pool-item pool-item--assigned">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">ready_to_work.wav</span>
+								<span class="pool-item-dur">0.6s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+								<span class="pool-item-assigned-badge">assigned</span>
+							</div>
+
+							<div class="pool-item">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">something_need_doing.wav</span>
+								<span class="pool-item-dur">1.2s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<div class="pool-item">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">dabu.mp3</span>
+								<span class="pool-item-dur">0.4s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<div class="pool-item">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">zug_zug.ogg</span>
+								<span class="pool-item-dur">0.5s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<div class="pool-item">
+								<div class="pool-grip">
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+									<div class="pool-grip-row">
+										<div class="pool-grip-dot"></div>
+										<div class="pool-grip-dot"></div>
+									</div>
+								</div>
+								<span class="pool-item-name">be_happy_to.wav</span>
+								<span class="pool-item-dur">0.9s</span>
+								<button class="pool-item-play" title="Preview">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══ VALIDATION BAR ═══ -->
+				<div class="validation-bar">
+					<div class="validation-msg validation-msg--error">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<circle cx="12" cy="12" r="10" />
+							<line x1="12" y1="8" x2="12" y2="12" />
+							<line x1="12" y1="16" x2="12.01" y2="16" />
+						</svg>
+						1 critical event needs a sound
+					</div>
+					<span class="gk-tiny" style="margin-left: var(--space-8)"
+						>4 of 15 events assigned</span
+					>
+					<div class="validation-spacer"></div>
+				</div>
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
+	</body>
 </html>

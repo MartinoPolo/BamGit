@@ -48,8 +48,9 @@ function createVersionControlContext() {
 	let syncError = $state<string | null>(null);
 	let assignedIssues = $state<AssignedIssue[]>([]);
 	let assignedIssuesHasMore = $state(false);
-	let assignedIssuesLimit = $state(10);
-	let deletedAssignedIssueNumbers = $state<number[]>([]);
+	let assignedIssuesLimit = $state(50);
+	let assignedIssuesLastSynced = $state<Date | null>(null);
+	let assignedIssuesLoading = $state(false);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -64,6 +65,25 @@ function createVersionControlContext() {
 			authStatus = await invoke<GhAuthStatus>('github_auth_status');
 		} catch {
 			authStatus = { status: 'not-connected' };
+		}
+	}
+
+	async function fetchAssignedIssuesBatch(owner: string, repo: string) {
+		try {
+			assignedIssuesLoading = true;
+			const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
+				owner,
+				repo,
+				limit: assignedIssuesLimit,
+			});
+			assignedIssues = result.issues;
+			assignedIssuesHasMore = result.has_more;
+			assignedIssuesLastSynced = new Date();
+		} catch (err) {
+			error = String(err);
+			console.error('Failed to load assigned issues:', err);
+		} finally {
+			assignedIssuesLoading = false;
 		}
 	}
 
@@ -92,8 +112,11 @@ function createVersionControlContext() {
 		get assignedIssuesHasMore() {
 			return assignedIssuesHasMore;
 		},
-		get deletedAssignedIssueNumbers() {
-			return deletedAssignedIssueNumbers;
+		get assignedIssuesLastSynced() {
+			return assignedIssuesLastSynced;
+		},
+		get assignedIssuesLoading() {
+			return assignedIssuesLoading;
 		},
 		get loading() {
 			return loading;
@@ -201,46 +224,13 @@ function createVersionControlContext() {
 		},
 
 		async loadAssignedIssues(owner: string, repo: string) {
-			try {
-				assignedIssuesLimit = 10;
-				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
-					owner,
-					repo,
-					limit: assignedIssuesLimit,
-				});
-				assignedIssues = result.issues;
-				assignedIssuesHasMore = result.has_more;
-			} catch (err) {
-				error = String(err);
-				console.error('Failed to load assigned issues:', err);
-			}
+			assignedIssuesLimit = 50;
+			await fetchAssignedIssuesBatch(owner, repo);
 		},
 
 		async loadMoreAssignedIssues(owner: string, repo: string) {
-			try {
-				assignedIssuesLimit += 10;
-				const result = await invoke<AssignedIssuesResult>('fetch_assigned_issues', {
-					owner,
-					repo,
-					limit: assignedIssuesLimit,
-				});
-				assignedIssues = result.issues;
-				assignedIssuesHasMore = result.has_more;
-			} catch (err) {
-				error = String(err);
-				console.error('Failed to load more assigned issues:', err);
-			}
-		},
-
-		async loadDeletedAssignedIssueNumbers(dashboardId: string) {
-			try {
-				deletedAssignedIssueNumbers = await invoke<number[]>(
-					'get_deleted_assigned_issue_numbers',
-					{ dashboardId },
-				);
-			} catch (err) {
-				console.error('Failed to load deleted assigned issue numbers:', err);
-			}
+			assignedIssuesLimit += 50;
+			await fetchAssignedIssuesBatch(owner, repo);
 		},
 
 		clear() {

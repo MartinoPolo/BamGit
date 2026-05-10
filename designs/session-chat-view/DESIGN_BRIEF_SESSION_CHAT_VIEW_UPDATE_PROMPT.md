@@ -52,43 +52,54 @@ This is the most impactful change. The design system defines three control sizes
 **Remove ALL inline `height:` overrides** on buttons, badges, and inputs. Specific fixes:
 
 **FloatingInput bottom controls row:**
+
 - Remove `height: 24` from Attach, Tools, Local, Model dropdown, Approve each buttons
 - Remove `height: 28, width: 28` from Send button
 - All should inherit `.gk-btn-sm` height of 26px. Send is distinguished by `.gk-btn-primary` color only.
 
 **FloatingInput skill chips:**
+
 - Remove `height: 22` from all skill chip buttons and the "More" button
 - Let them inherit `.gk-btn-sm` height of 26px
 
 **TopBar badges:**
+
 - Remove `height: 17` from `#90 open` and `PR #5 draft` badges
 - Let them inherit `.gk-badge` height of 20px
 
 **Sidebar collapse/expand buttons:**
+
 - RightSidebar collapse button: remove `width: 24, height: 24` — let it inherit `.gk-btn-sm` 26px
 - CollapsedSidebar expand button: remove `width: 28, height: 28` — let it inherit `.gk-btn-sm` 26px
 
 **Sub-agents count badge:**
+
 - Remove `height: 15` — let it inherit `.gk-badge` 20px
 
 **Tool card headers:**
+
 - In `session-shared.jsx`: change `ToolCardL1` header height from 34px to 36px
 - `ToolCardL2` header height from 34px to 36px
 - `ToolCardL3Perm`, `ToolCardL3Elicit`, `ToolCardL3Ask` headers are already 36px — no change needed
 
 **ToolCardL3Elicit input:**
+
 - Remove `height: 28` from the elicit input — let it inherit `.gk-input` 32px
 
 **SubAgentExpansion Collapse button:**
+
 - Remove `height: 20` — let it inherit `.gk-btn-sm` 26px
 
 **SkillConfigPanel buttons:**
+
 - Remove `height: 20` from "+ Add" and "+ Add path" buttons — let them inherit `.gk-btn-sm` 26px
 
 **State09 Compact button:**
+
 - Remove `height: 22` — let it inherit `.gk-btn-sm` 26px
 
 **FloatingInput image "+ Add" button:**
+
 - Remove `height: 28` — let it inherit `.gk-btn-sm` 26px
 
 ### 7. Content dimming with hover restore

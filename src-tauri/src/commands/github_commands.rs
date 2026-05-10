@@ -355,7 +355,7 @@ pub async fn fetch_assigned_issues(
     repo: String,
     limit: Option<i64>,
 ) -> Result<AssignedIssuesResult, String> {
-    let effective_limit = limit.unwrap_or(10);
+    let effective_limit = limit.unwrap_or(50);
     let fetch_limit = (effective_limit + 1).to_string();
 
     let mut issues: Vec<AssignedIssue> = if github_client.is_oauth().await {
@@ -395,43 +395,6 @@ pub async fn fetch_assigned_issues(
     }
 
     Ok(AssignedIssuesResult { issues, has_more })
-}
-
-#[tauri::command]
-pub fn record_deleted_assigned_issue(
-    state: State<DatabaseState>,
-    dashboard_id: String,
-    github_issue_number: i64,
-) -> Result<(), String> {
-    let connection = state.write()?;
-    let id = uuid::Uuid::new_v4().to_string();
-    connection
-        .execute(
-            "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) \
-             VALUES (?1, ?2, ?3)",
-            rusqlite::params![id, dashboard_id, github_issue_number],
-        )
-        .map_err(|error| format!("Failed to record deleted assigned issue: {error}"))?;
-    Ok(())
-}
-
-#[tauri::command]
-pub fn get_deleted_assigned_issue_numbers(
-    state: State<DatabaseState>,
-    dashboard_id: String,
-) -> Result<Vec<i64>, String> {
-    let connection = state.read()?;
-    let mut statement = connection
-        .prepare(
-            "SELECT github_issue_number FROM deleted_assigned_issues WHERE dashboard_id = ?1",
-        )
-        .map_err(|error| format!("Failed to prepare query: {error}"))?;
-    let numbers = statement
-        .query_map([&dashboard_id], |row| row.get(0))
-        .map_err(|error| format!("Failed to query deleted issues: {error}"))?
-        .collect::<Result<Vec<i64>, _>>()
-        .map_err(|error| format!("Failed to read row: {error}"))?;
-    Ok(numbers)
 }
 
 #[tauri::command]
@@ -666,12 +629,17 @@ fn parse_rest_assigned_issues(json: &str) -> Result<Vec<AssignedIssue>, String> 
                         .collect()
                 })
                 .unwrap_or_default();
+            let parent_issue_number = issue
+                .get("parent")
+                .and_then(|p| p.get("number"))
+                .and_then(|n| n.as_i64());
             Some(AssignedIssue {
                 number: issue.get("number")?.as_i64()?,
                 title: issue.get("title")?.as_str()?.to_string(),
                 state: issue.get("state")?.as_str()?.to_string(),
                 url: issue.get("html_url")?.as_str()?.to_string(),
                 labels,
+                parent_issue_number,
             })
         })
         .collect())
@@ -1253,82 +1221,6 @@ mod tests {
         let parsed: Vec<AssignedIssue> = serde_json::from_str(json).unwrap();
         assert_eq!(parsed.len(), 1);
         assert!(parsed[0].labels.is_empty(), "labels should default to empty vec");
-    }
-
-    #[test]
-    fn record_and_get_deleted_assigned_issue_numbers() {
-        let connection = setup_test_database();
-        insert_dashboard(&connection, "d1");
-        insert_dashboard(&connection, "d2");
-
-        let id1 = uuid::Uuid::new_v4().to_string();
-        connection
-            .execute(
-                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
-                rusqlite::params![id1, "d1", 42],
-            )
-            .unwrap();
-
-        let id2 = uuid::Uuid::new_v4().to_string();
-        connection
-            .execute(
-                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
-                rusqlite::params![id2, "d1", 99],
-            )
-            .unwrap();
-
-        let id3 = uuid::Uuid::new_v4().to_string();
-        connection
-            .execute(
-                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
-                rusqlite::params![id3, "d2", 50],
-            )
-            .unwrap();
-
-        // Query d1
-        let mut stmt = connection
-            .prepare("SELECT github_issue_number FROM deleted_assigned_issues WHERE dashboard_id = ?1")
-            .unwrap();
-        let d1_numbers: Vec<i64> = stmt.query_map(["d1"], |row| row.get(0)).unwrap().collect::<Result<Vec<_>, _>>().unwrap();
-        assert_eq!(d1_numbers.len(), 2);
-        assert!(d1_numbers.contains(&42));
-        assert!(d1_numbers.contains(&99));
-
-        // Query d2
-        let d2_numbers: Vec<i64> = stmt.query_map(["d2"], |row| row.get(0)).unwrap().collect::<Result<Vec<_>, _>>().unwrap();
-        assert_eq!(d2_numbers.len(), 1);
-        assert!(d2_numbers.contains(&50));
-    }
-
-    #[test]
-    fn deleted_assigned_issue_duplicate_is_ignored() {
-        let connection = setup_test_database();
-        insert_dashboard(&connection, "d1");
-
-        let id1 = uuid::Uuid::new_v4().to_string();
-        connection
-            .execute(
-                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
-                rusqlite::params![id1, "d1", 42],
-            )
-            .unwrap();
-
-        let id2 = uuid::Uuid::new_v4().to_string();
-        connection
-            .execute(
-                "INSERT OR IGNORE INTO deleted_assigned_issues (id, dashboard_id, github_issue_number) VALUES (?1, ?2, ?3)",
-                rusqlite::params![id2, "d1", 42],
-            )
-            .unwrap();
-
-        let count: i64 = connection
-            .query_row(
-                "SELECT COUNT(*) FROM deleted_assigned_issues WHERE dashboard_id = 'd1'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert_eq!(count, 1, "duplicate insert should be ignored");
     }
 
     // --- GraphQL query builder tests ---
