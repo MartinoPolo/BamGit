@@ -120,7 +120,7 @@
 	}
 
 	$effect(() => {
-		value;
+		void value;
 		if (!open) {
 			syncInputDisplay();
 		}
