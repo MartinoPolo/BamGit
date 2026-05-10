@@ -8,9 +8,8 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import GitHubStatusCard from '$lib/components/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
-	import GithubIcon from '$lib/components/icons/GithubIcon.svelte';
 	import type { ColorPalette } from '$lib/types/generated';
 	import { invoke } from '$lib/tauri.js';
 
@@ -170,59 +169,27 @@
 			Connect your GitHub account to sync issues, pull requests, and branches.
 		</p>
 
-		{#if versionControl.authStatus.status === 'oauth-connected'}
-			<div class="flex items-center justify-between rounded border bg-muted/30 px-4 py-3">
-				<div class="flex items-center gap-3">
-					<img
-						src={versionControl.authStatus.user.avatar_url}
-						alt="{versionControl.authStatus.user.login}'s avatar"
-						class="size-10 rounded-full border"
-					/>
-					<div>
-						<p class="text-sm font-medium">{versionControl.authStatus.user.login}</p>
-						<Badge variant="moss" class="text-2xs">Connected via OAuth</Badge>
-					</div>
-				</div>
-				<Button
-					variant="danger"
-					size="sm"
-					onclick={async () => {
-						await invoke('github_logout');
-						await versionControl.checkAuthStatus();
-					}}
-				>
-					Disconnect
-				</Button>
-			</div>
-		{:else if versionControl.authStatus.status === 'cli-connected'}
-			<div class="flex items-center justify-between rounded border bg-muted/30 px-4 py-3">
-				<div class="flex items-center gap-3">
-					<GithubIcon size={24} />
-					<div>
-						<p class="text-sm font-medium">Connected via gh CLI</p>
-						<Badge variant="moss" class="text-2xs">gh auth</Badge>
-					</div>
-				</div>
-				<Button variant="secondary" size="sm" onclick={() => (authWizardOpen = true)}>
-					<GithubIcon size={14} />
-					Connect via OAuth
-				</Button>
-			</div>
+		<GitHubStatusCard
+			authStatus={versionControl.authStatus}
+			ghAvailability={versionControl.ghAvailability}
+			onconnect={() => (authWizardOpen = true)}
+			ondisconnect={async () => {
+				await invoke('github_logout');
+				await versionControl.checkAvailability();
+			}}
+		/>
+
+		{#if !versionControl.authStatus.status.startsWith('oauth') && versionControl.ghAvailability === 'available'}
 			<p class="text-xs text-muted-foreground">
 				Using the gh CLI for GitHub access. Connect via OAuth for a richer experience
 				without the CLI dependency.
 			</p>
-		{:else}
-			<Button onclick={() => (authWizardOpen = true)}>
-				<GithubIcon size={14} />
-				Connect to GitHub
-			</Button>
 		{/if}
 	</section>
 
 	<GitHubAuthWizard
 		bind:open={authWizardOpen}
-		onconnected={() => void versionControl.checkAuthStatus()}
+		onconnected={() => void versionControl.checkAvailability()}
 	/>
 
 	<NotificationSettingsPanel />

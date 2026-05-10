@@ -184,7 +184,7 @@ function createBoardContext() {
 		},
 
 		async updateDashboard(request: UpdateDashboardRequest): Promise<Dashboard> {
-			return invoke('update_dashboard', { request });
+			return invoke<Dashboard>('update_dashboard', { request });
 		},
 
 		async archiveDashboard(id: string): Promise<void> {

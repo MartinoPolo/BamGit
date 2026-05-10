@@ -64,7 +64,7 @@
 		void preloadCode(resolve('/quick-ideas'));
 		void preloadCode(resolve('/ai-config'));
 		void shortcutsCtx.loadCustomBindings();
-		void versionControlCtx.checkAuthStatus();
+		void versionControlCtx.checkAvailability();
 
 		shortcutsCtx.registerShortcut({
 			id: 'command-palette',

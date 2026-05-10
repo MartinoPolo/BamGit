@@ -136,11 +136,13 @@ pub fn update_dashboard(
         .query_row(&query, [&request.id], |row| row_to_dashboard(row))
         .map_err(|_| "ERR_DASHBOARD_NOT_FOUND".to_string())?;
 
+    let resolved_github_repo = resolve_nullable_field(request.github_repo, existing.github_repo.clone());
+
     let updated = Dashboard {
         id: existing.id,
         name: request.name.unwrap_or(existing.name),
         dashboard_type: request.dashboard_type.unwrap_or(existing.dashboard_type),
-        github_repo: resolve_nullable_field(request.github_repo, existing.github_repo),
+        github_repo: resolved_github_repo,
         local_folder: resolve_nullable_field(request.local_folder, existing.local_folder),
         default_base_branch: resolve_nullable_field(
             request.default_base_branch,
