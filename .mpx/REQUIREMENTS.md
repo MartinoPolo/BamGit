@@ -609,12 +609,185 @@ The existing `DashboardEditDialog` (compact modal) remains for quick edits (name
 - **Compare view:** Side-by-side model comparison. 7 metrics: one-shot rate, retry rate, cost/call, cost/edit, output tokens/call, cache hit rate. Category head-to-head. Working style metrics. Minimum 20 calls per model. Triggered from "Group by: Model" view.
 - **Backend wiring:** PricingEngine called during session completion and historical import. Achievement triggers hooked to session completion. `metrics-updated` and `achievement-unlocked` Tauri events. Missing indexes on `turn_metrics(timestamp)` and `tool_usage(timestamp)`.
 
-### AI Configuration Access
+### AI Configuration
 
-- Dedicated page with tabs: Skills, Agents, Hooks, MCP Servers, Memories, Instructions.
-- Card grid with badges (model, category, version). Click → full detail panel.
-- Discovery: `~/.claude/`, project `.claude/`, mpx-claude-code, memories folder. Scan on navigate + manual refresh.
-- "Open file" / "Open in editor" / "Open folder" buttons per item. Read-only display in Grovekeeper.
+Dedicated `/ai-config` page for browsing, editing, and managing AI agent configuration across all supported providers.
+
+#### Provider-Scoped Architecture
+
+- **Provider switcher** at page top (above tabs) — dropdown or segmented control selecting which provider's config to view
+- **All four providers shown** in switcher: Claude Code, OpenCode, Codex, Cursor. Uninstalled providers appear disabled/grayed out with "Not installed" label. Installed status detected via PATH check for CLI binary (`claude`, `opencode`, `codex`, `cursor`/`agent`)
+- **Tabs change per provider** — only tabs relevant to the selected provider are visible:
+
+| Tab          | Claude Code | OpenCode | Codex | Cursor |
+| ------------ | ----------- | -------- | ----- | ------ |
+| Skills       | ✓           | ✓        | ✓     | ✓      |
+| Agents       | ✓           | ✓        | ✓     | —      |
+| Hooks        | ✓           | —        | ✓     | —      |
+| MCP Servers  | ✓           | ✓        | ✓     | ✓      |
+| Rules        | ✓           | ✓        | —     | ✓      |
+| Memories     | ✓           | —        | ✓     | —      |
+| Instructions | ✓           | ✓        | ✓     | ✓      |
+| Settings     | ✓           | ✓        | ✓     | ✓      |
+
+- **No provider badges on individual items** — provider is implicit from the global switcher
+- All providers support the **Agent Skills standard** (agentskills.io) — `SKILL.md` files with YAML frontmatter are portable across tools
+
+#### Provider Config Directories
+
+| Provider    | User Dir              | Project Dir  | Config Format |
+| ----------- | --------------------- | ------------ | ------------- |
+| Claude Code | `~/.claude/`          | `.claude/`   | JSON          |
+| OpenCode    | `~/.config/opencode/` | `.opencode/` | JSON/JSONC    |
+| Codex       | `~/.codex/`           | `.codex/`    | TOML          |
+| Cursor      | `~/.cursor/`          | `.cursor/`   | JSON + MDC    |
+
+Cross-provider compatibility paths scanned per active provider (e.g., Claude Code reads `.agents/skills/`; OpenCode reads `.claude/skills/`). Items appear under whichever provider is selected — no "universal" badge.
+
+#### Discovery Sources
+
+- **Collapsible "Sources" section** between tab bar and content grid, per provider
+- Horizontal list of source pills/chips: label (User, Project, custom), truncated path (full in tooltip), item count, colored dot matching badge variant (blue=user, green=project, amber=custom)
+- **"Add Source" button** at end — folder picker with auto-derived label (editable)
+- Custom source labels appear on cards instead of generic "custom" badge text
+- Default collapsed to save vertical space
+
+#### Content Tabs (Skills, Agents, Hooks, MCP, Rules, Memories, Instructions)
+
+**View modes:**
+
+- **Card view** (default) — responsive 3-column grid (`grid-cols-1 md:grid-cols-2 xl:grid-cols-3`)
+- **List view** — compact table/accordion rows (name, source badge, key metadata, action icons)
+- Toggled by icon button pair (grid/list) in toolbar, persisted per tab in localStorage
+
+**Sort options:** Name (A-Z, default), Source (user → project → custom), Category (for skills/agents). Persisted per tab in localStorage.
+
+**Grouping modes:** Flat list (default) or Grouped by source (collapsible sections with headers showing source label + path). Skills additionally support "Group by category."
+
+**Cross-tab search:**
+
+- Search input above tabs, applies to all tabs simultaneously
+- Tab labels show filtered counts: "Skills (3)" / "Agents (1)" / "Hooks (0)"
+- Tabs with 0 results get dimmed text
+- "All" tab at start shows every matching item across all categories, grouped by type with collapsible section headers. Empty sections hidden.
+
+**Deprecated items:** Shown with "deprecated" badge (dimmed/archived appearance). Filterable via "Show deprecated" toggle (off by default).
+
+**Card content per type:**
+
+| Type        | Title    | Subtitle                       | Badges                              | Action Icons          |
+| ----------- | -------- | ------------------------------ | ----------------------------------- | --------------------- |
+| Skill       | name     | description (1-line truncated) | source, category                    | file, folder          |
+| Agent       | name     | description (1-line truncated) | source, model                       | file, folder          |
+| Hook        | filename | JSDoc description              | source, event_type                  | file, folder          |
+| MCP Server  | name     | provider or config source      | enabled/disabled, source, transport | — (no file for cloud) |
+| Memory      | name     | description                    | memory_type, source                 | file, folder          |
+| Instruction | filename | first line of content          | source, size                        | file, folder          |
+| Rule        | filename | first line of content          | source, language                    | file, folder          |
+
+- **Line count** shown as subtle monospace text on card bottom-right (`42 lines`, `text-foreground-subtle text-[10.5px] font-mono`). Only for file-backed items (skills, agents, memories, instructions, rules). Prominent in detail modal header.
+- **Open File / Open Folder** ghost icon-only buttons (`variant="ghost" size="icon-sm"`) on each card with path tooltips
+
+#### Detail Modal (replacing Sheet)
+
+- Centered **Dialog** (`max-w-2xl`, `h-[80vh]`) replaces right-side Sheet panel
+- **Header**: Item name as title, source badge + type-specific badges in description row
+- **Body** (scrollable): Metadata section (all badges), then full content rendered as markdown. MCP server details section for MCP items.
+- **Footer**: Left group — "Open File" + "Open Folder". Right group — "Edit" + "Open in Editor" + "Delete" (where applicable per type rules below)
+- **No backdrop blur** — standardize to dark semi-transparent overlay (matching Dialog pattern). Remove `backdrop-blur-xs` from Sheet overlay component.
+
+#### Edit Modal
+
+- Dialog (`max-w-3xl`, `h-[85vh]`) with monospace textarea
+- **Header**: "Edit [item name]", file path as clickable description
+- **Body**: Single `<textarea>` with monospace font, full available height. Raw markdown content.
+- **Footer**: "Open in Editor" (always available — user may prefer VS Code), Cancel (ghost), Save (primary)
+- Save writes via new Tauri command `write_ai_config_file { path, content }`
+- **Symlink handling**: Detect symlinks, prefer editing/creating the local project file (`.claude/settings.local.json`) over the symlink target. If local file doesn't exist, offer to create it. Show warning: "This file is a symlink to [resolved path]."
+- For hooks and MCP servers (not inline-editable): "Edit" button replaced by "Open in Editor" only
+
+#### Delete Behavior
+
+- **All deletions go through a confirmation dialog** — `AiConfigDeleteDialog` following `DeleteConfirmDialog` pattern
+- Dialog shows: item name (title), item type + source, full file path (clickable — opens Explorer), content preview in scrollable `<pre>` block (~300px max height), "This action cannot be undone" warning
+- **Extra warning for user-level items**: amber warning state — "This will modify your global configuration and affect all projects"
+- **Symlink warning**: "This will delete the symlink target file at [resolved path]"
+
+**Deletability per type:**
+
+| Type                         | Deletable? | Delete action                                              |
+| ---------------------------- | ---------- | ---------------------------------------------------------- |
+| Skills (user/project)        | Yes        | Delete SKILL.md file                                       |
+| Agents (user/project)        | Yes        | Delete .md file                                            |
+| Hooks                        | Yes        | Remove registration from settings.json (script file stays) |
+| MCP Servers (.mcp.json)      | Yes        | Remove entry from .mcp.json                                |
+| MCP Servers (enabledPlugins) | Yes        | Set to `false` in settings.json                            |
+| MCP Servers (settings.json)  | Yes        | Remove from mcpServers object                              |
+| Memories                     | Yes        | Delete .md file                                            |
+| Instructions                 | Edit only  | Full-file edit via edit modal, not whole-file delete       |
+| Rules (user/project)         | Yes        | Delete file or remove symlink                              |
+
+**Editability per type:**
+
+| Type         | In-app edit? | Fallback            |
+| ------------ | ------------ | ------------------- |
+| Skills       | Yes          | + Open in Editor    |
+| Agents       | Yes          | + Open in Editor    |
+| Hooks        | No           | Open in Editor only |
+| MCP Servers  | No           | Open in Editor only |
+| Memories     | Yes          | + Open in Editor    |
+| Instructions | Yes          | + Open in Editor    |
+| Rules        | Yes          | + Open in Editor    |
+
+#### Skill Overrides (Claude Code only)
+
+- Per-workspace skill toggling via `skillOverrides` in `.claude/settings.local.json`
+- Values: `"on"` (default), `"name-only"`, `"user-invocable-only"`, `"off"`
+- Card shows toggle control; detail modal shows full 4-option dropdown
+- Written to `settings.local.json` (gitignored, machine-local) — never to committed `settings.json`
+
+#### Settings Tab
+
+Separate tab showing curated, GUI-editable provider settings. Each setting shows: name, current value (toggle/dropdown/input), description, and the settings file key it maps to (e.g., `settings.json → effortLevel`) in subtle text.
+
+**Warning banner**: "Settings may change between provider versions. Verify against provider documentation."
+
+**Scope selector** (User / Project) determines which file to read/write.
+
+**Claude Code settings:**
+
+| Category    | Setting                                 | Control   | Values                                                  |
+| ----------- | --------------------------------------- | --------- | ------------------------------------------------------- |
+| Model       | `model`                                 | Dropdown  | Available model IDs                                     |
+| Model       | `effortLevel`                           | Segmented | low / medium / high / xhigh                             |
+| Thinking    | `alwaysThinkingEnabled`                 | Toggle    | on/off                                                  |
+| Thinking    | `showThinkingSummaries`                 | Toggle    | on/off                                                  |
+| Context     | `ENABLE_TOOL_SEARCH` (env)              | Dropdown  | disabled / auto (10%) / auto:5 / auto:15 / auto:20      |
+| Context     | `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` (env) | Slider    | 50-99%                                                  |
+| Context     | `autoCompactWindow`                     | Number    | Token count                                             |
+| Permissions | `permissions.defaultMode`               | Dropdown  | default / acceptEdits / plan / auto / bypassPermissions |
+| Permissions | `sandbox.enabled`                       | Toggle    | on/off                                                  |
+| Memory      | `autoMemoryEnabled`                     | Toggle    | on/off                                                  |
+| Memory      | `includeGitInstructions`                | Toggle    | on/off                                                  |
+| Memory      | `fileCheckpointingEnabled`              | Toggle    | on/off                                                  |
+| Hooks       | `disableAllHooks`                       | Toggle    | on/off                                                  |
+| MCP         | `enableAllProjectMcpServers`            | Toggle    | on/off                                                  |
+| UI          | `viewMode`                              | Dropdown  | default / verbose / focus                               |
+| UI          | `editorMode`                            | Dropdown  | normal / vim                                            |
+| Attribution | `attribution.commit`                    | Text      | Trailer text or empty                                   |
+
+**OpenCode settings:** `model`, `small_model`, `default_agent`, `compaction.auto`, `compaction.prune`, `snapshot`, `share`, `autoupdate`
+
+**Codex settings:** `model`, `model_reasoning_effort`, `model_verbosity`, `approval_policy`, `sandbox_mode`, `web_search`, `personality`, feature toggles (shell_snapshot, memories, multi_agent, undo, fast_mode)
+
+**Cursor settings:** `attribution.attributeCommitsToAgent`, `attribution.attributePRsToAgent`, `network.useHttp1ForAgent`, MCP allowlists, terminal allowlists. Note: "Most Cursor settings are configured through the Cursor IDE Settings panel."
+
+#### Discovery Bug Fixes (from PRD #94 implementation)
+
+- **Skills**: Scan `skills/` directory (not just `commands/`) at both user and project level
+- **MCP Servers**: Parse `enabledPlugins` as object (not array); read `.mcp.json` at project root
+- **Rules**: Add `discover_rules()` function scanning `.claude/rules/`, `.opencode/rules/`, `.cursor/rules/`
+- **settings.local.json**: Read local overrides in addition to `settings.json` for hooks and MCP servers
 
 ### PRD Management & Visualization
 
