@@ -5,7 +5,7 @@ argument-hint: 'all | <variant-letter> [refinement requirements...]'
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir *), Bash(pnpm dlx shadcn-svelte*), Bash(gh *), Agent
 metadata:
     author: MartinoPolo
-    version: '0.5'
+    version: '0.6'
     category: design
 ---
 
@@ -38,7 +38,7 @@ Ask if the variant is missing. Ask what to change if refinements are empty.
 
 ## Batch Mode (all)
 
-When the argument is `all`, run the following discovery loop **before** any refinement work, then process each eligible folder sequentially using the normal Steps 2–9.
+When the argument is `all`, run the following discovery loop **before** any refinement work, then process each eligible folder sequentially using the normal Steps 2–10.
 
 ### Batch Step A: Discover eligible design folders
 
@@ -76,7 +76,7 @@ For each eligible folder in order, spawn a dedicated **`mp-executor`** sub-agent
 - The target folder path (`designs/<name>/`)
 - The chosen variant letter and full refinement requirements extracted in Batch Step B
 - The full text of this skill's Steps 2–9 as the task specification
-- Instruction to skip Step 8 (GitHub issue comment) — issue comments are collected at the end
+- Instruction to skip Steps 8–9 (GitHub issue comment + unblock pass) — both are deferred until the user reviews the batch
 
 Wait for each sub-agent to complete before spawning the next (sequential, not parallel) to avoid file-system conflicts and to keep token usage predictable.
 
@@ -84,7 +84,7 @@ After each sub-agent completes, print a one-line status: ✓ `<folder>` refined 
 
 If a sub-agent fails or reports an error, log the failure, skip to the next folder, and include the failure in the final summary.
 
-At the end, print a summary table of all folders processed, any that were skipped (with reasons), and any failures. Then, if issue numbers are known, post all GitHub issue comments in one pass (Step 8) for each successfully refined folder.
+At the end, print a summary table of all folders processed, any that were skipped (with reasons), and any failures. Then, if issue numbers are known, run **Steps 8–9** in one pass for each successfully refined folder (post GitHub comment, then unblock dependent issues by removing the `Design needed` label and listing what is now executable).
 
 ---
 
@@ -184,7 +184,9 @@ If the refinement process revealed missing requirements or corrections, add/upda
 
 ### Step 8: Link to GitHub Issue
 
-Ask for the associated GitHub issue number if not known.
+Ask for the associated GitHub issue number if not known (the **design issue** — the one this refinement satisfies).
+
+Post a comment recording the refinement:
 
 ```bash
 gh issue comment <number> --body "## Design Refined
@@ -197,11 +199,36 @@ Variant **<X>** refined: [comma-separated refinements]
 - \`designs/<component-name>/DESIGN_BRIEF_<COMPONENT_NAME>.md\` — updated brief"
 ```
 
-### Step 9: Screenshot & Report
+### Step 9: Unblock Dependent Issues
 
-Open `refined.html` in Chrome DevTools MCP and screenshot for the user.
+Refining a design unblocks every issue that was waiting on it. Find those issues and clear the gate.
 
-Report: `refined.html` path, `SUMMARY.md` path, components to reuse (count + names), components adopted (if any).
+1. **Find candidates**. Build a candidate list from any of these signals (use whichever yield results — they're complementary):
+    - Sub-issues of the design issue: `gh issue view <design-issue> --json subIssues -q '.subIssues[].number'`
+    - Issues that link to the design folder in their body: `gh issue list --search "designs/<component-name>" --state open --json number,title,labels`
+    - Issues with the **`Design needed`** label that mention the component name: `gh issue list --label "Design needed" --search "<component-name>" --state open --json number,title,labels`
+    - Issues that explicitly list the design issue as a `blocked-by` (parse body for `Blocked by #<design-issue>`).
+2. **Filter** to issues that actually depend on this specific design (skim the body if uncertain — do not strip labels from unrelated issues).
+3. **Remove the `Design needed` label** from each confirmed dependent:
+    ```bash
+    gh issue edit <number> --remove-label "Design needed"
+    ```
+    If the label name in the repo is different (e.g. `needs-design`, `blocked: design`), match the repo's actual label — discover via `gh label list --search design`.
+4. **Report** in the final output (Step 10) which issues were unblocked and which can now be executed.
+
+If the user has not yet reviewed `refined.html` and approved it, **skip steps 3–4** and instead report "Pending user approval — re-run unblock pass once approved." Do not strip labels speculatively.
+
+### Step 10: Open & Report
+
+Open `refined.html` in Chrome DevTools MCP for the user to review (no screenshot — the user opens the file in their own browser or via the already-attached devtools page).
+
+Report (concise, in this order):
+
+1. **Artifacts**: `refined.html` path, `SUMMARY.md` path, brief updated.
+2. **Component map**: counts only — N reuse, N adopted, N custom.
+3. **Unblocked issues**: bulleted list of `#<num> — <title>` for every issue whose `Design needed` label was just removed.
+4. **Ready to execute**: bulleted list of those same issues that are also otherwise unblocked (no other open `blocked-by`), so the user knows which they can hand to an executor next.
+5. **Still blocked**: any candidate issues that were intentionally left labelled (with a one-line reason — usually "depends on a different design that's still pending").
 
 ## Folder Layout
 
