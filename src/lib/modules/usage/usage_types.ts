@@ -51,3 +51,27 @@ export type RefreshState = (typeof REFRESH_STATES)[keyof typeof REFRESH_STATES];
 
 export const FRESH_THRESHOLD_MS = 30_000;
 export const STALE_THRESHOLD_MS = 120_000;
+
+const METRICS_PERIOD_VALUES = new Set<string>([
+	'today',
+	'week',
+	'thirty-days',
+	'month',
+	'all',
+	'custom',
+]);
+
+export function isMetricsPeriod(value: unknown): value is MetricsPeriod {
+	return typeof value === 'string' && METRICS_PERIOD_VALUES.has(value);
+}
+
+export const USAGE_SCOPES = {
+	workspace: 'workspace',
+	global: 'global',
+} as const;
+
+export type UsageScope = (typeof USAGE_SCOPES)[keyof typeof USAGE_SCOPES];
+
+export function isUsageScope(value: unknown): value is UsageScope {
+	return typeof value === 'string' && Object.values(USAGE_SCOPES).includes(value as UsageScope);
+}
