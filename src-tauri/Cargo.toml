@@ -45,6 +45,8 @@ portpicker = "0.1"
 regex = "1"
 walkdir = "2"
 keyring = { version = "3", features = ["sync-secret-service"] }
+which = "6"
+toml = "0.8"
 
 [target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\"))".dependencies]
 tauri-plugin-single-instance = "2"

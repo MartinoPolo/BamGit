@@ -30,20 +30,20 @@ Answer "Which model performs better for my use case?" by showing concrete metric
 
 ### Performance Metrics (3)
 
-| Metric | Formula | Better |
-|---|---|---|
-| One-shot rate | edit turns with 0 retries / total edit turns * 100 | Higher |
-| Retry rate | total retries / edit turns | Lower |
-| Cache hit rate | cache_read / (input + cache_read + cache_write) * 100 | Higher |
+| Metric         | Formula                                                | Better |
+| -------------- | ------------------------------------------------------ | ------ |
+| One-shot rate  | edit turns with 0 retries / total edit turns \* 100    | Higher |
+| Retry rate     | total retries / edit turns                             | Lower  |
+| Cache hit rate | cache_read / (input + cache_read + cache_write) \* 100 | Higher |
 
 ### Efficiency Metrics (4)
 
-| Metric | Formula | Better |
-|---|---|---|
-| Cost per call | total cost / total API calls | Lower |
-| Cost per edit | edit turn cost / edit turns | Lower |
-| Output tokens per call | output tokens / calls | Lower |
-| Cache hit rate | (duplicated from performance for emphasis) | Higher |
+| Metric                 | Formula                                    | Better |
+| ---------------------- | ------------------------------------------ | ------ |
+| Cost per call          | total cost / total API calls               | Lower  |
+| Cost per edit          | edit turn cost / edit turns                | Lower  |
+| Output tokens per call | output tokens / calls                      | Lower  |
+| Cache hit rate         | (duplicated from performance for emphasis) | Higher |
 
 ### Category Head-to-Head
 
@@ -55,12 +55,12 @@ Answer "Which model performs better for my use case?" by showing concrete metric
 
 ### Working Style (4 metrics, display only — no winner)
 
-| Metric | Formula |
-|---|---|
-| Delegation rate | agent spawns / total turns (%) |
-| Planning rate | planning tool turns / total turns (%) |
-| Avg tools per turn | total tool calls / turns |
-| Fast mode usage | fast-mode calls / total calls (%) |
+| Metric             | Formula                               |
+| ------------------ | ------------------------------------- |
+| Delegation rate    | agent spawns / total turns (%)        |
+| Planning rate      | planning tool turns / total turns (%) |
+| Avg tools per turn | total tool calls / turns              |
+| Fast mode usage    | fast-mode calls / total calls (%)     |
 
 ### Context Panel (supplementary)
 
@@ -99,6 +99,7 @@ Per model: total calls, total cost, input/output tokens, days of data, edit turn
 - Category head-to-head with 5+ categories
 
 States to design after variant selection:
+
 - Model selector open (dropdown with call counts)
 - Single model selected (waiting for second)
 - No eligible models (< 2 models with sufficient data)
