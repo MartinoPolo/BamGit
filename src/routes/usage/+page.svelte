@@ -1,102 +1,24 @@
 <script lang="ts">
-	import { invoke } from '$lib/tauri.js';
-	import { cn } from '$lib/utils.js';
-	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
+	import { onMount } from 'svelte';
 	import DownloadIcon from '@lucide/svelte/icons/download';
-	import TrophyIcon from '@lucide/svelte/icons/trophy';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import { cn } from '$lib/utils.js';
+	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
+	import {
+		PERIODS,
+		type MetricsPeriod,
+		type GroupByOption,
+	} from '$lib/modules/usage/usage_types.js';
 
-	type MetricsPeriod = 'today' | 'week' | 'thirty-days' | 'month' | 'all';
+	import CostChart from '$lib/components/usage/CostChart.svelte';
+	import RefreshIndicator from '$lib/components/usage/RefreshIndicator.svelte';
+	import ColorThemePicker from '$lib/components/usage/ColorThemePicker.svelte';
+	import GroupByDropdown from '$lib/components/usage/GroupByDropdown.svelte';
+	import AchievementsDialog from '$lib/components/usage/AchievementsDialog.svelte';
+	import DateRangePicker from '$lib/components/usage/DateRangePicker.svelte';
 
-	interface UsageStats {
-		total_cost_usd: number;
-		session_count: number;
-		one_shot_rate: number;
-		cache_hit_ratio: number;
-		cost_delta_percent: number | null;
-		session_count_delta: number | null;
-	}
-
-	interface DailyCost {
-		date: string;
-		cost_usd: number;
-		session_count: number;
-	}
-
-	interface ActivityBreakdown {
-		category: string;
-		cost_usd: number;
-		turn_count: number;
-		one_shot_percent: number;
-	}
-
-	interface TopSession {
-		session_id: string;
-		issue_name: string | null;
-		issue_number: number | null;
-		cost_usd: number;
-		turn_count: number;
-		tool_call_count: number;
-		started_at: string;
-	}
-
-	interface ToolUsageBreakdown {
-		tool_name: string;
-		call_count: number;
-	}
-
-	interface UsageDashboardData {
-		stats: UsageStats;
-		daily_costs: DailyCost[];
-		activity_breakdown: ActivityBreakdown[];
-		top_sessions: TopSession[];
-		tool_usage: ToolUsageBreakdown[];
-	}
-
-	interface Achievement {
-		kind: string;
-		display_name: string;
-		description: string;
-		threshold: number;
-		progress: number;
-		unlocked_at: string | null;
-	}
-
-	const PERIODS: { value: MetricsPeriod; label: string }[] = [
-		{ value: 'today', label: 'Today' },
-		{ value: 'week', label: '7d' },
-		{ value: 'thirty-days', label: '30d' },
-		{ value: 'month', label: 'Month' },
-		{ value: 'all', label: 'All' },
-	];
-
-	let activePeriod = $state<MetricsPeriod>('thirty-days');
-	let dashboardData = $state<UsageDashboardData | null>(null);
-	let achievements = $state<Achievement[]>([]);
-	let loading = $state(true);
-	let showAchievements = $state(false);
-
-	async function loadData() {
-		loading = true;
-		try {
-			const [dashboard, achievementList] = await Promise.all([
-				invoke<UsageDashboardData>('get_usage_dashboard', { period: activePeriod }),
-				invoke<Achievement[]>('get_achievements'),
-			]);
-			dashboardData = dashboard;
-			achievements = achievementList;
-		} catch (err) {
-			console.error('Failed to load usage data:', err);
-		} finally {
-			loading = false;
-		}
-	}
-
-	$effect(() => {
-		void activePeriod;
-		void loadData();
-	});
+	const ctx = setUsageContext();
 
 	function formatCost(value: number): string {
 		return `$${value.toFixed(2)}`;
@@ -134,21 +56,42 @@
 		return category.charAt(0).toUpperCase() + category.slice(1).replace('-', '/');
 	}
 
-	let maxDailyCost = $derived(
-		dashboardData ? Math.max(...dashboardData.daily_costs.map((d) => d.cost_usd), 0.01) : 1,
-	);
-
-	let maxToolCount = $derived(
-		dashboardData ? Math.max(...dashboardData.tool_usage.map((t) => t.call_count), 1) : 1,
-	);
-
 	let maxActivityCost = $derived(
-		dashboardData
-			? Math.max(...dashboardData.activity_breakdown.map((a) => a.cost_usd), 0.01)
+		ctx.dashboardData.current
+			? Math.max(...ctx.dashboardData.current.activity_breakdown.map((a) => a.cost_usd), 0.01)
 			: 1,
 	);
 
-	let unlockedCount = $derived(achievements.filter((a) => a.unlocked_at !== null).length);
+	let maxToolCount = $derived(
+		ctx.dashboardData.current
+			? Math.max(...ctx.dashboardData.current.tool_usage.map((t) => t.call_count), 1)
+			: 1,
+	);
+
+	function handlePeriodChange(period: MetricsPeriod) {
+		ctx.activePeriod.current = period;
+		ctx.customDateRange.current = null;
+		void ctx.loadData();
+	}
+
+	function handleCustomRange(range: { start: string; end: string }) {
+		ctx.customDateRange.current = range;
+		ctx.activePeriod.current = 'custom';
+		void ctx.loadData();
+	}
+
+	function handleGroupByChange(option: GroupByOption) {
+		ctx.groupBy.current = option;
+		void ctx.loadData();
+	}
+
+	onMount(() => {
+		// TODO(#247): listen('metrics-updated', () => ctx.notifyNewData()) — blocked by backend event wiring
+		void ctx.loadData();
+		return () => {
+			ctx.clearTimers();
+		};
+	});
 </script>
 
 <div class="flex flex-col gap-6 p-8">
@@ -156,17 +99,20 @@
 	<div class="flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-foreground">Usage Analytics</h1>
 		<div class="flex items-center gap-2">
-			<Button
-				variant="secondary"
-				size="sm"
-				onclick={() => (showAchievements = !showAchievements)}
-			>
-				<TrophyIcon />
-				{unlockedCount}/{achievements.length}
-			</Button>
-			<Button variant="secondary" size="sm" onclick={() => loadData()}>
-				<RefreshCwIcon />
-			</Button>
+			<ColorThemePicker
+				value={ctx.colorTheme.current}
+				onchange={(theme) => (ctx.colorTheme.current = theme)}
+			/>
+			<AchievementsDialog
+				achievements={ctx.achievements.current}
+				unlockedCount={ctx.unlockedCount}
+				totalCount={ctx.achievements.current.length}
+			/>
+			<RefreshIndicator
+				refreshState={ctx.refreshState.current}
+				lastUpdatedAt={ctx.lastUpdatedAt.current}
+				onrefresh={() => ctx.loadData()}
+			/>
 			<Button variant="secondary" size="sm">
 				<DownloadIcon />
 				Export CSV
@@ -174,47 +120,54 @@
 		</div>
 	</div>
 
-	<!-- Period tabs -->
-	<div class="flex gap-1 rounded-lg bg-muted p-1">
-		{#each PERIODS as period (period.value)}
-			<button
-				class={cn(
-					'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
-					activePeriod === period.value
-						? 'bg-background text-foreground shadow-sm'
-						: 'text-muted-foreground hover:text-foreground',
-				)}
-				onclick={() => (activePeriod = period.value)}
-			>
-				{period.label}
-			</button>
-		{/each}
+	<!-- Filter bar: period tabs + group-by -->
+	<div class="flex items-center gap-3">
+		<div class="flex gap-1 rounded-lg bg-muted p-1">
+			{#each PERIODS as period (period.value)}
+				<button
+					class={cn(
+						'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
+						ctx.activePeriod.current === period.value
+							? 'bg-background text-foreground shadow-sm'
+							: 'text-muted-foreground hover:text-foreground',
+					)}
+					onclick={() => handlePeriodChange(period.value)}
+				>
+					{period.label}
+				</button>
+			{/each}
+			<DateRangePicker
+				onselect={handleCustomRange}
+				active={ctx.activePeriod.current === 'custom'}
+			/>
+		</div>
+		<GroupByDropdown value={ctx.groupBy.current} onchange={handleGroupByChange} />
 	</div>
 
-	{#if loading || !dashboardData}
+	{#if ctx.refreshState.current === 'loading' && !ctx.dashboardData.current}
 		<div class="flex h-64 items-center justify-center text-muted-foreground">Loading...</div>
-	{:else}
+	{:else if ctx.dashboardData.current}
+		{@const data = ctx.dashboardData.current}
+
 		<!-- KPI Cards -->
 		<div class="grid grid-cols-4 gap-4">
 			<Card.Card>
 				<div class="p-4">
 					<div class="text-sm text-muted-foreground">Total cost</div>
-					<div class="text-2xl font-bold">
-						{formatCost(dashboardData.stats.total_cost_usd)}
-					</div>
-					<div class={cn('text-xs', deltaTone(dashboardData.stats.cost_delta_percent))}>
-						{formatDelta(dashboardData.stats.cost_delta_percent)} vs prev period
+					<div class="text-2xl font-bold">{formatCost(data.stats.total_cost_usd)}</div>
+					<div class={cn('text-xs', deltaTone(data.stats.cost_delta_percent))}>
+						{formatDelta(data.stats.cost_delta_percent)} vs prev period
 					</div>
 				</div>
 			</Card.Card>
 			<Card.Card>
 				<div class="p-4">
 					<div class="text-sm text-muted-foreground">Sessions</div>
-					<div class="text-2xl font-bold">{dashboardData.stats.session_count}</div>
+					<div class="text-2xl font-bold">{data.stats.session_count}</div>
 					<div class="text-xs text-muted-foreground">
-						{#if dashboardData.stats.session_count_delta != null}
-							{dashboardData.stats.session_count_delta >= 0 ? '+' : ''}{dashboardData
-								.stats.session_count_delta} vs prev period
+						{#if data.stats.session_count_delta != null}
+							{data.stats.session_count_delta >= 0 ? '+' : ''}{data.stats
+								.session_count_delta} vs prev period
 						{/if}
 					</div>
 				</div>
@@ -222,53 +175,36 @@
 			<Card.Card>
 				<div class="p-4">
 					<div class="text-sm text-muted-foreground">One-shot rate</div>
-					<div class="text-2xl font-bold">
-						{dashboardData.stats.one_shot_rate.toFixed(0)}%
-					</div>
+					<div class="text-2xl font-bold">{data.stats.one_shot_rate.toFixed(0)}%</div>
 					<div class="text-xs text-muted-foreground">industry avg ≈ 62%</div>
 				</div>
 			</Card.Card>
 			<Card.Card>
 				<div class="p-4">
 					<div class="text-sm text-muted-foreground">Cache hit</div>
-					<div class="text-2xl font-bold">
-						{dashboardData.stats.cache_hit_ratio.toFixed(0)}%
-					</div>
+					<div class="text-2xl font-bold">{data.stats.cache_hit_ratio.toFixed(0)}%</div>
 					<div class="text-xs text-muted-foreground">
 						saving ≈ {formatCost(
-							dashboardData.stats.total_cost_usd *
-								(dashboardData.stats.cache_hit_ratio / 100) *
-								0.9,
+							data.stats.total_cost_usd * (data.stats.cache_hit_ratio / 100) * 0.9,
 						)}/mo
 					</div>
 				</div>
 			</Card.Card>
 		</div>
 
-		<!-- Daily Cost Chart -->
+		<!-- Cost Chart -->
 		<Card.Card>
 			<div class="px-4 pt-4 pb-2">
-				<h3 class="text-base font-semibold">Cost per day</h3>
+				<h3 class="text-base font-semibold">Cost per period</h3>
 			</div>
 			<div class="px-4 pb-4">
-				<div class="flex h-32 items-end gap-0.5">
-					{#each dashboardData.daily_costs as day (day.date)}
-						<div
-							class="flex-1 rounded-t bg-primary transition-all hover:opacity-80"
-							style:height="{Math.max((day.cost_usd / maxDailyCost) * 100, 2)}%"
-							title="{day.date}: {formatCost(
-								day.cost_usd,
-							)} ({day.session_count} sessions)"
-						></div>
-					{/each}
-				</div>
-				<div class="mt-1 flex justify-between text-xs text-muted-foreground">
-					<span>{dashboardData.daily_costs[0]?.date ?? ''}</span>
-					<span
-						>{dashboardData.daily_costs[dashboardData.daily_costs.length - 1]?.date ??
-							''}</span
-					>
-				</div>
+				<CostChart
+					data={data.time_bucket_costs}
+					groupedData={data.grouped_costs}
+					colorTheme={ctx.colorTheme.current}
+					groupBy={ctx.groupBy.current}
+					period={ctx.activePeriod.current}
+				/>
 			</div>
 		</Card.Card>
 
@@ -290,7 +226,7 @@
 							<span class="text-right">Turns</span>
 							<span class="text-right">1-shot</span>
 						</div>
-						{#each dashboardData.activity_breakdown as activity (activity.category)}
+						{#each data.activity_breakdown as activity (activity.category)}
 							<div
 								class="grid grid-cols-[120px_1fr_64px_44px_44px] items-center gap-2"
 							>
@@ -339,7 +275,7 @@
 					</div>
 					<div class="px-4 pb-4">
 						<div class="space-y-2">
-							{#each dashboardData.top_sessions as session (session.session_id)}
+							{#each data.top_sessions as session (session.session_id)}
 								<div class="flex items-center justify-between text-sm">
 									<div class="flex items-center gap-2 truncate">
 										{#if session.issue_number}
@@ -367,7 +303,7 @@
 					</div>
 					<div class="px-4 pb-4">
 						<div class="space-y-1.5">
-							{#each dashboardData.tool_usage as tool (tool.tool_name)}
+							{#each data.tool_usage as tool (tool.tool_name)}
 								<div class="grid grid-cols-[80px_1fr_48px] items-center gap-2">
 									<span class="truncate text-sm">{tool.tool_name}</span>
 									<div class="h-2 overflow-hidden rounded-full bg-muted">
@@ -387,67 +323,5 @@
 				</Card.Card>
 			</div>
 		</div>
-
-		<!-- Achievements Section -->
-		{#if showAchievements}
-			<Card.Card>
-				<div class="px-4 pt-4 pb-2">
-					<h3 class="text-base font-semibold">Achievements</h3>
-					<p class="text-sm text-muted-foreground">
-						{unlockedCount} of {achievements.length} unlocked
-					</p>
-				</div>
-				<div class="px-4 pb-4">
-					<div class="grid grid-cols-2 gap-3">
-						{#each achievements as achievement (achievement.kind)}
-							<div
-								class={cn(
-									'flex items-center gap-3 rounded-lg border p-3 transition-colors',
-									achievement.unlocked_at !== null
-										? 'border-primary/30 bg-primary/5'
-										: 'opacity-50',
-								)}
-							>
-								<div
-									class={cn(
-										'flex size-10 shrink-0 items-center justify-center rounded-lg text-lg',
-										achievement.unlocked_at !== null
-											? 'bg-primary/10'
-											: 'bg-muted',
-									)}
-								>
-									<TrophyIcon
-										class={cn(
-											'size-5',
-											achievement.unlocked_at !== null
-												? 'text-primary'
-												: 'text-muted-foreground',
-										)}
-									/>
-								</div>
-								<div class="min-w-0">
-									<div class="truncate text-sm font-medium">
-										{achievement.display_name}
-									</div>
-									<div class="text-xs text-muted-foreground">
-										{achievement.description}
-									</div>
-									<div class="mt-1 h-1 overflow-hidden rounded-full bg-muted">
-										<div
-											class="h-full rounded-full bg-primary"
-											style:width="{Math.min(
-												(achievement.progress / achievement.threshold) *
-													100,
-												100,
-											)}%"
-										></div>
-									</div>
-								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
-			</Card.Card>
-		{/if}
 	{/if}
 </div>
