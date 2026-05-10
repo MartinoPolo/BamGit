@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Character Creator — Refined</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../tokens.css" />
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+			body {
+				font-family: var(--font-sans);
+			}
+
+			/* ── Refined-mockup eyebrow tag ─────────────── */
+			.refined-tag {
+				position: fixed;
+				top: 10px;
+				right: 10px;
+				z-index: 100;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				padding: 4px 10px;
+				color: var(--foreground-subtle);
+				user-select: none;
+			}
+
+			/* ── App chrome stub (shows that the page lives inside the app — left sidebar of Grovekeeper) ── */
+			.app-shell {
+				display: grid;
+				grid-template-columns: 56px 1fr;
+				height: 100vh;
+				overflow: hidden;
+			}
+			.app-sidebar {
+				background: color-mix(in oklch, var(--surface) 80%, var(--background));
+				border-right: 1px solid var(--border);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-6) 0;
+				opacity: 0.55; /* parent chrome is reduced opacity per brief */
+				pointer-events: none;
+			}
+			.app-sidebar .nav-icon {
+				width: 36px;
+				height: 36px;
+				border-radius: var(--radius-md);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--foreground-muted);
+			}
+			.app-sidebar .nav-icon.active {
+				background: var(--primary-soft);
+				color: var(--primary);
+			}
+			.app-sidebar .nav-icon svg {
+				width: 18px;
+				height: 18px;
+			}
+
+			/* ── Page wrapper ─────────────────────────────── */
+			.page-wrapper {
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ── Top header ──────────────────────────────── */
+			.page-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-12);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+				min-height: 56px;
+			}
+			.back-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				text-decoration: none;
+				cursor: pointer;
+				transition: color 120ms;
+			}
+			.back-link:hover {
+				color: var(--foreground);
+			}
+			.back-link svg {
+				width: 14px;
+				height: 14px;
+			}
+			.header-divider {
+				width: 1px;
+				height: 22px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+			.header-title {
+				flex: 1;
+			}
+			.header-actions {
+				display: flex;
+				gap: var(--space-3);
+				align-items: center;
+			}
+
+			/* ── Identity strip ──────────────────────────── */
+			.identity-strip {
+				display: flex;
+				align-items: center;
+				gap: var(--space-10);
+				padding: var(--space-6) var(--space-12);
+				border-bottom: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 50%, var(--background));
+				flex-shrink: 0;
+			}
+			.avatar-upload {
+				width: 72px;
+				height: 72px;
+				border-radius: var(--radius-lg);
+				background: var(--surface-2);
+				border: 2px dashed var(--border-strong);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				position: relative;
+				overflow: hidden;
+				transition:
+					border-color 200ms,
+					background 200ms;
+			}
+			.avatar-upload.has-image {
+				border-style: solid;
+				border-color: var(--border);
+			}
+			.avatar-upload:hover {
+				border-color: var(--primary);
+			}
+			.avatar-placeholder {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: linear-gradient(135deg, oklch(0.36 0.06 55), oklch(0.28 0.05 60));
+				border-radius: inherit;
+				color: oklch(0.78 0.06 60);
+			}
+			.avatar-placeholder svg {
+				width: 32px;
+				height: 32px;
+			}
+			.avatar-overlay {
+				position: absolute;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.12 0.02 150) 70%, transparent);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 0;
+				transition: opacity 160ms;
+				border-radius: inherit;
+			}
+			.avatar-upload:hover .avatar-overlay {
+				opacity: 1;
+			}
+			.avatar-overlay svg {
+				width: 22px;
+				height: 22px;
+				color: var(--foreground);
+			}
+
+			.identity-fields {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				flex: 1;
+				max-width: 360px;
+			}
+			.identity-fields .gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* ── Language select with flag ──────────────── */
+			.lang-field {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				width: 200px;
+			}
+			.lang-select-wrapper {
+				position: relative;
+				display: flex;
+				align-items: center;
+			}
+			.lang-flag {
+				position: absolute;
+				left: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				font-size: 16px;
+				line-height: 1;
+				pointer-events: none;
+			}
+			.lang-select-wrapper select.gk-input {
+				padding-left: 34px;
+				appearance: auto;
+			}
+
+			/* ── Main split ──────────────────────────────── */
+			.main-split {
+				display: grid;
+				grid-template-columns: 1fr 340px;
+				flex: 1;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ── Event panel (left/main) ────────────────── */
+			.event-panel {
+				overflow-y: auto;
+				padding: var(--space-10) var(--space-12) var(--space-12);
+			}
+
+			.tier-section {
+				margin-bottom: var(--space-8);
+			}
+			.tier-section:last-child {
+				margin-bottom: 0;
+			}
+
+			.tier-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				width: 100%;
+				padding: var(--space-3) var(--space-4);
+				border: none;
+				background: transparent;
+				cursor: pointer;
+				transition: background 160ms;
+				font-family: inherit;
+				color: inherit;
+				text-align: left;
+				border-radius: var(--radius-md);
+			}
+			.tier-header:hover {
+				background: color-mix(in oklch, var(--foreground) 3%, transparent);
+			}
+			.tier-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				transition: transform 160ms ease;
+				flex-shrink: 0;
+			}
+			.tier-section.is-open .tier-chevron {
+				transform: rotate(90deg);
+			}
+			.tier-marker {
+				width: 9px;
+				height: 9px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tier-marker.critical {
+				background: var(--status-danger);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--status-danger) 50%, transparent);
+			}
+			.tier-marker.important {
+				background: var(--status-warning);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--status-warning) 40%, transparent);
+			}
+			.tier-marker.normal {
+				background: var(--foreground-muted);
+			}
+			.tier-label {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground);
+			}
+			.tier-section.has-missing.tier-critical .tier-label,
+			.tier-section.has-missing.tier-critical .tier-progress {
+				color: var(--status-danger);
+			}
+			.tier-section.has-missing.tier-important .tier-label,
+			.tier-section.has-missing.tier-important .tier-progress {
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
+			}
+
+			.tier-progress {
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+			.tier-progress strong {
+				font-weight: var(--weight-semibold);
+				color: inherit;
+			}
+			.tier-section:not(.has-missing) .tier-progress strong {
+				color: var(--foreground);
+			}
+
+			.tier-events {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+				gap: var(--space-3);
+				padding: var(--space-3) 0 0;
+			}
+			.tier-section:not(.is-open) .tier-events {
+				display: none;
+			}
+
+			/* ── Event card ──────────────────────────────── */
+			.event-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: var(--space-4) var(--space-5);
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				transition:
+					border-color 200ms,
+					background 200ms,
+					box-shadow 200ms;
+			}
+			.event-card:hover {
+				border-color: var(--border-strong);
+			}
+			.event-card.drop-target {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 6%, var(--surface));
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 15%, transparent);
+			}
+			/* state-tinted card per requirement: critical empty = red, important empty = orange */
+			.event-card.is-critical-empty {
+				border-color: color-mix(in oklch, var(--status-danger) 45%, var(--border));
+				background: color-mix(in oklch, var(--status-danger) 5%, var(--surface));
+			}
+			.event-card.is-important-empty {
+				border-color: color-mix(in oklch, var(--status-warning) 40%, var(--border));
+				background: color-mix(in oklch, var(--status-warning) 4%, var(--surface));
+			}
+
+			.event-card-header {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: var(--space-4);
+				margin-bottom: var(--space-2);
+			}
+			.event-name-row {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex-wrap: wrap;
+			}
+			.event-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+			}
+			.event-id {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				padding: 2px 6px;
+				border-radius: var(--radius-xs);
+				white-space: nowrap;
+			}
+			.event-count {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+			.event-count.is-multi {
+				color: var(--status-success);
+			}
+			.event-description {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+				margin-bottom: var(--space-4);
+			}
+
+			.event-sounds-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+			}
+
+			/* ── Assigned sound chip (D-style with primary play btn) ── */
+			.sound-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+				background: color-mix(in oklch, var(--primary) 10%, var(--surface-2));
+				border: 1px solid color-mix(in oklch, var(--primary) 22%, var(--border));
+				border-radius: var(--radius-sm);
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				transition:
+					background 120ms,
+					border-color 120ms;
+				min-height: 36px;
+			}
+			.sound-chip:hover {
+				background: color-mix(in oklch, var(--primary) 16%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--primary) 36%, var(--border));
+			}
+			.chip-play {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				background: var(--primary);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				border: none;
+				transition: background 120ms;
+			}
+			.chip-play:hover {
+				background: color-mix(in oklch, var(--primary) 80%, white 20%);
+			}
+			.chip-play svg {
+				width: 10px;
+				height: 10px;
+				color: var(--primary-fg);
+			}
+			.chip-play.is-playing svg {
+				width: 9px;
+				height: 9px;
+			}
+			.waveform {
+				display: flex;
+				align-items: center;
+				gap: 1px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+			.waveform .bar {
+				width: 2px;
+				border-radius: 1px;
+				background: var(--primary);
+				opacity: 0.55;
+			}
+			.sound-chip:hover .waveform .bar {
+				opacity: 0.85;
+			}
+			.sound-chip.is-playing .waveform .bar {
+				animation: wave-bounce 900ms ease-in-out infinite;
+				opacity: 1;
+			}
+			@keyframes wave-bounce {
+				0%,
+				100% {
+					transform: scaleY(0.6);
+				}
+				50% {
+					transform: scaleY(1.2);
+				}
+			}
+			.chip-name {
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+				flex: 1;
+			}
+			.chip-duration {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.chip-remove {
+				width: 18px;
+				height: 18px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--radius-xs);
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				background: transparent;
+				border: none;
+				transition:
+					color 120ms,
+					background 120ms;
+			}
+			.chip-remove:hover {
+				color: var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.chip-remove svg {
+				width: 12px;
+				height: 12px;
+			}
+
+			/* ── Drop zone (per event) ───────────────────── */
+			.drop-zone {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--space-3);
+				padding: var(--space-3) var(--space-4);
+				border: 1px dashed var(--border);
+				border-radius: var(--radius-sm);
+				color: var(--foreground-subtle);
+				font-size: var(--text-sm);
+				cursor: pointer;
+				transition:
+					border-color 200ms,
+					background 200ms,
+					color 200ms;
+				min-height: 32px;
+			}
+			.drop-zone:hover {
+				border-color: var(--border-strong);
+				color: var(--foreground-muted);
+				background: color-mix(in oklch, var(--foreground) 2%, transparent);
+			}
+			.drop-zone svg {
+				width: 13px;
+				height: 13px;
+				flex-shrink: 0;
+			}
+			.event-card.is-critical-empty .drop-zone {
+				border-color: color-mix(in oklch, var(--status-danger) 40%, var(--border));
+				color: color-mix(in oklch, var(--status-danger) 70%, var(--foreground-subtle));
+			}
+			.event-card.is-important-empty .drop-zone {
+				border-color: color-mix(in oklch, var(--status-warning) 40%, var(--border));
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground-subtle));
+			}
+			.drop-zone.is-secondary {
+				min-height: 26px;
+				padding: var(--space-2) var(--space-3);
+				font-size: var(--text-xs);
+				border-style: dashed;
+			}
+
+			/* ── Sound pool sidebar (right) ──────────────── */
+			.sound-sidebar {
+				display: flex;
+				flex-direction: column;
+				border-left: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 90%, var(--background));
+				overflow: hidden;
+				min-height: 0;
+			}
+			.sidebar-header {
+				padding: var(--space-6) var(--space-6) var(--space-4);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+			.sidebar-title-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: var(--space-4);
+			}
+			.sidebar-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+			}
+			.sidebar-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+
+			/* Big drop / import zone (A-style) */
+			.pool-drop-zone {
+				margin: var(--space-5) var(--space-6) var(--space-3);
+				padding: var(--space-8) var(--space-6);
+				border: 1.5px dashed var(--border-strong);
+				border-radius: var(--radius-md);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--space-2);
+				cursor: pointer;
+				transition:
+					border-color 160ms,
+					background 160ms;
+				flex-shrink: 0;
+				text-align: center;
+			}
+			.pool-drop-zone:hover {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 5%, transparent);
+			}
+			.pool-drop-zone svg {
+				width: 26px;
+				height: 26px;
+				color: var(--foreground-subtle);
+			}
+			.pool-drop-zone:hover svg {
+				color: var(--primary);
+			}
+			.pool-drop-zone .drop-label {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				font-weight: var(--weight-medium);
+			}
+			.pool-drop-zone .drop-hint {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+
+			.sidebar-search {
+				position: relative;
+				margin: 0 var(--space-6) var(--space-4);
+				flex-shrink: 0;
+			}
+			.sidebar-search svg {
+				position: absolute;
+				left: 9px;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 13px;
+				height: 13px;
+				color: var(--foreground-subtle);
+				pointer-events: none;
+			}
+			.sidebar-search .gk-input {
+				padding-left: 30px;
+			}
+
+			.sound-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-2) var(--space-3);
+			}
+
+			.sound-item {
+				display: grid;
+				grid-template-columns: 12px 1fr auto auto;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-3);
+				border-radius: var(--radius-sm);
+				cursor: grab;
+				transition: background 120ms;
+				min-height: 38px;
+			}
+			.sound-item:hover {
+				background: var(--surface-2);
+			}
+			.sound-item:active {
+				cursor: grabbing;
+			}
+			.sound-item .drag-handle {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				opacity: 0.45;
+				transition: opacity 120ms;
+			}
+			.sound-item:hover .drag-handle {
+				opacity: 1;
+			}
+			.sound-item .drag-handle .dot-row {
+				display: flex;
+				gap: 2px;
+			}
+			.sound-item .drag-handle .dot {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: currentColor;
+			}
+			.sound-info {
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+			.sound-filename {
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.sound-meta {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+			.sound-duration {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+			}
+			.sound-assigned-to {
+				font-size: 10px;
+				color: var(--status-success);
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				white-space: nowrap;
+			}
+			.sound-assigned-to .dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--status-success);
+			}
+			.sound-assigned-to.is-multi {
+				color: var(--primary);
+			}
+			.sound-assigned-to.is-multi .dot {
+				background: var(--primary);
+			}
+
+			.sound-play-btn {
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				background: transparent;
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				color: var(--foreground-muted);
+				transition:
+					background 120ms,
+					border-color 120ms,
+					color 120ms;
+			}
+			.sound-play-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.sound-play-btn svg {
+				width: 11px;
+				height: 11px;
+			}
+			.sound-item.is-playing .sound-play-btn {
+				background: var(--primary);
+				border-color: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 25%, transparent);
+			}
+
+			/* sidebar footer with clear all (close to list) */
+			.sidebar-footer {
+				display: flex;
+				justify-content: flex-end;
+				padding: var(--space-3) var(--space-6);
+				border-top: 1px solid var(--border);
+				flex-shrink: 0;
+				background: color-mix(in oklch, var(--surface) 70%, var(--background));
+			}
+
+			/* ── Validation footer ───────────────────────── */
+			.validation-footer {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-4) var(--space-12);
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+			.validation-msg {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+			}
+			.validation-msg svg {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+			.validation-msg.is-warning {
+				color: var(--status-warning);
+			}
+			.validation-msg.is-danger {
+				color: var(--status-danger);
+			}
+			.validation-msg.is-success {
+				color: var(--status-success);
+			}
+			.validation-progress {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+			.progress-bar {
+				width: 140px;
+				height: 6px;
+				background: var(--surface-2);
+				border-radius: 3px;
+				overflow: hidden;
+				border: 1px solid var(--border);
+			}
+			.progress-bar-fill {
+				height: 100%;
+				border-radius: 3px;
+				transition: width 300ms var(--ease-out);
+			}
+			.progress-label {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+			.progress-label strong {
+				color: var(--foreground);
+				font-weight: var(--weight-semibold);
+			}
+			.footer-actions {
+				margin-left: auto;
+				display: flex;
+				gap: var(--space-3);
+				align-items: center;
+				position: relative;
+			}
+
+			/* ── Tooltip on disabled save (static demo) ─── */
+			.save-tooltip-host {
+				position: relative;
+			}
+			.save-tooltip {
+				position: absolute;
+				bottom: calc(100% + 8px);
+				right: 0;
+				background: oklch(0.12 0.02 150);
+				color: var(--foreground);
+				font-size: 11.5px;
+				font-weight: var(--weight-medium);
+				padding: var(--space-2) var(--space-4);
+				border-radius: var(--radius-sm);
+				border: 1px solid var(--border-strong);
+				white-space: nowrap;
+				box-shadow: var(--shadow-md);
+				pointer-events: none;
+				z-index: 10;
+			}
+			.save-tooltip::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				right: 22px;
+				width: 8px;
+				height: 8px;
+				background: oklch(0.12 0.02 150);
+				border-right: 1px solid var(--border-strong);
+				border-bottom: 1px solid var(--border-strong);
+				transform: translateY(-50%) rotate(45deg);
+			}
+
+			/* ── Confirmation dialog (clear all sounds) ── */
+			.dialog-backdrop {
+				position: fixed;
+				inset: 0;
+				background: color-mix(in oklch, var(--background) 75%, transparent);
+				backdrop-filter: blur(2px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 50;
+			}
+			.dialog {
+				width: 420px;
+				max-width: 92vw;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-lg);
+				overflow: hidden;
+			}
+			.dialog-body {
+				padding: var(--space-8) var(--space-8) var(--space-6);
+				display: flex;
+				gap: var(--space-5);
+			}
+			.dialog-icon {
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				flex-shrink: 0;
+			}
+			.dialog-icon svg {
+				width: 18px;
+				height: 18px;
+			}
+			.dialog-text h3 {
+				margin: 0 0 var(--space-2);
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+			}
+			.dialog-text p {
+				margin: 0;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
+			.dialog-footer {
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--space-3);
+				padding: var(--space-4) var(--space-8);
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 70%, var(--background));
+			}
+			.gk-btn-destructive {
+				background: var(--status-danger);
+				color: oklch(0.99 0.005 150);
+				border-color: var(--status-danger);
+			}
+			.gk-btn-destructive:hover {
+				background: color-mix(in oklch, var(--status-danger) 88%, black 12%);
+			}
+
+			/* ── Responsive shrinks ──────────────────────── */
+			@media (max-width: 1100px) {
+				.main-split {
+					grid-template-columns: 1fr 300px;
+				}
+			}
+			@media (max-width: 900px) {
+				.main-split {
+					grid-template-columns: 1fr;
+				}
+				.sound-sidebar {
+					border-left: none;
+					border-top: 1px solid var(--border);
+					max-height: 300px;
+				}
+				.app-shell {
+					grid-template-columns: 0 1fr;
+				}
+				.app-sidebar {
+					display: none;
+				}
+			}
+
+			/* ── Custom scrollbar ─────────────────────────── */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<!-- Refined eyebrow tag -->
+			<span class="refined-tag gk-eyebrow">REFINED — Variant D + grid event layout, borderless tiers, numeric-only progress</span>
+
+			<div class="app-shell">
+				<!-- Parent app sidebar (reduced opacity per brief Container Context) -->
+				<aside class="app-sidebar" aria-hidden="true">
+					<span class="nav-icon active" title="Workspaces">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
+						</svg>
+					</span>
+					<span class="nav-icon" title="Sessions">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" /></svg>
+					</span>
+					<span class="nav-icon" title="Settings">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+					</span>
+				</aside>
+
+				<!-- Page content -->
+				<div class="page-wrapper">
+					<!-- ── Top header (Variant D style) ── -->
+					<header class="page-header">
+						<a class="back-link" href="#">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+							Back to Settings
+						</a>
+						<span class="header-divider"></span>
+						<div class="header-title">
+							<span class="gk-h2">Edit Character</span>
+						</div>
+						<div class="header-actions">
+							<!-- Critical-unfilled badge (per refinement requirement) -->
+							<span class="gk-badge gk-badge-danger">
+								<span class="gk-badge-dot"></span>
+								1 critical slot empty
+							</span>
+							<button class="gk-btn gk-btn-ghost">Cancel</button>
+							<button class="gk-btn gk-btn-primary" disabled>
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
+								Save Character
+							</button>
+						</div>
+					</header>
+
+					<!-- ── Identity strip (avatar + name + language with flag) ── -->
+					<div class="identity-strip">
+						<div class="avatar-upload has-image">
+							<div class="avatar-placeholder">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+									<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+									<path d="M12 6a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" />
+									<path d="M5.4 18.6a8 8 0 0 1 13.2 0" />
+								</svg>
+							</div>
+							<div class="avatar-overlay">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+									<polyline points="17 8 12 3 7 8" />
+									<line x1="12" y1="3" x2="12" y2="15" />
+								</svg>
+							</div>
+						</div>
+
+						<div class="identity-fields">
+							<label class="gk-eyebrow" for="character-name">Character Name</label>
+							<input id="character-name" class="gk-input" type="text" value="Night Watch Guard" placeholder="e.g. Footman, Orc Peon" />
+						</div>
+
+						<div class="lang-field">
+							<label class="gk-eyebrow" for="character-language">Voice Language</label>
+							<div class="lang-select-wrapper">
+								<span class="lang-flag" aria-hidden="true">🇺🇸</span>
+								<select id="character-language" class="gk-input">
+									<option>🇨🇿 Czech</option>
+									<option selected>🇺🇸 English</option>
+									<option>🇪🇸 Spanish</option>
+									<option>🇩🇪 German</option>
+									<option>🇫🇷 French</option>
+									<option>— None</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- ── Main split: events (left) + sound pool (right) ── -->
+					<div class="main-split">
+						<!-- ── Event panel (collapsible tiers, state-tinted cards) ── -->
+						<main class="event-panel">
+							<!-- ══ CRITICAL TIER (has missing → red headers + tinted bg) ══ -->
+							<section class="tier-section tier-critical has-missing is-open">
+								<button class="tier-header" type="button" aria-expanded="true">
+									<svg class="tier-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+									<span class="tier-marker critical"></span>
+									<span class="tier-label">Critical Events</span>
+									<span class="tier-progress"><strong>1</strong> / 2 assigned · 1 missing</span>
+								</button>
+								<div class="tier-events">
+									<!-- session.needs-input — ASSIGNED with TWO sounds (multi-sound demo) -->
+									<div class="event-card">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Needs Input</span>
+												<code class="event-id">session.needs-input</code>
+											</div>
+											<span class="event-count is-multi">2 sounds</span>
+										</div>
+										<div class="event-description">Agent is blocked and requires your response to continue.</div>
+										<div class="event-sounds-list">
+											<div class="sound-chip">
+												<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+												<span class="waveform">
+													<span class="bar" style="height: 4px"></span><span class="bar" style="height: 9px"></span><span class="bar" style="height: 6px"></span><span class="bar" style="height: 12px"></span><span class="bar" style="height: 8px"></span><span class="bar" style="height: 5px"></span><span class="bar" style="height: 10px"></span><span class="bar" style="height: 3px"></span>
+												</span>
+												<span class="chip-name">alert_horn.wav</span>
+												<span class="chip-duration">1.4s</span>
+												<button class="chip-remove" aria-label="Remove sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+											</div>
+											<div class="sound-chip">
+												<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+												<span class="waveform">
+													<span class="bar" style="height: 5px"></span><span class="bar" style="height: 7px"></span><span class="bar" style="height: 11px"></span><span class="bar" style="height: 6px"></span><span class="bar" style="height: 9px"></span><span class="bar" style="height: 4px"></span>
+												</span>
+												<span class="chip-name">guard_attention.wav</span>
+												<span class="chip-duration">0.9s</span>
+												<button class="chip-remove" aria-label="Remove sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+											</div>
+											<div class="drop-zone is-secondary">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+												Drop another sound (random rotation)
+											</div>
+										</div>
+									</div>
+
+									<!-- session.end — EMPTY (red-tinted card) -->
+									<div class="event-card is-critical-empty">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Session End</span>
+												<code class="event-id">session.end</code>
+											</div>
+											<span class="event-count">0 sounds · required</span>
+										</div>
+										<div class="event-description">A coding session has finished execution.</div>
+										<div class="event-sounds-list">
+											<div class="drop-zone">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+												Drop a sound here — required
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+
+							<!-- ══ IMPORTANT TIER (has missing → orange tint) ══ -->
+							<section class="tier-section tier-important has-missing is-open">
+								<button class="tier-header" type="button" aria-expanded="true">
+									<svg class="tier-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+									<span class="tier-marker important"></span>
+									<span class="tier-label">Important Events</span>
+									<span class="tier-progress"><strong>4</strong> / 6 assigned · 2 missing</span>
+								</button>
+								<div class="tier-events">
+									<!-- session.error — assigned (1 sound) -->
+									<div class="event-card">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Session Error</span>
+												<code class="event-id">session.error</code>
+											</div>
+											<span class="event-count is-multi">1 sound</span>
+										</div>
+										<div class="event-description">Unrecoverable error crashed the session.</div>
+										<div class="event-sounds-list">
+											<div class="sound-chip">
+												<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+												<span class="waveform"><span class="bar" style="height: 6px"></span><span class="bar" style="height: 11px"></span><span class="bar" style="height: 8px"></span><span class="bar" style="height: 4px"></span><span class="bar" style="height: 9px"></span><span class="bar" style="height: 7px"></span></span>
+												<span class="chip-name">error_clank.ogg</span>
+												<span class="chip-duration">0.8s</span>
+												<button class="chip-remove" aria-label="Remove sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+											</div>
+											<div class="drop-zone is-secondary">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+												Drop another sound (random rotation)
+											</div>
+										</div>
+									</div>
+
+									<!-- task.error — EMPTY (orange-tinted) -->
+									<div class="event-card is-important-empty">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Task Error</span>
+												<code class="event-id">task.error</code>
+											</div>
+											<span class="event-count">0 sounds</span>
+										</div>
+										<div class="event-description">A subtask within the session failed.</div>
+										<div class="event-sounds-list">
+											<div class="drop-zone">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+												Drop a sound here
+											</div>
+										</div>
+									</div>
+
+									<!-- merge.conflict — assigned, drop-target preview state -->
+									<div class="event-card drop-target">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Merge Conflict</span>
+												<code class="event-id">merge.conflict</code>
+											</div>
+											<span class="event-count is-multi">1 sound</span>
+										</div>
+										<div class="event-description">Git merge conflict detected on branch.</div>
+										<div class="event-sounds-list">
+											<div class="sound-chip">
+												<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+												<span class="waveform"><span class="bar" style="height: 5px"></span><span class="bar" style="height: 8px"></span><span class="bar" style="height: 11px"></span><span class="bar" style="height: 6px"></span><span class="bar" style="height: 9px"></span></span>
+												<span class="chip-name">clash_steel.wav</span>
+												<span class="chip-duration">1.1s</span>
+												<button class="chip-remove" aria-label="Remove sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+											</div>
+											<div class="drop-zone is-secondary" style="border-color: var(--primary); color: var(--primary);">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+												Release to add second sound
+											</div>
+										</div>
+									</div>
+
+									<!-- resource.limit — EMPTY (orange-tinted) -->
+									<div class="event-card is-important-empty">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Resource Limit</span>
+												<code class="event-id">resource.limit</code>
+											</div>
+											<span class="event-count">0 sounds</span>
+										</div>
+										<div class="event-description">Token or cost threshold exceeded.</div>
+										<div class="event-sounds-list">
+											<div class="drop-zone">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+												Drop a sound here
+											</div>
+										</div>
+									</div>
+
+									<!-- pr.ready — assigned -->
+									<div class="event-card">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">PR Ready</span>
+												<code class="event-id">pr.ready</code>
+											</div>
+											<span class="event-count is-multi">1 sound</span>
+										</div>
+										<div class="event-description">Pull request is ready for review.</div>
+										<div class="event-sounds-list">
+											<div class="sound-chip">
+												<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+												<span class="waveform"><span class="bar" style="height: 3px"></span><span class="bar" style="height: 7px"></span><span class="bar" style="height: 12px"></span><span class="bar" style="height: 8px"></span><span class="bar" style="height: 5px"></span></span>
+												<span class="chip-name">chime_bright.wav</span>
+												<span class="chip-duration">1.1s</span>
+												<button class="chip-remove" aria-label="Remove sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+											</div>
+											<div class="drop-zone is-secondary">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+												Drop another sound (random rotation)
+											</div>
+										</div>
+									</div>
+
+									<!-- pr.review-requested — assigned (currently playing chip) -->
+									<div class="event-card">
+										<div class="event-card-header">
+											<div class="event-name-row">
+												<span class="event-name">Review Requested</span>
+												<code class="event-id">pr.review-requested</code>
+											</div>
+											<span class="event-count is-multi">1 sound</span>
+										</div>
+										<div class="event-description">Someone requested your review on a PR.</div>
+										<div class="event-sounds-list">
+											<div class="sound-chip is-playing">
+												<button class="chip-play is-playing"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg></button>
+												<span class="waveform"><span class="bar" style="height: 5px"></span><span class="bar" style="height: 8px"></span><span class="bar" style="height: 11px"></span><span class="bar" style="height: 6px"></span><span class="bar" style="height: 9px"></span><span class="bar" style="height: 4px"></span></span>
+												<span class="chip-name">knock_double.mp3</span>
+												<span class="chip-duration">0.6s</span>
+												<button class="chip-remove" aria-label="Remove sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+											</div>
+											<div class="drop-zone is-secondary">
+												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+												Drop another sound (random rotation)
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+
+							<!-- ══ NORMAL TIER (collapsed by default to save vertical space) ══ -->
+							<section class="tier-section tier-normal">
+								<button class="tier-header" type="button" aria-expanded="false">
+									<svg class="tier-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+									<span class="tier-marker normal"></span>
+									<span class="tier-label">Normal Events</span>
+									<span class="tier-progress"><strong>2</strong> / 7 assigned</span>
+								</button>
+								<div class="tier-events">
+									<!-- collapsed — content hidden by .tier-section:not(.is-open) -->
+								</div>
+							</section>
+						</main>
+
+						<!-- ── Sound pool sidebar (RIGHT side; A-style structure, D-style visuals) ── -->
+						<aside class="sound-sidebar">
+							<div class="sidebar-header">
+								<div class="sidebar-title-row">
+									<span class="sidebar-title">Sound Pool</span>
+									<span class="sidebar-count"><strong style="color: var(--foreground);">12</strong> files</span>
+								</div>
+							</div>
+
+							<!-- Big drop / import zone (A-style) -->
+							<div class="pool-drop-zone">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+								</svg>
+								<span class="drop-label">Drop files or click to import</span>
+								<span class="drop-hint">WAV, MP3, OGG · folder import supported</span>
+							</div>
+
+							<!-- Search -->
+							<div class="sidebar-search">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+								<input class="gk-input" type="text" placeholder="Filter sounds…" />
+							</div>
+
+							<!-- Sound list -->
+							<div class="sound-list">
+								<!-- Assigned to multiple events -->
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">alert_horn.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">1.4s</span>
+											<span class="sound-assigned-to"><span class="dot"></span>needs-input</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">guard_attention.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">0.9s</span>
+											<span class="sound-assigned-to"><span class="dot"></span>needs-input</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">error_clank.ogg</span>
+										<div class="sound-meta">
+											<span class="sound-duration">0.8s</span>
+											<span class="sound-assigned-to"><span class="dot"></span>session.error</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">clash_steel.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">1.1s</span>
+											<span class="sound-assigned-to"><span class="dot"></span>merge.conflict</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">chime_bright.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">1.1s</span>
+											<span class="sound-assigned-to"><span class="dot"></span>pr.ready</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<!-- Currently playing -->
+								<div class="sound-item is-playing">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">knock_double.mp3</span>
+										<div class="sound-meta">
+											<span class="sound-duration">0.6s</span>
+											<span class="sound-assigned-to"><span class="dot"></span>review-requested</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg></button>
+								</div>
+
+								<!-- Unassigned items -->
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">boot_sequence.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">2.1s</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">ding_soft.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">0.5s</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">rumble_low.ogg</span>
+										<div class="sound-meta">
+											<span class="sound-duration">1.8s</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">bell_cascade.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">3.2s</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">trumpet_short.mp3</span>
+										<div class="sound-meta">
+											<span class="sound-duration">1.2s</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="sound-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="sound-info">
+										<span class="sound-filename">whoosh_quick.wav</span>
+										<div class="sound-meta">
+											<span class="sound-duration">0.4s</span>
+										</div>
+									</div>
+									<button class="sound-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+							</div>
+
+							<!-- Clear All near the list (per refinement) -->
+							<div class="sidebar-footer">
+								<button class="gk-btn gk-btn-danger gk-btn-sm">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+									</svg>
+									Clear All Sounds
+								</button>
+							</div>
+						</aside>
+					</div>
+
+					<!-- ── Validation footer (A-style icon save + D-style progress) ── -->
+					<footer class="validation-footer">
+						<div class="validation-msg is-danger">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+							1 critical event still needs a sound
+						</div>
+						<div class="validation-progress">
+							<div class="progress-bar">
+								<div class="progress-bar-fill" style="width: 47%; background: linear-gradient(90deg, var(--moss-400), var(--status-warning));"></div>
+							</div>
+							<span class="progress-label"><strong>7</strong> / 15 events</span>
+						</div>
+
+						<div class="footer-actions">
+							<button class="gk-btn gk-btn-ghost">Cancel</button>
+							<div class="save-tooltip-host">
+								<!-- Static tooltip shown to demonstrate disabled-save guidance -->
+								<div class="save-tooltip">Assign a sound to <code style="font-family: var(--font-mono); font-size: 11px;">session.end</code> to enable save</div>
+								<button class="gk-btn gk-btn-primary" disabled>
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
+									Save Character
+								</button>
+							</div>
+						</div>
+					</footer>
+				</div>
+			</div>
+
+			<!-- ── Confirmation dialog overlay (Clear All — destructive) ──
+			     Hidden by default; uncomment to preview the confirmation state. -->
+			<!--
+			<div class="dialog-backdrop">
+				<div class="dialog" role="alertdialog" aria-labelledby="dialog-title" aria-describedby="dialog-desc">
+					<div class="dialog-body">
+						<div class="dialog-icon">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+						</div>
+						<div class="dialog-text">
+							<h3 id="dialog-title">Clear all sounds?</h3>
+							<p id="dialog-desc">This removes all 12 imported sounds from the pool and detaches them from every event slot. This action cannot be undone.</p>
+						</div>
+					</div>
+					<div class="dialog-footer">
+						<button class="gk-btn gk-btn-ghost">Cancel</button>
+						<button class="gk-btn gk-btn-destructive">Clear All</button>
+					</div>
+				</div>
+			</div>
+			-->
+		</div>
+	</body>
+</html>
