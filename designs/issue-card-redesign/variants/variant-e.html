@@ -1,292 +1,332 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Issue Card — Variant E: Left Accent Bar + Frosted Glass</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Issue Card — Variant E: Left Accent Bar + Frosted Glass</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
    TOKENS — inlined from tokens.css
    ============================================================ */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
+			:root {
+				--moss-50: oklch(0.972 0.018 130);
+				--moss-100: oklch(0.94 0.034 130);
+				--moss-200: oklch(0.88 0.058 130);
+				--moss-300: oklch(0.795 0.082 130);
+				--moss-400: oklch(0.69 0.098 132);
+				--moss-500: oklch(0.58 0.096 134);
+				--moss-600: oklch(0.48 0.082 138);
+				--moss-700: oklch(0.395 0.066 142);
+				--moss-800: oklch(0.3 0.048 145);
+				--moss-900: oklch(0.215 0.032 148);
+				--moss-950: oklch(0.155 0.024 150);
 
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+				--amber-300: oklch(0.84 0.13 78);
+				--amber-400: oklch(0.77 0.15 65);
+				--amber-500: oklch(0.69 0.165 55);
+				--amber-600: oklch(0.595 0.16 48);
 
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+				--bark-300: oklch(0.7 0.06 60);
+				--bark-500: oklch(0.5 0.075 55);
+				--bark-700: oklch(0.345 0.055 50);
 
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+				--azure-300: oklch(0.75 0.09 230);
+				--azure-400: oklch(0.66 0.12 230);
+				--azure-500: oklch(0.57 0.13 235);
+				--azure-600: oklch(0.49 0.115 240);
+				--azure-700: oklch(0.4 0.095 240);
 
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
+				--plum-300: oklch(0.72 0.1 320);
+				--plum-400: oklch(0.64 0.13 320);
+				--plum-500: oklch(0.56 0.15 320);
+				--plum-600: oklch(0.48 0.13 320);
+				--plum-700: oklch(0.4 0.11 320);
 
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
+				--teal-300: oklch(0.78 0.075 195);
+				--teal-400: oklch(0.7 0.095 195);
+				--teal-500: oklch(0.62 0.11 195);
+				--teal-600: oklch(0.54 0.095 195);
+				--teal-700: oklch(0.46 0.08 195);
 
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
+				--rose-300: oklch(0.8 0.105 15);
+				--rose-400: oklch(0.72 0.135 15);
+				--rose-500: oklch(0.64 0.155 15);
+				--rose-600: oklch(0.56 0.135 15);
+				--rose-700: oklch(0.48 0.115 15);
 
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
+				--coral-300: oklch(0.78 0.105 30);
+				--coral-400: oklch(0.7 0.135 30);
+				--coral-500: oklch(0.62 0.155 30);
+				--coral-600: oklch(0.54 0.135 30);
+				--coral-700: oklch(0.46 0.115 30);
 
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
+				--gold-300: oklch(0.81 0.09 90);
+				--gold-400: oklch(0.73 0.115 90);
+				--gold-500: oklch(0.65 0.135 90);
+				--gold-600: oklch(0.57 0.115 90);
+				--gold-700: oklch(0.49 0.095 90);
 
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
+				--sage-300: oklch(0.76 0.055 160);
+				--sage-400: oklch(0.68 0.07 160);
+				--sage-500: oklch(0.6 0.085 160);
+				--sage-600: oklch(0.52 0.07 160);
+				--sage-700: oklch(0.44 0.06 160);
 
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
+				--indigo-300: oklch(0.7 0.095 275);
+				--indigo-400: oklch(0.62 0.12 275);
+				--indigo-500: oklch(0.54 0.14 275);
+				--indigo-600: oklch(0.46 0.12 275);
+				--indigo-700: oklch(0.38 0.1 275);
 
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
+				--fuchsia-300: oklch(0.74 0.105 350);
+				--fuchsia-400: oklch(0.66 0.135 350);
+				--fuchsia-500: oklch(0.58 0.155 350);
+				--fuchsia-600: oklch(0.5 0.135 350);
+				--fuchsia-700: oklch(0.42 0.115 350);
 
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
+				--sky-light-top: oklch(0.965 0.018 220);
+				--sky-light-bot: oklch(0.94 0.025 130);
+				--sky-dark-top: oklch(0.225 0.028 240);
+				--sky-dark-bot: oklch(0.18 0.03 150);
 
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
+				--status-success: oklch(0.66 0.135 145);
+				--status-warning: oklch(0.77 0.155 75);
+				--status-danger: oklch(0.62 0.205 25);
+				--status-info: oklch(0.66 0.105 220);
+				--status-merged: oklch(0.58 0.14 310);
 
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
+				--priority-top: oklch(0.62 0.205 25);
+				--priority-high: oklch(0.72 0.16 55);
+				--priority-medium: oklch(0.82 0.16 85);
+				--priority-low: oklch(0.66 0.105 220);
+				--priority-lowest: oklch(0.55 0.02 250);
 
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
+				--gh-open: oklch(0.66 0.135 145);
+				--gh-closed: oklch(0.58 0.14 310);
+				--gh-merged: oklch(0.58 0.14 310);
+				--gh-draft: oklch(0.55 0.02 250);
 
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
+				--session-running: oklch(0.66 0.135 145);
+				--session-errored: oklch(0.62 0.205 25);
+				--session-idle: oklch(0.66 0.105 220);
+				--session-paused: oklch(0.55 0.02 250);
+				--session-finished: oklch(0.45 0.015 250);
+				--session-needs-input: oklch(0.77 0.155 75);
+				--session-needs-review: oklch(0.66 0.105 220);
 
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+				--font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+				--font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
 
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
+				--text-2xs: 10.5px;
+				--text-xs: 11px;
+				--text-sm: 12px;
+				--text-md: 13px;
+				--text-base: 14px;
+				--text-lg: 15px;
+				--text-xl: 17px;
+				--text-2xl: 22px;
+				--text-3xl: 28px;
+				--text-4xl: 36px;
+				--text-5xl: 48px;
 
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
+				--leading-tight: 1.15;
+				--leading-snug: 1.25;
+				--leading-normal: 1.4;
+				--leading-relaxed: 1.55;
+				--leading-loose: 1.7;
 
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
+				--weight-regular: 400;
+				--weight-medium: 500;
+				--weight-semibold: 600;
+				--weight-bold: 700;
 
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
+				--tracking-tight: -0.02em;
+				--tracking-snug: -0.01em;
+				--tracking-normal: 0;
+				--tracking-wide: 0.04em;
+				--tracking-wider: 0.08em;
 
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
+				--space-0: 0;
+				--space-1: 2px;
+				--space-2: 4px;
+				--space-3: 6px;
+				--space-4: 8px;
+				--space-5: 10px;
+				--space-6: 12px;
+				--space-7: 14px;
+				--space-8: 16px;
+				--space-10: 20px;
+				--space-12: 24px;
+				--space-14: 28px;
+				--space-16: 32px;
+				--space-20: 40px;
+				--space-24: 48px;
+				--space-32: 64px;
 
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
+				--radius-none: 0;
+				--radius-xs: 4px;
+				--radius-sm: 6px;
+				--radius-md: 8px;
+				--radius-lg: 10px;
+				--radius-xl: 14px;
+				--radius-2xl: 20px;
+				--radius-full: 9999px;
 
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
+				--border-width-1: 1px;
+				--border-width-2: 1.5px;
+				--border-width-3: 2px;
+				--focus-ring-width: 3px;
+				--focus-ring-offset: 2px;
 
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+				--shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+				--shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+				--shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+				--shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.2), 0 4px 12px rgba(20, 30, 22, 0.08);
+				--shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
+				--size-control-sm: 26px;
+				--size-control-md: 32px;
+				--size-control-lg: 38px;
 
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
+				--z-base: 0;
+				--z-raised: 10;
+				--z-dropdown: 20;
+				--z-sticky: 30;
+				--z-overlay: 40;
+				--z-modal: 50;
+				--z-toast: 60;
+				--z-tooltip: 70;
 
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
+				--duration-1: 90ms;
+				--duration-2: 120ms;
+				--duration-3: 160ms;
+				--duration-4: 220ms;
+				--duration-5: 320ms;
+				--ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
+				--ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);
+				--ease-in: cubic-bezier(0.5, 0, 0.75, 0);
 
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
+				--sidebar-width: 240px;
+				--sidebar-width-collapsed: 56px;
+			}
 
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-/* Base reset */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
+			/* Base reset */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-/* Primitives */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-.gk-badge-mono { font-family: var(--font-mono); font-size: 10.5px; }
-.gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-merged  { background: color-mix(in oklch, var(--status-merged) 14%, transparent); color: var(--status-merged); border-color: color-mix(in oklch, var(--status-merged) 30%, transparent); }
-.gk-badge-subtle  { background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent); color: var(--foreground-subtle); border-color: color-mix(in oklch, var(--foreground-subtle) 20%, transparent); }
+			/* Primitives */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-merged {
+				background: color-mix(in oklch, var(--status-merged) 14%, transparent);
+				color: var(--status-merged);
+				border-color: color-mix(in oklch, var(--status-merged) 30%, transparent);
+			}
+			.gk-badge-subtle {
+				background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
+				color: var(--foreground-subtle);
+				border-color: color-mix(in oklch, var(--foreground-subtle) 20%, transparent);
+			}
 
-.gk-eyebrow {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-/* ============================================================
+			/* ============================================================
    VARIANT E — LEFT ACCENT BAR + FROSTED GLASS
    ============================================================
    Color identity is expressed through a 3px left accent bar
@@ -304,1133 +344,1653 @@
    On selected (batch): primary ring, bar stays accent-colored.
    ============================================================ */
 
-.ic-card {
-  --ic-accent:       oklch(0.690 0.098 132);
-  --ic-accent-dim:   oklch(0.480 0.082 138);
-  --ic-accent-soft:  color-mix(in oklch, var(--ic-accent) 12%, transparent);
-  --ic-accent-glow:  color-mix(in oklch, var(--ic-accent) 18%, transparent);
-  --ic-inner-glow:   color-mix(in oklch, var(--ic-accent) 0%, transparent);
+			.ic-card {
+				--ic-accent: oklch(0.69 0.098 132);
+				--ic-accent-dim: oklch(0.48 0.082 138);
+				--ic-accent-soft: color-mix(in oklch, var(--ic-accent) 12%, transparent);
+				--ic-accent-glow: color-mix(in oklch, var(--ic-accent) 18%, transparent);
+				--ic-inner-glow: color-mix(in oklch, var(--ic-accent) 0%, transparent);
 
-  min-width: 450px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  /* Frosted glass surface: slightly lighter than --surface with transparency */
-  background: color-mix(in oklch, var(--surface) 82%, oklch(1 0 0 / 0.04));
-  backdrop-filter: blur(16px) brightness(1.08);
-  -webkit-backdrop-filter: blur(16px) brightness(1.08);
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 0 0 0px var(--ic-inner-glow);
-  transition:
-    border-color var(--duration-3) var(--ease-out),
-    box-shadow   var(--duration-3) var(--ease-out),
-    background   var(--duration-3) var(--ease-out);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font-sans);
-}
+				min-width: 450px;
+				border-radius: var(--radius-lg);
+				border: 1px solid var(--border);
+				/* Frosted glass surface: slightly lighter than --surface with transparency */
+				background: color-mix(in oklch, var(--surface) 82%, oklch(1 0 0 / 0.04));
+				backdrop-filter: blur(16px) brightness(1.08);
+				-webkit-backdrop-filter: blur(16px) brightness(1.08);
+				box-shadow:
+					var(--shadow-sm),
+					inset 0 0 0 0px var(--ic-inner-glow);
+				transition:
+					border-color var(--duration-3) var(--ease-out),
+					box-shadow var(--duration-3) var(--ease-out),
+					background var(--duration-3) var(--ease-out);
+				cursor: pointer;
+				position: relative;
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				font-family: var(--font-sans);
+			}
 
-/* Left accent bar — the signature element */
-.ic-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--ic-accent);
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-  transition:
-    width var(--duration-4) var(--ease-out),
-    box-shadow var(--duration-4) var(--ease-out);
-  z-index: 1;
-}
+			/* Left accent bar — the signature element */
+			.ic-card::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 3px;
+				background: var(--ic-accent);
+				border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+				transition:
+					width var(--duration-4) var(--ease-out),
+					box-shadow var(--duration-4) var(--ease-out);
+				z-index: 1;
+			}
 
-/* ── HOVER STATE ────────────────────────────────────── */
-.ic-card:hover,
-.ic-card.state-hover {
-  border-color: var(--border-strong);
-  background: color-mix(in oklch, var(--surface) 78%, oklch(1 0 0 / 0.06));
-  box-shadow:
-    var(--shadow-md),
-    inset 3px 0 12px -2px var(--ic-accent-glow);
-}
-.ic-card:hover::before,
-.ic-card.state-hover::before {
-  width: 5px;
-  box-shadow: 2px 0 8px var(--ic-accent-glow);
-}
+			/* ── HOVER STATE ────────────────────────────────────── */
+			.ic-card:hover,
+			.ic-card.state-hover {
+				border-color: var(--border-strong);
+				background: color-mix(in oklch, var(--surface) 78%, oklch(1 0 0 / 0.06));
+				box-shadow:
+					var(--shadow-md),
+					inset 3px 0 12px -2px var(--ic-accent-glow);
+			}
+			.ic-card:hover::before,
+			.ic-card.state-hover::before {
+				width: 5px;
+				box-shadow: 2px 0 8px var(--ic-accent-glow);
+			}
 
-/* ── ACTIVE STATE (detail-selected) ─────────────────── */
-.ic-card:active,
-.ic-card.state-active {
-  border-color: color-mix(in oklch, var(--ic-accent) 55%, var(--border-strong));
-  background: color-mix(in oklch, var(--surface) 74%, oklch(1 0 0 / 0.08));
-  box-shadow:
-    0 0 0 3px var(--ic-accent-soft),
-    var(--shadow-md),
-    inset 4px 0 16px -2px color-mix(in oklch, var(--ic-accent) 22%, transparent);
-}
-.ic-card:active::before,
-.ic-card.state-active::before {
-  width: 5px;
-  box-shadow: 3px 0 12px color-mix(in oklch, var(--ic-accent) 35%, transparent);
-}
+			/* ── ACTIVE STATE (detail-selected) ─────────────────── */
+			.ic-card:active,
+			.ic-card.state-active {
+				border-color: color-mix(in oklch, var(--ic-accent) 55%, var(--border-strong));
+				background: color-mix(in oklch, var(--surface) 74%, oklch(1 0 0 / 0.08));
+				box-shadow:
+					0 0 0 3px var(--ic-accent-soft),
+					var(--shadow-md),
+					inset 4px 0 16px -2px color-mix(in oklch, var(--ic-accent) 22%, transparent);
+			}
+			.ic-card:active::before,
+			.ic-card.state-active::before {
+				width: 5px;
+				box-shadow: 3px 0 12px color-mix(in oklch, var(--ic-accent) 35%, transparent);
+			}
 
-/* ── SELECTED STATE (batch selection) ──────────────── */
-.ic-card.state-selected {
-  border-color: var(--primary);
-  background: color-mix(in oklch, var(--surface) 76%, oklch(1 0 0 / 0.06));
-  box-shadow:
-    0 0 0 3px color-mix(in oklch, var(--primary) 22%, transparent),
-    var(--shadow-md),
-    inset 3px 0 10px -2px var(--ic-accent-glow);
-}
-.ic-card.state-selected::before {
-  width: 5px;
-  box-shadow: 2px 0 8px var(--ic-accent-glow);
-}
+			/* ── SELECTED STATE (batch selection) ──────────────── */
+			.ic-card.state-selected {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--surface) 76%, oklch(1 0 0 / 0.06));
+				box-shadow:
+					0 0 0 3px color-mix(in oklch, var(--primary) 22%, transparent),
+					var(--shadow-md),
+					inset 3px 0 10px -2px var(--ic-accent-glow);
+			}
+			.ic-card.state-selected::before {
+				width: 5px;
+				box-shadow: 2px 0 8px var(--ic-accent-glow);
+			}
 
-/* ── COLOR VARIANTS ─────────────────────────────────── */
-.ic-card[data-color="amber"] {
-  --ic-accent:      oklch(0.770 0.150 65);
-  --ic-accent-dim:  oklch(0.560 0.130 55);
-  --ic-accent-soft: color-mix(in oklch, oklch(0.770 0.150 65) 14%, transparent);
-  --ic-accent-glow: color-mix(in oklch, oklch(0.770 0.150 65) 20%, transparent);
-}
-.ic-card[data-color="plum"] {
-  --ic-accent:      oklch(0.640 0.130 320);
-  --ic-accent-dim:  oklch(0.440 0.110 320);
-  --ic-accent-soft: color-mix(in oklch, oklch(0.640 0.130 320) 14%, transparent);
-  --ic-accent-glow: color-mix(in oklch, oklch(0.640 0.130 320) 20%, transparent);
-}
-.ic-card[data-color="moss"] {
-  --ic-accent:      oklch(0.690 0.098 132);
-  --ic-accent-dim:  oklch(0.480 0.082 138);
-  --ic-accent-soft: color-mix(in oklch, oklch(0.690 0.098 132) 14%, transparent);
-  --ic-accent-glow: color-mix(in oklch, oklch(0.690 0.098 132) 20%, transparent);
-}
-.ic-card[data-color="teal"] {
-  --ic-accent:      oklch(0.700 0.095 195);
-  --ic-accent-dim:  oklch(0.460 0.080 195);
-  --ic-accent-soft: color-mix(in oklch, oklch(0.700 0.095 195) 14%, transparent);
-  --ic-accent-glow: color-mix(in oklch, oklch(0.700 0.095 195) 20%, transparent);
-}
-.ic-card[data-color="coral"] {
-  --ic-accent:      oklch(0.700 0.135 30);
-  --ic-accent-dim:  oklch(0.460 0.115 30);
-  --ic-accent-soft: color-mix(in oklch, oklch(0.700 0.135 30) 14%, transparent);
-  --ic-accent-glow: color-mix(in oklch, oklch(0.700 0.135 30) 20%, transparent);
-}
-.ic-card[data-color="gold"] {
-  --ic-accent:      oklch(0.730 0.115 90);
-  --ic-accent-dim:  oklch(0.530 0.095 90);
-  --ic-accent-soft: color-mix(in oklch, oklch(0.730 0.115 90) 14%, transparent);
-  --ic-accent-glow: color-mix(in oklch, oklch(0.730 0.115 90) 20%, transparent);
-}
+			/* ── COLOR VARIANTS ─────────────────────────────────── */
+			.ic-card[data-color='amber'] {
+				--ic-accent: oklch(0.77 0.15 65);
+				--ic-accent-dim: oklch(0.56 0.13 55);
+				--ic-accent-soft: color-mix(in oklch, oklch(0.77 0.15 65) 14%, transparent);
+				--ic-accent-glow: color-mix(in oklch, oklch(0.77 0.15 65) 20%, transparent);
+			}
+			.ic-card[data-color='plum'] {
+				--ic-accent: oklch(0.64 0.13 320);
+				--ic-accent-dim: oklch(0.44 0.11 320);
+				--ic-accent-soft: color-mix(in oklch, oklch(0.64 0.13 320) 14%, transparent);
+				--ic-accent-glow: color-mix(in oklch, oklch(0.64 0.13 320) 20%, transparent);
+			}
+			.ic-card[data-color='moss'] {
+				--ic-accent: oklch(0.69 0.098 132);
+				--ic-accent-dim: oklch(0.48 0.082 138);
+				--ic-accent-soft: color-mix(in oklch, oklch(0.69 0.098 132) 14%, transparent);
+				--ic-accent-glow: color-mix(in oklch, oklch(0.69 0.098 132) 20%, transparent);
+			}
+			.ic-card[data-color='teal'] {
+				--ic-accent: oklch(0.7 0.095 195);
+				--ic-accent-dim: oklch(0.46 0.08 195);
+				--ic-accent-soft: color-mix(in oklch, oklch(0.7 0.095 195) 14%, transparent);
+				--ic-accent-glow: color-mix(in oklch, oklch(0.7 0.095 195) 20%, transparent);
+			}
+			.ic-card[data-color='coral'] {
+				--ic-accent: oklch(0.7 0.135 30);
+				--ic-accent-dim: oklch(0.46 0.115 30);
+				--ic-accent-soft: color-mix(in oklch, oklch(0.7 0.135 30) 14%, transparent);
+				--ic-accent-glow: color-mix(in oklch, oklch(0.7 0.135 30) 20%, transparent);
+			}
+			.ic-card[data-color='gold'] {
+				--ic-accent: oklch(0.73 0.115 90);
+				--ic-accent-dim: oklch(0.53 0.095 90);
+				--ic-accent-soft: color-mix(in oklch, oklch(0.73 0.115 90) 14%, transparent);
+				--ic-accent-glow: color-mix(in oklch, oklch(0.73 0.115 90) 20%, transparent);
+			}
 
-/* ── HEADER — no color band, clean frosted surface ──── */
-.ic-header {
-  padding: 10px 14px 10px 18px;
-  border-bottom: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
-  transition: border-color var(--duration-3) var(--ease-out);
-  position: relative;
-}
-.ic-card:hover .ic-header,
-.ic-card.state-hover .ic-header {
-  border-bottom-color: var(--border);
-}
-.ic-card.state-active .ic-header {
-  border-bottom-color: color-mix(in oklch, var(--ic-accent) 30%, var(--border));
-}
+			/* ── HEADER — no color band, clean frosted surface ──── */
+			.ic-header {
+				padding: 10px 14px 10px 18px;
+				border-bottom: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+				transition: border-color var(--duration-3) var(--ease-out);
+				position: relative;
+			}
+			.ic-card:hover .ic-header,
+			.ic-card.state-hover .ic-header {
+				border-bottom-color: var(--border);
+			}
+			.ic-card.state-active .ic-header {
+				border-bottom-color: color-mix(in oklch, var(--ic-accent) 30%, var(--border));
+			}
 
-/* Header top row */
-.ic-header-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
+			/* Header top row */
+			.ic-header-top {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 6px;
+			}
 
-.ic-issue-number {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--ic-accent);
-  letter-spacing: 0.01em;
-  flex-shrink: 0;
-}
+			.ic-issue-number {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--ic-accent);
+				letter-spacing: 0.01em;
+				flex-shrink: 0;
+			}
 
-.ic-title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+			.ic-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
 
-/* Header chips row */
-.ic-chips {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-.ic-chips-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+			/* Header chips row */
+			.ic-chips {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				flex-wrap: wrap;
+			}
+			.ic-chips-right {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
 
-/* Session state chip */
-.ic-session-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 8px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 500;
-  border: 1px solid;
-  white-space: nowrap;
-}
-.ic-session-chip.running {
-  background: color-mix(in oklch, var(--session-running) 14%, transparent);
-  color: var(--session-running);
-  border-color: color-mix(in oklch, var(--session-running) 32%, transparent);
-}
-.ic-session-chip.needs-input {
-  background: color-mix(in oklch, var(--session-needs-input) 14%, transparent);
-  color: var(--session-needs-input);
-  border-color: color-mix(in oklch, var(--session-needs-input) 32%, transparent);
-}
-.ic-session-chip.idle {
-  background: color-mix(in oklch, var(--session-idle) 12%, transparent);
-  color: var(--session-idle);
-  border-color: color-mix(in oklch, var(--session-idle) 28%, transparent);
-}
-.ic-session-chip.paused {
-  background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
-  color: var(--foreground-subtle);
-  border-color: color-mix(in oklch, var(--foreground-subtle) 22%, transparent);
-}
-.ic-session-chip.errored {
-  background: color-mix(in oklch, var(--session-errored) 14%, transparent);
-  color: var(--session-errored);
-  border-color: color-mix(in oklch, var(--session-errored) 32%, transparent);
-}
+			/* Session state chip */
+			.ic-session-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 8px;
+				border-radius: var(--radius-full);
+				font-size: 11px;
+				font-weight: 500;
+				border: 1px solid;
+				white-space: nowrap;
+			}
+			.ic-session-chip.running {
+				background: color-mix(in oklch, var(--session-running) 14%, transparent);
+				color: var(--session-running);
+				border-color: color-mix(in oklch, var(--session-running) 32%, transparent);
+			}
+			.ic-session-chip.needs-input {
+				background: color-mix(in oklch, var(--session-needs-input) 14%, transparent);
+				color: var(--session-needs-input);
+				border-color: color-mix(in oklch, var(--session-needs-input) 32%, transparent);
+			}
+			.ic-session-chip.idle {
+				background: color-mix(in oklch, var(--session-idle) 12%, transparent);
+				color: var(--session-idle);
+				border-color: color-mix(in oklch, var(--session-idle) 28%, transparent);
+			}
+			.ic-session-chip.paused {
+				background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
+				color: var(--foreground-subtle);
+				border-color: color-mix(in oklch, var(--foreground-subtle) 22%, transparent);
+			}
+			.ic-session-chip.errored {
+				background: color-mix(in oklch, var(--session-errored) 14%, transparent);
+				color: var(--session-errored);
+				border-color: color-mix(in oklch, var(--session-errored) 32%, transparent);
+			}
 
-/* Pulsing dot */
-.ic-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-.ic-dot.pulse {
-  animation: ic-pulse 1.8s ease-in-out infinite;
-}
-@keyframes ic-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
+			/* Pulsing dot */
+			.ic-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.ic-dot.pulse {
+				animation: ic-pulse 1.8s ease-in-out infinite;
+			}
+			@keyframes ic-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.35;
+				}
+			}
 
-/* Priority chip */
-.ic-priority {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 20px;
-  padding: 0 7px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 500;
-  border: 1px solid;
-  white-space: nowrap;
-}
-.ic-priority.high {
-  color: var(--priority-high);
-  background: color-mix(in oklch, var(--priority-high) 12%, transparent);
-  border-color: color-mix(in oklch, var(--priority-high) 28%, transparent);
-}
-.ic-priority.top {
-  color: var(--priority-top);
-  background: color-mix(in oklch, var(--priority-top) 12%, transparent);
-  border-color: color-mix(in oklch, var(--priority-top) 28%, transparent);
-}
-.ic-priority.low {
-  color: var(--priority-low);
-  background: color-mix(in oklch, var(--priority-low) 12%, transparent);
-  border-color: color-mix(in oklch, var(--priority-low) 28%, transparent);
-}
+			/* Priority chip */
+			.ic-priority {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				height: 20px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 11px;
+				font-weight: 500;
+				border: 1px solid;
+				white-space: nowrap;
+			}
+			.ic-priority.high {
+				color: var(--priority-high);
+				background: color-mix(in oklch, var(--priority-high) 12%, transparent);
+				border-color: color-mix(in oklch, var(--priority-high) 28%, transparent);
+			}
+			.ic-priority.top {
+				color: var(--priority-top);
+				background: color-mix(in oklch, var(--priority-top) 12%, transparent);
+				border-color: color-mix(in oklch, var(--priority-top) 28%, transparent);
+			}
+			.ic-priority.low {
+				color: var(--priority-low);
+				background: color-mix(in oklch, var(--priority-low) 12%, transparent);
+				border-color: color-mix(in oklch, var(--priority-low) 28%, transparent);
+			}
 
-/* Child count badge — tinted with accent */
-.ic-children {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 20px;
-  padding: 0 7px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 500;
-  background: color-mix(in oklch, var(--ic-accent) 10%, var(--surface-2));
-  color: color-mix(in oklch, var(--ic-accent) 75%, var(--foreground-muted));
-  border: 1px solid color-mix(in oklch, var(--ic-accent) 20%, var(--border));
-  transition: background var(--duration-2) var(--ease-standard),
-              border-color var(--duration-2) var(--ease-standard);
-}
-.ic-card:hover .ic-children,
-.ic-card.state-hover .ic-children,
-.ic-card.state-active .ic-children {
-  background: color-mix(in oklch, var(--ic-accent) 16%, var(--surface-2));
-  border-color: color-mix(in oklch, var(--ic-accent) 32%, var(--border));
-}
+			/* Child count badge — tinted with accent */
+			.ic-children {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				height: 20px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 11px;
+				font-weight: 500;
+				background: color-mix(in oklch, var(--ic-accent) 10%, var(--surface-2));
+				color: color-mix(in oklch, var(--ic-accent) 75%, var(--foreground-muted));
+				border: 1px solid color-mix(in oklch, var(--ic-accent) 20%, var(--border));
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard);
+			}
+			.ic-card:hover .ic-children,
+			.ic-card.state-hover .ic-children,
+			.ic-card.state-active .ic-children {
+				background: color-mix(in oklch, var(--ic-accent) 16%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--ic-accent) 32%, var(--border));
+			}
 
-/* Quick-action ghost icon buttons in header */
-.ic-action {
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  border: 1px solid transparent;
-  cursor: pointer;
-  color: var(--foreground-subtle);
-  transition: background var(--duration-2) var(--ease-standard),
-              color var(--duration-2) var(--ease-standard),
-              border-color var(--duration-2) var(--ease-standard);
-}
-.ic-action:hover {
-  background: color-mix(in oklch, var(--ic-accent) 14%, var(--surface-2));
-  color: var(--ic-accent);
-  border-color: color-mix(in oklch, var(--ic-accent) 28%, transparent);
-}
-.ic-action:active { transform: scale(0.93); }
-.ic-action:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
-.ic-action:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
-.ic-action.muted { color: color-mix(in oklch, var(--ic-accent) 50%, var(--foreground-subtle)); }
+			/* Quick-action ghost icon buttons in header */
+			.ic-action {
+				width: 24px;
+				height: 24px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--radius-sm);
+				background: transparent;
+				border: 1px solid transparent;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard);
+			}
+			.ic-action:hover {
+				background: color-mix(in oklch, var(--ic-accent) 14%, var(--surface-2));
+				color: var(--ic-accent);
+				border-color: color-mix(in oklch, var(--ic-accent) 28%, transparent);
+			}
+			.ic-action:active {
+				transform: scale(0.93);
+			}
+			.ic-action:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.ic-action:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.ic-action.muted {
+				color: color-mix(in oklch, var(--ic-accent) 50%, var(--foreground-subtle));
+			}
 
-/* Body area */
-.ic-body {
-  padding: 12px 14px 14px 18px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
+			/* Body area */
+			.ic-body {
+				padding: 12px 14px 14px 18px;
+				display: flex;
+				gap: 12px;
+				align-items: flex-start;
+			}
 
-/* Thumbnail placeholder */
-.ic-thumbnail {
-  width: 100px;
-  height: 100px;
-  flex-shrink: 0;
-  border-radius: var(--radius-md);
-  background: color-mix(in oklch, var(--ic-accent) 6%, var(--surface-2));
-  border: 1px solid color-mix(in oklch, var(--ic-accent) 14%, var(--border));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-  transition: border-color var(--duration-2) var(--ease-standard),
-              background   var(--duration-2) var(--ease-standard);
-}
-.ic-card:hover .ic-thumbnail,
-.ic-card.state-hover .ic-thumbnail,
-.ic-card.state-active .ic-thumbnail {
-  border-color: color-mix(in oklch, var(--ic-accent) 30%, var(--border));
-  background: color-mix(in oklch, var(--ic-accent) 10%, var(--surface-2));
-}
+			/* Thumbnail placeholder */
+			.ic-thumbnail {
+				width: 100px;
+				height: 100px;
+				flex-shrink: 0;
+				border-radius: var(--radius-md);
+				background: color-mix(in oklch, var(--ic-accent) 6%, var(--surface-2));
+				border: 1px solid color-mix(in oklch, var(--ic-accent) 14%, var(--border));
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				position: relative;
+				transition:
+					border-color var(--duration-2) var(--ease-standard),
+					background var(--duration-2) var(--ease-standard);
+			}
+			.ic-card:hover .ic-thumbnail,
+			.ic-card.state-hover .ic-thumbnail,
+			.ic-card.state-active .ic-thumbnail {
+				border-color: color-mix(in oklch, var(--ic-accent) 30%, var(--border));
+				background: color-mix(in oklch, var(--ic-accent) 10%, var(--surface-2));
+			}
 
-.ic-thumb-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  opacity: 0.55;
-}
-.ic-thumb-tree {
-  width: 42px;
-  height: 52px;
-}
+			.ic-thumb-inner {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0;
+				opacity: 0.55;
+			}
+			.ic-thumb-tree {
+				width: 42px;
+				height: 52px;
+			}
 
-/* Right column with info rows */
-.ic-rows {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+			/* Right column with info rows */
+			.ic-rows {
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
 
-/* A single info row */
-.ic-row {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 22px;
-  flex-wrap: wrap;
-}
+			/* A single info row */
+			.ic-row {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				min-height: 22px;
+				flex-wrap: wrap;
+			}
 
-.ic-row-content {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-  flex: 1;
-  min-width: 0;
-}
+			.ic-row-content {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				flex-wrap: wrap;
+				flex: 1;
+				min-width: 0;
+			}
 
-/* Branch name pill */
-.ic-branch {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 8px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: color-mix(in oklch, var(--ic-accent) 85%, var(--foreground));
-  background: color-mix(in oklch, var(--ic-accent) 8%, var(--surface-2));
-  border: 1px solid color-mix(in oklch, var(--ic-accent) 18%, var(--border));
-  letter-spacing: 0.01em;
-  transition: background var(--duration-2), border-color var(--duration-2);
-}
-.ic-card:hover .ic-branch,
-.ic-card.state-hover .ic-branch,
-.ic-card.state-active .ic-branch {
-  background: color-mix(in oklch, var(--ic-accent) 14%, var(--surface-2));
-  border-color: color-mix(in oklch, var(--ic-accent) 32%, var(--border));
-}
+			/* Branch name pill */
+			.ic-branch {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 8px;
+				border-radius: var(--radius-sm);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: color-mix(in oklch, var(--ic-accent) 85%, var(--foreground));
+				background: color-mix(in oklch, var(--ic-accent) 8%, var(--surface-2));
+				border: 1px solid color-mix(in oklch, var(--ic-accent) 18%, var(--border));
+				letter-spacing: 0.01em;
+				transition:
+					background var(--duration-2),
+					border-color var(--duration-2);
+			}
+			.ic-card:hover .ic-branch,
+			.ic-card.state-hover .ic-branch,
+			.ic-card.state-active .ic-branch {
+				background: color-mix(in oklch, var(--ic-accent) 14%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--ic-accent) 32%, var(--border));
+			}
 
-/* GitHub label chips */
-.ic-gh-label {
-  display: inline-flex;
-  align-items: center;
-  height: 18px;
-  padding: 0 7px;
-  border-radius: var(--radius-full);
-  font-size: 10.5px;
-  font-weight: 500;
-  border: 1px solid;
-  white-space: nowrap;
-}
-.ic-gh-label.label-bug {
-  background: color-mix(in oklch, var(--status-danger) 12%, transparent);
-  color: var(--status-danger);
-  border-color: color-mix(in oklch, var(--status-danger) 25%, transparent);
-}
-.ic-gh-label.label-feature {
-  background: color-mix(in oklch, var(--status-info) 12%, transparent);
-  color: var(--status-info);
-  border-color: color-mix(in oklch, var(--status-info) 25%, transparent);
-}
-.ic-gh-label.label-perf {
-  background: color-mix(in oklch, var(--status-warning) 12%, transparent);
-  color: color-mix(in oklch, var(--status-warning) 75%, var(--foreground));
-  border-color: color-mix(in oklch, var(--status-warning) 25%, transparent);
-}
-.ic-gh-label.label-refactor {
-  background: color-mix(in oklch, var(--status-merged) 12%, transparent);
-  color: var(--status-merged);
-  border-color: color-mix(in oklch, var(--status-merged) 25%, transparent);
-}
-.ic-gh-label.label-dx {
-  background: color-mix(in oklch, var(--moss-400) 12%, transparent);
-  color: var(--moss-400);
-  border-color: color-mix(in oklch, var(--moss-400) 25%, transparent);
-}
-.ic-gh-label.label-infra {
-  background: color-mix(in oklch, var(--bark-300) 14%, transparent);
-  color: var(--bark-300);
-  border-color: color-mix(in oklch, var(--bark-300) 25%, transparent);
-}
-.ic-gh-label.label-animation {
-  background: color-mix(in oklch, var(--teal-500) 12%, transparent);
-  color: var(--teal-400);
-  border-color: color-mix(in oklch, var(--teal-500) 25%, transparent);
-}
-.ic-overflow-badge {
-  display: inline-flex;
-  align-items: center;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: var(--radius-full);
-  font-size: 10.5px;
-  font-weight: 500;
-  color: var(--foreground-subtle);
-  background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
-  border: 1px solid color-mix(in oklch, var(--foreground-subtle) 18%, transparent);
-}
+			/* GitHub label chips */
+			.ic-gh-label {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 10.5px;
+				font-weight: 500;
+				border: 1px solid;
+				white-space: nowrap;
+			}
+			.ic-gh-label.label-bug {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 25%, transparent);
+			}
+			.ic-gh-label.label-feature {
+				background: color-mix(in oklch, var(--status-info) 12%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 25%, transparent);
+			}
+			.ic-gh-label.label-perf {
+				background: color-mix(in oklch, var(--status-warning) 12%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 75%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 25%, transparent);
+			}
+			.ic-gh-label.label-refactor {
+				background: color-mix(in oklch, var(--status-merged) 12%, transparent);
+				color: var(--status-merged);
+				border-color: color-mix(in oklch, var(--status-merged) 25%, transparent);
+			}
+			.ic-gh-label.label-dx {
+				background: color-mix(in oklch, var(--moss-400) 12%, transparent);
+				color: var(--moss-400);
+				border-color: color-mix(in oklch, var(--moss-400) 25%, transparent);
+			}
+			.ic-gh-label.label-infra {
+				background: color-mix(in oklch, var(--bark-300) 14%, transparent);
+				color: var(--bark-300);
+				border-color: color-mix(in oklch, var(--bark-300) 25%, transparent);
+			}
+			.ic-gh-label.label-animation {
+				background: color-mix(in oklch, var(--teal-500) 12%, transparent);
+				color: var(--teal-400);
+				border-color: color-mix(in oklch, var(--teal-500) 25%, transparent);
+			}
+			.ic-overflow-badge {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 6px;
+				border-radius: var(--radius-full);
+				font-size: 10.5px;
+				font-weight: 500;
+				color: var(--foreground-subtle);
+				background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
+				border: 1px solid color-mix(in oklch, var(--foreground-subtle) 18%, transparent);
+			}
 
-/* Dev server / checks status row */
-.ic-check-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-weight: 500;
-  border: 1px solid;
-  white-space: nowrap;
-}
-.ic-check-item.passing {
-  color: var(--status-success);
-  background: color-mix(in oklch, var(--status-success) 10%, transparent);
-  border-color: color-mix(in oklch, var(--status-success) 25%, transparent);
-}
-.ic-check-item.failing {
-  color: var(--status-danger);
-  background: color-mix(in oklch, var(--status-danger) 10%, transparent);
-  border-color: color-mix(in oklch, var(--status-danger) 25%, transparent);
-}
-.ic-check-item.running-check {
-  color: var(--status-info);
-  background: color-mix(in oklch, var(--status-info) 10%, transparent);
-  border-color: color-mix(in oklch, var(--status-info) 25%, transparent);
-}
-.ic-check-item.dev-server-on {
-  color: var(--status-success);
-  background: color-mix(in oklch, var(--status-success) 10%, transparent);
-  border-color: color-mix(in oklch, var(--status-success) 25%, transparent);
-}
-.ic-check-item.dev-server-off {
-  color: var(--foreground-subtle);
-  background: color-mix(in oklch, var(--foreground-subtle) 8%, transparent);
-  border-color: color-mix(in oklch, var(--foreground-subtle) 18%, transparent);
-}
+			/* Dev server / checks status row */
+			.ic-check-item {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				border-radius: var(--radius-sm);
+				font-size: 11px;
+				font-weight: 500;
+				border: 1px solid;
+				white-space: nowrap;
+			}
+			.ic-check-item.passing {
+				color: var(--status-success);
+				background: color-mix(in oklch, var(--status-success) 10%, transparent);
+				border-color: color-mix(in oklch, var(--status-success) 25%, transparent);
+			}
+			.ic-check-item.failing {
+				color: var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+				border-color: color-mix(in oklch, var(--status-danger) 25%, transparent);
+			}
+			.ic-check-item.running-check {
+				color: var(--status-info);
+				background: color-mix(in oklch, var(--status-info) 10%, transparent);
+				border-color: color-mix(in oklch, var(--status-info) 25%, transparent);
+			}
+			.ic-check-item.dev-server-on {
+				color: var(--status-success);
+				background: color-mix(in oklch, var(--status-success) 10%, transparent);
+				border-color: color-mix(in oklch, var(--status-success) 25%, transparent);
+			}
+			.ic-check-item.dev-server-off {
+				color: var(--foreground-subtle);
+				background: color-mix(in oklch, var(--foreground-subtle) 8%, transparent);
+				border-color: color-mix(in oklch, var(--foreground-subtle) 18%, transparent);
+			}
 
-/* SVG icon sizing */
-.ic-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.ic-icon-sm {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+			/* SVG icon sizing */
+			.ic-icon {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 1.6;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+			.ic-icon-sm {
+				width: 12px;
+				height: 12px;
+				flex-shrink: 0;
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 1.6;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
 
-/* ============================================================
+			/* ============================================================
    PAGE LAYOUT
    ============================================================ */
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background: oklch(0.130 0.016 150);
-}
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+				background: oklch(0.13 0.016 150);
+			}
 
-.page-root {
-  min-height: 100vh;
-  padding: 40px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  max-width: 1080px;
-}
+			.page-root {
+				min-height: 100vh;
+				padding: 40px 48px;
+				display: flex;
+				flex-direction: column;
+				gap: 32px;
+				max-width: 1080px;
+			}
 
-.page-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 8px;
-}
+			.page-header {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				margin-bottom: 8px;
+			}
 
-.page-title {
-  font-family: var(--font-sans);
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-}
+			.page-title {
+				font-family: var(--font-sans);
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+			}
 
-.page-subtitle {
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-  max-width: 680px;
-}
+			.page-subtitle {
+				font-family: var(--font-sans);
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+				max-width: 680px;
+			}
 
-.state-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+			.state-section {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
 
-.state-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding-left: 2px;
-}
+			.state-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				padding-left: 2px;
+			}
 
-.section-divider {
-  height: 1px;
-  background: linear-gradient(to right, var(--border), transparent 80%);
-  margin: 6px 0;
-}
+			.section-divider {
+				height: 1px;
+				background: linear-gradient(to right, var(--border), transparent 80%);
+				margin: 6px 0;
+			}
 
-/* Grid context for showing multiple cards side-by-side */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-  gap: 12px;
-}
+			/* Grid context for showing multiple cards side-by-side */
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+				gap: 12px;
+			}
 
-/* Inline icon helpers */
-.fill-current { fill: currentColor; stroke: none; }
-.spin { animation: ic-spin 1s linear infinite; }
-@keyframes ic-spin { to { transform: rotate(360deg); } }
+			/* Inline icon helpers */
+			.fill-current {
+				fill: currentColor;
+				stroke: none;
+			}
+			.spin {
+				animation: ic-spin 1s linear infinite;
+			}
+			@keyframes ic-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-/* Responsive */
-@media (max-width: 520px) {
-  .page-root { padding: 24px 16px; }
-  .ic-card { min-width: 0; }
-  .card-grid { grid-template-columns: 1fr; }
-  .ic-body { flex-direction: column; }
-  .ic-thumbnail { width: 100%; height: 64px; }
-}
-</style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="page-root">
+			/* Responsive */
+			@media (max-width: 520px) {
+				.page-root {
+					padding: 24px 16px;
+				}
+				.ic-card {
+					min-width: 0;
+				}
+				.card-grid {
+					grid-template-columns: 1fr;
+				}
+				.ic-body {
+					flex-direction: column;
+				}
+				.ic-thumbnail {
+					width: 100%;
+					height: 64px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-root">
+				<!-- Variant eyebrow label -->
+				<div class="page-header">
+					<div class="gk-eyebrow">Issue Card Redesign &mdash; Mockup</div>
+					<div class="page-title">Variant E &mdash; Left Accent Bar + Frosted Glass</div>
+					<div class="page-subtitle">
+						A 3px left accent bar in the issue color (like workspace cards) combined
+						with a frosted glass card surface. On hover, the bar widens to 5px and the
+						card gains a subtle inner glow along the left edge. Color identity through
+						the accent bar, not the header or surface tint.
+					</div>
+				</div>
 
-    <!-- Variant eyebrow label -->
-    <div class="page-header">
-      <div class="gk-eyebrow">Issue Card Redesign &mdash; Mockup</div>
-      <div class="page-title">Variant E &mdash; Left Accent Bar + Frosted Glass</div>
-      <div class="page-subtitle">A 3px left accent bar in the issue color (like workspace cards) combined with a frosted glass card surface. On hover, the bar widens to 5px and the card gains a subtle inner glow along the left edge. Color identity through the accent bar, not the header or surface tint.</div>
-    </div>
+				<!-- ── STATES: DEFAULT ────────────────────────────── -->
+				<div class="state-section">
+					<div class="state-label">
+						state / default &mdash; grid context (amber + teal)
+					</div>
 
-    <!-- ── STATES: DEFAULT ────────────────────────────── -->
-    <div class="state-section">
-      <div class="state-label">state / default &mdash; grid context (amber + teal)</div>
+					<div class="card-grid">
+						<!-- Card 1: Amber, running -->
+						<div class="ic-card" data-color="amber">
+							<div class="ic-header">
+								<div class="ic-header-top">
+									<span class="ic-issue-number">#214</span>
+									<span class="ic-title"
+										>Session cost tracking &amp; per-model budget alerts</span
+									>
+									<span class="ic-children">
+										<svg class="ic-icon-sm" viewBox="0 0 16 16">
+											<path d="M8 2v12M4 10l4 4 4-4" />
+										</svg>
+										6
+									</span>
+								</div>
+								<div class="ic-chips">
+									<span class="ic-session-chip running">
+										<span class="ic-dot pulse"></span>
+										Running
+									</span>
+									<span class="ic-priority high">
+										<svg class="ic-icon-sm" viewBox="0 0 16 16">
+											<path d="M8 3v6M8 12v.5" stroke-width="2" />
+										</svg>
+										High
+									</span>
+									<div class="ic-chips-right">
+										<button
+											class="ic-action"
+											title="Open in editor"
+											aria-label="Open in editor"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<path d="M3 8h10M9 4l4 4-4 4" />
+											</svg>
+										</button>
+										<button
+											class="ic-action"
+											title="Open terminal"
+											aria-label="Open terminal"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<path d="M3 4l4 4-4 4M9 12h4" />
+											</svg>
+										</button>
+										<button
+											class="ic-action"
+											title="View PR"
+											aria-label="View pull request"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<circle cx="5" cy="4" r="1.5" />
+												<circle cx="5" cy="12" r="1.5" />
+												<circle cx="11" cy="4" r="1.5" />
+												<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+											</svg>
+										</button>
+										<button
+											class="ic-action"
+											title="Mute notifications"
+											aria-label="Mute notifications"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<path
+													d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
 
-      <div class="card-grid">
-        <!-- Card 1: Amber, running -->
-        <div class="ic-card" data-color="amber">
-          <div class="ic-header">
-            <div class="ic-header-top">
-              <span class="ic-issue-number">#214</span>
-              <span class="ic-title">Session cost tracking &amp; per-model budget alerts</span>
-              <span class="ic-children">
-                <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 2v12M4 10l4 4 4-4" /></svg>
-                6
-              </span>
-            </div>
-            <div class="ic-chips">
-              <span class="ic-session-chip running">
-                <span class="ic-dot pulse"></span>
-                Running
-              </span>
-              <span class="ic-priority high">
-                <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 3v6M8 12v.5" stroke-width="2" /></svg>
-                High
-              </span>
-              <div class="ic-chips-right">
-                <button class="ic-action" title="Open in editor" aria-label="Open in editor">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
-                </button>
-                <button class="ic-action" title="Open terminal" aria-label="Open terminal">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 4l4 4-4 4M9 12h4" /></svg>
-                </button>
-                <button class="ic-action" title="View PR" aria-label="View pull request">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                </button>
-                <button class="ic-action" title="Mute notifications" aria-label="Mute notifications">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><path d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0" /></svg>
-                </button>
-              </div>
-            </div>
-          </div>
+							<div class="ic-body">
+								<div class="ic-thumbnail">
+									<div class="ic-thumb-inner">
+										<svg
+											class="ic-thumb-tree"
+											viewBox="0 0 42 52"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+											style="color: var(--ic-accent)"
+										>
+											<rect
+												x="18"
+												y="38"
+												width="6"
+												height="12"
+												rx="1"
+												fill="currentColor"
+												opacity="0.5"
+											/>
+											<ellipse
+												cx="21"
+												cy="22"
+												rx="12"
+												ry="14"
+												fill="currentColor"
+												opacity="0.35"
+											/>
+											<ellipse
+												cx="21"
+												cy="15"
+												rx="9"
+												ry="11"
+												fill="currentColor"
+												opacity="0.45"
+											/>
+											<ellipse
+												cx="21"
+												cy="10"
+												rx="6"
+												ry="8"
+												fill="currentColor"
+												opacity="0.55"
+											/>
+										</svg>
+									</div>
+								</div>
 
-          <div class="ic-body">
-            <div class="ic-thumbnail">
-              <div class="ic-thumb-inner">
-                <svg class="ic-thumb-tree" viewBox="0 0 42 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--ic-accent)">
-                  <rect x="18" y="38" width="6" height="12" rx="1" fill="currentColor" opacity="0.5"/>
-                  <ellipse cx="21" cy="22" rx="12" ry="14" fill="currentColor" opacity="0.35"/>
-                  <ellipse cx="21" cy="15" rx="9" ry="11" fill="currentColor" opacity="0.45"/>
-                  <ellipse cx="21" cy="10" rx="6" ry="8" fill="currentColor" opacity="0.55"/>
-                </svg>
-              </div>
-            </div>
+								<div class="ic-rows">
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="ic-branch">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<circle cx="5" cy="4" r="1.5" />
+													<circle cx="5" cy="12" r="1.5" />
+													<circle cx="11" cy="4" r="1.5" />
+													<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+												</svg>
+												feat/session-cost-v2
+											</span>
+											<span class="gk-badge gk-badge-info">worktree</span>
+											<span class="gk-badge gk-badge-success">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<path d="M3 8l3 3 7-7" />
+												</svg>
+												synced
+											</span>
+										</div>
+									</div>
 
-            <div class="ic-rows">
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="ic-branch">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                    feat/session-cost-v2
-                  </span>
-                  <span class="gk-badge gk-badge-info">worktree</span>
-                  <span class="gk-badge gk-badge-success">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M3 8l3 3 7-7" /></svg>
-                    synced
-                  </span>
-                </div>
-              </div>
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="gk-badge gk-badge-success">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<circle cx="5" cy="4" r="1.5" />
+													<circle cx="5" cy="12" r="1.5" />
+													<circle cx="11" cy="4" r="1.5" />
+													<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+												</svg>
+												PR #408 open
+											</span>
+											<span class="gk-badge gk-badge-info">Issue #214</span>
+											<span class="gk-badge">2 reviews</span>
+										</div>
+									</div>
 
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="gk-badge gk-badge-success">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                    PR #408 open
-                  </span>
-                  <span class="gk-badge gk-badge-info">Issue #214</span>
-                  <span class="gk-badge">2 reviews</span>
-                </div>
-              </div>
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="ic-gh-label label-feature">feature</span>
+											<span class="ic-gh-label label-perf">performance</span>
+											<span class="ic-gh-label label-dx">dx</span>
+											<span class="ic-overflow-badge">+2</span>
+										</div>
+									</div>
 
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="ic-gh-label label-feature">feature</span>
-                  <span class="ic-gh-label label-perf">performance</span>
-                  <span class="ic-gh-label label-dx">dx</span>
-                  <span class="ic-overflow-badge">+2</span>
-                </div>
-              </div>
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="ic-check-item dev-server-on">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<rect
+														x="2"
+														y="3"
+														width="12"
+														height="10"
+														rx="1.5"
+													/>
+													<path d="M5 13h6" />
+												</svg>
+												:1421
+											</span>
+											<span class="ic-check-item passing">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<path d="M3 8l3 3 7-7" />
+												</svg>
+												checks passing
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="ic-check-item dev-server-on">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M5 13h6" /></svg>
-                    :1421
-                  </span>
-                  <span class="ic-check-item passing">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M3 8l3 3 7-7" /></svg>
-                    checks passing
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+						<!-- Card 2: Teal, idle -->
+						<div class="ic-card" data-color="teal">
+							<div class="ic-header">
+								<div class="ic-header-top">
+									<span class="ic-issue-number">#241</span>
+									<span class="ic-title"
+										>Notification sound engine &mdash; character pack
+										system</span
+									>
+									<span class="ic-children">
+										<svg class="ic-icon-sm" viewBox="0 0 16 16">
+											<path d="M8 2v12M4 10l4 4 4-4" />
+										</svg>
+										9
+									</span>
+								</div>
+								<div class="ic-chips">
+									<span class="ic-session-chip idle">
+										<span class="ic-dot"></span>
+										Idle
+									</span>
+									<div class="ic-chips-right">
+										<button
+											class="ic-action"
+											title="Open in editor"
+											aria-label="Open in editor"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<path d="M3 8h10M9 4l4 4-4 4" />
+											</svg>
+										</button>
+										<button
+											class="ic-action"
+											title="Open terminal"
+											aria-label="Open terminal"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<path d="M3 4l4 4-4 4M9 12h4" />
+											</svg>
+										</button>
+										<button
+											class="ic-action"
+											title="View PR"
+											aria-label="View pull request"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<circle cx="5" cy="4" r="1.5" />
+												<circle cx="5" cy="12" r="1.5" />
+												<circle cx="11" cy="4" r="1.5" />
+												<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+											</svg>
+										</button>
+										<button
+											class="ic-action muted"
+											title="Muted"
+											aria-label="Muted"
+										>
+											<svg class="ic-icon" viewBox="0 0 16 16">
+												<path
+													d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0M13 3L3 13"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
 
-        <!-- Card 2: Teal, idle -->
-        <div class="ic-card" data-color="teal">
-          <div class="ic-header">
-            <div class="ic-header-top">
-              <span class="ic-issue-number">#241</span>
-              <span class="ic-title">Notification sound engine &mdash; character pack system</span>
-              <span class="ic-children">
-                <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 2v12M4 10l4 4 4-4" /></svg>
-                9
-              </span>
-            </div>
-            <div class="ic-chips">
-              <span class="ic-session-chip idle">
-                <span class="ic-dot"></span>
-                Idle
-              </span>
-              <div class="ic-chips-right">
-                <button class="ic-action" title="Open in editor" aria-label="Open in editor">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
-                </button>
-                <button class="ic-action" title="Open terminal" aria-label="Open terminal">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 4l4 4-4 4M9 12h4" /></svg>
-                </button>
-                <button class="ic-action" title="View PR" aria-label="View pull request">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                </button>
-                <button class="ic-action muted" title="Muted" aria-label="Muted">
-                  <svg class="ic-icon" viewBox="0 0 16 16"><path d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0M13 3L3 13" /></svg>
-                </button>
-              </div>
-            </div>
-          </div>
+							<div class="ic-body">
+								<div class="ic-thumbnail">
+									<div class="ic-thumb-inner">
+										<svg
+											class="ic-thumb-tree"
+											viewBox="0 0 42 52"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+											style="color: var(--ic-accent)"
+										>
+											<rect
+												x="19"
+												y="40"
+												width="4"
+												height="10"
+												rx="1"
+												fill="currentColor"
+												opacity="0.55"
+											/>
+											<polygon
+												points="21,6 9,32 33,32"
+												fill="currentColor"
+												opacity="0.30"
+											/>
+											<polygon
+												points="21,2 7,28 35,28"
+												fill="currentColor"
+												opacity="0.40"
+											/>
+											<polygon
+												points="21,7 10,24 32,24"
+												fill="currentColor"
+												opacity="0.50"
+											/>
+											<polygon
+												points="21,4 12,20 30,20"
+												fill="currentColor"
+												opacity="0.60"
+											/>
+										</svg>
+									</div>
+								</div>
 
-          <div class="ic-body">
-            <div class="ic-thumbnail">
-              <div class="ic-thumb-inner">
-                <svg class="ic-thumb-tree" viewBox="0 0 42 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--ic-accent)">
-                  <rect x="19" y="40" width="4" height="10" rx="1" fill="currentColor" opacity="0.55"/>
-                  <polygon points="21,6 9,32 33,32" fill="currentColor" opacity="0.30"/>
-                  <polygon points="21,2 7,28 35,28" fill="currentColor" opacity="0.40"/>
-                  <polygon points="21,7 10,24 32,24" fill="currentColor" opacity="0.50"/>
-                  <polygon points="21,4 12,20 30,20" fill="currentColor" opacity="0.60"/>
-                </svg>
-              </div>
-            </div>
+								<div class="ic-rows">
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="ic-branch">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<circle cx="5" cy="4" r="1.5" />
+													<circle cx="5" cy="12" r="1.5" />
+													<circle cx="11" cy="4" r="1.5" />
+													<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+												</svg>
+												feat/notification-sounds
+											</span>
+											<span class="gk-badge gk-badge-info">worktree</span>
+											<span class="gk-badge gk-badge-success">synced</span>
+										</div>
+									</div>
 
-            <div class="ic-rows">
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="ic-branch">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                    feat/notification-sounds
-                  </span>
-                  <span class="gk-badge gk-badge-info">worktree</span>
-                  <span class="gk-badge gk-badge-success">synced</span>
-                </div>
-              </div>
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="gk-badge gk-badge-subtle">no PR yet</span>
+											<span class="gk-badge gk-badge-info">Issue #241</span>
+										</div>
+									</div>
 
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="gk-badge gk-badge-subtle">no PR yet</span>
-                  <span class="gk-badge gk-badge-info">Issue #241</span>
-                </div>
-              </div>
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="ic-gh-label label-feature">feature</span>
+											<span class="ic-gh-label label-dx">dx</span>
+										</div>
+									</div>
 
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="ic-gh-label label-feature">feature</span>
-                  <span class="ic-gh-label label-dx">dx</span>
-                </div>
-              </div>
+									<div class="ic-row">
+										<div class="ic-row-content">
+											<span class="ic-check-item dev-server-on">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<rect
+														x="2"
+														y="3"
+														width="12"
+														height="10"
+														rx="1.5"
+													/>
+													<path d="M5 13h6" />
+												</svg>
+												:1420
+											</span>
+											<span class="ic-check-item passing">
+												<svg class="ic-icon-sm" viewBox="0 0 16 16">
+													<path d="M3 8l3 3 7-7" />
+												</svg>
+												8/8 passing
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-              <div class="ic-row">
-                <div class="ic-row-content">
-                  <span class="ic-check-item dev-server-on">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M5 13h6" /></svg>
-                    :1420
-                  </span>
-                  <span class="ic-check-item passing">
-                    <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M3 8l3 3 7-7" /></svg>
-                    8/8 passing
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+				<div class="section-divider"></div>
 
-    <div class="section-divider"></div>
+				<!-- ── STATE: HOVER ───────────────────────────────── -->
+				<div class="state-section">
+					<div class="state-label">
+						state / hover &mdash; plum (accent bar widens, inner glow appears)
+					</div>
 
-    <!-- ── STATE: HOVER ───────────────────────────────── -->
-    <div class="state-section">
-      <div class="state-label">state / hover &mdash; plum (accent bar widens, inner glow appears)</div>
+					<div class="ic-card state-hover" data-color="plum">
+						<div class="ic-header">
+							<div class="ic-header-top">
+								<span class="ic-issue-number">#187</span>
+								<span class="ic-title"
+									>Refactor skill execution pipeline &mdash; parallel provider
+									dispatch</span
+								>
+								<span class="ic-children">
+									<svg class="ic-icon-sm" viewBox="0 0 16 16">
+										<path d="M8 2v12M4 10l4 4 4-4" />
+									</svg>
+									11
+								</span>
+							</div>
+							<div class="ic-chips">
+								<span class="ic-session-chip needs-input">
+									<span class="ic-dot pulse"></span>
+									Needs input
+								</span>
+								<span class="ic-priority top">
+									<svg class="ic-icon-sm" viewBox="0 0 16 16">
+										<path d="M8 3v6M8 12v.5" stroke-width="2.2" />
+									</svg>
+									Top
+								</span>
+								<div class="ic-chips-right">
+									<button
+										class="ic-action"
+										title="Open in editor"
+										aria-label="Open in editor"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path d="M3 8h10M9 4l4 4-4 4" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="Open terminal"
+										aria-label="Open terminal"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path d="M3 4l4 4-4 4M9 12h4" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="View PR"
+										aria-label="View pull request"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<circle cx="5" cy="4" r="1.5" />
+											<circle cx="5" cy="12" r="1.5" />
+											<circle cx="11" cy="4" r="1.5" />
+											<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+										</svg>
+									</button>
+									<button
+										class="ic-action muted"
+										title="Muted"
+										aria-label="Muted"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path
+												d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0M13 3L3 13"
+											/>
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
 
-      <div class="ic-card state-hover" data-color="plum">
-        <div class="ic-header">
-          <div class="ic-header-top">
-            <span class="ic-issue-number">#187</span>
-            <span class="ic-title">Refactor skill execution pipeline &mdash; parallel provider dispatch</span>
-            <span class="ic-children">
-              <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 2v12M4 10l4 4 4-4" /></svg>
-              11
-            </span>
-          </div>
-          <div class="ic-chips">
-            <span class="ic-session-chip needs-input">
-              <span class="ic-dot pulse"></span>
-              Needs input
-            </span>
-            <span class="ic-priority top">
-              <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 3v6M8 12v.5" stroke-width="2.2" /></svg>
-              Top
-            </span>
-            <div class="ic-chips-right">
-              <button class="ic-action" title="Open in editor" aria-label="Open in editor">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
-              </button>
-              <button class="ic-action" title="Open terminal" aria-label="Open terminal">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 4l4 4-4 4M9 12h4" /></svg>
-              </button>
-              <button class="ic-action" title="View PR" aria-label="View pull request">
-                <svg class="ic-icon" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-              </button>
-              <button class="ic-action muted" title="Muted" aria-label="Muted">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0M13 3L3 13" /></svg>
-              </button>
-            </div>
-          </div>
-        </div>
+						<div class="ic-body">
+							<div class="ic-thumbnail">
+								<div class="ic-thumb-inner">
+									<svg
+										class="ic-thumb-tree"
+										viewBox="0 0 42 52"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										style="color: var(--ic-accent)"
+									>
+										<rect
+											x="18"
+											y="38"
+											width="6"
+											height="12"
+											rx="1"
+											fill="currentColor"
+											opacity="0.5"
+										/>
+										<ellipse
+											cx="21"
+											cy="24"
+											rx="14"
+											ry="16"
+											fill="currentColor"
+											opacity="0.3"
+										/>
+										<ellipse
+											cx="21"
+											cy="18"
+											rx="11"
+											ry="13"
+											fill="currentColor"
+											opacity="0.4"
+										/>
+										<ellipse
+											cx="21"
+											cy="12"
+											rx="8"
+											ry="9"
+											fill="currentColor"
+											opacity="0.5"
+										/>
+										<ellipse
+											cx="21"
+											cy="7"
+											rx="5"
+											ry="6"
+											fill="currentColor"
+											opacity="0.6"
+										/>
+									</svg>
+								</div>
+							</div>
 
-        <div class="ic-body">
-          <div class="ic-thumbnail">
-            <div class="ic-thumb-inner">
-              <svg class="ic-thumb-tree" viewBox="0 0 42 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--ic-accent)">
-                <rect x="18" y="38" width="6" height="12" rx="1" fill="currentColor" opacity="0.5"/>
-                <ellipse cx="21" cy="24" rx="14" ry="16" fill="currentColor" opacity="0.3"/>
-                <ellipse cx="21" cy="18" rx="11" ry="13" fill="currentColor" opacity="0.4"/>
-                <ellipse cx="21" cy="12" rx="8" ry="9" fill="currentColor" opacity="0.5"/>
-                <ellipse cx="21" cy="7" rx="5" ry="6" fill="currentColor" opacity="0.6"/>
-              </svg>
-            </div>
-          </div>
+							<div class="ic-rows">
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-branch">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<circle cx="5" cy="4" r="1.5" />
+												<circle cx="5" cy="12" r="1.5" />
+												<circle cx="11" cy="4" r="1.5" />
+												<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+											</svg>
+											refactor/skill-pipeline
+										</span>
+										<span class="gk-badge gk-badge-info">worktree</span>
+										<span class="gk-badge gk-badge-warning">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<path d="M8 4v5M8 11.5v.5" stroke-width="2" />
+											</svg>
+											3 behind
+										</span>
+									</div>
+								</div>
 
-          <div class="ic-rows">
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-branch">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                  refactor/skill-pipeline
-                </span>
-                <span class="gk-badge gk-badge-info">worktree</span>
-                <span class="gk-badge gk-badge-warning">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 4v5M8 11.5v.5" stroke-width="2"/></svg>
-                  3 behind
-                </span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span
+											class="gk-badge"
+											style="
+												background: color-mix(
+													in oklch,
+													var(--gh-draft) 14%,
+													transparent
+												);
+												color: var(--gh-draft);
+												border-color: color-mix(
+													in oklch,
+													var(--gh-draft) 28%,
+													transparent
+												);
+											"
+										>
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<circle cx="5" cy="4" r="1.5" />
+												<circle cx="5" cy="12" r="1.5" />
+												<circle cx="11" cy="4" r="1.5" />
+												<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+											</svg>
+											PR #391 draft
+										</span>
+										<span class="gk-badge gk-badge-info">Issue #187</span>
+									</div>
+								</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="gk-badge" style="background: color-mix(in oklch, var(--gh-draft) 14%, transparent); color: var(--gh-draft); border-color: color-mix(in oklch, var(--gh-draft) 28%, transparent);">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                  PR #391 draft
-                </span>
-                <span class="gk-badge gk-badge-info">Issue #187</span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-gh-label label-refactor">refactor</span>
+										<span class="ic-gh-label label-feature">feature</span>
+										<span class="ic-gh-label label-infra">infra</span>
+										<span class="ic-overflow-badge">+1</span>
+									</div>
+								</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-gh-label label-refactor">refactor</span>
-                <span class="ic-gh-label label-feature">feature</span>
-                <span class="ic-gh-label label-infra">infra</span>
-                <span class="ic-overflow-badge">+1</span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-check-item dev-server-off">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<rect x="2" y="3" width="12" height="10" rx="1.5" />
+												<path d="M5 13h6" />
+											</svg>
+											no dev server
+										</span>
+										<span class="ic-check-item running-check">
+											<svg
+												class="ic-icon-sm spin fill-current"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="none"
+											>
+												<path
+													d="M8 2a6 6 0 11-1 0"
+													fill="currentColor"
+													opacity="0.2"
+												/>
+												<path
+													d="M8 2a6 6 0 010 12"
+													stroke="currentColor"
+													stroke-width="1.6"
+													fill="none"
+													stroke-linecap="round"
+												/>
+											</svg>
+											checks running
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-check-item dev-server-off">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M5 13h6" /></svg>
-                  no dev server
-                </span>
-                <span class="ic-check-item running-check">
-                  <svg class="ic-icon-sm spin fill-current" viewBox="0 0 16 16" fill="none" stroke="none"><path d="M8 2a6 6 0 11-1 0" fill="currentColor" opacity="0.2"/><path d="M8 2a6 6 0 010 12" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
-                  checks running
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+				<div class="section-divider"></div>
 
-    <div class="section-divider"></div>
+				<!-- ── STATE: ACTIVE ──────────────────────────────── -->
+				<div class="state-section">
+					<div class="state-label">
+						state / active (detail-selected) &mdash; moss (accent ring + strong inner
+						glow)
+					</div>
 
-    <!-- ── STATE: ACTIVE ──────────────────────────────── -->
-    <div class="state-section">
-      <div class="state-label">state / active (detail-selected) &mdash; moss (accent ring + strong inner glow)</div>
+					<div class="ic-card state-active" data-color="moss">
+						<div class="ic-header">
+							<div class="ic-header-top">
+								<span class="ic-issue-number">#203</span>
+								<span class="ic-title"
+									>Forest canvas &mdash; drag-to-reorder trees with spring
+									physics</span
+								>
+								<span class="ic-children">
+									<svg class="ic-icon-sm" viewBox="0 0 16 16">
+										<path d="M8 2v12M4 10l4 4 4-4" />
+									</svg>
+									4
+								</span>
+							</div>
+							<div class="ic-chips">
+								<span class="ic-session-chip running">
+									<span class="ic-dot pulse"></span>
+									Running
+								</span>
+								<div class="ic-chips-right">
+									<button
+										class="ic-action"
+										title="Open in editor"
+										aria-label="Open in editor"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path d="M3 8h10M9 4l4 4-4 4" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="Open terminal"
+										aria-label="Open terminal"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path d="M3 4l4 4-4 4M9 12h4" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="View PR"
+										aria-label="View pull request"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<circle cx="5" cy="4" r="1.5" />
+											<circle cx="5" cy="12" r="1.5" />
+											<circle cx="11" cy="4" r="1.5" />
+											<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="Mute notifications"
+										aria-label="Mute notifications"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path
+												d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0"
+											/>
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
 
-      <div class="ic-card state-active" data-color="moss">
-        <div class="ic-header">
-          <div class="ic-header-top">
-            <span class="ic-issue-number">#203</span>
-            <span class="ic-title">Forest canvas &mdash; drag-to-reorder trees with spring physics</span>
-            <span class="ic-children">
-              <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 2v12M4 10l4 4 4-4" /></svg>
-              4
-            </span>
-          </div>
-          <div class="ic-chips">
-            <span class="ic-session-chip running">
-              <span class="ic-dot pulse"></span>
-              Running
-            </span>
-            <div class="ic-chips-right">
-              <button class="ic-action" title="Open in editor" aria-label="Open in editor">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
-              </button>
-              <button class="ic-action" title="Open terminal" aria-label="Open terminal">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 4l4 4-4 4M9 12h4" /></svg>
-              </button>
-              <button class="ic-action" title="View PR" aria-label="View pull request">
-                <svg class="ic-icon" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-              </button>
-              <button class="ic-action" title="Mute notifications" aria-label="Mute notifications">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0" /></svg>
-              </button>
-            </div>
-          </div>
-        </div>
+						<div class="ic-body">
+							<div class="ic-thumbnail">
+								<div class="ic-thumb-inner">
+									<svg
+										class="ic-thumb-tree"
+										viewBox="0 0 42 52"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										style="color: var(--ic-accent)"
+									>
+										<rect
+											x="19"
+											y="40"
+											width="4"
+											height="10"
+											rx="1"
+											fill="currentColor"
+											opacity="0.55"
+										/>
+										<polygon
+											points="21,6 9,32 33,32"
+											fill="currentColor"
+											opacity="0.30"
+										/>
+										<polygon
+											points="21,12 10,34 32,34"
+											fill="currentColor"
+											opacity="0.20"
+										/>
+										<polygon
+											points="21,2 7,28 35,28"
+											fill="currentColor"
+											opacity="0.40"
+										/>
+										<polygon
+											points="21,7 10,24 32,24"
+											fill="currentColor"
+											opacity="0.50"
+										/>
+										<polygon
+											points="21,4 12,20 30,20"
+											fill="currentColor"
+											opacity="0.60"
+										/>
+									</svg>
+								</div>
+							</div>
 
-        <div class="ic-body">
-          <div class="ic-thumbnail">
-            <div class="ic-thumb-inner">
-              <svg class="ic-thumb-tree" viewBox="0 0 42 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--ic-accent)">
-                <rect x="19" y="40" width="4" height="10" rx="1" fill="currentColor" opacity="0.55"/>
-                <polygon points="21,6 9,32 33,32" fill="currentColor" opacity="0.30"/>
-                <polygon points="21,12 10,34 32,34" fill="currentColor" opacity="0.20"/>
-                <polygon points="21,2 7,28 35,28" fill="currentColor" opacity="0.40"/>
-                <polygon points="21,7 10,24 32,24" fill="currentColor" opacity="0.50"/>
-                <polygon points="21,4 12,20 30,20" fill="currentColor" opacity="0.60"/>
-              </svg>
-            </div>
-          </div>
+							<div class="ic-rows">
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-branch">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<circle cx="5" cy="4" r="1.5" />
+												<circle cx="5" cy="12" r="1.5" />
+												<circle cx="11" cy="4" r="1.5" />
+												<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+											</svg>
+											feat/forest-drag-physics
+										</span>
+										<span class="gk-badge gk-badge-info">worktree</span>
+										<span class="gk-badge gk-badge-success">synced</span>
+										<span class="gk-badge gk-badge-success">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<path d="M3 8l3 3 7-7" />
+											</svg>
+											merge-ready
+										</span>
+									</div>
+								</div>
 
-          <div class="ic-rows">
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-branch">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                  feat/forest-drag-physics
-                </span>
-                <span class="gk-badge gk-badge-info">worktree</span>
-                <span class="gk-badge gk-badge-success">synced</span>
-                <span class="gk-badge gk-badge-success">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M3 8l3 3 7-7" /></svg>
-                  merge-ready
-                </span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="gk-badge gk-badge-success">PR #399 open</span>
+										<span class="gk-badge gk-badge-info">Issue #203</span>
+										<span class="gk-badge gk-badge-success">approved</span>
+									</div>
+								</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="gk-badge gk-badge-success">PR #399 open</span>
-                <span class="gk-badge gk-badge-info">Issue #203</span>
-                <span class="gk-badge gk-badge-success">approved</span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-gh-label label-feature">feature</span>
+										<span class="ic-gh-label label-dx">dx</span>
+										<span class="ic-gh-label label-animation">animation</span>
+									</div>
+								</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-gh-label label-feature">feature</span>
-                <span class="ic-gh-label label-dx">dx</span>
-                <span class="ic-gh-label label-animation">animation</span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-check-item dev-server-on">:1420</span>
+										<span class="ic-check-item passing">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<path d="M3 8l3 3 7-7" />
+											</svg>
+											14/14 passing
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-check-item dev-server-on">:1420</span>
-                <span class="ic-check-item passing">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M3 8l3 3 7-7" /></svg>
-                  14/14 passing
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+				<div class="section-divider"></div>
 
-    <div class="section-divider"></div>
+				<!-- ── STATE: SELECTED (batch) ────────────────────── -->
+				<div class="state-section">
+					<div class="state-label">
+						state / selected (batch) &mdash; coral (primary ring, accent bar stays
+						coral)
+					</div>
 
-    <!-- ── STATE: SELECTED (batch) ────────────────────── -->
-    <div class="state-section">
-      <div class="state-label">state / selected (batch) &mdash; coral (primary ring, accent bar stays coral)</div>
+					<div class="ic-card state-selected" data-color="coral">
+						<div class="ic-header">
+							<div class="ic-header-top">
+								<span class="ic-issue-number">#229</span>
+								<span class="ic-title"
+									>SQLite WAL-mode migration &mdash; concurrent read
+									performance</span
+								>
+								<span class="ic-children">
+									<svg class="ic-icon-sm" viewBox="0 0 16 16">
+										<path d="M8 2v12M4 10l4 4 4-4" />
+									</svg>
+									3
+								</span>
+							</div>
+							<div class="ic-chips">
+								<span class="ic-session-chip paused">
+									<span class="ic-dot"></span>
+									Paused
+								</span>
+								<span class="ic-priority low">
+									<svg class="ic-icon-sm" viewBox="0 0 16 16">
+										<path d="M8 13V7M5 10l3-3 3 3" stroke-width="1.6" />
+									</svg>
+									Low
+								</span>
+								<div class="ic-chips-right">
+									<button
+										class="ic-action"
+										title="Open in editor"
+										aria-label="Open in editor"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path d="M3 8h10M9 4l4 4-4 4" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="Open terminal"
+										aria-label="Open terminal"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path d="M3 4l4 4-4 4M9 12h4" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="No PR yet"
+										aria-label="No pull request"
+										disabled
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<circle cx="5" cy="4" r="1.5" />
+											<circle cx="5" cy="12" r="1.5" />
+											<circle cx="11" cy="4" r="1.5" />
+											<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+										</svg>
+									</button>
+									<button
+										class="ic-action"
+										title="Mute notifications"
+										aria-label="Mute notifications"
+									>
+										<svg class="ic-icon" viewBox="0 0 16 16">
+											<path
+												d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0"
+											/>
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
 
-      <div class="ic-card state-selected" data-color="coral">
-        <div class="ic-header">
-          <div class="ic-header-top">
-            <span class="ic-issue-number">#229</span>
-            <span class="ic-title">SQLite WAL-mode migration &mdash; concurrent read performance</span>
-            <span class="ic-children">
-              <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 2v12M4 10l4 4 4-4" /></svg>
-              3
-            </span>
-          </div>
-          <div class="ic-chips">
-            <span class="ic-session-chip paused">
-              <span class="ic-dot"></span>
-              Paused
-            </span>
-            <span class="ic-priority low">
-              <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M8 13V7M5 10l3-3 3 3" stroke-width="1.6" /></svg>
-              Low
-            </span>
-            <div class="ic-chips-right">
-              <button class="ic-action" title="Open in editor" aria-label="Open in editor">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
-              </button>
-              <button class="ic-action" title="Open terminal" aria-label="Open terminal">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M3 4l4 4-4 4M9 12h4" /></svg>
-              </button>
-              <button class="ic-action" title="No PR yet" aria-label="No pull request" disabled>
-                <svg class="ic-icon" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-              </button>
-              <button class="ic-action" title="Mute notifications" aria-label="Mute notifications">
-                <svg class="ic-icon" viewBox="0 0 16 16"><path d="M8 3c-2.2 0-4 1.8-4 4v3l-1 1h10l-1-1V7c0-2.2-1.8-4-4-4zM6.5 13a1.5 1.5 0 003 0" /></svg>
-              </button>
-            </div>
-          </div>
-        </div>
+						<div class="ic-body">
+							<div class="ic-thumbnail">
+								<div class="ic-thumb-inner">
+									<svg
+										class="ic-thumb-tree"
+										viewBox="0 0 42 52"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										style="color: var(--ic-accent)"
+									>
+										<rect
+											x="18"
+											y="38"
+											width="6"
+											height="12"
+											rx="1"
+											fill="currentColor"
+											opacity="0.45"
+										/>
+										<ellipse
+											cx="21"
+											cy="25"
+											rx="16"
+											ry="15"
+											fill="currentColor"
+											opacity="0.22"
+										/>
+										<ellipse
+											cx="15"
+											cy="22"
+											rx="10"
+											ry="10"
+											fill="currentColor"
+											opacity="0.30"
+										/>
+										<ellipse
+											cx="27"
+											cy="20"
+											rx="11"
+											ry="11"
+											fill="currentColor"
+											opacity="0.30"
+										/>
+										<ellipse
+											cx="21"
+											cy="17"
+											rx="10"
+											ry="12"
+											fill="currentColor"
+											opacity="0.40"
+										/>
+									</svg>
+								</div>
+							</div>
 
-        <div class="ic-body">
-          <div class="ic-thumbnail">
-            <div class="ic-thumb-inner">
-              <svg class="ic-thumb-tree" viewBox="0 0 42 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--ic-accent)">
-                <rect x="18" y="38" width="6" height="12" rx="1" fill="currentColor" opacity="0.45"/>
-                <ellipse cx="21" cy="25" rx="16" ry="15" fill="currentColor" opacity="0.22"/>
-                <ellipse cx="15" cy="22" rx="10" ry="10" fill="currentColor" opacity="0.30"/>
-                <ellipse cx="27" cy="20" rx="11" ry="11" fill="currentColor" opacity="0.30"/>
-                <ellipse cx="21" cy="17" rx="10" ry="12" fill="currentColor" opacity="0.40"/>
-              </svg>
-            </div>
-          </div>
+							<div class="ic-rows">
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-branch">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<circle cx="5" cy="4" r="1.5" />
+												<circle cx="5" cy="12" r="1.5" />
+												<circle cx="11" cy="4" r="1.5" />
+												<path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" />
+											</svg>
+											chore/sqlite-wal-perf
+										</span>
+										<span class="gk-badge gk-badge-info">worktree</span>
+										<span class="gk-badge gk-badge-warning">1 conflict</span>
+									</div>
+								</div>
 
-          <div class="ic-rows">
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-branch">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><circle cx="5" cy="4" r="1.5" /><circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="4" r="1.5" /><path d="M5 5.5v5M11 5.5c0 3.5-2 5-6 5" /></svg>
-                  chore/sqlite-wal-perf
-                </span>
-                <span class="gk-badge gk-badge-info">worktree</span>
-                <span class="gk-badge gk-badge-warning">1 conflict</span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="gk-badge gk-badge-subtle">no PR yet</span>
+										<span class="gk-badge gk-badge-info">Issue #229</span>
+									</div>
+								</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="gk-badge gk-badge-subtle">no PR yet</span>
-                <span class="gk-badge gk-badge-info">Issue #229</span>
-              </div>
-            </div>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-gh-label label-perf">performance</span>
+										<span class="ic-gh-label label-infra">infra</span>
+										<span class="ic-gh-label label-bug">bug</span>
+									</div>
+								</div>
 
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-gh-label label-perf">performance</span>
-                <span class="ic-gh-label label-infra">infra</span>
-                <span class="ic-gh-label label-bug">bug</span>
-              </div>
-            </div>
-
-            <div class="ic-row">
-              <div class="ic-row-content">
-                <span class="ic-check-item dev-server-off">no dev server</span>
-                <span class="ic-check-item failing">
-                  <svg class="ic-icon-sm" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" /></svg>
-                  2 failing
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /page-root -->
-</div><!-- /gk-root -->
-</body>
+								<div class="ic-row">
+									<div class="ic-row-content">
+										<span class="ic-check-item dev-server-off"
+											>no dev server</span
+										>
+										<span class="ic-check-item failing">
+											<svg class="ic-icon-sm" viewBox="0 0 16 16">
+												<path d="M4 4l8 8M12 4l-8 8" />
+											</svg>
+											2 failing
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /page-root -->
+		</div>
+		<!-- /gk-root -->
+	</body>
 </html>

@@ -1,1253 +1,1679 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RefreshIndicator — Variant A: Inline Label</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>RefreshIndicator — Variant A: Inline Label</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
    DESIGN TOKENS — inlined from tokens.css
    ============================================================ */
 
-:root {
-  /* Brand greens (deep moss + olive) */
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
+			:root {
+				/* Brand greens (deep moss + olive) */
+				--moss-50: oklch(0.972 0.018 130);
+				--moss-100: oklch(0.94 0.034 130);
+				--moss-200: oklch(0.88 0.058 130);
+				--moss-300: oklch(0.795 0.082 130);
+				--moss-400: oklch(0.69 0.098 132);
+				--moss-500: oklch(0.58 0.096 134);
+				--moss-600: oklch(0.48 0.082 138);
+				--moss-700: oklch(0.395 0.066 142);
+				--moss-800: oklch(0.3 0.048 145);
+				--moss-900: oklch(0.215 0.032 148);
+				--moss-950: oklch(0.155 0.024 150);
 
-  /* Olive / amber accent (autumn fruit) */
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+				/* Olive / amber accent (autumn fruit) */
+				--amber-300: oklch(0.84 0.13 78);
+				--amber-400: oklch(0.77 0.15 65);
+				--amber-500: oklch(0.69 0.165 55);
+				--amber-600: oklch(0.595 0.16 48);
 
-  /* Bark (warm brown for trunks, secondary accents) */
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+				/* Bark (warm brown for trunks, secondary accents) */
+				--bark-300: oklch(0.7 0.06 60);
+				--bark-500: oklch(0.5 0.075 55);
+				--bark-700: oklch(0.345 0.055 50);
 
-  /* Azure (cool blue accent scale) */
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+				/* Azure (cool blue accent scale) */
+				--azure-300: oklch(0.75 0.09 230);
+				--azure-400: oklch(0.66 0.12 230);
+				--azure-500: oklch(0.57 0.13 235);
+				--azure-600: oklch(0.49 0.115 240);
+				--azure-700: oklch(0.4 0.095 240);
 
-  /* Plum (purple accent) */
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
+				/* Plum (purple accent) */
+				--plum-300: oklch(0.72 0.1 320);
+				--plum-400: oklch(0.64 0.13 320);
+				--plum-500: oklch(0.56 0.15 320);
+				--plum-600: oklch(0.48 0.13 320);
+				--plum-700: oklch(0.4 0.11 320);
 
-  /* Teal (blue-green accent) */
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
+				/* Teal (blue-green accent) */
+				--teal-300: oklch(0.78 0.075 195);
+				--teal-400: oklch(0.7 0.095 195);
+				--teal-500: oklch(0.62 0.11 195);
+				--teal-600: oklch(0.54 0.095 195);
+				--teal-700: oklch(0.46 0.08 195);
 
-  /* Rose (warm pink-red accent) */
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
+				/* Rose (warm pink-red accent) */
+				--rose-300: oklch(0.8 0.105 15);
+				--rose-400: oklch(0.72 0.135 15);
+				--rose-500: oklch(0.64 0.155 15);
+				--rose-600: oklch(0.56 0.135 15);
+				--rose-700: oklch(0.48 0.115 15);
 
-  /* Coral (warm orange-red accent) */
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
+				/* Coral (warm orange-red accent) */
+				--coral-300: oklch(0.78 0.105 30);
+				--coral-400: oklch(0.7 0.135 30);
+				--coral-500: oklch(0.62 0.155 30);
+				--coral-600: oklch(0.54 0.135 30);
+				--coral-700: oklch(0.46 0.115 30);
 
-  /* Gold (warm yellow accent) */
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
+				/* Gold (warm yellow accent) */
+				--gold-300: oklch(0.81 0.09 90);
+				--gold-400: oklch(0.73 0.115 90);
+				--gold-500: oklch(0.65 0.135 90);
+				--gold-600: oklch(0.57 0.115 90);
+				--gold-700: oklch(0.49 0.095 90);
 
-  /* Sage (muted green accent) */
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
+				/* Sage (muted green accent) */
+				--sage-300: oklch(0.76 0.055 160);
+				--sage-400: oklch(0.68 0.07 160);
+				--sage-500: oklch(0.6 0.085 160);
+				--sage-600: oklch(0.52 0.07 160);
+				--sage-700: oklch(0.44 0.06 160);
 
-  /* Indigo (deep blue-violet accent) */
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
+				/* Indigo (deep blue-violet accent) */
+				--indigo-300: oklch(0.7 0.095 275);
+				--indigo-400: oklch(0.62 0.12 275);
+				--indigo-500: oklch(0.54 0.14 275);
+				--indigo-600: oklch(0.46 0.12 275);
+				--indigo-700: oklch(0.38 0.1 275);
 
-  /* Fuchsia (vivid magenta accent) */
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
+				/* Fuchsia (vivid magenta accent) */
+				--fuchsia-300: oklch(0.74 0.105 350);
+				--fuchsia-400: oklch(0.66 0.135 350);
+				--fuchsia-500: oklch(0.58 0.155 350);
+				--fuchsia-600: oklch(0.5 0.135 350);
+				--fuchsia-700: oklch(0.42 0.115 350);
 
-  /* Sky (gradient bg for forest view) */
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
+				/* Sky (gradient bg for forest view) */
+				--sky-light-top: oklch(0.965 0.018 220);
+				--sky-light-bot: oklch(0.94 0.025 130);
+				--sky-dark-top: oklch(0.225 0.028 240);
+				--sky-dark-bot: oklch(0.18 0.03 150);
 
-  /* Status accents */
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
+				/* Status accents */
+				--status-success: oklch(0.66 0.135 145);
+				--status-warning: oklch(0.77 0.155 75);
+				--status-danger: oklch(0.62 0.205 25);
+				--status-info: oklch(0.66 0.105 220);
+				--status-merged: oklch(0.58 0.14 310);
 
-  /* Priority levels */
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
+				/* Priority levels */
+				--priority-top: oklch(0.62 0.205 25);
+				--priority-high: oklch(0.72 0.16 55);
+				--priority-medium: oklch(0.82 0.16 85);
+				--priority-low: oklch(0.66 0.105 220);
+				--priority-lowest: oklch(0.55 0.02 250);
 
-  /* GitHub state colors */
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
+				/* GitHub state colors */
+				--gh-open: oklch(0.66 0.135 145);
+				--gh-closed: oklch(0.58 0.14 310);
+				--gh-merged: oklch(0.58 0.14 310);
+				--gh-draft: oklch(0.55 0.02 250);
 
-  /* Session state colors */
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
+				/* Session state colors */
+				--session-running: oklch(0.66 0.135 145);
+				--session-errored: oklch(0.62 0.205 25);
+				--session-idle: oklch(0.66 0.105 220);
+				--session-paused: oklch(0.55 0.02 250);
+				--session-finished: oklch(0.45 0.015 250);
+				--session-needs-input: oklch(0.77 0.155 75);
+				--session-needs-review: oklch(0.66 0.105 220);
 
-  /* Typography */
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+				/* Typography */
+				--font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+				--font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
 
-  /* Font sizes */
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
+				/* Font sizes */
+				--text-2xs: 10.5px;
+				--text-xs: 11px;
+				--text-sm: 12px;
+				--text-md: 13px;
+				--text-base: 14px;
+				--text-lg: 15px;
+				--text-xl: 17px;
+				--text-2xl: 22px;
+				--text-3xl: 28px;
+				--text-4xl: 36px;
+				--text-5xl: 48px;
 
-  /* Line heights */
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
+				/* Line heights */
+				--leading-tight: 1.15;
+				--leading-snug: 1.25;
+				--leading-normal: 1.4;
+				--leading-relaxed: 1.55;
+				--leading-loose: 1.7;
 
-  /* Font weights */
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
+				/* Font weights */
+				--weight-regular: 400;
+				--weight-medium: 500;
+				--weight-semibold: 600;
+				--weight-bold: 700;
 
-  /* Letter spacing */
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
+				/* Letter spacing */
+				--tracking-tight: -0.02em;
+				--tracking-snug: -0.01em;
+				--tracking-normal: 0;
+				--tracking-wide: 0.04em;
+				--tracking-wider: 0.08em;
 
-  /* Spacing scale (4px base) */
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
+				/* Spacing scale (4px base) */
+				--space-0: 0;
+				--space-1: 2px;
+				--space-2: 4px;
+				--space-3: 6px;
+				--space-4: 8px;
+				--space-5: 10px;
+				--space-6: 12px;
+				--space-7: 14px;
+				--space-8: 16px;
+				--space-10: 20px;
+				--space-12: 24px;
+				--space-14: 28px;
+				--space-16: 32px;
+				--space-20: 40px;
+				--space-24: 48px;
+				--space-32: 64px;
 
-  /* Radii */
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
+				/* Radii */
+				--radius-none: 0;
+				--radius-xs: 4px;
+				--radius-sm: 6px;
+				--radius-md: 8px;
+				--radius-lg: 10px;
+				--radius-xl: 14px;
+				--radius-2xl: 20px;
+				--radius-full: 9999px;
 
-  /* Borders */
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
+				/* Borders */
+				--border-width-1: 1px;
+				--border-width-2: 1.5px;
+				--border-width-3: 2px;
+				--focus-ring-width: 3px;
+				--focus-ring-offset: 2px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+				/* Shadows */
+				--shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+				--shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+				--shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+				--shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.2), 0 4px 12px rgba(20, 30, 22, 0.08);
+				--shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-  /* Sizing */
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
+				/* Sizing */
+				--size-control-sm: 26px;
+				--size-control-md: 32px;
+				--size-control-lg: 38px;
 
-  /* Z-index scale */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
+				/* Z-index scale */
+				--z-base: 0;
+				--z-raised: 10;
+				--z-dropdown: 20;
+				--z-sticky: 30;
+				--z-overlay: 40;
+				--z-modal: 50;
+				--z-toast: 60;
+				--z-tooltip: 70;
 
-  /* Motion */
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
+				/* Motion */
+				--duration-1: 90ms;
+				--duration-2: 120ms;
+				--duration-3: 160ms;
+				--duration-4: 220ms;
+				--duration-5: 320ms;
+				--ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
+				--ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);
+				--ease-in: cubic-bezier(0.5, 0, 0.75, 0);
 
-  /* Layout */
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
+				/* Layout */
+				--sidebar-width: 240px;
+				--sidebar-width-collapsed: 56px;
+			}
 
-/* Light theme */
-.theme-light, [data-theme='light'] {
-  color-scheme: light;
-  --background:        oklch(0.985 0.005 130);
-  --surface:           oklch(1.000 0 0);
-  --surface-2:         oklch(0.965 0.008 130);
-  --surface-hover:     oklch(0.940 0.012 130);
-  --surface-3:         oklch(0.940 0.012 130);
-  --foreground:        oklch(0.205 0.015 145);
-  --foreground-muted:  oklch(0.460 0.015 145);
-  --foreground-subtle: oklch(0.620 0.012 145);
-  --border:            oklch(0.900 0.012 135);
-  --border-strong:     oklch(0.815 0.018 135);
-  --primary:           var(--moss-700);
-  --primary-fg:        oklch(0.985 0.008 130);
-  --primary-soft:      oklch(0.920 0.030 135);
-  --accent:            var(--moss-500);
-  --accent-fg:         oklch(0.985 0.008 130);
-  --ring:              var(--moss-600);
-  --sidebar-bg:        oklch(0.955 0.010 135);
-  --sidebar-fg:        oklch(0.300 0.020 145);
-  --code-bg:           oklch(0.955 0.010 135);
-  --sky-top:           var(--sky-light-top);
-  --sky-bot:           var(--sky-light-bot);
-  --ground-color:      oklch(0.550 0.090 135);
-  --ground-dark:       oklch(0.380 0.060 55);
-}
+			/* Light theme */
+			.theme-light,
+			[data-theme='light'] {
+				color-scheme: light;
+				--background: oklch(0.985 0.005 130);
+				--surface: oklch(1 0 0);
+				--surface-2: oklch(0.965 0.008 130);
+				--surface-hover: oklch(0.94 0.012 130);
+				--surface-3: oklch(0.94 0.012 130);
+				--foreground: oklch(0.205 0.015 145);
+				--foreground-muted: oklch(0.46 0.015 145);
+				--foreground-subtle: oklch(0.62 0.012 145);
+				--border: oklch(0.9 0.012 135);
+				--border-strong: oklch(0.815 0.018 135);
+				--primary: var(--moss-700);
+				--primary-fg: oklch(0.985 0.008 130);
+				--primary-soft: oklch(0.92 0.03 135);
+				--accent: var(--moss-500);
+				--accent-fg: oklch(0.985 0.008 130);
+				--ring: var(--moss-600);
+				--sidebar-bg: oklch(0.955 0.01 135);
+				--sidebar-fg: oklch(0.3 0.02 145);
+				--code-bg: oklch(0.955 0.01 135);
+				--sky-top: var(--sky-light-top);
+				--sky-bot: var(--sky-light-bot);
+				--ground-color: oklch(0.55 0.09 135);
+				--ground-dark: oklch(0.38 0.06 55);
+			}
 
-/* Dark theme — primary mode */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
+			/* Dark theme — primary mode */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
 
-.gk-root, .gk-root * {
-  box-sizing: border-box;
-}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-.font-mono { font-family: var(--font-mono); }
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-/* Buttons */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition:
-    background var(--duration-2) var(--ease-standard),
-    border-color var(--duration-2) var(--ease-standard),
-    color var(--duration-2) var(--ease-standard),
-    transform var(--duration-1) var(--ease-standard),
-    box-shadow var(--duration-2) var(--ease-standard),
-    opacity var(--duration-2) var(--ease-standard);
-  white-space: nowrap;
-  user-select: none;
-  position: relative;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-}
-.gk-btn-secondary:active {
-  transform: scale(0.96);
-  filter: brightness(0.95);
-}
-.gk-btn-secondary:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-.gk-btn-sm {
-  height: var(--size-control-sm);
-  padding: 0 9px;
-  font-size: 12px;
-  border-radius: var(--radius-sm);
-}
-.gk-btn-icon {
-  padding: 0;
-  width: 32px;
-}
-.gk-btn-icon.gk-btn-sm {
-  width: var(--size-control-sm);
-}
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					transform var(--duration-1) var(--ease-standard),
+					box-shadow var(--duration-2) var(--ease-standard),
+					opacity var(--duration-2) var(--ease-standard);
+				white-space: nowrap;
+				user-select: none;
+				position: relative;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-secondary:active {
+				transform: scale(0.96);
+				filter: brightness(0.95);
+			}
+			.gk-btn-secondary:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-sm {
+				height: var(--size-control-sm);
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: var(--size-control-sm);
+			}
 
-/* Card */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-/* Type scale */
-.gk-h3 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-}
-.gk-eyebrow {
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
+			/* Type scale */
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-/* Divider */
-.gk-hr {
-  height: 1px;
-  background: var(--border);
-  border: none;
-  margin: 0;
-}
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-/* Animations from tokens */
-@keyframes gk-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-.gk-pulse { animation: gk-pulse 1.8s ease-in-out infinite; }
+			/* Animations from tokens */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
 
-@keyframes gk-spin {
-  to { transform: rotate(360deg); }
-}
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-/* ============================================================
+			/* ============================================================
    REFRESH INDICATOR — Component styles
    ============================================================ */
 
-/* Spinning icon for loading state */
-@keyframes ri-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+			/* Spinning icon for loading state */
+			@keyframes ri-spin {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-/* Badge dot pulse */
-@keyframes ri-dot-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 color-mix(in oklch, var(--status-success) 55%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-success) 0%, transparent);
-  }
-}
+			/* Badge dot pulse */
+			@keyframes ri-dot-pulse {
+				0%,
+				100% {
+					box-shadow: 0 0 0 0 color-mix(in oklch, var(--status-success) 55%, transparent);
+				}
+				50% {
+					box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-success) 0%, transparent);
+				}
+			}
 
-/* Checkmark flash for fresh state */
-@keyframes ri-fresh-flash {
-  0%   { color: var(--status-success); }
-  60%  { color: var(--status-success); }
-  100% { color: var(--foreground-muted); }
-}
+			/* Checkmark flash for fresh state */
+			@keyframes ri-fresh-flash {
+				0% {
+					color: var(--status-success);
+				}
+				60% {
+					color: var(--status-success);
+				}
+				100% {
+					color: var(--foreground-muted);
+				}
+			}
 
-/* The compound widget: label + icon button */
-.ri-widget {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-shrink: 0;
-}
+			/* The compound widget: label + icon button */
+			.ri-widget {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex-shrink: 0;
+			}
 
-/* Text label to the LEFT of the button */
-.ri-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--foreground-subtle);
-  transition: color var(--duration-3) var(--ease-out);
-}
+			/* Text label to the LEFT of the button */
+			.ri-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-variant-numeric: tabular-nums;
+				letter-spacing: 0;
+				line-height: 1;
+				white-space: nowrap;
+				color: var(--foreground-subtle);
+				transition: color var(--duration-3) var(--ease-out);
+			}
 
-/* Icon button wrapper with badge support */
-.ri-btn-wrapper {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-}
+			/* Icon button wrapper with badge support */
+			.ri-btn-wrapper {
+				position: relative;
+				display: inline-flex;
+				flex-shrink: 0;
+			}
 
-/* The icon button itself — 26px square */
-.ri-btn {
-  width: var(--size-control-sm);
-  height: var(--size-control-sm);
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  color: var(--foreground-muted);
-  transition:
-    background var(--duration-2) var(--ease-standard),
-    border-color var(--duration-2) var(--ease-standard),
-    color var(--duration-2) var(--ease-standard),
-    transform var(--duration-1) var(--ease-standard);
-  flex-shrink: 0;
-}
-.ri-btn:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-  color: var(--foreground);
-}
-.ri-btn:active {
-  transform: scale(0.93);
-}
-.ri-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.ri-btn:disabled,
-.ri-btn[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+			/* The icon button itself — 26px square */
+			.ri-btn {
+				width: var(--size-control-sm);
+				height: var(--size-control-sm);
+				padding: 0;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				color: var(--foreground-muted);
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					transform var(--duration-1) var(--ease-standard);
+				flex-shrink: 0;
+			}
+			.ri-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.ri-btn:active {
+				transform: scale(0.93);
+			}
+			.ri-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.ri-btn:disabled,
+			.ri-btn[aria-disabled='true'] {
+				opacity: 0.5;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-/* SVG icon inside the button */
-.ri-icon {
-  width: 13px;
-  height: 13px;
-  display: block;
-  flex-shrink: 0;
-}
+			/* SVG icon inside the button */
+			.ri-icon {
+				width: 13px;
+				height: 13px;
+				display: block;
+				flex-shrink: 0;
+			}
 
-/* ── State: loading — spin the icon */
-.ri-widget[data-state="loading"] .ri-icon {
-  animation: ri-spin 0.75s linear infinite;
-}
-.ri-widget[data-state="loading"] .ri-label {
-  color: var(--foreground-subtle);
-  opacity: 0.65;
-}
-.ri-widget[data-state="loading"] .ri-btn {
-  cursor: default;
-  pointer-events: none;
-}
+			/* ── State: loading — spin the icon */
+			.ri-widget[data-state='loading'] .ri-icon {
+				animation: ri-spin 0.75s linear infinite;
+			}
+			.ri-widget[data-state='loading'] .ri-label {
+				color: var(--foreground-subtle);
+				opacity: 0.65;
+			}
+			.ri-widget[data-state='loading'] .ri-btn {
+				cursor: default;
+				pointer-events: none;
+			}
 
-/* ── State: fresh — subtle green tint on icon */
-.ri-widget[data-state="fresh"] .ri-btn {
-  color: var(--status-success);
-  border-color: color-mix(in oklch, var(--status-success) 28%, var(--border));
-  background: color-mix(in oklch, var(--status-success) 8%, var(--surface-2));
-}
-.ri-widget[data-state="fresh"] .ri-label {
-  color: color-mix(in oklch, var(--status-success) 70%, var(--foreground-muted));
-}
+			/* ── State: fresh — subtle green tint on icon */
+			.ri-widget[data-state='fresh'] .ri-btn {
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 28%, var(--border));
+				background: color-mix(in oklch, var(--status-success) 8%, var(--surface-2));
+			}
+			.ri-widget[data-state='fresh'] .ri-label {
+				color: color-mix(in oklch, var(--status-success) 70%, var(--foreground-muted));
+			}
 
-/* ── State: stale — fade both icon and label to muted */
-.ri-widget[data-state="stale"] .ri-btn {
-  color: var(--foreground-subtle);
-  opacity: 0.7;
-}
-.ri-widget[data-state="stale"] .ri-label {
-  opacity: 0.55;
-}
+			/* ── State: stale — fade both icon and label to muted */
+			.ri-widget[data-state='stale'] .ri-btn {
+				color: var(--foreground-subtle);
+				opacity: 0.7;
+			}
+			.ri-widget[data-state='stale'] .ri-label {
+				opacity: 0.55;
+			}
 
-/* ── State: new-data — primary badge dot on corner */
-.ri-badge-dot {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-full);
-  background: var(--status-success);
-  border: 1.5px solid var(--background);
-  display: none;
-  z-index: var(--z-raised);
-}
+			/* ── State: new-data — primary badge dot on corner */
+			.ri-badge-dot {
+				position: absolute;
+				top: -3px;
+				right: -3px;
+				width: 7px;
+				height: 7px;
+				border-radius: var(--radius-full);
+				background: var(--status-success);
+				border: 1.5px solid var(--background);
+				display: none;
+				z-index: var(--z-raised);
+			}
 
-.ri-widget[data-state="new-data"] .ri-badge-dot {
-  display: block;
-  animation: ri-dot-pulse 2s ease-in-out infinite;
-}
-.ri-widget[data-state="new-data"] .ri-btn {
-  border-color: color-mix(in oklch, var(--status-success) 35%, var(--border));
-}
-.ri-widget[data-state="new-data"] .ri-label {
-  color: var(--foreground-muted);
-}
+			.ri-widget[data-state='new-data'] .ri-badge-dot {
+				display: block;
+				animation: ri-dot-pulse 2s ease-in-out infinite;
+			}
+			.ri-widget[data-state='new-data'] .ri-btn {
+				border-color: color-mix(in oklch, var(--status-success) 35%, var(--border));
+			}
+			.ri-widget[data-state='new-data'] .ri-label {
+				color: var(--foreground-muted);
+			}
 
-/* ============================================================
+			/* ============================================================
    PAGE CHROME — for in-context placement demos
    ============================================================ */
 
-/* Page header toolbar */
-.demo-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
+			/* Page header toolbar */
+			.demo-toolbar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				padding: var(--space-3) var(--space-4);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-.demo-toolbar-title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  color: var(--foreground);
-  margin-right: var(--space-3);
-}
+			.demo-toolbar-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+				margin-right: var(--space-3);
+			}
 
-.demo-toolbar-sep {
-  width: 1px;
-  height: 18px;
-  background: var(--border);
-  margin: 0 var(--space-1);
-  flex-shrink: 0;
-}
+			.demo-toolbar-sep {
+				width: 1px;
+				height: 18px;
+				background: var(--border);
+				margin: 0 var(--space-1);
+				flex-shrink: 0;
+			}
 
-/* Generic icon-only toolbar button (sibling buttons for context) */
-.demo-icon-btn {
-  width: var(--size-control-sm);
-  height: var(--size-control-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  color: var(--foreground-subtle);
-  transition:
-    background var(--duration-2) var(--ease-standard),
-    color var(--duration-2) var(--ease-standard),
-    border-color var(--duration-2) var(--ease-standard);
-  padding: 0;
-}
-.demo-icon-btn:hover {
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border-color: var(--border);
-}
-.demo-icon-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
+			/* Generic icon-only toolbar button (sibling buttons for context) */
+			.demo-icon-btn {
+				width: var(--size-control-sm);
+				height: var(--size-control-sm);
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard);
+				padding: 0;
+			}
+			.demo-icon-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border-color: var(--border);
+			}
+			.demo-icon-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
 
-/* Spacer that pushes right-side items to the end */
-.demo-toolbar-spacer {
-  flex: 1;
-}
+			/* Spacer that pushes right-side items to the end */
+			.demo-toolbar-spacer {
+				flex: 1;
+			}
 
-/* Card header with title + refresh indicator */
-.demo-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6) var(--space-8);
-  border-bottom: 1px solid var(--border);
-}
+			/* Card header with title + refresh indicator */
+			.demo-card-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-6) var(--space-8);
+				border-bottom: 1px solid var(--border);
+			}
 
-.demo-card-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
+			.demo-card-header-left {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
 
-.demo-card-title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  color: var(--foreground);
-  line-height: var(--leading-tight);
-}
+			.demo-card-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+				line-height: var(--leading-tight);
+			}
 
-.demo-card-subtitle {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.02em;
-}
+			.demo-card-subtitle {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.02em;
+			}
 
-.demo-card-body {
-  padding: var(--space-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
+			.demo-card-body {
+				padding: var(--space-8);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
 
-/* Skeleton rows for card body */
-.demo-skeleton-row {
-  height: 10px;
-  background: var(--surface-2);
-  border-radius: var(--radius-xs);
-  opacity: 0.6;
-}
+			/* Skeleton rows for card body */
+			.demo-skeleton-row {
+				height: 10px;
+				background: var(--surface-2);
+				border-radius: var(--radius-xs);
+				opacity: 0.6;
+			}
 
-/* ============================================================
+			/* ============================================================
    SHOWCASE PAGE LAYOUT
    ============================================================ */
 
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+			}
 
-.page-shell {
-  min-height: 100vh;
-  padding: var(--space-16) var(--space-12);
-  max-width: 980px;
-  margin: 0 auto;
-}
+			.page-shell {
+				min-height: 100vh;
+				padding: var(--space-16) var(--space-12);
+				max-width: 980px;
+				margin: 0 auto;
+			}
 
-/* Section heading */
-.section-heading {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-  margin: 0 0 var(--space-8) 0;
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border);
-}
+			/* Section heading */
+			.section-heading {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: 500;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				margin: 0 0 var(--space-8) 0;
+				padding-bottom: var(--space-4);
+				border-bottom: 1px solid var(--border);
+			}
 
-/* Section spacer */
-.section-gap {
-  margin-top: var(--space-20);
-}
+			/* Section spacer */
+			.section-gap {
+				margin-top: var(--space-20);
+			}
 
-/* State grid: 5 columns for the 5 states */
-.states-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-4);
-}
+			/* State grid: 5 columns for the 5 states */
+			.states-grid {
+				display: grid;
+				grid-template-columns: repeat(5, 1fr);
+				gap: var(--space-4);
+			}
 
-@media (max-width: 700px) {
-  .states-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .states-grid .state-card:last-child {
-    grid-column: span 2;
-  }
-}
+			@media (max-width: 700px) {
+				.states-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				.states-grid .state-card:last-child {
+					grid-column: span 2;
+				}
+			}
 
-/* Individual state card */
-.state-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--space-7) var(--space-6) var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
+			/* Individual state card */
+			.state-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: var(--space-7) var(--space-6) var(--space-6);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-8);
+			}
 
-.state-card-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.05em;
-  text-transform: lowercase;
-}
+			.state-card-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.05em;
+				text-transform: lowercase;
+			}
 
-.state-card-stage {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 40px;
-}
+			.state-card-stage {
+				display: flex;
+				align-items: center;
+				justify-content: flex-start;
+				min-height: 40px;
+			}
 
-.state-card-note {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  line-height: 1.4;
-  border-top: 1px dashed var(--border);
-  padding-top: var(--space-3);
-  opacity: 0.75;
-}
+			.state-card-note {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				line-height: 1.4;
+				border-top: 1px dashed var(--border);
+				padding-top: var(--space-3);
+				opacity: 0.75;
+			}
 
-/* In-context placement grid */
-.context-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
-}
+			/* In-context placement grid */
+			.context-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-8);
+			}
 
-@media (max-width: 600px) {
-  .context-grid {
-    grid-template-columns: 1fr;
-  }
-}
+			@media (max-width: 600px) {
+				.context-grid {
+					grid-template-columns: 1fr;
+				}
+			}
 
-/* Anatomy callout */
-.anatomy-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-10);
-  padding: var(--space-8);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
+			/* Anatomy callout */
+			.anatomy-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-10);
+				padding: var(--space-8);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+			}
 
-.anatomy-callout-line {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
+			.anatomy-callout-line {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
 
-.anatomy-callout-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--foreground-subtle);
-  flex-shrink: 0;
-}
+			.anatomy-callout-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: var(--radius-full);
+				background: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
 
-.anatomy-callout-text {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-}
+			.anatomy-callout-text {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
 
-/* Variant eyebrow banner */
-.variant-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-16);
-}
+			/* Variant eyebrow banner */
+			.variant-banner {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-16);
+			}
 
-.variant-banner-tag {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--accent);
-  background: color-mix(in oklch, var(--accent) 10%, transparent);
-  border: 1px solid color-mix(in oklch, var(--accent) 25%, transparent);
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
-}
+			.variant-banner-tag {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: 600;
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--accent);
+				background: color-mix(in oklch, var(--accent) 10%, transparent);
+				border: 1px solid color-mix(in oklch, var(--accent) 25%, transparent);
+				padding: 3px 8px;
+				border-radius: var(--radius-xs);
+			}
 
-.variant-banner-title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-}
+			.variant-banner-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
 
-.variant-banner-desc {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  margin-left: auto;
-  letter-spacing: 0.01em;
-}
-  </style>
-</head>
-<body>
+			.variant-banner-desc {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-left: auto;
+				letter-spacing: 0.01em;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-shell">
+				<!-- Variant label banner -->
+				<div class="variant-banner">
+					<span class="gk-eyebrow" style="letter-spacing: var(--tracking-wider)"
+						>Variant</span
+					>
+					<span class="variant-banner-tag">A</span>
+					<span class="variant-banner-title">Inline Label</span>
+					<span class="variant-banner-desc"
+						>RefreshIndicator · 5 states · 2 context placements</span
+					>
+				</div>
 
-<div class="gk-root theme-dark">
-  <div class="page-shell">
+				<!-- ── SECTION: ALL 5 STATES ─────────────────────────────── -->
+				<p class="section-heading">Component states</p>
 
-    <!-- Variant label banner -->
-    <div class="variant-banner">
-      <span class="gk-eyebrow" style="letter-spacing: var(--tracking-wider);">Variant</span>
-      <span class="variant-banner-tag">A</span>
-      <span class="variant-banner-title">Inline Label</span>
-      <span class="variant-banner-desc">RefreshIndicator · 5 states · 2 context placements</span>
-    </div>
+				<div class="states-grid">
+					<!-- 1. IDLE -->
+					<div class="state-card">
+						<span class="state-card-label">idle</span>
+						<div class="state-card-stage">
+							<div class="ri-widget" data-state="idle">
+								<span class="ri-label">Refresh metrics</span>
+								<div class="ri-btn-wrapper">
+									<button
+										class="ri-btn"
+										aria-label="Refresh metrics"
+										type="button"
+									>
+										<!-- RefreshCw SVG -->
+										<svg
+											class="ri-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</button>
+									<span class="ri-badge-dot" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+						<p class="state-card-note">
+							Default secondary style · interactive · no badge
+						</p>
+					</div>
 
-    <!-- ── SECTION: ALL 5 STATES ─────────────────────────────── -->
-    <p class="section-heading">Component states</p>
+					<!-- 2. LOADING -->
+					<div class="state-card">
+						<span class="state-card-label">loading</span>
+						<div class="state-card-stage">
+							<div class="ri-widget" data-state="loading">
+								<span class="ri-label">Refreshing...</span>
+								<div class="ri-btn-wrapper">
+									<button
+										class="ri-btn"
+										aria-label="Refreshing, please wait"
+										aria-disabled="true"
+										type="button"
+									>
+										<svg
+											class="ri-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</button>
+									<span class="ri-badge-dot" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+						<p class="state-card-note">Icon spins · label muted · non-interactive</p>
+					</div>
 
-    <div class="states-grid">
+					<!-- 3. FRESH -->
+					<div class="state-card">
+						<span class="state-card-label">fresh</span>
+						<div class="state-card-stage">
+							<div class="ri-widget" data-state="fresh">
+								<span class="ri-label">Updated just now</span>
+								<div class="ri-btn-wrapper">
+									<button
+										class="ri-btn"
+										aria-label="Data is fresh, refresh"
+										type="button"
+									>
+										<svg
+											class="ri-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</button>
+									<span class="ri-badge-dot" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+						<p class="state-card-note">Green icon tint · label echoes success</p>
+					</div>
 
-      <!-- 1. IDLE -->
-      <div class="state-card">
-        <span class="state-card-label">idle</span>
-        <div class="state-card-stage">
-          <div class="ri-widget" data-state="idle">
-            <span class="ri-label">Refresh metrics</span>
-            <div class="ri-btn-wrapper">
-              <button class="ri-btn" aria-label="Refresh metrics" type="button">
-                <!-- RefreshCw SVG -->
-                <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </button>
-              <span class="ri-badge-dot" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-        <p class="state-card-note">Default secondary style · interactive · no badge</p>
-      </div>
+					<!-- 4. STALE -->
+					<div class="state-card">
+						<span class="state-card-label">stale</span>
+						<div class="state-card-stage">
+							<div class="ri-widget" data-state="stale">
+								<span class="ri-label">Updated 5m ago</span>
+								<div class="ri-btn-wrapper">
+									<button
+										class="ri-btn"
+										aria-label="Data is stale, click to refresh"
+										type="button"
+									>
+										<svg
+											class="ri-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</button>
+									<span class="ri-badge-dot" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+						<p class="state-card-note">
+							Both icon and label fade to subtle · still clickable
+						</p>
+					</div>
 
-      <!-- 2. LOADING -->
-      <div class="state-card">
-        <span class="state-card-label">loading</span>
-        <div class="state-card-stage">
-          <div class="ri-widget" data-state="loading">
-            <span class="ri-label">Refreshing...</span>
-            <div class="ri-btn-wrapper">
-              <button class="ri-btn" aria-label="Refreshing, please wait" aria-disabled="true" type="button">
-                <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </button>
-              <span class="ri-badge-dot" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-        <p class="state-card-note">Icon spins · label muted · non-interactive</p>
-      </div>
+					<!-- 5. NEW DATA -->
+					<div class="state-card">
+						<span class="state-card-label">new-data</span>
+						<div class="state-card-stage">
+							<div class="ri-widget" data-state="new-data">
+								<span class="ri-label">New data available</span>
+								<div class="ri-btn-wrapper">
+									<button
+										class="ri-btn"
+										aria-label="New data available, click to refresh"
+										type="button"
+									>
+										<svg
+											class="ri-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</button>
+									<span class="ri-badge-dot" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+						<p class="state-card-note">
+							Green dot badge pulses top-right · border tint · muted label
+						</p>
+					</div>
+				</div>
+				<!-- /states-grid -->
 
-      <!-- 3. FRESH -->
-      <div class="state-card">
-        <span class="state-card-label">fresh</span>
-        <div class="state-card-stage">
-          <div class="ri-widget" data-state="fresh">
-            <span class="ri-label">Updated just now</span>
-            <div class="ri-btn-wrapper">
-              <button class="ri-btn" aria-label="Data is fresh, refresh" type="button">
-                <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </button>
-              <span class="ri-badge-dot" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-        <p class="state-card-note">Green icon tint · label echoes success</p>
-      </div>
+				<!-- ── SECTION: ANATOMY ───────────────────────────────────── -->
+				<div class="section-gap"></div>
+				<p class="section-heading">Anatomy</p>
 
-      <!-- 4. STALE -->
-      <div class="state-card">
-        <span class="state-card-label">stale</span>
-        <div class="state-card-stage">
-          <div class="ri-widget" data-state="stale">
-            <span class="ri-label">Updated 5m ago</span>
-            <div class="ri-btn-wrapper">
-              <button class="ri-btn" aria-label="Data is stale, click to refresh" type="button">
-                <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </button>
-              <span class="ri-badge-dot" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-        <p class="state-card-note">Both icon and label fade to subtle · still clickable</p>
-      </div>
+				<div class="anatomy-row">
+					<!-- The live component used for annotation -->
+					<div class="ri-widget" data-state="idle" style="flex-shrink: 0">
+						<span class="ri-label">Updated 2m ago</span>
+						<div class="ri-btn-wrapper">
+							<button class="ri-btn" aria-label="Refresh" type="button">
+								<svg
+									class="ri-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.25"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									aria-hidden="true"
+								>
+									<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+									<path d="M21 3v5h-5" />
+									<path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+									<path d="M8 16H3v5" />
+								</svg>
+							</button>
+							<span
+								class="ri-badge-dot"
+								style="display: block"
+								aria-hidden="true"
+							></span>
+						</div>
+					</div>
 
-      <!-- 5. NEW DATA -->
-      <div class="state-card">
-        <span class="state-card-label">new-data</span>
-        <div class="state-card-stage">
-          <div class="ri-widget" data-state="new-data">
-            <span class="ri-label">New data available</span>
-            <div class="ri-btn-wrapper">
-              <button class="ri-btn" aria-label="New data available, click to refresh" type="button">
-                <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </button>
-              <span class="ri-badge-dot" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-        <p class="state-card-note">Green dot badge pulses top-right · border tint · muted label</p>
-      </div>
+					<!-- Callout list -->
+					<div
+						style="display: flex; flex-direction: column; gap: var(--space-3); flex: 1"
+					>
+						<div class="anatomy-callout-line">
+							<span class="anatomy-callout-dot"></span>
+							<span class="anatomy-callout-text"
+								><strong style="color: var(--foreground-muted)">.ri-label</strong> —
+								Geist Mono 11px, tabular-nums, foreground-subtle · LEFT of
+								button</span
+							>
+						</div>
+						<div class="anatomy-callout-line">
+							<span class="anatomy-callout-dot"></span>
+							<span class="anatomy-callout-text"
+								><strong style="color: var(--foreground-muted)">.ri-btn</strong> —
+								26×26px icon square, gk-btn-sm gk-btn-secondary base</span
+							>
+						</div>
+						<div class="anatomy-callout-line">
+							<span class="anatomy-callout-dot"></span>
+							<span class="anatomy-callout-text"
+								><strong style="color: var(--foreground-muted)">.ri-icon</strong> —
+								RefreshCw SVG, 13×13px, stroke currentColor</span
+							>
+						</div>
+						<div class="anatomy-callout-line">
+							<span
+								class="anatomy-callout-dot"
+								style="background: var(--status-success)"
+							></span>
+							<span class="anatomy-callout-text"
+								><strong style="color: var(--foreground-muted)"
+									>.ri-badge-dot</strong
+								>
+								— 7px circle, status-success bg, 1.5px border matches surface ·
+								top-right -3/-3</span
+							>
+						</div>
+					</div>
+				</div>
 
-    </div><!-- /states-grid -->
+				<!-- ── SECTION: IN-CONTEXT PLACEMENTS ──────────────────────── -->
+				<div class="section-gap"></div>
+				<p class="section-heading">In-context placements</p>
 
-    <!-- ── SECTION: ANATOMY ───────────────────────────────────── -->
-    <div class="section-gap"></div>
-    <p class="section-heading">Anatomy</p>
+				<div class="context-grid">
+					<!-- CONTEXT 1: Page header toolbar -->
+					<div>
+						<p
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.05em;
+								text-transform: uppercase;
+								margin: 0 0 var(--space-4) 0;
+							"
+						>
+							1 · Page header toolbar
+						</p>
 
-    <div class="anatomy-row">
-      <!-- The live component used for annotation -->
-      <div class="ri-widget" data-state="idle" style="flex-shrink:0;">
-        <span class="ri-label">Updated 2m ago</span>
-        <div class="ri-btn-wrapper">
-          <button class="ri-btn" aria-label="Refresh" type="button">
-            <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-              <path d="M21 3v5h-5"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-              <path d="M8 16H3v5"/>
-            </svg>
-          </button>
-          <span class="ri-badge-dot" style="display:block;" aria-hidden="true"></span>
-        </div>
-      </div>
+						<div class="demo-toolbar">
+							<span class="demo-toolbar-title">Metrics</span>
 
-      <!-- Callout list -->
-      <div style="display:flex;flex-direction:column;gap:var(--space-3);flex:1;">
-        <div class="anatomy-callout-line">
-          <span class="anatomy-callout-dot"></span>
-          <span class="anatomy-callout-text"><strong style="color:var(--foreground-muted);">.ri-label</strong> — Geist Mono 11px, tabular-nums, foreground-subtle · LEFT of button</span>
-        </div>
-        <div class="anatomy-callout-line">
-          <span class="anatomy-callout-dot"></span>
-          <span class="anatomy-callout-text"><strong style="color:var(--foreground-muted);">.ri-btn</strong> — 26×26px icon square, gk-btn-sm gk-btn-secondary base</span>
-        </div>
-        <div class="anatomy-callout-line">
-          <span class="anatomy-callout-dot"></span>
-          <span class="anatomy-callout-text"><strong style="color:var(--foreground-muted);">.ri-icon</strong> — RefreshCw SVG, 13×13px, stroke currentColor</span>
-        </div>
-        <div class="anatomy-callout-line">
-          <span class="anatomy-callout-dot" style="background:var(--status-success);"></span>
-          <span class="anatomy-callout-text"><strong style="color:var(--foreground-muted);">.ri-badge-dot</strong> — 7px circle, status-success bg, 1.5px border matches surface · top-right -3/-3</span>
-        </div>
-      </div>
-    </div>
+							<div class="demo-toolbar-sep"></div>
 
-    <!-- ── SECTION: IN-CONTEXT PLACEMENTS ──────────────────────── -->
-    <div class="section-gap"></div>
-    <p class="section-heading">In-context placements</p>
+							<!-- Period filter tabs (sibling context) -->
+							<button
+								class="demo-icon-btn"
+								aria-label="Filter by day"
+								type="button"
+								title="1D"
+							>
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<rect x="3" y="4" width="18" height="18" rx="2" />
+									<line x1="16" y1="2" x2="16" y2="6" />
+									<line x1="8" y1="2" x2="8" y2="6" />
+									<line x1="3" y1="10" x2="21" y2="10" />
+								</svg>
+							</button>
 
-    <div class="context-grid">
+							<button class="demo-icon-btn" aria-label="Download CSV" type="button">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+									<polyline points="7 10 12 15 17 10" />
+									<line x1="12" y1="15" x2="12" y2="3" />
+								</svg>
+							</button>
 
-      <!-- CONTEXT 1: Page header toolbar -->
-      <div>
-        <p style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.05em;text-transform:uppercase;margin:0 0 var(--space-4) 0;">1 · Page header toolbar</p>
+							<div class="demo-toolbar-sep"></div>
 
-        <div class="demo-toolbar">
-          <span class="demo-toolbar-title">Metrics</span>
+							<!-- The refresh indicator — new-data state to show badge in context -->
+							<div class="ri-widget" data-state="new-data">
+								<span class="ri-label">New data available</span>
+								<div class="ri-btn-wrapper">
+									<button
+										class="ri-btn"
+										aria-label="New data available, click to refresh"
+										type="button"
+									>
+										<svg
+											class="ri-icon"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+											/>
+											<path d="M21 3v5h-5" />
+											<path
+												d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+											/>
+											<path d="M8 16H3v5" />
+										</svg>
+									</button>
+									<span class="ri-badge-dot" aria-hidden="true"></span>
+								</div>
+							</div>
 
-          <div class="demo-toolbar-sep"></div>
+							<div class="demo-toolbar-spacer"></div>
 
-          <!-- Period filter tabs (sibling context) -->
-          <button class="demo-icon-btn" aria-label="Filter by day" type="button" title="1D">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </button>
+							<!-- Settings icon far right -->
+							<button class="demo-icon-btn" aria-label="Settings" type="button">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="3" />
+									<path
+										d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
 
-          <button class="demo-icon-btn" aria-label="Download CSV" type="button">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-          </button>
+					<!-- CONTEXT 2: Card header -->
+					<div>
+						<p
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.05em;
+								text-transform: uppercase;
+								margin: 0 0 var(--space-4) 0;
+							"
+						>
+							2 · Card header
+						</p>
 
-          <div class="demo-toolbar-sep"></div>
+						<div class="gk-card" style="overflow: hidden">
+							<div class="demo-card-header">
+								<div class="demo-card-header-left">
+									<span class="demo-card-title">Session Cost Breakdown</span>
+									<span class="demo-card-subtitle"
+										>last 30 days · 14 sessions</span
+									>
+								</div>
 
-          <!-- The refresh indicator — new-data state to show badge in context -->
-          <div class="ri-widget" data-state="new-data">
-            <span class="ri-label">New data available</span>
-            <div class="ri-btn-wrapper">
-              <button class="ri-btn" aria-label="New data available, click to refresh" type="button">
-                <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M8 16H3v5"/>
-                </svg>
-              </button>
-              <span class="ri-badge-dot" aria-hidden="true"></span>
-            </div>
-          </div>
+								<!-- The refresh indicator — stale state for variation -->
+								<div class="ri-widget" data-state="stale">
+									<span class="ri-label">Updated 8m ago</span>
+									<div class="ri-btn-wrapper">
+										<button
+											class="ri-btn"
+											aria-label="Data is stale. Click to refresh."
+											type="button"
+										>
+											<svg
+												class="ri-icon"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.25"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												aria-hidden="true"
+											>
+												<path
+													d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+												/>
+												<path d="M21 3v5h-5" />
+												<path
+													d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+												/>
+												<path d="M8 16H3v5" />
+											</svg>
+										</button>
+										<span class="ri-badge-dot" aria-hidden="true"></span>
+									</div>
+								</div>
+							</div>
 
-          <div class="demo-toolbar-spacer"></div>
+							<!-- Fake card body for context -->
+							<div class="demo-card-body">
+								<div class="demo-skeleton-row" style="width: 88%"></div>
+								<div class="demo-skeleton-row" style="width: 72%"></div>
+								<div class="demo-skeleton-row" style="width: 80%"></div>
+								<div class="demo-skeleton-row" style="width: 60%"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /context-grid -->
 
-          <!-- Settings icon far right -->
-          <button class="demo-icon-btn" aria-label="Settings" type="button">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
+				<!-- ── SECTION: HOVER / INTERACTION STATES ──────────────────── -->
+				<div class="section-gap"></div>
+				<p class="section-heading">Button interaction states (idle base)</p>
 
-      <!-- CONTEXT 2: Card header -->
-      <div>
-        <p style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.05em;text-transform:uppercase;margin:0 0 var(--space-4) 0;">2 · Card header</p>
+				<div
+					style="
+						display: flex;
+						align-items: center;
+						gap: var(--space-12);
+						flex-wrap: wrap;
+					"
+				>
+					<!-- Default -->
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							align-items: flex-start;
+							gap: var(--space-3);
+						"
+					>
+						<span
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.04em;
+							"
+							>default</span
+						>
+						<div class="ri-widget" data-state="idle">
+							<span class="ri-label">Refresh metrics</span>
+							<div class="ri-btn-wrapper">
+								<button class="ri-btn" type="button" aria-label="Refresh metrics">
+									<svg
+										class="ri-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.25"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+								</button>
+								<span class="ri-badge-dot" aria-hidden="true"></span>
+							</div>
+						</div>
+					</div>
 
-        <div class="gk-card" style="overflow:hidden;">
-          <div class="demo-card-header">
-            <div class="demo-card-header-left">
-              <span class="demo-card-title">Session Cost Breakdown</span>
-              <span class="demo-card-subtitle">last 30 days · 14 sessions</span>
-            </div>
+					<!-- Hover (simulated) -->
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							align-items: flex-start;
+							gap: var(--space-3);
+						"
+					>
+						<span
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.04em;
+							"
+							>hover</span
+						>
+						<div class="ri-widget" data-state="idle" style="--ri-hover-override: 1">
+							<span class="ri-label">Refresh metrics</span>
+							<div class="ri-btn-wrapper">
+								<button
+									class="ri-btn"
+									type="button"
+									aria-label="Refresh metrics"
+									style="
+										background: var(--surface-3);
+										border-color: var(--border-strong);
+										color: var(--foreground);
+									"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.25"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+								</button>
+								<span class="ri-badge-dot" aria-hidden="true"></span>
+							</div>
+						</div>
+					</div>
 
-            <!-- The refresh indicator — stale state for variation -->
-            <div class="ri-widget" data-state="stale">
-              <span class="ri-label">Updated 8m ago</span>
-              <div class="ri-btn-wrapper">
-                <button class="ri-btn" aria-label="Data is stale. Click to refresh." type="button">
-                  <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                    <path d="M8 16H3v5"/>
-                  </svg>
-                </button>
-                <span class="ri-badge-dot" aria-hidden="true"></span>
-              </div>
-            </div>
-          </div>
+					<!-- Active / Pressed (simulated) -->
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							align-items: flex-start;
+							gap: var(--space-3);
+						"
+					>
+						<span
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.04em;
+							"
+							>active</span
+						>
+						<div class="ri-widget" data-state="idle">
+							<span class="ri-label">Refresh metrics</span>
+							<div class="ri-btn-wrapper">
+								<button
+									class="ri-btn"
+									type="button"
+									aria-label="Refresh metrics"
+									style="
+										transform: scale(0.93);
+										background: var(--surface-3);
+										border-color: var(--border-strong);
+										color: var(--foreground);
+										filter: brightness(0.95);
+									"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.25"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+								</button>
+								<span class="ri-badge-dot" aria-hidden="true"></span>
+							</div>
+						</div>
+					</div>
 
-          <!-- Fake card body for context -->
-          <div class="demo-card-body">
-            <div class="demo-skeleton-row" style="width:88%;"></div>
-            <div class="demo-skeleton-row" style="width:72%;"></div>
-            <div class="demo-skeleton-row" style="width:80%;"></div>
-            <div class="demo-skeleton-row" style="width:60%;"></div>
-          </div>
-        </div>
-      </div>
+					<!-- Focus (simulated) -->
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							align-items: flex-start;
+							gap: var(--space-3);
+						"
+					>
+						<span
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.04em;
+							"
+							>focus</span
+						>
+						<div class="ri-widget" data-state="idle">
+							<span class="ri-label">Refresh metrics</span>
+							<div class="ri-btn-wrapper">
+								<button
+									class="ri-btn"
+									type="button"
+									aria-label="Refresh metrics"
+									style="outline: 2px solid var(--ring); outline-offset: 2px"
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.25"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+								</button>
+								<span class="ri-badge-dot" aria-hidden="true"></span>
+							</div>
+						</div>
+					</div>
 
-    </div><!-- /context-grid -->
+					<!-- Disabled -->
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							align-items: flex-start;
+							gap: var(--space-3);
+						"
+					>
+						<span
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+								letter-spacing: 0.04em;
+							"
+							>disabled</span
+						>
+						<div
+							class="ri-widget"
+							data-state="idle"
+							style="opacity: 0.45; pointer-events: none"
+						>
+							<span class="ri-label">Refresh metrics</span>
+							<div class="ri-btn-wrapper">
+								<button
+									class="ri-btn"
+									type="button"
+									aria-label="Refresh metrics"
+									disabled
+								>
+									<svg
+										class="ri-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.25"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+										/>
+										<path d="M21 3v5h-5" />
+										<path
+											d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+										/>
+										<path d="M8 16H3v5" />
+									</svg>
+								</button>
+								<span class="ri-badge-dot" aria-hidden="true"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /interaction states row -->
 
-    <!-- ── SECTION: HOVER / INTERACTION STATES ──────────────────── -->
-    <div class="section-gap"></div>
-    <p class="section-heading">Button interaction states (idle base)</p>
-
-    <div style="display:flex;align-items:center;gap:var(--space-12);flex-wrap:wrap;">
-
-      <!-- Default -->
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-3);">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.04em;">default</span>
-        <div class="ri-widget" data-state="idle">
-          <span class="ri-label">Refresh metrics</span>
-          <div class="ri-btn-wrapper">
-            <button class="ri-btn" type="button" aria-label="Refresh metrics">
-              <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-            </button>
-            <span class="ri-badge-dot" aria-hidden="true"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Hover (simulated) -->
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-3);">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.04em;">hover</span>
-        <div class="ri-widget" data-state="idle" style="--ri-hover-override:1;">
-          <span class="ri-label">Refresh metrics</span>
-          <div class="ri-btn-wrapper">
-            <button class="ri-btn" type="button" aria-label="Refresh metrics"
-              style="background:var(--surface-3);border-color:var(--border-strong);color:var(--foreground);">
-              <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-            </button>
-            <span class="ri-badge-dot" aria-hidden="true"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active / Pressed (simulated) -->
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-3);">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.04em;">active</span>
-        <div class="ri-widget" data-state="idle">
-          <span class="ri-label">Refresh metrics</span>
-          <div class="ri-btn-wrapper">
-            <button class="ri-btn" type="button" aria-label="Refresh metrics"
-              style="transform:scale(0.93);background:var(--surface-3);border-color:var(--border-strong);color:var(--foreground);filter:brightness(0.95);">
-              <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-            </button>
-            <span class="ri-badge-dot" aria-hidden="true"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Focus (simulated) -->
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-3);">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.04em;">focus</span>
-        <div class="ri-widget" data-state="idle">
-          <span class="ri-label">Refresh metrics</span>
-          <div class="ri-btn-wrapper">
-            <button class="ri-btn" type="button" aria-label="Refresh metrics"
-              style="outline:2px solid var(--ring);outline-offset:2px;">
-              <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-            </button>
-            <span class="ri-badge-dot" aria-hidden="true"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Disabled -->
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-3);">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--foreground-subtle);letter-spacing:0.04em;">disabled</span>
-        <div class="ri-widget" data-state="idle" style="opacity:0.45;pointer-events:none;">
-          <span class="ri-label">Refresh metrics</span>
-          <div class="ri-btn-wrapper">
-            <button class="ri-btn" type="button" aria-label="Refresh metrics" disabled>
-              <svg class="ri-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M8 16H3v5"/>
-              </svg>
-            </button>
-            <span class="ri-badge-dot" aria-hidden="true"></span>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /interaction states row -->
-
-    <!-- bottom breathing room -->
-    <div style="height:var(--space-32);"></div>
-
-  </div><!-- /page-shell -->
-</div><!-- /gk-root -->
-
-</body>
+				<!-- bottom breathing room -->
+				<div style="height: var(--space-32)"></div>
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
+	</body>
 </html>

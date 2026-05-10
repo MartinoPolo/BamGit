@@ -1,1644 +1,2704 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usage Dashboard — Variant E (Heatmap Calendar)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ── Grovekeeper design tokens — Forest Moss palette ─────────────────── */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Usage Dashboard — Variant E (Heatmap Calendar)</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* ── Grovekeeper design tokens — Forest Moss palette ─────────────────── */
+			:root {
+				--moss-50: oklch(0.972 0.018 130);
+				--moss-100: oklch(0.94 0.034 130);
+				--moss-200: oklch(0.88 0.058 130);
+				--moss-300: oklch(0.795 0.082 130);
+				--moss-400: oklch(0.69 0.098 132);
+				--moss-500: oklch(0.58 0.096 134);
+				--moss-600: oklch(0.48 0.082 138);
+				--moss-700: oklch(0.395 0.066 142);
+				--moss-800: oklch(0.3 0.048 145);
+				--moss-900: oklch(0.215 0.032 148);
+				--moss-950: oklch(0.155 0.024 150);
+				--amber-300: oklch(0.84 0.13 78);
+				--amber-400: oklch(0.77 0.15 65);
+				--amber-500: oklch(0.69 0.165 55);
+				--amber-600: oklch(0.595 0.16 48);
+				--bark-300: oklch(0.7 0.06 60);
+				--bark-500: oklch(0.5 0.075 55);
+				--bark-700: oklch(0.345 0.055 50);
+				--azure-300: oklch(0.75 0.09 230);
+				--azure-400: oklch(0.66 0.12 230);
+				--azure-500: oklch(0.57 0.13 235);
+				--azure-600: oklch(0.49 0.115 240);
+				--azure-700: oklch(0.4 0.095 240);
+				--plum-300: oklch(0.72 0.1 320);
+				--plum-400: oklch(0.64 0.13 320);
+				--plum-500: oklch(0.56 0.15 320);
+				--plum-600: oklch(0.48 0.13 320);
+				--plum-700: oklch(0.4 0.11 320);
+				--teal-300: oklch(0.78 0.075 195);
+				--teal-400: oklch(0.7 0.095 195);
+				--teal-500: oklch(0.62 0.11 195);
+				--teal-600: oklch(0.54 0.095 195);
+				--teal-700: oklch(0.46 0.08 195);
+				--rose-300: oklch(0.8 0.105 15);
+				--rose-400: oklch(0.72 0.135 15);
+				--rose-500: oklch(0.64 0.155 15);
+				--rose-600: oklch(0.56 0.135 15);
+				--rose-700: oklch(0.48 0.115 15);
+				--coral-300: oklch(0.78 0.105 30);
+				--coral-400: oklch(0.7 0.135 30);
+				--coral-500: oklch(0.62 0.155 30);
+				--coral-600: oklch(0.54 0.135 30);
+				--coral-700: oklch(0.46 0.115 30);
+				--gold-300: oklch(0.81 0.09 90);
+				--gold-400: oklch(0.73 0.115 90);
+				--gold-500: oklch(0.65 0.135 90);
+				--gold-600: oklch(0.57 0.115 90);
+				--gold-700: oklch(0.49 0.095 90);
+				--sage-300: oklch(0.76 0.055 160);
+				--sage-400: oklch(0.68 0.07 160);
+				--sage-500: oklch(0.6 0.085 160);
+				--sage-600: oklch(0.52 0.07 160);
+				--sage-700: oklch(0.44 0.06 160);
+				--indigo-300: oklch(0.7 0.095 275);
+				--indigo-400: oklch(0.62 0.12 275);
+				--indigo-500: oklch(0.54 0.14 275);
+				--indigo-600: oklch(0.46 0.12 275);
+				--indigo-700: oklch(0.38 0.1 275);
+				--fuchsia-300: oklch(0.74 0.105 350);
+				--fuchsia-400: oklch(0.66 0.135 350);
+				--fuchsia-500: oklch(0.58 0.155 350);
+				--fuchsia-600: oklch(0.5 0.135 350);
+				--fuchsia-700: oklch(0.42 0.115 350);
+				--sky-light-top: oklch(0.965 0.018 220);
+				--sky-light-bot: oklch(0.94 0.025 130);
+				--sky-dark-top: oklch(0.225 0.028 240);
+				--sky-dark-bot: oklch(0.18 0.03 150);
+				--status-success: oklch(0.66 0.135 145);
+				--status-warning: oklch(0.77 0.155 75);
+				--status-danger: oklch(0.62 0.205 25);
+				--status-info: oklch(0.66 0.105 220);
+				--status-merged: oklch(0.58 0.14 310);
+				--priority-top: oklch(0.62 0.205 25);
+				--priority-high: oklch(0.72 0.16 55);
+				--priority-medium: oklch(0.82 0.16 85);
+				--priority-low: oklch(0.66 0.105 220);
+				--priority-lowest: oklch(0.55 0.02 250);
+				--gh-open: oklch(0.66 0.135 145);
+				--gh-closed: oklch(0.58 0.14 310);
+				--gh-merged: oklch(0.58 0.14 310);
+				--gh-draft: oklch(0.55 0.02 250);
+				--session-running: oklch(0.66 0.135 145);
+				--session-errored: oklch(0.62 0.205 25);
+				--session-idle: oklch(0.66 0.105 220);
+				--session-paused: oklch(0.55 0.02 250);
+				--session-finished: oklch(0.45 0.015 250);
+				--session-needs-input: oklch(0.77 0.155 75);
+				--session-needs-review: oklch(0.66 0.105 220);
+				--font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+				--font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', Menlo, monospace;
+				--text-2xs: 10.5px;
+				--text-xs: 11px;
+				--text-sm: 12px;
+				--text-md: 13px;
+				--text-base: 14px;
+				--text-lg: 15px;
+				--text-xl: 17px;
+				--text-2xl: 22px;
+				--text-3xl: 28px;
+				--text-4xl: 36px;
+				--text-5xl: 48px;
+				--leading-tight: 1.15;
+				--leading-snug: 1.25;
+				--leading-normal: 1.4;
+				--leading-relaxed: 1.55;
+				--leading-loose: 1.7;
+				--weight-regular: 400;
+				--weight-medium: 500;
+				--weight-semibold: 600;
+				--weight-bold: 700;
+				--tracking-tight: -0.02em;
+				--tracking-snug: -0.01em;
+				--tracking-normal: 0;
+				--tracking-wide: 0.04em;
+				--tracking-wider: 0.08em;
+				--space-0: 0;
+				--space-1: 2px;
+				--space-2: 4px;
+				--space-3: 6px;
+				--space-4: 8px;
+				--space-5: 10px;
+				--space-6: 12px;
+				--space-7: 14px;
+				--space-8: 16px;
+				--space-10: 20px;
+				--space-12: 24px;
+				--space-14: 28px;
+				--space-16: 32px;
+				--space-20: 40px;
+				--space-24: 48px;
+				--space-32: 64px;
+				--radius-none: 0;
+				--radius-xs: 4px;
+				--radius-sm: 6px;
+				--radius-md: 8px;
+				--radius-lg: 10px;
+				--radius-xl: 14px;
+				--radius-2xl: 20px;
+				--radius-full: 9999px;
+				--border-width-1: 1px;
+				--border-width-2: 1.5px;
+				--border-width-3: 2px;
+				--focus-ring-width: 3px;
+				--focus-ring-offset: 2px;
+				--shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
+				--shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
+				--shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
+				--shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.2), 0 4px 12px rgba(20, 30, 22, 0.08);
+				--shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+				--size-control-sm: 26px;
+				--size-control-md: 32px;
+				--size-control-lg: 38px;
+				--z-base: 0;
+				--z-raised: 10;
+				--z-dropdown: 20;
+				--z-sticky: 30;
+				--z-overlay: 40;
+				--z-modal: 50;
+				--z-toast: 60;
+				--z-tooltip: 70;
+				--duration-1: 90ms;
+				--duration-2: 120ms;
+				--duration-3: 160ms;
+				--duration-4: 220ms;
+				--duration-5: 320ms;
+				--ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
+				--ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);
+				--ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+				--sidebar-width: 240px;
+				--sidebar-width-collapsed: 56px;
+			}
 
-/* Dark theme */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
+			/* Dark theme */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  min-height: 100vh;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+				min-height: 100vh;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-/* Buttons */
-.gk-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
-  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
-  border: 1px solid transparent; cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease,
-              transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap; user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary {
-  background: var(--primary); color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-primary:active { transform: scale(0.96); filter: brightness(0.92); }
-.gk-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-secondary {
-  background: var(--surface-2); color: var(--foreground); border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-secondary:active { transform: scale(0.96); filter: brightness(0.95); }
-.gk-btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-ghost {
-  background: transparent; color: var(--foreground-muted);
-}
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-ghost:active { transform: scale(0.96); background: var(--surface-3); }
-.gk-btn-ghost:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-primary:active {
+				transform: scale(0.96);
+				filter: brightness(0.92);
+			}
+			.gk-btn-primary:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-secondary:active {
+				transform: scale(0.96);
+				filter: brightness(0.95);
+			}
+			.gk-btn-secondary:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-ghost:active {
+				transform: scale(0.96);
+				background: var(--surface-3);
+			}
+			.gk-btn-ghost:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
 
-/* Cards */
-.gk-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
-}
-.gk-card-padded { padding: 16px; }
+			/* Cards */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-/* Badges */
-.gk-badge {
-  display: inline-flex; align-items: center; gap: 4px; height: 20px;
-  padding: 0 7px; font-size: 11px; font-weight: 500; border-radius: 999px;
-  background: var(--surface-2); color: var(--foreground-muted);
-  border: 1px solid var(--border); font-family: var(--font-sans);
-  letter-spacing: 0.01em; white-space: nowrap;
-}
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-moss    { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
 
-/* CB tabs (period / filter - mono style) */
-.cb-tabs { display: inline-flex; gap: 0; font-family: var(--font-mono); font-size: 11.5px; }
-.cb-tab {
-  padding: 5px 12px; background: transparent; border: 1px solid transparent;
-  border-radius: 4px; color: var(--foreground-muted); cursor: pointer;
-  transition: all 120ms ease; font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap;
-}
-.cb-tab:hover { color: var(--foreground); background: var(--surface-2); }
-.cb-tab.is-active {
-  color: var(--foreground); background: var(--surface-2); border-color: var(--border);
-  box-shadow: inset 0 -2px 0 oklch(0.770 0.155 75);
-}
-.cb-tab:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+			/* CB tabs (period / filter - mono style) */
+			.cb-tabs {
+				display: inline-flex;
+				gap: 0;
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+			}
+			.cb-tab {
+				padding: 5px 12px;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: 4px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				white-space: nowrap;
+			}
+			.cb-tab:hover {
+				color: var(--foreground);
+				background: var(--surface-2);
+			}
+			.cb-tab.is-active {
+				color: var(--foreground);
+				background: var(--surface-2);
+				border-color: var(--border);
+				box-shadow: inset 0 -2px 0 oklch(0.77 0.155 75);
+			}
+			.cb-tab:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
 
-/* HR */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+			/* HR */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-/* Typography */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+			/* Typography */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-/* CB panel */
-.cb-panel {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0;
-}
-.cb-panel-title {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-  color: var(--foreground-muted); text-transform: uppercase; letter-spacing: 0.08em;
-  display: flex; align-items: baseline; gap: 8px;
-  padding-bottom: 6px; border-bottom: 1px dashed var(--border);
-}
-.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
-.cb-panel-title::after  { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
-.cb-panel-sub {
-  font-family: var(--font-mono); font-size: 10.5px; font-weight: 400;
-  color: var(--foreground-subtle); text-transform: none; letter-spacing: 0; margin-left: auto;
-}
+			/* CB panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
 
-/* CB row */
-.cb-row {
-  display: grid; align-items: center; gap: 10px;
-  font-size: 12px; padding: 3px 0; min-height: 22px; font-family: var(--font-sans);
-}
-.cb-num {
-  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-  font-size: 11.5px; text-align: right; color: var(--foreground);
-}
-.cb-mute { color: var(--foreground-subtle); font-family: var(--font-mono); font-size: 11px; }
+			/* CB row */
+			.cb-row {
+				display: grid;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				padding: 3px 0;
+				min-height: 22px;
+				font-family: var(--font-sans);
+			}
+			.cb-num {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11.5px;
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-mute {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
 
-/* CB bar */
-.cb-bar {
-  height: 10px; border-radius: 2px;
-  background: linear-gradient(90deg, oklch(0.770 0.155 75) 0%, oklch(0.700 0.180 50) 60%, oklch(0.640 0.205 25) 100%);
-  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06); min-width: 2px;
-}
-.cb-bar-cool {
-  background: linear-gradient(90deg, oklch(0.700 0.110 200) 0%, oklch(0.620 0.130 230) 60%, oklch(0.560 0.150 260) 100%);
-}
-.cb-bar-moss {
-  background: linear-gradient(90deg, var(--moss-300) 0%, var(--moss-500) 100%);
-  box-shadow: none;
-}
+			/* CB bar */
+			.cb-bar {
+				height: 10px;
+				border-radius: 2px;
+				background: linear-gradient(
+					90deg,
+					oklch(0.77 0.155 75) 0%,
+					oklch(0.7 0.18 50) 60%,
+					oklch(0.64 0.205 25) 100%
+				);
+				box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+				min-width: 2px;
+			}
+			.cb-bar-cool {
+				background: linear-gradient(
+					90deg,
+					oklch(0.7 0.11 200) 0%,
+					oklch(0.62 0.13 230) 60%,
+					oklch(0.56 0.15 260) 100%
+				);
+			}
+			.cb-bar-moss {
+				background: linear-gradient(90deg, var(--moss-300) 0%, var(--moss-500) 100%);
+				box-shadow: none;
+			}
 
-/* Category color tokens */
-.cb-cat-coding       { color: oklch(0.700 0.150 145); }
-.cb-cat-debugging    { color: oklch(0.640 0.205 25); }
-.cb-cat-refactor     { color: oklch(0.700 0.180 50); }
-.cb-cat-feature      { color: oklch(0.770 0.155 75); }
-.cb-cat-testing      { color: oklch(0.620 0.130 230); }
-.cb-cat-exploration  { color: oklch(0.700 0.110 200); }
-.cb-cat-brainstorm   { color: oklch(0.660 0.180 320); }
-.cb-cat-planning     { color: oklch(0.620 0.150 280); }
-.cb-cat-conversation { color: var(--foreground-muted); }
+			/* Category color tokens */
+			.cb-cat-coding {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-cat-debugging {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-cat-refactor {
+				color: oklch(0.7 0.18 50);
+			}
+			.cb-cat-feature {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-cat-testing {
+				color: oklch(0.62 0.13 230);
+			}
+			.cb-cat-exploration {
+				color: oklch(0.7 0.11 200);
+			}
+			.cb-cat-brainstorm {
+				color: oklch(0.66 0.18 320);
+			}
+			.cb-cat-planning {
+				color: oklch(0.62 0.15 280);
+			}
+			.cb-cat-conversation {
+				color: var(--foreground-muted);
+			}
 
-/* 1-shot rate */
-.cb-1shot { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 11px; text-align: right; }
-.cb-1shot-good { color: oklch(0.700 0.150 145); }
-.cb-1shot-mid  { color: oklch(0.770 0.155 75); }
-.cb-1shot-bad  { color: oklch(0.640 0.205 25); }
+			/* 1-shot rate */
+			.cb-1shot {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11px;
+				text-align: right;
+			}
+			.cb-1shot-good {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-1shot-mid {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-1shot-bad {
+				color: oklch(0.64 0.205 25);
+			}
 
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-/* Animations */
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-@keyframes gk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+			/* Animations */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
 
-/* ── VARIANT E: Heatmap Calendar — Page-specific styles ──────────────── */
-* { margin: 0; padding: 0; }
-body { background: var(--background); }
+			/* ── VARIANT E: Heatmap Calendar — Page-specific styles ──────────────── */
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				background: var(--background);
+			}
 
-.page-shell {
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  max-width: 1360px;
-  margin: 0 auto;
-}
+			.page-shell {
+				padding: 32px;
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+				max-width: 1360px;
+				margin: 0 auto;
+			}
 
-/* Variant label */
-.variant-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-}
+			/* Variant label */
+			.variant-label {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 20px;
+			}
 
-/* Page header */
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.page-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.page-header-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+			/* Page header */
+			.page-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 20px;
+			}
+			.page-header-left {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.page-header-right {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
 
-/* Trophy badge (special treatment) */
-.trophy-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  height: 32px; padding: 0 10px;
-  background: color-mix(in oklch, var(--amber-400) 14%, transparent);
-  border: 1px solid color-mix(in oklch, var(--amber-400) 30%, transparent);
-  border-radius: var(--radius-md);
-  font-size: 12px; font-weight: 500; font-family: var(--font-sans);
-  color: var(--amber-300);
-  cursor: pointer;
-  transition: background 120ms, border-color 120ms, transform 90ms;
-}
-.trophy-btn:hover {
-  background: color-mix(in oklch, var(--amber-400) 22%, transparent);
-  border-color: color-mix(in oklch, var(--amber-400) 50%, transparent);
-}
-.trophy-btn:active { transform: scale(0.96); }
-.trophy-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.trophy-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+			/* Trophy badge (special treatment) */
+			.trophy-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				height: 32px;
+				padding: 0 10px;
+				background: color-mix(in oklch, var(--amber-400) 14%, transparent);
+				border: 1px solid color-mix(in oklch, var(--amber-400) 30%, transparent);
+				border-radius: var(--radius-md);
+				font-size: 12px;
+				font-weight: 500;
+				font-family: var(--font-sans);
+				color: var(--amber-300);
+				cursor: pointer;
+				transition:
+					background 120ms,
+					border-color 120ms,
+					transform 90ms;
+			}
+			.trophy-btn:hover {
+				background: color-mix(in oklch, var(--amber-400) 22%, transparent);
+				border-color: color-mix(in oklch, var(--amber-400) 50%, transparent);
+			}
+			.trophy-btn:active {
+				transform: scale(0.96);
+			}
+			.trophy-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.trophy-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-/* Filter bar */
-.filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0 20px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.filter-separator {
-  width: 1px;
-  height: 20px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-.filter-label {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  white-space: nowrap;
-}
-.filter-select-ghost {
-  display: inline-flex; align-items: center; gap: 5px;
-  height: 26px; padding: 0 8px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 11.5px; font-family: var(--font-mono);
-  color: var(--foreground-muted);
-  cursor: pointer;
-  transition: background 120ms, border-color 120ms;
-  white-space: nowrap;
-}
-.filter-select-ghost:hover { background: var(--surface-2); border-color: var(--border-strong); color: var(--foreground); }
-.filter-select-ghost:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.filter-select-ghost svg { flex-shrink: 0; }
+			/* Filter bar */
+			.filter-bar {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 10px 0 20px;
+				border-bottom: 1px solid var(--border);
+				margin-bottom: 24px;
+				flex-wrap: wrap;
+			}
+			.filter-group {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.filter-separator {
+				width: 1px;
+				height: 20px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+			.filter-label {
+				font-size: 11px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+			.filter-select-ghost {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				height: 26px;
+				padding: 0 8px;
+				background: transparent;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				font-size: 11.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition:
+					background 120ms,
+					border-color 120ms;
+				white-space: nowrap;
+			}
+			.filter-select-ghost:hover {
+				background: var(--surface-2);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.filter-select-ghost:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.filter-select-ghost svg {
+				flex-shrink: 0;
+			}
 
-/* ── Main layout: heatmap left + sidebar right ──────────────────────── */
-.main-layout {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 24px;
-  align-items: start;
-}
+			/* ── Main layout: heatmap left + sidebar right ──────────────────────── */
+			.main-layout {
+				display: grid;
+				grid-template-columns: 1fr 320px;
+				gap: 24px;
+				align-items: start;
+			}
 
-/* ── KPI Cards (horizontal strip in sidebar) ────────────────────────── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-}
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--kpi-accent, var(--border));
-  opacity: 0.7;
-}
-.kpi-label {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-weight: 500;
-}
-.kpi-value {
-  font-size: 22px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  color: var(--foreground);
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  font-variant-numeric: tabular-nums;
-}
-.kpi-delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10.5px;
-  font-family: var(--font-mono);
-  font-weight: 500;
-}
-.kpi-delta-up   { color: var(--status-success); }
-.kpi-delta-down { color: var(--status-danger); }
-.kpi-delta-neutral { color: var(--foreground-subtle); }
-.kpi-sub {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-}
+			/* ── KPI Cards (horizontal strip in sidebar) ────────────────────────── */
+			.kpi-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+				margin-bottom: 16px;
+			}
+			.kpi-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				box-shadow: var(--shadow-sm);
+				position: relative;
+				overflow: hidden;
+			}
+			.kpi-card::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: var(--kpi-accent, var(--border));
+				opacity: 0.7;
+			}
+			.kpi-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.07em;
+				font-weight: 500;
+			}
+			.kpi-value {
+				font-size: 22px;
+				font-weight: 600;
+				font-family: var(--font-mono);
+				color: var(--foreground);
+				letter-spacing: -0.02em;
+				line-height: 1.15;
+				font-variant-numeric: tabular-nums;
+			}
+			.kpi-delta {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				font-size: 10.5px;
+				font-family: var(--font-mono);
+				font-weight: 500;
+			}
+			.kpi-delta-up {
+				color: var(--status-success);
+			}
+			.kpi-delta-down {
+				color: var(--status-danger);
+			}
+			.kpi-delta-neutral {
+				color: var(--foreground-subtle);
+			}
+			.kpi-sub {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+			}
 
-/* ── Heatmap Calendar ───────────────────────────────────────────────── */
-.heatmap-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+			/* ── Heatmap Calendar ───────────────────────────────────────────────── */
+			.heatmap-section {
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+			}
 
-.heatmap-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-.heatmap-month-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.heatmap-month-label {
-  font-size: 15px;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  min-width: 140px;
-  text-align: center;
-  letter-spacing: -0.01em;
-}
-.heatmap-legend {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-}
-.heatmap-legend-label {
-  margin: 0 2px;
-}
-.heatmap-legend-cells {
-  display: flex;
-  gap: 3px;
-}
-.heatmap-legend-cell {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
+			.heatmap-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 16px;
+			}
+			.heatmap-month-nav {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.heatmap-month-label {
+				font-size: 15px;
+				font-weight: 600;
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				min-width: 140px;
+				text-align: center;
+				letter-spacing: -0.01em;
+			}
+			.heatmap-legend {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+			}
+			.heatmap-legend-label {
+				margin: 0 2px;
+			}
+			.heatmap-legend-cells {
+				display: flex;
+				gap: 3px;
+			}
+			.heatmap-legend-cell {
+				width: 12px;
+				height: 12px;
+				border-radius: 2px;
+			}
 
-/* Calendar grid */
-.heatmap-grid-wrapper {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px 16px;
-  box-shadow: var(--shadow-sm);
-}
-.heatmap-weekday-labels {
-  display: grid;
-  grid-template-columns: 32px repeat(var(--weeks, 5), 1fr);
-  gap: 4px;
-  margin-bottom: 4px;
-}
-.heatmap-weekday-label {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  text-align: center;
-  letter-spacing: 0.04em;
-}
-.heatmap-grid {
-  display: grid;
-  grid-template-columns: 32px repeat(var(--weeks, 5), 1fr);
-  grid-template-rows: repeat(7, 1fr);
-  gap: 4px;
-  grid-auto-flow: column;
-}
-.heatmap-day-label {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 6px;
-  letter-spacing: 0.02em;
-}
-.heatmap-cell {
-  aspect-ratio: 1;
-  min-width: 0;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: outline 100ms ease, transform 100ms ease;
-  position: relative;
-}
-.heatmap-cell:hover {
-  outline: 2px solid var(--foreground-muted);
-  outline-offset: -1px;
-  z-index: 2;
-}
-.heatmap-cell:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
-}
-.heatmap-cell.is-selected {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
-  z-index: 3;
-}
-.heatmap-cell.is-empty {
-  background: var(--surface-2);
-  cursor: default;
-}
-.heatmap-cell.is-empty:hover {
-  outline: none;
-}
-.heatmap-cell.is-future {
-  background: transparent;
-  border: 1px dashed var(--border);
-  cursor: default;
-  opacity: 0.4;
-}
-.heatmap-cell.is-future:hover { outline: none; }
+			/* Calendar grid */
+			.heatmap-grid-wrapper {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: 20px 24px 16px;
+				box-shadow: var(--shadow-sm);
+			}
+			.heatmap-weekday-labels {
+				display: grid;
+				grid-template-columns: 32px repeat(var(--weeks, 5), 1fr);
+				gap: 4px;
+				margin-bottom: 4px;
+			}
+			.heatmap-weekday-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				text-align: center;
+				letter-spacing: 0.04em;
+			}
+			.heatmap-grid {
+				display: grid;
+				grid-template-columns: 32px repeat(var(--weeks, 5), 1fr);
+				grid-template-rows: repeat(7, 1fr);
+				gap: 4px;
+				grid-auto-flow: column;
+			}
+			.heatmap-day-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				padding-right: 6px;
+				letter-spacing: 0.02em;
+			}
+			.heatmap-cell {
+				aspect-ratio: 1;
+				min-width: 0;
+				border-radius: 3px;
+				cursor: pointer;
+				transition:
+					outline 100ms ease,
+					transform 100ms ease;
+				position: relative;
+			}
+			.heatmap-cell:hover {
+				outline: 2px solid var(--foreground-muted);
+				outline-offset: -1px;
+				z-index: 2;
+			}
+			.heatmap-cell:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.heatmap-cell.is-selected {
+				outline: 2px solid var(--primary);
+				outline-offset: 1px;
+				z-index: 3;
+			}
+			.heatmap-cell.is-empty {
+				background: var(--surface-2);
+				cursor: default;
+			}
+			.heatmap-cell.is-empty:hover {
+				outline: none;
+			}
+			.heatmap-cell.is-future {
+				background: transparent;
+				border: 1px dashed var(--border);
+				cursor: default;
+				opacity: 0.4;
+			}
+			.heatmap-cell.is-future:hover {
+				outline: none;
+			}
 
-/* Heatmap intensity scale (moss palette) */
-.heatmap-cell.intensity-0 { background: var(--surface-2); }
-.heatmap-cell.intensity-1 { background: oklch(0.280 0.032 145); }
-.heatmap-cell.intensity-2 { background: oklch(0.340 0.050 142); }
-.heatmap-cell.intensity-3 { background: oklch(0.420 0.068 138); }
-.heatmap-cell.intensity-4 { background: oklch(0.520 0.088 135); }
-.heatmap-cell.intensity-5 { background: oklch(0.620 0.098 132); }
-.heatmap-cell.intensity-6 { background: oklch(0.720 0.108 130); }
+			/* Heatmap intensity scale (moss palette) */
+			.heatmap-cell.intensity-0 {
+				background: var(--surface-2);
+			}
+			.heatmap-cell.intensity-1 {
+				background: oklch(0.28 0.032 145);
+			}
+			.heatmap-cell.intensity-2 {
+				background: oklch(0.34 0.05 142);
+			}
+			.heatmap-cell.intensity-3 {
+				background: oklch(0.42 0.068 138);
+			}
+			.heatmap-cell.intensity-4 {
+				background: oklch(0.52 0.088 135);
+			}
+			.heatmap-cell.intensity-5 {
+				background: oklch(0.62 0.098 132);
+			}
+			.heatmap-cell.intensity-6 {
+				background: oklch(0.72 0.108 130);
+			}
 
-/* Cell tooltip on hover */
-.heatmap-cell-tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: oklch(0.12 0.02 150);
-  border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-md);
-  padding: 6px 10px;
-  z-index: var(--z-tooltip);
-  white-space: nowrap;
-  pointer-events: none;
-}
-.heatmap-cell:hover .heatmap-cell-tooltip {
-  display: block;
-}
-.heatmap-cell-tooltip-date {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: oklch(0.560 0.020 140);
-  margin-bottom: 3px;
-}
-.heatmap-cell-tooltip-value {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: oklch(0.965 0.010 130);
-  font-weight: 500;
-}
+			/* Cell tooltip on hover */
+			.heatmap-cell-tooltip {
+				display: none;
+				position: absolute;
+				bottom: calc(100% + 8px);
+				left: 50%;
+				transform: translateX(-50%);
+				background: oklch(0.12 0.02 150);
+				border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+				border-radius: var(--radius-sm);
+				box-shadow: var(--shadow-md);
+				padding: 6px 10px;
+				z-index: var(--z-tooltip);
+				white-space: nowrap;
+				pointer-events: none;
+			}
+			.heatmap-cell:hover .heatmap-cell-tooltip {
+				display: block;
+			}
+			.heatmap-cell-tooltip-date {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: oklch(0.56 0.02 140);
+				margin-bottom: 3px;
+			}
+			.heatmap-cell-tooltip-value {
+				font-size: 11px;
+				font-family: var(--font-mono);
+				color: oklch(0.965 0.01 130);
+				font-weight: 500;
+			}
 
-/* Week totals row */
-.heatmap-week-totals {
-  display: grid;
-  grid-template-columns: 32px repeat(var(--weeks, 5), 1fr);
-  gap: 4px;
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed var(--border);
-}
-.heatmap-week-total {
-  font-size: 9.5px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
+			/* Week totals row */
+			.heatmap-week-totals {
+				display: grid;
+				grid-template-columns: 32px repeat(var(--weeks, 5), 1fr);
+				gap: 4px;
+				margin-top: 6px;
+				padding-top: 6px;
+				border-top: 1px dashed var(--border);
+			}
+			.heatmap-week-total {
+				font-size: 9.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				text-align: center;
+				font-variant-numeric: tabular-nums;
+			}
 
-/* ── Selected Day Detail Panel ──────────────────────────────────────── */
-.day-detail {
-  margin-top: 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  transition: opacity 160ms ease;
-}
-.day-detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-}
-.day-detail-date {
-  font-size: 14px;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  letter-spacing: -0.01em;
-}
-.day-detail-weekday {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  margin-left: 8px;
-  font-weight: 400;
-}
-.day-detail-kpis {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.day-detail-kpi {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-}
-.day-detail-kpi-label {
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.day-detail-kpi-value {
-  font-size: 13px;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
+			/* ── Selected Day Detail Panel ──────────────────────────────────────── */
+			.day-detail {
+				margin-top: 20px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				transition: opacity 160ms ease;
+			}
+			.day-detail-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 14px 18px 12px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+			}
+			.day-detail-date {
+				font-size: 14px;
+				font-weight: 600;
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				letter-spacing: -0.01em;
+			}
+			.day-detail-weekday {
+				font-size: 11px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				margin-left: 8px;
+				font-weight: 400;
+			}
+			.day-detail-kpis {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+			}
+			.day-detail-kpi {
+				display: flex;
+				align-items: baseline;
+				gap: 5px;
+			}
+			.day-detail-kpi-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+			.day-detail-kpi-value {
+				font-size: 13px;
+				font-family: var(--font-mono);
+				font-weight: 600;
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
 
-.day-detail-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-}
-.day-detail-section {
-  padding: 14px 18px;
-}
-.day-detail-section + .day-detail-section {
-  border-left: 1px solid var(--border);
-}
-.day-detail-section-title {
-  font-size: 10.5px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-.day-detail-session-row {
-  display: grid;
-  grid-template-columns: 36px 1fr 52px;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 0;
-  font-size: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.day-detail-session-row:last-child { border-bottom: none; }
-.day-detail-session-issue {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-}
-.day-detail-session-name {
-  color: var(--foreground-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.day-detail-session-cost {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--foreground);
-}
+			.day-detail-body {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 0;
+			}
+			.day-detail-section {
+				padding: 14px 18px;
+			}
+			.day-detail-section + .day-detail-section {
+				border-left: 1px solid var(--border);
+			}
+			.day-detail-section-title {
+				font-size: 10.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				font-weight: 600;
+				margin-bottom: 10px;
+			}
+			.day-detail-session-row {
+				display: grid;
+				grid-template-columns: 36px 1fr 52px;
+				align-items: center;
+				gap: 8px;
+				padding: 5px 0;
+				font-size: 12px;
+				border-bottom: 1px solid var(--border);
+			}
+			.day-detail-session-row:last-child {
+				border-bottom: none;
+			}
+			.day-detail-session-issue {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+			}
+			.day-detail-session-name {
+				color: var(--foreground-muted);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.day-detail-session-cost {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				color: var(--foreground);
+			}
 
-.day-detail-category-row {
-  display: grid;
-  grid-template-columns: 80px 1fr 48px;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-}
-.day-detail-cat-name {
-  font-size: 12px;
-  font-weight: 500;
-}
-.day-detail-cat-bar {
-  height: 6px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--moss-400), var(--moss-600));
-}
-.day-detail-cat-cost {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--foreground);
-}
+			.day-detail-category-row {
+				display: grid;
+				grid-template-columns: 80px 1fr 48px;
+				align-items: center;
+				gap: 8px;
+				padding: 4px 0;
+			}
+			.day-detail-cat-name {
+				font-size: 12px;
+				font-weight: 500;
+			}
+			.day-detail-cat-bar {
+				height: 6px;
+				border-radius: 2px;
+				background: linear-gradient(90deg, var(--moss-400), var(--moss-600));
+			}
+			.day-detail-cat-cost {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				color: var(--foreground);
+			}
 
-/* ── Sidebar panels ─────────────────────────────────────────────────── */
-.sidebar-panels {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+			/* ── Sidebar panels ─────────────────────────────────────────────────── */
+			.sidebar-panels {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
 
-/* Tool usage bar rows */
-.tool-row {
-  display: grid;
-  grid-template-columns: 72px 1fr 40px;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-}
-.tool-name {
-  font-size: 11.5px;
-  font-family: var(--font-mono);
-  color: var(--foreground-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tool-bar {
-  height: 6px;
-  border-radius: 2px;
-  background: color-mix(in oklch, var(--primary) 70%, transparent);
-}
-.tool-count {
-  font-size: 10.5px;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--foreground-subtle);
-}
+			/* Tool usage bar rows */
+			.tool-row {
+				display: grid;
+				grid-template-columns: 72px 1fr 40px;
+				align-items: center;
+				gap: 8px;
+				padding: 3px 0;
+			}
+			.tool-name {
+				font-size: 11.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-muted);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.tool-bar {
+				height: 6px;
+				border-radius: 2px;
+				background: color-mix(in oklch, var(--primary) 70%, transparent);
+			}
+			.tool-count {
+				font-size: 10.5px;
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				color: var(--foreground-subtle);
+			}
 
-/* Top sessions list */
-.session-row {
-  display: grid;
-  grid-template-columns: 36px 1fr 52px;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border);
-}
-.session-row:last-child { border-bottom: none; }
-.session-issue {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-}
-.session-name {
-  font-size: 12px;
-  color: var(--foreground-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.session-cost {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--foreground);
-}
+			/* Top sessions list */
+			.session-row {
+				display: grid;
+				grid-template-columns: 36px 1fr 52px;
+				align-items: center;
+				gap: 6px;
+				padding: 5px 0;
+				border-bottom: 1px solid var(--border);
+			}
+			.session-row:last-child {
+				border-bottom: none;
+			}
+			.session-issue {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+			}
+			.session-name {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.session-cost {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				color: var(--foreground);
+			}
 
-/* ── Weekly pattern sparkline ───────────────────────────────────────── */
-.weekly-pattern {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  padding: 4px 0;
-}
-.weekly-pattern-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.weekly-pattern-label {
-  font-size: 9.5px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.weekly-pattern-bar-wrapper {
-  width: 100%;
-  height: 48px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-.weekly-pattern-bar {
-  width: 100%;
-  max-width: 24px;
-  border-radius: 2px 2px 0 0;
-  background: linear-gradient(180deg, var(--moss-400) 0%, var(--moss-700) 100%);
-  transition: filter 120ms;
-}
-.weekly-pattern-bar:hover { filter: brightness(1.2); }
-.weekly-pattern-value {
-  font-size: 9px;
-  font-family: var(--font-mono);
-  color: var(--foreground-subtle);
-  font-variant-numeric: tabular-nums;
-}
+			/* ── Weekly pattern sparkline ───────────────────────────────────────── */
+			.weekly-pattern {
+				display: grid;
+				grid-template-columns: repeat(7, 1fr);
+				gap: 4px;
+				padding: 4px 0;
+			}
+			.weekly-pattern-day {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
+			}
+			.weekly-pattern-label {
+				font-size: 9.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+			}
+			.weekly-pattern-bar-wrapper {
+				width: 100%;
+				height: 48px;
+				display: flex;
+				align-items: flex-end;
+				justify-content: center;
+			}
+			.weekly-pattern-bar {
+				width: 100%;
+				max-width: 24px;
+				border-radius: 2px 2px 0 0;
+				background: linear-gradient(180deg, var(--moss-400) 0%, var(--moss-700) 100%);
+				transition: filter 120ms;
+			}
+			.weekly-pattern-bar:hover {
+				filter: brightness(1.2);
+			}
+			.weekly-pattern-value {
+				font-size: 9px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
 
-/* ── Responsive ─────────────────────────────────────────────────────── */
-@media (max-width: 960px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-  .sidebar-panels {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 600px) {
-  .page-shell { padding: 16px; }
-  .sidebar-panels { grid-template-columns: 1fr; }
-  .kpi-grid { grid-template-columns: 1fr; }
-  .filter-bar { gap: 8px; }
-  .day-detail-body { grid-template-columns: 1fr; }
-  .day-detail-section + .day-detail-section { border-left: none; border-top: 1px solid var(--border); }
-  .heatmap-grid-wrapper { padding: 12px 10px; }
-}
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="page-shell">
+			/* ── Responsive ─────────────────────────────────────────────────────── */
+			@media (max-width: 960px) {
+				.main-layout {
+					grid-template-columns: 1fr;
+				}
+				.sidebar-panels {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+				}
+				.kpi-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+			}
+			@media (max-width: 600px) {
+				.page-shell {
+					padding: 16px;
+				}
+				.sidebar-panels {
+					grid-template-columns: 1fr;
+				}
+				.kpi-grid {
+					grid-template-columns: 1fr;
+				}
+				.filter-bar {
+					gap: 8px;
+				}
+				.day-detail-body {
+					grid-template-columns: 1fr;
+				}
+				.day-detail-section + .day-detail-section {
+					border-left: none;
+					border-top: 1px solid var(--border);
+				}
+				.heatmap-grid-wrapper {
+					padding: 12px 10px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-shell">
+				<!-- Variant label -->
+				<div class="variant-label">
+					<span class="gk-eyebrow">Variant</span>
+					<span
+						class="gk-badge"
+						style="
+							font-family: var(--font-mono);
+							font-size: 10.5px;
+							letter-spacing: 0.04em;
+						"
+						>E — Heatmap Calendar</span
+					>
+				</div>
 
-    <!-- Variant label -->
-    <div class="variant-label">
-      <span class="gk-eyebrow">Variant</span>
-      <span class="gk-badge" style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.04em;">E — Heatmap Calendar</span>
-    </div>
+				<!-- Page header -->
+				<div class="page-header">
+					<div class="page-header-left">
+						<h1 class="gk-h1">Usage Analytics</h1>
+						<p class="gk-small" style="margin-top: 2px">Workspace: grovekeeper-dev</p>
+					</div>
+					<div class="page-header-right">
+						<!-- Palette -->
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-icon"
+							title="Appearance"
+							aria-label="Change appearance"
+						>
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<circle cx="8" cy="8" r="6" />
+								<path d="M8 2a6 6 0 0 1 4.243 10.243M4 4.5C5.5 3 7 2.5 8 2" />
+								<circle cx="5.5" cy="9.5" r="1" fill="currentColor" stroke="none" />
+								<circle cx="8" cy="11.5" r="1" fill="currentColor" stroke="none" />
+								<circle
+									cx="10.5"
+									cy="9.5"
+									r="1"
+									fill="currentColor"
+									stroke="none"
+								/>
+							</svg>
+						</button>
+						<!-- Trophy / achievements -->
+						<button
+							class="trophy-btn"
+							title="Achievements: 3 of 8 unlocked"
+							aria-label="Achievements 3 of 8"
+						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M8 11V13M5 15h6M3 2h10v5a5 5 0 0 1-10 0V2Z" />
+								<path d="M3 4H1v2a2 2 0 0 0 2 2M13 4h2v2a2 2 0 0 1-2 2" />
+							</svg>
+							3/8
+						</button>
+						<!-- Refresh -->
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-icon"
+							title="Refresh data"
+							aria-label="Refresh"
+						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M13.5 8A5.5 5.5 0 1 1 8 2.5a5.5 5.5 0 0 1 4.5 2.343" />
+								<path d="M13.5 2.5V5h-2.5" />
+							</svg>
+						</button>
+						<!-- Export -->
+						<button class="gk-btn gk-btn-secondary gk-btn-sm" title="Export data">
+							<svg
+								width="13"
+								height="13"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M3 10v3h10v-3M8 2v8M5 7l3 3 3-3" />
+							</svg>
+							Export
+						</button>
+					</div>
+				</div>
 
-    <!-- Page header -->
-    <div class="page-header">
-      <div class="page-header-left">
-        <h1 class="gk-h1">Usage Analytics</h1>
-        <p class="gk-small" style="margin-top:2px;">Workspace: grovekeeper-dev</p>
-      </div>
-      <div class="page-header-right">
-        <!-- Palette -->
-        <button class="gk-btn gk-btn-ghost gk-btn-icon" title="Appearance" aria-label="Change appearance">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="8" cy="8" r="6"/>
-            <path d="M8 2a6 6 0 0 1 4.243 10.243M4 4.5C5.5 3 7 2.5 8 2"/>
-            <circle cx="5.5" cy="9.5" r="1" fill="currentColor" stroke="none"/>
-            <circle cx="8" cy="11.5" r="1" fill="currentColor" stroke="none"/>
-            <circle cx="10.5" cy="9.5" r="1" fill="currentColor" stroke="none"/>
-          </svg>
-        </button>
-        <!-- Trophy / achievements -->
-        <button class="trophy-btn" title="Achievements: 3 of 8 unlocked" aria-label="Achievements 3 of 8">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 11V13M5 15h6M3 2h10v5a5 5 0 0 1-10 0V2Z"/>
-            <path d="M3 4H1v2a2 2 0 0 0 2 2M13 4h2v2a2 2 0 0 1-2 2"/>
-          </svg>
-          3/8
-        </button>
-        <!-- Refresh -->
-        <button class="gk-btn gk-btn-ghost gk-btn-icon" title="Refresh data" aria-label="Refresh">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5a5.5 5.5 0 0 1 4.5 2.343"/>
-            <path d="M13.5 2.5V5h-2.5"/>
-          </svg>
-        </button>
-        <!-- Export -->
-        <button class="gk-btn gk-btn-secondary gk-btn-sm" title="Export data">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 10v3h10v-3M8 2v8M5 7l3 3 3-3"/>
-          </svg>
-          Export
-        </button>
-      </div>
-    </div>
+				<!-- Filter bar -->
+				<div class="filter-bar">
+					<!-- Period tabs -->
+					<div class="cb-tabs" role="tablist" aria-label="Time period">
+						<button class="cb-tab" role="tab">today</button>
+						<button class="cb-tab" role="tab">7d</button>
+						<button class="cb-tab" role="tab">30d</button>
+						<button class="cb-tab is-active" role="tab" aria-selected="true">
+							month
+						</button>
+						<button class="cb-tab" role="tab">all</button>
+						<button class="cb-tab" role="tab">custom</button>
+					</div>
 
-    <!-- Filter bar -->
-    <div class="filter-bar">
-      <!-- Period tabs -->
-      <div class="cb-tabs" role="tablist" aria-label="Time period">
-        <button class="cb-tab" role="tab">today</button>
-        <button class="cb-tab" role="tab">7d</button>
-        <button class="cb-tab" role="tab">30d</button>
-        <button class="cb-tab is-active" role="tab" aria-selected="true">month</button>
-        <button class="cb-tab" role="tab">all</button>
-        <button class="cb-tab" role="tab">custom</button>
-      </div>
+					<div class="filter-separator" aria-hidden="true"></div>
 
-      <div class="filter-separator" aria-hidden="true"></div>
+					<!-- Scope -->
+					<div class="filter-group">
+						<span class="filter-label">scope</span>
+						<button class="filter-select-ghost" aria-label="Select scope">
+							This workspace
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M4 6l4 4 4-4" />
+							</svg>
+						</button>
+					</div>
 
-      <!-- Scope -->
-      <div class="filter-group">
-        <span class="filter-label">scope</span>
-        <button class="filter-select-ghost" aria-label="Select scope">
-          This workspace
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
-        </button>
-      </div>
+					<div class="filter-separator" aria-hidden="true"></div>
 
-      <div class="filter-separator" aria-hidden="true"></div>
+					<!-- Group by -->
+					<div class="filter-group">
+						<span class="filter-label">group</span>
+						<button class="filter-select-ghost" aria-label="Group by">
+							None
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M4 6l4 4 4-4" />
+							</svg>
+						</button>
+					</div>
+				</div>
 
-      <!-- Group by -->
-      <div class="filter-group">
-        <span class="filter-label">group</span>
-        <button class="filter-select-ghost" aria-label="Group by">
-          None
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Main Layout: Heatmap + Sidebar -->
-    <div class="main-layout">
-
-      <!-- ══════════════════════════════════════════════════════
+				<!-- Main Layout: Heatmap + Sidebar -->
+				<div class="main-layout">
+					<!-- ══════════════════════════════════════════════════════
            LEFT: Heatmap Calendar
            ══════════════════════════════════════════════════════ -->
-      <div class="heatmap-section">
+					<div class="heatmap-section">
+						<!-- Heatmap header: month nav + legend -->
+						<div class="heatmap-header">
+							<div class="heatmap-month-nav">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm"
+									aria-label="Previous month"
+								>
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 3L5 8l5 5" />
+									</svg>
+								</button>
+								<span class="heatmap-month-label">May 2026</span>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm"
+									aria-label="Next month"
+									disabled
+								>
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M6 3l5 5-5 5" />
+									</svg>
+								</button>
+							</div>
 
-        <!-- Heatmap header: month nav + legend -->
-        <div class="heatmap-header">
-          <div class="heatmap-month-nav">
-            <button class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm" aria-label="Previous month">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
-            </button>
-            <span class="heatmap-month-label">May 2026</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm" aria-label="Next month" disabled>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>
-            </button>
-          </div>
+							<div class="heatmap-legend">
+								<span class="heatmap-legend-label">less</span>
+								<div class="heatmap-legend-cells">
+									<div
+										class="heatmap-legend-cell"
+										style="background: var(--surface-2)"
+									></div>
+									<div
+										class="heatmap-legend-cell"
+										style="background: oklch(0.28 0.032 145)"
+									></div>
+									<div
+										class="heatmap-legend-cell"
+										style="background: oklch(0.34 0.05 142)"
+									></div>
+									<div
+										class="heatmap-legend-cell"
+										style="background: oklch(0.42 0.068 138)"
+									></div>
+									<div
+										class="heatmap-legend-cell"
+										style="background: oklch(0.52 0.088 135)"
+									></div>
+									<div
+										class="heatmap-legend-cell"
+										style="background: oklch(0.62 0.098 132)"
+									></div>
+									<div
+										class="heatmap-legend-cell"
+										style="background: oklch(0.72 0.108 130)"
+									></div>
+								</div>
+								<span class="heatmap-legend-label">more</span>
+							</div>
+						</div>
 
-          <div class="heatmap-legend">
-            <span class="heatmap-legend-label">less</span>
-            <div class="heatmap-legend-cells">
-              <div class="heatmap-legend-cell" style="background:var(--surface-2);"></div>
-              <div class="heatmap-legend-cell" style="background:oklch(0.280 0.032 145);"></div>
-              <div class="heatmap-legend-cell" style="background:oklch(0.340 0.050 142);"></div>
-              <div class="heatmap-legend-cell" style="background:oklch(0.420 0.068 138);"></div>
-              <div class="heatmap-legend-cell" style="background:oklch(0.520 0.088 135);"></div>
-              <div class="heatmap-legend-cell" style="background:oklch(0.620 0.098 132);"></div>
-              <div class="heatmap-legend-cell" style="background:oklch(0.720 0.108 130);"></div>
-            </div>
-            <span class="heatmap-legend-label">more</span>
-          </div>
-        </div>
-
-        <!-- Heatmap grid: May 2026 starts on Friday
+						<!-- Heatmap grid: May 2026 starts on Friday
              Week columns: Apr27-May3, May4-10, May11-17, May18-24, May25-31
              Grid-auto-flow: column means we fill column-by-column (week-by-week)
         -->
-        <div class="heatmap-grid-wrapper">
-          <div class="heatmap-grid" style="--weeks:5;">
-            <!-- Day labels (row headers) — placed first, they span the first column -->
-            <div class="heatmap-day-label">Mon</div>
-            <div class="heatmap-day-label">Tue</div>
-            <div class="heatmap-day-label">Wed</div>
-            <div class="heatmap-day-label">Thu</div>
-            <div class="heatmap-day-label">Fri</div>
-            <div class="heatmap-day-label">Sat</div>
-            <div class="heatmap-day-label">Sun</div>
+						<div class="heatmap-grid-wrapper">
+							<div class="heatmap-grid" style="--weeks: 5">
+								<!-- Day labels (row headers) — placed first, they span the first column -->
+								<div class="heatmap-day-label">Mon</div>
+								<div class="heatmap-day-label">Tue</div>
+								<div class="heatmap-day-label">Wed</div>
+								<div class="heatmap-day-label">Thu</div>
+								<div class="heatmap-day-label">Fri</div>
+								<div class="heatmap-day-label">Sat</div>
+								<div class="heatmap-day-label">Sun</div>
 
-            <!-- Week 1: Apr 28 - May 4 (Mon Apr 28 - Sun May 4) -->
-            <!-- Apr 28 (Mon) -->
-            <div class="heatmap-cell intensity-2" data-day="2026-04-28" data-cost="0.82" data-sessions="1" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Mon, Apr 28</div>
-                <div class="heatmap-cell-tooltip-value">$0.82 &middot; 1 session</div>
-              </div>
-            </div>
-            <!-- Apr 29 (Tue) -->
-            <div class="heatmap-cell intensity-3" data-day="2026-04-29" data-cost="1.44" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Tue, Apr 29</div>
-                <div class="heatmap-cell-tooltip-value">$1.44 &middot; 2 sessions</div>
-              </div>
-            </div>
-            <!-- Apr 30 (Wed) -->
-            <div class="heatmap-cell intensity-0" data-day="2026-04-30" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Wed, Apr 30</div>
-                <div class="heatmap-cell-tooltip-value">no activity</div>
-              </div>
-            </div>
-            <!-- May 1 (Thu) -->
-            <div class="heatmap-cell intensity-4" data-day="2026-05-01" data-cost="2.18" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Thu, May 1</div>
-                <div class="heatmap-cell-tooltip-value">$2.18 &middot; 3 sessions</div>
-              </div>
-            </div>
-            <!-- May 2 (Fri) -->
-            <div class="heatmap-cell intensity-5" data-day="2026-05-02" data-cost="3.05" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Fri, May 2</div>
-                <div class="heatmap-cell-tooltip-value">$3.05 &middot; 3 sessions</div>
-              </div>
-            </div>
-            <!-- May 3 (Sat) -->
-            <div class="heatmap-cell intensity-1" data-day="2026-05-03" data-cost="0.36" data-sessions="1" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Sat, May 3</div>
-                <div class="heatmap-cell-tooltip-value">$0.36 &middot; 1 session</div>
-              </div>
-            </div>
-            <!-- May 4 (Sun) -->
-            <div class="heatmap-cell intensity-0" data-day="2026-05-04" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip">
-                <div class="heatmap-cell-tooltip-date">Sun, May 4</div>
-                <div class="heatmap-cell-tooltip-value">no activity</div>
-              </div>
-            </div>
+								<!-- Week 1: Apr 28 - May 4 (Mon Apr 28 - Sun May 4) -->
+								<!-- Apr 28 (Mon) -->
+								<div
+									class="heatmap-cell intensity-2"
+									data-day="2026-04-28"
+									data-cost="0.82"
+									data-sessions="1"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Mon, Apr 28</div>
+										<div class="heatmap-cell-tooltip-value">
+											$0.82 &middot; 1 session
+										</div>
+									</div>
+								</div>
+								<!-- Apr 29 (Tue) -->
+								<div
+									class="heatmap-cell intensity-3"
+									data-day="2026-04-29"
+									data-cost="1.44"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Tue, Apr 29</div>
+										<div class="heatmap-cell-tooltip-value">
+											$1.44 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<!-- Apr 30 (Wed) -->
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-04-30"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Wed, Apr 30</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
+								<!-- May 1 (Thu) -->
+								<div
+									class="heatmap-cell intensity-4"
+									data-day="2026-05-01"
+									data-cost="2.18"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Thu, May 1</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.18 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<!-- May 2 (Fri) -->
+								<div
+									class="heatmap-cell intensity-5"
+									data-day="2026-05-02"
+									data-cost="3.05"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Fri, May 2</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.05 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<!-- May 3 (Sat) -->
+								<div
+									class="heatmap-cell intensity-1"
+									data-day="2026-05-03"
+									data-cost="0.36"
+									data-sessions="1"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sat, May 3</div>
+										<div class="heatmap-cell-tooltip-value">
+											$0.36 &middot; 1 session
+										</div>
+									</div>
+								</div>
+								<!-- May 4 (Sun) -->
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-05-04"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sun, May 4</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
 
-            <!-- Week 2: May 5 - May 11 -->
-            <div class="heatmap-cell intensity-3" data-day="2026-05-05" data-cost="1.27" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Mon, May 5</div><div class="heatmap-cell-tooltip-value">$1.27 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-5" data-day="2026-05-06" data-cost="2.91" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Tue, May 6</div><div class="heatmap-cell-tooltip-value">$2.91 &middot; 3 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-6" data-day="2026-05-07" data-cost="3.88" data-sessions="4" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Wed, May 7</div><div class="heatmap-cell-tooltip-value">$3.88 &middot; 4 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-4" data-day="2026-05-08" data-cost="2.15" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Thu, May 8</div><div class="heatmap-cell-tooltip-value">$2.15 &middot; 2 sessions</div></div>
-            </div>
-            <!-- May 9 (Fri) — selected day -->
-            <div class="heatmap-cell intensity-6 is-selected" data-day="2026-05-09" data-cost="4.12" data-sessions="4" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Fri, May 9</div><div class="heatmap-cell-tooltip-value">$4.12 &middot; 4 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-1" data-day="2026-05-10" data-cost="0.41" data-sessions="1" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sat, May 10</div><div class="heatmap-cell-tooltip-value">$0.41 &middot; 1 session</div></div>
-            </div>
-            <div class="heatmap-cell intensity-0" data-day="2026-05-11" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sun, May 11</div><div class="heatmap-cell-tooltip-value">no activity</div></div>
-            </div>
+								<!-- Week 2: May 5 - May 11 -->
+								<div
+									class="heatmap-cell intensity-3"
+									data-day="2026-05-05"
+									data-cost="1.27"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Mon, May 5</div>
+										<div class="heatmap-cell-tooltip-value">
+											$1.27 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-5"
+									data-day="2026-05-06"
+									data-cost="2.91"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Tue, May 6</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.91 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-6"
+									data-day="2026-05-07"
+									data-cost="3.88"
+									data-sessions="4"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Wed, May 7</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.88 &middot; 4 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-4"
+									data-day="2026-05-08"
+									data-cost="2.15"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Thu, May 8</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.15 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<!-- May 9 (Fri) — selected day -->
+								<div
+									class="heatmap-cell intensity-6 is-selected"
+									data-day="2026-05-09"
+									data-cost="4.12"
+									data-sessions="4"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Fri, May 9</div>
+										<div class="heatmap-cell-tooltip-value">
+											$4.12 &middot; 4 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-1"
+									data-day="2026-05-10"
+									data-cost="0.41"
+									data-sessions="1"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sat, May 10</div>
+										<div class="heatmap-cell-tooltip-value">
+											$0.41 &middot; 1 session
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-05-11"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sun, May 11</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
 
-            <!-- Week 3: May 12 - May 18 -->
-            <div class="heatmap-cell intensity-4" data-day="2026-05-12" data-cost="2.33" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Mon, May 12</div><div class="heatmap-cell-tooltip-value">$2.33 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-3" data-day="2026-05-13" data-cost="1.56" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Tue, May 13</div><div class="heatmap-cell-tooltip-value">$1.56 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-5" data-day="2026-05-14" data-cost="3.24" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Wed, May 14</div><div class="heatmap-cell-tooltip-value">$3.24 &middot; 3 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-6" data-day="2026-05-15" data-cost="3.91" data-sessions="4" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Thu, May 15</div><div class="heatmap-cell-tooltip-value">$3.91 &middot; 4 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-5" data-day="2026-05-16" data-cost="3.56" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Fri, May 16</div><div class="heatmap-cell-tooltip-value">$3.56 &middot; 3 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-0" data-day="2026-05-17" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sat, May 17</div><div class="heatmap-cell-tooltip-value">no activity</div></div>
-            </div>
-            <div class="heatmap-cell intensity-0" data-day="2026-05-18" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sun, May 18</div><div class="heatmap-cell-tooltip-value">no activity</div></div>
-            </div>
+								<!-- Week 3: May 12 - May 18 -->
+								<div
+									class="heatmap-cell intensity-4"
+									data-day="2026-05-12"
+									data-cost="2.33"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Mon, May 12</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.33 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-3"
+									data-day="2026-05-13"
+									data-cost="1.56"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Tue, May 13</div>
+										<div class="heatmap-cell-tooltip-value">
+											$1.56 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-5"
+									data-day="2026-05-14"
+									data-cost="3.24"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Wed, May 14</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.24 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-6"
+									data-day="2026-05-15"
+									data-cost="3.91"
+									data-sessions="4"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Thu, May 15</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.91 &middot; 4 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-5"
+									data-day="2026-05-16"
+									data-cost="3.56"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Fri, May 16</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.56 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-05-17"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sat, May 17</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-05-18"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sun, May 18</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
 
-            <!-- Week 4: May 19 - May 25 -->
-            <div class="heatmap-cell intensity-5" data-day="2026-05-19" data-cost="3.18" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Mon, May 19</div><div class="heatmap-cell-tooltip-value">$3.18 &middot; 3 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-4" data-day="2026-05-20" data-cost="2.47" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Tue, May 20</div><div class="heatmap-cell-tooltip-value">$2.47 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-6" data-day="2026-05-21" data-cost="4.05" data-sessions="4" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Wed, May 21</div><div class="heatmap-cell-tooltip-value">$4.05 &middot; 4 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-5" data-day="2026-05-22" data-cost="3.42" data-sessions="3" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Thu, May 22</div><div class="heatmap-cell-tooltip-value">$3.42 &middot; 3 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-4" data-day="2026-05-23" data-cost="2.06" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Fri, May 23</div><div class="heatmap-cell-tooltip-value">$2.06 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-2" data-day="2026-05-24" data-cost="0.73" data-sessions="1" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sat, May 24</div><div class="heatmap-cell-tooltip-value">$0.73 &middot; 1 session</div></div>
-            </div>
-            <div class="heatmap-cell intensity-0" data-day="2026-05-25" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sun, May 25</div><div class="heatmap-cell-tooltip-value">no activity</div></div>
-            </div>
+								<!-- Week 4: May 19 - May 25 -->
+								<div
+									class="heatmap-cell intensity-5"
+									data-day="2026-05-19"
+									data-cost="3.18"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Mon, May 19</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.18 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-4"
+									data-day="2026-05-20"
+									data-cost="2.47"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Tue, May 20</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.47 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-6"
+									data-day="2026-05-21"
+									data-cost="4.05"
+									data-sessions="4"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Wed, May 21</div>
+										<div class="heatmap-cell-tooltip-value">
+											$4.05 &middot; 4 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-5"
+									data-day="2026-05-22"
+									data-cost="3.42"
+									data-sessions="3"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Thu, May 22</div>
+										<div class="heatmap-cell-tooltip-value">
+											$3.42 &middot; 3 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-4"
+									data-day="2026-05-23"
+									data-cost="2.06"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Fri, May 23</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.06 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-2"
+									data-day="2026-05-24"
+									data-cost="0.73"
+									data-sessions="1"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sat, May 24</div>
+										<div class="heatmap-cell-tooltip-value">
+											$0.73 &middot; 1 session
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-05-25"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sun, May 25</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
 
-            <!-- Week 5: May 26 - Jun 1 (only May 26-31 shown, Jun 1 is future) -->
-            <div class="heatmap-cell intensity-3" data-day="2026-05-26" data-cost="1.62" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Mon, May 26</div><div class="heatmap-cell-tooltip-value">$1.62 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-4" data-day="2026-05-27" data-cost="2.08" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Tue, May 27</div><div class="heatmap-cell-tooltip-value">$2.08 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-2" data-day="2026-05-28" data-cost="0.91" data-sessions="1" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Wed, May 28</div><div class="heatmap-cell-tooltip-value">$0.91 &middot; 1 session</div></div>
-            </div>
-            <div class="heatmap-cell intensity-3" data-day="2026-05-29" data-cost="1.38" data-sessions="2" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Thu, May 29</div><div class="heatmap-cell-tooltip-value">$1.38 &middot; 2 sessions</div></div>
-            </div>
-            <div class="heatmap-cell intensity-1" data-day="2026-05-30" data-cost="0.28" data-sessions="1" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Fri, May 30</div><div class="heatmap-cell-tooltip-value">$0.28 &middot; 1 session</div></div>
-            </div>
-            <div class="heatmap-cell intensity-0" data-day="2026-05-31" data-cost="0" data-sessions="0" tabindex="0">
-              <div class="heatmap-cell-tooltip"><div class="heatmap-cell-tooltip-date">Sat, May 31</div><div class="heatmap-cell-tooltip-value">no activity</div></div>
-            </div>
-            <!-- Jun 1 (Sun) - future -->
-            <div class="heatmap-cell is-future" data-day="2026-06-01" tabindex="-1"></div>
-          </div>
+								<!-- Week 5: May 26 - Jun 1 (only May 26-31 shown, Jun 1 is future) -->
+								<div
+									class="heatmap-cell intensity-3"
+									data-day="2026-05-26"
+									data-cost="1.62"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Mon, May 26</div>
+										<div class="heatmap-cell-tooltip-value">
+											$1.62 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-4"
+									data-day="2026-05-27"
+									data-cost="2.08"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Tue, May 27</div>
+										<div class="heatmap-cell-tooltip-value">
+											$2.08 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-2"
+									data-day="2026-05-28"
+									data-cost="0.91"
+									data-sessions="1"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Wed, May 28</div>
+										<div class="heatmap-cell-tooltip-value">
+											$0.91 &middot; 1 session
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-3"
+									data-day="2026-05-29"
+									data-cost="1.38"
+									data-sessions="2"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Thu, May 29</div>
+										<div class="heatmap-cell-tooltip-value">
+											$1.38 &middot; 2 sessions
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-1"
+									data-day="2026-05-30"
+									data-cost="0.28"
+									data-sessions="1"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Fri, May 30</div>
+										<div class="heatmap-cell-tooltip-value">
+											$0.28 &middot; 1 session
+										</div>
+									</div>
+								</div>
+								<div
+									class="heatmap-cell intensity-0"
+									data-day="2026-05-31"
+									data-cost="0"
+									data-sessions="0"
+									tabindex="0"
+								>
+									<div class="heatmap-cell-tooltip">
+										<div class="heatmap-cell-tooltip-date">Sat, May 31</div>
+										<div class="heatmap-cell-tooltip-value">no activity</div>
+									</div>
+								</div>
+								<!-- Jun 1 (Sun) - future -->
+								<div
+									class="heatmap-cell is-future"
+									data-day="2026-06-01"
+									tabindex="-1"
+								></div>
+							</div>
 
-          <!-- Week totals -->
-          <div class="heatmap-week-totals" style="--weeks:5;">
-            <div></div><!-- spacer for day labels column -->
-            <div class="heatmap-week-total">$7.85</div>
-            <div class="heatmap-week-total">$14.74</div>
-            <div class="heatmap-week-total">$14.60</div>
-            <div class="heatmap-week-total">$15.91</div>
-            <div class="heatmap-week-total">$6.27</div>
-          </div>
-        </div>
+							<!-- Week totals -->
+							<div class="heatmap-week-totals" style="--weeks: 5">
+								<div></div>
+								<!-- spacer for day labels column -->
+								<div class="heatmap-week-total">$7.85</div>
+								<div class="heatmap-week-total">$14.74</div>
+								<div class="heatmap-week-total">$14.60</div>
+								<div class="heatmap-week-total">$15.91</div>
+								<div class="heatmap-week-total">$6.27</div>
+							</div>
+						</div>
 
-        <!-- ── Selected Day Detail Panel ──────────────────── -->
-        <div class="day-detail" id="day-detail-panel">
-          <div class="day-detail-header">
-            <div>
-              <span class="day-detail-date">May 9, 2026</span>
-              <span class="day-detail-weekday">Friday</span>
-            </div>
-            <div class="day-detail-kpis">
-              <div class="day-detail-kpi">
-                <span class="day-detail-kpi-label">cost</span>
-                <span class="day-detail-kpi-value" style="color:var(--amber-400);">$4.12</span>
-              </div>
-              <div class="day-detail-kpi">
-                <span class="day-detail-kpi-label">sessions</span>
-                <span class="day-detail-kpi-value">4</span>
-              </div>
-              <div class="day-detail-kpi">
-                <span class="day-detail-kpi-label">turns</span>
-                <span class="day-detail-kpi-value">31</span>
-              </div>
-              <div class="day-detail-kpi">
-                <span class="day-detail-kpi-label">1-shot</span>
-                <span class="day-detail-kpi-value" style="color:oklch(0.700 0.150 145);">75%</span>
-              </div>
-            </div>
-          </div>
-          <div class="day-detail-body">
-            <!-- Sessions on this day -->
-            <div class="day-detail-section">
-              <div class="day-detail-section-title">Sessions</div>
-              <div class="day-detail-session-row">
-                <span class="day-detail-session-issue">#263</span>
-                <span class="day-detail-session-name">GitHub OAuth device flow integration</span>
-                <span class="day-detail-session-cost">$1.74</span>
-              </div>
-              <div class="day-detail-session-row">
-                <span class="day-detail-session-issue">#258</span>
-                <span class="day-detail-session-name">Fix manual testing follow-up regressions</span>
-                <span class="day-detail-session-cost">$1.22</span>
-              </div>
-              <div class="day-detail-session-row">
-                <span class="day-detail-session-issue">#251</span>
-                <span class="day-detail-session-name">Notification character pack sound engine</span>
-                <span class="day-detail-session-cost">$0.84</span>
-              </div>
-              <div class="day-detail-session-row">
-                <span class="day-detail-session-issue" style="color:var(--foreground-subtle);">&mdash;</span>
-                <span class="day-detail-session-name" style="font-style:italic;color:var(--foreground-subtle);">Ad-hoc exploration session</span>
-                <span class="day-detail-session-cost">$0.32</span>
-              </div>
-            </div>
+						<!-- ── Selected Day Detail Panel ──────────────────── -->
+						<div class="day-detail" id="day-detail-panel">
+							<div class="day-detail-header">
+								<div>
+									<span class="day-detail-date">May 9, 2026</span>
+									<span class="day-detail-weekday">Friday</span>
+								</div>
+								<div class="day-detail-kpis">
+									<div class="day-detail-kpi">
+										<span class="day-detail-kpi-label">cost</span>
+										<span
+											class="day-detail-kpi-value"
+											style="color: var(--amber-400)"
+											>$4.12</span
+										>
+									</div>
+									<div class="day-detail-kpi">
+										<span class="day-detail-kpi-label">sessions</span>
+										<span class="day-detail-kpi-value">4</span>
+									</div>
+									<div class="day-detail-kpi">
+										<span class="day-detail-kpi-label">turns</span>
+										<span class="day-detail-kpi-value">31</span>
+									</div>
+									<div class="day-detail-kpi">
+										<span class="day-detail-kpi-label">1-shot</span>
+										<span
+											class="day-detail-kpi-value"
+											style="color: oklch(0.7 0.15 145)"
+											>75%</span
+										>
+									</div>
+								</div>
+							</div>
+							<div class="day-detail-body">
+								<!-- Sessions on this day -->
+								<div class="day-detail-section">
+									<div class="day-detail-section-title">Sessions</div>
+									<div class="day-detail-session-row">
+										<span class="day-detail-session-issue">#263</span>
+										<span class="day-detail-session-name"
+											>GitHub OAuth device flow integration</span
+										>
+										<span class="day-detail-session-cost">$1.74</span>
+									</div>
+									<div class="day-detail-session-row">
+										<span class="day-detail-session-issue">#258</span>
+										<span class="day-detail-session-name"
+											>Fix manual testing follow-up regressions</span
+										>
+										<span class="day-detail-session-cost">$1.22</span>
+									</div>
+									<div class="day-detail-session-row">
+										<span class="day-detail-session-issue">#251</span>
+										<span class="day-detail-session-name"
+											>Notification character pack sound engine</span
+										>
+										<span class="day-detail-session-cost">$0.84</span>
+									</div>
+									<div class="day-detail-session-row">
+										<span
+											class="day-detail-session-issue"
+											style="color: var(--foreground-subtle)"
+											>&mdash;</span
+										>
+										<span
+											class="day-detail-session-name"
+											style="
+												font-style: italic;
+												color: var(--foreground-subtle);
+											"
+											>Ad-hoc exploration session</span
+										>
+										<span class="day-detail-session-cost">$0.32</span>
+									</div>
+								</div>
 
-            <!-- Category breakdown for this day -->
-            <div class="day-detail-section">
-              <div class="day-detail-section-title">Category Breakdown</div>
-              <div class="day-detail-category-row">
-                <span class="day-detail-cat-name cb-cat-feature">feature</span>
-                <div style="display:flex;align-items:center;height:6px;">
-                  <div class="day-detail-cat-bar" style="width:62%;background:linear-gradient(90deg,oklch(0.770 0.155 75),oklch(0.690 0.165 55));"></div>
-                </div>
-                <span class="day-detail-cat-cost">$2.56</span>
-              </div>
-              <div class="day-detail-category-row">
-                <span class="day-detail-cat-name cb-cat-debugging">debugging</span>
-                <div style="display:flex;align-items:center;height:6px;">
-                  <div class="day-detail-cat-bar" style="width:30%;background:linear-gradient(90deg,oklch(0.640 0.205 25),oklch(0.560 0.180 20));"></div>
-                </div>
-                <span class="day-detail-cat-cost">$1.22</span>
-              </div>
-              <div class="day-detail-category-row">
-                <span class="day-detail-cat-name cb-cat-exploration">exploration</span>
-                <div style="display:flex;align-items:center;height:6px;">
-                  <div class="day-detail-cat-bar" style="width:8%;background:linear-gradient(90deg,oklch(0.700 0.110 200),oklch(0.620 0.130 230));"></div>
-                </div>
-                <span class="day-detail-cat-cost">$0.34</span>
-              </div>
-            </div>
-          </div>
-        </div>
+								<!-- Category breakdown for this day -->
+								<div class="day-detail-section">
+									<div class="day-detail-section-title">Category Breakdown</div>
+									<div class="day-detail-category-row">
+										<span class="day-detail-cat-name cb-cat-feature"
+											>feature</span
+										>
+										<div
+											style="display: flex; align-items: center; height: 6px"
+										>
+											<div
+												class="day-detail-cat-bar"
+												style="
+													width: 62%;
+													background: linear-gradient(
+														90deg,
+														oklch(0.77 0.155 75),
+														oklch(0.69 0.165 55)
+													);
+												"
+											></div>
+										</div>
+										<span class="day-detail-cat-cost">$2.56</span>
+									</div>
+									<div class="day-detail-category-row">
+										<span class="day-detail-cat-name cb-cat-debugging"
+											>debugging</span
+										>
+										<div
+											style="display: flex; align-items: center; height: 6px"
+										>
+											<div
+												class="day-detail-cat-bar"
+												style="
+													width: 30%;
+													background: linear-gradient(
+														90deg,
+														oklch(0.64 0.205 25),
+														oklch(0.56 0.18 20)
+													);
+												"
+											></div>
+										</div>
+										<span class="day-detail-cat-cost">$1.22</span>
+									</div>
+									<div class="day-detail-category-row">
+										<span class="day-detail-cat-name cb-cat-exploration"
+											>exploration</span
+										>
+										<div
+											style="display: flex; align-items: center; height: 6px"
+										>
+											<div
+												class="day-detail-cat-bar"
+												style="
+													width: 8%;
+													background: linear-gradient(
+														90deg,
+														oklch(0.7 0.11 200),
+														oklch(0.62 0.13 230)
+													);
+												"
+											></div>
+										</div>
+										<span class="day-detail-cat-cost">$0.34</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /heatmap-section -->
 
-      </div><!-- /heatmap-section -->
-
-      <!-- ══════════════════════════════════════════════════════
+					<!-- ══════════════════════════════════════════════════════
            RIGHT: Sidebar (KPIs + Tool Usage + Weekly Pattern)
            ══════════════════════════════════════════════════════ -->
-      <div class="sidebar-panels">
+					<div class="sidebar-panels">
+						<!-- KPI Cards 2x2 -->
+						<div class="kpi-grid">
+							<div class="kpi-card" style="--kpi-accent: var(--amber-400)">
+								<div class="kpi-label">Total Cost</div>
+								<div class="kpi-value">$59.37</div>
+								<div
+									style="
+										display: flex;
+										align-items: center;
+										justify-content: space-between;
+									"
+								>
+									<span class="kpi-delta kpi-delta-down">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 10 10"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M5 2v6M2 5l3 3 3-3" />
+										</svg>
+										&minus;8%
+									</span>
+									<span class="kpi-sub">vs Apr</span>
+								</div>
+							</div>
 
-        <!-- KPI Cards 2x2 -->
-        <div class="kpi-grid">
-          <div class="kpi-card" style="--kpi-accent: var(--amber-400);">
-            <div class="kpi-label">Total Cost</div>
-            <div class="kpi-value">$59.37</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span class="kpi-delta kpi-delta-down">
-                <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2v6M2 5l3 3 3-3"/></svg>
-                &minus;8%
-              </span>
-              <span class="kpi-sub">vs Apr</span>
-            </div>
-          </div>
+							<div class="kpi-card" style="--kpi-accent: var(--azure-400)">
+								<div class="kpi-label">Sessions</div>
+								<div class="kpi-value">42</div>
+								<div
+									style="
+										display: flex;
+										align-items: center;
+										justify-content: space-between;
+									"
+								>
+									<span class="kpi-delta kpi-delta-up">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 10 10"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M5 8V2M2 5l3-3 3 3" />
+										</svg>
+										+5
+									</span>
+									<span class="kpi-sub">312 turns</span>
+								</div>
+							</div>
 
-          <div class="kpi-card" style="--kpi-accent: var(--azure-400);">
-            <div class="kpi-label">Sessions</div>
-            <div class="kpi-value">42</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span class="kpi-delta kpi-delta-up">
-                <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8V2M2 5l3-3 3 3"/></svg>
-                +5
-              </span>
-              <span class="kpi-sub">312 turns</span>
-            </div>
-          </div>
+							<div class="kpi-card" style="--kpi-accent: var(--status-success)">
+								<div class="kpi-label">One-shot</div>
+								<div class="kpi-value">
+									73<span
+										style="
+											font-size: 14px;
+											color: var(--foreground-muted);
+											font-weight: 400;
+										"
+										>%</span
+									>
+								</div>
+								<div
+									style="
+										display: flex;
+										align-items: center;
+										justify-content: space-between;
+									"
+								>
+									<span class="kpi-delta kpi-delta-up">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 10 10"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M5 8V2M2 5l3-3 3 3" />
+										</svg>
+										+2pp
+									</span>
+									<span class="kpi-sub">31/42</span>
+								</div>
+							</div>
 
-          <div class="kpi-card" style="--kpi-accent: var(--status-success);">
-            <div class="kpi-label">One-shot</div>
-            <div class="kpi-value">73<span style="font-size:14px;color:var(--foreground-muted);font-weight:400;">%</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span class="kpi-delta kpi-delta-up">
-                <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8V2M2 5l3-3 3 3"/></svg>
-                +2pp
-              </span>
-              <span class="kpi-sub">31/42</span>
-            </div>
-          </div>
+							<div class="kpi-card" style="--kpi-accent: var(--teal-400)">
+								<div class="kpi-label">Cache Hit</div>
+								<div class="kpi-value">
+									86<span
+										style="
+											font-size: 14px;
+											color: var(--foreground-muted);
+											font-weight: 400;
+										"
+										>%</span
+									>
+								</div>
+								<div
+									style="
+										display: flex;
+										align-items: center;
+										justify-content: space-between;
+									"
+								>
+									<span class="kpi-delta kpi-delta-up">
+										<svg
+											width="9"
+											height="9"
+											viewBox="0 0 10 10"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M5 8V2M2 5l3-3 3 3" />
+										</svg>
+										+3pp
+									</span>
+									<span class="kpi-sub">2.4M saved</span>
+								</div>
+							</div>
+						</div>
 
-          <div class="kpi-card" style="--kpi-accent: var(--teal-400);">
-            <div class="kpi-label">Cache Hit</div>
-            <div class="kpi-value">86<span style="font-size:14px;color:var(--foreground-muted);font-weight:400;">%</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span class="kpi-delta kpi-delta-up">
-                <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8V2M2 5l3-3 3 3"/></svg>
-                +3pp
-              </span>
-              <span class="kpi-sub">2.4M saved</span>
-            </div>
-          </div>
-        </div>
+						<!-- Weekly Pattern -->
+						<div class="cb-panel">
+							<div class="cb-panel-title">
+								Weekly Pattern
+								<span class="cb-panel-sub">avg $/day</span>
+							</div>
+							<div class="weekly-pattern">
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div class="weekly-pattern-bar" style="height: 72%"></div>
+									</div>
+									<span class="weekly-pattern-value">$2.48</span>
+									<span class="weekly-pattern-label">Mon</span>
+								</div>
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div class="weekly-pattern-bar" style="height: 85%"></div>
+									</div>
+									<span class="weekly-pattern-value">$2.92</span>
+									<span class="weekly-pattern-label">Tue</span>
+								</div>
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div class="weekly-pattern-bar" style="height: 100%"></div>
+									</div>
+									<span class="weekly-pattern-value">$3.27</span>
+									<span class="weekly-pattern-label">Wed</span>
+								</div>
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div class="weekly-pattern-bar" style="height: 90%"></div>
+									</div>
+									<span class="weekly-pattern-value">$3.01</span>
+									<span class="weekly-pattern-label">Thu</span>
+								</div>
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div class="weekly-pattern-bar" style="height: 76%"></div>
+									</div>
+									<span class="weekly-pattern-value">$2.59</span>
+									<span class="weekly-pattern-label">Fri</span>
+								</div>
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div
+											class="weekly-pattern-bar"
+											style="height: 22%; opacity: 0.6"
+										></div>
+									</div>
+									<span class="weekly-pattern-value">$0.38</span>
+									<span class="weekly-pattern-label">Sat</span>
+								</div>
+								<div class="weekly-pattern-day">
+									<div class="weekly-pattern-bar-wrapper">
+										<div
+											class="weekly-pattern-bar"
+											style="height: 4%; opacity: 0.3"
+										></div>
+									</div>
+									<span class="weekly-pattern-value">$0.00</span>
+									<span class="weekly-pattern-label">Sun</span>
+								</div>
+							</div>
+						</div>
 
-        <!-- Weekly Pattern -->
-        <div class="cb-panel">
-          <div class="cb-panel-title">
-            Weekly Pattern
-            <span class="cb-panel-sub">avg $/day</span>
-          </div>
-          <div class="weekly-pattern">
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:72%;"></div>
-              </div>
-              <span class="weekly-pattern-value">$2.48</span>
-              <span class="weekly-pattern-label">Mon</span>
-            </div>
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:85%;"></div>
-              </div>
-              <span class="weekly-pattern-value">$2.92</span>
-              <span class="weekly-pattern-label">Tue</span>
-            </div>
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:100%;"></div>
-              </div>
-              <span class="weekly-pattern-value">$3.27</span>
-              <span class="weekly-pattern-label">Wed</span>
-            </div>
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:90%;"></div>
-              </div>
-              <span class="weekly-pattern-value">$3.01</span>
-              <span class="weekly-pattern-label">Thu</span>
-            </div>
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:76%;"></div>
-              </div>
-              <span class="weekly-pattern-value">$2.59</span>
-              <span class="weekly-pattern-label">Fri</span>
-            </div>
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:22%;opacity:0.6;"></div>
-              </div>
-              <span class="weekly-pattern-value">$0.38</span>
-              <span class="weekly-pattern-label">Sat</span>
-            </div>
-            <div class="weekly-pattern-day">
-              <div class="weekly-pattern-bar-wrapper">
-                <div class="weekly-pattern-bar" style="height:4%;opacity:0.3;"></div>
-              </div>
-              <span class="weekly-pattern-value">$0.00</span>
-              <span class="weekly-pattern-label">Sun</span>
-            </div>
-          </div>
-        </div>
+						<!-- Tool Usage -->
+						<div class="cb-panel">
+							<div class="cb-panel-title">
+								Tool Usage
+								<span class="cb-panel-sub">this month</span>
+							</div>
 
-        <!-- Tool Usage -->
-        <div class="cb-panel">
-          <div class="cb-panel-title">
-            Tool Usage
-            <span class="cb-panel-sub">this month</span>
-          </div>
+							<div class="tool-row">
+								<span class="tool-name">Edit</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 100%"></div>
+								</div>
+								<span class="tool-count">247</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Read</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 82%"></div>
+								</div>
+								<span class="tool-count">203</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Bash</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 61%"></div>
+								</div>
+								<span class="tool-count">151</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Grep</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 44%"></div>
+								</div>
+								<span class="tool-count">108</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Write</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 35%"></div>
+								</div>
+								<span class="tool-count">87</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Glob</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 22%"></div>
+								</div>
+								<span class="tool-count">54</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Agent</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 14%"></div>
+								</div>
+								<span class="tool-count">35</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">MCP</span>
+								<div style="display: flex; align-items: center; height: 6px">
+									<div class="tool-bar" style="width: 8%"></div>
+								</div>
+								<span class="tool-count">19</span>
+							</div>
 
-          <div class="tool-row">
-            <span class="tool-name">Edit</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:100%;"></div>
-            </div>
-            <span class="tool-count">247</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">Read</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:82%;"></div>
-            </div>
-            <span class="tool-count">203</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">Bash</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:61%;"></div>
-            </div>
-            <span class="tool-count">151</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">Grep</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:44%;"></div>
-            </div>
-            <span class="tool-count">108</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">Write</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:35%;"></div>
-            </div>
-            <span class="tool-count">87</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">Glob</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:22%;"></div>
-            </div>
-            <span class="tool-count">54</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">Agent</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:14%;"></div>
-            </div>
-            <span class="tool-count">35</span>
-          </div>
-          <div class="tool-row">
-            <span class="tool-name">MCP</span>
-            <div style="display:flex;align-items:center;height:6px;">
-              <div class="tool-bar" style="width:8%;"></div>
-            </div>
-            <span class="tool-count">19</span>
-          </div>
+							<!-- Footer -->
+							<div
+								style="
+									padding-top: 6px;
+									border-top: 1px solid var(--border);
+									display: flex;
+									justify-content: space-between;
+									align-items: center;
+								"
+							>
+								<span class="cb-mute" style="font-size: 10px"
+									>8 tools &middot; 904 total calls</span
+								>
+								<span class="cb-mute" style="font-size: 10px"
+									>avg 21.5/session</span
+								>
+							</div>
+						</div>
 
-          <!-- Footer -->
-          <div style="padding-top:6px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-            <span class="cb-mute" style="font-size:10px;">8 tools &middot; 904 total calls</span>
-            <span class="cb-mute" style="font-size:10px;">avg 21.5/session</span>
-          </div>
-        </div>
+						<!-- Top Sessions -->
+						<div class="cb-panel">
+							<div class="cb-panel-title">
+								Top Sessions
+								<span class="cb-panel-sub">by cost</span>
+							</div>
 
-        <!-- Top Sessions -->
-        <div class="cb-panel">
-          <div class="cb-panel-title">
-            Top Sessions
-            <span class="cb-panel-sub">by cost</span>
-          </div>
+							<div class="session-row">
+								<span class="session-issue">#247</span>
+								<span class="session-name">Metrics v2 aggregation pipeline</span>
+								<span class="session-cost">$9.14</span>
+							</div>
+							<div class="session-row">
+								<span class="session-issue">#239</span>
+								<span class="session-name">Session provider adapter refactor</span>
+								<span class="session-cost">$7.82</span>
+							</div>
+							<div class="session-row">
+								<span class="session-issue">#263</span>
+								<span class="session-name"
+									>GitHub OAuth device flow integration</span
+								>
+								<span class="session-cost">$6.37</span>
+							</div>
+							<div class="session-row">
+								<span class="session-issue">#251</span>
+								<span class="session-name"
+									>Tauri invoke timeout regression fix</span
+								>
+								<span class="session-cost">$5.20</span>
+							</div>
+							<div class="session-row">
+								<span class="session-issue">#244</span>
+								<span class="session-name"
+									>Color picker swatch dropdown redesign</span
+								>
+								<span class="session-cost">$4.88</span>
+							</div>
 
-          <div class="session-row">
-            <span class="session-issue">#247</span>
-            <span class="session-name">Metrics v2 aggregation pipeline</span>
-            <span class="session-cost">$9.14</span>
-          </div>
-          <div class="session-row">
-            <span class="session-issue">#239</span>
-            <span class="session-name">Session provider adapter refactor</span>
-            <span class="session-cost">$7.82</span>
-          </div>
-          <div class="session-row">
-            <span class="session-issue">#263</span>
-            <span class="session-name">GitHub OAuth device flow integration</span>
-            <span class="session-cost">$6.37</span>
-          </div>
-          <div class="session-row">
-            <span class="session-issue">#251</span>
-            <span class="session-name">Tauri invoke timeout regression fix</span>
-            <span class="session-cost">$5.20</span>
-          </div>
-          <div class="session-row">
-            <span class="session-issue">#244</span>
-            <span class="session-name">Color picker swatch dropdown redesign</span>
-            <span class="session-cost">$4.88</span>
-          </div>
+							<div
+								style="
+									padding-top: 6px;
+									border-top: 1px solid var(--border);
+									display: flex;
+									justify-content: space-between;
+									align-items: center;
+								"
+							>
+								<span class="cb-mute" style="font-size: 10px"
+									>Top 5 of 42 sessions</span
+								>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									style="
+										font-size: 10.5px;
+										font-family: var(--font-mono);
+										height: 20px;
+										padding: 0 6px;
+										color: var(--primary);
+									"
+								>
+									View all
+									<svg
+										width="9"
+										height="9"
+										viewBox="0 0 10 10"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M2 5h6M5 2l3 3-3 3" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- /sidebar-panels -->
+				</div>
+				<!-- /main-layout -->
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
 
-          <div style="padding-top:6px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-            <span class="cb-mute" style="font-size:10px;">Top 5 of 42 sessions</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm" style="font-size:10.5px;font-family:var(--font-mono);height:20px;padding:0 6px;color:var(--primary);">
-              View all
-              <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h6M5 2l3 3-3 3"/></svg>
-            </button>
-          </div>
-        </div>
+		<script>
+			// Heatmap cell click: select day and update detail panel
+			var cells = document.querySelectorAll('.heatmap-cell:not(.is-future):not(.is-empty)');
+			cells.forEach(function (cell) {
+				cell.addEventListener('click', function () {
+					// Remove previous selection
+					document.querySelectorAll('.heatmap-cell.is-selected').forEach(function (c) {
+						c.classList.remove('is-selected');
+					});
+					// Select this cell
+					this.classList.add('is-selected');
 
-      </div><!-- /sidebar-panels -->
+					// Update detail panel with data attributes
+					var day = this.getAttribute('data-day');
+					var cost = this.getAttribute('data-cost');
+					var sessions = this.getAttribute('data-sessions');
 
-    </div><!-- /main-layout -->
+					var dateObj = new Date(day + 'T12:00:00');
+					var options = {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+					};
+					var formatted = dateObj.toLocaleDateString('en-US', {
+						month: 'long',
+						day: 'numeric',
+						year: 'numeric',
+					});
+					var weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
 
-  </div><!-- /page-shell -->
-</div><!-- /gk-root -->
+					var dateEl = document.querySelector('.day-detail-date');
+					var weekdayEl = document.querySelector('.day-detail-weekday');
+					if (dateEl) {
+						dateEl.textContent = formatted;
+					}
+					if (weekdayEl) {
+						weekdayEl.textContent = weekday;
+					}
 
-<script>
-  // Heatmap cell click: select day and update detail panel
-  var cells = document.querySelectorAll('.heatmap-cell:not(.is-future):not(.is-empty)');
-  cells.forEach(function(cell) {
-    cell.addEventListener('click', function() {
-      // Remove previous selection
-      document.querySelectorAll('.heatmap-cell.is-selected').forEach(function(c) {
-        c.classList.remove('is-selected');
-      });
-      // Select this cell
-      this.classList.add('is-selected');
+					// Update cost KPI in detail panel
+					var costKpi = document.querySelectorAll('.day-detail-kpi-value');
+					if (costKpi.length >= 1) {
+						costKpi[0].textContent = '$' + cost;
+					}
+					if (costKpi.length >= 2) {
+						costKpi[1].textContent = sessions;
+					}
+				});
+			});
 
-      // Update detail panel with data attributes
-      var day = this.getAttribute('data-day');
-      var cost = this.getAttribute('data-cost');
-      var sessions = this.getAttribute('data-sessions');
-
-      var dateObj = new Date(day + 'T12:00:00');
-      var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      var formatted = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-      var weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-
-      var dateEl = document.querySelector('.day-detail-date');
-      var weekdayEl = document.querySelector('.day-detail-weekday');
-      if (dateEl) { dateEl.textContent = formatted; }
-      if (weekdayEl) { weekdayEl.textContent = weekday; }
-
-      // Update cost KPI in detail panel
-      var costKpi = document.querySelectorAll('.day-detail-kpi-value');
-      if (costKpi.length >= 1) { costKpi[0].textContent = '$' + cost; }
-      if (costKpi.length >= 2) { costKpi[1].textContent = sessions; }
-    });
-  });
-
-  // Period tab switching
-  var periodTabs = document.querySelectorAll('.cb-tabs .cb-tab');
-  periodTabs.forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      periodTabs.forEach(function(t) { t.classList.remove('is-active'); });
-      this.classList.add('is-active');
-    });
-  });
-</script>
-</body>
+			// Period tab switching
+			var periodTabs = document.querySelectorAll('.cb-tabs .cb-tab');
+			periodTabs.forEach(function (tab) {
+				tab.addEventListener('click', function () {
+					periodTabs.forEach(function (t) {
+						t.classList.remove('is-active');
+					});
+					this.classList.add('is-active');
+				});
+			});
+		</script>
+	</body>
 </html>

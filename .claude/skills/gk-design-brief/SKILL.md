@@ -39,6 +39,7 @@ Before writing the brief, determine whether this component lives inside an exist
 - **Card / Inline**: Embedded in a list or grid; owns its own boundary.
 
 To identify the container:
+
 1. Where is this component mounted? (`grep -r "ComponentName" src/`)
 2. Which layout component wraps it?
 3. What chrome does the parent already provide?
@@ -54,6 +55,7 @@ For each component relevant to the feature, read the story for available variant
 ### Step 4: Research Missing Primitives
 
 If the feature needs UI patterns not in the inventory:
+
 - Spawn `mp-context7-docs-fetcher` to check shadcn-svelte (`/huntabyte/shadcn-svelte`) and Bits UI (`/huntabyte/bits-ui`)
 - Include as "Components to Adopt" in the brief
 
