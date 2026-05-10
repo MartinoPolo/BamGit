@@ -1,0 +1,2484 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Usage Dashboard — Variant D: Activity Feed + KPIs</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
+   GROVEKEEPER DESIGN TOKENS — inlined from tokens.css
+   ============================================================ */
+
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+
+			/* ── Base ─────────────────────────────────────────────────── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ── Type ─────────────────────────────────────────────────── */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* ── Buttons ──────────────────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease,
+					color var(--duration-2) ease,
+					transform var(--duration-1) ease,
+					box-shadow var(--duration-2) ease;
+				white-space: nowrap;
+				user-select: none;
+				text-decoration: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 85%, oklch(0.9 0 0) 15%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── Card ─────────────────────────────────────────────────── */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
+
+			/* ── Tabs ─────────────────────────────────────────────────── */
+			.gk-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+				gap: 2px;
+			}
+			.gk-tab {
+				padding: 4px 10px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all var(--duration-2) ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+				white-space: nowrap;
+			}
+			.gk-tab:hover {
+				color: var(--foreground);
+			}
+			.gk-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-tab:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.gk-tab:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── HR ───────────────────────────────────────────────────── */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* ── Badge ────────────────────────────────────────────────── */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+
+			/* ── cb components ────────────────────────────────────────── */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+			.cb-num {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11.5px;
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-mute {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
+			.cb-statusbar {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 5px 14px;
+				background: var(--surface-2);
+				border-top: 1px solid var(--border);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				flex-shrink: 0;
+			}
+			.cb-key {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+			}
+			.cb-keycap {
+				display: inline-block;
+				min-width: 14px;
+				padding: 0 4px;
+				text-align: center;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 3px;
+				font-size: 10px;
+				line-height: 14px;
+				color: var(--foreground);
+			}
+
+			/* category colors */
+			.cb-cat-coding {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-cat-debugging {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-cat-refactor {
+				color: oklch(0.7 0.18 50);
+			}
+			.cb-cat-feature {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-cat-testing {
+				color: oklch(0.62 0.13 230);
+			}
+			.cb-cat-exploration {
+				color: oklch(0.7 0.11 200);
+			}
+			.cb-cat-brainstorm {
+				color: oklch(0.66 0.18 320);
+			}
+			.cb-cat-planning {
+				color: oklch(0.62 0.15 280);
+			}
+
+			.cb-1shot {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11px;
+				text-align: right;
+			}
+			.cb-1shot-good {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-1shot-mid {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-1shot-bad {
+				color: oklch(0.64 0.205 25);
+			}
+
+			/* ── Scrollbar ────────────────────────────────────────────── */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ── Animations ───────────────────────────────────────────── */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-shimmer {
+				from {
+					background-position: 200% 0;
+				}
+				to {
+					background-position: -200% 0;
+				}
+			}
+
+			/* ============================================================
+   VARIANT D — Activity Feed + KPIs
+   Top: 4 KPI cards in a row
+   Center: vertical activity feed (timeline)
+   Right: filter sidebar
+   ============================================================ */
+
+			body {
+				margin: 0;
+				padding: 0;
+			}
+
+			/* ── Icon ─────────────────────────────────────────────────── */
+			.icon-sm {
+				width: 15px;
+				height: 15px;
+				flex-shrink: 0;
+			}
+
+			/* ── Page scaffold ────────────────────────────────────────── */
+			.ud-page {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				max-width: 1280px;
+				margin: 0 auto;
+				padding: 16px 20px 0;
+			}
+
+			/* ── Variant label ────────────────────────────────────────── */
+			.ud-variant-label {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 2px 8px 2px 6px;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-full);
+				background: var(--surface-2);
+				width: fit-content;
+				margin-bottom: 8px;
+			}
+
+			/* ── Page header ──────────────────────────────────────────── */
+			.ud-header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				flex-wrap: wrap;
+				margin-bottom: 12px;
+			}
+			.ud-header-left {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				flex: 1;
+				min-width: 0;
+			}
+			.ud-header-title {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: -0.025em;
+				line-height: 1.15;
+				color: var(--foreground);
+				white-space: nowrap;
+			}
+			.ud-header-actions {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+
+			/* ── KPI strip ────────────────────────────────────────────── */
+			.ud-kpi-strip {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 8px;
+				margin-bottom: 16px;
+			}
+			.ud-kpi-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 13px;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				transition:
+					border-color var(--duration-2) ease,
+					box-shadow var(--duration-2) ease;
+				position: relative;
+				overflow: hidden;
+			}
+			.ud-kpi-card:hover {
+				border-color: var(--border-strong);
+				box-shadow: var(--shadow-md);
+			}
+			.ud-kpi-card::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 2px;
+			}
+			.ud-kpi-card:nth-child(1)::after {
+				background: var(--moss-400);
+			}
+			.ud-kpi-card:nth-child(2)::after {
+				background: var(--azure-400);
+			}
+			.ud-kpi-card:nth-child(3)::after {
+				background: var(--amber-400);
+			}
+			.ud-kpi-card:nth-child(4)::after {
+				background: var(--teal-400);
+			}
+
+			.ud-kpi-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+			}
+			.ud-kpi-value {
+				font-family: var(--font-mono);
+				font-size: 24px;
+				font-weight: 700;
+				letter-spacing: -0.03em;
+				line-height: 1.1;
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+			.ud-kpi-delta {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-variant-numeric: tabular-nums;
+			}
+			.ud-kpi-delta.is-up {
+				color: oklch(0.7 0.155 70);
+			}
+			.ud-kpi-delta.is-down {
+				color: oklch(0.7 0.11 200);
+			}
+			.ud-kpi-delta.is-neutral {
+				color: var(--foreground-subtle);
+			}
+			/* cost going up = amber warning, cost going down = good */
+			.ud-kpi-delta.is-cost-up {
+				color: var(--status-warning);
+			}
+			.ud-kpi-delta.is-cost-down {
+				color: var(--status-success);
+			}
+			.ud-kpi-subtext {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				margin-top: 1px;
+			}
+
+			/* ── Main layout: feed + sidebar ──────────────────────────── */
+			.ud-main {
+				display: grid;
+				grid-template-columns: 1fr 260px;
+				gap: 16px;
+				flex: 1;
+				min-height: 0;
+			}
+
+			/* ── Feed section ─────────────────────────────────────────── */
+			.ud-feed-section {
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+				min-width: 0;
+			}
+			.ud-feed-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding-bottom: 10px;
+				border-bottom: 1px solid var(--border);
+				margin-bottom: 0;
+			}
+			.ud-feed-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+			}
+			.ud-feed-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.ud-feed-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.ud-feed-count {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+			}
+
+			/* ── Timeline ─────────────────────────────────────────────── */
+			.ud-timeline {
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+				position: relative;
+			}
+
+			/* Day separator */
+			.ud-day-separator {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 14px 0 8px 30px;
+			}
+			.ud-day-separator-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				white-space: nowrap;
+			}
+			.ud-day-separator-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+			.ud-day-separator-total {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+				white-space: nowrap;
+			}
+
+			/* ── Session entry ────────────────────────────────────────── */
+			.ud-entry {
+				display: grid;
+				grid-template-columns: 30px 1fr;
+				gap: 0;
+				position: relative;
+				transition: background var(--duration-2) ease;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+			}
+			.ud-entry:hover {
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+			}
+			.ud-entry:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: -2px;
+			}
+
+			/* Timeline dot + line */
+			.ud-entry-gutter {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding-top: 14px;
+				position: relative;
+			}
+			.ud-entry-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				border: 2px solid var(--border-strong);
+				background: var(--surface);
+				flex-shrink: 0;
+				z-index: 1;
+				transition:
+					border-color var(--duration-2) ease,
+					background var(--duration-2) ease;
+			}
+			.ud-entry:hover .ud-entry-dot {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 30%, var(--surface));
+			}
+			/* outcome-based dot colors */
+			.ud-entry[data-outcome='success'] .ud-entry-dot {
+				border-color: var(--status-success);
+			}
+			.ud-entry[data-outcome='error'] .ud-entry-dot {
+				border-color: var(--status-danger);
+			}
+			.ud-entry[data-outcome='partial'] .ud-entry-dot {
+				border-color: var(--status-warning);
+			}
+
+			.ud-entry-line {
+				width: 1px;
+				flex: 1;
+				background: var(--border);
+				margin-top: 4px;
+			}
+			/* hide line on last entry in each day group */
+			.ud-entry:last-child .ud-entry-line,
+			.ud-entry.is-last-in-day .ud-entry-line {
+				background: transparent;
+			}
+
+			/* Entry content */
+			.ud-entry-content {
+				padding: 8px 10px 12px 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				min-width: 0;
+			}
+			.ud-entry-row-top {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				min-width: 0;
+			}
+			.ud-entry-time {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				font-variant-numeric: tabular-nums;
+				min-width: 44px;
+			}
+			.ud-entry-issue {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.ud-entry-name {
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+				flex: 1;
+			}
+			.ud-entry-outcome {
+				flex-shrink: 0;
+				margin-left: auto;
+			}
+
+			.ud-entry-row-bottom {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding-left: 0;
+				flex-wrap: wrap;
+			}
+
+			/* Meta chips */
+			.ud-meta {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
+			.ud-meta-icon {
+				width: 12px;
+				height: 12px;
+				opacity: 0.6;
+				flex-shrink: 0;
+			}
+			.ud-meta-value {
+				color: var(--foreground-muted);
+			}
+			.ud-meta-cost {
+				color: var(--foreground);
+				font-weight: 500;
+			}
+			.ud-meta-separator {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: var(--border-strong);
+				flex-shrink: 0;
+			}
+
+			/* Category tag in feed */
+			.ud-entry-category {
+				font-family: var(--font-sans);
+				font-size: 10.5px;
+				font-weight: 500;
+				padding: 1px 6px;
+				border-radius: var(--radius-full);
+				background: color-mix(in oklch, currentColor 10%, transparent);
+				border: 1px solid color-mix(in oklch, currentColor 20%, transparent);
+			}
+
+			/* ── Sidebar ──────────────────────────────────────────────── */
+			.ud-sidebar {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+				position: sticky;
+				top: 16px;
+				align-self: start;
+			}
+
+			.ud-sidebar-section {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+			.ud-sidebar-title {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			/* Sidebar filter controls */
+			.ud-filter-group {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+			.ud-filter-label {
+				font-size: 11px;
+				font-weight: 500;
+				color: var(--foreground-muted);
+			}
+			.ud-filter-select {
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				height: 28px;
+				padding: 0 24px 0 8px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				color: var(--foreground);
+				outline: none;
+				cursor: pointer;
+				appearance: none;
+				width: 100%;
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+				background-repeat: no-repeat;
+				background-position: right 8px center;
+				transition:
+					border-color var(--duration-2) ease,
+					box-shadow var(--duration-2) ease;
+			}
+			.ud-filter-select:hover {
+				border-color: var(--border-strong);
+			}
+			.ud-filter-select:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			/* Scope toggle in sidebar */
+			.ud-scope-toggle {
+				display: flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 2px;
+				gap: 2px;
+			}
+			.ud-scope-btn {
+				flex: 1;
+				padding: 4px 6px;
+				font-size: 10.5px;
+				font-weight: 500;
+				font-family: var(--font-sans);
+				border: none;
+				border-radius: 4px;
+				background: transparent;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all var(--duration-2) ease;
+				white-space: nowrap;
+				text-align: center;
+			}
+			.ud-scope-btn:hover {
+				color: var(--foreground);
+			}
+			.ud-scope-btn.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+			.ud-scope-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.ud-scope-btn:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Sidebar model breakdown mini-list */
+			.ud-model-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 3px 0;
+				font-size: 11px;
+			}
+			.ud-model-name {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				display: flex;
+				align-items: center;
+				gap: 5px;
+			}
+			.ud-model-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.ud-model-count {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Sidebar outcome summary */
+			.ud-outcome-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 2px 0;
+				font-size: 11px;
+			}
+			.ud-outcome-bar-track {
+				flex: 1;
+				height: 4px;
+				background: var(--surface-2);
+				border-radius: 2px;
+				overflow: hidden;
+			}
+			.ud-outcome-bar-fill {
+				height: 100%;
+				border-radius: 2px;
+			}
+			.ud-outcome-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				min-width: 52px;
+			}
+			.ud-outcome-count {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+				min-width: 20px;
+				text-align: right;
+			}
+
+			/* ── Period tabs (compact in header) ──────────────────────── */
+			.ud-period-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 2px;
+				border-radius: var(--radius-sm);
+				gap: 1px;
+			}
+			.ud-period-tab {
+				padding: 3px 8px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 4px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all var(--duration-2) ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-mono);
+				white-space: nowrap;
+			}
+			.ud-period-tab:hover {
+				color: var(--foreground);
+			}
+			.ud-period-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+			.ud-period-tab:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.ud-period-tab:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── Responsive ───────────────────────────────────────────── */
+			@media (max-width: 860px) {
+				.ud-main {
+					grid-template-columns: 1fr;
+				}
+				.ud-sidebar {
+					position: static;
+					flex-direction: row;
+					flex-wrap: wrap;
+					gap: 8px;
+				}
+				.ud-sidebar-section {
+					flex: 1;
+					min-width: 200px;
+				}
+			}
+			@media (max-width: 640px) {
+				.ud-kpi-strip {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				.ud-header {
+					gap: 8px;
+				}
+				.ud-page {
+					padding: 12px 12px 0;
+				}
+				.ud-entry-row-top {
+					flex-wrap: wrap;
+				}
+			}
+			@media (max-width: 420px) {
+				.ud-kpi-strip {
+					grid-template-columns: 1fr;
+				}
+				.ud-header-actions {
+					gap: 4px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="ud-page">
+				<!-- Variant label -->
+				<div class="ud-variant-label">
+					<span class="gk-eyebrow">Variant D</span>
+					<span
+						style="
+							width: 1px;
+							height: 10px;
+							background: var(--border);
+							display: inline-block;
+						"
+					></span>
+					<span
+						class="gk-eyebrow"
+						style="
+							color: var(--foreground-subtle);
+							letter-spacing: 0.04em;
+							text-transform: none;
+							font-size: 10px;
+						"
+						>Activity Feed + KPIs</span
+					>
+				</div>
+
+				<!-- ── Page Header ───────────────────────────────────────── -->
+				<div class="ud-header">
+					<div class="ud-header-left">
+						<h1 class="ud-header-title">Usage Analytics</h1>
+					</div>
+
+					<!-- Period tabs (compact, monospace) -->
+					<div class="ud-period-tabs" role="tablist" aria-label="Time period">
+						<button class="ud-period-tab" role="tab" aria-selected="false">
+							today
+						</button>
+						<button class="ud-period-tab" role="tab" aria-selected="false">7d</button>
+						<button
+							class="ud-period-tab is-active"
+							role="tab"
+							aria-selected="true"
+							aria-current="true"
+						>
+							30d
+						</button>
+						<button class="ud-period-tab" role="tab" aria-selected="false">
+							month
+						</button>
+						<button class="ud-period-tab" role="tab" aria-selected="false">all</button>
+					</div>
+
+					<!-- Header action buttons -->
+					<div class="ud-header-actions">
+						<!-- Palette -->
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+							title="Color theme"
+							aria-label="Change color theme"
+						>
+							<svg
+								class="icon-sm"
+								viewBox="0 0 15 15"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true"
+							>
+								<path
+									d="M7.5 1a6.5 6.5 0 100 13A6.5 6.5 0 007.5 1z"
+									stroke="currentColor"
+									stroke-width="1.2"
+									fill="none"
+								/>
+								<path
+									d="M7.5 1v13M1 7.5h13"
+									stroke="currentColor"
+									stroke-width="1"
+									opacity="0.45"
+								/>
+								<circle cx="7.5" cy="7.5" r="2" fill="currentColor" opacity="0.7" />
+							</svg>
+						</button>
+
+						<!-- Trophy -->
+						<button
+							class="gk-btn gk-btn-secondary gk-btn-sm"
+							style="gap: 5px; padding: 0 9px"
+							title="Achievements"
+							aria-label="Achievements: 3 of 8 unlocked"
+						>
+							<svg
+								class="icon-sm"
+								viewBox="0 0 15 15"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true"
+							>
+								<path
+									d="M5 1h5v5a2.5 2.5 0 01-5 0V1z"
+									stroke="currentColor"
+									stroke-width="1.2"
+								/>
+								<path
+									d="M2 1h3M10 1h3M2 2c0 2 1 3 3 4M13 2c0 2-1 3-3 4M5.5 11.5v2M9.5 11.5v2M4 13.5h7"
+									stroke="currentColor"
+									stroke-width="1.2"
+									stroke-linecap="round"
+								/>
+							</svg>
+							<span
+								style="
+									font-family: var(--font-mono);
+									font-size: 11px;
+									font-variant-numeric: tabular-nums;
+								"
+								>3/8</span
+							>
+						</button>
+
+						<!-- Refresh -->
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+							title="Refresh data"
+							aria-label="Refresh data"
+						>
+							<svg
+								class="icon-sm"
+								viewBox="0 0 15 15"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true"
+							>
+								<path
+									d="M13 7.5A5.5 5.5 0 012.5 9.5"
+									stroke="currentColor"
+									stroke-width="1.3"
+									stroke-linecap="round"
+								/>
+								<path
+									d="M2 7.5A5.5 5.5 0 0112.5 5.5"
+									stroke="currentColor"
+									stroke-width="1.3"
+									stroke-linecap="round"
+								/>
+								<path
+									d="M2 5v3H5"
+									stroke="currentColor"
+									stroke-width="1.3"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M13 10v-3h-3"
+									stroke="currentColor"
+									stroke-width="1.3"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+
+						<!-- Export CSV -->
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-sm"
+							style="gap: 5px; padding: 0 9px"
+							title="Export as CSV"
+							aria-label="Export as CSV"
+						>
+							<svg
+								class="icon-sm"
+								viewBox="0 0 15 15"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 12H2a1 1 0 01-1-1V2a1 1 0 011-1h7l3 3v2"
+									stroke="currentColor"
+									stroke-width="1.2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M9 1v3h3"
+									stroke="currentColor"
+									stroke-width="1.2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M7.5 9v5M5 12l2.5 2.5L10 12"
+									stroke="currentColor"
+									stroke-width="1.2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							<span style="font-size: 11.5px">CSV</span>
+						</button>
+					</div>
+				</div>
+
+				<!-- ── KPI Strip ─────────────────────────────────────────── -->
+				<div class="ud-kpi-strip" role="region" aria-label="Key metrics">
+					<!-- Total Cost -->
+					<div
+						class="ud-kpi-card"
+						tabindex="0"
+						aria-label="Total cost: $47.82, up 12% from previous period"
+					>
+						<div class="ud-kpi-label">Total Cost</div>
+						<div class="ud-kpi-value">$47.82</div>
+						<div class="ud-kpi-delta is-cost-up" aria-label="Up 12% vs previous period">
+							<svg
+								width="10"
+								height="10"
+								viewBox="0 0 10 10"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M5 8.5V1.5M1.5 5L5 1.5 8.5 5"
+									stroke="currentColor"
+									stroke-width="1.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							+12% vs prev
+						</div>
+						<div class="ud-kpi-subtext">Apr 8 -- May 7</div>
+					</div>
+
+					<!-- Sessions -->
+					<div
+						class="ud-kpi-card"
+						tabindex="0"
+						aria-label="Sessions: 34, down 3 from previous period"
+					>
+						<div class="ud-kpi-label">Sessions</div>
+						<div class="ud-kpi-value">34</div>
+						<div class="ud-kpi-delta is-down" aria-label="Down 3 vs previous period">
+							<svg
+								width="10"
+								height="10"
+								viewBox="0 0 10 10"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M5 1.5V8.5M8.5 5L5 8.5 1.5 5"
+									stroke="currentColor"
+									stroke-width="1.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							-3 vs prev
+						</div>
+						<div class="ud-kpi-subtext">346 total turns</div>
+					</div>
+
+					<!-- One-shot rate -->
+					<div
+						class="ud-kpi-card"
+						tabindex="0"
+						aria-label="One-shot rate: 71%, above industry average of 62%"
+					>
+						<div class="ud-kpi-label">One-Shot Rate</div>
+						<div class="ud-kpi-value">71%</div>
+						<div
+							class="ud-kpi-delta is-up"
+							aria-label="9 points above industry average"
+						>
+							<svg
+								width="10"
+								height="10"
+								viewBox="0 0 10 10"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M5 8.5V1.5M1.5 5L5 1.5 8.5 5"
+									stroke="currentColor"
+									stroke-width="1.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							vs ~62% avg
+						</div>
+						<div class="ud-kpi-subtext">Industry benchmark</div>
+					</div>
+
+					<!-- Cache hit -->
+					<div
+						class="ud-kpi-card"
+						tabindex="0"
+						aria-label="Cache hit rate: 84%, saving approximately $12.40 per month"
+					>
+						<div class="ud-kpi-label">Cache Hit</div>
+						<div class="ud-kpi-value">84%</div>
+						<div class="ud-kpi-delta is-up" aria-label="Saving $12.40 per month">
+							<svg
+								width="10"
+								height="10"
+								viewBox="0 0 10 10"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M5 8.5V1.5M1.5 5L5 1.5 8.5 5"
+									stroke="currentColor"
+									stroke-width="1.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							~$12.40/mo saved
+						</div>
+						<div class="ud-kpi-subtext">Prompt cache tokens</div>
+					</div>
+				</div>
+
+				<!-- ── Main layout: feed + sidebar ───────────────────────── -->
+				<div class="ud-main">
+					<!-- ── Activity Feed ─────────────────────────────────────── -->
+					<div class="ud-feed-section" role="region" aria-label="Session activity feed">
+						<div class="ud-feed-header">
+							<div class="ud-feed-title">
+								Recent Sessions
+								<span class="ud-feed-count">34 sessions in 30d</span>
+							</div>
+							<button
+								class="gk-btn gk-btn-ghost gk-btn-sm"
+								style="gap: 4px; padding: 0 8px"
+								aria-label="Sort sessions"
+							>
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 13 13"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M2 3h9M2 6.5h6M2 10h3"
+										stroke="currentColor"
+										stroke-width="1.2"
+										stroke-linecap="round"
+									/>
+								</svg>
+								<span style="font-size: 11px">Newest</span>
+							</button>
+						</div>
+
+						<div class="ud-timeline" role="list" aria-label="Activity timeline">
+							<!-- ═══ May 7, 2026 ═══ -->
+							<div class="ud-day-separator" role="separator">
+								<span class="ud-day-separator-label">May 7</span>
+								<span class="ud-day-separator-line"></span>
+								<span class="ud-day-separator-total">$5.18 / 3 sessions</span>
+							</div>
+
+							<!-- Session 1 -->
+							<div
+								class="ud-entry"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="2:47 PM, Issue #267: OAuth device flow, Opus, 42 minutes, $2.34, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">2:47 pm</span>
+										<span class="ud-entry-issue">#267</span>
+										<span class="ud-entry-name"
+											>OAuth device flow + keyring storage</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Opus</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">42m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$2.34</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">18 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-feature"
+											>feature</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- Session 2 -->
+							<div
+								class="ud-entry"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="11:15 AM, Issue #262: Follow-up fixes from manual testing, Sonnet, 28 minutes, $1.52, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">11:15 am</span>
+										<span class="ud-entry-issue">#262</span>
+										<span class="ud-entry-name"
+											>Follow-up fixes from manual testing</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Sonnet</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">28m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$1.52</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">12 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-debugging"
+											>debugging</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- Session 3 -->
+							<div
+								class="ud-entry is-last-in-day"
+								data-outcome="partial"
+								role="listitem"
+								tabindex="0"
+								aria-label="9:30 AM, Issue #258: Design mockup generation, Opus, 15 minutes, $1.32, needs review"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">9:30 am</span>
+										<span class="ud-entry-issue">#258</span>
+										<span class="ud-entry-name">Design mockup generation</span>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-warning"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												needs review
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Opus</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">15m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$1.32</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">8 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-brainstorm"
+											>brainstorm</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- ═══ May 6, 2026 ═══ -->
+							<div class="ud-day-separator" role="separator">
+								<span class="ud-day-separator-label">May 6</span>
+								<span class="ud-day-separator-line"></span>
+								<span class="ud-day-separator-total">$5.80 / 5 sessions</span>
+							</div>
+
+							<!-- Session 4 -->
+							<div
+								class="ud-entry"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="4:52 PM, Issue #253: SQLite schema rework, Opus, 55 minutes, $2.90, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">4:52 pm</span>
+										<span class="ud-entry-issue">#253</span>
+										<span class="ud-entry-name"
+											>SQLite schema rework for session providers</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Opus</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">55m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$2.90</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">24 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-refactor"
+											>refactor</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- Session 5 -->
+							<div
+								class="ud-entry"
+								data-outcome="error"
+								role="listitem"
+								tabindex="0"
+								aria-label="2:15 PM, Issue #250: Notification sound engine, Sonnet, 38 minutes, $1.44, errored"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">2:15 pm</span>
+										<span class="ud-entry-issue">#250</span>
+										<span class="ud-entry-name"
+											>Notification sound engine integration</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-danger"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												errored
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Sonnet</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">38m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$1.44</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">14 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-coding">coding</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Session 6 -->
+							<div
+								class="ud-entry is-last-in-day"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="10:40 AM, Ad-hoc session: Explore LayerChart API, Sonnet, 12 minutes, $0.68, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">10:40 am</span>
+										<span
+											class="ud-entry-issue"
+											style="
+												color: var(--foreground-subtle);
+												font-style: italic;
+											"
+											>ad-hoc</span
+										>
+										<span class="ud-entry-name"
+											>Explore LayerChart API for usage bars</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Sonnet</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">12m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$0.68</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">6 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-exploration"
+											>exploration</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- ═══ May 5, 2026 ═══ -->
+							<div class="ud-day-separator" role="separator">
+								<span class="ud-day-separator-label">May 5</span>
+								<span class="ud-day-separator-line"></span>
+								<span class="ud-day-separator-total">$0.00 / 0 sessions</span>
+							</div>
+							<div style="padding: 6px 0 6px 30px">
+								<span
+									style="
+										font-family: var(--font-mono);
+										font-size: 10.5px;
+										color: var(--foreground-subtle);
+										font-style: italic;
+									"
+									>No sessions</span
+								>
+							</div>
+
+							<!-- ═══ May 4, 2026 ═══ -->
+							<div class="ud-day-separator" role="separator">
+								<span class="ud-day-separator-label">May 4</span>
+								<span class="ud-day-separator-line"></span>
+								<span class="ud-day-separator-total">$3.92 / 2 sessions</span>
+							</div>
+
+							<!-- Session 7 -->
+							<div
+								class="ud-entry"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="6:10 PM, Issue #247: Workspace card component tests, Sonnet, 34 minutes, $1.88, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">6:10 pm</span>
+										<span class="ud-entry-issue">#247</span>
+										<span class="ud-entry-name"
+											>Workspace card component tests</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Sonnet</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">34m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$1.88</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">16 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-testing"
+											>testing</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- Session 8 -->
+							<div
+								class="ud-entry is-last-in-day"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="1:25 PM, Issue #245: Tree rendering performance, Opus, 48 minutes, $2.04, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">1:25 pm</span>
+										<span class="ud-entry-issue">#245</span>
+										<span class="ud-entry-name"
+											>Tree rendering performance optimization</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Opus</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">48m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$2.04</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">22 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-coding">coding</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- ═══ May 3, 2026 ═══ -->
+							<div class="ud-day-separator" role="separator">
+								<span class="ud-day-separator-label">May 3</span>
+								<span class="ud-day-separator-line"></span>
+								<span class="ud-day-separator-total">$4.82 / 4 sessions</span>
+							</div>
+
+							<!-- Session 9 -->
+							<div
+								class="ud-entry"
+								data-outcome="success"
+								role="listitem"
+								tabindex="0"
+								aria-label="5:30 PM, Issue #241: Settings page restructure, Opus, 52 minutes, $2.66, completed"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">5:30 pm</span>
+										<span class="ud-entry-issue">#241</span>
+										<span class="ud-entry-name"
+											>Settings page restructure + sidebar nav</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												completed
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Opus</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">52m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$2.66</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">20 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-feature"
+											>feature</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- Session 10 -->
+							<div
+								class="ud-entry is-last-in-day"
+								data-outcome="partial"
+								role="listitem"
+								tabindex="0"
+								aria-label="10:08 AM, Issue #238: Command palette fuzzy matching, Sonnet, 22 minutes, $0.94, needs input"
+							>
+								<div class="ud-entry-gutter">
+									<div class="ud-entry-dot"></div>
+									<div class="ud-entry-line"></div>
+								</div>
+								<div class="ud-entry-content">
+									<div class="ud-entry-row-top">
+										<span class="ud-entry-time">10:08 am</span>
+										<span class="ud-entry-issue">#238</span>
+										<span class="ud-entry-name"
+											>Command palette fuzzy matching</span
+										>
+										<span class="ud-entry-outcome">
+											<span
+												class="gk-badge gk-badge-info"
+												style="height: 18px; font-size: 10px"
+											>
+												<span
+													style="
+														width: 5px;
+														height: 5px;
+														border-radius: 50%;
+														background: currentColor;
+														display: inline-block;
+													"
+												></span>
+												needs input
+											</span>
+										</span>
+									</div>
+									<div class="ud-entry-row-bottom">
+										<span class="ud-meta">
+											<span class="ud-meta-value">Sonnet</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">22m</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-cost">$0.94</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-meta">
+											<span class="ud-meta-value">10 turns</span>
+										</span>
+										<span class="ud-meta-separator"></span>
+										<span class="ud-entry-category cb-cat-coding">coding</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Load more button -->
+							<div style="padding: 12px 0 16px 30px">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									style="
+										gap: 5px;
+										width: 100%;
+										justify-content: center;
+										border: 1px dashed var(--border);
+										border-radius: var(--radius-sm);
+									"
+									aria-label="Load older sessions"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 13 13"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M6.5 2.5v8M2.5 6.5l4 4 4-4"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									<span style="font-size: 11px">Load 24 older sessions</span>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- ── Sidebar ───────────────────────────────────────────── -->
+					<aside class="ud-sidebar" aria-label="Filters and summary">
+						<!-- Workspace scope -->
+						<div class="ud-sidebar-section">
+							<div class="ud-sidebar-title">Scope</div>
+							<div class="ud-scope-toggle" role="group" aria-label="Workspace scope">
+								<button class="ud-scope-btn is-active" aria-pressed="true">
+									This workspace
+								</button>
+								<button class="ud-scope-btn" aria-pressed="false">All</button>
+							</div>
+						</div>
+
+						<!-- Filters -->
+						<div class="ud-sidebar-section">
+							<div class="ud-sidebar-title">Filters</div>
+
+							<div class="ud-filter-group">
+								<label class="ud-filter-label" for="filter-model">Model</label>
+								<select
+									class="ud-filter-select"
+									id="filter-model"
+									aria-label="Filter by model"
+								>
+									<option value="all">All models</option>
+									<option value="opus">Opus</option>
+									<option value="sonnet">Sonnet</option>
+								</select>
+							</div>
+
+							<div class="ud-filter-group">
+								<label class="ud-filter-label" for="filter-category"
+									>Category</label
+								>
+								<select
+									class="ud-filter-select"
+									id="filter-category"
+									aria-label="Filter by category"
+								>
+									<option value="all">All categories</option>
+									<option value="coding">Coding</option>
+									<option value="debugging">Debugging</option>
+									<option value="feature">Feature</option>
+									<option value="refactor">Refactor</option>
+									<option value="testing">Testing</option>
+									<option value="exploration">Exploration</option>
+								</select>
+							</div>
+
+							<div class="ud-filter-group">
+								<label class="ud-filter-label" for="filter-outcome">Outcome</label>
+								<select
+									class="ud-filter-select"
+									id="filter-outcome"
+									aria-label="Filter by outcome"
+								>
+									<option value="all">All outcomes</option>
+									<option value="completed">Completed</option>
+									<option value="errored">Errored</option>
+									<option value="needs-review">Needs review</option>
+									<option value="needs-input">Needs input</option>
+								</select>
+							</div>
+
+							<div class="ud-filter-group">
+								<label class="ud-filter-label" for="filter-cost">Min cost</label>
+								<select
+									class="ud-filter-select"
+									id="filter-cost"
+									aria-label="Filter by minimum cost"
+								>
+									<option value="0">Any</option>
+									<option value="0.50">> $0.50</option>
+									<option value="1.00">> $1.00</option>
+									<option value="2.00">> $2.00</option>
+									<option value="5.00">> $5.00</option>
+								</select>
+							</div>
+						</div>
+
+						<!-- Model breakdown -->
+						<div class="ud-sidebar-section">
+							<div class="ud-sidebar-title">Models</div>
+							<div style="display: flex; flex-direction: column; gap: 4px">
+								<div class="ud-model-row">
+									<span class="ud-model-name">
+										<span
+											class="ud-model-dot"
+											style="background: var(--moss-400)"
+										></span>
+										Opus
+									</span>
+									<span class="ud-model-count">14 ($28.40)</span>
+								</div>
+								<div class="ud-model-row">
+									<span class="ud-model-name">
+										<span
+											class="ud-model-dot"
+											style="background: var(--azure-400)"
+										></span>
+										Sonnet
+									</span>
+									<span class="ud-model-count">20 ($19.42)</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Outcome summary -->
+						<div class="ud-sidebar-section">
+							<div class="ud-sidebar-title">Outcomes</div>
+							<div style="display: flex; flex-direction: column; gap: 6px">
+								<div class="ud-outcome-row">
+									<span
+										class="ud-outcome-label"
+										style="color: var(--status-success)"
+										>Completed</span
+									>
+									<div class="ud-outcome-bar-track">
+										<div
+											class="ud-outcome-bar-fill"
+											style="width: 76%; background: var(--status-success)"
+										></div>
+									</div>
+									<span class="ud-outcome-count">26</span>
+								</div>
+								<div class="ud-outcome-row">
+									<span
+										class="ud-outcome-label"
+										style="color: var(--status-warning)"
+										>Review</span
+									>
+									<div class="ud-outcome-bar-track">
+										<div
+											class="ud-outcome-bar-fill"
+											style="width: 12%; background: var(--status-warning)"
+										></div>
+									</div>
+									<span class="ud-outcome-count">4</span>
+								</div>
+								<div class="ud-outcome-row">
+									<span class="ud-outcome-label" style="color: var(--status-info)"
+										>Input</span
+									>
+									<div class="ud-outcome-bar-track">
+										<div
+											class="ud-outcome-bar-fill"
+											style="width: 6%; background: var(--status-info)"
+										></div>
+									</div>
+									<span class="ud-outcome-count">2</span>
+								</div>
+								<div class="ud-outcome-row">
+									<span
+										class="ud-outcome-label"
+										style="color: var(--status-danger)"
+										>Errored</span
+									>
+									<div class="ud-outcome-bar-track">
+										<div
+											class="ud-outcome-bar-fill"
+											style="width: 6%; background: var(--status-danger)"
+										></div>
+									</div>
+									<span class="ud-outcome-count">2</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Quick stats -->
+						<div class="ud-sidebar-section">
+							<div class="ud-sidebar-title">Averages</div>
+							<div style="display: flex; flex-direction: column; gap: 5px">
+								<div
+									style="
+										display: flex;
+										justify-content: space-between;
+										align-items: center;
+									"
+								>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10.5px;
+											color: var(--foreground-subtle);
+										"
+										>Cost/session</span
+									>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground);
+											font-variant-numeric: tabular-nums;
+										"
+										>$1.41</span
+									>
+								</div>
+								<div
+									style="
+										display: flex;
+										justify-content: space-between;
+										align-items: center;
+									"
+								>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10.5px;
+											color: var(--foreground-subtle);
+										"
+										>Duration</span
+									>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground);
+											font-variant-numeric: tabular-nums;
+										"
+										>31m</span
+									>
+								</div>
+								<div
+									style="
+										display: flex;
+										justify-content: space-between;
+										align-items: center;
+									"
+								>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10.5px;
+											color: var(--foreground-subtle);
+										"
+										>Turns/session</span
+									>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground);
+											font-variant-numeric: tabular-nums;
+										"
+										>10.2</span
+									>
+								</div>
+								<div
+									style="
+										display: flex;
+										justify-content: space-between;
+										align-items: center;
+									"
+								>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10.5px;
+											color: var(--foreground-subtle);
+										"
+										>Cost/day</span
+									>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground);
+											font-variant-numeric: tabular-nums;
+										"
+										>$1.59</span
+									>
+								</div>
+							</div>
+						</div>
+					</aside>
+				</div>
+				<!-- end ud-main -->
+
+				<!-- ── Status bar ─────────────────────────────────────────── -->
+				<div
+					class="cb-statusbar"
+					role="contentinfo"
+					aria-label="Dashboard status"
+					style="margin: 0 -20px; border-radius: 0"
+				>
+					<span class="cb-key">
+						<span class="cb-keycap">R</span>
+						refresh
+					</span>
+					<span class="cb-key">
+						<span class="cb-keycap">E</span>
+						export
+					</span>
+					<span class="cb-key">
+						<span class="cb-keycap">J</span>
+						next
+					</span>
+					<span class="cb-key">
+						<span class="cb-keycap">K</span>
+						prev
+					</span>
+					<span class="cb-key">
+						<span class="cb-keycap">?</span>
+						help
+					</span>
+					<span style="margin-left: auto; color: var(--foreground-subtle)">
+						Last updated: May 7 14:32
+					</span>
+					<span style="display: inline-flex; align-items: center; gap: 4px">
+						<span
+							style="
+								width: 6px;
+								height: 6px;
+								border-radius: 50%;
+								background: var(--status-success);
+								display: inline-block;
+							"
+						></span>
+						<span style="color: var(--status-success)">live</span>
+					</span>
+				</div>
+			</div>
+			<!-- end ud-page -->
+		</div>
+		<!-- end gk-root -->
+	</body>
+</html>

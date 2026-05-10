@@ -1,0 +1,3114 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Assigned Issues Panel — Variant E: Refined Batch Action Bar</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="stylesheet" href="../../tokens.css" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
+   DESIGN TOKENS — Grovekeeper Forest Moss palette (inlined)
+   ============================================================ */
+			/* Dark theme */
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--ring: var(--moss-400);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 5px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease;
+				white-space: nowrap;
+				user-select: none;
+				text-decoration: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.38;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+
+			/* Checkbox */
+			.gk-check {
+				appearance: none;
+				width: 15px;
+				height: 15px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 4px;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.gk-check:checked {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check:checked::after {
+				content: '';
+				position: absolute;
+				left: 4px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
+				border: solid var(--primary-fg);
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+			.gk-check:hover {
+				border-color: var(--ring);
+			}
+			.gk-check:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-check[data-state='indeterminate'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check[data-state='indeterminate']::after {
+				content: '';
+				position: absolute;
+				left: 2.5px;
+				top: 5.5px;
+				width: 8px;
+				height: 2px;
+				background: var(--primary-fg);
+				border: 0;
+				transform: none;
+			}
+
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				height: 18px;
+				padding: 0 6px;
+				font-size: 10.5px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+			.gk-badge-amber {
+				background: color-mix(in oklch, var(--amber-500) 16%, transparent);
+				color: var(--amber-300);
+				border-color: color-mix(in oklch, var(--amber-500) 32%, transparent);
+			}
+			.gk-badge-coral {
+				background: color-mix(in oklch, var(--coral-500) 16%, transparent);
+				color: var(--coral-300);
+				border-color: color-mix(in oklch, var(--coral-500) 32%, transparent);
+			}
+			.gk-badge-plum {
+				background: color-mix(in oklch, var(--plum-500) 16%, transparent);
+				color: var(--plum-300);
+				border-color: color-mix(in oklch, var(--plum-500) 32%, transparent);
+			}
+			.gk-badge-azure {
+				background: color-mix(in oklch, var(--azure-500) 16%, transparent);
+				color: var(--azure-300);
+				border-color: color-mix(in oklch, var(--azure-500) 32%, transparent);
+			}
+			.gk-badge-teal {
+				background: color-mix(in oklch, var(--teal-500) 16%, transparent);
+				color: var(--teal-300);
+				border-color: color-mix(in oklch, var(--teal-500) 32%, transparent);
+			}
+			.gk-badge-gold {
+				background: color-mix(in oklch, var(--gold-500) 16%, transparent);
+				color: var(--gold-300);
+				border-color: color-mix(in oklch, var(--gold-500) 32%, transparent);
+			}
+			.gk-badge-rose {
+				background: color-mix(in oklch, var(--rose-500) 14%, transparent);
+				color: var(--rose-400);
+				border-color: color-mix(in oklch, var(--rose-500) 30%, transparent);
+			}
+			.gk-badge-indigo {
+				background: color-mix(in oklch, var(--indigo-500) 16%, transparent);
+				color: var(--indigo-300);
+				border-color: color-mix(in oklch, var(--indigo-500) 32%, transparent);
+			}
+			.gk-badge-sage {
+				background: color-mix(in oklch, var(--sage-500) 16%, transparent);
+				color: var(--sage-300);
+				border-color: color-mix(in oklch, var(--sage-500) 32%, transparent);
+			}
+			/* Priority badge — for afk / hitl (always shown first) */
+			.gk-badge-priority {
+				background: color-mix(in oklch, var(--amber-500) 18%, transparent);
+				color: var(--amber-300);
+				border-color: color-mix(in oklch, var(--amber-500) 38%, transparent);
+				font-weight: 600;
+				letter-spacing: 0.04em;
+			}
+
+			/* Animations */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 8px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+				background: oklch(0.13 0.018 150);
+			}
+
+			.page-shell {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: flex-start;
+				padding: 32px 24px 64px;
+				gap: 20px;
+			}
+
+			.page-label {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 6px;
+				text-align: center;
+			}
+			.page-label .variant-pill {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				background: color-mix(in oklch, var(--primary) 12%, transparent);
+				border: 1px solid color-mix(in oklch, var(--primary) 28%, transparent);
+				color: var(--primary);
+				border-radius: var(--radius-full);
+				padding: 3px 10px;
+				font-size: 10.5px;
+				font-weight: 600;
+				font-family: var(--font-mono);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+			.page-label .component-name {
+				font-size: 17px;
+				font-weight: 600;
+				color: var(--foreground);
+				letter-spacing: -0.02em;
+			}
+			.page-label .component-desc {
+				font-size: 12px;
+				color: var(--foreground-subtle);
+				line-height: 1.5;
+				max-width: 640px;
+			}
+
+			.panel-frame {
+				width: 100%;
+				max-width: 1080px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow:
+					0 12px 40px rgba(10, 18, 12, 0.35),
+					0 2px 8px rgba(10, 18, 12, 0.18);
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			/* ============================================================
+   CONTEXT SHELL — parent tab bar at 40% opacity
+   ============================================================ */
+			.context-shell {
+				opacity: 0.4;
+				pointer-events: none;
+			}
+			.context-note {
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				margin: 6px 14px 3px;
+				opacity: 0.6;
+			}
+
+			/* Tab bar */
+			.panel-header {
+				display: flex;
+				align-items: stretch;
+				padding: 0 12px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+				flex-shrink: 0;
+				height: 36px;
+			}
+
+			/* Tab strip with overflow: hidden so extra tabs are cut off on narrow widths */
+			.panel-tab-strip {
+				display: flex;
+				align-items: center;
+				gap: 1px;
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+			}
+
+			.panel-tab {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				padding: 0 9px;
+				height: 100%;
+				font-size: 12px;
+				font-weight: 500;
+				font-family: var(--font-sans);
+				color: var(--foreground-muted);
+				background: transparent;
+				border: none;
+				border-bottom: 2px solid transparent;
+				cursor: pointer;
+				transition:
+					color 120ms ease,
+					border-color 120ms ease;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+			.panel-tab:hover {
+				color: var(--foreground);
+			}
+			.panel-tab.is-active {
+				color: var(--foreground);
+				border-bottom-color: var(--primary);
+			}
+
+			/* Tab count badge — shows suitable-for-linking count */
+			.tab-badge {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: 600;
+				background: var(--primary);
+				color: var(--primary-fg);
+				border-radius: var(--radius-full);
+				padding: 1px 5px;
+				min-width: 16px;
+				text-align: center;
+				line-height: 1.5;
+			}
+
+			/* Overflow indicator — appears when tabs are clipped on narrow widths */
+			.panel-tab-overflow {
+				display: inline-flex;
+				align-items: center;
+				padding: 0 8px;
+				height: 100%;
+				color: var(--foreground-subtle);
+				font-size: 13px;
+				font-weight: 700;
+				cursor: pointer;
+				flex-shrink: 0;
+				letter-spacing: 0.05em;
+				gap: 4px;
+				border-bottom: 2px solid transparent;
+			}
+			.panel-tab-overflow:hover {
+				color: var(--foreground);
+			}
+			.panel-tab-overflow .overflow-count {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: 500;
+				background: var(--surface-3);
+				color: var(--foreground-subtle);
+				border-radius: var(--radius-full);
+				padding: 1px 5px;
+			}
+
+			/* Icon helper */
+			.icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+
+			/* ============================================================
+   COMPONENT BODY
+   ============================================================ */
+			.bab-body {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ── Toolbar: search + refresh indicator ──────────────── */
+			.bab-toolbar {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 6px 14px;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+
+			.bab-search-wrap {
+				flex: 1;
+				min-width: 0;
+				position: relative;
+			}
+			.bab-search-icon {
+				position: absolute;
+				left: 8px;
+				top: 50%;
+				transform: translateY(-50%);
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				pointer-events: none;
+			}
+			.bab-search {
+				width: 100%;
+				height: 28px;
+				padding: 0 8px 0 28px;
+				font-family: var(--font-sans);
+				font-size: 12px;
+				color: var(--foreground);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					background 120ms ease;
+			}
+			.bab-search::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.bab-search:focus {
+				border-color: var(--ring);
+				background: var(--surface);
+			}
+
+			.bab-refresh-indicator {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+			.bab-sync-status {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+			}
+			.bab-sync-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--status-success);
+				animation: gk-pulse 2.4s ease-in-out infinite;
+				flex-shrink: 0;
+			}
+			.bab-sync-dot.is-syncing {
+				background: var(--amber-400);
+				animation: gk-pulse 0.8s ease-in-out infinite;
+			}
+
+			/* ── Selection / Batch action bar ─────────────────────── */
+			.bab-action-bar {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 5px 14px;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+				min-height: 36px;
+				transition:
+					background 160ms ease,
+					border-color 160ms ease;
+			}
+			.bab-action-bar.has-selection {
+				background: color-mix(in oklch, var(--primary-soft) 55%, var(--surface));
+				border-bottom-color: color-mix(in oklch, var(--primary) 22%, var(--border));
+			}
+
+			.bab-sel-left {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex: 1;
+				min-width: 0;
+			}
+			.bab-sel-info {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.bab-sel-count {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				font-weight: 600;
+				color: var(--primary);
+			}
+			.bab-sel-count.is-empty {
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.bab-sep-dot {
+				color: var(--foreground-subtle);
+				font-size: 11px;
+			}
+
+			.bab-select-all-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				padding: 0;
+				border: none;
+				background: none;
+				font-family: var(--font-sans);
+				font-size: 12px;
+				font-weight: 500;
+				color: var(--primary);
+				cursor: pointer;
+				text-decoration: underline;
+				text-decoration-color: color-mix(in oklch, var(--primary) 40%, transparent);
+				text-underline-offset: 2px;
+				white-space: nowrap;
+			}
+			.bab-select-all-btn:hover {
+				color: color-mix(in oklch, var(--primary) 80%, white 20%);
+				text-decoration-color: currentColor;
+			}
+			.bab-select-all-btn:disabled {
+				opacity: 0.38;
+				cursor: not-allowed;
+			}
+
+			.bab-action-btns {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+
+			/* ── Table grid: checkbox | PRD | Issue# | Title | Labels | Actions ── */
+			.bab-table-head,
+			.bab-row {
+				display: grid;
+				/* 28px checkbox | 58px PRD | 54px issue# | 1fr title | minmax labels | 72px actions */
+				grid-template-columns: 28px 58px 54px 1fr minmax(180px, 240px) 72px;
+				align-items: center;
+				gap: 6px;
+				padding: 0 14px;
+			}
+
+			.bab-table-head {
+				padding: 5px 14px;
+				background: var(--surface-2);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+				position: sticky;
+				top: 0;
+				z-index: var(--z-sticky);
+			}
+
+			.bab-th {
+				display: flex;
+				align-items: center;
+				gap: 3px;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				white-space: nowrap;
+				user-select: none;
+				cursor: pointer;
+			}
+			.bab-th:hover {
+				color: var(--foreground-muted);
+			}
+			.bab-th.is-sorted {
+				color: var(--foreground);
+			}
+			.bab-sort-icon {
+				flex-shrink: 0;
+				opacity: 0.4;
+			}
+			.bab-th.is-sorted .bab-sort-icon {
+				opacity: 1;
+				color: var(--primary);
+			}
+			.bab-th-noclick {
+				cursor: default;
+			}
+			.bab-th-noclick:hover {
+				color: var(--foreground-subtle);
+			}
+			.bab-th-actions {
+				justify-content: flex-end;
+			}
+
+			/* ── Scroll area ──────────────────────────────────────── */
+			.bab-scroll {
+				flex: 1;
+				overflow-y: auto;
+			}
+
+			/* ── Section group ────────────────────────────────────── */
+			.bab-group-header {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 5px 14px;
+				background: color-mix(in oklch, var(--surface-2) 70%, var(--surface));
+				border-bottom: 1px solid var(--border);
+				cursor: pointer;
+				user-select: none;
+				transition: background 120ms ease;
+			}
+			.bab-group-header:hover {
+				background: var(--surface-2);
+			}
+
+			.bab-group-chevron {
+				display: flex;
+				align-items: center;
+				color: var(--foreground-subtle);
+				transition: transform 160ms cubic-bezier(0.2, 0.7, 0.3, 1);
+				flex-shrink: 0;
+			}
+			.bab-group-header.is-collapsed .bab-group-chevron {
+				transform: rotate(-90deg);
+			}
+
+			.bab-group-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+			.bab-group-count {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-full);
+				padding: 0 5px;
+				line-height: 16px;
+				min-width: 18px;
+				text-align: center;
+			}
+			.bab-group-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* ── Table rows ───────────────────────────────────────── */
+			.bab-row {
+				height: 38px;
+				border-bottom: 1px solid color-mix(in oklch, var(--border) 55%, transparent);
+				cursor: pointer; /* most of the row is a click-to-select target */
+				transition: background 120ms ease;
+			}
+			.bab-row:hover {
+				background: color-mix(in oklch, var(--surface-2) 65%, transparent);
+			}
+			.bab-row.is-selected {
+				background: color-mix(in oklch, var(--primary) 8%, transparent);
+				border-bottom-color: color-mix(in oklch, var(--primary) 15%, var(--border));
+			}
+			.bab-row.is-selected:hover {
+				background: color-mix(in oklch, var(--primary) 12%, transparent);
+			}
+
+			/* Linked rows — dimmed */
+			.bab-row.is-linked {
+				opacity: 0.42;
+			}
+			.bab-row.is-linked:hover {
+				opacity: 0.58;
+				background: color-mix(in oklch, var(--surface-2) 35%, transparent);
+			}
+
+			/* Cells */
+			.bab-cell-check {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.bab-cell-prd {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 500;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.bab-cell-num {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 500;
+				color: var(--foreground-muted);
+				white-space: nowrap;
+			}
+
+			/* Clickable number links — subtle, no underline by default */
+			.bab-num-link {
+				color: inherit;
+				text-decoration: none;
+				transition: color 100ms ease;
+				/* Links are NOT click-to-select: stop propagation on click */
+			}
+			.bab-num-link:hover {
+				color: var(--foreground);
+				text-decoration: underline;
+				text-underline-offset: 2px;
+			}
+			.bab-prd-link:hover {
+				color: var(--primary);
+			}
+
+			/* Title — NOT a click-to-select target; cursor remains text */
+			.bab-cell-title {
+				font-size: 12px;
+				font-weight: 500;
+				color: var(--foreground);
+				letter-spacing: -0.01em;
+				line-height: 1.3;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+				cursor: text;
+			}
+			.bab-row.is-linked .bab-cell-title {
+				color: var(--foreground-muted);
+			}
+
+			/* Labels */
+			.bab-cell-labels {
+				display: flex;
+				align-items: center;
+				gap: 3px;
+				overflow: hidden;
+				min-width: 0;
+			}
+			.bab-label-overflow {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: 500;
+				color: var(--foreground-subtle);
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-full);
+				padding: 0 5px;
+				height: 18px;
+				display: inline-flex;
+				align-items: center;
+				flex-shrink: 0;
+			}
+
+			/* Actions — always visible, pinned right */
+			.bab-cell-actions {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				gap: 3px;
+			}
+
+			.bab-quick-action {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 24px;
+				height: 24px;
+				border-radius: var(--radius-xs);
+				border: 1px solid transparent;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background 100ms ease,
+					color 100ms ease,
+					border-color 100ms ease;
+				flex-shrink: 0;
+			}
+			.bab-quick-action:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.bab-quick-action:active {
+				transform: scale(0.9);
+			}
+			.bab-quick-action.is-add:hover {
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 35%, transparent);
+				background: color-mix(in oklch, var(--primary) 10%, transparent);
+			}
+			.bab-quick-action.is-worktree:hover {
+				color: var(--azure-300);
+				border-color: color-mix(in oklch, var(--azure-500) 35%, transparent);
+				background: color-mix(in oklch, var(--azure-500) 10%, transparent);
+			}
+
+			/* Linked indicator chip (no quick-add for linked rows) */
+			.bab-linked-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 500;
+				color: var(--status-success);
+				padding: 0 6px;
+				height: 18px;
+				border-radius: var(--radius-xs);
+				background: color-mix(in oklch, var(--status-success) 10%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-success) 25%, transparent);
+				white-space: nowrap;
+			}
+
+			/* Load more */
+			.bab-load-more {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 10px 0 12px;
+			}
+
+			/* Demo spacer */
+			.demo-spacer {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				padding: 8px 0 0;
+			}
+			.demo-spacer-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				padding: 3px 10px;
+				border: 1px dashed var(--border);
+				border-radius: var(--radius-full);
+			}
+
+			/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+			@media (max-width: 860px) {
+				.bab-table-head,
+				.bab-row {
+					grid-template-columns: 28px 58px 54px 1fr 72px;
+				}
+				.bab-cell-labels {
+					display: none;
+				}
+				.bab-th-labels {
+					display: none;
+				}
+			}
+			@media (max-width: 640px) {
+				.bab-table-head,
+				.bab-row {
+					grid-template-columns: 28px 54px 1fr 72px;
+				}
+				.bab-cell-prd {
+					display: none;
+				}
+				.bab-th-prd {
+					display: none;
+				}
+			}
+			@media (max-width: 460px) {
+				.bab-action-bar {
+					flex-wrap: wrap;
+					gap: 6px;
+				}
+				.bab-action-btns {
+					flex-wrap: wrap;
+				}
+				.panel-tab .tab-label-text {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-shell">
+				<!-- Page label -->
+				<div class="page-label">
+					<span class="variant-pill"
+						>Variant E — Refined &nbsp;·&nbsp; Batch Action Bar</span
+					>
+					<div class="component-name">Assigned Issues Panel</div>
+					<div class="component-desc">
+						Sortable table with dedicated PRD column, always-visible quick-add actions,
+						global tri-state checkbox, full-text search bar, and refresh indicator. Two
+						collapsible sections: Unlinked (expanded) and Linked (collapsed by default).
+						Repo and status columns removed. Circular state dots removed. Tab badge
+						shows count of suitable-for-linking issues only.
+					</div>
+				</div>
+
+				<!-- ══════════════════════════════════════════════════════
+       DEMO 1: 3 items selected — batch bar populated
+       ══════════════════════════════════════════════════════ -->
+				<div class="panel-frame">
+					<div class="context-note">
+						▼ PARENT CONTEXT — bottom panel tab bar, not part of this component
+					</div>
+
+					<!-- Parent context: tab bar at 40% opacity -->
+					<div class="context-shell">
+						<div class="panel-header">
+							<div class="panel-tab-strip">
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="3,5 6,8 3,11" />
+										<line x1="7.5" y1="11" x2="13" y2="11" />
+									</svg>
+									<span class="tab-label-text">Terminal</span>
+								</button>
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L9 2z"
+										/>
+										<polyline points="9,2 9,6 13,6" />
+									</svg>
+									<span class="tab-label-text">Issues</span>
+								</button>
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<rect x="2" y="3" width="3.5" height="10" rx="1" />
+										<rect x="6.25" y="5" width="3.5" height="8" rx="1" />
+										<rect x="10.5" y="3" width="3.5" height="10" rx="1" />
+									</svg>
+									<span class="tab-label-text">Kanban</span>
+								</button>
+								<!-- Active tab: Assigned Issues with badge -->
+								<button class="panel-tab is-active">
+									<svg class="icon" viewBox="0 0 16 16" fill="currentColor">
+										<path
+											d="M8 .5a7.5 7.5 0 00-2.372 14.621c.375.069.512-.163.512-.362 0-.179-.007-.654-.01-1.283-2.085.453-2.524-.998-2.524-.998-.341-.866-.832-1.097-.832-1.097-.68-.464.051-.455.051-.455.752.053 1.147.773 1.147.773.668 1.145 1.753.814 2.18.622.068-.484.261-.814.475-1.001-1.665-.19-3.415-.833-3.415-3.707 0-.819.293-1.487.773-2.01-.078-.19-.335-.95.073-1.981 0 0 .63-.202 2.065.77A7.19 7.19 0 018 4.98c.638.003 1.28.086 1.879.253 1.432-.972 2.062-.77 2.062-.77.41 1.031.153 1.79.075 1.98.482.523.772 1.192.772 2.01 0 2.882-1.753 3.516-3.422 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.06 0 .2.135.434.516.36A7.5 7.5 0 008 .5z"
+										/>
+									</svg>
+									<span class="tab-label-text">Assigned Issues</span>
+									<!-- Badge: count of suitable (open + unlinked) issues -->
+									<span class="tab-badge">8</span>
+								</button>
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<polyline points="2,11 5,7 8,9 11,4 14,7" />
+									</svg>
+									<span class="tab-label-text">Activity</span>
+								</button>
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<circle cx="8" cy="8" r="5.5" />
+										<path d="M8 5.5v2.5l1.5 1.5" />
+									</svg>
+									<span class="tab-label-text">Session</span>
+								</button>
+								<!-- Overflow indicator — for narrower panels where tabs don't fit -->
+								<div class="panel-tab-overflow" title="More tabs">
+									···
+									<span class="overflow-count">+2</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /context-shell -->
+
+					<!-- ═══════════════════════════════════════════
+         COMPONENT CONTENT STARTS HERE
+         ═══════════════════════════════════════════ -->
+					<div class="bab-body">
+						<!-- ── Toolbar: search + refresh ─────────────── -->
+						<div class="bab-toolbar">
+							<div class="bab-search-wrap">
+								<span class="bab-search-icon">
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<circle cx="6.5" cy="6.5" r="4.5" />
+										<line x1="10" y1="10" x2="14" y2="14" />
+									</svg>
+								</span>
+								<input
+									class="bab-search"
+									type="text"
+									placeholder="Search assigned issues…"
+									aria-label="Search issues"
+								/>
+							</div>
+							<div class="bab-refresh-indicator">
+								<div class="bab-sync-status">
+									<span class="bab-sync-dot"></span>
+									<span>synced 45s ago</span>
+								</div>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Refresh now"
+									aria-label="Refresh assigned issues"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M13.5 8a5.5 5.5 0 11-1.1-3.3" />
+										<polyline points="13.5,2 13.5,5 10.5,5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<!-- ── Selection bar — 3 selected ──────────── -->
+						<div class="bab-action-bar has-selection">
+							<div class="bab-sel-left">
+								<div class="bab-sel-info">
+									<!-- Global checkbox — indeterminate state -->
+									<input
+										type="checkbox"
+										class="gk-check"
+										data-state="indeterminate"
+										aria-label="Toggle all selection"
+									/>
+									<span class="bab-sel-count">3 selected</span>
+									<span class="bab-sep-dot">·</span>
+									<button class="bab-select-all-btn">
+										Select all 8 unlinked
+									</button>
+								</div>
+							</div>
+							<div class="bab-action-btns">
+								<button class="gk-btn gk-btn-primary gk-btn-sm">
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="8" y1="3" x2="8" y2="13" />
+										<line x1="3" y1="8" x2="13" y2="8" />
+									</svg>
+									Quick Add Selected
+								</button>
+								<button class="gk-btn gk-btn-secondary gk-btn-sm">
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="4.5" cy="4.5" r="1.5" />
+										<circle cx="4.5" cy="11.5" r="1.5" />
+										<circle cx="11.5" cy="4.5" r="1.5" />
+										<path d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0" />
+									</svg>
+									Add + Worktree
+								</button>
+							</div>
+						</div>
+
+						<!-- ── Table header ──────────────────────────── -->
+						<div class="bab-table-head">
+							<div class="bab-th bab-th-noclick"></div>
+							<div class="bab-th bab-th-prd is-sorted">
+								PRD
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+								>
+									<polyline points="4,9 8,5 12,9" />
+								</svg>
+							</div>
+							<div class="bab-th">
+								Issue
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th">
+								Title
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th bab-th-labels">
+								Labels
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th bab-th-noclick bab-th-actions">Actions</div>
+						</div>
+
+						<!-- ── Scrollable table body ─────────────────── -->
+						<div class="bab-scroll">
+							<!-- ═══ UNLINKED GROUP (expanded) ═══ -->
+							<div class="bab-group">
+								<div
+									class="bab-group-header"
+									role="button"
+									aria-expanded="true"
+									tabindex="0"
+								>
+									<span class="bab-group-chevron"
+										><svg
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polyline points="4,6 8,10 12,6" /></svg
+									></span>
+									<span class="bab-group-label">Unlinked</span>
+									<span class="bab-group-count">8</span>
+									<div class="bab-group-line"></div>
+								</div>
+
+								<!-- Row 1 — SELECTED · afk (priority label first) -->
+								<div class="bab-row is-selected">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											checked
+											aria-label="Select issue #312"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-93</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#312</a>
+									</div>
+									<div class="bab-cell-title">
+										Add p95 latency histogram to session metrics panel
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-priority">afk</span>
+										<span class="gk-badge gk-badge-azure">metrics</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace (no worktree)"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 2 — SELECTED · hitl (priority label first) -->
+								<div class="bab-row is-selected">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											checked
+											aria-label="Select issue #304"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-95</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#304</a>
+									</div>
+									<div class="bab-cell-title">
+										Character pack audio preview in notification settings
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-priority">hitl</span>
+										<span class="gk-badge gk-badge-plum">notifications</span>
+										<span class="gk-badge gk-badge-coral">audio</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 3 — SELECTED · design-needed (second priority) -->
+								<div class="bab-row is-selected">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											checked
+											aria-label="Select issue #317"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-96</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#317</a>
+									</div>
+									<div class="bab-cell-title">
+										Persist panel split ratios per workspace in local config
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-indigo">design-needed</span>
+										<span class="gk-badge gk-badge-moss">frontend</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 4 — unselected · afk priority -->
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Select issue #321"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-90</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#321</a>
+									</div>
+									<div class="bab-cell-title">
+										Tool approval queue: batch-approve with keyboard modifier
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-priority">afk</span>
+										<span class="gk-badge gk-badge-azure">sessions</span>
+										<span class="gk-badge gk-badge-sage">keyboard</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 5 — unselected · design-needed -->
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Select issue #326"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-87</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#326</a>
+									</div>
+									<div class="bab-cell-title">
+										Command palette: fuzzy-match workspace card names
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-indigo">design-needed</span>
+										<span class="gk-badge gk-badge-amber">command-palette</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 6 — no PRD -->
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Select issue #298"
+										/>
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#298</a>
+									</div>
+									<div class="bab-cell-title">
+										Keyboard shortcut to toggle bottom panel sections
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-gold">ux</span>
+										<span class="gk-badge">enhancement</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 7 — no PRD -->
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Select issue #289"
+										/>
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#289</a>
+									</div>
+									<div class="bab-cell-title">
+										Implement drag-to-reorder for workspace sessions list
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-amber">drag-drop</span>
+										<span class="gk-badge">enhancement</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<!-- Row 8 — many labels, label overflow chip -->
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Select issue #331"
+										/>
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#331</a>
+									</div>
+									<div class="bab-cell-title">
+										Bottom panel: resize handle accessibility improvements
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-teal">a11y</span>
+										<span class="gk-badge gk-badge-moss">frontend</span>
+										<span class="gk-badge">panel</span>
+										<span class="bab-label-overflow">+2</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button
+											class="bab-quick-action is-add"
+											title="Quick add to workspace"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg>
+										</button>
+										<button
+											class="bab-quick-action is-worktree"
+											title="Quick add with worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- /unlinked group -->
+
+							<!-- ═══ LINKED GROUP — COLLAPSED BY DEFAULT ═══ -->
+							<div class="bab-group">
+								<div
+									class="bab-group-header is-collapsed"
+									role="button"
+									aria-expanded="false"
+									tabindex="0"
+								>
+									<span class="bab-group-chevron"
+										><svg
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polyline points="4,6 8,10 12,6" /></svg
+									></span>
+									<span
+										class="bab-group-label"
+										style="color: var(--foreground-subtle)"
+										>Linked</span
+									>
+									<span class="bab-group-count">3</span>
+									<div
+										class="bab-group-line"
+										style="
+											background: color-mix(
+												in oklch,
+												var(--border) 60%,
+												transparent
+											);
+										"
+									></div>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											white-space: nowrap;
+											flex-shrink: 0;
+										"
+										>Already in workspace · click to expand</span
+									>
+								</div>
+								<!-- Rows hidden when collapsed -->
+							</div>
+						</div>
+						<!-- /bab-scroll -->
+					</div>
+					<!-- /bab-body -->
+				</div>
+				<!-- /panel-frame -->
+
+				<!-- ══════════════════════════════════════════════════════
+       DEMO 2: Empty selection state + syncing indicator
+       ══════════════════════════════════════════════════════ -->
+				<div class="demo-spacer">
+					<span class="demo-spacer-label">Empty selection — syncing in progress</span>
+				</div>
+
+				<div class="panel-frame">
+					<div class="context-note">▼ PARENT CONTEXT — not part of this component</div>
+					<div class="context-shell">
+						<div class="panel-header">
+							<div class="panel-tab-strip">
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="3,5 6,8 3,11" />
+										<line x1="7.5" y1="11" x2="13" y2="11" /></svg
+									><span class="tab-label-text">Terminal</span>
+								</button>
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L9 2z"
+										/>
+										<polyline points="9,2 9,6 13,6" /></svg
+									><span class="tab-label-text">Issues</span>
+								</button>
+								<button class="panel-tab is-active">
+									<svg class="icon" viewBox="0 0 16 16" fill="currentColor">
+										<path
+											d="M8 .5a7.5 7.5 0 00-2.372 14.621c.375.069.512-.163.512-.362 0-.179-.007-.654-.01-1.283-2.085.453-2.524-.998-2.524-.998-.341-.866-.832-1.097-.832-1.097-.68-.464.051-.455.051-.455.752.053 1.147.773 1.147.773.668 1.145 1.753.814 2.18.622.068-.484.261-.814.475-1.001-1.665-.19-3.415-.833-3.415-3.707 0-.819.293-1.487.773-2.01-.078-.19-.335-.95.073-1.981 0 0 .63-.202 2.065.77A7.19 7.19 0 018 4.98c.638.003 1.28.086 1.879.253 1.432-.972 2.062-.77 2.062-.77.41 1.031.153 1.79.075 1.98.482.523.772 1.192.772 2.01 0 2.882-1.753 3.516-3.422 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.06 0 .2.135.434.516.36A7.5 7.5 0 008 .5z"
+										/>
+									</svg>
+									<span class="tab-label-text">Assigned Issues</span>
+									<span class="tab-badge">8</span>
+								</button>
+								<button class="panel-tab">
+									<svg
+										class="icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<polyline points="2,11 5,7 8,9 11,4 14,7" /></svg
+									><span class="tab-label-text">Activity</span>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="bab-body">
+						<!-- Toolbar — syncing state -->
+						<div class="bab-toolbar">
+							<div class="bab-search-wrap">
+								<span class="bab-search-icon"
+									><svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<circle cx="6.5" cy="6.5" r="4.5" />
+										<line x1="10" y1="10" x2="14" y2="14" /></svg
+								></span>
+								<input
+									class="bab-search"
+									type="text"
+									placeholder="Search assigned issues…"
+									aria-label="Search issues"
+								/>
+							</div>
+							<div class="bab-refresh-indicator">
+								<div class="bab-sync-status">
+									<span class="bab-sync-dot is-syncing"></span>
+									<span style="color: var(--amber-300)">syncing…</span>
+								</div>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									disabled
+									aria-label="Refreshing"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										style="animation: gk-spin 1s linear infinite"
+									>
+										<path d="M13.5 8a5.5 5.5 0 11-1.1-3.3" />
+										<polyline points="13.5,2 13.5,5 10.5,5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<!-- Selection bar — empty state -->
+						<div class="bab-action-bar">
+							<div class="bab-sel-left">
+								<div class="bab-sel-info">
+									<input
+										type="checkbox"
+										class="gk-check"
+										aria-label="Select all"
+									/>
+									<span class="bab-sel-count is-empty">No issues selected</span>
+									<span class="bab-sep-dot">·</span>
+									<button class="bab-select-all-btn">
+										Select all 8 unlinked
+									</button>
+								</div>
+							</div>
+							<div class="bab-action-btns">
+								<button class="gk-btn gk-btn-primary gk-btn-sm" disabled>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="8" y1="3" x2="8" y2="13" />
+										<line x1="3" y1="8" x2="13" y2="8" />
+									</svg>
+									Quick Add Selected
+								</button>
+								<button class="gk-btn gk-btn-secondary gk-btn-sm" disabled>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="4.5" cy="4.5" r="1.5" />
+										<circle cx="4.5" cy="11.5" r="1.5" />
+										<circle cx="11.5" cy="4.5" r="1.5" />
+										<path d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0" />
+									</svg>
+									Add + Worktree
+								</button>
+							</div>
+						</div>
+
+						<!-- Table header -->
+						<div class="bab-table-head">
+							<div class="bab-th bab-th-noclick"></div>
+							<div class="bab-th bab-th-prd">
+								PRD
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th">
+								Issue
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th">
+								Title
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th bab-th-labels">
+								Labels
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th bab-th-noclick bab-th-actions">Actions</div>
+						</div>
+
+						<div class="bab-scroll">
+							<!-- Unlinked group with all rows, no selection -->
+							<div class="bab-group">
+								<div
+									class="bab-group-header"
+									role="button"
+									aria-expanded="true"
+									tabindex="0"
+								>
+									<span class="bab-group-chevron"
+										><svg
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polyline points="4,6 8,10 12,6" /></svg
+									></span>
+									<span class="bab-group-label">Unlinked</span>
+									<span class="bab-group-count">8</span>
+									<div class="bab-group-line"></div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#312" />
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-93</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#312</a>
+									</div>
+									<div class="bab-cell-title">
+										Add p95 latency histogram to session metrics panel
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-priority">afk</span
+										><span class="gk-badge gk-badge-azure">metrics</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#304" />
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-95</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#304</a>
+									</div>
+									<div class="bab-cell-title">
+										Character pack audio preview in notification settings
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-priority">hitl</span
+										><span class="gk-badge gk-badge-plum">notifications</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#317" />
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-96</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#317</a>
+									</div>
+									<div class="bab-cell-title">
+										Persist panel split ratios per workspace in local config
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-indigo">design-needed</span
+										><span class="gk-badge gk-badge-moss">frontend</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#321" />
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-90</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#321</a>
+									</div>
+									<div class="bab-cell-title">
+										Tool approval queue: batch-approve with keyboard modifier
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-priority">afk</span
+										><span class="gk-badge gk-badge-azure">sessions</span
+										><span class="gk-badge gk-badge-sage">keyboard</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#326" />
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-87</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#326</a>
+									</div>
+									<div class="bab-cell-title">
+										Command palette: fuzzy-match workspace card names
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-indigo">design-needed</span
+										><span class="gk-badge gk-badge-amber"
+											>command-palette</span
+										>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#298" />
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#298</a>
+									</div>
+									<div class="bab-cell-title">
+										Keyboard shortcut to toggle bottom panel sections
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-gold">ux</span
+										><span class="gk-badge">enhancement</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#289" />
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#289</a>
+									</div>
+									<div class="bab-cell-title">
+										Implement drag-to-reorder for workspace sessions list
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-amber">drag-drop</span
+										><span class="gk-badge">enhancement</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+
+								<div class="bab-row">
+									<div class="bab-cell-check">
+										<input type="checkbox" class="gk-check" aria-label="#331" />
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#331</a>
+									</div>
+									<div class="bab-cell-title">
+										Bottom panel: resize handle accessibility improvements
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-teal">a11y</span
+										><span class="gk-badge gk-badge-moss">frontend</span
+										><span class="gk-badge">panel</span>
+									</div>
+									<div class="bab-cell-actions">
+										<button class="bab-quick-action is-add" title="Quick add">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<line x1="8" y1="3" x2="8" y2="13" />
+												<line x1="3" y1="8" x2="13" y2="8" />
+											</svg></button
+										><button
+											class="bab-quick-action is-worktree"
+											title="Add + worktree"
+										>
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<circle cx="4.5" cy="4.5" r="1.5" />
+												<circle cx="4.5" cy="11.5" r="1.5" />
+												<circle cx="11.5" cy="4.5" r="1.5" />
+												<path
+													d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- Linked collapsed -->
+							<div class="bab-group">
+								<div
+									class="bab-group-header is-collapsed"
+									role="button"
+									aria-expanded="false"
+									tabindex="0"
+								>
+									<span class="bab-group-chevron"
+										><svg
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polyline points="4,6 8,10 12,6" /></svg
+									></span>
+									<span
+										class="bab-group-label"
+										style="color: var(--foreground-subtle)"
+										>Linked</span
+									>
+									<span class="bab-group-count">3</span>
+									<div
+										class="bab-group-line"
+										style="
+											background: color-mix(
+												in oklch,
+												var(--border) 60%,
+												transparent
+											);
+										"
+									></div>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											white-space: nowrap;
+											flex-shrink: 0;
+										"
+										>Already in workspace · click to expand</span
+									>
+								</div>
+							</div>
+						</div>
+						<!-- /bab-scroll -->
+					</div>
+					<!-- /bab-body -->
+				</div>
+				<!-- /panel-frame -->
+
+				<!-- ══════════════════════════════════════════════════════
+       DEMO 3: Linked section expanded (reference state)
+       ══════════════════════════════════════════════════════ -->
+				<div class="demo-spacer">
+					<span class="demo-spacer-label"
+						>Linked section expanded (dimmed rows + linked indicators)</span
+					>
+				</div>
+
+				<div class="panel-frame">
+					<div class="context-note">▼ PARENT CONTEXT — not part of this component</div>
+					<div class="context-shell">
+						<div class="panel-header">
+							<div class="panel-tab-strip">
+								<button class="panel-tab">Terminal</button>
+								<button class="panel-tab">Issues</button>
+								<button class="panel-tab is-active">
+									<svg class="icon" viewBox="0 0 16 16" fill="currentColor">
+										<path
+											d="M8 .5a7.5 7.5 0 00-2.372 14.621c.375.069.512-.163.512-.362 0-.179-.007-.654-.01-1.283-2.085.453-2.524-.998-2.524-.998-.341-.866-.832-1.097-.832-1.097-.68-.464.051-.455.051-.455.752.053 1.147.773 1.147.773.668 1.145 1.753.814 2.18.622.068-.484.261-.814.475-1.001-1.665-.19-3.415-.833-3.415-3.707 0-.819.293-1.487.773-2.01-.078-.19-.335-.95.073-1.981 0 0 .63-.202 2.065.77A7.19 7.19 0 018 4.98c.638.003 1.28.086 1.879.253 1.432-.972 2.062-.77 2.062-.77.41 1.031.153 1.79.075 1.98.482.523.772 1.192.772 2.01 0 2.882-1.753 3.516-3.422 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.06 0 .2.135.434.516.36A7.5 7.5 0 008 .5z"
+										/>
+									</svg>
+									Assigned Issues
+									<span class="tab-badge">8</span>
+								</button>
+								<button class="panel-tab">Activity</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="bab-body">
+						<div class="bab-toolbar">
+							<div class="bab-search-wrap">
+								<span class="bab-search-icon"
+									><svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<circle cx="6.5" cy="6.5" r="4.5" />
+										<line x1="10" y1="10" x2="14" y2="14" /></svg
+								></span>
+								<input
+									class="bab-search"
+									type="text"
+									placeholder="Search assigned issues…"
+									aria-label="Search issues"
+								/>
+							</div>
+							<div class="bab-refresh-indicator">
+								<div class="bab-sync-status">
+									<span class="bab-sync-dot"></span><span>synced 3m ago</span>
+								</div>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Refresh now"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M13.5 8a5.5 5.5 0 11-1.1-3.3" />
+										<polyline points="13.5,2 13.5,5 10.5,5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<div class="bab-action-bar">
+							<div class="bab-sel-left">
+								<div class="bab-sel-info">
+									<input
+										type="checkbox"
+										class="gk-check"
+										aria-label="Select all"
+									/>
+									<span class="bab-sel-count is-empty">No issues selected</span>
+									<span class="bab-sep-dot">·</span>
+									<button class="bab-select-all-btn">
+										Select all 8 unlinked
+									</button>
+								</div>
+							</div>
+							<div class="bab-action-btns">
+								<button class="gk-btn gk-btn-primary gk-btn-sm" disabled>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="8" y1="3" x2="8" y2="13" />
+										<line x1="3" y1="8" x2="13" y2="8" /></svg
+									>Quick Add Selected
+								</button>
+								<button class="gk-btn gk-btn-secondary gk-btn-sm" disabled>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="4.5" cy="4.5" r="1.5" />
+										<circle cx="4.5" cy="11.5" r="1.5" />
+										<circle cx="11.5" cy="4.5" r="1.5" />
+										<path d="M4.5 6v4M6 4.5h3.5a2.5 2.5 0 012.5 2.5v0" /></svg
+									>Add + Worktree
+								</button>
+							</div>
+						</div>
+
+						<div class="bab-table-head">
+							<div class="bab-th bab-th-noclick"></div>
+							<div class="bab-th bab-th-prd">
+								PRD
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th">
+								Issue
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th">
+								Title
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th bab-th-labels">
+								Labels
+								<svg
+									class="bab-sort-icon"
+									width="10"
+									height="10"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<line x1="8" y1="4" x2="8" y2="12" />
+									<polyline points="5,9 8,12 11,9" />
+								</svg>
+							</div>
+							<div class="bab-th bab-th-noclick bab-th-actions">Actions</div>
+						</div>
+
+						<div class="bab-scroll">
+							<!-- Unlinked — collapsed in this demo to focus on linked -->
+							<div class="bab-group">
+								<div
+									class="bab-group-header is-collapsed"
+									role="button"
+									aria-expanded="false"
+									tabindex="0"
+								>
+									<span class="bab-group-chevron"
+										><svg
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polyline points="4,6 8,10 12,6" /></svg
+									></span>
+									<span class="bab-group-label">Unlinked</span>
+									<span class="bab-group-count">8</span>
+									<div class="bab-group-line"></div>
+								</div>
+							</div>
+
+							<!-- Linked — EXPANDED, dimmed rows, linked indicators -->
+							<div class="bab-group">
+								<div
+									class="bab-group-header"
+									role="button"
+									aria-expanded="true"
+									tabindex="0"
+								>
+									<span class="bab-group-chevron"
+										><svg
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<polyline points="4,6 8,10 12,6" /></svg
+									></span>
+									<span
+										class="bab-group-label"
+										style="color: var(--foreground-subtle)"
+										>Linked</span
+									>
+									<span class="bab-group-count">3</span>
+									<div
+										class="bab-group-line"
+										style="
+											background: color-mix(
+												in oklch,
+												var(--border) 60%,
+												transparent
+											);
+										"
+									></div>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											white-space: nowrap;
+											flex-shrink: 0;
+										"
+										>Already in workspace</span
+									>
+								</div>
+
+								<!-- Linked row 1 — dimmed -->
+								<div class="bab-row is-linked">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Issue #252 (linked)"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-87</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#252</a>
+									</div>
+									<div class="bab-cell-title">
+										Metrics v2 requirements and architecture
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-azure">metrics</span
+										><span class="gk-badge">architecture</span>
+									</div>
+									<div class="bab-cell-actions">
+										<span class="bab-linked-chip">
+											<svg
+												width="10"
+												height="10"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<polyline points="3,8 6,11 13,4" />
+											</svg>
+											linked
+										</span>
+									</div>
+								</div>
+
+								<!-- Linked row 2 -->
+								<div class="bab-row is-linked">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Issue #267 (linked)"
+										/>
+									</div>
+									<div class="bab-cell-prd">
+										<a href="#" class="bab-num-link bab-prd-link">PRD-93</a>
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#267</a>
+									</div>
+									<div class="bab-cell-title">
+										OAuth device flow with keyring storage
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge gk-badge-moss">auth</span
+										><span class="gk-badge gk-badge-rose">security</span>
+									</div>
+									<div class="bab-cell-actions">
+										<span class="bab-linked-chip">
+											<svg
+												width="10"
+												height="10"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<polyline points="3,8 6,11 13,4" />
+											</svg>
+											linked
+										</span>
+									</div>
+								</div>
+
+								<!-- Linked row 3 — no PRD -->
+								<div class="bab-row is-linked">
+									<div class="bab-cell-check">
+										<input
+											type="checkbox"
+											class="gk-check"
+											aria-label="Issue #253 (linked)"
+										/>
+									</div>
+									<div
+										class="bab-cell-prd"
+										style="color: var(--foreground-subtle); opacity: 0.35"
+									>
+										—
+									</div>
+									<div class="bab-cell-num">
+										<a href="#" class="bab-num-link">#253</a>
+									</div>
+									<div class="bab-cell-title">
+										Grilling decisions and design brief updates
+									</div>
+									<div class="bab-cell-labels">
+										<span class="gk-badge">design</span>
+									</div>
+									<div class="bab-cell-actions">
+										<span class="bab-linked-chip">
+											<svg
+												width="10"
+												height="10"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+											>
+												<polyline points="3,8 6,11 13,4" />
+											</svg>
+											linked
+										</span>
+									</div>
+								</div>
+							</div>
+							<!-- /linked group -->
+						</div>
+						<!-- /bab-scroll -->
+					</div>
+					<!-- /bab-body -->
+				</div>
+				<!-- /panel-frame -->
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

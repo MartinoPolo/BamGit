@@ -1,0 +1,3124 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Issue Card Redesign — Variant A: Subtle Glow</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
+       Grovekeeper design tokens — Forest Moss palette
+       (inlined from tokens.css)
+       ============================================================ */
+
+
+			/* Dark theme */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Fern texture */
+			.gk-fern-bg {
+				background-image:
+					radial-gradient(
+						1px 1px at 25% 20%,
+						color-mix(in oklch, var(--foreground) 6%, transparent) 50%,
+						transparent 51%
+					),
+					radial-gradient(
+						1px 1px at 75% 60%,
+						color-mix(in oklch, var(--foreground) 5%, transparent) 50%,
+						transparent 51%
+					),
+					radial-gradient(
+						1px 1px at 40% 80%,
+						color-mix(in oklch, var(--foreground) 4%, transparent) 50%,
+						transparent 51%
+					);
+				background-size:
+					64px 64px,
+					96px 96px,
+					80px 80px;
+			}
+
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+
+			/* Type scale */
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* Animations */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ============================================================
+       PAGE LAYOUT
+       ============================================================ */
+			body {
+				margin: 0;
+				padding: 0;
+			}
+
+			.page-wrapper {
+				min-height: 100vh;
+				padding: 48px 40px 80px;
+				background: var(--background);
+			}
+
+			.page-header {
+				margin-bottom: 40px;
+			}
+
+			.page-title {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 500;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				margin-bottom: 4px;
+			}
+
+			.page-subtitle {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+
+			.state-section {
+				margin-bottom: 48px;
+			}
+
+			.state-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				letter-spacing: 0.06em;
+				text-transform: lowercase;
+				color: var(--foreground-subtle);
+				margin-bottom: 14px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.state-label::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.cards-grid {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+
+			/* ============================================================
+       ISSUE CARD — VARIANT A: SUBTLE GLOW
+       ============================================================ */
+
+			.ic-card {
+				--ic-color: var(--moss-500);
+				--ic-color-dark: oklch(from var(--ic-color) calc(l * 0.78) calc(c * 0.8) h);
+				--ic-color-glow: oklch(from var(--ic-color) calc(l * 0.9) c h / 0.22);
+				--ic-color-glow-strong: oklch(from var(--ic-color) calc(l * 0.9) c h / 0.38);
+				--ic-color-border: oklch(from var(--ic-color) calc(l * 0.85) c h / 0.55);
+				--ic-color-tint: oklch(from var(--ic-color) calc(l * 0.9) c h / 0.06);
+
+				min-width: 450px;
+				max-width: 680px;
+				border-radius: var(--radius-lg);
+				border: 1px solid var(--border);
+				background: var(--surface);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				transition:
+					border-color var(--duration-3) var(--ease-out),
+					box-shadow var(--duration-3) var(--ease-out),
+					transform var(--duration-3) var(--ease-out),
+					background var(--duration-3) var(--ease-out);
+				cursor: pointer;
+				position: relative;
+			}
+
+			/* Default state — no special ring */
+			.ic-card:hover {
+				border-color: var(--ic-color-border);
+				background: color-mix(in oklch, var(--surface) 94%, var(--ic-color) 6%);
+				box-shadow:
+					var(--shadow-md),
+					0 0 0 0px transparent,
+					0 0 16px 0px var(--ic-color-glow),
+					0 0 48px 0px oklch(from var(--ic-color) l c h / 0.1);
+				transform: translateY(-1px);
+			}
+
+			/* Active state (simulated via class) */
+			.ic-card.is-active {
+				border-color: var(--ic-color-border);
+				background: color-mix(in oklch, var(--surface) 92%, var(--ic-color) 8%);
+				box-shadow:
+					var(--shadow-md),
+					0 0 0 2px oklch(from var(--ic-color) l c h / 0.25),
+					0 0 24px 2px var(--ic-color-glow-strong),
+					0 0 64px 4px oklch(from var(--ic-color) l c h / 0.14);
+				transform: translateY(0px);
+			}
+
+			/* Hover state (simulated via class for showcase) */
+			.ic-card.is-hover {
+				border-color: var(--ic-color-border);
+				background: color-mix(in oklch, var(--surface) 94%, var(--ic-color) 6%);
+				box-shadow:
+					var(--shadow-md),
+					0 0 0 0px transparent,
+					0 0 16px 0px var(--ic-color-glow),
+					0 0 48px 0px oklch(from var(--ic-color) l c h / 0.1);
+				transform: translateY(-1px);
+			}
+
+			/* ── Issue colors ── */
+			.ic-moss {
+				--ic-color: oklch(0.58 0.096 134);
+			}
+			.ic-amber {
+				--ic-color: oklch(0.69 0.165 55);
+			}
+			.ic-azure {
+				--ic-color: oklch(0.57 0.13 235);
+			}
+			.ic-plum {
+				--ic-color: oklch(0.56 0.15 320);
+			}
+
+			/* ── Header band ── */
+			.ic-header {
+				padding: 10px 12px 0;
+				position: relative;
+				overflow: hidden;
+
+				/* Issue color as bg, desaturated ~20% for dark mode readability */
+				--ic-header-bg: oklch(from var(--ic-color) calc(l * 0.7) calc(c * 0.8) h);
+				background: var(--ic-header-bg);
+			}
+
+			/* Softer bottom edge: gradient fade from header color into card body */
+			.ic-header::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 20px;
+				background: linear-gradient(
+					to bottom,
+					transparent 0%,
+					color-mix(in oklch, var(--ic-header-bg) 80%, var(--surface)) 60%,
+					var(--surface) 100%
+				);
+				pointer-events: none;
+			}
+
+			/* Subtle fern pattern on header for texture */
+			.ic-header-pattern {
+				position: absolute;
+				inset: 0;
+				opacity: 0.12;
+				background-image:
+					radial-gradient(1px 1px at 20% 30%, white 50%, transparent 51%),
+					radial-gradient(1px 1px at 60% 15%, white 50%, transparent 51%),
+					radial-gradient(1px 1px at 80% 70%, white 50%, transparent 51%),
+					radial-gradient(1px 1px at 35% 80%, white 50%, transparent 51%),
+					radial-gradient(1px 1px at 55% 55%, white 50%, transparent 51%);
+				background-size:
+					48px 48px,
+					72px 72px,
+					56px 56px,
+					64px 64px,
+					40px 40px;
+				pointer-events: none;
+			}
+
+			.ic-header-row1 {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				position: relative;
+				z-index: 1;
+				padding-bottom: 8px;
+			}
+
+			.ic-issue-number {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 500;
+				color: oklch(from var(--ic-color) calc(l + 0.3) calc(c * 0.6) h / 0.85);
+				flex-shrink: 0;
+				letter-spacing: 0.02em;
+			}
+
+			.ic-issue-name {
+				font-size: 13px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				/* WCAG contrast: bright text on darker header bg */
+				color: oklch(0.97 0.006 130);
+				flex: 1;
+				min-width: 0;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.ic-header-chips {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				flex-shrink: 0;
+			}
+
+			/* Child count badge */
+			.ic-child-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				height: 18px;
+				padding: 0 6px;
+				border-radius: var(--radius-full);
+				font-size: 10.5px;
+				font-weight: 500;
+				font-family: var(--font-mono);
+				background: oklch(from var(--ic-color) calc(l * 0.55) calc(c * 0.85) h / 0.55);
+				color: oklch(0.96 0.008 130);
+				border: 1px solid oklch(from var(--ic-color) calc(l + 0.15) c h / 0.3);
+			}
+
+			/* Session state chip */
+			.ic-session-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 10.5px;
+				font-weight: 500;
+				letter-spacing: 0.01em;
+				border: 1px solid transparent;
+				background: oklch(from var(--ic-color) calc(l * 0.5) calc(c * 0.9) h / 0.6);
+				color: oklch(0.97 0.006 130);
+				border-color: oklch(from var(--ic-color) calc(l + 0.1) c h / 0.25);
+			}
+
+			.ic-session-dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: currentColor;
+			}
+
+			.ic-session-running .ic-session-dot {
+				background: var(--session-running);
+			}
+			.ic-session-needs-input .ic-session-dot {
+				background: var(--session-needs-input);
+			}
+			.ic-session-idle .ic-session-dot {
+				background: var(--session-idle);
+			}
+			.ic-session-paused .ic-session-dot {
+				background: var(--session-paused);
+			}
+
+			/* Priority chip */
+			.ic-priority-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.03em;
+				text-transform: uppercase;
+				border: 1px solid;
+			}
+
+			.ic-priority-high {
+				background: color-mix(in oklch, var(--priority-high) 18%, transparent);
+				color: oklch(0.93 0.01 55);
+				border-color: oklch(from var(--priority-high) l c h / 0.4);
+			}
+
+			.ic-priority-top {
+				background: color-mix(in oklch, var(--priority-top) 20%, transparent);
+				color: oklch(0.93 0.01 20);
+				border-color: oklch(from var(--priority-top) l c h / 0.45);
+			}
+
+			.ic-priority-low {
+				background: color-mix(in oklch, var(--priority-low) 18%, transparent);
+				color: oklch(0.88 0.01 220);
+				border-color: oklch(from var(--priority-low) l c h / 0.4);
+			}
+
+			/* Quick-action icons in header */
+			.ic-header-actions {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				position: relative;
+				z-index: 1;
+				padding-bottom: 8px;
+			}
+
+			.ic-action-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: oklch(0.96 0.006 130 / 0.65);
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					color 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+
+			.ic-action-btn:hover {
+				background: oklch(from var(--ic-color) calc(l * 0.5) calc(c * 0.8) h / 0.45);
+				color: oklch(0.97 0.006 130);
+				border-color: oklch(from var(--ic-color) calc(l + 0.15) c h / 0.3);
+			}
+
+			.ic-action-btn:active {
+				background: oklch(from var(--ic-color) calc(l * 0.42) calc(c * 0.85) h / 0.55);
+				transform: scale(0.93);
+			}
+
+			.ic-action-btn:focus-visible {
+				outline: 2px solid oklch(0.97 0.006 130 / 0.6);
+				outline-offset: 1px;
+			}
+
+			.ic-action-btn:disabled {
+				opacity: 0.35;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Mute toggle — active when muted */
+			.ic-mute-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: oklch(0.96 0.006 130 / 0.5);
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					color 120ms ease,
+					border-color 120ms ease;
+			}
+
+			.ic-mute-btn:hover {
+				background: oklch(from var(--ic-color) calc(l * 0.5) calc(c * 0.8) h / 0.4);
+				color: oklch(0.97 0.006 130);
+			}
+
+			.ic-mute-btn.is-muted {
+				color: oklch(0.75 0.02 140 / 0.55);
+			}
+
+			.ic-mute-btn:focus-visible {
+				outline: 2px solid oklch(0.97 0.006 130 / 0.6);
+				outline-offset: 1px;
+			}
+
+			/* Spacer between name and chips */
+			.ic-header-spacer {
+				flex: 1;
+			}
+
+			/* Full header row layout */
+			.ic-header-top {
+				display: flex;
+				align-items: flex-start;
+				gap: 6px;
+				position: relative;
+				z-index: 1;
+				padding-bottom: 10px;
+			}
+
+			.ic-header-left {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.ic-name-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-bottom: 6px;
+			}
+
+			.ic-chips-row {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				flex-wrap: wrap;
+			}
+
+			.ic-header-right {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				flex-shrink: 0;
+				padding-top: 1px;
+			}
+
+			/* ── Card Body ── */
+			.ic-body {
+				padding: 12px 12px 12px;
+				display: grid;
+				grid-template-columns: 100px 1fr;
+				gap: 12px;
+			}
+
+			/* Thumbnail */
+			.ic-thumb {
+				width: 100px;
+				height: 100px;
+				border-radius: var(--radius-md);
+				background: linear-gradient(
+					135deg,
+					oklch(from var(--ic-color) calc(l * 0.65) calc(c * 0.7) h) 0%,
+					oklch(from var(--ic-color) calc(l * 0.5) calc(c * 0.85) h) 50%,
+					oklch(from var(--ic-color) calc(l * 0.38) calc(c * 0.9) h) 100%
+				);
+				border: 1px solid oklch(from var(--ic-color) calc(l * 0.75) c h / 0.25);
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.ic-thumb-icon {
+				opacity: 0.3;
+				color: oklch(0.96 0.006 130);
+			}
+
+			.ic-thumb-pattern {
+				position: absolute;
+				inset: 0;
+				opacity: 0.18;
+				background-image: repeating-linear-gradient(
+					-45deg,
+					transparent 0,
+					transparent 5px,
+					oklch(0.97 0.008 130 / 0.35) 5px,
+					oklch(0.97 0.008 130 / 0.35) 6px
+				);
+			}
+
+			/* Right detail rows */
+			.ic-details {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				min-width: 0;
+			}
+
+			.ic-detail-row {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				flex-wrap: wrap;
+				min-height: 22px;
+			}
+
+			/* Branch name */
+			.ic-branch {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 180px;
+			}
+
+			/* Worktree / sync / merge badges */
+			.ic-badge-worktree {
+				background: color-mix(in oklch, var(--ic-color) 12%, transparent);
+				color: oklch(from var(--ic-color) calc(l * 1.15) calc(c * 0.85) h);
+				border-color: oklch(from var(--ic-color) calc(l * 0.9) c h / 0.35);
+			}
+
+			/* Empty state for a row */
+			.ic-detail-empty {
+				height: 22px;
+				/* just occupies the min-height so layout stays stable */
+			}
+
+			/* GitHub labels */
+			.ic-gh-label {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 10.5px;
+				font-weight: 500;
+				border: 1px solid;
+			}
+
+			.ic-overflow-count {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			/* Dev server / check badges */
+			.ic-devserver-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			/* ============================================================
+       STATE SHOWCASE LAYOUT
+       ============================================================ */
+			.showcase-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+				gap: 24px;
+			}
+
+			.showcase-item {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.showcase-item-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				letter-spacing: 0.06em;
+				text-transform: lowercase;
+				color: var(--foreground-subtle);
+			}
+
+			/* ============================================================
+       SVG ICONS (inline)
+       ============================================================ */
+			.icon {
+				display: block;
+				flex-shrink: 0;
+			}
+
+			/* ============================================================
+       PAGE DIVIDER
+       ============================================================ */
+			.section-divider {
+				height: 1px;
+				background: var(--border);
+				margin: 40px 0;
+			}
+
+			/* Ensure the cards don't exceed page width in narrow layouts */
+			@media (max-width: 600px) {
+				.page-wrapper {
+					padding: 24px 16px 60px;
+				}
+				.ic-card {
+					min-width: unset;
+				}
+				.showcase-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrapper">
+				<!-- Page header -->
+				<div class="page-header">
+					<div class="gk-eyebrow" style="margin-bottom: 6px">Issue Card Redesign</div>
+					<div class="page-subtitle">Variant A — Subtle Glow</div>
+					<p
+						style="
+							font-size: 12px;
+							color: var(--foreground-subtle);
+							margin-top: 8px;
+							max-width: 540px;
+							line-height: 1.6;
+						"
+					>
+						Hover/active states surface through expressive box-shadow glows and
+						issue-color border transitions. Header band retains full saturation with a
+						gradient fade into the card body.
+					</p>
+				</div>
+
+				<!-- ── SECTION: Default state ── -->
+				<div class="state-section">
+					<div class="state-label">default — no ring, clean border</div>
+					<div class="cards-grid">
+						<!-- CARD 1: Moss · Running session · High priority -->
+						<div class="ic-card ic-moss">
+							<!-- Header band -->
+							<div class="ic-header">
+								<div class="ic-header-pattern"></div>
+								<div class="ic-header-top">
+									<div class="ic-header-left">
+										<div class="ic-name-row">
+											<span class="ic-issue-number">#247</span>
+											<span class="ic-issue-name"
+												>Implement parallel session spawning with resource
+												limits</span
+											>
+										</div>
+										<div class="ic-chips-row">
+											<span class="ic-child-badge">
+												<!-- tree icon -->
+												<svg
+													class="icon"
+													width="10"
+													height="10"
+													viewBox="0 0 16 16"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M8 2v12M4 10l4 4 4-4"
+														stroke="currentColor"
+														stroke-width="1.8"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												3
+											</span>
+											<span class="ic-session-chip ic-session-running">
+												<span class="ic-session-dot gk-pulse"></span>
+												running
+											</span>
+											<span class="ic-priority-chip ic-priority-high">
+												<svg
+													class="icon"
+													width="9"
+													height="9"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 2L14 14H2L8 2Z"
+														fill="currentColor"
+													/>
+												</svg>
+												high
+											</span>
+										</div>
+									</div>
+									<div class="ic-header-right">
+										<!-- Folder -->
+										<button
+											class="ic-action-btn"
+											title="Open folder"
+											aria-label="Open folder"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+										<!-- Terminal -->
+										<button
+											class="ic-action-btn"
+											title="Open terminal"
+											aria-label="Open terminal"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<rect
+													x="1"
+													y="2"
+													width="14"
+													height="12"
+													rx="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<path
+													d="M4 6l3 2.5L4 11"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+												<path
+													d="M9 11h3"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+										</button>
+										<!-- Editor -->
+										<button
+											class="ic-action-btn"
+											title="Open in editor"
+											aria-label="Open in editor"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M11 2l3 3-8 8H3v-3l8-8z"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+										<!-- Mute -->
+										<button
+											class="ic-mute-btn"
+											title="Mute notifications"
+											aria-label="Mute notifications"
+										>
+											<svg
+												class="icon"
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- Body -->
+							<div class="ic-body">
+								<!-- Thumbnail -->
+								<div class="ic-thumb">
+									<div class="ic-thumb-pattern"></div>
+									<svg
+										class="icon ic-thumb-icon"
+										width="36"
+										height="36"
+										viewBox="0 0 24 24"
+										fill="none"
+									>
+										<path
+											d="M12 3C9.5 3 7 5.5 7 9v2l-2 3h14l-2-3V9c0-3.5-2.5-6-5-6zM9 17a3 3 0 006 0"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+
+								<!-- Details -->
+								<div class="ic-details">
+									<!-- Row 1: Branch + badges -->
+									<div class="ic-detail-row">
+										<svg
+											class="icon"
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle
+												cx="4"
+												cy="4"
+												r="2"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<circle
+												cx="12"
+												cy="12"
+												r="2"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<path
+												d="M4 6v2a2 2 0 002 2h4"
+												stroke="currentColor"
+												stroke-width="1.4"
+												stroke-linecap="round"
+											/>
+										</svg>
+										<span class="ic-branch"
+											>feat/parallel-session-spawning</span
+										>
+										<span
+											class="gk-badge ic-badge-worktree"
+											style="height: 18px; font-size: 10px"
+											>worktree</span
+										>
+										<span
+											class="gk-badge gk-badge-success"
+											style="height: 18px; font-size: 10px"
+											>synced</span
+										>
+									</div>
+
+									<!-- Row 2: PR + issue badges -->
+									<div class="ic-detail-row">
+										<span
+											class="gk-badge gk-badge-success"
+											style="height: 20px"
+										>
+											<svg
+												class="icon"
+												width="10"
+												height="10"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<circle
+													cx="4"
+													cy="4"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<circle
+													cx="12"
+													cy="12"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<path
+													d="M4 6v6"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+												<path
+													d="M12 4v2a4 4 0 01-4 4H6"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+											PR #184
+										</span>
+										<span class="gk-badge gk-badge-info" style="height: 20px">
+											<svg
+												class="icon"
+												width="9"
+												height="9"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<circle
+													cx="8"
+													cy="8"
+													r="6"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<circle cx="8" cy="8" r="2.5" fill="currentColor" />
+											</svg>
+											GH #247
+										</span>
+									</div>
+
+									<!-- Row 3: GitHub labels -->
+									<div class="ic-detail-row">
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.64 0.135 145 / 0.15);
+												color: oklch(0.74 0.14 145);
+												border-color: oklch(0.64 0.135 145 / 0.35);
+											"
+											>enhancement</span
+										>
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.57 0.13 235 / 0.15);
+												color: oklch(0.68 0.12 230);
+												border-color: oklch(0.57 0.13 235 / 0.35);
+											"
+											>backend</span
+										>
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.56 0.15 320 / 0.12);
+												color: oklch(0.66 0.13 320);
+												border-color: oklch(0.56 0.15 320 / 0.3);
+											"
+											>performance</span
+										>
+										<span class="ic-overflow-count">+1</span>
+									</div>
+
+									<!-- Row 4: Dev server + check status -->
+									<div class="ic-detail-row">
+										<span
+											class="gk-badge gk-badge-success"
+											style="height: 20px; gap: 5px"
+										>
+											<span
+												class="ic-devserver-dot"
+												style="background: var(--status-success)"
+											></span>
+											:3421
+										</span>
+										<span
+											class="gk-badge gk-badge-success"
+											style="height: 20px"
+										>
+											<svg
+												class="icon"
+												width="9"
+												height="9"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M3 8l4 4 6-7"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+											checks
+										</span>
+										<span
+											class="gk-badge"
+											style="
+												height: 20px;
+												font-size: 10.5px;
+												font-family: var(--font-mono);
+											"
+										>
+											3.2k tokens
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── SECTION: Hover state ── -->
+				<div class="state-section">
+					<div class="state-label">
+						hover — issue-color border, glow, background tint, translateY(-1px)
+					</div>
+					<div class="cards-grid">
+						<!-- CARD 2: Amber · Needs input · Top priority — hovered -->
+						<div class="ic-card ic-amber is-hover">
+							<div class="ic-header">
+								<div class="ic-header-pattern"></div>
+								<div class="ic-header-top">
+									<div class="ic-header-left">
+										<div class="ic-name-row">
+											<span class="ic-issue-number">#189</span>
+											<span class="ic-issue-name"
+												>Redesign workspace card color system with oklch
+												palette</span
+											>
+										</div>
+										<div class="ic-chips-row">
+											<span class="ic-child-badge">
+												<svg
+													class="icon"
+													width="10"
+													height="10"
+													viewBox="0 0 16 16"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M8 2v12M4 10l4 4 4-4"
+														stroke="currentColor"
+														stroke-width="1.8"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												6
+											</span>
+											<span class="ic-session-chip ic-session-needs-input">
+												<span
+													class="ic-session-dot"
+													style="background: var(--session-needs-input)"
+												></span>
+												needs input
+											</span>
+											<span class="ic-priority-chip ic-priority-top">
+												<svg
+													class="icon"
+													width="9"
+													height="9"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 12l6-8 6 8"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												top
+											</span>
+										</div>
+									</div>
+									<div class="ic-header-right">
+										<button
+											class="ic-action-btn"
+											title="Open folder"
+											aria-label="Open folder"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+										<button
+											class="ic-action-btn"
+											title="Open terminal"
+											aria-label="Open terminal"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<rect
+													x="1"
+													y="2"
+													width="14"
+													height="12"
+													rx="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<path
+													d="M4 6l3 2.5L4 11"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+												<path
+													d="M9 11h3"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+										</button>
+										<button
+											class="ic-action-btn"
+											title="Open in editor"
+											aria-label="Open in editor"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M11 2l3 3-8 8H3v-3l8-8z"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+										<button
+											class="ic-mute-btn"
+											title="Mute notifications"
+											aria-label="Mute notifications"
+										>
+											<svg
+												class="icon"
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="ic-body">
+								<div class="ic-thumb">
+									<div class="ic-thumb-pattern"></div>
+									<svg
+										class="icon ic-thumb-icon"
+										width="36"
+										height="36"
+										viewBox="0 0 24 24"
+										fill="none"
+									>
+										<rect
+											x="3"
+											y="3"
+											width="8"
+											height="8"
+											rx="1.5"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+										<rect
+											x="13"
+											y="3"
+											width="8"
+											height="8"
+											rx="1.5"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+										<rect
+											x="3"
+											y="13"
+											width="8"
+											height="8"
+											rx="1.5"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+										<rect
+											x="13"
+											y="13"
+											width="8"
+											height="8"
+											rx="1.5"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+									</svg>
+								</div>
+
+								<div class="ic-details">
+									<div class="ic-detail-row">
+										<svg
+											class="icon"
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle
+												cx="4"
+												cy="4"
+												r="2"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<circle
+												cx="12"
+												cy="12"
+												r="2"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<path
+												d="M4 6v2a2 2 0 002 2h4"
+												stroke="currentColor"
+												stroke-width="1.4"
+												stroke-linecap="round"
+											/>
+										</svg>
+										<span class="ic-branch">feat/workspace-color-system</span>
+										<span
+											class="gk-badge ic-badge-worktree"
+											style="height: 18px; font-size: 10px"
+											>worktree</span
+										>
+										<span
+											class="gk-badge gk-badge-warning"
+											style="height: 18px; font-size: 10px"
+											>2 behind</span
+										>
+									</div>
+
+									<div class="ic-detail-row">
+										<span
+											class="gk-badge"
+											style="
+												height: 20px;
+												background: color-mix(
+													in oklch,
+													var(--gh-draft) 14%,
+													transparent
+												);
+												color: var(--gh-draft);
+												border-color: color-mix(
+													in oklch,
+													var(--gh-draft) 30%,
+													transparent
+												);
+											"
+										>
+											<svg
+												class="icon"
+												width="10"
+												height="10"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<circle
+													cx="4"
+													cy="4"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<circle
+													cx="12"
+													cy="12"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<path
+													d="M4 6v6"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+												<path
+													d="M12 4v2a4 4 0 01-4 4H6"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+											PR #201 draft
+										</span>
+										<span class="gk-badge gk-badge-info" style="height: 20px">
+											<svg
+												class="icon"
+												width="9"
+												height="9"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<circle
+													cx="8"
+													cy="8"
+													r="6"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<circle cx="8" cy="8" r="2.5" fill="currentColor" />
+											</svg>
+											GH #189
+										</span>
+									</div>
+
+									<div class="ic-detail-row">
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.69 0.165 55 / 0.15);
+												color: oklch(0.8 0.15 65);
+												border-color: oklch(0.69 0.165 55 / 0.35);
+											"
+											>design</span
+										>
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.64 0.135 145 / 0.15);
+												color: oklch(0.74 0.14 145);
+												border-color: oklch(0.64 0.135 145 / 0.35);
+											"
+											>frontend</span
+										>
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.56 0.15 320 / 0.12);
+												color: oklch(0.66 0.13 320);
+												border-color: oklch(0.56 0.15 320 / 0.3);
+											"
+											>tokens</span
+										>
+									</div>
+
+									<div class="ic-detail-row">
+										<span
+											class="gk-badge gk-badge-warning"
+											style="height: 20px; gap: 5px"
+										>
+											<span
+												class="ic-devserver-dot"
+												style="background: var(--status-warning)"
+											></span>
+											:5173
+										</span>
+										<span
+											class="gk-badge gk-badge-warning"
+											style="height: 20px"
+										>
+											<svg
+												class="icon"
+												width="9"
+												height="9"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<circle
+													cx="8"
+													cy="8"
+													r="6"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<path
+													d="M8 5v4M8 11v1"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+											2 warnings
+										</span>
+										<span
+											class="gk-badge"
+											style="
+												height: 20px;
+												font-size: 10.5px;
+												font-family: var(--font-mono);
+											"
+										>
+											8.7k tokens
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── SECTION: Active state ── -->
+				<div class="state-section">
+					<div class="state-label">active — stronger glow, 2px ring, deeper border</div>
+					<div class="cards-grid">
+						<!-- CARD 3: Azure · Idle session · Low priority — active -->
+						<div class="ic-card ic-azure is-active">
+							<div class="ic-header">
+								<div class="ic-header-pattern"></div>
+								<div class="ic-header-top">
+									<div class="ic-header-left">
+										<div class="ic-name-row">
+											<span class="ic-issue-number">#312</span>
+											<span class="ic-issue-name"
+												>Migrate SQLite schema to support multi-workspace
+												isolation</span
+											>
+										</div>
+										<div class="ic-chips-row">
+											<span class="ic-session-chip ic-session-idle">
+												<span
+													class="ic-session-dot"
+													style="background: var(--session-idle)"
+												></span>
+												idle
+											</span>
+											<span class="ic-priority-chip ic-priority-low">
+												<svg
+													class="icon"
+													width="9"
+													height="9"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 14L2 6h12L8 14Z"
+														fill="currentColor"
+													/>
+												</svg>
+												low
+											</span>
+										</div>
+									</div>
+									<div class="ic-header-right">
+										<button
+											class="ic-action-btn"
+											title="Open folder"
+											aria-label="Open folder"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+										<button
+											class="ic-action-btn"
+											title="Open terminal"
+											aria-label="Open terminal"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<rect
+													x="1"
+													y="2"
+													width="14"
+													height="12"
+													rx="2"
+													stroke="currentColor"
+													stroke-width="1.5"
+												/>
+												<path
+													d="M4 6l3 2.5L4 11"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+												<path
+													d="M9 11h3"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+										</button>
+										<button
+											class="ic-action-btn"
+											title="Open in editor"
+											aria-label="Open in editor"
+										>
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M11 2l3 3-8 8H3v-3l8-8z"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+										<!-- Muted -->
+										<button
+											class="ic-mute-btn is-muted"
+											title="Unmute notifications"
+											aria-label="Unmute notifications"
+										>
+											<svg
+												class="icon"
+												width="13"
+												height="13"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linejoin="round"
+												/>
+												<line
+													x1="2"
+													y1="2"
+													x2="14"
+													y2="14"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+												/>
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="ic-body">
+								<div class="ic-thumb">
+									<div class="ic-thumb-pattern"></div>
+									<svg
+										class="icon ic-thumb-icon"
+										width="36"
+										height="36"
+										viewBox="0 0 24 24"
+										fill="none"
+									>
+										<ellipse
+											cx="12"
+											cy="12"
+											rx="10"
+											ry="4"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+										<path
+											d="M2 12c0 2.2 4.5 4 10 4s10-1.8 10-4"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+										<path
+											d="M2 12c0-2.2 4.5-4 10-4s10 1.8 10 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+										/>
+									</svg>
+								</div>
+
+								<div class="ic-details">
+									<div class="ic-detail-row">
+										<svg
+											class="icon"
+											width="12"
+											height="12"
+											viewBox="0 0 16 16"
+											fill="none"
+											style="color: var(--foreground-subtle)"
+										>
+											<circle
+												cx="4"
+												cy="4"
+												r="2"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<circle
+												cx="12"
+												cy="12"
+												r="2"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<path
+												d="M4 6v2a2 2 0 002 2h4"
+												stroke="currentColor"
+												stroke-width="1.4"
+												stroke-linecap="round"
+											/>
+										</svg>
+										<span class="ic-branch">chore/sqlite-multi-workspace</span>
+										<span
+											class="gk-badge gk-badge-info"
+											style="height: 18px; font-size: 10px"
+											>no worktree</span
+										>
+									</div>
+
+									<!-- Empty PR row — still occupies min-height -->
+									<div class="ic-detail-row ic-detail-empty"></div>
+
+									<div class="ic-detail-row">
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.57 0.13 235 / 0.15);
+												color: oklch(0.68 0.12 230);
+												border-color: oklch(0.57 0.13 235 / 0.35);
+											"
+											>database</span
+										>
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.5 0.075 55 / 0.15);
+												color: oklch(0.65 0.07 55);
+												border-color: oklch(0.5 0.075 55 / 0.35);
+											"
+											>architecture</span
+										>
+										<span
+											class="ic-gh-label"
+											style="
+												background: oklch(0.64 0.135 145 / 0.15);
+												color: oklch(0.74 0.14 145);
+												border-color: oklch(0.64 0.135 145 / 0.35);
+											"
+											>rust</span
+										>
+									</div>
+
+									<div class="ic-detail-row">
+										<span
+											class="gk-badge"
+											style="
+												height: 20px;
+												gap: 5px;
+												background: color-mix(
+													in oklch,
+													var(--surface-2) 80%,
+													transparent
+												);
+												color: var(--foreground-subtle);
+											"
+										>
+											<span
+												class="ic-devserver-dot"
+												style="
+													background: var(--foreground-subtle);
+													opacity: 0.5;
+												"
+											></span>
+											offline
+										</span>
+										<span
+											class="gk-badge gk-badge-success"
+											style="height: 20px"
+										>
+											<svg
+												class="icon"
+												width="9"
+												height="9"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M3 8l4 4 6-7"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+											checks
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── SECTION: All four colors side by side ── -->
+				<div class="state-section">
+					<div class="state-label">
+						color variants — moss · amber · azure · plum (default + hover live)
+					</div>
+					<div class="showcase-grid">
+						<!-- Moss (default) -->
+						<div class="showcase-item">
+							<div class="showcase-item-label">moss · default</div>
+							<div class="ic-card ic-moss">
+								<div class="ic-header">
+									<div class="ic-header-pattern"></div>
+									<div class="ic-header-top">
+										<div class="ic-header-left">
+											<div class="ic-name-row">
+												<span class="ic-issue-number">#156</span>
+												<span class="ic-issue-name"
+													>Tree renderer performance profiling</span
+												>
+											</div>
+											<div class="ic-chips-row">
+												<span class="ic-session-chip ic-session-running">
+													<span class="ic-session-dot gk-pulse"></span>
+													running
+												</span>
+											</div>
+										</div>
+										<div class="ic-header-right">
+											<button class="ic-action-btn" aria-label="Open folder">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="ic-action-btn"
+												aria-label="Open terminal"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1"
+														y="2"
+														width="14"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.5"
+													/>
+													<path
+														d="M4 6l3 2.5L4 11"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+													<path
+														d="M9 11h3"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Open editor">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M11 2l3 3-8 8H3v-3l8-8z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-mute-btn" aria-label="Mute">
+												<svg
+													class="icon"
+													width="13"
+													height="13"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="ic-body">
+									<div class="ic-thumb">
+										<div class="ic-thumb-pattern"></div>
+										<svg
+											class="icon ic-thumb-icon"
+											width="32"
+											height="32"
+											viewBox="0 0 24 24"
+											fill="none"
+										>
+											<path
+												d="M12 3v18M7 7l5 5 5-5M7 17l5-5 5 5"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</div>
+									<div class="ic-details">
+										<div class="ic-detail-row">
+											<svg
+												class="icon"
+												width="12"
+												height="12"
+												viewBox="0 0 16 16"
+												fill="none"
+												style="color: var(--foreground-subtle)"
+											>
+												<circle
+													cx="4"
+													cy="4"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<circle
+													cx="12"
+													cy="12"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<path
+													d="M4 6v2a2 2 0 002 2h4"
+													stroke="currentColor"
+													stroke-width="1.4"
+													stroke-linecap="round"
+												/>
+											</svg>
+											<span class="ic-branch">perf/tree-renderer</span>
+											<span
+												class="gk-badge ic-badge-worktree"
+												style="height: 18px; font-size: 10px"
+												>worktree</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px"
+												>PR #142 open</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.64 0.135 145 / 0.15);
+													color: oklch(0.74 0.14 145);
+													border-color: oklch(0.64 0.135 145 / 0.35);
+												"
+												>performance</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.58 0.096 134 / 0.15);
+													color: oklch(0.69 0.098 132);
+													border-color: oklch(0.58 0.096 134 / 0.35);
+												"
+												>rendering</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px; gap: 5px"
+												><span
+													class="ic-devserver-dot"
+													style="background: var(--status-success)"
+												></span
+												>:4001</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Amber (hover live) -->
+						<div class="showcase-item">
+							<div class="showcase-item-label">amber · hover (live on mouse)</div>
+							<div class="ic-card ic-amber">
+								<div class="ic-header">
+									<div class="ic-header-pattern"></div>
+									<div class="ic-header-top">
+										<div class="ic-header-left">
+											<div class="ic-name-row">
+												<span class="ic-issue-number">#271</span>
+												<span class="ic-issue-name"
+													>Harvest notification sound system</span
+												>
+											</div>
+											<div class="ic-chips-row">
+												<span class="ic-child-badge">
+													<svg
+														class="icon"
+														width="10"
+														height="10"
+														viewBox="0 0 16 16"
+														fill="none"
+													>
+														<path
+															d="M8 2v12M4 10l4 4 4-4"
+															stroke="currentColor"
+															stroke-width="1.8"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+													4
+												</span>
+												<span class="ic-session-chip ic-session-paused">
+													<span
+														class="ic-session-dot"
+														style="background: var(--session-paused)"
+													></span>
+													paused
+												</span>
+												<span class="ic-priority-chip ic-priority-high">
+													<svg
+														class="icon"
+														width="9"
+														height="9"
+														viewBox="0 0 16 16"
+														fill="none"
+													>
+														<path
+															d="M8 2L14 14H2L8 2Z"
+															fill="currentColor"
+														/>
+													</svg>
+													high
+												</span>
+											</div>
+										</div>
+										<div class="ic-header-right">
+											<button class="ic-action-btn" aria-label="Open folder">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Terminal">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1"
+														y="2"
+														width="14"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.5"
+													/>
+													<path
+														d="M4 6l3 2.5L4 11"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+													<path
+														d="M9 11h3"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Editor">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M11 2l3 3-8 8H3v-3l8-8z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-mute-btn" aria-label="Mute">
+												<svg
+													class="icon"
+													width="13"
+													height="13"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="ic-body">
+									<div class="ic-thumb">
+										<div class="ic-thumb-pattern"></div>
+										<svg
+											class="icon ic-thumb-icon"
+											width="32"
+											height="32"
+											viewBox="0 0 24 24"
+											fill="none"
+										>
+											<path
+												d="M9 18V5l12-2v13"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<circle
+												cx="6"
+												cy="18"
+												r="3"
+												stroke="currentColor"
+												stroke-width="1.5"
+											/>
+											<circle
+												cx="18"
+												cy="16"
+												r="3"
+												stroke="currentColor"
+												stroke-width="1.5"
+											/>
+										</svg>
+									</div>
+									<div class="ic-details">
+										<div class="ic-detail-row">
+											<svg
+												class="icon"
+												width="12"
+												height="12"
+												viewBox="0 0 16 16"
+												fill="none"
+												style="color: var(--foreground-subtle)"
+											>
+												<circle
+													cx="4"
+													cy="4"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<circle
+													cx="12"
+													cy="12"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<path
+													d="M4 6v2a2 2 0 002 2h4"
+													stroke="currentColor"
+													stroke-width="1.4"
+													stroke-linecap="round"
+												/>
+											</svg>
+											<span class="ic-branch">feat/harvest-sounds</span>
+											<span
+												class="gk-badge ic-badge-worktree"
+												style="height: 18px; font-size: 10px"
+												>worktree</span
+											>
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+												>synced</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge"
+												style="
+													height: 20px;
+													background: color-mix(
+														in oklch,
+														var(--gh-draft) 14%,
+														transparent
+													);
+													color: var(--gh-draft);
+													border-color: color-mix(
+														in oklch,
+														var(--gh-draft) 30%,
+														transparent
+													);
+												"
+												>PR #261 draft</span
+											>
+											<span
+												class="gk-badge gk-badge-info"
+												style="height: 20px"
+												>GH #271</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.69 0.165 55 / 0.15);
+													color: oklch(0.8 0.15 65);
+													border-color: oklch(0.69 0.165 55 / 0.35);
+												"
+												>audio</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.64 0.135 145 / 0.15);
+													color: oklch(0.74 0.14 145);
+													border-color: oklch(0.64 0.135 145 / 0.35);
+												"
+												>ux</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.56 0.15 320 / 0.12);
+													color: oklch(0.66 0.13 320);
+													border-color: oklch(0.56 0.15 320 / 0.3);
+												"
+												>tauri</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span class="gk-badge" style="height: 20px; gap: 5px"
+												><span
+													class="ic-devserver-dot"
+													style="
+														background: var(--foreground-subtle);
+														opacity: 0.5;
+													"
+												></span
+												>offline</span
+											>
+											<span
+												class="gk-badge gk-badge-danger"
+												style="height: 20px"
+											>
+												<svg
+													class="icon"
+													width="9"
+													height="9"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="8"
+														cy="8"
+														r="6"
+														stroke="currentColor"
+														stroke-width="1.5"
+													/>
+													<path
+														d="M8 5v4M8 11v1"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+													/>
+												</svg>
+												1 failed
+											</span>
+											<span
+												class="gk-badge"
+												style="
+													height: 20px;
+													font-size: 10.5px;
+													font-family: var(--font-mono);
+												"
+												>5.1k tokens</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Azure (hover frozen) -->
+						<div class="showcase-item">
+							<div class="showcase-item-label">azure · hover (frozen)</div>
+							<div class="ic-card ic-azure is-hover">
+								<div class="ic-header">
+									<div class="ic-header-pattern"></div>
+									<div class="ic-header-top">
+										<div class="ic-header-left">
+											<div class="ic-name-row">
+												<span class="ic-issue-number">#334</span>
+												<span class="ic-issue-name"
+													>Command palette keyboard navigation
+													overhaul</span
+												>
+											</div>
+											<div class="ic-chips-row">
+												<span class="ic-session-chip ic-session-running">
+													<span class="ic-session-dot gk-pulse"></span>
+													running
+												</span>
+												<span class="ic-priority-chip ic-priority-high">
+													<svg
+														class="icon"
+														width="9"
+														height="9"
+														viewBox="0 0 16 16"
+														fill="none"
+													>
+														<path
+															d="M8 2L14 14H2L8 2Z"
+															fill="currentColor"
+														/>
+													</svg>
+													high
+												</span>
+											</div>
+										</div>
+										<div class="ic-header-right">
+											<button class="ic-action-btn" aria-label="Folder">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Terminal">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1"
+														y="2"
+														width="14"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.5"
+													/>
+													<path
+														d="M4 6l3 2.5L4 11"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+													<path
+														d="M9 11h3"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Editor">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M11 2l3 3-8 8H3v-3l8-8z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-mute-btn" aria-label="Mute">
+												<svg
+													class="icon"
+													width="13"
+													height="13"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="ic-body">
+									<div class="ic-thumb">
+										<div class="ic-thumb-pattern"></div>
+										<svg
+											class="icon ic-thumb-icon"
+											width="32"
+											height="32"
+											viewBox="0 0 24 24"
+											fill="none"
+										>
+											<rect
+												x="3"
+												y="5"
+												width="18"
+												height="14"
+												rx="2"
+												stroke="currentColor"
+												stroke-width="1.5"
+											/>
+											<path
+												d="M7 9h1M7 13h1M10 9h7M10 13h5"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</div>
+									<div class="ic-details">
+										<div class="ic-detail-row">
+											<svg
+												class="icon"
+												width="12"
+												height="12"
+												viewBox="0 0 16 16"
+												fill="none"
+												style="color: var(--foreground-subtle)"
+											>
+												<circle
+													cx="4"
+													cy="4"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<circle
+													cx="12"
+													cy="12"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<path
+													d="M4 6v2a2 2 0 002 2h4"
+													stroke="currentColor"
+													stroke-width="1.4"
+													stroke-linecap="round"
+												/>
+											</svg>
+											<span class="ic-branch">feat/palette-keyboard-nav</span>
+											<span
+												class="gk-badge ic-badge-worktree"
+												style="height: 18px; font-size: 10px"
+												>worktree</span
+											>
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 18px; font-size: 10px"
+												>synced</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px"
+												>PR #318 open</span
+											>
+											<span
+												class="gk-badge gk-badge-info"
+												style="height: 20px"
+												>GH #334</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.57 0.13 235 / 0.15);
+													color: oklch(0.68 0.12 230);
+													border-color: oklch(0.57 0.13 235 / 0.35);
+												"
+												>keyboard</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.64 0.135 145 / 0.15);
+													color: oklch(0.74 0.14 145);
+													border-color: oklch(0.64 0.135 145 / 0.35);
+												"
+												>accessibility</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.5 0.075 55 / 0.15);
+													color: oklch(0.65 0.07 55);
+													border-color: oklch(0.5 0.075 55 / 0.35);
+												"
+												>frontend</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px; gap: 5px"
+												><span
+													class="ic-devserver-dot"
+													style="background: var(--status-success)"
+												></span
+												>:5173</span
+											>
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px"
+											>
+												<svg
+													class="icon"
+													width="9"
+													height="9"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M3 8l4 4 6-7"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												checks
+											</span>
+											<span
+												class="gk-badge"
+												style="
+													height: 20px;
+													font-size: 10.5px;
+													font-family: var(--font-mono);
+												"
+												>11.4k tokens</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Plum (active frozen) -->
+						<div class="showcase-item">
+							<div class="showcase-item-label">plum · active (frozen)</div>
+							<div class="ic-card ic-plum is-active">
+								<div class="ic-header">
+									<div class="ic-header-pattern"></div>
+									<div class="ic-header-top">
+										<div class="ic-header-left">
+											<div class="ic-name-row">
+												<span class="ic-issue-number">#298</span>
+												<span class="ic-issue-name"
+													>AI session cost attribution and usage
+													dashboard</span
+												>
+											</div>
+											<div class="ic-chips-row">
+												<span class="ic-child-badge">
+													<svg
+														class="icon"
+														width="10"
+														height="10"
+														viewBox="0 0 16 16"
+														fill="none"
+													>
+														<path
+															d="M8 2v12M4 10l4 4 4-4"
+															stroke="currentColor"
+															stroke-width="1.8"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+													8
+												</span>
+												<span
+													class="ic-session-chip ic-session-needs-input"
+												>
+													<span
+														class="ic-session-dot"
+														style="
+															background: var(--session-needs-input);
+														"
+													></span>
+													needs input
+												</span>
+												<span class="ic-priority-chip ic-priority-top">
+													<svg
+														class="icon"
+														width="9"
+														height="9"
+														viewBox="0 0 16 16"
+														fill="none"
+													>
+														<path
+															d="M2 12l6-8 6 8"
+															stroke="currentColor"
+															stroke-width="2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+													top
+												</span>
+											</div>
+										</div>
+										<div class="ic-header-right">
+											<button class="ic-action-btn" aria-label="Folder">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M1 4a1 1 0 011-1h4l2 2h6a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Terminal">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1"
+														y="2"
+														width="14"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.5"
+													/>
+													<path
+														d="M4 6l3 2.5L4 11"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+													<path
+														d="M9 11h3"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linecap="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-action-btn" aria-label="Editor">
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M11 2l3 3-8 8H3v-3l8-8z"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button class="ic-mute-btn" aria-label="Mute">
+												<svg
+													class="icon"
+													width="13"
+													height="13"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 2a4 4 0 014 4v3l1.5 2h-11L4 9V6a4 4 0 014-4zM6 13a2 2 0 004 0"
+														stroke="currentColor"
+														stroke-width="1.5"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="ic-body">
+									<div class="ic-thumb">
+										<div class="ic-thumb-pattern"></div>
+										<svg
+											class="icon ic-thumb-icon"
+											width="32"
+											height="32"
+											viewBox="0 0 24 24"
+											fill="none"
+										>
+											<path
+												d="M3 3h18v18H3z"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M3 9h18M9 9v12M15 3v6"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</div>
+									<div class="ic-details">
+										<div class="ic-detail-row">
+											<svg
+												class="icon"
+												width="12"
+												height="12"
+												viewBox="0 0 16 16"
+												fill="none"
+												style="color: var(--foreground-subtle)"
+											>
+												<circle
+													cx="4"
+													cy="4"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<circle
+													cx="12"
+													cy="12"
+													r="2"
+													stroke="currentColor"
+													stroke-width="1.4"
+												/>
+												<path
+													d="M4 6v2a2 2 0 002 2h4"
+													stroke="currentColor"
+													stroke-width="1.4"
+													stroke-linecap="round"
+												/>
+											</svg>
+											<span class="ic-branch">feat/usage-dashboard-v2</span>
+											<span
+												class="gk-badge ic-badge-worktree"
+												style="height: 18px; font-size: 10px"
+												>worktree</span
+											>
+											<span
+												class="gk-badge gk-badge-warning"
+												style="height: 18px; font-size: 10px"
+												>4 behind</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px"
+												>PR #291 open</span
+											>
+											<span
+												class="gk-badge gk-badge-info"
+												style="height: 20px"
+												>GH #298</span
+											>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.56 0.15 320 / 0.12);
+													color: oklch(0.66 0.13 320);
+													border-color: oklch(0.56 0.15 320 / 0.3);
+												"
+												>analytics</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.64 0.135 145 / 0.15);
+													color: oklch(0.74 0.14 145);
+													border-color: oklch(0.64 0.135 145 / 0.35);
+												"
+												>charts</span
+											>
+											<span
+												class="ic-gh-label"
+												style="
+													background: oklch(0.57 0.13 235 / 0.15);
+													color: oklch(0.68 0.12 230);
+													border-color: oklch(0.57 0.13 235 / 0.35);
+												"
+												>ai-cost</span
+											>
+											<span class="ic-overflow-count">+2</span>
+										</div>
+										<div class="ic-detail-row">
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px; gap: 5px"
+												><span
+													class="ic-devserver-dot"
+													style="background: var(--status-success)"
+												></span
+												>:5174</span
+											>
+											<span
+												class="gk-badge gk-badge-success"
+												style="height: 20px"
+											>
+												<svg
+													class="icon"
+													width="9"
+													height="9"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M3 8l4 4 6-7"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												checks
+											</span>
+											<span
+												class="gk-badge"
+												style="
+													height: 20px;
+													font-size: 10.5px;
+													font-family: var(--font-mono);
+												"
+												>22.6k tokens</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>VARIANT B: HERO THUMBNAIL — Workspace Card</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ── Grovekeeper tokens (inlined) ──────────────────────────── */
+
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ── Page layout ────────────────────────────────────────── */
+			body {
+				margin: 0;
+				padding: 0;
+				background: oklch(0.155 0.018 150);
+			}
+			.page-wrapper {
+				min-height: 100vh;
+				padding: 40px 32px;
+			}
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin-bottom: 24px;
+				padding-bottom: 12px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+				gap: 20px;
+				max-width: 1400px;
+			}
+
+			/* ── Hero Workspace Card ───────────────────────────────── */
+			.ws-card {
+				--card-accent: var(--moss-400);
+				--card-accent-dim: var(--moss-700);
+
+				position: relative;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				overflow: hidden;
+				cursor: pointer;
+				transition:
+					transform var(--duration-4) var(--ease-out),
+					border-color var(--duration-3) ease,
+					box-shadow var(--duration-4) var(--ease-out);
+				box-shadow: var(--shadow-sm);
+				isolation: isolate;
+			}
+			.ws-card:hover {
+				transform: translateY(-3px);
+				border-color: color-mix(in oklch, var(--card-accent) 50%, var(--border));
+				box-shadow:
+					var(--shadow-md),
+					0 0 0 1px color-mix(in oklch, var(--card-accent) 22%, transparent),
+					0 8px 28px -10px color-mix(in oklch, var(--card-accent) 45%, transparent);
+			}
+			.ws-card:active {
+				transform: translateY(-1px) scale(0.995);
+			}
+			.ws-card:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			/* ── Hero area (thumbnail + gradient + name) ─────────── */
+			.ws-hero {
+				position: relative;
+				height: 160px;
+				background: linear-gradient(
+					160deg,
+					color-mix(in oklch, var(--card-accent) 18%, var(--sky-top)) 0%,
+					color-mix(in oklch, var(--card-accent) 8%, var(--sky-bot)) 60%,
+					var(--surface) 100%
+				);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+			}
+
+			/* Ground plane in hero */
+			.ws-hero-ground {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 32px;
+				background: linear-gradient(
+					180deg,
+					transparent 0%,
+					color-mix(in oklch, var(--ground-color) 40%, transparent) 50%,
+					color-mix(in oklch, var(--ground-color) 65%, transparent) 100%
+				);
+			}
+
+			/* Gradient overlay fading to card surface */
+			.ws-hero-fade {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 72px;
+				background: linear-gradient(
+					180deg,
+					transparent 0%,
+					color-mix(in oklch, var(--surface) 30%, transparent) 40%,
+					var(--surface) 100%
+				);
+				z-index: 2;
+			}
+
+			/* Tree thumbnail container */
+			.ws-hero-tree {
+				position: relative;
+				z-index: 1;
+				margin-top: 12px;
+				filter: drop-shadow(0 4px 12px rgba(10, 20, 12, 0.3));
+				transition: transform 600ms var(--ease-out);
+			}
+			.ws-card:hover .ws-hero-tree {
+				transform: scale(1.04);
+			}
+
+			/* Name overlaid on gradient fade */
+			.ws-hero-name {
+				position: absolute;
+				bottom: 10px;
+				left: 14px;
+				right: 14px;
+				z-index: 3;
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+			}
+			.ws-hero-name .ws-branch {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-regular);
+				color: var(--foreground-muted);
+				letter-spacing: 0;
+				white-space: nowrap;
+			}
+
+			/* Quick access buttons in hero top-right */
+			.ws-hero-actions {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				z-index: 4;
+				display: flex;
+				gap: 4px;
+				opacity: 0;
+				transition: opacity var(--duration-3) ease;
+			}
+			.ws-card:hover .ws-hero-actions {
+				opacity: 1;
+			}
+			.ws-hero-action {
+				width: 26px;
+				height: 26px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+				border-radius: var(--radius-sm);
+				background: color-mix(in oklch, var(--surface) 80%, transparent);
+				backdrop-filter: blur(8px);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease;
+			}
+			.ws-hero-action:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.ws-hero-action:active {
+				transform: scale(0.92);
+			}
+			.ws-hero-action svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			/* ── Card body (below hero) ──────────────────────────── */
+			.ws-body {
+				padding: 8px 14px 12px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			/* Stat chips row */
+			.ws-stats {
+				display: flex;
+				gap: 6px;
+			}
+			.ws-chip {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				padding: 5px 8px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+				min-width: 0;
+			}
+			.ws-chip:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.ws-chip-icon {
+				flex-shrink: 0;
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+			}
+			.ws-chip-label {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: var(--weight-medium);
+				text-transform: uppercase;
+				letter-spacing: var(--tracking-wide);
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.ws-chip-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				margin-left: auto;
+				white-space: nowrap;
+			}
+			.ws-chip-value .ws-val-denom {
+				font-weight: var(--weight-regular);
+				color: var(--foreground-muted);
+			}
+
+			/* Chip tones */
+			.ws-chip--warning {
+				background: color-mix(in oklch, var(--status-warning) 10%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--status-warning) 25%, var(--border));
+			}
+			.ws-chip--warning .ws-chip-icon,
+			.ws-chip--warning .ws-chip-label,
+			.ws-chip--warning .ws-chip-value {
+				color: color-mix(in oklch, var(--status-warning) 75%, var(--foreground));
+			}
+			.ws-chip--danger {
+				background: color-mix(in oklch, var(--status-danger) 10%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--status-danger) 25%, var(--border));
+			}
+			.ws-chip--danger .ws-chip-icon,
+			.ws-chip--danger .ws-chip-label,
+			.ws-chip--danger .ws-chip-value {
+				color: var(--status-danger);
+			}
+			.ws-chip--zero .ws-chip-value {
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-regular);
+			}
+
+			/* Pulse dot */
+			.ws-pulse-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+				animation: pulse-chip 1.8s ease-in-out infinite;
+			}
+			.ws-pulse-dot--warning {
+				background: var(--status-warning);
+				box-shadow: 0 0 6px var(--status-warning);
+			}
+			.ws-pulse-dot--danger {
+				background: var(--status-danger);
+				box-shadow: 0 0 6px var(--status-danger);
+			}
+			@keyframes pulse-chip {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.4;
+				}
+			}
+
+			/* ── PRD progress bar ─────────────────────────────────── */
+			.ws-prd-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 5px 8px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition: background var(--duration-2) ease;
+			}
+			.ws-prd-row:hover {
+				background: var(--surface-3);
+			}
+			.ws-prd-icon {
+				flex-shrink: 0;
+				width: 12px;
+				height: 12px;
+				color: var(--foreground-subtle);
+			}
+			.ws-prd-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-muted);
+				white-space: nowrap;
+			}
+			.ws-prd-bar-track {
+				flex: 1;
+				height: 4px;
+				background: var(--border);
+				border-radius: 2px;
+				overflow: hidden;
+				min-width: 40px;
+			}
+			.ws-prd-bar-fill {
+				height: 100%;
+				border-radius: 2px;
+				background: linear-gradient(90deg, var(--moss-500), var(--moss-300));
+				transition: width 600ms var(--ease-out);
+			}
+			.ws-prd-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+
+			/* ── Footer row (AFK LED + cost) ─────────────────────── */
+			.ws-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding-top: 6px;
+				border-top: 1px dashed var(--border);
+			}
+			.ws-afk {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.ws-afk-led {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+				transition: background var(--duration-3) ease;
+			}
+			.ws-afk-led--on {
+				background: var(--moss-400);
+				box-shadow:
+					0 0 8px color-mix(in oklch, var(--moss-400) 70%, transparent),
+					0 0 3px color-mix(in oklch, var(--moss-400) 90%, transparent);
+				animation: afk-led-breathe 3.6s ease-in-out infinite;
+			}
+			.ws-afk-led--off {
+				background: var(--foreground-subtle);
+			}
+			@keyframes afk-led-breathe {
+				0%,
+				100% {
+					opacity: 1;
+					box-shadow:
+						0 0 8px color-mix(in oklch, var(--moss-400) 70%, transparent),
+						0 0 3px color-mix(in oklch, var(--moss-400) 90%, transparent);
+				}
+				50% {
+					opacity: 0.65;
+					box-shadow: 0 0 4px color-mix(in oklch, var(--moss-400) 40%, transparent);
+				}
+			}
+			.ws-afk-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-muted);
+			}
+			.ws-afk-label--on {
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+			.ws-cost {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				gap: 5px;
+			}
+
+			/* ── Breathing glow for active cards ─────────────────── */
+			.ws-card--active {
+				animation: card-breathe 3.6s ease-in-out infinite;
+			}
+			@keyframes card-breathe {
+				0%,
+				100% {
+					box-shadow:
+						var(--shadow-sm),
+						inset 0 0 0 1px color-mix(in oklch, var(--card-accent) 15%, transparent),
+						0 0 20px -5px color-mix(in oklch, var(--card-accent) 35%, transparent);
+				}
+				50% {
+					box-shadow:
+						var(--shadow-sm),
+						inset 0 0 0 1px color-mix(in oklch, var(--card-accent) 30%, transparent),
+						0 0 32px -5px color-mix(in oklch, var(--card-accent) 55%, transparent);
+				}
+			}
+			.ws-card--active:hover {
+				animation: none;
+			}
+
+			/* ── Accent overrides ────────────────────────────────── */
+			.ws-card[data-accent='teal'] {
+				--card-accent: var(--teal-400);
+				--card-accent-dim: var(--teal-500);
+			}
+			.ws-card[data-accent='azure'] {
+				--card-accent: var(--azure-400);
+				--card-accent-dim: var(--azure-600);
+			}
+			.ws-card[data-accent='amber'] {
+				--card-accent: var(--amber-400);
+				--card-accent-dim: var(--amber-600);
+			}
+			.ws-card[data-accent='plum'] {
+				--card-accent: var(--plum-400);
+				--card-accent-dim: var(--plum-500);
+			}
+			.ws-card[data-accent='rose'] {
+				--card-accent: var(--rose-400);
+				--card-accent-dim: var(--rose-500);
+			}
+			.ws-card[data-accent='coral'] {
+				--card-accent: var(--coral-400);
+				--card-accent-dim: var(--coral-500);
+			}
+			.ws-card[data-accent='moss'] {
+				--card-accent: var(--moss-400);
+				--card-accent-dim: var(--moss-600);
+			}
+			.ws-card[data-accent='indigo'] {
+				--card-accent: var(--indigo-400);
+				--card-accent-dim: var(--indigo-500);
+			}
+			.ws-card[data-accent='gold'] {
+				--card-accent: var(--gold-400);
+				--card-accent-dim: var(--gold-500);
+			}
+			.ws-card[data-accent='fuchsia'] {
+				--card-accent: var(--fuchsia-400);
+				--card-accent-dim: var(--fuchsia-500);
+			}
+
+			/* ── Responsive ──────────────────────────────────────── */
+			@media (max-width: 720px) {
+				.page-wrapper {
+					padding: 20px 16px;
+				}
+				.card-grid {
+					grid-template-columns: 1fr;
+					gap: 16px;
+				}
+				.ws-hero {
+					height: 140px;
+				}
+				.ws-chip-label {
+					display: none;
+				}
+			}
+			@media (min-width: 1280px) {
+				.card-grid {
+					grid-template-columns: repeat(4, 1fr);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrapper">
+				<div class="variant-label">VARIANT B: HERO THUMBNAIL</div>
+
+				<div class="card-grid">
+					<!-- ═══════════════════════════════════════════════════
+         CARD 1 — grovekeeper (teal, oak, AFK active)
+         ═══════════════════════════════════════════════════ -->
+					<div
+						class="ws-card ws-card--active"
+						data-accent="teal"
+						tabindex="0"
+						role="button"
+						aria-label="Open grovekeeper workspace"
+					>
+						<div class="ws-hero">
+							<!-- Tree: Oak shape, full canopy -->
+							<svg
+								class="ws-hero-tree"
+								width="130"
+								height="130"
+								viewBox="-65 -85 130 105"
+								aria-hidden="true"
+							>
+								<!-- trunk -->
+								<path
+									d="M-6,0 L-5.7,-8.4 L-3.4,-18.2 L-4,-28 L4,-28 L3.4,-18.2 L5.7,-8.4 L6,0 Z"
+									fill="#7a4f2c"
+									stroke="#523619"
+									stroke-width="0.5"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M-6,0 L-5.7,-8.4 L-3.4,-18.2 L-4,-28 L0,-28 L0,0 Z"
+									fill="#a87144"
+									opacity="0.7"
+								/>
+								<!-- canopy: oak cluster -->
+								<polygon
+									points="0,-42 -18,-25 -26,-34"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 -26,-34 -28,-46"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 -28,-46 -22,-56"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 -22,-56 -8,-58"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 -8,-58 6,-57"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 6,-57 22,-50"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 22,-50 28,-40"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 28,-40 24,-28"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 24,-28 -18,-25"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- secondary blob left -->
+								<polygon
+									points="-22,-36 -34,-22 -40,-30"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-22,-36 -40,-30 -42,-42"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-22,-36 -42,-42 -36,-50"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-22,-36 -36,-50 -18,-48"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-22,-36 -18,-48 -8,-42"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- secondary blob right -->
+								<polygon
+									points="22,-38 32,-24 38,-32"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="22,-38 38,-32 40,-44"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="22,-38 40,-44 34,-52"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="22,-38 34,-52 20,-50"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- top blob -->
+								<polygon
+									points="0,-56 -14,-46 -20,-54"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 -20,-54 -18,-66"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 -18,-66 -4,-72"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 -4,-72 10,-70"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 10,-70 20,-60"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 20,-60 14,-46"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- ground shadow -->
+								<ellipse cx="0" cy="0" rx="32" ry="5" fill="rgba(50,35,18,0.3)" />
+							</svg>
+							<div class="ws-hero-ground"></div>
+							<div class="ws-hero-fade"></div>
+							<div class="ws-hero-name">
+								grovekeeper
+								<span class="ws-branch">
+									<svg
+										width="10"
+										height="10"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									dev &middot; 4 worktrees
+								</span>
+							</div>
+							<div class="ws-hero-actions">
+								<button
+									class="ws-hero-action"
+									title="Open on GitHub"
+									aria-label="Open on GitHub"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-hero-action"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="ws-body">
+							<div class="ws-stats">
+								<div
+									class="ws-chip"
+									title="3 actionable AFK issues out of 10 tracked"
+								>
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 18V6" />
+										<path d="M14 18V6" />
+										<path d="m3 6 3-3 3 3" />
+										<path d="m3 18 3 3 3-3" />
+										<path d="m15 6 3-3 3 3" />
+										<path d="m15 18 3 3 3-3" />
+									</svg>
+									<span class="ws-chip-label">ISSUES</span>
+									<span class="ws-chip-value"
+										>3<span class="ws-val-denom">/10</span></span
+									>
+								</div>
+								<div class="ws-chip">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									<span class="ws-chip-label">PRs</span>
+									<span class="ws-chip-value">2</span>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									<span class="ws-chip-label">ATTN</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									<span class="ws-chip-label">HITL</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+							</div>
+							<div class="ws-prd-row" title="3 PRDs, 12 of 31 sub-issues done">
+								<svg
+									class="ws-prd-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.7"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+									/>
+									<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+								</svg>
+								<span class="ws-prd-label">3 PRDs</span>
+								<div class="ws-prd-bar-track">
+									<div class="ws-prd-bar-fill" style="width: 38.7%"></div>
+								</div>
+								<span class="ws-prd-count">12/31</span>
+							</div>
+							<div class="ws-footer">
+								<div class="ws-afk">
+									<div class="ws-afk-led ws-afk-led--on"></div>
+									<span class="ws-afk-label ws-afk-label--on">AFK running</span>
+									<span
+										class="ws-cost"
+										style="
+											margin-left: 6px;
+											border-left: 1px solid var(--border);
+											padding-left: 8px;
+										"
+										>2 sessions (1 AFK)</span
+									>
+								</div>
+								<span class="ws-cost">today $4.82</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══════════════════════════════════════════════════
+         CARD 2 — nightingale (azure, birch, needs attention)
+         ═══════════════════════════════════════════════════ -->
+					<div
+						class="ws-card"
+						data-accent="azure"
+						tabindex="0"
+						role="button"
+						aria-label="Open nightingale workspace"
+					>
+						<div class="ws-hero">
+							<!-- Tree: Birch shape -->
+							<svg
+								class="ws-hero-tree"
+								width="120"
+								height="130"
+								viewBox="-60 -90 120 110"
+								aria-hidden="true"
+							>
+								<!-- trunk: birch white -->
+								<path
+									d="M-4,0 L-3.8,-9 L-3,-20 L-3.5,-38 L3.5,-38 L3,-20 L3.8,-9 L4,0 Z"
+									fill="#d4cfc0"
+									stroke="#8a8474"
+									stroke-width="0.5"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M-4,0 L-3.8,-9 L-3,-20 L-3.5,-38 L0,-38 L0,0 Z"
+									fill="#e8e2d4"
+									opacity="0.7"
+								/>
+								<!-- birch bark marks -->
+								<line
+									x1="-3"
+									y1="-8"
+									x2="3"
+									y2="-7"
+									stroke="#6a6458"
+									stroke-width="0.6"
+									opacity="0.5"
+								/>
+								<line
+									x1="-2.5"
+									y1="-16"
+									x2="2.5"
+									y2="-15.5"
+									stroke="#6a6458"
+									stroke-width="0.5"
+									opacity="0.4"
+								/>
+								<line
+									x1="-3"
+									y1="-24"
+									x2="3"
+									y2="-23"
+									stroke="#6a6458"
+									stroke-width="0.6"
+									opacity="0.5"
+								/>
+								<line
+									x1="-2"
+									y1="-32"
+									x2="2"
+									y2="-31.5"
+									stroke="#6a6458"
+									stroke-width="0.5"
+									opacity="0.4"
+								/>
+								<!-- canopy: birch -->
+								<polygon
+									points="0,-50 -14,-36 -20,-42"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 -20,-42 -22,-54"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 -22,-54 -16,-64"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 -16,-64 0,-68"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 0,-68 14,-62"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 14,-62 22,-52"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 22,-52 20,-40"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 20,-40 14,-34"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-50 14,-34 -14,-36"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- lower left cluster -->
+								<polygon
+									points="-14,-38 -24,-28 -28,-36"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-14,-38 -28,-36 -30,-46"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-14,-38 -30,-46 -22,-52"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-14,-38 -22,-52 -10,-48"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- lower right cluster -->
+								<polygon
+									points="16,-42 26,-30 30,-38"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="16,-42 30,-38 32,-50"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="16,-42 32,-50 24,-56"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="16,-42 24,-56 12,-50"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- ground -->
+								<ellipse cx="0" cy="0" rx="28" ry="4.5" fill="rgba(50,35,18,0.3)" />
+							</svg>
+							<div class="ws-hero-ground"></div>
+							<div class="ws-hero-fade"></div>
+							<div class="ws-hero-name">
+								nightingale
+								<span class="ws-branch">
+									<svg
+										width="10"
+										height="10"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									main &middot; 2 worktrees
+								</span>
+							</div>
+							<div class="ws-hero-actions">
+								<button
+									class="ws-hero-action"
+									title="Open on GitHub"
+									aria-label="Open on GitHub"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-hero-action"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="ws-body">
+							<div class="ws-stats">
+								<div class="ws-chip">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 18V6" />
+										<path d="M14 18V6" />
+										<path d="m3 6 3-3 3 3" />
+										<path d="m3 18 3 3 3-3" />
+										<path d="m15 6 3-3 3 3" />
+										<path d="m15 18 3 3 3-3" />
+									</svg>
+									<span class="ws-chip-label">ISSUES</span>
+									<span class="ws-chip-value"
+										>5<span class="ws-val-denom">/18</span></span
+									>
+								</div>
+								<div class="ws-chip">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									<span class="ws-chip-label">PRs</span>
+									<span class="ws-chip-value">4</span>
+								</div>
+								<div class="ws-chip ws-chip--danger">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									<span class="ws-chip-label">ATTN</span>
+									<span class="ws-chip-value">2</span>
+									<span class="ws-pulse-dot ws-pulse-dot--danger"></span>
+								</div>
+								<div class="ws-chip ws-chip--warning">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									<span class="ws-chip-label">HITL</span>
+									<span class="ws-chip-value">1</span>
+									<span class="ws-pulse-dot ws-pulse-dot--warning"></span>
+								</div>
+							</div>
+							<div class="ws-prd-row" title="5 PRDs, 28 of 46 sub-issues done">
+								<svg
+									class="ws-prd-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.7"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+									/>
+									<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+								</svg>
+								<span class="ws-prd-label">5 PRDs</span>
+								<div class="ws-prd-bar-track">
+									<div class="ws-prd-bar-fill" style="width: 60.8%"></div>
+								</div>
+								<span class="ws-prd-count">28/46</span>
+							</div>
+							<div class="ws-footer">
+								<div class="ws-afk">
+									<div class="ws-afk-led ws-afk-led--off"></div>
+									<span class="ws-afk-label">AFK off</span>
+									<span
+										class="ws-cost"
+										style="
+											margin-left: 6px;
+											border-left: 1px solid var(--border);
+											padding-left: 8px;
+										"
+										>last 38m ago</span
+									>
+								</div>
+								<span class="ws-cost">today $11.47</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══════════════════════════════════════════════════
+         CARD 3 — low-poly-2d-trees (amber, fir/conifer, AFK active)
+         ═══════════════════════════════════════════════════ -->
+					<div
+						class="ws-card ws-card--active"
+						data-accent="amber"
+						tabindex="0"
+						role="button"
+						aria-label="Open low-poly-2d-trees workspace"
+					>
+						<div class="ws-hero">
+							<!-- Tree: Fir / conifer shape -->
+							<svg
+								class="ws-hero-tree"
+								width="110"
+								height="130"
+								viewBox="-55 -100 110 115"
+								aria-hidden="true"
+							>
+								<!-- trunk -->
+								<path
+									d="M-5,0 L-4.8,-7 L-3.5,-16 L-3.8,-24 L3.8,-24 L3.5,-16 L4.8,-7 L5,0 Z"
+									fill="#7a4f2c"
+									stroke="#523619"
+									stroke-width="0.5"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M-5,0 L-4.8,-7 L-3.5,-16 L-3.8,-24 L0,-24 L0,0 Z"
+									fill="#a87144"
+									opacity="0.7"
+								/>
+								<!-- Layer 1 (bottom) -->
+								<polygon
+									points="0,-42 -28,-20 -11.2,-30.8"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 -11.2,-30.8 11.2,-30.8"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-28,-20 -11.2,-30.8 0,-20"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="28,-20 11.2,-30.8 0,-20"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-42 11.2,-30.8 28,-20"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- Layer 2 -->
+								<polygon
+									points="0,-56 -24,-34 -9.6,-42.4"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 -9.6,-42.4 9.6,-42.4"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-24,-34 -9.6,-42.4 0,-34"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="24,-34 9.6,-42.4 0,-34"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-56 9.6,-42.4 24,-34"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- Layer 3 -->
+								<polygon
+									points="0,-70 -20,-48 -8,-56"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-70 -8,-56 8,-56"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-20,-48 -8,-56 0,-48"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="20,-48 8,-56 0,-48"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-70 8,-56 20,-48"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- Layer 4 (top) -->
+								<polygon
+									points="0,-84 -16,-62 -6.4,-70"
+									fill="#6ea838"
+									stroke="#6ea838"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-84 -6.4,-70 6.4,-70"
+									fill="#3f7818"
+									stroke="#3f7818"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-16,-62 -6.4,-70 0,-62"
+									fill="#9ed760"
+									stroke="#9ed760"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="16,-62 6.4,-70 0,-62"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-84 6.4,-70 16,-62"
+									fill="#27580a"
+									stroke="#27580a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- ground -->
+								<ellipse cx="0" cy="0" rx="26" ry="4" fill="rgba(50,35,18,0.3)" />
+							</svg>
+							<div class="ws-hero-ground"></div>
+							<div class="ws-hero-fade"></div>
+							<div class="ws-hero-name">
+								low-poly-2d-trees
+								<span class="ws-branch">
+									<svg
+										width="10"
+										height="10"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									main &middot; 1 worktree
+								</span>
+							</div>
+							<div class="ws-hero-actions">
+								<button
+									class="ws-hero-action"
+									title="Open on GitHub"
+									aria-label="Open on GitHub"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-hero-action"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="ws-body">
+							<div class="ws-stats">
+								<div class="ws-chip">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 18V6" />
+										<path d="M14 18V6" />
+										<path d="m3 6 3-3 3 3" />
+										<path d="m3 18 3 3 3-3" />
+										<path d="m15 6 3-3 3 3" />
+										<path d="m15 18 3 3 3-3" />
+									</svg>
+									<span class="ws-chip-label">ISSUES</span>
+									<span class="ws-chip-value"
+										>1<span class="ws-val-denom">/4</span></span
+									>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									<span class="ws-chip-label">PRs</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									<span class="ws-chip-label">ATTN</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									<span class="ws-chip-label">HITL</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+							</div>
+							<div class="ws-prd-row" title="1 PRD, 6 of 8 sub-issues done">
+								<svg
+									class="ws-prd-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.7"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+									/>
+									<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+								</svg>
+								<span class="ws-prd-label">1 PRD</span>
+								<div class="ws-prd-bar-track">
+									<div class="ws-prd-bar-fill" style="width: 75%"></div>
+								</div>
+								<span class="ws-prd-count">6/8</span>
+							</div>
+							<div class="ws-footer">
+								<div class="ws-afk">
+									<div class="ws-afk-led ws-afk-led--on"></div>
+									<span class="ws-afk-label ws-afk-label--on">AFK running</span>
+									<span
+										class="ws-cost"
+										style="
+											margin-left: 6px;
+											border-left: 1px solid var(--border);
+											padding-left: 8px;
+										"
+										>idle</span
+									>
+								</div>
+								<span class="ws-cost">today $1.20</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══════════════════════════════════════════════════
+         CARD 4 — stellarwind (plum, maple, dormant)
+         ═══════════════════════════════════════════════════ -->
+					<div
+						class="ws-card"
+						data-accent="plum"
+						tabindex="0"
+						role="button"
+						aria-label="Open stellarwind workspace"
+						style="opacity: 0.72; filter: saturate(0.7)"
+					>
+						<div class="ws-hero">
+							<!-- Tree: Maple shape, autumn palette for variety -->
+							<svg
+								class="ws-hero-tree"
+								width="130"
+								height="130"
+								viewBox="-65 -85 130 105"
+								aria-hidden="true"
+							>
+								<!-- trunk -->
+								<path
+									d="M-6,0 L-5.7,-8.4 L-3.4,-18.2 L-4,-28 L4,-28 L3.4,-18.2 L5.7,-8.4 L6,0 Z"
+									fill="#7a4f2c"
+									stroke="#523619"
+									stroke-width="0.5"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M-6,0 L-5.7,-8.4 L-3.4,-18.2 L-4,-28 L0,-28 L0,0 Z"
+									fill="#a87144"
+									opacity="0.7"
+								/>
+								<!-- Maple canopy: more spread, autumn colors -->
+								<polygon
+									points="0,-46 -16,-30 -24,-38"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 -24,-38 -28,-50"
+									fill="#cc7a28"
+									stroke="#cc7a28"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 -28,-50 -20,-60"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 -20,-60 -6,-64"
+									fill="#cc7a28"
+									stroke="#cc7a28"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 -6,-64 8,-62"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 8,-62 24,-54"
+									fill="#6e3208"
+									stroke="#6e3208"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 24,-54 28,-42"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 28,-42 22,-30"
+									fill="#cc7a28"
+									stroke="#cc7a28"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="0,-46 22,-30 -16,-30"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- left extra -->
+								<polygon
+									points="-26,-38 -38,-26 -42,-36"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-26,-38 -42,-36 -44,-48"
+									fill="#cc7a28"
+									stroke="#cc7a28"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-26,-38 -44,-48 -34,-56"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-26,-38 -34,-56 -18,-50"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- right extra -->
+								<polygon
+									points="26,-40 36,-28 40,-38"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="26,-40 40,-38 42,-50"
+									fill="#6e3208"
+									stroke="#6e3208"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="26,-40 42,-50 34,-56"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="26,-40 34,-56 18,-50"
+									fill="#cc7a28"
+									stroke="#cc7a28"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- top left -->
+								<polygon
+									points="-12,-58 -24,-50 -28,-58"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-12,-58 -28,-58 -22,-68"
+									fill="#cc7a28"
+									stroke="#cc7a28"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="-12,-58 -22,-68 -8,-66"
+									fill="#e8a64a"
+									stroke="#e8a64a"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- top right -->
+								<polygon
+									points="14,-56 24,-48 28,-56"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="14,-56 28,-56 22,-66"
+									fill="#6e3208"
+									stroke="#6e3208"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<polygon
+									points="14,-56 22,-66 10,-64"
+									fill="#9a4f12"
+									stroke="#9a4f12"
+									stroke-width="0.6"
+									stroke-linejoin="round"
+								/>
+								<!-- ground -->
+								<ellipse cx="0" cy="0" rx="34" ry="5.5" fill="rgba(50,35,18,0.3)" />
+							</svg>
+							<div class="ws-hero-ground"></div>
+							<div class="ws-hero-fade"></div>
+							<div class="ws-hero-name">
+								stellarwind
+								<span class="ws-branch">
+									<svg
+										width="10"
+										height="10"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									main &middot; 3 worktrees
+								</span>
+							</div>
+							<div class="ws-hero-actions">
+								<button
+									class="ws-hero-action"
+									title="Open on GitHub"
+									aria-label="Open on GitHub"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-hero-action"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="ws-body">
+							<div class="ws-stats">
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 18V6" />
+										<path d="M14 18V6" />
+										<path d="m3 6 3-3 3 3" />
+										<path d="m3 18 3 3 3-3" />
+										<path d="m15 6 3-3 3 3" />
+										<path d="m15 18 3 3 3-3" />
+									</svg>
+									<span class="ws-chip-label">ISSUES</span>
+									<span class="ws-chip-value"
+										>0<span class="ws-val-denom">/7</span></span
+									>
+								</div>
+								<div class="ws-chip">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									<span class="ws-chip-label">PRs</span>
+									<span class="ws-chip-value">1</span>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									<span class="ws-chip-label">ATTN</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+								<div class="ws-chip ws-chip--zero">
+									<svg
+										class="ws-chip-icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									<span class="ws-chip-label">HITL</span>
+									<span class="ws-chip-value">0</span>
+								</div>
+							</div>
+							<div class="ws-prd-row" title="2 PRDs, 18 of 22 sub-issues done">
+								<svg
+									class="ws-prd-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.7"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+									/>
+									<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+								</svg>
+								<span class="ws-prd-label">2 PRDs</span>
+								<div class="ws-prd-bar-track">
+									<div class="ws-prd-bar-fill" style="width: 81.8%"></div>
+								</div>
+								<span class="ws-prd-count">18/22</span>
+							</div>
+							<div class="ws-footer">
+								<div class="ws-afk">
+									<div class="ws-afk-led ws-afk-led--off"></div>
+									<span class="ws-afk-label">AFK off</span>
+									<span
+										class="ws-cost"
+										style="
+											margin-left: 6px;
+											border-left: 1px solid var(--border);
+											padding-left: 8px;
+										"
+										>last 2d ago</span
+									>
+								</div>
+								<span class="ws-cost">today $0.00</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /card-grid -->
+			</div>
+			<!-- /page-wrapper -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

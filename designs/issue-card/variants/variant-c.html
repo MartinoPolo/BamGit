@@ -1,0 +1,1470 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Issue Card — Variant C: Full Bleed Color</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ── Grovekeeper tokens (inlined) ───────────────────────── */
+
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* ── VARIANT C: FULL BLEED COLOR ─────────────────────────── */
+
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-bold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				margin-bottom: var(--space-12);
+				padding: var(--space-4) 0;
+				border-bottom: 1px dashed var(--border);
+			}
+
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: var(--space-8);
+				max-width: 960px;
+				margin: 0 auto;
+			}
+
+			@media (max-width: 680px) {
+				.card-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			/* ── Issue Card ── */
+			.ic-card {
+				--ic: #525252;
+				--ic-bg: color-mix(in oklch, var(--ic) 13%, var(--surface));
+				--ic-border: color-mix(in oklch, var(--ic) 25%, var(--border));
+
+				position: relative;
+				background: var(--ic-bg);
+				border: 1px solid var(--ic-border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-10) var(--space-10) 0;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-6);
+				transition:
+					border-color var(--duration-3) var(--ease-standard),
+					box-shadow var(--duration-3) var(--ease-standard);
+				overflow: hidden;
+				min-height: 300px;
+			}
+
+			.ic-card:hover {
+				border-color: color-mix(in oklch, var(--ic) 45%, var(--border-strong));
+				box-shadow: var(--shadow-md);
+			}
+
+			/* Issue number */
+			.ic-number {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-medium);
+				color: color-mix(in oklch, var(--ic) 70%, var(--foreground-muted));
+				letter-spacing: var(--tracking-wide);
+			}
+
+			/* Title — large gk-h2 */
+			.ic-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+				margin: 0;
+				padding-right: var(--space-4);
+			}
+
+			/* ── Metadata rows (vertical stack) ── */
+			.ic-meta-stack {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+				flex: 1;
+			}
+
+			.ic-meta-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				min-height: 22px;
+			}
+
+			.ic-meta-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+				width: 52px;
+				flex-shrink: 0;
+			}
+
+			/* Mini badges */
+			.ic-mini-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 18px;
+				padding: 0 6px;
+				border-radius: var(--radius-xs);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-medium);
+				border: 1px solid;
+				white-space: nowrap;
+			}
+			.ic-mini-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.ic-mini-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.ic-mini-badge-warn {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.ic-mini-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.ic-mini-badge-purple {
+				background: color-mix(in oklch, var(--status-merged) 14%, transparent);
+				color: var(--status-merged);
+				border-color: color-mix(in oklch, var(--status-merged) 30%, transparent);
+			}
+			.ic-mini-badge-muted {
+				background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
+				color: var(--foreground-subtle);
+				border-color: color-mix(in oklch, var(--foreground-subtle) 20%, transparent);
+			}
+
+			/* Status dot */
+			.ic-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.ic-dot-open {
+				background: var(--status-success);
+			}
+			.ic-dot-closed {
+				background: var(--status-merged);
+			}
+
+			/* Label pills */
+			.ic-label-pill {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-family: var(--font-sans);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-medium);
+				border: 1px solid;
+				white-space: nowrap;
+			}
+
+			/* GitHub link */
+			.ic-gh-link {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				text-decoration: none;
+				transition: color var(--duration-2) var(--ease-standard);
+				cursor: pointer;
+			}
+			.ic-gh-link:hover {
+				color: var(--foreground);
+				text-decoration: underline;
+			}
+			.ic-gh-link svg {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+
+			/* Priority chip */
+			.ic-pri-chip {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 6px;
+				border-radius: var(--radius-xs);
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: var(--weight-bold);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				border: none;
+				cursor: pointer;
+			}
+
+			/* ── Tree thumbnail area ── */
+			.ic-tree-area {
+				display: flex;
+				justify-content: center;
+				align-items: flex-end;
+				padding: var(--space-4) 0 0;
+				margin-top: auto;
+				position: relative;
+			}
+
+			.ic-tree-svg {
+				width: 80px;
+				height: 80px;
+				opacity: 0.85;
+				transition:
+					opacity var(--duration-3) var(--ease-standard),
+					transform var(--duration-4) var(--ease-standard);
+			}
+			.ic-card:hover .ic-tree-svg {
+				opacity: 1;
+				transform: translateY(-2px);
+			}
+
+			/* ── Floating action bar (hover-revealed) ── */
+			.ic-action-bar {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--space-3);
+				padding: var(--space-4) var(--space-6);
+				background: linear-gradient(
+					to top,
+					color-mix(in oklch, var(--ic) 22%, var(--surface)) 0%,
+					color-mix(in oklch, var(--ic) 16%, var(--surface)) 60%,
+					transparent 100%
+				);
+				opacity: 0;
+				transform: translateY(4px);
+				transition:
+					opacity var(--duration-4) var(--ease-out),
+					transform var(--duration-4) var(--ease-out);
+				pointer-events: none;
+				z-index: var(--z-raised);
+			}
+			.ic-card:hover .ic-action-bar,
+			.ic-card.show-actions .ic-action-bar {
+				opacity: 1;
+				transform: translateY(0);
+				pointer-events: auto;
+			}
+
+			.ic-action-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 4px;
+				height: 26px;
+				padding: 0 10px;
+				border-radius: var(--radius-sm);
+				font-family: var(--font-sans);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-medium);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					transform 90ms var(--ease-standard);
+				white-space: nowrap;
+				border: 1px solid;
+			}
+			.ic-action-btn:active {
+				transform: scale(0.96);
+			}
+			.ic-action-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.ic-action-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			.ic-action-btn-primary {
+				background: var(--moss-600);
+				color: oklch(0.965 0.01 130);
+				border-color: var(--moss-700);
+			}
+			.ic-action-btn-primary:hover {
+				background: var(--moss-500);
+				border-color: var(--moss-600);
+			}
+
+			.ic-action-btn-ghost {
+				background: color-mix(in oklch, var(--foreground) 6%, transparent);
+				color: var(--foreground-muted);
+				border-color: color-mix(in oklch, var(--foreground) 10%, transparent);
+			}
+			.ic-action-btn-ghost:hover {
+				background: color-mix(in oklch, var(--foreground) 12%, transparent);
+				color: var(--foreground);
+				border-color: color-mix(in oklch, var(--foreground) 18%, transparent);
+			}
+
+			.ic-action-btn-icon {
+				padding: 0;
+				width: 26px;
+			}
+			.ic-action-btn svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			/* ── Quick action buttons (header row) ── */
+			.ic-quick-actions {
+				display: flex;
+				gap: var(--space-2);
+				margin-left: auto;
+			}
+			.ic-quick-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 20px;
+				height: 20px;
+				border-radius: var(--radius-xs);
+				border: none;
+				background: color-mix(in oklch, var(--ic) 18%, transparent);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard);
+			}
+			.ic-quick-btn:hover {
+				background: color-mix(in oklch, var(--ic) 35%, transparent);
+				color: var(--foreground);
+			}
+			.ic-quick-btn:active {
+				transform: scale(0.92);
+			}
+			.ic-quick-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.ic-quick-btn:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+			.ic-quick-btn svg {
+				width: 13px;
+				height: 13px;
+			}
+
+			/* ── Header row ── */
+			.ic-header-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+
+			/* ── Branch name ── */
+			.ic-branch {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				background: color-mix(in oklch, var(--foreground) 5%, transparent);
+				padding: 2px 6px;
+				border-radius: var(--radius-xs);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 200px;
+			}
+
+			/* ── Session chip ── */
+			.ic-session-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				height: 16px;
+				padding: 0 5px;
+				border-radius: var(--radius-xs);
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: var(--weight-bold);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				background: color-mix(in oklch, var(--foreground) 8%, transparent);
+				border: none;
+			}
+			.ic-session-running {
+				color: var(--status-success);
+			}
+			.ic-session-review {
+				color: var(--status-info);
+			}
+			.ic-session-hitl {
+				color: var(--status-warning);
+			}
+			.ic-session-error {
+				color: var(--status-danger);
+			}
+
+			/* ── Page layout ── */
+			.page-wrap {
+				padding: var(--space-16) var(--space-12);
+				min-height: 100vh;
+			}
+			.section-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-muted);
+				letter-spacing: var(--tracking-wide);
+				margin-bottom: var(--space-8);
+				margin-top: var(--space-20);
+			}
+			.section-title:first-of-type {
+				margin-top: 0;
+			}
+
+			/* ── Hover demonstration ── */
+			.ic-card.show-actions {
+				border-color: color-mix(in oklch, var(--ic) 45%, var(--border-strong));
+				box-shadow: var(--shadow-md);
+			}
+			.ic-card.show-actions .ic-tree-svg {
+				opacity: 1;
+				transform: translateY(-2px);
+			}
+
+			/* ── Tree SVGs ── */
+			.tree-sapling {
+				fill: none;
+			}
+			.tree-growing {
+				fill: none;
+			}
+
+			/* ── Responsive ── */
+			@media (max-width: 375px) {
+				.page-wrap {
+					padding: var(--space-8) var(--space-4);
+				}
+				.ic-card {
+					padding: var(--space-6) var(--space-6) 0;
+				}
+				.ic-title {
+					font-size: var(--text-base);
+				}
+				.ic-meta-label {
+					width: 42px;
+					font-size: 9px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrap">
+				<div class="variant-label">VARIANT C: FULL BLEED COLOR</div>
+
+				<div class="section-title">Default State (4-card grid, different accents)</div>
+
+				<div class="card-grid">
+					<!-- Card 1: Teal — open issue, sapling, running session -->
+					<div class="ic-card" style="--ic: oklch(0.7 0.095 195)">
+						<div class="ic-header-row">
+							<span class="ic-number">#147</span>
+							<span class="ic-session-chip ic-session-running">
+								<svg width="6" height="6" viewBox="0 0 6 6">
+									<circle cx="3" cy="3" r="3" fill="currentColor" />
+								</svg>
+								Executing
+							</span>
+							<div class="ic-quick-actions">
+								<button class="ic-quick-btn" title="Open folder">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										/>
+									</svg>
+								</button>
+								<button class="ic-quick-btn" title="Open terminal">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="4 17 10 11 4 5" />
+										<line x1="12" y1="19" x2="20" y2="19" />
+									</svg>
+								</button>
+								<button class="ic-quick-btn" title="Open editor">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<h3 class="ic-title">Refactor database connection pooling</h3>
+
+						<div class="ic-meta-stack">
+							<!-- Status row -->
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Status</span>
+								<span class="ic-mini-badge ic-mini-badge-success"
+									><span class="ic-dot ic-dot-open"></span>Open</span
+								>
+								<span class="ic-mini-badge ic-mini-badge-info">PR: Review</span>
+								<span class="ic-branch">feat/db-pool-refactor</span>
+							</div>
+							<!-- Labels row -->
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Labels</span>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.7 0.095 195);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>refactor</span
+								>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.77 0.155 75);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>performance</span
+								>
+							</div>
+							<!-- GitHub link row -->
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">GitHub</span>
+								<a class="ic-gh-link" href="#">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<path
+											d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+										/>
+									</svg>
+									grovekeeper/grovekeeper#147
+								</a>
+								<span
+									class="ic-pri-chip"
+									style="
+										background: color-mix(
+											in oklch,
+											var(--priority-high) 20%,
+											transparent
+										);
+										color: var(--priority-high);
+									"
+									>HIGH</span
+								>
+							</div>
+						</div>
+
+						<div class="ic-tree-area">
+							<!-- Sapling tree SVG -->
+							<svg class="ic-tree-svg" viewBox="0 0 80 80" fill="none">
+								<rect
+									x="37"
+									y="48"
+									width="6"
+									height="18"
+									rx="1"
+									fill="oklch(0.400 0.060 55)"
+								/>
+								<ellipse
+									cx="40"
+									cy="42"
+									rx="16"
+									ry="18"
+									fill="oklch(0.550 0.085 195)"
+									opacity="0.7"
+								/>
+								<ellipse
+									cx="40"
+									cy="38"
+									rx="13"
+									ry="15"
+									fill="oklch(0.620 0.095 195)"
+									opacity="0.8"
+								/>
+								<ellipse
+									cx="40"
+									cy="35"
+									rx="10"
+									ry="12"
+									fill="oklch(0.680 0.090 195)"
+								/>
+								<circle
+									cx="33"
+									cy="38"
+									r="2"
+									fill="oklch(0.750 0.080 195)"
+									opacity="0.5"
+								/>
+								<circle
+									cx="46"
+									cy="36"
+									r="1.5"
+									fill="oklch(0.750 0.080 195)"
+									opacity="0.4"
+								/>
+							</svg>
+							<div class="ic-action-bar">
+								<button class="ic-action-btn ic-action-btn-primary">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+									Execute
+								</button>
+								<button class="ic-action-btn ic-action-btn-ghost">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+										<circle cx="12" cy="12" r="3" />
+									</svg>
+									Review
+								</button>
+								<button
+									class="ic-action-btn ic-action-btn-ghost ic-action-btn-icon"
+									title="More actions"
+								>
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="12" cy="5" r="1.5" />
+										<circle cx="12" cy="12" r="1.5" />
+										<circle cx="12" cy="19" r="1.5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Card 2: Rose — closed/merged, flowering stage -->
+					<div class="ic-card" style="--ic: oklch(0.72 0.135 15)">
+						<div class="ic-header-row">
+							<span class="ic-number">#132</span>
+							<div class="ic-quick-actions">
+								<button class="ic-quick-btn" title="Open folder">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										/>
+									</svg>
+								</button>
+								<button class="ic-quick-btn" title="Open terminal">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="4 17 10 11 4 5" />
+										<line x1="12" y1="19" x2="20" y2="19" />
+									</svg>
+								</button>
+								<button class="ic-quick-btn" title="Open editor">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<h3 class="ic-title">Fix authentication token refresh loop</h3>
+
+						<div class="ic-meta-stack">
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Status</span>
+								<span class="ic-mini-badge ic-mini-badge-purple"
+									><span class="ic-dot ic-dot-closed"></span>Merged</span
+								>
+								<span class="ic-branch">fix/auth-token-refresh</span>
+							</div>
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Labels</span>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.62 0.205 25);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>bug</span
+								>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.72 0.135 15);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>auth</span
+								>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.66 0.135 145);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>P0</span
+								>
+							</div>
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">GitHub</span>
+								<a class="ic-gh-link" href="#">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<path
+											d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+										/>
+									</svg>
+									grovekeeper/grovekeeper#132
+								</a>
+								<span
+									class="ic-pri-chip"
+									style="
+										background: color-mix(
+											in oklch,
+											var(--priority-top) 20%,
+											transparent
+										);
+										color: var(--priority-top);
+									"
+									>TOP</span
+								>
+							</div>
+						</div>
+
+						<div class="ic-tree-area">
+							<!-- Flowering tree SVG -->
+							<svg class="ic-tree-svg" viewBox="0 0 80 80" fill="none">
+								<rect
+									x="37"
+									y="44"
+									width="6"
+									height="22"
+									rx="1"
+									fill="oklch(0.400 0.060 55)"
+								/>
+								<ellipse
+									cx="40"
+									cy="36"
+									rx="20"
+									ry="22"
+									fill="oklch(0.550 0.100 15)"
+									opacity="0.6"
+								/>
+								<ellipse
+									cx="40"
+									cy="32"
+									rx="17"
+									ry="19"
+									fill="oklch(0.620 0.120 15)"
+									opacity="0.7"
+								/>
+								<ellipse
+									cx="40"
+									cy="28"
+									rx="14"
+									ry="16"
+									fill="oklch(0.680 0.130 15)"
+								/>
+								<circle
+									cx="30"
+									cy="28"
+									r="3"
+									fill="oklch(0.820 0.110 15)"
+									opacity="0.7"
+								/>
+								<circle
+									cx="44"
+									cy="24"
+									r="2.5"
+									fill="oklch(0.820 0.110 15)"
+									opacity="0.6"
+								/>
+								<circle
+									cx="38"
+									cy="20"
+									r="2"
+									fill="oklch(0.860 0.100 15)"
+									opacity="0.5"
+								/>
+								<circle
+									cx="48"
+									cy="32"
+									r="2"
+									fill="oklch(0.820 0.110 15)"
+									opacity="0.5"
+								/>
+							</svg>
+							<div class="ic-action-bar">
+								<button class="ic-action-btn ic-action-btn-ghost">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M3 6h18" />
+										<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+										<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+									</svg>
+									Clean Worktree
+								</button>
+								<button
+									class="ic-action-btn ic-action-btn-ghost ic-action-btn-icon"
+									title="More actions"
+								>
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="12" cy="5" r="1.5" />
+										<circle cx="12" cy="12" r="1.5" />
+										<circle cx="12" cy="19" r="1.5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Card 3: Indigo — open, growing, with hover state shown -->
+					<div class="ic-card show-actions" style="--ic: oklch(0.62 0.12 275)">
+						<div class="ic-header-row">
+							<span class="ic-number">#158</span>
+							<span class="ic-session-chip ic-session-review">
+								<svg width="6" height="6" viewBox="0 0 6 6">
+									<circle cx="3" cy="3" r="3" fill="currentColor" />
+								</svg>
+								Review
+							</span>
+							<div class="ic-quick-actions">
+								<button class="ic-quick-btn" title="Open folder">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										/>
+									</svg>
+								</button>
+								<button class="ic-quick-btn" title="Open terminal">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="4 17 10 11 4 5" />
+										<line x1="12" y1="19" x2="20" y2="19" />
+									</svg>
+								</button>
+								<button class="ic-quick-btn" title="Open editor">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<h3 class="ic-title">Implement WebSocket event streaming</h3>
+
+						<div class="ic-meta-stack">
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Status</span>
+								<span class="ic-mini-badge ic-mini-badge-success"
+									><span class="ic-dot ic-dot-open"></span>Open</span
+								>
+								<span class="ic-mini-badge ic-mini-badge-warn">PR: Draft</span>
+								<span class="ic-mini-badge ic-mini-badge-muted">2 behind</span>
+							</div>
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Labels</span>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.62 0.12 275);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>feature</span
+								>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.66 0.105 220);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>backend</span
+								>
+							</div>
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">GitHub</span>
+								<a class="ic-gh-link" href="#">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<path
+											d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+										/>
+									</svg>
+									grovekeeper/grovekeeper#158
+								</a>
+								<span
+									class="ic-pri-chip"
+									style="
+										background: color-mix(
+											in oklch,
+											var(--priority-medium) 20%,
+											transparent
+										);
+										color: var(--priority-medium);
+									"
+									>MED</span
+								>
+							</div>
+						</div>
+
+						<div class="ic-tree-area">
+							<!-- Growing tree SVG -->
+							<svg class="ic-tree-svg" viewBox="0 0 80 80" fill="none">
+								<rect
+									x="37"
+									y="46"
+									width="6"
+									height="20"
+									rx="1"
+									fill="oklch(0.400 0.060 55)"
+								/>
+								<ellipse
+									cx="40"
+									cy="38"
+									rx="18"
+									ry="20"
+									fill="oklch(0.450 0.100 275)"
+									opacity="0.6"
+								/>
+								<ellipse
+									cx="40"
+									cy="34"
+									rx="15"
+									ry="17"
+									fill="oklch(0.520 0.110 275)"
+									opacity="0.7"
+								/>
+								<ellipse
+									cx="40"
+									cy="30"
+									rx="12"
+									ry="14"
+									fill="oklch(0.580 0.115 275)"
+								/>
+								<circle
+									cx="35"
+									cy="32"
+									r="2"
+									fill="oklch(0.680 0.100 275)"
+									opacity="0.5"
+								/>
+								<circle
+									cx="44"
+									cy="28"
+									r="1.5"
+									fill="oklch(0.680 0.100 275)"
+									opacity="0.4"
+								/>
+							</svg>
+							<div class="ic-action-bar">
+								<button class="ic-action-btn ic-action-btn-primary">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+										<circle cx="12" cy="12" r="3" />
+									</svg>
+									Review
+								</button>
+								<button class="ic-action-btn ic-action-btn-ghost">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M9 11l3 3L22 4" />
+										<path
+											d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+										/>
+									</svg>
+									Approve
+								</button>
+								<button
+									class="ic-action-btn ic-action-btn-ghost ic-action-btn-icon"
+									title="More actions"
+								>
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="12" cy="5" r="1.5" />
+										<circle cx="12" cy="12" r="1.5" />
+										<circle cx="12" cy="19" r="1.5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Card 4: Amber — open, seed stage, no worktree -->
+					<div class="ic-card" style="--ic: oklch(0.77 0.15 65)">
+						<div class="ic-header-row">
+							<span class="ic-number">#163</span>
+							<div class="ic-quick-actions">
+								<button class="ic-quick-btn" disabled title="Assign folder">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										/>
+									</svg>
+								</button>
+								<button class="ic-quick-btn" disabled title="Assign folder">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="4 17 10 11 4 5" />
+										<line x1="12" y1="19" x2="20" y2="19" />
+									</svg>
+								</button>
+								<button class="ic-quick-btn" disabled title="Assign folder">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<h3 class="ic-title">Add keyboard shortcut customization panel</h3>
+
+						<div class="ic-meta-stack">
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Status</span>
+								<span class="ic-mini-badge ic-mini-badge-success"
+									><span class="ic-dot ic-dot-open"></span>Open</span
+								>
+								<span class="ic-mini-badge ic-mini-badge-muted">No PR</span>
+							</div>
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">Labels</span>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.77 0.15 65);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>enhancement</span
+								>
+								<span
+									class="ic-label-pill"
+									style="
+										--lbl: oklch(0.62 0.12 275);
+										background: color-mix(
+											in oklch,
+											var(--lbl) 14%,
+											transparent
+										);
+										color: color-mix(
+											in oklch,
+											var(--lbl) 75%,
+											var(--foreground)
+										);
+										border-color: color-mix(
+											in oklch,
+											var(--lbl) 30%,
+											transparent
+										);
+									"
+									>UX</span
+								>
+							</div>
+							<div class="ic-meta-row">
+								<span class="ic-meta-label">GitHub</span>
+								<a class="ic-gh-link" href="#">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<path
+											d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+										/>
+									</svg>
+									grovekeeper/grovekeeper#163
+								</a>
+								<span
+									class="ic-pri-chip"
+									style="
+										background: color-mix(
+											in oklch,
+											var(--priority-low) 20%,
+											transparent
+										);
+										color: var(--priority-low);
+									"
+									>LOW</span
+								>
+							</div>
+						</div>
+
+						<div class="ic-tree-area">
+							<!-- Seed/sprout tree SVG -->
+							<svg class="ic-tree-svg" viewBox="0 0 80 80" fill="none">
+								<ellipse
+									cx="40"
+									cy="64"
+									rx="12"
+									ry="3"
+									fill="oklch(0.400 0.060 55)"
+									opacity="0.3"
+								/>
+								<rect
+									x="39"
+									y="52"
+									width="2"
+									height="14"
+									rx="1"
+									fill="oklch(0.500 0.070 65)"
+								/>
+								<ellipse
+									cx="40"
+									cy="50"
+									rx="6"
+									ry="8"
+									fill="oklch(0.650 0.130 65)"
+									opacity="0.7"
+								/>
+								<ellipse
+									cx="40"
+									cy="48"
+									rx="4.5"
+									ry="6"
+									fill="oklch(0.720 0.140 65)"
+								/>
+								<ellipse
+									cx="40"
+									cy="66"
+									rx="5"
+									ry="2"
+									fill="oklch(0.350 0.050 55)"
+									opacity="0.4"
+								/>
+							</svg>
+							<div class="ic-action-bar">
+								<button class="ic-action-btn ic-action-btn-primary">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+										/>
+									</svg>
+									Setup Worktree
+								</button>
+								<button
+									class="ic-action-btn ic-action-btn-ghost ic-action-btn-icon"
+									title="More actions"
+								>
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="12" cy="5" r="1.5" />
+										<circle cx="12" cy="12" r="1.5" />
+										<circle cx="12" cy="19" r="1.5" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /card-grid -->
+			</div>
+			<!-- /page-wrap -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

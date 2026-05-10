@@ -1,0 +1,1393 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Session Spawning Dialog — Variant E: Quick-Launch Grid</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--amber-400);
+				--accent-fg: oklch(0.15 0.02 50);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn:active:not(:disabled) {
+				transform: scale(0.96);
+				filter: brightness(0.95);
+			}
+
+			/* Inputs */
+			.gk-input,
+			.gk-select,
+			.gk-textarea {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-textarea {
+				height: auto;
+				padding: 8px 10px;
+				resize: vertical;
+				line-height: 1.5;
+			}
+			.gk-input::placeholder,
+			.gk-textarea::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus,
+			.gk-select:focus,
+			.gk-textarea:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+			.gk-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				margin-bottom: 6px;
+				display: block;
+				letter-spacing: 0.01em;
+			}
+
+			/* Checkbox */
+			.gk-check {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 4px;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.gk-check:checked {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check:checked::after {
+				content: '';
+				position: absolute;
+				left: 4.5px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
+				border: solid var(--primary-fg);
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+
+			/* Radio */
+			.gk-radio {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 50%;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition: border-color 120ms;
+			}
+			.gk-radio:checked {
+				border-color: var(--primary);
+			}
+			.gk-radio:checked::after {
+				content: '';
+				position: absolute;
+				inset: 3px;
+				background: var(--primary);
+				border-radius: 50%;
+			}
+			.gk-radio:hover {
+				border-color: var(--ring);
+			}
+
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+
+			/* Badge */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-amber {
+				background: color-mix(in oklch, var(--amber-400) 16%, transparent);
+				color: var(--amber-400);
+				border-color: color-mix(in oklch, var(--amber-400) 32%, transparent);
+			}
+
+			/* Modal */
+			.gk-modal-backdrop {
+				position: fixed;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.1 0.02 150) 50%, transparent);
+				backdrop-filter: blur(2px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: var(--z-modal);
+			}
+			.gk-modal {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-xl);
+				width: 100%;
+				max-width: 600px;
+				display: flex;
+				flex-direction: column;
+				max-height: 86%;
+			}
+			.gk-modal-header {
+				padding: 16px 18px 12px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				border-bottom: 1px solid var(--border);
+			}
+			.gk-modal-body {
+				padding: 18px;
+				overflow-y: auto;
+			}
+			.gk-modal-footer {
+				padding: 12px 18px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: flex-end;
+				gap: 8px;
+				background: var(--surface-2);
+				border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+			}
+
+			/* Type scale */
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Kbd */
+			.gk-kbd {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 18px;
+				height: 18px;
+				padding: 0 5px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: 4px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+			}
+
+			/* Toggle */
+			.gk-toggle {
+				width: 32px;
+				height: 18px;
+				border-radius: 999px;
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				position: relative;
+				cursor: pointer;
+				transition: background 120ms;
+				flex-shrink: 0;
+			}
+			.gk-toggle::after {
+				content: '';
+				position: absolute;
+				top: 1px;
+				left: 1px;
+				width: 14px;
+				height: 14px;
+				border-radius: 999px;
+				background: var(--surface);
+				box-shadow: var(--shadow-sm);
+				transition: left 140ms;
+			}
+			.gk-toggle[data-on='true'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-toggle[data-on='true']::after {
+				left: 16px;
+			}
+
+			/* ========== VARIANT E: QUICK-LAUNCH GRID ========== */
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+
+			.variant-label {
+				position: fixed;
+				top: 8px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 100;
+				padding: 4px 14px;
+				border-radius: var(--radius-full);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+			}
+
+			/* Provider section header */
+			.provider-section {
+				margin-bottom: 6px;
+			}
+			.provider-section-header {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 10px;
+			}
+			.provider-icon-label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-muted);
+				letter-spacing: var(--tracking-snug);
+			}
+			.provider-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			/* Model tile grid */
+			.tile-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 6px;
+				margin-bottom: 14px;
+			}
+			.tile-grid.cols-2 {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			/* Individual model tile */
+			.model-tile {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				padding: 10px 10px 8px;
+				background: transparent;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				cursor: pointer;
+				transition: all 140ms var(--ease-standard);
+				font-family: var(--font-sans);
+				text-align: left;
+				position: relative;
+			}
+			.model-tile:hover {
+				border-color: var(--border-strong);
+				background: var(--surface-2);
+				box-shadow: var(--shadow-sm);
+			}
+			.model-tile:active {
+				transform: scale(0.97);
+				filter: brightness(0.95);
+			}
+			.model-tile:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.model-tile.is-unavailable {
+				opacity: 0.45;
+				cursor: not-allowed;
+			}
+			.model-tile.is-unavailable:hover {
+				border-color: var(--border);
+				background: transparent;
+				box-shadow: none;
+				transform: none;
+				filter: none;
+			}
+
+			/* Tile inner elements */
+			.tile-model-name {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				font-family: var(--font-mono);
+				line-height: var(--leading-snug);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.model-tile.is-unavailable .tile-model-name {
+				color: var(--foreground-subtle);
+			}
+			.tile-meta-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-wrap: wrap;
+			}
+			.tile-context-size {
+				font-size: var(--text-2xs);
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+			}
+			.tile-cost-badge {
+				display: inline-flex;
+				align-items: center;
+				height: 16px;
+				padding: 0 5px;
+				font-size: 10px;
+				font-weight: 500;
+				border-radius: var(--radius-full);
+				font-family: var(--font-mono);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.cost-low {
+				background: color-mix(in oklch, var(--status-success) 12%, transparent);
+				color: var(--status-success);
+			}
+			.cost-mid {
+				background: color-mix(in oklch, var(--amber-400) 12%, transparent);
+				color: var(--amber-400);
+			}
+			.cost-high {
+				background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+				color: oklch(0.7 0.16 25);
+			}
+			.tile-default-mark {
+				position: absolute;
+				top: 6px;
+				right: 6px;
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--primary);
+				box-shadow: 0 0 6px color-mix(in oklch, var(--primary) 50%, transparent);
+			}
+			.tile-unavailable-hint {
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				font-style: italic;
+			}
+
+			/* Context attachment — compact bar */
+			.context-bar {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 10px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				margin-top: 4px;
+			}
+			.context-bar-issue {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex: 1;
+				min-width: 0;
+			}
+			.context-bar-title {
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			/* Advanced panel (collapsed by default) */
+			.advanced-toggle-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 2px 0;
+				margin-top: 14px;
+			}
+			.advanced-toggle-btn {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				background: none;
+				border: none;
+				cursor: pointer;
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+				padding: 4px 0;
+				transition: color 120ms;
+			}
+			.advanced-toggle-btn:hover {
+				color: var(--foreground);
+			}
+			.advanced-toggle-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.advanced-chevron {
+				display: inline-block;
+				font-size: 10px;
+				transition: transform 160ms var(--ease-standard);
+				line-height: 1;
+			}
+			.advanced-chevron.is-open {
+				transform: rotate(90deg);
+			}
+
+			.advanced-panel {
+				margin-top: 10px;
+				padding: 14px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				display: flex;
+				flex-direction: column;
+				gap: 14px;
+			}
+
+			/* Permission chips (inline in advanced) */
+			.permission-chips {
+				display: flex;
+				gap: 4px;
+				flex-wrap: wrap;
+			}
+			.perm-chip {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				padding: 5px 10px;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition: all 120ms ease;
+				background: transparent;
+				font-family: var(--font-sans);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+			}
+			.perm-chip:hover {
+				border-color: var(--border-strong);
+				color: var(--foreground);
+				background: var(--surface-hover);
+			}
+			.perm-chip:active {
+				transform: scale(0.97);
+			}
+			.perm-chip:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.perm-chip.is-selected {
+				border-color: color-mix(in oklch, var(--primary) 50%, transparent);
+				background: color-mix(in oklch, var(--primary) 8%, transparent);
+				color: var(--foreground);
+			}
+
+			/* Workspace path display */
+			.workspace-display {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.workspace-path {
+				flex: 1;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			/* Resume row */
+			.resume-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			/* Footer */
+			.footer-hint {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-right: auto;
+			}
+
+			/* Section divider with spacing */
+			.section-gap {
+				margin: 0 -18px;
+				padding: 0;
+			}
+
+			/* Provider divider */
+			.provider-divider {
+				height: 1px;
+				background: var(--border);
+				margin: 8px 0 14px;
+				opacity: 0.5;
+			}
+
+			/* Responsive: collapse to 2-col on narrow */
+			@media (max-width: 480px) {
+				.tile-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				.gk-modal {
+					max-width: 100%;
+					margin: 8px;
+					border-radius: var(--radius-lg);
+				}
+				.gk-modal-body {
+					padding: 14px;
+				}
+			}
+
+			/* State showcase helpers */
+			.showcase-wrapper {
+				display: flex;
+				flex-direction: column;
+				gap: 80px;
+				padding: 60px 20px 40px;
+				width: 100%;
+				max-width: 680px;
+				margin: 0 auto;
+			}
+			.showcase-label {
+				text-align: center;
+				margin-bottom: 12px;
+			}
+		</style>
+	</head>
+	<body class="gk-root theme-dark">
+		<div class="variant-label gk-eyebrow">Variant E: Quick-Launch Grid</div>
+
+		<div class="showcase-wrapper">
+			<!-- ============================================================
+     STATE 1: COLLAPSED (Simple mode — the fast path)
+     ============================================================ -->
+			<div>
+				<div
+					class="showcase-label gk-eyebrow"
+					style="margin-bottom: 16px; color: var(--foreground-subtle)"
+				>
+					Collapsed &mdash; pick a tile, hit Enter
+				</div>
+
+				<div
+					class="gk-modal"
+					role="dialog"
+					aria-labelledby="dialog-title-1"
+					aria-modal="true"
+					style="position: relative"
+				>
+					<!-- Header -->
+					<div class="gk-modal-header">
+						<h2
+							class="gk-h2"
+							id="dialog-title-1"
+							style="margin: 0; letter-spacing: -0.02em; line-height: 1.15"
+						>
+							Launch Session
+						</h2>
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm"
+							aria-label="Close"
+							title="Close (Esc)"
+						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 14 14"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+							>
+								<line x1="3" y1="3" x2="11" y2="11" />
+								<line x1="11" y1="3" x2="3" y2="11" />
+							</svg>
+						</button>
+					</div>
+
+					<!-- Body -->
+					<div class="gk-modal-body" style="padding: 16px 18px">
+						<!-- ---- CLAUDE CODE ---- -->
+						<div class="provider-section">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--moss-400)"
+									></span>
+									Claude Code
+								</div>
+								<span
+									class="gk-badge gk-badge-moss"
+									style="height: 16px; font-size: 10px; padding: 0 5px"
+									>default</span
+								>
+							</div>
+							<div class="tile-grid">
+								<button
+									class="model-tile"
+									tabindex="0"
+									style="
+										border-color: var(--primary);
+										background: color-mix(
+											in oklch,
+											var(--primary) 5%,
+											transparent
+										);
+									"
+								>
+									<span class="tile-default-mark"></span>
+									<span class="tile-model-name">opus-4-7</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-high">$$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">sonnet-4-6</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">haiku-3.5</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-low">$</span>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- ---- OPENCODE ---- -->
+						<div class="provider-divider"></div>
+						<div class="provider-section">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--azure-400)"
+									></span>
+									OpenCode
+								</div>
+							</div>
+							<div class="tile-grid">
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">gpt-4.1</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">1M</span>
+										<span class="tile-cost-badge cost-high">$$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">o4-mini</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">gemini-2.5-pro</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">1M</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- ---- CODEX ---- -->
+						<div class="provider-divider"></div>
+						<div class="provider-section">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--amber-400)"
+									></span>
+									Codex
+								</div>
+							</div>
+							<div class="tile-grid cols-2">
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">o4-mini</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">codex-mini-latest</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-low">$</span>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- ---- CURSOR ---- -->
+						<div class="provider-divider"></div>
+						<div class="provider-section" style="margin-bottom: 0">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--bark-300)"
+									></span>
+									Cursor
+								</div>
+								<span
+									style="
+										font-size: 10px;
+										color: var(--foreground-subtle);
+										font-style: italic;
+									"
+									>not installed</span
+								>
+							</div>
+							<div class="tile-grid cols-2">
+								<button class="model-tile is-unavailable" tabindex="-1" disabled>
+									<span class="tile-model-name">cursor-agent</span>
+									<span class="tile-unavailable-hint">requires Cursor IDE</span>
+								</button>
+								<button class="model-tile is-unavailable" tabindex="-1" disabled>
+									<span class="tile-model-name">cursor-fast</span>
+									<span class="tile-unavailable-hint">requires Cursor IDE</span>
+								</button>
+							</div>
+						</div>
+
+						<!-- Context bar (always visible) -->
+						<div style="margin-top: 14px">
+							<div class="context-bar">
+								<input
+									type="checkbox"
+									class="gk-check"
+									checked
+									style="width: 14px; height: 14px"
+								/>
+								<span
+									class="gk-badge gk-badge-moss"
+									style="
+										font-family: var(--font-mono);
+										font-size: 10px;
+										height: 18px;
+										padding: 0 5px;
+									"
+									>#42</span
+								>
+								<span class="context-bar-title"
+									>Fix authentication timeout on workspace switch</span
+								>
+							</div>
+						</div>
+
+						<!-- Advanced toggle (collapsed) -->
+						<div class="advanced-toggle-row">
+							<button class="advanced-toggle-btn">
+								<span class="advanced-chevron">&#9654;</span>
+								Advanced options
+							</button>
+							<span
+								style="
+									font-size: var(--text-2xs);
+									font-family: var(--font-mono);
+									color: var(--foreground-subtle);
+								"
+								>/repos/Grovekeeper</span
+							>
+						</div>
+					</div>
+
+					<!-- Footer -->
+					<div class="gk-modal-footer">
+						<div class="footer-hint">
+							<span class="gk-kbd">Esc</span> close
+							<span class="gk-kbd" style="margin-left: 4px">&#8629;</span> launch
+						</div>
+						<button class="gk-btn gk-btn-ghost">Cancel</button>
+						<button class="gk-btn gk-btn-primary gk-btn-lg" style="min-width: 110px">
+							<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+								<polygon points="2,1 10,6 2,11" />
+							</svg>
+							Launch
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- ============================================================
+     STATE 2: EXPANDED (Advanced options visible)
+     ============================================================ -->
+			<div>
+				<div
+					class="showcase-label gk-eyebrow"
+					style="margin-bottom: 16px; color: var(--foreground-subtle)"
+				>
+					Expanded &mdash; advanced options
+				</div>
+
+				<div
+					class="gk-modal"
+					role="dialog"
+					aria-labelledby="dialog-title-2"
+					aria-modal="true"
+					style="position: relative"
+				>
+					<!-- Header -->
+					<div class="gk-modal-header">
+						<h2
+							class="gk-h2"
+							id="dialog-title-2"
+							style="margin: 0; letter-spacing: -0.02em; line-height: 1.15"
+						>
+							Launch Session
+						</h2>
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm"
+							aria-label="Close"
+							title="Close (Esc)"
+						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 14 14"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+							>
+								<line x1="3" y1="3" x2="11" y2="11" />
+								<line x1="11" y1="3" x2="3" y2="11" />
+							</svg>
+						</button>
+					</div>
+
+					<!-- Body -->
+					<div class="gk-modal-body" style="padding: 16px 18px">
+						<!-- ---- CLAUDE CODE ---- -->
+						<div class="provider-section">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--moss-400)"
+									></span>
+									Claude Code
+								</div>
+								<span
+									class="gk-badge gk-badge-moss"
+									style="height: 16px; font-size: 10px; padding: 0 5px"
+									>default</span
+								>
+							</div>
+							<div class="tile-grid">
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">opus-4-7</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-high">$$$</span>
+									</div>
+								</button>
+								<button
+									class="model-tile"
+									tabindex="0"
+									style="
+										border-color: var(--primary);
+										background: color-mix(
+											in oklch,
+											var(--primary) 5%,
+											transparent
+										);
+									"
+								>
+									<span class="tile-default-mark"></span>
+									<span class="tile-model-name">sonnet-4-6</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">haiku-3.5</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-low">$</span>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- ---- OPENCODE ---- -->
+						<div class="provider-divider"></div>
+						<div class="provider-section">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--azure-400)"
+									></span>
+									OpenCode
+								</div>
+							</div>
+							<div class="tile-grid">
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">gpt-4.1</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">1M</span>
+										<span class="tile-cost-badge cost-high">$$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">o4-mini</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">gemini-2.5-pro</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">1M</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- ---- CODEX ---- -->
+						<div class="provider-divider"></div>
+						<div class="provider-section">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--amber-400)"
+									></span>
+									Codex
+								</div>
+							</div>
+							<div class="tile-grid cols-2">
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">o4-mini</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-mid">$$</span>
+									</div>
+								</button>
+								<button class="model-tile" tabindex="0">
+									<span class="tile-model-name">codex-mini-latest</span>
+									<div class="tile-meta-row">
+										<span class="tile-context-size">200K</span>
+										<span class="tile-cost-badge cost-low">$</span>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- ---- CURSOR ---- -->
+						<div class="provider-divider"></div>
+						<div class="provider-section" style="margin-bottom: 0">
+							<div class="provider-section-header">
+								<div class="provider-icon-label">
+									<span
+										class="provider-dot"
+										style="background: var(--bark-300)"
+									></span>
+									Cursor
+								</div>
+								<span
+									style="
+										font-size: 10px;
+										color: var(--foreground-subtle);
+										font-style: italic;
+									"
+									>not installed</span
+								>
+							</div>
+							<div class="tile-grid cols-2">
+								<button class="model-tile is-unavailable" tabindex="-1" disabled>
+									<span class="tile-model-name">cursor-agent</span>
+									<span class="tile-unavailable-hint">requires Cursor IDE</span>
+								</button>
+								<button class="model-tile is-unavailable" tabindex="-1" disabled>
+									<span class="tile-model-name">cursor-fast</span>
+									<span class="tile-unavailable-hint">requires Cursor IDE</span>
+								</button>
+							</div>
+						</div>
+
+						<!-- Context bar with issue -->
+						<div style="margin-top: 14px">
+							<div class="context-bar">
+								<input
+									type="checkbox"
+									class="gk-check"
+									checked
+									style="width: 14px; height: 14px"
+								/>
+								<span
+									class="gk-badge gk-badge-moss"
+									style="
+										font-family: var(--font-mono);
+										font-size: 10px;
+										height: 18px;
+										padding: 0 5px;
+									"
+									>#42</span
+								>
+								<span class="context-bar-title"
+									>Fix authentication timeout on workspace switch</span
+								>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									style="
+										margin-left: auto;
+										padding: 0 6px;
+										height: 22px;
+										font-size: 10px;
+										color: var(--foreground-subtle);
+									"
+								>
+									preview
+								</button>
+							</div>
+						</div>
+
+						<!-- Advanced toggle (EXPANDED) -->
+						<div class="advanced-toggle-row">
+							<button class="advanced-toggle-btn" style="color: var(--foreground)">
+								<span class="advanced-chevron is-open">&#9654;</span>
+								Advanced options
+							</button>
+						</div>
+
+						<!-- Advanced panel (visible) -->
+						<div class="advanced-panel">
+							<!-- Permission mode -->
+							<div>
+								<label class="gk-label">Permission mode</label>
+								<div class="permission-chips">
+									<button class="perm-chip is-selected">
+										<input
+											type="radio"
+											name="perm-exp"
+											class="gk-radio"
+											checked
+											style="width: 13px; height: 13px"
+										/>
+										Approve each
+									</button>
+									<button class="perm-chip">
+										<input
+											type="radio"
+											name="perm-exp"
+											class="gk-radio"
+											style="width: 13px; height: 13px"
+										/>
+										Auto-accept edits
+									</button>
+									<button class="perm-chip">
+										<input
+											type="radio"
+											name="perm-exp"
+											class="gk-radio"
+											style="width: 13px; height: 13px"
+										/>
+										Bypass all
+									</button>
+								</div>
+							</div>
+
+							<!-- Workspace -->
+							<div>
+								<label class="gk-label" for="workspace-exp">Workspace</label>
+								<div class="workspace-display">
+									<select
+										class="gk-select"
+										id="workspace-exp"
+										style="height: 28px; font-size: 12px"
+									>
+										<option selected>/repos/Grovekeeper</option>
+										<option>/repos/low-poly-2d-trees</option>
+										<option>/repos/mpx-claude-code</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- Prompt prefix -->
+							<div>
+								<label class="gk-label" for="prompt-exp">
+									Prompt prefix
+									<span style="color: var(--foreground-subtle); font-weight: 400"
+										>(optional)</span
+									>
+								</label>
+								<textarea
+									class="gk-textarea"
+									id="prompt-exp"
+									rows="2"
+									style="font-size: 12px"
+									placeholder="e.g., Focus on the Rust session_manager module..."
+								></textarea>
+							</div>
+
+							<!-- Resume session -->
+							<div class="resume-row">
+								<span
+									style="
+										font-size: var(--text-sm);
+										color: var(--foreground-muted);
+										font-weight: var(--weight-medium);
+									"
+									>Resume existing session</span
+								>
+								<div
+									class="gk-toggle"
+									data-on="false"
+									role="switch"
+									aria-checked="false"
+									tabindex="0"
+								></div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Footer -->
+					<div class="gk-modal-footer">
+						<div class="footer-hint">
+							<span class="gk-kbd">Esc</span> close
+							<span class="gk-kbd" style="margin-left: 4px">&#8629;</span> launch
+						</div>
+						<button class="gk-btn gk-btn-ghost">Cancel</button>
+						<button class="gk-btn gk-btn-primary gk-btn-lg" style="min-width: 110px">
+							<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+								<polygon points="2,1 10,6 2,11" />
+							</svg>
+							Launch
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /showcase-wrapper -->
+	</body>
+</html>

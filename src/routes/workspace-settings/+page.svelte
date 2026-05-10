@@ -212,12 +212,13 @@
 							id="ws-repo"
 							bind:value={githubRepo}
 							placeholder="owner/repo"
+							onchange={markDirty}
 						/>
 					</div>
 
 					<div class="space-y-1.5">
 						<Label for="ws-folder">Local Folder</Label>
-						<PathInput id="ws-folder" bind:value={localFolder} />
+						<PathInput id="ws-folder" bind:value={localFolder} onchange={markDirty} />
 					</div>
 
 					<div class="space-y-1.5">
@@ -245,6 +246,7 @@
 						id="ws-worktree-parent"
 						bind:value={worktreeParentFolder}
 						placeholder="Folder where worktrees are created"
+						onchange={markDirty}
 					/>
 					<p class="text-xs text-muted-foreground">
 						New worktrees will be created as subdirectories of this folder.

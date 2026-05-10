@@ -79,10 +79,10 @@ pub fn update_notification_config(
 }
 
 #[tauri::command]
-pub fn test_notification_sound(
+pub async fn test_notification_sound(
     app_handle: AppHandle,
     event_type: NotificationEventType,
-    state: State<DatabaseState>,
+    state: State<'_, DatabaseState>,
 ) -> Result<(), String> {
     let connection = state.read()?;
 
@@ -103,7 +103,6 @@ pub fn test_notification_sound(
     let resource_directory = service.resource_directory().clone();
     let app_data_directory = service.app_data_directory().clone();
 
-    // Load volume settings
     let global_volume: f64 = connection
         .query_row(
             "SELECT value FROM app_settings WHERE key = 'notification_volume'",
@@ -132,15 +131,11 @@ pub fn test_notification_sound(
     )
     .ok_or(format!("Sound file not found: {sound_file}"))?;
 
-    std::thread::spawn(move || {
-        if let Err(error) =
-            crate::notification::sound::play_sound_blocking(&resolved_path, volume)
-        {
-            log::error!("Test sound playback failed: {error}");
-        }
-    });
-
-    Ok(())
+    tokio::task::spawn_blocking(move || {
+        crate::notification::sound::play_sound_blocking(&resolved_path, volume)
+    })
+    .await
+    .map_err(|error| format!("Playback task failed: {error}"))?
 }
 
 // ─── Volume commands ─────────────────────────────────────────────────────────

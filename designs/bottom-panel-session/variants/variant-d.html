@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Bottom Panel Session Tab — Variant D</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
+   GROVEKEEPER DESIGN TOKENS (inlined)
+   ============================================================ */
+
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--amber-400);
+				--accent-fg: oklch(0.15 0.02 50);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Components */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-success {
+				background: var(--status-success);
+				color: oklch(0.15 0.02 145);
+				border-color: transparent;
+			}
+			.gk-btn-success:hover {
+				background: color-mix(in oklch, var(--status-success) 85%, white 15%);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+
+			.gk-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+				gap: 2px;
+			}
+			.gk-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+			.gk-tab:hover {
+				color: var(--foreground);
+			}
+			.gk-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			/* ============================================================
+   VARIANT D — Notification Stream
+   ============================================================ */
+
+			body {
+				margin: 0;
+				padding: 0;
+				background: oklch(0.12 0.015 150);
+				min-height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.mockup-wrapper {
+				width: 100%;
+				max-width: 960px;
+				padding: 40px 24px;
+			}
+
+			.mockup-label {
+				margin-bottom: 12px;
+			}
+
+			/* Context shell — parent panel chrome at 40% opacity */
+			.context-shell {
+				opacity: 0.4;
+				pointer-events: none;
+			}
+
+			.context-tab-bar {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				padding: 6px 12px;
+				background: var(--surface-2);
+				border-bottom: 1px solid var(--border);
+				border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+			}
+
+			.context-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				font-family: var(--font-sans);
+				background: transparent;
+				border: none;
+			}
+
+			.context-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+
+			/* Panel shell */
+			.panel-shell {
+				height: 340px;
+				width: 100%;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				box-shadow: var(--shadow-lg);
+			}
+
+			/* --- Status card at top --- */
+			.stream-status-card {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 8px 14px;
+				border-bottom: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 60%, var(--surface-2) 40%);
+				flex-shrink: 0;
+			}
+
+			.stream-status-left {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex: 1;
+				min-width: 0;
+			}
+
+			.stream-status-right {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+
+			.provider-mark {
+				width: 20px;
+				height: 20px;
+				border-radius: var(--radius-xs);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 10px;
+				font-weight: 700;
+				flex-shrink: 0;
+				background: color-mix(in oklch, var(--amber-400) 18%, transparent);
+				color: var(--amber-400);
+				font-family: var(--font-mono);
+			}
+
+			.status-meta {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.status-meta-val {
+				color: var(--foreground-muted);
+			}
+
+			.status-sep {
+				width: 1px;
+				height: 12px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+
+			.open-full-link {
+				font-size: var(--text-xs);
+				color: var(--primary);
+				text-decoration: none;
+				font-weight: 500;
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				transition: color 120ms ease;
+				cursor: pointer;
+				white-space: nowrap;
+			}
+			.open-full-link:hover {
+				color: var(--foreground);
+			}
+
+			/* --- Event stream --- */
+			.event-stream {
+				flex: 1;
+				overflow-y: auto;
+				min-height: 0;
+				padding: 4px 0;
+			}
+
+			.event-row {
+				display: grid;
+				grid-template-columns: 52px 18px 1fr;
+				align-items: center;
+				gap: 6px;
+				padding: 3px 14px;
+				min-height: 28px;
+				font-size: var(--text-sm);
+				transition: background 100ms ease;
+			}
+
+			.event-row:hover {
+				background: color-mix(in oklch, var(--foreground) 3%, transparent);
+			}
+
+			/* Dimmed older events */
+			.event-row.is-dimmed {
+				opacity: 0.4;
+				transition: opacity 150ms ease-out;
+			}
+			.event-row.is-dimmed:hover {
+				opacity: 1;
+			}
+
+			.event-time {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				text-align: right;
+				font-variant-numeric: tabular-nums;
+				flex-shrink: 0;
+				letter-spacing: -0.01em;
+			}
+
+			.event-icon {
+				width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				font-size: 12px;
+				border-radius: 3px;
+			}
+
+			/* Event type colors */
+			.event-icon.type-tool {
+				color: var(--azure-400);
+			}
+			.event-icon.type-assistant {
+				color: var(--amber-400);
+			}
+			.event-icon.type-user {
+				color: var(--primary);
+			}
+			.event-icon.type-needs-input {
+				color: var(--session-needs-input);
+			}
+			.event-icon.type-system {
+				color: var(--foreground-subtle);
+			}
+			.event-icon.type-error {
+				color: var(--status-danger);
+			}
+
+			.event-summary {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				min-width: 0;
+				line-height: var(--leading-snug);
+			}
+
+			.event-type-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: 600;
+				flex-shrink: 0;
+				letter-spacing: 0.01em;
+			}
+
+			.event-type-label.type-tool {
+				color: var(--azure-400);
+			}
+			.event-type-label.type-assistant {
+				color: var(--amber-400);
+			}
+			.event-type-label.type-user {
+				color: var(--primary);
+			}
+			.event-type-label.type-needs-input {
+				color: var(--session-needs-input);
+			}
+			.event-type-label.type-system {
+				color: var(--foreground-subtle);
+			}
+			.event-type-label.type-error {
+				color: var(--status-danger);
+			}
+
+			.event-desc {
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+			}
+
+			.event-desc code {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				background: var(--surface-2);
+				padding: 1px 5px;
+				border-radius: 3px;
+				color: var(--foreground);
+				border: 1px solid var(--border);
+			}
+
+			.event-diff {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				flex-shrink: 0;
+				margin-left: auto;
+				display: inline-flex;
+				gap: 4px;
+			}
+
+			.diff-add {
+				color: var(--status-success);
+			}
+			.diff-del {
+				color: var(--status-danger);
+			}
+
+			/* Needs-input row — expanded */
+			.event-row.is-needs-input {
+				grid-template-columns: 52px 18px 1fr auto;
+				background: color-mix(in oklch, var(--session-needs-input) 5%, transparent);
+				border-left: 2px solid var(--session-needs-input);
+				padding-left: 12px;
+				min-height: 36px;
+			}
+
+			.event-row.is-needs-input:hover {
+				background: color-mix(in oklch, var(--session-needs-input) 8%, transparent);
+			}
+
+			.needs-input-actions {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				flex-shrink: 0;
+			}
+
+			/* Inline Allow/Deny buttons — small ghost style */
+			.btn-allow {
+				height: 22px;
+				padding: 0 8px;
+				font-size: 11px;
+				font-weight: 600;
+				border-radius: var(--radius-xs);
+				border: 1px solid color-mix(in oklch, var(--status-success) 40%, transparent);
+				background: color-mix(in oklch, var(--status-success) 12%, transparent);
+				color: var(--status-success);
+				cursor: pointer;
+				font-family: var(--font-sans);
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+			}
+			.btn-allow:hover {
+				background: color-mix(in oklch, var(--status-success) 22%, transparent);
+				border-color: color-mix(in oklch, var(--status-success) 60%, transparent);
+			}
+			.btn-allow:active {
+				transform: scale(0.96);
+			}
+			.btn-allow:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.btn-allow:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.btn-deny {
+				height: 22px;
+				padding: 0 8px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: var(--radius-xs);
+				border: 1px solid var(--border);
+				background: transparent;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				font-family: var(--font-sans);
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease;
+				display: inline-flex;
+				align-items: center;
+			}
+			.btn-deny:hover {
+				background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+				color: var(--status-danger);
+			}
+			.btn-deny:active {
+				transform: scale(0.96);
+			}
+			.btn-deny:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.btn-deny:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Stream divider — timestamp grouping */
+			.stream-divider {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 4px 14px 2px;
+				margin-top: 2px;
+			}
+
+			.stream-divider-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.stream-divider-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				flex-shrink: 0;
+			}
+
+			/* Running indicator dot */
+			.running-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--status-success);
+				animation: gk-pulse 1.8s ease-in-out infinite;
+				flex-shrink: 0;
+			}
+
+			/* Live indicator on running event */
+			.event-row.is-live .event-icon {
+				position: relative;
+			}
+
+			.event-live-pulse {
+				display: inline-block;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--status-success);
+				animation: gk-pulse 1.8s ease-in-out infinite;
+				margin-left: auto;
+				flex-shrink: 0;
+			}
+
+			/* --- Input row (pinned bottom) --- */
+			.input-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 8px 14px;
+				border-top: 1px solid var(--border);
+				background: var(--surface-2);
+				flex-shrink: 0;
+			}
+
+			.input-wrapper {
+				position: relative;
+				flex: 1;
+			}
+
+			.input-wrapper .gk-input {
+				background: var(--surface);
+				padding-right: 28px;
+			}
+
+			.input-slash-hint {
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				pointer-events: none;
+				background: var(--surface-2);
+				padding: 1px 4px;
+				border-radius: 3px;
+				border: 1px solid var(--border);
+				line-height: 1;
+			}
+
+			/* Session picker in status card */
+			.session-picker {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.session-picker-btn {
+				height: 22px;
+				padding: 0 8px;
+				font-size: var(--text-2xs);
+				font-weight: 500;
+				border-radius: var(--radius-xs);
+				border: 1px solid var(--border);
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				font-family: var(--font-mono);
+				transition: all 120ms ease;
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+			}
+			.session-picker-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.session-picker-btn:active {
+				transform: scale(0.96);
+			}
+			.session-picker-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.session-picker-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.session-picker-btn.is-active {
+				background: var(--surface);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+
+			.session-new-btn {
+				width: 22px;
+				height: 22px;
+				padding: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 13px;
+				line-height: 1;
+				border-radius: var(--radius-xs);
+				border: 1px solid var(--border);
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				font-family: var(--font-sans);
+				transition: all 120ms ease;
+			}
+			.session-new-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border-strong);
+			}
+			.session-new-btn:active {
+				transform: scale(0.96);
+			}
+			.session-new-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.session-new-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Event count label */
+			.event-count {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				padding: 2px 6px;
+				background: var(--surface-2);
+				border-radius: var(--radius-xs);
+				border: 1px solid var(--border);
+			}
+
+			/* Responsive */
+			@media (max-width: 600px) {
+				.mockup-wrapper {
+					padding: 16px 8px;
+				}
+				.stream-status-card {
+					flex-wrap: wrap;
+					gap: 6px;
+				}
+				.status-meta {
+					flex-wrap: wrap;
+				}
+				.event-row {
+					grid-template-columns: 42px 16px 1fr;
+					gap: 4px;
+					padding: 3px 8px;
+				}
+				.event-row.is-needs-input {
+					grid-template-columns: 42px 16px 1fr;
+					padding-left: 6px;
+				}
+				.needs-input-actions {
+					grid-column: 3;
+					margin-top: 2px;
+				}
+				.event-diff {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="mockup-wrapper">
+				<div class="mockup-label gk-eyebrow">Variant D: Notification Stream</div>
+
+				<div class="panel-shell">
+					<!-- Context shell — parent tab bar at 40% opacity -->
+					<div class="context-shell">
+						<div class="context-tab-bar">
+							<button class="context-tab">Terminal</button>
+							<button class="context-tab is-active">Session</button>
+							<button class="context-tab">Output</button>
+							<button class="context-tab">Problems</button>
+						</div>
+					</div>
+
+					<!-- Status card -->
+					<div class="stream-status-card">
+						<div class="stream-status-left">
+							<div class="session-picker">
+								<button class="session-picker-btn is-active">
+									<span class="running-dot"></span>
+									S1
+								</button>
+								<button class="session-picker-btn">
+									<span
+										style="
+											width: 5px;
+											height: 5px;
+											border-radius: 50%;
+											background: var(--foreground-subtle);
+											flex-shrink: 0;
+										"
+									></span>
+									S2
+								</button>
+								<button class="session-new-btn" title="Spawn session">+</button>
+							</div>
+
+							<span class="status-sep"></span>
+
+							<div class="provider-mark">A</div>
+
+							<span
+								class="gk-badge gk-badge-success"
+								style="height: 18px; font-size: 10px; padding: 0 6px"
+							>
+								<span class="gk-badge-dot"></span>
+								Running
+							</span>
+
+							<div class="status-meta">
+								<span class="status-meta-val">Opus 4.7</span>
+								<span class="status-sep"></span>
+								<span class="status-meta-val">$2.14</span>
+								<span class="status-sep"></span>
+								<span class="status-meta-val">43 events</span>
+							</div>
+						</div>
+
+						<div class="stream-status-right">
+							<a class="open-full-link" href="#">Open full &#8599;</a>
+						</div>
+					</div>
+
+					<!-- Event stream -->
+					<div class="event-stream">
+						<!-- Older dimmed events -->
+						<div class="event-row is-dimmed">
+							<span class="event-time">14:18</span>
+							<span class="event-icon type-user">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+									<circle cx="12" cy="7" r="4" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-user">You:</span>
+								<span class="event-desc"
+									>Refactor notification service to use event bus pattern</span
+								>
+							</span>
+						</div>
+
+						<div class="event-row is-dimmed">
+							<span class="event-time">14:18</span>
+							<span class="event-icon type-assistant">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M12 8V4H8" />
+									<rect x="2" y="2" width="20" height="8" rx="2" />
+									<path d="M2 14h20" />
+									<rect x="2" y="14" width="20" height="8" rx="2" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-assistant">Assistant:</span>
+								<span class="event-desc"
+									>Analyzing subscription model and existing event
+									infrastructure</span
+								>
+							</span>
+						</div>
+
+						<div class="event-row is-dimmed">
+							<span class="event-time">14:19</span>
+							<span class="event-icon type-tool">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+									/>
+									<path d="M14 2v6h6" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-tool">Read:</span>
+								<span class="event-desc"
+									><code>src/lib/services/notification_service.ts</code></span
+								>
+							</span>
+						</div>
+
+						<div class="event-row is-dimmed">
+							<span class="event-time">14:19</span>
+							<span class="event-icon type-tool">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+									/>
+									<path d="M14 2v6h6" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-tool">Read:</span>
+								<span class="event-desc"
+									><code>src/lib/modules/events/event_bus.ts</code></span
+								>
+							</span>
+						</div>
+
+						<!-- Divider — recent events -->
+						<div class="stream-divider">
+							<span class="stream-divider-line"></span>
+							<span class="stream-divider-label">2m ago</span>
+							<span class="stream-divider-line"></span>
+						</div>
+
+						<!-- Recent events — full opacity -->
+						<div class="event-row">
+							<span class="event-time">14:31</span>
+							<span class="event-icon type-user">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+									<circle cx="12" cy="7" r="4" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-user">You:</span>
+								<span class="event-desc"
+									>Go ahead with refactor, keep backward compat for toast
+									bridge</span
+								>
+							</span>
+						</div>
+
+						<div class="event-row">
+							<span class="event-time">14:31</span>
+							<span class="event-icon type-assistant">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M12 8V4H8" />
+									<rect x="2" y="2" width="20" height="8" rx="2" />
+									<path d="M2 14h20" />
+									<rect x="2" y="14" width="20" height="8" rx="2" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-assistant">Assistant:</span>
+								<span class="event-desc"
+									>Implementing event bus adapter with backward-compatible
+									shim</span
+								>
+							</span>
+						</div>
+
+						<div class="event-row">
+							<span class="event-time">14:32</span>
+							<span class="event-icon type-tool">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-tool">Edit:</span>
+								<span class="event-desc"
+									><code>src/lib/services/notification_service.ts</code></span
+								>
+								<span class="event-diff">
+									<span class="diff-add">+38</span>
+									<span class="diff-del">-15</span>
+								</span>
+							</span>
+						</div>
+
+						<div class="event-row">
+							<span class="event-time">14:32</span>
+							<span class="event-icon type-tool">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-tool">Edit:</span>
+								<span class="event-desc"
+									><code>src/lib/modules/toasts/mock_toast_bridge.ts</code></span
+								>
+								<span class="event-diff">
+									<span class="diff-add">+7</span>
+									<span class="diff-del">-2</span>
+								</span>
+							</span>
+						</div>
+
+						<!-- Needs Input row — actionable -->
+						<div class="event-row is-needs-input">
+							<span class="event-time">14:33</span>
+							<span class="event-icon type-needs-input">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<path d="M12 8v4" />
+									<path d="M12 16h.01" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-needs-input">Approve:</span>
+								<span class="event-desc"
+									>Write <code>src/lib/services/event_bus_adapter.ts</code> (new
+									file)</span
+								>
+							</span>
+							<span class="needs-input-actions">
+								<button class="btn-allow">Allow</button>
+								<button class="btn-deny">Deny</button>
+							</span>
+						</div>
+
+						<!-- Live running event -->
+						<div class="event-row is-live">
+							<span class="event-time">14:33</span>
+							<span class="event-icon type-tool">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="4 17 10 11 4 5" />
+									<line x1="12" y1="19" x2="20" y2="19" />
+								</svg>
+							</span>
+							<span class="event-summary">
+								<span class="event-type-label type-tool">Bash:</span>
+								<span class="event-desc"
+									><code>pnpm test -- notification</code></span
+								>
+								<span class="event-live-pulse"></span>
+							</span>
+						</div>
+					</div>
+
+					<!-- Input row — pinned bottom -->
+					<div class="input-row">
+						<div class="input-wrapper">
+							<input type="text" class="gk-input" placeholder="Send a message..." />
+							<span class="input-slash-hint">/</span>
+						</div>
+						<button class="gk-btn gk-btn-primary gk-btn-sm">Send</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

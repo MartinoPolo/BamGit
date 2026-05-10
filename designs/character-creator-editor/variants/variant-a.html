@@ -1,0 +1,1816 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Character Creator — Variant A: Split Panel</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ═══════════════════════════════════════════════════════════
+   TOKENS.CSS — inlined
+   ═══════════════════════════════════════════════════════════ */
+
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+
+			/* ═══════════════════════════════════════════════════════════
+   BASE COMPONENT CLASSES
+   ═══════════════════════════════════════════════════════════ */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			.gk-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				margin-bottom: 6px;
+				display: block;
+				letter-spacing: 0.01em;
+			}
+
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
+
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ═══════════════════════════════════════════════════════════
+   VARIANT A — SPLIT PANEL LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+
+			.page-shell {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			/* ── Variant Label ── */
+			.variant-label {
+				position: fixed;
+				top: 12px;
+				right: 16px;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				padding: 3px 8px;
+				z-index: 100;
+				user-select: none;
+			}
+
+			/* ── Top Header ── */
+			.page-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-6) var(--space-12);
+				height: 56px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+			.back-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				text-decoration: none;
+				cursor: pointer;
+				transition: color 120ms;
+				flex-shrink: 0;
+			}
+			.back-link:hover {
+				color: var(--foreground);
+			}
+			.back-link svg {
+				width: 16px;
+				height: 16px;
+			}
+			.page-title {
+				flex: 1;
+			}
+			.header-actions {
+				display: flex;
+				gap: var(--space-4);
+				align-items: center;
+			}
+
+			/* ── Main Split ── */
+			.split-layout {
+				display: grid;
+				grid-template-columns: minmax(300px, 2fr) 5fr;
+				gap: 0;
+				flex: 1;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ── Left Panel: Sound Pool ── */
+			.sound-pool {
+				display: flex;
+				flex-direction: column;
+				border-right: 1px solid var(--border);
+				background: var(--surface);
+				min-height: 0;
+			}
+
+			.pool-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-6) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+			.pool-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+			.pool-count strong {
+				color: var(--foreground);
+				font-weight: var(--weight-semibold);
+			}
+
+			.pool-search {
+				padding: var(--space-4) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+			.search-wrapper {
+				position: relative;
+			}
+			.search-wrapper svg {
+				position: absolute;
+				left: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				pointer-events: none;
+			}
+			.search-wrapper .gk-input {
+				padding-left: 30px;
+			}
+
+			.pool-drop-zone {
+				margin: var(--space-4) var(--space-8);
+				padding: var(--space-10) var(--space-8);
+				border: 1.5px dashed var(--border-strong);
+				border-radius: var(--radius-md);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--space-3);
+				cursor: pointer;
+				transition:
+					border-color 160ms,
+					background 160ms;
+				flex-shrink: 0;
+			}
+			.pool-drop-zone:hover {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 5%, transparent);
+			}
+			.pool-drop-zone svg {
+				width: 28px;
+				height: 28px;
+				color: var(--foreground-subtle);
+			}
+			.pool-drop-zone span {
+				font-size: var(--text-sm);
+				color: var(--foreground-subtle);
+			}
+			.pool-drop-zone .gk-tiny {
+				margin-top: -2px;
+			}
+
+			.sound-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-2) 0;
+			}
+
+			.sound-item {
+				display: grid;
+				grid-template-columns: 20px 1fr auto auto auto;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-8);
+				height: 36px;
+				cursor: grab;
+				transition: background 100ms;
+				border-left: 2px solid transparent;
+			}
+			.sound-item:hover {
+				background: var(--surface-2);
+			}
+			.sound-item.is-assigned {
+				border-left-color: var(--status-success);
+			}
+			.sound-item.is-dragging {
+				opacity: 0.5;
+				background: var(--surface-3);
+			}
+
+			.drag-handle {
+				display: flex;
+				align-items: center;
+				color: var(--foreground-subtle);
+				cursor: grab;
+			}
+			.drag-handle svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			.sound-name {
+				font-size: var(--text-md);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+			}
+
+			.sound-duration {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+				white-space: nowrap;
+			}
+
+			.sound-badge-area {
+				display: flex;
+				align-items: center;
+				min-width: 0;
+			}
+			.sound-assign-badge {
+				font-size: 10px;
+				height: 18px;
+				padding: 0 6px;
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				border-radius: 999px;
+				background: color-mix(in oklch, var(--status-success) 12%, transparent);
+				color: var(--status-success);
+				border: 1px solid color-mix(in oklch, var(--status-success) 25%, transparent);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 100px;
+			}
+			.sound-assign-badge .dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--status-success);
+				flex-shrink: 0;
+			}
+
+			.play-btn {
+				width: 26px;
+				height: 26px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				color: var(--foreground-muted);
+				transition:
+					background 100ms,
+					color 100ms;
+				flex-shrink: 0;
+			}
+			.play-btn:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+			}
+			.play-btn svg {
+				width: 14px;
+				height: 14px;
+			}
+			.play-btn.is-playing {
+				color: var(--primary);
+			}
+
+			/* Waveform thumbnail */
+			.waveform-mini {
+				display: flex;
+				align-items: center;
+				gap: 1px;
+				height: 16px;
+				margin-right: 2px;
+			}
+			.waveform-mini .bar {
+				width: 2px;
+				border-radius: 1px;
+				background: var(--foreground-subtle);
+				opacity: 0.5;
+				transition: opacity 100ms;
+			}
+			.sound-item:hover .waveform-mini .bar {
+				opacity: 0.8;
+			}
+			.sound-item.is-playing .waveform-mini .bar {
+				background: var(--primary);
+				opacity: 1;
+			}
+
+			/* ── Right Panel: Event Assignment ── */
+			.event-panel {
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
+			}
+
+			.identity-bar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-8) var(--space-12);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+				background: var(--surface);
+			}
+
+			.avatar-upload {
+				width: 72px;
+				height: 72px;
+				border-radius: var(--radius-lg);
+				background: var(--surface-2);
+				border: 1.5px dashed var(--border-strong);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				transition:
+					border-color 160ms,
+					background 160ms;
+				position: relative;
+				overflow: hidden;
+				flex-shrink: 0;
+			}
+			.avatar-upload:hover {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 6%, transparent);
+			}
+			.avatar-upload svg {
+				width: 28px;
+				height: 28px;
+				color: var(--foreground-subtle);
+				transition: color 160ms;
+			}
+			.avatar-upload:hover svg {
+				color: var(--primary);
+			}
+			.avatar-upload .avatar-overlay {
+				position: absolute;
+				inset: 0;
+				background: color-mix(in oklch, var(--background) 60%, transparent);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 0;
+				transition: opacity 160ms;
+			}
+			.avatar-upload:hover .avatar-overlay {
+				opacity: 1;
+			}
+			.avatar-upload.has-image {
+				border-style: solid;
+				border-color: var(--border);
+			}
+
+			.avatar-placeholder {
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(135deg, var(--moss-800), var(--moss-700));
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 28px;
+				font-weight: 700;
+				color: var(--moss-300);
+				letter-spacing: -0.02em;
+			}
+
+			.identity-fields {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+			.identity-fields .field-row {
+				display: flex;
+				gap: var(--space-6);
+				align-items: flex-end;
+			}
+			.identity-fields .field-group {
+				flex: 1;
+				min-width: 0;
+			}
+			.identity-fields .field-group.narrow {
+				flex: 0 0 180px;
+			}
+
+			.event-scroll {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-8) var(--space-12) var(--space-16);
+			}
+
+			/* ── Tier Sections ── */
+			.tier-section {
+				margin-bottom: var(--space-12);
+			}
+			.tier-section:last-child {
+				margin-bottom: 0;
+			}
+
+			.tier-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-6);
+				padding-bottom: var(--space-3);
+				border-bottom: 1px solid var(--border);
+			}
+			.tier-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tier-critical .tier-dot {
+				background: var(--status-danger);
+			}
+			.tier-important .tier-dot {
+				background: var(--status-warning);
+			}
+			.tier-normal .tier-dot {
+				background: var(--foreground-subtle);
+			}
+
+			.tier-critical .tier-label {
+				color: var(--status-danger);
+			}
+			.tier-important .tier-label {
+				color: color-mix(in oklch, var(--status-warning) 85%, var(--foreground));
+			}
+			.tier-normal .tier-label {
+				color: var(--foreground-muted);
+			}
+
+			.tier-label {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.tier-badge-count {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
+
+			.event-slots {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			/* ── Event Slot ── */
+			.event-slot {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				gap: var(--space-6);
+				align-items: start;
+				padding: var(--space-5) var(--space-6);
+				border-radius: var(--radius-md);
+				border: 1px solid var(--border);
+				background: var(--surface);
+				transition:
+					border-color 160ms,
+					background 160ms,
+					box-shadow 160ms;
+				min-height: 52px;
+			}
+			.event-slot:hover {
+				border-color: var(--border-strong);
+			}
+
+			.event-info {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				min-width: 0;
+			}
+			.event-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+			.event-name code {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				padding: 1px 5px;
+				border-radius: 3px;
+			}
+			.event-desc {
+				font-size: var(--text-sm);
+				color: var(--foreground-subtle);
+				line-height: var(--leading-normal);
+			}
+
+			.drop-zone {
+				min-width: 200px;
+				min-height: 36px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--space-3);
+				padding: var(--space-3);
+				border: 1.5px dashed var(--border);
+				border-radius: var(--radius-sm);
+				align-items: center;
+				transition:
+					border-color 160ms,
+					background 160ms;
+			}
+			.drop-zone.is-empty {
+				justify-content: center;
+			}
+			.drop-zone.is-empty::after {
+				content: 'Drop sound here';
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-style: italic;
+			}
+
+			/* Drag over state */
+			.drop-zone.drag-over {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 6%, transparent);
+				border-style: solid;
+			}
+			.drop-zone.drag-over::after {
+				content: 'Release to assign';
+				color: var(--primary);
+				font-style: normal;
+				font-weight: 500;
+			}
+
+			/* Critical empty warning */
+			.tier-critical .drop-zone.is-empty {
+				border-color: color-mix(in oklch, var(--status-danger) 40%, var(--border));
+				background: color-mix(in oklch, var(--status-danger) 3%, transparent);
+			}
+			.tier-critical .drop-zone.is-empty::after {
+				color: color-mix(in oklch, var(--status-danger) 70%, var(--foreground-subtle));
+				content: 'Required — drop sound here';
+			}
+
+			/* ── Sound Chip (assigned in drop zone) ── */
+			.sound-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-2);
+				height: 28px;
+				padding: 0 var(--space-3) 0 var(--space-4);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				transition:
+					border-color 120ms,
+					background 120ms;
+				max-width: 180px;
+			}
+			.sound-chip:hover {
+				border-color: var(--border-strong);
+				background: var(--surface-3);
+			}
+			.sound-chip .chip-name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+			}
+			.sound-chip .chip-play {
+				width: 20px;
+				height: 20px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				color: var(--foreground-muted);
+				flex-shrink: 0;
+				transition: color 100ms;
+			}
+			.sound-chip .chip-play:hover {
+				color: var(--primary);
+			}
+			.sound-chip .chip-play svg {
+				width: 12px;
+				height: 12px;
+			}
+			.sound-chip .chip-remove {
+				width: 18px;
+				height: 18px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				transition:
+					color 100ms,
+					background 100ms;
+			}
+			.sound-chip .chip-remove:hover {
+				color: var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+			}
+			.sound-chip .chip-remove svg {
+				width: 12px;
+				height: 12px;
+			}
+
+			/* ── Validation Footer ── */
+			.validation-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-5) var(--space-12);
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+			.validation-msg {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+			}
+			.validation-msg svg {
+				width: 16px;
+				height: 16px;
+				flex-shrink: 0;
+			}
+			.validation-msg.is-warning {
+				color: var(--status-danger);
+			}
+			.validation-msg.is-success {
+				color: var(--status-success);
+			}
+
+			.footer-actions {
+				display: flex;
+				gap: var(--space-4);
+				align-items: center;
+			}
+
+			/* ── Responsive ── */
+			@media (max-width: 860px) {
+				.split-layout {
+					grid-template-columns: 1fr;
+				}
+				.sound-pool {
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+					max-height: 280px;
+				}
+				.identity-bar {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+				.identity-fields .field-row {
+					flex-direction: column;
+				}
+				.identity-fields .field-group.narrow {
+					flex: 1;
+				}
+				.drop-zone {
+					min-width: 140px;
+				}
+				.event-slot {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			/* ── Drag ghost shim ── */
+			.sound-item[draggable='true'] {
+				cursor: grab;
+			}
+			.sound-item[draggable='true']:active {
+				cursor: grabbing;
+			}
+
+			/* ── Animations ── */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes pulse-border {
+				0%,
+				100% {
+					border-color: color-mix(in oklch, var(--status-danger) 40%, var(--border));
+				}
+				50% {
+					border-color: color-mix(in oklch, var(--status-danger) 20%, var(--border));
+				}
+			}
+			.tier-critical .drop-zone.is-empty {
+				animation: pulse-border 3s ease-in-out infinite;
+			}
+
+			/* Smooth slot highlight for "just assigned" */
+			@keyframes slot-flash {
+				0% {
+					background: color-mix(in oklch, var(--primary) 12%, transparent);
+				}
+				100% {
+					background: var(--surface);
+				}
+			}
+			.event-slot.just-assigned {
+				animation: slot-flash 600ms ease-out;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-shell">
+				<!-- Variant Label -->
+				<div class="variant-label">VARIANT A: SPLIT PANEL</div>
+
+				<!-- ══════════════ PAGE HEADER ══════════════ -->
+				<header class="page-header">
+					<a class="back-link" href="#">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M19 12H5" />
+							<path d="m12 19-7-7 7-7" />
+						</svg>
+						Back to Settings
+					</a>
+					<div class="page-title">
+						<h1 class="gk-h2">Create Character</h1>
+					</div>
+					<div class="header-actions">
+						<button class="gk-btn gk-btn-ghost">Cancel</button>
+						<button class="gk-btn gk-btn-primary" disabled>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+								/>
+								<polyline points="17 21 17 13 7 13 7 21" />
+								<polyline points="7 3 7 8 15 8" />
+							</svg>
+							Save Character
+						</button>
+					</div>
+				</header>
+
+				<!-- ══════════════ SPLIT LAYOUT ══════════════ -->
+				<div class="split-layout">
+					<!-- ────── LEFT: Sound Pool ────── -->
+					<aside class="sound-pool">
+						<div class="pool-header">
+							<span class="pool-count"><strong>10</strong> sounds imported</span>
+							<button class="gk-btn gk-btn-ghost gk-btn-sm">Clear All</button>
+						</div>
+
+						<!-- Import / Drop Zone -->
+						<div class="pool-drop-zone">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+								<polyline points="17 8 12 3 7 8" />
+								<line x1="12" y1="3" x2="12" y2="15" />
+							</svg>
+							<span>Drop files or click to import</span>
+							<span class="gk-tiny">WAV, MP3, OGG supported</span>
+						</div>
+
+						<!-- Search -->
+						<div class="pool-search">
+							<div class="search-wrapper">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="11" cy="11" r="8" />
+									<line x1="21" y1="21" x2="16.65" y2="16.65" />
+								</svg>
+								<input
+									class="gk-input"
+									type="text"
+									placeholder="Filter sounds..."
+								/>
+							</div>
+						</div>
+
+						<!-- Sound List -->
+						<div class="sound-list">
+							<!-- Sound 1 — assigned -->
+							<div class="sound-item is-assigned" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">attention_horn.wav</span>
+								<span class="sound-assign-badge"
+									><span class="dot"></span>needs-input</span
+								>
+								<span class="sound-duration">0.8s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 2 — assigned -->
+							<div class="sound-item is-assigned" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">session_done_chime.wav</span>
+								<span class="sound-assign-badge"
+									><span class="dot"></span>session.end</span
+								>
+								<span class="sound-duration">1.4s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 3 — assigned -->
+							<div class="sound-item is-assigned" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">error_buzz.wav</span>
+								<span class="sound-assign-badge"
+									><span class="dot"></span>session.error</span
+								>
+								<span class="sound-duration">0.6s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 4 — assigned, currently playing -->
+							<div class="sound-item is-assigned is-playing" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">merge_clash.wav</span>
+								<span class="sound-assign-badge"
+									><span class="dot"></span>merge.conflict</span
+								>
+								<span class="sound-duration">1.1s</span>
+								<button class="play-btn is-playing">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<rect x="6" y="4" width="4" height="16" />
+										<rect x="14" y="4" width="4" height="16" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 5 — assigned -->
+							<div class="sound-item is-assigned" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">pr_ready_fanfare.wav</span>
+								<span class="sound-assign-badge"
+									><span class="dot"></span>pr.ready</span
+								>
+								<span class="sound-duration">2.3s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 6 — unassigned -->
+							<div class="sound-item" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">task_ding.wav</span>
+								<span class="sound-badge-area"></span>
+								<span class="sound-duration">0.5s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 7 — unassigned -->
+							<div class="sound-item" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">branch_warning.wav</span>
+								<span class="sound-badge-area"></span>
+								<span class="sound-duration">0.9s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 8 — unassigned -->
+							<div class="sound-item" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">achievement_trumpet.wav</span>
+								<span class="sound-badge-area"></span>
+								<span class="sound-duration">1.8s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 9 — unassigned -->
+							<div class="sound-item" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">resource_limit_siren.ogg</span>
+								<span class="sound-badge-area"></span>
+								<span class="sound-duration">1.0s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+
+							<!-- Sound 10 — unassigned -->
+							<div class="sound-item" draggable="true">
+								<div class="drag-handle">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="9" cy="6" r="1.5" />
+										<circle cx="15" cy="6" r="1.5" />
+										<circle cx="9" cy="12" r="1.5" />
+										<circle cx="15" cy="12" r="1.5" />
+										<circle cx="9" cy="18" r="1.5" />
+										<circle cx="15" cy="18" r="1.5" />
+									</svg>
+								</div>
+								<span class="sound-name">start_whoosh.mp3</span>
+								<span class="sound-badge-area"></span>
+								<span class="sound-duration">0.7s</span>
+								<button class="play-btn">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<polygon points="5 3 19 12 5 21 5 3" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					</aside>
+
+					<!-- ────── RIGHT: Event Assignment ────── -->
+					<main class="event-panel">
+						<!-- Character Identity Bar -->
+						<div class="identity-bar">
+							<div class="avatar-upload has-image">
+								<div class="avatar-placeholder">WK</div>
+								<div class="avatar-overlay">
+									<svg
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+										/>
+										<circle cx="12" cy="13" r="4" />
+									</svg>
+								</div>
+							</div>
+							<div class="identity-fields">
+								<div class="field-row">
+									<div class="field-group">
+										<label class="gk-label">Character Name</label>
+										<input
+											class="gk-input"
+											type="text"
+											value="Warcraft Knight"
+											placeholder="e.g. Footman, Orc Peon"
+										/>
+									</div>
+									<div class="field-group narrow">
+										<label class="gk-label">Language</label>
+										<select
+											class="gk-input"
+											style="appearance: auto; padding-right: 28px"
+										>
+											<option>None</option>
+											<option selected>English</option>
+											<option>Czech</option>
+											<option>Spanish</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Scrollable Event Slots -->
+						<div class="event-scroll">
+							<!-- ── CRITICAL TIER ── -->
+							<section class="tier-section tier-critical">
+								<div class="tier-header">
+									<span class="tier-dot"></span>
+									<span class="tier-label">Critical</span>
+									<span class="tier-badge-count">2 / 2 assigned</span>
+								</div>
+								<div class="event-slots">
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Needs Input
+												<code>session.needs-input</code>
+											</div>
+											<div class="event-desc">
+												Agent is waiting for your response to continue
+											</div>
+										</div>
+										<div class="drop-zone">
+											<div class="sound-chip">
+												<button class="chip-play">
+													<svg viewBox="0 0 24 24" fill="currentColor">
+														<polygon points="5 3 19 12 5 21 5 3" />
+													</svg>
+												</button>
+												<span class="chip-name">attention_horn.wav</span>
+												<button class="chip-remove">
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+													>
+														<line x1="18" y1="6" x2="6" y2="18" />
+														<line x1="6" y1="6" x2="18" y2="18" />
+													</svg>
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Session End
+												<code>session.end</code>
+											</div>
+											<div class="event-desc">
+												Coding session has completed all tasks
+											</div>
+										</div>
+										<div class="drop-zone">
+											<div class="sound-chip">
+												<button class="chip-play">
+													<svg viewBox="0 0 24 24" fill="currentColor">
+														<polygon points="5 3 19 12 5 21 5 3" />
+													</svg>
+												</button>
+												<span class="chip-name"
+													>session_done_chime.wav</span
+												>
+												<button class="chip-remove">
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+													>
+														<line x1="18" y1="6" x2="6" y2="18" />
+														<line x1="6" y1="6" x2="18" y2="18" />
+													</svg>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+
+							<!-- ── IMPORTANT TIER ── -->
+							<section class="tier-section tier-important">
+								<div class="tier-header">
+									<span class="tier-dot"></span>
+									<span class="tier-label">Important</span>
+									<span class="tier-badge-count">3 / 6 assigned</span>
+								</div>
+								<div class="event-slots">
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Session Error
+												<code>session.error</code>
+											</div>
+											<div class="event-desc">
+												Unrecoverable error crashed the session
+											</div>
+										</div>
+										<div class="drop-zone">
+											<div class="sound-chip">
+												<button class="chip-play">
+													<svg viewBox="0 0 24 24" fill="currentColor">
+														<polygon points="5 3 19 12 5 21 5 3" />
+													</svg>
+												</button>
+												<span class="chip-name">error_buzz.wav</span>
+												<button class="chip-remove">
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+													>
+														<line x1="18" y1="6" x2="6" y2="18" />
+														<line x1="6" y1="6" x2="18" y2="18" />
+													</svg>
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Task Error
+												<code>task.error</code>
+											</div>
+											<div class="event-desc">
+												A subtask within the session failed
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Merge Conflict
+												<code>merge.conflict</code>
+											</div>
+											<div class="event-desc">
+												Git merge conflict detected on branch
+											</div>
+										</div>
+										<div class="drop-zone">
+											<div class="sound-chip">
+												<button class="chip-play">
+													<svg viewBox="0 0 24 24" fill="currentColor">
+														<rect x="6" y="4" width="4" height="16" />
+														<rect x="14" y="4" width="4" height="16" />
+													</svg>
+												</button>
+												<span class="chip-name">merge_clash.wav</span>
+												<button class="chip-remove">
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+													>
+														<line x1="18" y1="6" x2="6" y2="18" />
+														<line x1="6" y1="6" x2="18" y2="18" />
+													</svg>
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Resource Limit
+												<code>resource.limit</code>
+											</div>
+											<div class="event-desc">
+												Token or cost threshold exceeded
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												PR Ready
+												<code>pr.ready</code>
+											</div>
+											<div class="event-desc">
+												Pull request is ready for review
+											</div>
+										</div>
+										<div class="drop-zone">
+											<div class="sound-chip">
+												<button class="chip-play">
+													<svg viewBox="0 0 24 24" fill="currentColor">
+														<polygon points="5 3 19 12 5 21 5 3" />
+													</svg>
+												</button>
+												<span class="chip-name">pr_ready_fanfare.wav</span>
+												<button class="chip-remove">
+													<svg
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+													>
+														<line x1="18" y1="6" x2="6" y2="18" />
+														<line x1="6" y1="6" x2="18" y2="18" />
+													</svg>
+												</button>
+											</div>
+										</div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Review Requested
+												<code>pr.review-requested</code>
+											</div>
+											<div class="event-desc">
+												Someone requested your review on a PR
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+								</div>
+							</section>
+
+							<!-- ── NORMAL TIER ── -->
+							<section class="tier-section tier-normal">
+								<div class="tier-header">
+									<span class="tier-dot"></span>
+									<span class="tier-label">Normal</span>
+									<span class="tier-badge-count">0 / 8 assigned</span>
+								</div>
+								<div class="event-slots">
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Session Start
+												<code>session.start</code>
+											</div>
+											<div class="event-desc">
+												A new coding session has been spawned
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Task Complete
+												<code>task.complete</code>
+											</div>
+											<div class="event-desc">
+												A subtask finished successfully
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Task Acknowledged
+												<code>task.acknowledge</code>
+											</div>
+											<div class="event-desc">
+												Agent confirmed it received the task
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												PR Merged
+												<code>pr.merged</code>
+											</div>
+											<div class="event-desc">
+												Pull request was merged into base branch
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Branch Behind Base
+												<code>branch.behind-base</code>
+											</div>
+											<div class="event-desc">
+												Working branch is behind the base branch
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Issue Assigned
+												<code>github.issue-assigned</code>
+											</div>
+											<div class="event-desc">
+												A GitHub issue was assigned to you
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Trigger Received
+												<code>github.trigger-received</code>
+											</div>
+											<div class="event-desc">
+												External trigger from GitHub webhook
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+
+									<div class="event-slot">
+										<div class="event-info">
+											<div class="event-name">
+												Achievement Unlocked
+												<code>achievement.unlocked</code>
+											</div>
+											<div class="event-desc">
+												A productivity milestone was reached
+											</div>
+										</div>
+										<div class="drop-zone is-empty"></div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<!-- /event-scroll -->
+
+						<!-- Validation Footer -->
+						<footer class="validation-footer">
+							<div class="validation-msg is-warning">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+									/>
+									<line x1="12" y1="9" x2="12" y2="13" />
+									<line x1="12" y1="17" x2="12.01" y2="17" />
+								</svg>
+								<span
+									>5 unassigned sounds remaining &middot; 3 important events need
+									sounds</span
+								>
+							</div>
+							<div class="footer-actions">
+								<button class="gk-btn gk-btn-ghost">Cancel</button>
+								<button class="gk-btn gk-btn-primary" disabled>
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+										/>
+										<polyline points="17 21 17 13 7 13 7 21" />
+										<polyline points="7 3 7 8 15 8" />
+									</svg>
+									Save Character
+								</button>
+							</div>
+						</footer>
+					</main>
+				</div>
+				<!-- /split-layout -->
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

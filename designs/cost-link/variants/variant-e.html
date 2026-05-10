@@ -1,0 +1,2316 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CostLink — Variant E: Contextual Color Coding</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+
+			/* Dark theme */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Type */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
+
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* cb-panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+			.cb-row {
+				display: grid;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				padding: 3px 0;
+				min-height: 22px;
+				font-family: var(--font-sans);
+			}
+			.cb-num {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11.5px;
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-mute {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
+
+			/* ──────────────────────────────────────────────────────────────
+   CostLink — Variant E: Contextual Color Coding
+
+   Plain inline text that is color-coded by cost magnitude.
+   On hover, a popover appears showing cost breakdown by model
+   and a "View in Usage" navigation link.
+
+   The color IS the information — no chip, no underline at rest.
+   Hover reveals the popover with detail breakdown.
+   ────────────────────────────────────────────────────────────── */
+
+			.cost-link {
+				display: inline;
+				text-decoration: none;
+				cursor: pointer;
+				border: none;
+				background: none;
+				padding: 0;
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				outline: none;
+				position: relative;
+				font-weight: var(--weight-medium);
+				transition:
+					color var(--duration-2) var(--ease-out),
+					text-shadow var(--duration-3) var(--ease-out),
+					filter var(--duration-2) var(--ease-out);
+				user-select: none;
+				/* Subtle underline that signals clickability on hover */
+				border-bottom: 1px solid transparent;
+			}
+
+			/* ── Size: sm (10.5px) ── */
+			.cost-link-sm {
+				font-size: var(--text-2xs);
+				letter-spacing: 0.01em;
+				line-height: 1.4;
+			}
+
+			/* ── Size: md (12px) ── */
+			.cost-link-md {
+				font-size: var(--text-sm);
+				letter-spacing: 0.01em;
+				line-height: 1.4;
+			}
+
+			/* ── Magnitude: LOW (< $1) — moss/green — "all is well" ── */
+			.cost-link-low {
+				--cl-color: oklch(0.7 0.12 142);
+				--cl-color-hover: oklch(0.78 0.135 138);
+				--cl-glow: oklch(0.58 0.096 134 / 0.35);
+				--cl-underline: oklch(0.58 0.096 134 / 0.5);
+				--cl-ring: oklch(0.58 0.096 134);
+				--cl-popover-accent: oklch(0.66 0.135 145);
+			}
+
+			/* ── Magnitude: MEDIUM ($1-$20) — amber/gold — "watch it" ── */
+			.cost-link-medium {
+				--cl-color: oklch(0.79 0.145 68);
+				--cl-color-hover: oklch(0.84 0.16 65);
+				--cl-glow: oklch(0.69 0.165 55 / 0.3);
+				--cl-underline: oklch(0.69 0.165 55 / 0.5);
+				--cl-ring: oklch(0.69 0.165 55);
+				--cl-popover-accent: oklch(0.77 0.155 75);
+			}
+
+			/* ── Magnitude: HIGH (> $20) — rose/danger — "heads up" ── */
+			.cost-link-high {
+				--cl-color: oklch(0.72 0.135 15);
+				--cl-color-hover: oklch(0.78 0.155 14);
+				--cl-glow: oklch(0.62 0.205 25 / 0.3);
+				--cl-underline: oklch(0.62 0.155 25 / 0.5);
+				--cl-ring: oklch(0.64 0.155 15);
+				--cl-popover-accent: oklch(0.62 0.205 25);
+			}
+
+			/* Apply color by magnitude */
+			.cost-link-low,
+			.cost-link-medium,
+			.cost-link-high {
+				color: var(--cl-color);
+			}
+
+			/* ── Hover state ── */
+			.cost-link:hover,
+			.cost-link[data-state='hover'] {
+				color: var(--cl-color-hover);
+				text-shadow: 0 0 12px var(--cl-glow);
+				border-bottom-color: var(--cl-underline);
+			}
+
+			/* ── Focus state ── */
+			.cost-link:focus-visible,
+			.cost-link[data-state='focus'] {
+				outline: none;
+				box-shadow:
+					0 0 0 2px var(--background),
+					0 0 0 4px var(--cl-ring);
+				border-radius: 2px;
+			}
+
+			/* ── Active / pressed state ── */
+			.cost-link:active,
+			.cost-link[data-state='active'] {
+				filter: brightness(0.85);
+			}
+
+			/* ── Disabled state ── */
+			.cost-link[data-state='disabled'],
+			.cost-link:disabled,
+			.cost-link[aria-disabled='true'] {
+				color: var(--foreground-subtle) !important;
+				opacity: 0.42;
+				cursor: not-allowed;
+				pointer-events: none;
+				text-shadow: none !important;
+				border-bottom-color: transparent !important;
+			}
+
+			/* ─── Popover wrapper ─── */
+			.cost-link-wrapper {
+				position: relative;
+				display: inline-flex;
+				align-items: center;
+			}
+
+			/* ─── Cost breakdown popover ─── */
+			.cost-link-popover {
+				position: absolute;
+				bottom: calc(100% + 8px);
+				left: 50%;
+				transform: translateX(-50%) translateY(4px);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				box-shadow: var(--shadow-lg);
+				padding: 0;
+				min-width: 220px;
+				max-width: 280px;
+				pointer-events: none;
+				opacity: 0;
+				transition:
+					opacity var(--duration-3) var(--ease-out),
+					transform var(--duration-3) var(--ease-out);
+				z-index: var(--z-tooltip);
+				overflow: hidden;
+			}
+
+			/* Popover arrow */
+			.cost-link-popover::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				border: 5px solid transparent;
+				border-top-color: var(--border);
+			}
+			.cost-link-popover::before {
+				content: '';
+				position: absolute;
+				top: calc(100% - 1px);
+				left: 50%;
+				transform: translateX(-50%);
+				border: 5px solid transparent;
+				border-top-color: var(--surface);
+				z-index: 1;
+			}
+
+			/* Popover header with accent bar */
+			.popover-header {
+				padding: 8px 12px 6px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.popover-title {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+			.popover-total {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				font-weight: var(--weight-semibold);
+				font-variant-numeric: tabular-nums;
+			}
+			/* Total inherits the magnitude color */
+			.cost-link-low + .cost-link-popover .popover-total,
+			.cost-link-wrapper[data-magnitude='low'] .popover-total {
+				color: oklch(0.7 0.12 142);
+			}
+			.cost-link-medium + .cost-link-popover .popover-total,
+			.cost-link-wrapper[data-magnitude='medium'] .popover-total {
+				color: oklch(0.79 0.145 68);
+			}
+			.cost-link-high + .cost-link-popover .popover-total,
+			.cost-link-wrapper[data-magnitude='high'] .popover-total {
+				color: oklch(0.72 0.135 15);
+			}
+
+			/* Popover body rows */
+			.popover-body {
+				padding: 6px 12px 8px;
+			}
+			.popover-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 4px 0;
+				font-size: 11px;
+				gap: 12px;
+			}
+			.popover-row + .popover-row {
+				border-top: 1px dashed color-mix(in oklch, var(--border) 50%, transparent);
+			}
+			.popover-model {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 140px;
+			}
+			.popover-model-cost {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: var(--weight-medium);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground);
+				white-space: nowrap;
+			}
+
+			/* Popover footer with link */
+			.popover-footer {
+				padding: 6px 12px 8px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+			.popover-nav-link {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				text-decoration: none;
+				cursor: pointer;
+				transition: color var(--duration-2) var(--ease-out);
+			}
+			.popover-nav-link:hover {
+				color: var(--foreground);
+			}
+			.popover-nav-link svg {
+				flex-shrink: 0;
+			}
+
+			/* Show popover on hover */
+			.cost-link-wrapper:hover .cost-link-popover,
+			.cost-link-wrapper:focus-within .cost-link-popover,
+			.cost-link-wrapper[data-show-popover] .cost-link-popover {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0);
+				pointer-events: auto;
+			}
+
+			/* Bar chart in popover — small proportional bars next to each model */
+			.popover-bar {
+				height: 3px;
+				border-radius: 1.5px;
+				flex-shrink: 0;
+				margin-top: 2px;
+			}
+			.cost-link-wrapper[data-magnitude='low'] .popover-bar {
+				background: oklch(0.7 0.12 142);
+			}
+			.cost-link-wrapper[data-magnitude='medium'] .popover-bar {
+				background: oklch(0.79 0.145 68);
+			}
+			.cost-link-wrapper[data-magnitude='high'] .popover-bar {
+				background: oklch(0.72 0.135 15);
+			}
+
+			/* ── Showcase page layout ── */
+			.showcase-page {
+				min-height: 100vh;
+				padding: 40px 48px 80px;
+				max-width: 960px;
+				margin: 0 auto;
+			}
+
+			.showcase-header {
+				margin-bottom: 48px;
+			}
+
+			.showcase-section {
+				margin-bottom: 48px;
+			}
+
+			.showcase-section-title {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				margin-bottom: 16px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.showcase-section-title::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* State grid */
+			.state-grid {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: 12px;
+			}
+
+			@media (max-width: 700px) {
+				.state-grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.showcase-page {
+					padding: 24px 20px 60px;
+				}
+				.context-row {
+					flex-direction: column;
+				}
+			}
+
+			.state-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				padding: 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+			}
+
+			.state-cell-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+
+			.state-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			/* Magnitude row */
+			.magnitude-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-wrap: wrap;
+				padding: 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				margin-bottom: 10px;
+			}
+
+			.magnitude-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				min-width: 80px;
+			}
+
+			/* Context: workspace card */
+			.workspace-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				width: 280px;
+				transition:
+					border-color var(--duration-2),
+					box-shadow var(--duration-2);
+			}
+			.workspace-card:hover {
+				border-color: var(--border-strong);
+				box-shadow: var(--shadow-md);
+			}
+			.workspace-card-accent {
+				height: 3px;
+				background: linear-gradient(90deg, var(--moss-500) 0%, var(--moss-400) 100%);
+			}
+			.workspace-card-body {
+				padding: 14px 14px 10px;
+			}
+			.workspace-card-name {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				margin-bottom: 2px;
+			}
+			.workspace-card-meta {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				margin-bottom: 10px;
+			}
+			.workspace-card-stats {
+				display: flex;
+				gap: 14px;
+				margin-bottom: 12px;
+			}
+			.workspace-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+			}
+			.workspace-stat-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+			.workspace-stat-label {
+				font-size: 10px;
+				color: var(--foreground-subtle);
+			}
+			.workspace-card-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 8px 14px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+			.workspace-footer-left {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+			.session-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--session-running);
+				flex-shrink: 0;
+			}
+
+			/* Context: session sidebar */
+			.sidebar-panel {
+				width: 260px;
+				background: var(--sidebar-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+			}
+			.sidebar-header {
+				padding: 12px 14px 10px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.sidebar-header-icon {
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				background: var(--primary-soft);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+			.sidebar-header-title {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				line-height: var(--leading-snug);
+			}
+			.sidebar-header-sub {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+			.sidebar-section {
+				padding: 10px 14px;
+				border-bottom: 1px solid var(--border);
+			}
+			.sidebar-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 4px 0;
+				font-size: var(--text-xs);
+			}
+			.sidebar-row-label {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+			.sidebar-row-value {
+				color: var(--foreground-muted);
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Standalone context */
+			.standalone-demo {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				flex-wrap: wrap;
+				padding: 16px 20px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+			}
+			.standalone-label {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			/* Context row layout */
+			.context-row {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+				align-items: flex-start;
+			}
+
+			/* Color swatch for legend */
+			.color-swatch {
+				display: inline-block;
+				width: 10px;
+				height: 10px;
+				border-radius: 2px;
+				margin-right: 6px;
+				vertical-align: middle;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="showcase-page">
+				<!-- ── Header ── -->
+				<div class="showcase-header">
+					<div class="gk-eyebrow" style="margin-bottom: 10px">
+						Variant E &middot; Contextual Color Coding
+					</div>
+					<h1 class="gk-h2" style="margin-bottom: 6px">CostLink</h1>
+					<p
+						class="gk-small"
+						style="max-width: 580px; line-height: var(--leading-relaxed)"
+					>
+						Plain monospace text whose color encodes cost magnitude. Green for low,
+						amber for medium, rose for high. On hover, a popover reveals model-level
+						cost breakdown and a navigation link to Usage. The color <em>is</em> the
+						information -- no chrome at rest.
+					</p>
+				</div>
+
+				<!-- ── Section 1: Color Legend ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Color Scale</div>
+					<div
+						style="
+							display: flex;
+							gap: 32px;
+							flex-wrap: wrap;
+							padding: 16px 20px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-md);
+						"
+					>
+						<div style="display: flex; align-items: center; gap: 8px">
+							<span
+								class="color-swatch"
+								style="background: oklch(0.7 0.12 142)"
+							></span>
+							<span class="gk-tiny" style="color: var(--foreground-muted)">Low</span>
+							<span
+								style="
+									font-family: var(--font-mono);
+									font-size: 10.5px;
+									color: var(--foreground-subtle);
+								"
+								>&lt; $1</span
+							>
+						</div>
+						<div style="display: flex; align-items: center; gap: 8px">
+							<span
+								class="color-swatch"
+								style="background: oklch(0.79 0.145 68)"
+							></span>
+							<span class="gk-tiny" style="color: var(--foreground-muted)"
+								>Medium</span
+							>
+							<span
+								style="
+									font-family: var(--font-mono);
+									font-size: 10.5px;
+									color: var(--foreground-subtle);
+								"
+								>$1 - $20</span
+							>
+						</div>
+						<div style="display: flex; align-items: center; gap: 8px">
+							<span
+								class="color-swatch"
+								style="background: oklch(0.72 0.135 15)"
+							></span>
+							<span class="gk-tiny" style="color: var(--foreground-muted)">High</span>
+							<span
+								style="
+									font-family: var(--font-mono);
+									font-size: 10.5px;
+									color: var(--foreground-subtle);
+								"
+								>&gt; $20</span
+							>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 2: Magnitudes at Both Sizes ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Magnitudes &amp; Sizes</div>
+
+					<!-- Low -->
+					<div class="magnitude-row">
+						<span class="magnitude-label">low &lt; $1</span>
+						<div style="display: flex; align-items: baseline; gap: 20px">
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									align-items: flex-start;
+								"
+							>
+								<a
+									class="cost-link cost-link-sm cost-link-low"
+									href="#"
+									role="link"
+									aria-label="View usage for $0.12"
+									>$0.12</a
+								>
+								<span class="gk-tiny">sm</span>
+							</div>
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									align-items: flex-start;
+								"
+							>
+								<a
+									class="cost-link cost-link-md cost-link-low"
+									href="#"
+									role="link"
+									aria-label="View usage for $0.12"
+									>$0.12</a
+								>
+								<span class="gk-tiny">md</span>
+							</div>
+							<span
+								class="gk-tiny"
+								style="color: var(--foreground-subtle); margin-left: 8px"
+								>Looks like regular text, only greener</span
+							>
+						</div>
+					</div>
+
+					<!-- Medium -->
+					<div class="magnitude-row">
+						<span class="magnitude-label">mid $1 - $20</span>
+						<div style="display: flex; align-items: baseline; gap: 20px">
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									align-items: flex-start;
+								"
+							>
+								<a
+									class="cost-link cost-link-sm cost-link-medium"
+									href="#"
+									role="link"
+									aria-label="View usage for $4.38"
+									>$4.38</a
+								>
+								<span class="gk-tiny">sm</span>
+							</div>
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									align-items: flex-start;
+								"
+							>
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									href="#"
+									role="link"
+									aria-label="View usage for $4.38"
+									>$4.38</a
+								>
+								<span class="gk-tiny">md</span>
+							</div>
+							<span
+								class="gk-tiny"
+								style="color: var(--foreground-subtle); margin-left: 8px"
+								>Amber draws attention without alarming</span
+							>
+						</div>
+					</div>
+
+					<!-- High -->
+					<div class="magnitude-row">
+						<span class="magnitude-label">high &gt; $20</span>
+						<div style="display: flex; align-items: baseline; gap: 20px">
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									align-items: flex-start;
+								"
+							>
+								<a
+									class="cost-link cost-link-sm cost-link-high"
+									href="#"
+									role="link"
+									aria-label="View usage for $28.75"
+									>$28.75</a
+								>
+								<span class="gk-tiny">sm</span>
+							</div>
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: 4px;
+									align-items: flex-start;
+								"
+							>
+								<a
+									class="cost-link cost-link-md cost-link-high"
+									href="#"
+									role="link"
+									aria-label="View usage for $28.75"
+									>$28.75</a
+								>
+								<span class="gk-tiny">md</span>
+							</div>
+							<span
+								class="gk-tiny"
+								style="color: var(--foreground-subtle); margin-left: 8px"
+								>Rose/danger signals cost worth investigating</span
+							>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 3: Interactive States ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Interactive States -- $4.38 (medium)</div>
+					<div class="state-grid">
+						<!-- Default -->
+						<div class="state-cell">
+							<div class="state-cell-label">default</div>
+							<div class="state-cell-stage">
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									href="#"
+									tabindex="-1"
+									aria-label="$4.38"
+									>$4.38</a
+								>
+							</div>
+						</div>
+
+						<!-- Hover -->
+						<div class="state-cell">
+							<div class="state-cell-label">hover</div>
+							<div class="state-cell-stage">
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									data-state="hover"
+									href="#"
+									tabindex="-1"
+									aria-label="$4.38"
+									>$4.38</a
+								>
+							</div>
+						</div>
+
+						<!-- Focus -->
+						<div class="state-cell">
+							<div class="state-cell-label">focus</div>
+							<div class="state-cell-stage">
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									data-state="focus"
+									href="#"
+									tabindex="-1"
+									aria-label="$4.38"
+									>$4.38</a
+								>
+							</div>
+						</div>
+
+						<!-- Active -->
+						<div class="state-cell">
+							<div class="state-cell-label">active</div>
+							<div class="state-cell-stage">
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									data-state="active"
+									href="#"
+									tabindex="-1"
+									aria-label="$4.38"
+									>$4.38</a
+								>
+							</div>
+						</div>
+
+						<!-- Disabled -->
+						<div class="state-cell">
+							<div class="state-cell-label">disabled</div>
+							<div class="state-cell-stage">
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									data-state="disabled"
+									aria-disabled="true"
+									href="#"
+									tabindex="-1"
+									aria-label="$4.38 disabled"
+									>$4.38</a
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 4: Popover Breakdown on Hover ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Hover Popover -- Cost Breakdown by Model
+					</div>
+
+					<div
+						style="
+							display: flex;
+							gap: 40px;
+							flex-wrap: wrap;
+							align-items: flex-end;
+							padding: 60px 20px 20px;
+						"
+					>
+						<!-- Low cost popover -->
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								align-items: center;
+								gap: 8px;
+							"
+						>
+							<div class="cost-link-wrapper" data-magnitude="low" data-show-popover>
+								<a
+									class="cost-link cost-link-md cost-link-low"
+									href="#"
+									role="link"
+									aria-label="View usage for $0.12"
+									>$0.12</a
+								>
+								<div class="cost-link-popover">
+									<div class="popover-header">
+										<span class="popover-title">Cost Breakdown</span>
+										<span class="popover-total">$0.12</span>
+									</div>
+									<div class="popover-body">
+										<div class="popover-row">
+											<span class="popover-model">claude-haiku-4</span>
+											<span class="popover-model-cost">$0.08</span>
+										</div>
+										<div class="popover-row">
+											<span class="popover-model">claude-sonnet-4</span>
+											<span class="popover-model-cost">$0.04</span>
+										</div>
+									</div>
+									<div class="popover-footer">
+										<a class="popover-nav-link" href="#">
+											View in Usage
+											<svg
+												width="10"
+												height="10"
+												viewBox="0 0 10 10"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</a>
+									</div>
+								</div>
+							</div>
+							<span class="gk-tiny">low</span>
+						</div>
+
+						<!-- Medium cost popover -->
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								align-items: center;
+								gap: 8px;
+							"
+						>
+							<div
+								class="cost-link-wrapper"
+								data-magnitude="medium"
+								data-show-popover
+							>
+								<a
+									class="cost-link cost-link-md cost-link-medium"
+									href="#"
+									role="link"
+									aria-label="View usage for $4.38"
+									>$4.38</a
+								>
+								<div class="cost-link-popover">
+									<div class="popover-header">
+										<span class="popover-title">Cost Breakdown</span>
+										<span class="popover-total">$4.38</span>
+									</div>
+									<div class="popover-body">
+										<div class="popover-row">
+											<span class="popover-model">claude-sonnet-4</span>
+											<span class="popover-model-cost">$2.91</span>
+										</div>
+										<div class="popover-row">
+											<span class="popover-model">claude-opus-4</span>
+											<span class="popover-model-cost">$1.22</span>
+										</div>
+										<div class="popover-row">
+											<span class="popover-model">claude-haiku-4</span>
+											<span class="popover-model-cost">$0.25</span>
+										</div>
+									</div>
+									<div class="popover-footer">
+										<a class="popover-nav-link" href="#">
+											View in Usage
+											<svg
+												width="10"
+												height="10"
+												viewBox="0 0 10 10"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</a>
+									</div>
+								</div>
+							</div>
+							<span class="gk-tiny">medium</span>
+						</div>
+
+						<!-- High cost popover -->
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								align-items: center;
+								gap: 8px;
+							"
+						>
+							<div class="cost-link-wrapper" data-magnitude="high" data-show-popover>
+								<a
+									class="cost-link cost-link-md cost-link-high"
+									href="#"
+									role="link"
+									aria-label="View usage for $28.75"
+									>$28.75</a
+								>
+								<div class="cost-link-popover">
+									<div class="popover-header">
+										<span class="popover-title">Cost Breakdown</span>
+										<span class="popover-total">$28.75</span>
+									</div>
+									<div class="popover-body">
+										<div class="popover-row">
+											<span class="popover-model">claude-opus-4</span>
+											<span class="popover-model-cost">$18.40</span>
+										</div>
+										<div class="popover-row">
+											<span class="popover-model">claude-sonnet-4</span>
+											<span class="popover-model-cost">$7.62</span>
+										</div>
+										<div class="popover-row">
+											<span class="popover-model">claude-haiku-4</span>
+											<span class="popover-model-cost">$1.85</span>
+										</div>
+										<div class="popover-row">
+											<span class="popover-model">claude-sonnet-4-5</span>
+											<span class="popover-model-cost">$0.88</span>
+										</div>
+									</div>
+									<div class="popover-footer">
+										<a class="popover-nav-link" href="#">
+											View in Usage
+											<svg
+												width="10"
+												height="10"
+												viewBox="0 0 10 10"
+												fill="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+													stroke="currentColor"
+													stroke-width="1.2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</a>
+									</div>
+								</div>
+							</div>
+							<span class="gk-tiny">high</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 5: Full State Matrix ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Full Matrix -- All States x Magnitudes (md)
+					</div>
+					<div style="overflow-x: auto">
+						<table style="border-collapse: collapse; width: 100%; min-width: 480px">
+							<thead>
+								<tr>
+									<th
+										style="
+											text-align: left;
+											padding: 8px 14px 8px 0;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+										"
+									>
+										State
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										low &lt; $1
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										mid $1-$20
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										high &gt; $20
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Default -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										default
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<!-- Hover -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										hover
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="hover"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="hover"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="hover"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<!-- Focus -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										focus
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="focus"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="focus"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="focus"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<!-- Active -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										active
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="active"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="active"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 10px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="active"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<!-- Disabled -->
+								<tr>
+									<td
+										style="
+											padding: 10px 14px 10px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+										"
+									>
+										disabled
+									</td>
+									<td style="padding: 10px 14px; text-align: center">
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="disabled"
+											aria-disabled="true"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td style="padding: 10px 14px; text-align: center">
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="disabled"
+											aria-disabled="true"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td style="padding: 10px 14px; text-align: center">
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="disabled"
+											aria-disabled="true"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- ── Section 6: In-Context Usage ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">In Context</div>
+					<div class="context-row">
+						<!-- Workspace Card -->
+						<div style="display: flex; flex-direction: column; gap: 8px">
+							<div class="gk-tiny">workspace card footer</div>
+							<div class="workspace-card">
+								<div class="workspace-card-accent"></div>
+								<div class="workspace-card-body">
+									<div class="workspace-card-name">grovekeeper</div>
+									<div class="workspace-card-meta">
+										~/dev/grovekeeper &middot; main
+									</div>
+									<div class="workspace-card-stats">
+										<div class="workspace-stat">
+											<div class="workspace-stat-value">7</div>
+											<div class="workspace-stat-label">sessions</div>
+										</div>
+										<div class="workspace-stat">
+											<div class="workspace-stat-value">3</div>
+											<div class="workspace-stat-label">active</div>
+										</div>
+										<div class="workspace-stat">
+											<div class="workspace-stat-value">24</div>
+											<div class="workspace-stat-label">issues</div>
+										</div>
+									</div>
+								</div>
+								<div class="workspace-card-footer">
+									<div class="workspace-footer-left">
+										<span class="session-dot"></span>
+										<span>3 running</span>
+									</div>
+									<div class="cost-link-wrapper" data-magnitude="medium">
+										<a
+											class="cost-link cost-link-sm cost-link-medium"
+											href="#"
+											aria-label="$4.38 today -- View cost breakdown"
+											>$4.38</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Today</span>
+												<span class="popover-total">$4.38</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$2.91</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$1.22</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-haiku-4</span
+													>
+													<span class="popover-model-cost">$0.25</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+														aria-hidden="true"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Session Sidebar -->
+						<div style="display: flex; flex-direction: column; gap: 8px">
+							<div class="gk-tiny">session sidebar panel</div>
+							<div class="sidebar-panel">
+								<div class="sidebar-header">
+									<div class="sidebar-header-icon">
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="9"
+												rx="2"
+												stroke="var(--primary)"
+												stroke-width="1.4"
+											/>
+											<path
+												d="M5 13h6"
+												stroke="var(--primary)"
+												stroke-width="1.4"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</div>
+									<div>
+										<div class="sidebar-header-title">
+											PRD-97 &middot; metrics v2
+										</div>
+										<div class="sidebar-header-sub">
+											claude-sonnet-4 &middot; running
+										</div>
+									</div>
+								</div>
+								<div class="sidebar-section">
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">tokens in</span>
+										<span class="sidebar-row-value">284,391</span>
+									</div>
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">tokens out</span>
+										<span class="sidebar-row-value">41,822</span>
+									</div>
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">tool calls</span>
+										<span class="sidebar-row-value">138</span>
+									</div>
+									<div
+										class="sidebar-row"
+										style="
+											padding-top: 8px;
+											margin-top: 4px;
+											border-top: 1px dashed var(--border);
+										"
+									>
+										<span class="sidebar-row-label">session cost</span>
+										<div class="cost-link-wrapper" data-magnitude="medium">
+											<a
+												class="cost-link cost-link-sm cost-link-medium"
+												href="#"
+												aria-label="$4.38 -- View cost breakdown"
+												>$4.38</a
+											>
+											<div class="cost-link-popover">
+												<div class="popover-header">
+													<span class="popover-title">Session</span>
+													<span class="popover-total">$4.38</span>
+												</div>
+												<div class="popover-body">
+													<div class="popover-row">
+														<span class="popover-model"
+															>claude-sonnet-4</span
+														>
+														<span class="popover-model-cost"
+															>$4.38</span
+														>
+													</div>
+												</div>
+												<div class="popover-footer">
+													<a class="popover-nav-link" href="#">
+														View in Usage
+														<svg
+															width="10"
+															height="10"
+															viewBox="0 0 10 10"
+															fill="none"
+															aria-hidden="true"
+														>
+															<path
+																d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+																stroke="currentColor"
+																stroke-width="1.2"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+															/>
+														</svg>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="sidebar-row">
+										<span class="sidebar-row-label">workspace total</span>
+										<div class="cost-link-wrapper" data-magnitude="high">
+											<a
+												class="cost-link cost-link-sm cost-link-high"
+												href="#"
+												aria-label="$28.75 -- View cost breakdown"
+												>$28.75</a
+											>
+											<div class="cost-link-popover">
+												<div class="popover-header">
+													<span class="popover-title">Workspace</span>
+													<span class="popover-total">$28.75</span>
+												</div>
+												<div class="popover-body">
+													<div class="popover-row">
+														<span class="popover-model"
+															>claude-opus-4</span
+														>
+														<span class="popover-model-cost"
+															>$18.40</span
+														>
+													</div>
+													<div class="popover-row">
+														<span class="popover-model"
+															>claude-sonnet-4</span
+														>
+														<span class="popover-model-cost"
+															>$7.62</span
+														>
+													</div>
+													<div class="popover-row">
+														<span class="popover-model"
+															>claude-haiku-4</span
+														>
+														<span class="popover-model-cost"
+															>$1.85</span
+														>
+													</div>
+													<div class="popover-row">
+														<span class="popover-model"
+															>claude-sonnet-4-5</span
+														>
+														<span class="popover-model-cost"
+															>$0.88</span
+														>
+													</div>
+												</div>
+												<div class="popover-footer">
+													<a class="popover-nav-link" href="#">
+														View in Usage
+														<svg
+															width="10"
+															height="10"
+															viewBox="0 0 10 10"
+															fill="none"
+															aria-hidden="true"
+														>
+															<path
+																d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+																stroke="currentColor"
+																stroke-width="1.2"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+															/>
+														</svg>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Standalone inline -->
+						<div
+							style="
+								display: flex;
+								flex-direction: column;
+								gap: 8px;
+								flex: 1;
+								min-width: 200px;
+							"
+						>
+							<div class="gk-tiny">standalone / inline text</div>
+							<div class="standalone-demo">
+								<span class="standalone-label">Today's spend:</span>
+								<div class="cost-link-wrapper" data-magnitude="low">
+									<a
+										class="cost-link cost-link-md cost-link-low"
+										href="#"
+										aria-label="$0.12 -- View cost breakdown"
+										>$0.12</a
+									>
+									<div class="cost-link-popover">
+										<div class="popover-header">
+											<span class="popover-title">Today</span>
+											<span class="popover-total">$0.12</span>
+										</div>
+										<div class="popover-body">
+											<div class="popover-row">
+												<span class="popover-model">claude-haiku-4</span>
+												<span class="popover-model-cost">$0.08</span>
+											</div>
+											<div class="popover-row">
+												<span class="popover-model">claude-sonnet-4</span>
+												<span class="popover-model-cost">$0.04</span>
+											</div>
+										</div>
+										<div class="popover-footer">
+											<a class="popover-nav-link" href="#">
+												View in Usage
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="none"
+													aria-hidden="true"
+												>
+													<path
+														d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+														stroke="currentColor"
+														stroke-width="1.2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="standalone-demo">
+								<span class="standalone-label">This session:</span>
+								<div class="cost-link-wrapper" data-magnitude="medium">
+									<a
+										class="cost-link cost-link-md cost-link-medium"
+										href="#"
+										aria-label="$4.38 -- View cost breakdown"
+										>$4.38</a
+									>
+									<div class="cost-link-popover">
+										<div class="popover-header">
+											<span class="popover-title">Session</span>
+											<span class="popover-total">$4.38</span>
+										</div>
+										<div class="popover-body">
+											<div class="popover-row">
+												<span class="popover-model">claude-sonnet-4</span>
+												<span class="popover-model-cost">$2.91</span>
+											</div>
+											<div class="popover-row">
+												<span class="popover-model">claude-opus-4</span>
+												<span class="popover-model-cost">$1.22</span>
+											</div>
+											<div class="popover-row">
+												<span class="popover-model">claude-haiku-4</span>
+												<span class="popover-model-cost">$0.25</span>
+											</div>
+										</div>
+										<div class="popover-footer">
+											<a class="popover-nav-link" href="#">
+												View in Usage
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="none"
+													aria-hidden="true"
+												>
+													<path
+														d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+														stroke="currentColor"
+														stroke-width="1.2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="standalone-demo">
+								<span class="standalone-label">MTD total:</span>
+								<div class="cost-link-wrapper" data-magnitude="high">
+									<a
+										class="cost-link cost-link-md cost-link-high"
+										href="#"
+										aria-label="$28.75 -- View cost breakdown"
+										>$28.75</a
+									>
+									<div class="cost-link-popover">
+										<div class="popover-header">
+											<span class="popover-title">Month-to-date</span>
+											<span class="popover-total">$28.75</span>
+										</div>
+										<div class="popover-body">
+											<div class="popover-row">
+												<span class="popover-model">claude-opus-4</span>
+												<span class="popover-model-cost">$18.40</span>
+											</div>
+											<div class="popover-row">
+												<span class="popover-model">claude-sonnet-4</span>
+												<span class="popover-model-cost">$7.62</span>
+											</div>
+											<div class="popover-row">
+												<span class="popover-model">claude-haiku-4</span>
+												<span class="popover-model-cost">$1.85</span>
+											</div>
+											<div class="popover-row">
+												<span class="popover-model">claude-sonnet-4-5</span>
+												<span class="popover-model-cost">$0.88</span>
+											</div>
+										</div>
+										<div class="popover-footer">
+											<a class="popover-nav-link" href="#">
+												View in Usage
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="none"
+													aria-hidden="true"
+												>
+													<path
+														d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+														stroke="currentColor"
+														stroke-width="1.2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 7: Live Interactive ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Live -- Hover for Popover, Tab for Focus
+					</div>
+					<div
+						style="
+							display: flex;
+							gap: 24px;
+							flex-wrap: wrap;
+							align-items: center;
+							padding: 20px 24px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-md);
+						"
+					>
+						<span class="gk-small">Hover each value:</span>
+						<div class="cost-link-wrapper" data-magnitude="low">
+							<a
+								class="cost-link cost-link-md cost-link-low"
+								href="#"
+								aria-label="$0.12 -- View cost breakdown"
+								>$0.12</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$0.12</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-haiku-4</span>
+										<span class="popover-model-cost">$0.08</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$0.04</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div class="cost-link-wrapper" data-magnitude="medium">
+							<a
+								class="cost-link cost-link-md cost-link-medium"
+								href="#"
+								aria-label="$4.38 -- View cost breakdown"
+								>$4.38</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$4.38</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$2.91</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-opus-4</span>
+										<span class="popover-model-cost">$1.22</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-haiku-4</span>
+										<span class="popover-model-cost">$0.25</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div class="cost-link-wrapper" data-magnitude="high">
+							<a
+								class="cost-link cost-link-md cost-link-high"
+								href="#"
+								aria-label="$28.75 -- View cost breakdown"
+								>$28.75</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$28.75</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-opus-4</span>
+										<span class="popover-model-cost">$18.40</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$7.62</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-haiku-4</span>
+										<span class="popover-model-cost">$1.85</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4-5</span>
+										<span class="popover-model-cost">$0.88</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ── Section 8: Inline Flow Demo ── -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Inline Text Flow</div>
+					<div
+						style="
+							padding: 20px 24px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-md);
+							line-height: 1.7;
+						"
+					>
+						<p
+							style="
+								font-size: var(--text-md);
+								color: var(--foreground-muted);
+								max-width: 560px;
+							"
+						>
+							Session "fix auth token refresh" used
+							<span
+								class="cost-link-wrapper"
+								data-magnitude="low"
+								style="display: inline"
+							>
+								<a
+									class="cost-link cost-link-sm cost-link-low"
+									href="#"
+									style="display: inline"
+									>$0.12</a
+								>
+							</span>
+							over 14 tool calls. The workspace total for today is
+							<span
+								class="cost-link-wrapper"
+								data-magnitude="medium"
+								style="display: inline"
+							>
+								<a
+									class="cost-link cost-link-sm cost-link-medium"
+									href="#"
+									style="display: inline"
+									>$4.38</a
+								>
+							</span>
+							across 3 active sessions. Month-to-date spend sits at
+							<span
+								class="cost-link-wrapper"
+								data-magnitude="high"
+								style="display: inline"
+							>
+								<a
+									class="cost-link cost-link-sm cost-link-high"
+									href="#"
+									style="display: inline"
+									>$28.75</a
+								>
+							</span>
+							which is 62% of the monthly budget.
+						</p>
+					</div>
+				</div>
+			</div>
+			<!-- /showcase-page -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

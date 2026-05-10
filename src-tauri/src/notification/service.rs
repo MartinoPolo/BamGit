@@ -11,8 +11,9 @@ use crate::models::notification::{
 };
 use crate::models::session::SessionState;
 
-use super::playback_queue::PlaybackQueueHandle;
+use super::playback_queue::LazyPlaybackQueue;
 use super::sound;
+use super::sound_pack;
 
 /// Manages notification dispatch across all channels (toast, sound, window attention).
 pub struct NotificationService {
@@ -126,36 +127,96 @@ impl NotificationService {
         database_connection: &std::sync::Arc<Mutex<Connection>>,
     ) {
         let global_volume = self.load_global_volume(database_connection);
-        let per_sound_volume = self.load_sound_volume_override(
-            event_type,
-            sound_file,
-            database_connection,
-        );
+        let per_sound_volume =
+            self.load_sound_volume_override(event_type, sound_file, database_connection);
         let volume = global_volume * per_sound_volume;
 
-        let resolved_path = sound::resolve_sound_path(
+        let candidates = self.resolve_sound_candidates(sound_file, event_type);
+
+        if candidates.is_empty() {
+            log::warn!("Sound file not found: {sound_file}");
+            return;
+        }
+
+        if let Some(queue) = app_handle.try_state::<LazyPlaybackQueue>() {
+            queue.enqueue(candidates, volume as f32, event_type, session_id.to_owned());
+        } else {
+            // Fallback: direct playback on thread (shouldn't happen in normal operation)
+            let volume_f32 = volume as f32;
+            let path = candidates.into_iter().next().unwrap();
+            std::thread::spawn(move || {
+                if let Err(error) = sound::play_sound_blocking(&path, volume_f32) {
+                    log::error!("Sound playback failed: {error}");
+                }
+            });
+        }
+    }
+
+    fn resolve_sound_candidates(
+        &self,
+        sound_file: &str,
+        event_type: NotificationEventType,
+    ) -> Vec<PathBuf> {
+        // Try to find all sounds in the same category from the pack
+        if let Some(pack_prefix) = sound_file.split('/').next() {
+            // Try bundled packs first
+            let bundled_pack_dir = self.resource_directory.join("sounds").join(pack_prefix);
+            if let Ok(manifest) = sound_pack::load_manifest(&bundled_pack_dir) {
+                if let Some(sounds) = manifest.categories.get(event_type.as_str()) {
+                    if sounds.len() > 1 {
+                        let resolved: Vec<PathBuf> = sounds
+                            .iter()
+                            .filter_map(|entry| {
+                                let relative = format!("{}/{}", pack_prefix, entry.file);
+                                sound::resolve_sound_path(
+                                    &relative,
+                                    &self.resource_directory,
+                                    &self.app_data_directory,
+                                )
+                            })
+                            .collect();
+                        if !resolved.is_empty() {
+                            return resolved;
+                        }
+                    }
+                }
+            }
+
+            // Try user-installed packs
+            let user_pack_dir = self
+                .app_data_directory
+                .join("sound-packs")
+                .join(pack_prefix);
+            if let Ok(manifest) = sound_pack::load_manifest(&user_pack_dir) {
+                if let Some(sounds) = manifest.categories.get(event_type.as_str()) {
+                    if sounds.len() > 1 {
+                        let resolved: Vec<PathBuf> = sounds
+                            .iter()
+                            .filter_map(|entry| {
+                                let relative = format!("{}/{}", pack_prefix, entry.file);
+                                sound::resolve_sound_path(
+                                    &relative,
+                                    &self.resource_directory,
+                                    &self.app_data_directory,
+                                )
+                            })
+                            .collect();
+                        if !resolved.is_empty() {
+                            return resolved;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fallback: single resolved file
+        match sound::resolve_sound_path(
             sound_file,
             &self.resource_directory,
             &self.app_data_directory,
-        );
-
-        match resolved_path {
-            Some(path) => {
-                if let Some(queue) = app_handle.try_state::<PlaybackQueueHandle>() {
-                    queue.enqueue(path, volume as f32, event_type, session_id.to_owned());
-                } else {
-                    // Fallback: direct playback on thread (shouldn't happen in normal operation)
-                    let volume_f32 = volume as f32;
-                    std::thread::spawn(move || {
-                        if let Err(error) = sound::play_sound_blocking(&path, volume_f32) {
-                            log::error!("Sound playback failed: {error}");
-                        }
-                    });
-                }
-            }
-            None => {
-                log::warn!("Sound file not found: {sound_file}");
-            }
+        ) {
+            Some(path) => vec![path],
+            None => vec![],
         }
     }
 

@@ -1,91 +1,218 @@
 ---
 name: gk-design-refine
-description: 'Refine a chosen design variant into the final HTML mockup, adopt components, and link to GitHub issue. Use when: "refine design", "accept variant", "polish design", "select variant", "create final mockup"'
-argument-hint: '[variant-path or brief-path]'
+description: 'Apply refinement requirements to a chosen variant, produce refined.html + SUMMARY.md, update brief, link to GitHub issue. Use when: "refine design", "accept variant", "polish design", "select variant", "apply refinements", "refine variant B", "refine all"'
+argument-hint: 'all | <variant-letter> [refinement requirements...]'
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir *), Bash(pnpm dlx shadcn-svelte*), Bash(gh *), Agent
 metadata:
     author: MartinoPolo
-    version: '0.1'
+    version: '0.5'
     category: design
 ---
 
 # Design Refinement
 
-Refine a chosen design variant (or a sufficiently specific brief) into the final polished HTML mockup. Adopt needed components, link to the GitHub issue.
+Apply refinement requirements to a chosen variant. Produces `refined.html` and `SUMMARY.md`, updates the design brief, and links to the GitHub issue.
+
+Supports two modes:
+
+- **Single**: refine a specific variant for the active design folder
+- **Batch (`all`)**: scan every design subfolder for unprocessed DECISION.md files and refine each one in sequence
 
 ## Process
 
-### Step 1: Read Design System
+### Step 1: Parse Arguments
 
-Read `claude_design/DESIGN_SYSTEM.md` and `claude_design/tokens.css`.
+**If the argument is `all`** → switch to [Batch Mode](#batch-mode-all) below.
 
-### Step 2: Identify Source
+Otherwise (single mode):
 
-- If given a variant path (e.g., `claude_design/mockups/variants/session-panel/variant-b.html`): use as the visual base.
-- If given a brief path (or brief is specific enough for a single design): create directly from the brief.
+- **Variant**: first token — letter (A–Z) identifying the variant (case-insensitive)
+- **Refinements**: everything after the variant — requirements to apply
 
-Read the full design brief for all requirements, states, and edge cases.
+Example: `B make header sticky, use Badge for status, add empty state`
+→ Variant B + 3 refinements
 
-### Step 3: Adopt Missing Components
+Ask if the variant is missing. Ask what to change if refinements are empty.
 
-If the design uses components not yet in `src/lib/components/ui/`:
+---
 
-1. Spawn `mp-context7-docs-fetcher` to look up the component in shadcn-svelte / Bits UI
+## Batch Mode (all)
+
+When the argument is `all`, run the following discovery loop **before** any refinement work, then process each eligible folder sequentially using the normal Steps 2–9.
+
+### Batch Step A: Discover eligible design folders
+
+Scan every direct subfolder of `designs/` (exclude `designs/DESIGN_SYSTEM.md` and `designs/tokens.css`).
+
+For each folder, check **all three** conditions:
+
+1. `designs/<name>/variants/DECISION.md` **exists**
+2. `designs/<name>/SUMMARY.md` does **not** exist
+3. `designs/<name>/refined.html` does **not** exist
+
+Collect every folder that meets all three conditions. If none qualify, report "No unprocessed DECISION.md folders found" and stop.
+
+### Batch Step B: Parse each DECISION.md
+
+For each eligible folder, read its `DECISION.md` and extract:
+
+- **Chosen variant letter** — look for explicit phrases like "Let's refine Variant E", "go with B", "I prefer C", "accept variant A", etc. (case-insensitive). If ambiguous, pick the last mentioned variant.
+- **Refinement requirements** — the full body of the DECISION.md (after any variant-selection sentence) is the refinement spec. Pass it verbatim as the refinements for that folder.
+
+### Batch Step C: Report plan and confirm
+
+Before processing, print a summary table:
+
+| Folder | Variant | Refinement preview (first 80 chars) |
+| ------ | ------- | ----------------------------------- |
+| …      | …       | …                                   |
+
+Ask the user: "Proceed with refining all N folders above?" — wait for confirmation before continuing.
+
+### Batch Step D: Process sequentially via sub-agents
+
+For each eligible folder in order, spawn a dedicated **`mp-executor`** sub-agent to handle that folder end-to-end. Pass the sub-agent:
+
+- The target folder path (`designs/<name>/`)
+- The chosen variant letter and full refinement requirements extracted in Batch Step B
+- The full text of this skill's Steps 2–9 as the task specification
+- Instruction to skip Step 8 (GitHub issue comment) — issue comments are collected at the end
+
+Wait for each sub-agent to complete before spawning the next (sequential, not parallel) to avoid file-system conflicts and to keep token usage predictable.
+
+After each sub-agent completes, print a one-line status: ✓ `<folder>` refined (Variant X).
+
+If a sub-agent fails or reports an error, log the failure, skip to the next folder, and include the failure in the final summary.
+
+At the end, print a summary table of all folders processed, any that were skipped (with reasons), and any failures. Then, if issue numbers are known, post all GitHub issue comments in one pass (Step 8) for each successfully refined folder.
+
+---
+
+### Step 2: Locate Source Files
+
+1. Infer active component from context, or find the most recently modified folder under `designs/` that has variants.
+2. Read: `designs/<component-name>/variants/variant-<letter>.html` (chosen variant)
+3. Read: `designs/<component-name>/DESIGN_BRIEF_<COMPONENT_NAME>.md` (full brief)
+4. Read: `designs/DESIGN_SYSTEM.md` (class names and component reference)
+
+### Step 3: Inventory Available Components
+
+For every component referenced in the brief or refinements:
+
+- Check `src/lib/components/ui/` for existence
+- Read the `.stories.svelte` to identify available props/variants
+- Note gaps
+
+### Step 4: Adopt Missing Components (if needed, preferably from shadcn-svelte or Bits UI)
+
+1. Spawn `mp-context7-docs-fetcher` to look up in shadcn-svelte (`/huntabyte/shadcn-svelte`) or Bits UI (`/huntabyte/bits-ui`)
 2. Install: `pnpm dlx shadcn-svelte@latest add <name> --yes --overwrite`
-3. Rename main `.svelte` file to PascalCase
-4. Extract `<script module>` content to separate `.ts` file
-5. Update `index.ts` imports
-6. Create a Storybook story at `src/lib/components/ui/<name>/<Name>.stories.svelte`
+3. Record adoption in SUMMARY.md
 
-### Step 4: Create Final Mockup
+### Step 5: Produce `refined.html`
 
-Output: `claude_design/mockups/<component-name>.html`
+Create `designs/<component-name>/refined.html`.
 
-The final mockup must:
+The refined HTML must:
 
-- Include **all states and edge cases** from the brief (not just the happy path)
-- Inline the complete `tokens.css` in `<style>`
-- Use design system classes (`gk-*`, `cb-*`) throughout
-- Have higher fidelity than the variant — refined spacing, more realistic data, polished details
-- Be self-contained and openable in any browser
+- Use the chosen variant as visual and structural base
+- Apply **every** refinement requirement
+- Cover all states from the brief (not just the happy path)
+- `<link rel="stylesheet" href="../tokens.css">` in `<head>` — **never** inline token values
+- Geist / Geist Mono from Google Fonts CDN (with system fallbacks)
+- Design system classes (`gk-*`, `cb-*`) throughout
+- Only component-specific styles in `<style>`
+- Realistic mock data
+- Header label: `REFINED — Variant <X> + <short refinement summary>` using `.gk-eyebrow`
+- Respect Container Context from the brief — show parent chrome at reduced opacity
 
-### Step 5: Mark Brief as Completed
+### Step 6: Create `SUMMARY.md`
 
-Rename the design brief to add underscore prefix:
-`claude_design/design_briefs/COMPONENT_NAME.md` → `claude_design/design_briefs/_COMPONENT_NAME.md`
+Create `designs/<component-name>/SUMMARY.md`.
 
-Add a reference line at the top of the brief:
+The summary must **not** duplicate content from the design brief. All design requirements, states, and layout rules live in the brief. The summary captures the implementation-relevant decisions and component map.
 
 ```markdown
-> **Final design**: `claude_design/mockups/<component-name>.html`
-> **Adopted components**: [list any new components installed]
+# <Component Name> — Design Summary
+
+**Base**: Variant <X> | **Refined**: <date>
+
+## Refinements Applied
+
+Variant <X> was chosen and refined with: [comma-separated list]. See the design brief for full
+requirements. Key changes from the base variant: [1–3 concise sentences on structural differences].
+
+## Component Map
+
+### Codebase — Use As-Is
+
+| Component | Path                            | Usage         | Key Props/Variants          |
+| --------- | ------------------------------- | ------------- | --------------------------- |
+| Button    | `src/lib/components/ui/button/` | [where + how] | `variant="ghost" size="sm"` |
+| Badge     | `src/lib/components/ui/badge/`  | [where + how] | `variant="success"`         |
+
+### Adopt from shadcn-svelte / Bits UI
+
+| Component | Source        | Install command                            | Purpose          |
+| --------- | ------------- | ------------------------------------------ | ---------------- |
+| [name]    | shadcn-svelte | `pnpm dlx shadcn-svelte@latest add [name]` | [what it covers] |
+
+### Build Custom
+
+| Proposed Name | Description    | Why existing components don't cover it |
+| ------------- | -------------- | -------------------------------------- |
+| [name]        | [what it does] | [reason]                               |
+
+## Implementation Notes
+
+[Animation approach, event model, accessibility, keyboard nav, scroll behavior, edge cases to
+handle in Svelte. Only things not already in the brief.]
 ```
 
-### Step 6: Link to GitHub Issue
+### Step 7: Update Design Brief
 
-Ask the user for the associated GitHub issue number (if not already known from context).
+Prepend a refinement block below the `# Title` heading:
 
-Add a comment to the issue:
+```markdown
+> **Status**: Refined (Variant <X>)
+> **Refined mockup**: `designs/<component-name>/refined.html`
+> **Summary**: `designs/<component-name>/SUMMARY.md`
+> **Refinements**: [comma-separated short list]
+```
+
+If the refinement process revealed missing requirements or corrections, add/update them in the brief's relevant sections rather than documenting them separately in the summary.
+
+### Step 8: Link to GitHub Issue
+
+Ask for the associated GitHub issue number if not known.
 
 ```bash
-gh issue comment <number> --body "## Design Finalized
+gh issue comment <number> --body "## Design Refined
 
-Final mockup: \`claude_design/mockups/<component-name>.html\`
-Design brief: \`claude_design/design_briefs/_COMPONENT_NAME.md\`
-Components adopted: [list or 'none']
+Variant **<X>** refined: [comma-separated refinements]
 
-Open the HTML file in a browser to review. During implementation, reference the mockup and brief for exact specifications."
+**Artifacts:**
+- \`designs/<component-name>/refined.html\` — open in browser to review
+- \`designs/<component-name>/SUMMARY.md\` — component map + implementation notes
+- \`designs/<component-name>/DESIGN_BRIEF_<COMPONENT_NAME>.md\` — updated brief"
 ```
 
-This ensures the implementation phase (which reads GitHub issue descriptions and comments) has a deterministic reference to the design.
+### Step 9: Screenshot & Report
 
-### Step 7: Screenshot & Report
+Open `refined.html` in Chrome DevTools MCP and screenshot for the user.
 
-Screenshot the final mockup via Chrome DevTools MCP and present to the user.
+Report: `refined.html` path, `SUMMARY.md` path, components to reuse (count + names), components adopted (if any).
 
-Report:
+## Folder Layout
 
-- Final mockup path
-- Components adopted (if any)
-- GitHub issue comment link
-- Brief marked as completed
+```
+designs/
+└── <component-name>/
+    ├── DESIGN_BRIEF_<COMPONENT_NAME>.md   ← authoritative requirements (always updated)
+    ├── refined.html                        ← authoritative visual design (post-refine)
+    ├── SUMMARY.md                          ← component map + implementation notes
+    └── variants/
+        ├── variant-a.html                  ← kept for reference
+        ├── variant-b.html
+        └── VARIANT-*.md                    ← decision notes
+```

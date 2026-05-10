@@ -104,8 +104,8 @@ pub fn check_issue_achievements(conn: &Connection) -> Vec<AchievementKind> {
 
     for kind in &[
         AchievementKind::FirstSeed,
-        AchievementKind::Planted10Trees,
-        AchievementKind::Planted50Trees,
+        AchievementKind::Created10Trees,
+        AchievementKind::Created50Trees,
     ] {
         let current_progress: i64 = conn
             .query_row(

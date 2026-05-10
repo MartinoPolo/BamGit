@@ -1,0 +1,3019 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Issue Accordion Row — Variant D: Timeline List</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
+   GROVEKEEPER DESIGN TOKENS — inlined from tokens.css
+   ============================================================ */
+
+
+			/* Dark theme — primary mode */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease,
+					color var(--duration-2) ease,
+					transform var(--duration-1) ease,
+					box-shadow var(--duration-2) ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 82%, white 18%);
+			}
+			.theme-dark .gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 82%, black 18%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-merged {
+				background: color-mix(in oklch, var(--status-merged) 14%, transparent);
+				color: var(--status-merged);
+				border-color: color-mix(in oklch, var(--status-merged) 30%, transparent);
+			}
+			.gk-badge-draft {
+				background: color-mix(in oklch, var(--gh-draft) 14%, transparent);
+				color: var(--gh-draft);
+				border-color: color-mix(in oklch, var(--gh-draft) 30%, transparent);
+			}
+
+			/* Type scale */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Animations */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			/* SVG icon helper */
+			.icon {
+				display: block;
+				flex-shrink: 0;
+			}
+
+			/* ============================================================
+   VARIANT D — TIMELINE LIST — SPECIFIC STYLES
+   ============================================================ */
+
+			/* Per-accent color sets for timeline dots and accents */
+			.tl-accent-moss {
+				--tl-dot: oklch(0.69 0.098 132);
+				--tl-dot-glow: oklch(0.69 0.098 132 / 0.35);
+				--tl-accent-bg: oklch(0.225 0.032 142);
+				--tl-accent-border: oklch(0.31 0.04 142);
+				--tl-accent-muted: oklch(0.68 0.022 138);
+			}
+
+			.tl-accent-amber {
+				--tl-dot: oklch(0.77 0.15 65);
+				--tl-dot-glow: oklch(0.77 0.15 65 / 0.35);
+				--tl-accent-bg: oklch(0.225 0.032 68);
+				--tl-accent-border: oklch(0.31 0.045 68);
+				--tl-accent-muted: oklch(0.7 0.028 75);
+			}
+
+			.tl-accent-azure {
+				--tl-dot: oklch(0.66 0.12 230);
+				--tl-dot-glow: oklch(0.66 0.12 230 / 0.35);
+				--tl-accent-bg: oklch(0.218 0.032 235);
+				--tl-accent-border: oklch(0.3 0.045 232);
+				--tl-accent-muted: oklch(0.67 0.024 232);
+			}
+
+			.tl-accent-plum {
+				--tl-dot: oklch(0.64 0.13 320);
+				--tl-dot-glow: oklch(0.64 0.13 320 / 0.35);
+				--tl-accent-bg: oklch(0.218 0.035 322);
+				--tl-accent-border: oklch(0.3 0.048 318);
+				--tl-accent-muted: oklch(0.668 0.026 318);
+			}
+
+			.tl-accent-teal {
+				--tl-dot: oklch(0.7 0.095 195);
+				--tl-dot-glow: oklch(0.7 0.095 195 / 0.35);
+				--tl-accent-bg: oklch(0.218 0.028 198);
+				--tl-accent-border: oklch(0.3 0.04 196);
+				--tl-accent-muted: oklch(0.672 0.022 196);
+			}
+
+			.tl-accent-coral {
+				--tl-dot: oklch(0.7 0.135 30);
+				--tl-dot-glow: oklch(0.7 0.135 30 / 0.35);
+				--tl-accent-bg: oklch(0.218 0.032 28);
+				--tl-accent-border: oklch(0.3 0.045 30);
+				--tl-accent-muted: oklch(0.675 0.026 30);
+			}
+
+			.tl-accent-gold {
+				--tl-dot: oklch(0.73 0.115 90);
+				--tl-dot-glow: oklch(0.73 0.115 90 / 0.35);
+				--tl-accent-bg: oklch(0.225 0.032 88);
+				--tl-accent-border: oklch(0.31 0.042 90);
+				--tl-accent-muted: oklch(0.678 0.024 90);
+			}
+
+			.tl-accent-indigo {
+				--tl-dot: oklch(0.62 0.12 275);
+				--tl-dot-glow: oklch(0.62 0.12 275 / 0.35);
+				--tl-accent-bg: oklch(0.218 0.032 278);
+				--tl-accent-border: oklch(0.3 0.045 274);
+				--tl-accent-muted: oklch(0.665 0.026 274);
+			}
+
+			/* ── Page layout ──────────────────────────────────────── */
+
+			.page-wrap {
+				min-height: 100vh;
+				padding: 40px 32px;
+				background: var(--background);
+			}
+
+			.page-header {
+				margin-bottom: 24px;
+				display: flex;
+				align-items: baseline;
+				gap: 12px;
+			}
+
+			/* ── Context shell (parent panel at 40% opacity) ─────── */
+
+			.context-shell {
+				opacity: 0.4;
+				pointer-events: none;
+				max-width: 1020px;
+				margin: 0 auto;
+			}
+
+			.context-tab-bar {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				padding: 6px 12px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-bottom: none;
+				border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+			}
+
+			.context-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: default;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+
+			.context-tab.is-active {
+				background: var(--surface-2);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+
+			/* ── Issues panel (the component fills this) ──────────── */
+
+			.issues-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-top: none;
+				border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+				overflow: hidden;
+				max-width: 1020px;
+				margin: 0 auto;
+				box-shadow: var(--shadow-md);
+			}
+
+			.issues-toolbar {
+				display: flex;
+				align-items: center;
+				padding: 10px 12px;
+				border-bottom: 1px solid var(--border);
+				gap: 8px;
+				background: var(--surface-2);
+			}
+
+			.issues-toolbar-title {
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+			}
+
+			.issues-toolbar-count {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				flex: 1;
+			}
+
+			.issues-body {
+				padding: 4px 8px 12px;
+			}
+
+			/* ── PRD Group Header ─────────────────────────────────── */
+
+			.tl-prd-group {
+				margin-top: 8px;
+			}
+
+			.tl-prd-group:first-child {
+				margin-top: 0;
+			}
+
+			.tl-prd-header {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 12px 6px 44px;
+				position: relative;
+			}
+
+			.tl-prd-label {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				letter-spacing: 0.04em;
+				white-space: nowrap;
+			}
+
+			.tl-prd-name {
+				font-size: 12px;
+				font-weight: 500;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+			}
+
+			.tl-prd-progress-wrap {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-left: auto;
+				flex-shrink: 0;
+			}
+
+			.tl-prd-progress-bar {
+				width: 80px;
+				height: 4px;
+				background: var(--surface-3);
+				border-radius: 2px;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.tl-prd-progress-fill {
+				height: 100%;
+				border-radius: 2px;
+				background: var(--primary);
+				transition: width 300ms var(--ease-out);
+			}
+
+			.tl-prd-progress-text {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* ── Timeline structure ───────────────────────────────── */
+
+			.tl-list {
+				display: flex;
+				flex-direction: column;
+				position: relative;
+			}
+
+			/* The vertical timeline connector line */
+			.tl-list::before {
+				content: '';
+				position: absolute;
+				left: 27px;
+				top: 0;
+				bottom: 0;
+				width: 1.5px;
+				background: var(--border);
+				z-index: 0;
+			}
+
+			/* ── Single timeline row ─────────────────────────────── */
+
+			.tl-row {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+			}
+
+			/* ── Collapsed row header ────────────────────────────── */
+
+			.tl-header {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				min-height: 44px;
+				padding: 0 8px 0 0;
+				cursor: pointer;
+				user-select: none;
+				transition: background var(--duration-2) ease;
+				position: relative;
+				border-radius: var(--radius-sm);
+				z-index: 1;
+			}
+
+			.tl-header:hover {
+				background: var(--surface-2);
+			}
+
+			.tl-row.is-expanded .tl-header {
+				background: var(--surface-2);
+				border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+			}
+
+			/* Timeline dot zone — houses the dot and sits on top of the line */
+			.tl-dot-zone {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 56px;
+				height: 44px;
+				flex-shrink: 0;
+				position: relative;
+				z-index: 2;
+			}
+
+			.tl-dot {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: var(--tl-dot);
+				border: 2px solid var(--surface);
+				flex-shrink: 0;
+				transition:
+					box-shadow var(--duration-3) ease,
+					transform var(--duration-2) ease;
+				position: relative;
+				z-index: 2;
+			}
+
+			.tl-header:hover .tl-dot {
+				box-shadow: 0 0 0 3px var(--tl-dot-glow);
+				transform: scale(1.2);
+			}
+
+			.tl-row.is-expanded .tl-dot {
+				box-shadow: 0 0 0 4px var(--tl-dot-glow);
+				transform: scale(1.3);
+			}
+
+			/* Running session: pulsing ring on dot */
+			.tl-row.is-running .tl-dot::after {
+				content: '';
+				position: absolute;
+				inset: -5px;
+				border-radius: 50%;
+				border: 1.5px solid var(--tl-dot);
+				opacity: 0;
+				animation: tl-ring-pulse 2s ease-out infinite;
+			}
+
+			@keyframes tl-ring-pulse {
+				0% {
+					transform: scale(0.8);
+					opacity: 0.6;
+				}
+				100% {
+					transform: scale(1.6);
+					opacity: 0;
+				}
+			}
+
+			/* Chevron toggle — right side */
+			.tl-chevron {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 24px;
+				height: 24px;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+				transition:
+					color var(--duration-2) ease,
+					transform var(--duration-3) var(--ease-standard);
+				margin-left: 4px;
+			}
+
+			.tl-row.is-expanded .tl-chevron {
+				transform: rotate(90deg);
+				color: var(--foreground-muted);
+			}
+
+			.tl-header:hover .tl-chevron {
+				color: var(--foreground-muted);
+			}
+
+			/* Issue number */
+			.tl-issue-num {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 500;
+				color: var(--tl-dot);
+				flex-shrink: 0;
+				padding-right: 6px;
+				white-space: nowrap;
+				letter-spacing: -0.01em;
+			}
+
+			/* Issue title */
+			.tl-title {
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--foreground);
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				letter-spacing: var(--tracking-snug);
+				padding-right: 8px;
+			}
+
+			/* Right-side metadata cluster */
+			.tl-meta {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+
+			/* Session chip */
+			.tl-session {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 8px 0 6px;
+				border-radius: 999px;
+				font-size: 11px;
+				font-weight: 500;
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+				flex-shrink: 0;
+				border: 1px solid;
+			}
+
+			.tl-session-running {
+				color: var(--session-running);
+				background: color-mix(in oklch, var(--session-running) 12%, transparent);
+				border-color: color-mix(in oklch, var(--session-running) 28%, transparent);
+			}
+
+			.tl-session-needs-input {
+				color: var(--session-needs-input);
+				background: color-mix(in oklch, var(--session-needs-input) 12%, transparent);
+				border-color: color-mix(in oklch, var(--session-needs-input) 28%, transparent);
+			}
+
+			.tl-session-idle {
+				color: var(--session-idle);
+				background: color-mix(in oklch, var(--session-idle) 12%, transparent);
+				border-color: color-mix(in oklch, var(--session-idle) 28%, transparent);
+			}
+
+			.tl-session-paused {
+				color: var(--session-paused);
+				background: color-mix(in oklch, var(--session-paused) 12%, transparent);
+				border-color: color-mix(in oklch, var(--session-paused) 28%, transparent);
+			}
+
+			.tl-session-count {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				flex-shrink: 0;
+			}
+
+			/* Status badge in header row */
+			.tl-status-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				height: 20px;
+				padding: 0 7px;
+				border-radius: 999px;
+				font-size: 10.5px;
+				font-weight: 500;
+				white-space: nowrap;
+				border: 1px solid;
+				font-family: var(--font-sans);
+			}
+
+			.tl-status-open {
+				color: var(--gh-open);
+				background: color-mix(in oklch, var(--gh-open) 12%, transparent);
+				border-color: color-mix(in oklch, var(--gh-open) 25%, transparent);
+			}
+
+			.tl-status-in-progress {
+				color: var(--status-info);
+				background: color-mix(in oklch, var(--status-info) 12%, transparent);
+				border-color: color-mix(in oklch, var(--status-info) 25%, transparent);
+			}
+
+			.tl-status-review {
+				color: var(--status-warning);
+				background: color-mix(in oklch, var(--status-warning) 12%, transparent);
+				border-color: color-mix(in oklch, var(--status-warning) 25%, transparent);
+			}
+
+			.tl-status-done {
+				color: var(--foreground-subtle);
+				background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent);
+				border-color: color-mix(in oklch, var(--foreground-subtle) 20%, transparent);
+			}
+
+			/* Action buttons on row */
+			.tl-actions {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				flex-shrink: 0;
+				padding-left: 6px;
+				opacity: 0;
+				transition: opacity var(--duration-2) ease;
+			}
+
+			.tl-header:hover .tl-actions,
+			.tl-row.is-expanded .tl-actions {
+				opacity: 1;
+			}
+
+			.tl-row.is-hover .tl-actions {
+				opacity: 1;
+			}
+
+			.tl-action-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease,
+					border-color var(--duration-2) ease,
+					transform var(--duration-1) ease;
+				font-size: 13px;
+				padding: 0;
+				flex-shrink: 0;
+			}
+
+			.tl-action-btn:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+
+			.tl-action-btn:active {
+				transform: scale(0.92);
+			}
+
+			.tl-action-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+
+			.tl-action-btn:disabled {
+				opacity: 0.35;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── Expanded body ────────────────────────────────────── */
+
+			.tl-body {
+				display: none;
+				position: relative;
+				z-index: 1;
+			}
+
+			.tl-row.is-expanded .tl-body {
+				display: block;
+			}
+
+			.tl-body-inner {
+				margin-left: 56px;
+				padding: 0 12px 14px 0;
+				border-left: 1.5px solid var(--tl-dot);
+				margin-left: 27px;
+				padding-left: 29px;
+				display: grid;
+				grid-template-columns: 110px 1fr;
+				gap: 14px;
+				align-items: start;
+			}
+
+			/* Tree thumbnail */
+			.tl-tree-thumb {
+				width: 110px;
+				height: 84px;
+				border-radius: var(--radius-md);
+				border: 1px solid var(--border);
+				background: var(--surface-2);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				flex-shrink: 0;
+				position: relative;
+			}
+
+			.tl-tree-sky {
+				position: absolute;
+				inset: 0;
+				background: linear-gradient(
+					to bottom,
+					oklch(0.2 0.028 240) 0%,
+					oklch(0.175 0.025 160) 100%
+				);
+			}
+
+			.tl-tree-thumb svg {
+				opacity: 0.9;
+				position: relative;
+				z-index: 1;
+			}
+
+			/* Detail section next to tree */
+			.tl-detail-cols {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+
+			.tl-detail-row {
+				display: flex;
+				align-items: flex-start;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			.tl-detail-label {
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				font-family: var(--font-mono);
+				padding-top: 1px;
+				flex-shrink: 0;
+				min-width: 60px;
+			}
+
+			.tl-detail-value {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				flex-wrap: wrap;
+				min-width: 0;
+			}
+
+			.tl-description {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				line-height: 1.45;
+			}
+
+			/* Branch label */
+			.tl-branch {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground);
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				padding: 1px 6px;
+			}
+
+			/* GH label pills */
+			.tl-gh-label {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: 999px;
+				font-size: 10.5px;
+				font-weight: 500;
+				white-space: nowrap;
+				border: 1px solid transparent;
+			}
+
+			/* Session list in expanded */
+			.tl-session-list {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+
+			.tl-session-item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 11.5px;
+				color: var(--foreground-muted);
+				padding: 3px 0;
+			}
+
+			.tl-session-item-dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			.tl-session-item-name {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground);
+			}
+
+			.tl-session-item-time {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
+
+			/* Expanded action row */
+			.tl-body-actions {
+				margin-left: 27px;
+				padding: 8px 12px 8px 29px;
+				border-left: 1.5px solid var(--tl-dot);
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				flex-wrap: wrap;
+				border-bottom-left-radius: 0;
+			}
+
+			/* Last segment of timeline in expanded: rounded bottom */
+			.tl-body-actions::after {
+				content: '';
+				position: absolute;
+				left: 26px;
+				bottom: -1px;
+				width: 3px;
+				height: 3px;
+				background: var(--tl-dot);
+				border-radius: 0 0 2px 2px;
+			}
+
+			/* Dev server badge */
+			.tl-devserver {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 11px;
+				font-family: var(--font-mono);
+				padding: 1px 7px;
+				border-radius: 999px;
+				white-space: nowrap;
+			}
+
+			.tl-devserver-live {
+				color: var(--status-success);
+				background: color-mix(in oklch, var(--status-success) 12%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-success) 28%, transparent);
+			}
+
+			.tl-devserver-offline {
+				color: var(--foreground-subtle);
+				background: color-mix(in oklch, var(--foreground-subtle) 8%, transparent);
+				border: 1px solid var(--border);
+			}
+
+			/* ── Hover demo row ──────────────────────────────────── */
+			.tl-row.is-hover .tl-header {
+				background: var(--surface-2);
+			}
+
+			.tl-row.is-hover .tl-dot {
+				box-shadow: 0 0 0 3px var(--tl-dot-glow);
+				transform: scale(1.2);
+			}
+
+			.tl-row.is-hover .tl-chevron {
+				color: var(--foreground-muted);
+			}
+
+			/* ── Responsive ──────────────────────────────────────── */
+			@media (max-width: 768px) {
+				.page-wrap {
+					padding: 20px 12px;
+				}
+
+				.tl-actions {
+					display: none;
+				}
+
+				.tl-meta .gk-badge {
+					padding: 0 4px;
+					font-size: 0;
+					min-width: 20px;
+					justify-content: center;
+				}
+
+				.tl-meta .gk-badge .gk-badge-dot {
+					margin: 0;
+				}
+
+				.tl-meta .gk-badge svg + span,
+				.tl-meta .gk-badge-text {
+					display: none;
+				}
+
+				.tl-body-inner {
+					grid-template-columns: 1fr;
+				}
+
+				.tl-tree-thumb {
+					width: 100%;
+					height: 64px;
+				}
+
+				.tl-prd-header {
+					padding-left: 44px;
+				}
+
+				.tl-prd-progress-wrap {
+					display: none;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.tl-session,
+				.tl-status-badge {
+					display: none;
+				}
+
+				.tl-title {
+					font-size: 12px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrap">
+				<!-- Variant label -->
+				<div class="page-header">
+					<span class="gk-eyebrow">Grovekeeper · Issues Tab · Variant D</span>
+					<span
+						style="
+							font-size: 11px;
+							color: var(--foreground-subtle);
+							font-family: var(--font-mono);
+						"
+						>Timeline List</span
+					>
+				</div>
+
+				<!-- Context shell: parent bottom panel tab bar at 40% opacity -->
+				<div class="context-shell">
+					<div class="context-tab-bar">
+						<span class="context-tab is-active">Issues</span>
+						<span class="context-tab">Sessions</span>
+						<span class="context-tab">Git Log</span>
+						<span class="context-tab">Terminal</span>
+						<span style="flex: 1"></span>
+						<span
+							style="
+								font-family: var(--font-mono);
+								font-size: 10px;
+								color: var(--foreground-subtle);
+							"
+							>Bottom Panel</span
+						>
+					</div>
+				</div>
+
+				<!-- Main panel (component fills this area) -->
+				<div class="issues-panel">
+					<!-- Toolbar -->
+					<div class="issues-toolbar">
+						<span class="issues-toolbar-title">Issues</span>
+						<span class="issues-toolbar-count">8 issues · 3 active</span>
+
+						<!-- View mode toggle -->
+						<div
+							style="
+								display: flex;
+								gap: 2px;
+								background: var(--surface);
+								border: 1px solid var(--border);
+								border-radius: var(--radius-sm);
+								padding: 2px;
+								margin-left: auto;
+							"
+						>
+							<button
+								class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+								style="width: 24px; height: 22px; color: var(--foreground-subtle)"
+								title="Card grid"
+								aria-label="Card grid view"
+							>
+								<svg
+									class="icon"
+									width="12"
+									height="12"
+									viewBox="0 0 16 16"
+									fill="none"
+								>
+									<rect
+										x="1"
+										y="1"
+										width="6"
+										height="6"
+										rx="1"
+										stroke="currentColor"
+										stroke-width="1.4"
+									/>
+									<rect
+										x="9"
+										y="1"
+										width="6"
+										height="6"
+										rx="1"
+										stroke="currentColor"
+										stroke-width="1.4"
+									/>
+									<rect
+										x="1"
+										y="9"
+										width="6"
+										height="6"
+										rx="1"
+										stroke="currentColor"
+										stroke-width="1.4"
+									/>
+									<rect
+										x="9"
+										y="9"
+										width="6"
+										height="6"
+										rx="1"
+										stroke="currentColor"
+										stroke-width="1.4"
+									/>
+								</svg>
+							</button>
+							<button
+								class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+								style="
+									width: 24px;
+									height: 22px;
+									color: var(--foreground);
+									background: var(--surface-2);
+								"
+								title="Timeline list"
+								aria-label="Timeline list view"
+								aria-pressed="true"
+							>
+								<svg
+									class="icon"
+									width="12"
+									height="12"
+									viewBox="0 0 16 16"
+									fill="none"
+								>
+									<path
+										d="M4 2v12M7 4h7M7 8h5M7 12h6"
+										stroke="currentColor"
+										stroke-width="1.4"
+										stroke-linecap="round"
+									/>
+									<circle cx="4" cy="4" r="1.5" fill="currentColor" />
+									<circle cx="4" cy="8" r="1.5" fill="currentColor" />
+									<circle cx="4" cy="12" r="1.5" fill="currentColor" />
+								</svg>
+							</button>
+						</div>
+
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-sm"
+							style="gap: 5px; color: var(--foreground-muted)"
+						>
+							<svg
+								class="icon"
+								width="13"
+								height="13"
+								viewBox="0 0 16 16"
+								fill="none"
+							>
+								<path
+									d="M2 4h12M4 8h8M6 12h4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+								/>
+							</svg>
+							Filter
+						</button>
+						<button
+							class="gk-btn gk-btn-ghost gk-btn-sm"
+							style="gap: 5px; color: var(--foreground-muted)"
+						>
+							<svg
+								class="icon"
+								width="13"
+								height="13"
+								viewBox="0 0 16 16"
+								fill="none"
+							>
+								<path
+									d="M3 4l4 4 4-4M3 8h10"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							Sort
+						</button>
+						<button class="gk-btn gk-btn-primary gk-btn-sm" style="gap: 5px">
+							<svg
+								class="icon"
+								width="12"
+								height="12"
+								viewBox="0 0 16 16"
+								fill="none"
+							>
+								<path
+									d="M8 3v10M3 8h10"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								/>
+							</svg>
+							New Issue
+						</button>
+					</div>
+
+					<!-- Accordion list with timeline -->
+					<div class="issues-body">
+						<!-- ═══════════════════════════════════
+             PRD GROUP 1: PRD#87 — Workspace Dashboard
+             ═══════════════════════════════════ -->
+						<div class="tl-prd-group">
+							<div class="tl-prd-header">
+								<span class="tl-prd-label">PRD#87</span>
+								<span class="tl-prd-name">Workspace Dashboard</span>
+								<div class="tl-prd-progress-wrap">
+									<div class="tl-prd-progress-bar">
+										<div
+											class="tl-prd-progress-fill"
+											style="width: 60%; background: var(--moss-400)"
+										></div>
+									</div>
+									<span class="tl-prd-progress-text">3/5</span>
+								</div>
+							</div>
+
+							<div class="tl-list">
+								<!-- ROW 1: Sidebar navigation (MOSS) — Expanded, session running -->
+								<div class="tl-row tl-accent-moss is-expanded is-running">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="true"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#142</span>
+										<span class="tl-title"
+											>Sidebar navigation with collapsed/expanded gesture
+											support</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-in-progress">
+												<span class="gk-badge-dot"></span>
+												In Progress
+											</span>
+											<span class="tl-session tl-session-running">
+												<span class="gk-badge-dot gk-pulse"></span>
+												running
+											</span>
+										</div>
+										<div class="tl-actions" style="opacity: 1">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="Open terminal"
+												aria-label="Open terminal"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1.5"
+														y="2.5"
+														width="13"
+														height="11"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+													<path
+														d="M4.5 6.5l2 1.5-2 1.5M8.5 9.5h3"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="Open editor"
+												aria-label="Open editor"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M10 2l4 4-8 8H2v-4l8-8z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+													<path
+														d="M8.5 3.5L12.5 7.5"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+
+									<!-- Expanded body -->
+									<div class="tl-body">
+										<div class="tl-body-inner">
+											<!-- Tree thumbnail -->
+											<div class="tl-tree-thumb" aria-hidden="true">
+												<div class="tl-tree-sky"></div>
+												<svg
+													width="80"
+													height="76"
+													viewBox="0 0 80 76"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<rect
+														x="0"
+														y="66"
+														width="80"
+														height="10"
+														fill="oklch(0.300 0.060 140)"
+													/>
+													<rect
+														x="36"
+														y="42"
+														width="8"
+														height="24"
+														rx="2"
+														fill="oklch(0.400 0.055 50)"
+													/>
+													<ellipse
+														cx="40"
+														cy="32"
+														rx="18"
+														ry="20"
+														fill="oklch(0.420 0.080 140)"
+													/>
+													<ellipse
+														cx="34"
+														cy="28"
+														rx="11"
+														ry="13"
+														fill="oklch(0.480 0.082 138)"
+													/>
+													<ellipse
+														cx="46"
+														cy="30"
+														rx="10"
+														ry="12"
+														fill="oklch(0.450 0.078 142)"
+													/>
+													<ellipse
+														cx="40"
+														cy="22"
+														rx="8"
+														ry="9"
+														fill="oklch(0.520 0.088 135)"
+													/>
+												</svg>
+											</div>
+
+											<!-- Detail columns -->
+											<div class="tl-detail-cols">
+												<div class="tl-description">
+													Implement collapsible sidebar with icon-only
+													mode, tooltip labels on collapsed hover,
+													keyboard shortcuts for toggle. Support
+													gesture-based expand on trackpad swipe.
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Branch</span>
+													<div class="tl-detail-value">
+														<span class="tl-branch">
+															<svg
+																class="icon"
+																width="10"
+																height="10"
+																viewBox="0 0 16 16"
+																fill="none"
+															>
+																<circle
+																	cx="4"
+																	cy="4"
+																	r="2"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																/>
+																<circle
+																	cx="4"
+																	cy="12"
+																	r="2"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																/>
+																<circle
+																	cx="12"
+																	cy="4"
+																	r="2"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																/>
+																<path
+																	d="M4 6v4M4 6c0-1 1-2 2-2h2a2 2 0 012 2v0"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															feat/sidebar-nav
+														</span>
+														<span class="gk-badge gk-badge-success">
+															<span class="gk-badge-dot"></span>
+															PR #44 open
+														</span>
+													</div>
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Labels</span>
+													<div class="tl-detail-value">
+														<span
+															class="tl-gh-label"
+															style="
+																background: color-mix(
+																	in oklch,
+																	var(--moss-400) 18%,
+																	transparent
+																);
+																color: var(--moss-300);
+																border-color: color-mix(
+																	in oklch,
+																	var(--moss-400) 30%,
+																	transparent
+																);
+															"
+															>feature</span
+														>
+														<span
+															class="tl-gh-label"
+															style="
+																background: color-mix(
+																	in oklch,
+																	var(--azure-400) 18%,
+																	transparent
+																);
+																color: var(--azure-300);
+																border-color: color-mix(
+																	in oklch,
+																	var(--azure-400) 30%,
+																	transparent
+																);
+															"
+															>ui</span
+														>
+														<span
+															class="tl-gh-label"
+															style="
+																background: color-mix(
+																	in oklch,
+																	var(--amber-400) 18%,
+																	transparent
+																);
+																color: var(--amber-300);
+																border-color: color-mix(
+																	in oklch,
+																	var(--amber-400) 30%,
+																	transparent
+																);
+															"
+															>prd-87</span
+														>
+													</div>
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Server</span>
+													<div class="tl-detail-value">
+														<span
+															class="tl-devserver tl-devserver-live"
+														>
+															<span
+																class="gk-badge-dot"
+																style="
+																	background: var(
+																		--status-success
+																	);
+																"
+															></span>
+															:1420 live
+														</span>
+													</div>
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Sessions</span>
+													<div class="tl-detail-value">
+														<div class="tl-session-list">
+															<div class="tl-session-item">
+																<span
+																	class="tl-session-item-dot"
+																	style="
+																		background: var(
+																			--session-running
+																		);
+																	"
+																></span>
+																<span class="tl-session-item-name"
+																	>sidebar-collapse-animation</span
+																>
+																<span class="tl-session-item-time"
+																	>12m ago</span
+																>
+															</div>
+															<div class="tl-session-item">
+																<span
+																	class="tl-session-item-dot"
+																	style="
+																		background: var(
+																			--session-finished
+																		);
+																	"
+																></span>
+																<span class="tl-session-item-name"
+																	>sidebar-nav-layout</span
+																>
+																<span class="tl-session-item-time"
+																	>2h ago</span
+																>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="tl-body-actions">
+											<button
+												class="gk-btn gk-btn-sm gk-btn-primary"
+												style="gap: 5px"
+											>
+												<svg
+													class="icon"
+													width="11"
+													height="11"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M4 12V4l8 4-8 4z"
+														fill="currentColor"
+													/>
+												</svg>
+												Resume Session
+											</button>
+											<button
+												class="gk-btn gk-btn-sm gk-btn-ghost"
+												style="gap: 5px"
+											>
+												<svg
+													class="icon"
+													width="12"
+													height="12"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 3v10M3 8h10"
+														stroke="currentColor"
+														stroke-width="1.8"
+														stroke-linecap="round"
+													/>
+												</svg>
+												New Session
+											</button>
+											<button
+												class="gk-btn gk-btn-sm gk-btn-ghost"
+												style="gap: 5px"
+											>
+												<svg
+													class="icon"
+													width="12"
+													height="12"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="8"
+														cy="8"
+														r="6"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+													<path
+														d="M8 5v3l2 2"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linecap="round"
+													/>
+												</svg>
+												View History
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<!-- ROW 2: Command palette (AMBER) — Collapsed -->
+								<div class="tl-row tl-accent-amber">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="false"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#148</span>
+										<span class="tl-title"
+											>Command palette with fuzzy search and recent
+											actions</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-open">
+												<span class="gk-badge-dot"></span>
+												Open
+											</span>
+											<span class="tl-session-count">
+												<svg
+													class="icon"
+													width="11"
+													height="11"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="2"
+														y="2"
+														width="12"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.3"
+													/>
+													<path
+														d="M5 6l2 1.5L5 9"
+														stroke="currentColor"
+														stroke-width="1.3"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												2 sessions
+											</span>
+										</div>
+										<div class="tl-actions">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="Open terminal"
+												aria-label="Open terminal"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1.5"
+														y="2.5"
+														width="13"
+														height="11"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+													<path
+														d="M4.5 6.5l2 1.5-2 1.5M8.5 9.5h3"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+
+								<!-- ROW 3: Workspace card layout (AZURE) — Hover demo -->
+								<div class="tl-row tl-accent-azure is-hover">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="false"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#151</span>
+										<span class="tl-title"
+											>Workspace card responsive grid with accent color
+											borders</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-review">
+												<span class="gk-badge-dot"></span>
+												Review
+											</span>
+											<span class="tl-session tl-session-needs-input">
+												<span class="gk-badge-dot"></span>
+												needs input
+											</span>
+										</div>
+										<div class="tl-actions">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="Open terminal"
+												aria-label="Open terminal"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1.5"
+														y="2.5"
+														width="13"
+														height="11"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+													<path
+														d="M4.5 6.5l2 1.5-2 1.5M8.5 9.5h3"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+
+								<!-- ROW 4: Forest view rendering (TEAL) — Collapsed, done -->
+								<div class="tl-row tl-accent-teal">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="false"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#138</span>
+										<span class="tl-title"
+											>Forest view canvas with parallax sky gradient</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-done">
+												<span class="gk-badge-dot"></span>
+												Done
+											</span>
+											<span class="tl-session-count">
+												<svg
+													class="icon"
+													width="11"
+													height="11"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="2"
+														y="2"
+														width="12"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.3"
+													/>
+													<path
+														d="M5 6l2 1.5L5 9"
+														stroke="currentColor"
+														stroke-width="1.3"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												4 sessions
+											</span>
+										</div>
+										<div class="tl-actions">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+
+								<!-- ROW 5: Top bar layout (PLUM) — Collapsed -->
+								<div class="tl-row tl-accent-plum">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="false"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#155</span>
+										<span class="tl-title"
+											>Top bar breadcrumb navigation and workspace
+											selector</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-open">
+												<span class="gk-badge-dot"></span>
+												Open
+											</span>
+											<span class="tl-session-count">
+												<svg
+													class="icon"
+													width="11"
+													height="11"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="2"
+														y="2"
+														width="12"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.3"
+													/>
+													<path
+														d="M5 6l2 1.5L5 9"
+														stroke="currentColor"
+														stroke-width="1.3"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												0 sessions
+											</span>
+										</div>
+										<div class="tl-actions">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- /tl-list -->
+						</div>
+						<!-- /tl-prd-group -->
+
+						<!-- ═══════════════════════════════════
+             PRD GROUP 2: PRD#90 — Session Management
+             ═══════════════════════════════════ -->
+						<div class="tl-prd-group">
+							<div class="tl-prd-header">
+								<span class="tl-prd-label">PRD#90</span>
+								<span class="tl-prd-name">Session Management</span>
+								<div class="tl-prd-progress-wrap">
+									<div class="tl-prd-progress-bar">
+										<div
+											class="tl-prd-progress-fill"
+											style="width: 33%; background: var(--azure-400)"
+										></div>
+									</div>
+									<span class="tl-prd-progress-text">1/3</span>
+								</div>
+							</div>
+
+							<div class="tl-list">
+								<!-- ROW 6: Session provider adapters (CORAL) — Expanded -->
+								<div class="tl-row tl-accent-coral is-expanded">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="true"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#160</span>
+										<span class="tl-title"
+											>Session provider adapter pattern for multi-backend
+											support</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-in-progress">
+												<span class="gk-badge-dot"></span>
+												In Progress
+											</span>
+											<span class="tl-session tl-session-idle">
+												<span class="gk-badge-dot"></span>
+												idle
+											</span>
+										</div>
+										<div class="tl-actions" style="opacity: 1">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="Open terminal"
+												aria-label="Open terminal"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="1.5"
+														y="2.5"
+														width="13"
+														height="11"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+													<path
+														d="M4.5 6.5l2 1.5-2 1.5M8.5 9.5h3"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="Open editor"
+												aria-label="Open editor"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M10 2l4 4-8 8H2v-4l8-8z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+													<path
+														d="M8.5 3.5L12.5 7.5"
+														stroke="currentColor"
+														stroke-width="1.4"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+
+									<!-- Expanded body -->
+									<div class="tl-body">
+										<div class="tl-body-inner">
+											<!-- Tree thumbnail -->
+											<div class="tl-tree-thumb" aria-hidden="true">
+												<div class="tl-tree-sky"></div>
+												<svg
+													width="80"
+													height="76"
+													viewBox="0 0 80 76"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<rect
+														x="0"
+														y="66"
+														width="80"
+														height="10"
+														fill="oklch(0.300 0.060 140)"
+													/>
+													<rect
+														x="37"
+														y="46"
+														width="6"
+														height="20"
+														rx="1.5"
+														fill="oklch(0.380 0.050 45)"
+													/>
+													<ellipse
+														cx="40"
+														cy="36"
+														rx="14"
+														ry="16"
+														fill="oklch(0.500 0.080 30)"
+													/>
+													<ellipse
+														cx="35"
+														cy="33"
+														rx="9"
+														ry="10"
+														fill="oklch(0.540 0.095 28)"
+													/>
+													<ellipse
+														cx="45"
+														cy="34"
+														rx="8"
+														ry="10"
+														fill="oklch(0.520 0.090 32)"
+													/>
+													<ellipse
+														cx="40"
+														cy="26"
+														rx="6"
+														ry="7"
+														fill="oklch(0.580 0.100 25)"
+													/>
+												</svg>
+											</div>
+
+											<!-- Detail columns -->
+											<div class="tl-detail-cols">
+												<div class="tl-description">
+													Abstract session lifecycle (spawn, pause,
+													resume, kill) behind a provider interface.
+													Implement Claude Code adapter first, stub Aider
+													and Codex adapters with feature flags.
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Branch</span>
+													<div class="tl-detail-value">
+														<span class="tl-branch">
+															<svg
+																class="icon"
+																width="10"
+																height="10"
+																viewBox="0 0 16 16"
+																fill="none"
+															>
+																<circle
+																	cx="4"
+																	cy="4"
+																	r="2"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																/>
+																<circle
+																	cx="4"
+																	cy="12"
+																	r="2"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																/>
+																<circle
+																	cx="12"
+																	cy="4"
+																	r="2"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																/>
+																<path
+																	d="M4 6v4M4 6c0-1 1-2 2-2h2a2 2 0 012 2v0"
+																	stroke="currentColor"
+																	stroke-width="1.5"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															feat/session-providers
+														</span>
+														<span class="gk-badge gk-badge-draft">
+															<span class="gk-badge-dot"></span>
+															PR #52 draft
+														</span>
+													</div>
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Labels</span>
+													<div class="tl-detail-value">
+														<span
+															class="tl-gh-label"
+															style="
+																background: color-mix(
+																	in oklch,
+																	var(--coral-400) 18%,
+																	transparent
+																);
+																color: var(--coral-300);
+																border-color: color-mix(
+																	in oklch,
+																	var(--coral-400) 30%,
+																	transparent
+																);
+															"
+															>backend</span
+														>
+														<span
+															class="tl-gh-label"
+															style="
+																background: color-mix(
+																	in oklch,
+																	var(--plum-400) 18%,
+																	transparent
+																);
+																color: var(--plum-300);
+																border-color: color-mix(
+																	in oklch,
+																	var(--plum-400) 30%,
+																	transparent
+																);
+															"
+															>architecture</span
+														>
+														<span
+															class="tl-gh-label"
+															style="
+																background: color-mix(
+																	in oklch,
+																	var(--azure-400) 18%,
+																	transparent
+																);
+																color: var(--azure-300);
+																border-color: color-mix(
+																	in oklch,
+																	var(--azure-400) 30%,
+																	transparent
+																);
+															"
+															>prd-90</span
+														>
+													</div>
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Server</span>
+													<div class="tl-detail-value">
+														<span
+															class="tl-devserver tl-devserver-offline"
+															>offline</span
+														>
+													</div>
+												</div>
+
+												<div class="tl-detail-row">
+													<span class="tl-detail-label">Sessions</span>
+													<div class="tl-detail-value">
+														<div class="tl-session-list">
+															<div class="tl-session-item">
+																<span
+																	class="tl-session-item-dot"
+																	style="
+																		background: var(
+																			--session-idle
+																		);
+																	"
+																></span>
+																<span class="tl-session-item-name"
+																	>provider-trait-def</span
+																>
+																<span class="tl-session-item-time"
+																	>45m ago</span
+																>
+															</div>
+															<div class="tl-session-item">
+																<span
+																	class="tl-session-item-dot"
+																	style="
+																		background: var(
+																			--session-finished
+																		);
+																	"
+																></span>
+																<span class="tl-session-item-name"
+																	>claude-adapter-impl</span
+																>
+																<span class="tl-session-item-time"
+																	>3h ago</span
+																>
+															</div>
+															<div class="tl-session-item">
+																<span
+																	class="tl-session-item-dot"
+																	style="
+																		background: var(
+																			--session-finished
+																		);
+																	"
+																></span>
+																<span class="tl-session-item-name"
+																	>adapter-test-harness</span
+																>
+																<span class="tl-session-item-time"
+																	>yesterday</span
+																>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="tl-body-actions">
+											<button
+												class="gk-btn gk-btn-sm gk-btn-primary"
+												style="gap: 5px"
+											>
+												<svg
+													class="icon"
+													width="11"
+													height="11"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M4 12V4l8 4-8 4z"
+														fill="currentColor"
+													/>
+												</svg>
+												Resume Session
+											</button>
+											<button
+												class="gk-btn gk-btn-sm gk-btn-ghost"
+												style="gap: 5px"
+											>
+												<svg
+													class="icon"
+													width="12"
+													height="12"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M8 3v10M3 8h10"
+														stroke="currentColor"
+														stroke-width="1.8"
+														stroke-linecap="round"
+													/>
+												</svg>
+												New Session
+											</button>
+											<button
+												class="gk-btn gk-btn-sm gk-btn-ghost"
+												style="gap: 5px"
+											>
+												<svg
+													class="icon"
+													width="12"
+													height="12"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M4 6h8M4 10h8"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linecap="round"
+													/>
+													<circle
+														cx="6"
+														cy="6"
+														r="1.5"
+														fill="currentColor"
+													/>
+													<circle
+														cx="10"
+														cy="10"
+														r="1.5"
+														fill="currentColor"
+													/>
+												</svg>
+												Compare Providers
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<!-- ROW 7: Tool approval flow (GOLD) — Collapsed -->
+								<div class="tl-row tl-accent-gold">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="false"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#163</span>
+										<span class="tl-title"
+											>Tool approval flow with configurable auto-accept
+											rules</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-open">
+												<span class="gk-badge-dot"></span>
+												Open
+											</span>
+											<span class="tl-session tl-session-paused">
+												<span class="gk-badge-dot"></span>
+												paused
+											</span>
+										</div>
+										<div class="tl-actions">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+
+								<!-- ROW 8: Session history timeline (INDIGO) — Collapsed -->
+								<div class="tl-row tl-accent-indigo">
+									<div
+										class="tl-header"
+										role="button"
+										tabindex="0"
+										aria-expanded="false"
+									>
+										<div class="tl-dot-zone">
+											<div class="tl-dot"></div>
+										</div>
+										<span class="tl-issue-num">#165</span>
+										<span class="tl-title"
+											>Session history with conversation replay and diff
+											viewer</span
+										>
+										<div class="tl-meta">
+											<span class="tl-status-badge tl-status-open">
+												<span class="gk-badge-dot"></span>
+												Open
+											</span>
+											<span class="tl-session-count">
+												<svg
+													class="icon"
+													width="11"
+													height="11"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<rect
+														x="2"
+														y="2"
+														width="12"
+														height="12"
+														rx="2"
+														stroke="currentColor"
+														stroke-width="1.3"
+													/>
+													<path
+														d="M5 6l2 1.5L5 9"
+														stroke="currentColor"
+														stroke-width="1.3"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+												1 session
+											</span>
+										</div>
+										<div class="tl-actions">
+											<button
+												class="tl-action-btn"
+												title="Open folder"
+												aria-label="Open folder"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<path
+														d="M2 4.5A1.5 1.5 0 013.5 3H6l1.5 2H12.5A1.5 1.5 0 0114 6.5v5A1.5 1.5 0 0112.5 13h-9A1.5 1.5 0 012 11.5v-7z"
+														stroke="currentColor"
+														stroke-width="1.4"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</button>
+											<button
+												class="tl-action-btn"
+												title="More actions"
+												aria-label="More actions"
+												aria-haspopup="menu"
+											>
+												<svg
+													class="icon"
+													width="14"
+													height="14"
+													viewBox="0 0 16 16"
+													fill="none"
+												>
+													<circle
+														cx="3"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="8"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+													<circle
+														cx="13"
+														cy="8"
+														r="1.25"
+														fill="currentColor"
+													/>
+												</svg>
+											</button>
+										</div>
+										<div class="tl-chevron" aria-hidden="true">
+											<svg
+												class="icon"
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+											>
+												<path
+													d="M6 4l4 4-4 4"
+													stroke="currentColor"
+													stroke-width="1.75"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- /tl-list -->
+						</div>
+						<!-- /tl-prd-group -->
+					</div>
+					<!-- /issues-body -->
+				</div>
+				<!-- /issues-panel -->
+			</div>
+			<!-- /page-wrap -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

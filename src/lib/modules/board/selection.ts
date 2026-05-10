@@ -7,6 +7,7 @@ export const BOTTOM_PANEL_TABS = {
 	dependencies: 'dependencies',
 	activity: 'activity',
 	session: 'session',
+	assignedIssues: 'assigned-issues',
 } as const;
 
 export type BottomPanelTab = (typeof BOTTOM_PANEL_TABS)[keyof typeof BOTTOM_PANEL_TABS];
@@ -22,6 +23,7 @@ export const TAB_BEHAVIOR_MAP = {
 	dependencies: 'highlight',
 	activity: 'filter',
 	session: 'replace',
+	'assigned-issues': 'replace',
 } as const satisfies Record<BottomPanelTab, TabBehavior>;
 
 // ─── Tab Labels ──────────────────────────────────────────────────────────
@@ -33,6 +35,7 @@ export const BOTTOM_PANEL_TAB_LABELS = {
 	dependencies: 'Dependencies',
 	activity: 'Activity',
 	session: 'Session',
+	'assigned-issues': 'Assigned Issues',
 } as const satisfies Record<BottomPanelTab, string>;
 
 // ─── PRD Overview Logic ──────────────────────────────────────────────────

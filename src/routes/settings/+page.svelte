@@ -203,7 +203,15 @@
 						<Badge variant="moss" class="text-2xs">gh auth</Badge>
 					</div>
 				</div>
+				<Button variant="secondary" size="sm" onclick={() => (authWizardOpen = true)}>
+					<GithubIcon size={14} />
+					Connect via OAuth
+				</Button>
 			</div>
+			<p class="text-xs text-muted-foreground">
+				Using the gh CLI for GitHub access. Connect via OAuth for a richer experience
+				without the CLI dependency.
+			</p>
 		{:else}
 			<Button onclick={() => (authWizardOpen = true)}>
 				<GithubIcon size={14} />

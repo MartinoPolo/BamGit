@@ -150,7 +150,9 @@
 							<itemConfig.icon />
 						{:else if !hideIndicator}
 							<div
-								style="--color-bg: {indicatorColor}; --color-border: {indicatorColor};"
+								style="
+
+--color-bg: {indicatorColor}; --color-border: {indicatorColor};"
 								class={cn(
 									'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
 									{

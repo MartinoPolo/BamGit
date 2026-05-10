@@ -162,14 +162,6 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             UNIQUE(blocker_issue_id, blocked_issue_id)
         );
 
-        CREATE TABLE IF NOT EXISTS deleted_assigned_issues (
-            id TEXT PRIMARY KEY,
-            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
-            github_issue_number INTEGER NOT NULL,
-            deleted_at TEXT NOT NULL DEFAULT (datetime('now')),
-            UNIQUE(dashboard_id, github_issue_number)
-        );
-
         CREATE TABLE IF NOT EXISTS session_metrics (
             session_id TEXT PRIMARY KEY REFERENCES sessions(id) ON DELETE CASCADE,
             provider TEXT NOT NULL,
@@ -256,7 +248,6 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE INDEX IF NOT EXISTS idx_sessions_issue_id ON sessions(issue_id);
         CREATE INDEX IF NOT EXISTS idx_issue_dependencies_blocker ON issue_dependencies(blocker_issue_id);
         CREATE INDEX IF NOT EXISTS idx_issue_dependencies_blocked ON issue_dependencies(blocked_issue_id);
-        CREATE INDEX IF NOT EXISTS idx_deleted_assigned_issues_dashboard ON deleted_assigned_issues(dashboard_id);
         CREATE INDEX IF NOT EXISTS idx_session_metrics_started_at ON session_metrics(started_at);
         CREATE INDEX IF NOT EXISTS idx_session_metrics_provider ON session_metrics(provider);
         CREATE INDEX IF NOT EXISTS idx_turn_metrics_session_id ON turn_metrics(session_id);

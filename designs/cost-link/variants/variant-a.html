@@ -1,0 +1,3091 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CostLink — Variant A: Subtle Underline</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+
+
+			/* Light theme */
+			.theme-light,
+			[data-theme='light'] {
+				color-scheme: light;
+				--background: oklch(0.985 0.005 130);
+				--surface: oklch(1 0 0);
+				--surface-2: oklch(0.965 0.008 130);
+				--surface-hover: oklch(0.94 0.012 130);
+				--surface-3: oklch(0.94 0.012 130);
+				--foreground: oklch(0.205 0.015 145);
+				--foreground-muted: oklch(0.46 0.015 145);
+				--foreground-subtle: oklch(0.62 0.012 145);
+				--border: oklch(0.9 0.012 135);
+				--border-strong: oklch(0.815 0.018 135);
+				--primary: var(--moss-700);
+				--primary-fg: oklch(0.985 0.008 130);
+				--primary-soft: oklch(0.92 0.03 135);
+				--accent: var(--moss-500);
+				--accent-fg: oklch(0.985 0.008 130);
+				--ring: var(--moss-600);
+				--sidebar-bg: oklch(0.955 0.01 135);
+				--sidebar-fg: oklch(0.3 0.02 145);
+				--code-bg: oklch(0.955 0.01 135);
+				--sky-top: var(--sky-light-top);
+				--sky-bot: var(--sky-light-bot);
+				--ground-color: oklch(0.55 0.09 135);
+				--ground-dark: oklch(0.38 0.06 55);
+			}
+
+			/* Dark theme — the primary mode for a Tauri dev tool */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* ── Accent color overrides ─────────────────────────────────── */
+			[data-accent='amber'][data-theme='light'] {
+				--primary: oklch(0.595 0.16 48);
+				--primary-fg: oklch(0.985 0.008 75);
+				--primary-soft: oklch(0.92 0.065 75);
+				--accent: oklch(0.69 0.165 55);
+				--accent-fg: oklch(0.16 0.02 50);
+				--ring: oklch(0.595 0.16 48);
+			}
+			[data-accent='amber'][data-theme='dark'] {
+				--primary: oklch(0.77 0.15 65);
+				--primary-fg: oklch(0.135 0.02 55);
+				--primary-soft: oklch(0.305 0.07 60);
+				--accent: oklch(0.77 0.15 65);
+				--accent-fg: oklch(0.15 0.02 50);
+				--ring: oklch(0.77 0.15 65);
+			}
+
+			[data-accent='bark'][data-theme='light'] {
+				--primary: oklch(0.345 0.055 50);
+				--primary-fg: oklch(0.985 0.008 55);
+				--primary-soft: oklch(0.92 0.03 55);
+				--accent: oklch(0.5 0.075 55);
+				--accent-fg: oklch(0.985 0.008 55);
+				--ring: oklch(0.345 0.055 50);
+			}
+			[data-accent='bark'][data-theme='dark'] {
+				--primary: oklch(0.7 0.06 60);
+				--primary-fg: oklch(0.135 0.02 50);
+				--primary-soft: oklch(0.305 0.04 55);
+				--accent: oklch(0.7 0.06 60);
+				--accent-fg: oklch(0.135 0.02 50);
+				--ring: oklch(0.7 0.06 60);
+			}
+
+			[data-accent='azure'][data-theme='light'] {
+				--primary: oklch(0.49 0.115 240);
+				--primary-fg: oklch(0.985 0.008 230);
+				--primary-soft: oklch(0.92 0.04 230);
+				--accent: oklch(0.57 0.13 235);
+				--accent-fg: oklch(0.985 0.008 230);
+				--ring: oklch(0.49 0.115 240);
+			}
+			[data-accent='azure'][data-theme='dark'] {
+				--primary: oklch(0.66 0.12 230);
+				--primary-fg: oklch(0.135 0.02 240);
+				--primary-soft: oklch(0.305 0.055 235);
+				--accent: oklch(0.66 0.12 230);
+				--accent-fg: oklch(0.135 0.02 240);
+				--ring: oklch(0.66 0.12 230);
+			}
+
+			[data-accent='moss'][data-theme='light'] {
+				--accent: oklch(0.58 0.096 134);
+				--accent-fg: oklch(0.985 0.008 130);
+			}
+			[data-accent='moss'][data-theme='dark'] {
+				--accent: oklch(0.69 0.098 132);
+				--accent-fg: oklch(0.135 0.02 150);
+			}
+
+			[data-accent='plum'][data-theme='light'] {
+				--primary: oklch(0.48 0.13 320);
+				--primary-fg: oklch(0.985 0.008 320);
+				--primary-soft: oklch(0.92 0.05 320);
+				--accent: oklch(0.56 0.15 320);
+				--accent-fg: oklch(0.985 0.008 320);
+				--ring: oklch(0.48 0.13 320);
+			}
+			[data-accent='plum'][data-theme='dark'] {
+				--primary: oklch(0.64 0.13 320);
+				--primary-fg: oklch(0.135 0.02 320);
+				--primary-soft: oklch(0.305 0.06 320);
+				--accent: oklch(0.64 0.13 320);
+				--accent-fg: oklch(0.135 0.02 320);
+				--ring: oklch(0.64 0.13 320);
+			}
+
+			[data-accent='teal'][data-theme='light'] {
+				--primary: oklch(0.54 0.095 195);
+				--primary-fg: oklch(0.985 0.008 195);
+				--primary-soft: oklch(0.92 0.035 195);
+				--accent: oklch(0.62 0.11 195);
+				--accent-fg: oklch(0.985 0.008 195);
+				--ring: oklch(0.54 0.095 195);
+			}
+			[data-accent='teal'][data-theme='dark'] {
+				--primary: oklch(0.7 0.095 195);
+				--primary-fg: oklch(0.135 0.02 195);
+				--primary-soft: oklch(0.305 0.04 195);
+				--accent: oklch(0.7 0.095 195);
+				--accent-fg: oklch(0.135 0.02 195);
+				--ring: oklch(0.7 0.095 195);
+			}
+
+			[data-accent='rose'][data-theme='light'] {
+				--primary: oklch(0.56 0.135 15);
+				--primary-fg: oklch(0.985 0.008 15);
+				--primary-soft: oklch(0.92 0.055 15);
+				--accent: oklch(0.64 0.155 15);
+				--accent-fg: oklch(0.985 0.008 15);
+				--ring: oklch(0.56 0.135 15);
+			}
+			[data-accent='rose'][data-theme='dark'] {
+				--primary: oklch(0.72 0.135 15);
+				--primary-fg: oklch(0.135 0.02 15);
+				--primary-soft: oklch(0.305 0.06 15);
+				--accent: oklch(0.72 0.135 15);
+				--accent-fg: oklch(0.135 0.02 15);
+				--ring: oklch(0.72 0.135 15);
+			}
+
+			[data-accent='coral'][data-theme='light'] {
+				--primary: oklch(0.54 0.135 30);
+				--primary-fg: oklch(0.985 0.008 30);
+				--primary-soft: oklch(0.92 0.055 30);
+				--accent: oklch(0.62 0.155 30);
+				--accent-fg: oklch(0.985 0.008 30);
+				--ring: oklch(0.54 0.135 30);
+			}
+			[data-accent='coral'][data-theme='dark'] {
+				--primary: oklch(0.7 0.135 30);
+				--primary-fg: oklch(0.135 0.02 30);
+				--primary-soft: oklch(0.305 0.06 30);
+				--accent: oklch(0.7 0.135 30);
+				--accent-fg: oklch(0.135 0.02 30);
+				--ring: oklch(0.7 0.135 30);
+			}
+
+			[data-accent='gold'][data-theme='light'] {
+				--primary: oklch(0.57 0.115 90);
+				--primary-fg: oklch(0.985 0.008 90);
+				--primary-soft: oklch(0.92 0.045 90);
+				--accent: oklch(0.65 0.135 90);
+				--accent-fg: oklch(0.16 0.02 90);
+				--ring: oklch(0.57 0.115 90);
+			}
+			[data-accent='gold'][data-theme='dark'] {
+				--primary: oklch(0.73 0.115 90);
+				--primary-fg: oklch(0.135 0.02 90);
+				--primary-soft: oklch(0.305 0.05 90);
+				--accent: oklch(0.73 0.115 90);
+				--accent-fg: oklch(0.135 0.02 90);
+				--ring: oklch(0.73 0.115 90);
+			}
+
+			[data-accent='sage'][data-theme='light'] {
+				--primary: oklch(0.52 0.07 160);
+				--primary-fg: oklch(0.985 0.008 160);
+				--primary-soft: oklch(0.92 0.03 160);
+				--accent: oklch(0.6 0.085 160);
+				--accent-fg: oklch(0.985 0.008 160);
+				--ring: oklch(0.52 0.07 160);
+			}
+			[data-accent='sage'][data-theme='dark'] {
+				--primary: oklch(0.68 0.07 160);
+				--primary-fg: oklch(0.135 0.02 160);
+				--primary-soft: oklch(0.305 0.035 160);
+				--accent: oklch(0.68 0.07 160);
+				--accent-fg: oklch(0.135 0.02 160);
+				--ring: oklch(0.68 0.07 160);
+			}
+
+			[data-accent='indigo'][data-theme='light'] {
+				--primary: oklch(0.46 0.12 275);
+				--primary-fg: oklch(0.985 0.008 275);
+				--primary-soft: oklch(0.92 0.05 275);
+				--accent: oklch(0.54 0.14 275);
+				--accent-fg: oklch(0.985 0.008 275);
+				--ring: oklch(0.46 0.12 275);
+			}
+			[data-accent='indigo'][data-theme='dark'] {
+				--primary: oklch(0.62 0.12 275);
+				--primary-fg: oklch(0.135 0.02 275);
+				--primary-soft: oklch(0.305 0.055 275);
+				--accent: oklch(0.62 0.12 275);
+				--accent-fg: oklch(0.135 0.02 275);
+				--ring: oklch(0.62 0.12 275);
+			}
+
+			[data-accent='fuchsia'][data-theme='light'] {
+				--primary: oklch(0.5 0.135 350);
+				--primary-fg: oklch(0.985 0.008 350);
+				--primary-soft: oklch(0.92 0.055 350);
+				--accent: oklch(0.58 0.155 350);
+				--accent-fg: oklch(0.985 0.008 350);
+				--ring: oklch(0.5 0.135 350);
+			}
+			[data-accent='fuchsia'][data-theme='dark'] {
+				--primary: oklch(0.66 0.135 350);
+				--primary-fg: oklch(0.135 0.02 350);
+				--primary-soft: oklch(0.305 0.06 350);
+				--accent: oklch(0.66 0.135 350);
+				--accent-fg: oklch(0.135 0.02 350);
+				--ring: oklch(0.66 0.135 350);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Subtle fern pattern for surfaces — adds tactile feel without competing */
+			.gk-fern-bg {
+				background-image:
+					radial-gradient(
+						1px 1px at 25% 20%,
+						color-mix(in oklch, var(--foreground) 6%, transparent) 50%,
+						transparent 51%
+					),
+					radial-gradient(
+						1px 1px at 75% 60%,
+						color-mix(in oklch, var(--foreground) 5%, transparent) 50%,
+						transparent 51%
+					),
+					radial-gradient(
+						1px 1px at 40% 80%,
+						color-mix(in oklch, var(--foreground) 4%, transparent) 50%,
+						transparent 51%
+					);
+				background-size:
+					64px 64px,
+					96px 96px,
+					80px 80px;
+			}
+
+			/* Topographic line texture for forest canvas */
+			.gk-topo {
+				background-image: repeating-radial-gradient(
+					circle at 30% 70%,
+					transparent 0,
+					transparent 22px,
+					color-mix(in oklch, var(--foreground) 4%, transparent) 22px,
+					color-mix(in oklch, var(--foreground) 4%, transparent) 23px
+				);
+			}
+
+			/* Grovekeeper component primitives */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, white 12%);
+			}
+			.theme-dark .gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+
+			/* Inputs */
+			.gk-input,
+			.gk-select,
+			.gk-textarea {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-textarea {
+				height: auto;
+				padding: 8px 10px;
+				resize: vertical;
+				line-height: 1.5;
+			}
+			.gk-input::placeholder,
+			.gk-textarea::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus,
+			.gk-select:focus,
+			.gk-textarea:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			.gk-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				margin-bottom: 6px;
+				display: block;
+				letter-spacing: 0.01em;
+			}
+
+			/* Checkbox */
+			.gk-check {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 4px;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.gk-check:checked {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check:checked::after {
+				content: '';
+				position: absolute;
+				left: 4.5px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
+				border: solid var(--primary-fg);
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
+
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+			.gk-badge-amber {
+				background: color-mix(in oklch, var(--accent) 16%, transparent);
+				color: color-mix(in oklch, var(--accent) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--accent) 32%, transparent);
+			}
+
+			/* Tabs */
+			.gk-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+				gap: 2px;
+			}
+			.gk-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+			.gk-tab:hover {
+				color: var(--foreground);
+			}
+			.gk-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Type scale */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* Glow for approved/ready PRs */
+			.gk-glow {
+				filter: drop-shadow(0 0 12px color-mix(in oklch, var(--accent) 60%, transparent))
+					drop-shadow(0 0 4px color-mix(in oklch, var(--accent) 80%, transparent));
+			}
+
+			/* Animations */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			@keyframes gk-sway {
+				0%,
+				100% {
+					transform: rotate(-1.5deg);
+				}
+				50% {
+					transform: rotate(1.5deg);
+				}
+			}
+			.gk-sway {
+				transform-origin: bottom center;
+				animation: gk-sway 4s ease-in-out infinite;
+			}
+
+			@keyframes gk-bob {
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(-3px);
+				}
+			}
+			.gk-bob {
+				animation: gk-bob 2.4s ease-in-out infinite;
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* Sidebar collapse toggle — fades in on sidebar hover, sticks once focused */
+			.sb-root:hover .sb-toggle,
+			.sb-toggle:hover,
+			.sb-toggle:focus-visible {
+				opacity: 1 !important;
+			}
+			.sb-toggle:hover {
+				color: var(--foreground) !important;
+				background: var(--surface-3) !important;
+			}
+
+			/* CodeBurn-style data panel: thin border, bracket-style title, mono-dense body */
+			.cb-panel {
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				background: color-mix(in oklch, var(--surface) 70%, transparent);
+				padding: 14px 16px 14px 16px;
+				position: relative;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 500;
+				letter-spacing: 0.02em;
+				color: var(--accent);
+				margin-bottom: 10px;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+			}
+			.cb-panel-title::before {
+				content: '[';
+				opacity: 0.5;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				opacity: 0.5;
+				margin-left: -4px;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
+
+			/* Bracket-style period switcher */
+			.cb-tabs {
+				display: inline-flex;
+				gap: 14px;
+				font-family: var(--font-mono);
+				font-size: 12px;
+			}
+			.cb-tab {
+				background: none;
+				border: 0;
+				cursor: pointer;
+				padding: 2px 0;
+				color: var(--foreground-subtle);
+				font-family: inherit;
+				font-size: inherit;
+			}
+			.cb-tab.is-active {
+				color: var(--accent);
+			}
+			.cb-tab.is-active::before {
+				content: '[ ';
+			}
+			.cb-tab.is-active::after {
+				content: ' ]';
+			}
+			.cb-tab:hover:not(.is-active) {
+				color: var(--foreground-muted);
+			}
+
+			/* Gradient bar for codeburn-style charts */
+			.cb-bar {
+				height: 8px;
+				border-radius: 2px;
+				background: linear-gradient(
+					90deg,
+					oklch(0.76 0.165 70) 0%,
+					oklch(0.7 0.18 50) 50%,
+					oklch(0.62 0.205 25) 100%
+				);
+				box-shadow: 0 0 12px -2px oklch(0.7 0.18 55 / 0.4);
+			}
+			.cb-bar.cb-bar-cool {
+				background: linear-gradient(
+					90deg,
+					oklch(0.66 0.105 220) 0%,
+					oklch(0.58 0.13 230) 100%
+				);
+				box-shadow: 0 0 10px -2px oklch(0.62 0.135 220 / 0.35);
+			}
+			.cb-bar.cb-bar-moss {
+				background: linear-gradient(90deg, var(--moss-300) 0%, var(--moss-500) 100%);
+				box-shadow: none;
+			}
+
+			/* Category color tokens for activity rows */
+			.cb-cat-coding {
+				color: oklch(0.77 0.155 75);
+			} /* warm yellow-orange */
+			.cb-cat-debugging {
+				color: oklch(0.7 0.165 50);
+			} /* orange */
+			.cb-cat-feature {
+				color: oklch(0.64 0.22 25);
+			} /* red */
+			.cb-cat-refactor {
+				color: oklch(0.66 0.18 320);
+			} /* magenta */
+			.cb-cat-testing {
+				color: oklch(0.7 0.15 145);
+			} /* moss */
+			.cb-cat-exploration {
+				color: oklch(0.72 0.15 195);
+			} /* teal */
+			.cb-cat-planning {
+				color: oklch(0.72 0.13 250);
+			} /* blue */
+			.cb-cat-conversation {
+				color: oklch(0.72 0.06 280);
+			} /* lavender */
+			.cb-cat-build {
+				color: oklch(0.72 0.13 165);
+			} /* mint */
+			.cb-cat-git {
+				color: oklch(0.62 0.15 30);
+			} /* rust */
+			.cb-cat-brainstorm {
+				color: oklch(0.73 0.165 120);
+			} /* lime */
+			.cb-cat-general {
+				color: var(--foreground-subtle);
+			}
+			.cb-cat-deploy {
+				color: oklch(0.7 0.15 155);
+			}
+
+			/* Dense table rows */
+			.cb-row {
+				display: grid;
+				align-items: center;
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				padding: 2px 0;
+				font-variant-numeric: tabular-nums;
+			}
+			.cb-row .cb-num {
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-row .cb-mute {
+				color: var(--foreground-subtle);
+			}
+			.cb-row .cb-1shot {
+				text-align: right;
+			}
+
+			.cb-1shot-good {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-1shot-mid {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-1shot-bad {
+				color: oklch(0.64 0.205 25);
+			}
+
+			/* Status bar */
+			.cb-statusbar {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				gap: 18px;
+				padding: 6px 16px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--background) 50%, transparent);
+			}
+			.cb-statusbar .cb-key {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+			}
+			.cb-statusbar .cb-keycap {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 16px;
+				height: 16px;
+				padding: 0 4px;
+				border: 1px solid var(--border);
+				border-radius: 3px;
+				font-size: 10px;
+				color: var(--foreground-muted);
+				background: var(--surface-2);
+			}
+
+			/* Optimize finding cards */
+			.cb-finding {
+				border: 1px solid var(--border);
+				border-left-width: 2px;
+				border-left-color: var(--accent);
+				border-radius: var(--radius-sm);
+				padding: 10px 12px;
+				background: color-mix(in oklch, var(--surface) 60%, transparent);
+			}
+			.cb-finding.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.cb-finding.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.cb-finding.is-low {
+				border-left-color: oklch(0.66 0.105 220);
+			}
+			.cb-pri-high {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-pri-med {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-pri-low {
+				color: oklch(0.66 0.105 220);
+			}
+
+			/* ===========================================================
+   Codeburn-flavored panels (Usage view)
+   Dense, low-chrome, mono-numeric, bracket-style headings.
+   =========================================================== */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+
+			/* row: shared grid template for codeburn list rows */
+			.cb-row {
+				display: grid;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				padding: 3px 0;
+				min-height: 22px;
+				font-family: var(--font-sans);
+			}
+			.cb-num {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11.5px;
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-mute {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
+
+			/* gradient bar — codeburn signature */
+			.cb-bar {
+				height: 10px;
+				border-radius: 2px;
+				background: linear-gradient(
+					90deg,
+					oklch(0.77 0.155 75) 0%,
+					oklch(0.7 0.18 50) 60%,
+					oklch(0.64 0.205 25) 100%
+				);
+				box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+				min-width: 2px;
+			}
+			.cb-bar-cool {
+				background: linear-gradient(
+					90deg,
+					oklch(0.7 0.11 200) 0%,
+					oklch(0.62 0.13 230) 60%,
+					oklch(0.56 0.15 260) 100%
+				);
+			}
+
+			/* tabs */
+			.cb-tabs {
+				display: inline-flex;
+				gap: 0;
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+			}
+			.cb-tab {
+				padding: 5px 12px;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: 4px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				white-space: nowrap;
+			}
+			.cb-tab:hover {
+				color: var(--foreground);
+				background: var(--surface-2);
+			}
+			.cb-tab.is-active {
+				color: var(--foreground);
+				background: var(--surface-2);
+				border-color: var(--border);
+				box-shadow: inset 0 -2px 0 oklch(0.77 0.155 75);
+			}
+
+			/* one-shot rate cells */
+			.cb-1shot {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11px;
+				text-align: right;
+			}
+			.cb-1shot-good {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-1shot-mid {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-1shot-bad {
+				color: oklch(0.64 0.205 25);
+			}
+
+			/* category label tints */
+			.cb-cat-coding {
+				color: oklch(0.7 0.15 145);
+			}
+			.cb-cat-debugging {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-cat-refactor {
+				color: oklch(0.7 0.18 50);
+			}
+			.cb-cat-feature {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-cat-testing {
+				color: oklch(0.62 0.13 230);
+			}
+			.cb-cat-exploration {
+				color: oklch(0.7 0.11 200);
+			}
+			.cb-cat-brainstorm {
+				color: oklch(0.66 0.18 320);
+			}
+			.cb-cat-planning {
+				color: oklch(0.62 0.15 280);
+			}
+			.cb-cat-conversation {
+				color: var(--foreground-muted);
+			}
+			.cb-cat-git {
+				color: oklch(0.62 0.15 280);
+			}
+			.cb-cat-build {
+				color: var(--foreground-subtle);
+			}
+
+			/* findings */
+			.cb-finding {
+				border-left: 2px solid var(--border);
+				padding: 8px 10px 9px 10px;
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			}
+			.cb-finding.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.cb-finding.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.cb-finding.is-low {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+			.cb-pri-high {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-pri-med {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-pri-low {
+				color: oklch(0.7 0.11 200);
+			}
+
+			/* status bar (TUI-style) */
+			.cb-statusbar {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 5px 14px;
+				background: var(--surface-2);
+				border-top: 1px solid var(--border);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				flex-shrink: 0;
+			}
+			.cb-key {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+			}
+			.cb-keycap {
+				display: inline-block;
+				min-width: 14px;
+				padding: 0 4px;
+				text-align: center;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 3px;
+				font-size: 10px;
+				line-height: 14px;
+				color: var(--foreground);
+			}
+
+			/* Sidebar collapse button — hover affordances */
+			.sb-collapse-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			/* Collapsed brand: hovering swaps the leaf mark for a chevron-right cue */
+			.sb-brand-collapsed:hover .sb-brand-mark {
+				opacity: 0;
+			}
+			.sb-brand-collapsed:hover .sb-brand-chev {
+				opacity: 1 !important;
+			}
+			.sb-brand-mark {
+				transition: opacity 120ms;
+			}
+
+			/* ============================================================
+   STATE-AWARE COMPONENT STYLES
+   ============================================================ */
+
+			/* Button extra states */
+			.gk-btn[data-state='hover'] {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-primary[data-state='hover'] {
+				background: color-mix(in oklch, var(--primary) 88%, white 12%);
+			}
+			.theme-dark .gk-btn-primary[data-state='hover'] {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-danger[data-state='hover'] {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+				border-color: color-mix(in oklch, var(--status-danger) 50%, transparent);
+				color: var(--status-danger);
+			}
+			.gk-btn-ghost[data-state='hover'] {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: transparent;
+			}
+			.gk-btn[data-state='active'] {
+				transform: scale(0.96);
+				filter: brightness(0.95);
+			}
+			.gk-btn[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn[data-state='disabled'],
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn[data-state='loading'] {
+				color: transparent !important;
+				position: relative;
+				pointer-events: none;
+			}
+			.gk-btn[data-state='loading']::after {
+				content: '';
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: 12px;
+				height: 12px;
+				margin: -6px 0 0 -6px;
+				border: 2px solid currentColor;
+				border-right-color: transparent;
+				border-radius: 50%;
+				animation: gk-spin 0.7s linear infinite;
+				color: var(--foreground);
+			}
+			.gk-btn-primary[data-state='loading']::after {
+				color: var(--primary-fg);
+			}
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.gk-btn-success {
+				background: var(--status-success);
+				color: oklch(0.15 0.02 145);
+				border-color: transparent;
+			}
+
+			/* Input states */
+			.gk-input[data-state='hover'],
+			.gk-textarea[data-state='hover'],
+			.gk-select[data-state='hover'] {
+				border-color: var(--border-strong);
+			}
+			.gk-input[data-state='focus'],
+			.gk-textarea[data-state='focus'],
+			.gk-select[data-state='focus'] {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+			.gk-input[data-state='error'],
+			.gk-textarea[data-state='error'],
+			.gk-select[data-state='error'] {
+				border-color: var(--status-danger);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--status-danger) 18%, transparent);
+			}
+			.gk-input[data-state='success'],
+			.gk-textarea[data-state='success'],
+			.gk-select[data-state='success'] {
+				border-color: var(--status-success);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--status-success) 18%, transparent);
+			}
+			.gk-input[data-state='disabled'],
+			.gk-input:disabled,
+			.gk-textarea[data-state='disabled'],
+			.gk-textarea:disabled,
+			.gk-select[data-state='disabled'],
+			.gk-select:disabled {
+				background: var(--surface-2);
+				color: var(--foreground-subtle);
+				cursor: not-allowed;
+				opacity: 0.7;
+			}
+			.gk-input[data-state='readonly'],
+			.gk-input[readonly] {
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+			}
+			.gk-input[data-state='loading'] {
+				background-image: linear-gradient(
+					90deg,
+					transparent 0%,
+					color-mix(in oklch, var(--primary) 12%, transparent) 50%,
+					transparent 100%
+				);
+				background-size: 200% 100%;
+				animation: gk-shimmer 1.4s linear infinite;
+			}
+			@keyframes gk-shimmer {
+				from {
+					background-position: 200% 0;
+				}
+				to {
+					background-position: -200% 0;
+				}
+			}
+
+			.gk-help {
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				margin-top: 4px;
+			}
+			.gk-help.is-error {
+				color: var(--status-danger);
+			}
+			.gk-help.is-success {
+				color: var(--status-success);
+			}
+
+			/* Checkbox states */
+			.gk-check[data-state='hover'] {
+				border-color: var(--ring);
+			}
+			.gk-check[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-check[data-state='indeterminate'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check[data-state='indeterminate']::after {
+				content: '';
+				position: absolute;
+				left: 2.5px;
+				top: 6.5px;
+				width: 8px;
+				height: 2px;
+				background: var(--primary-fg);
+				border: 0;
+				transform: none;
+			}
+			.gk-check:disabled,
+			.gk-check[data-state='disabled'] {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+
+			/* Radio */
+			.gk-radio {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 50%;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition: border-color 120ms;
+			}
+			.gk-radio:checked {
+				border-color: var(--primary);
+			}
+			.gk-radio:checked::after {
+				content: '';
+				position: absolute;
+				inset: 3px;
+				background: var(--primary);
+				border-radius: 50%;
+			}
+			.gk-radio[data-state='hover'],
+			.gk-radio:hover {
+				border-color: var(--ring);
+			}
+			.gk-radio[data-state='focus']:checked {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-radio:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+
+			/* Tab states */
+			.gk-tab[data-state='hover']:not(.is-active) {
+				color: var(--foreground);
+				background: color-mix(in oklch, var(--foreground) 4%, transparent);
+			}
+			.gk-tab[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-tab:disabled,
+			.gk-tab[data-state='disabled'] {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+
+			/* Badge variants — copied state */
+			.gk-badge-copied {
+				background: color-mix(in oklch, var(--status-success) 16%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 32%, transparent);
+			}
+
+			/* Issue card states */
+			.gk-card[data-state='hover'] {
+				border-color: var(--border-strong);
+				box-shadow: var(--shadow-md);
+			}
+			.gk-card[data-state='selected'] {
+				border-color: var(--primary);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 22%, transparent);
+			}
+			.gk-card[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-card[data-state='dragging'] {
+				transform: rotate(-1deg) scale(1.02);
+				box-shadow: var(--shadow-lg);
+				cursor: grabbing;
+				opacity: 0.92;
+			}
+			.gk-card[data-state='loading'] {
+				position: relative;
+				overflow: hidden;
+			}
+			.gk-card[data-state='loading']::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					color-mix(in oklch, var(--primary) 8%, transparent),
+					transparent
+				);
+				background-size: 200% 100%;
+				animation: gk-shimmer 1.6s linear infinite;
+				pointer-events: none;
+			}
+			.gk-card[data-state='error'] {
+				border-color: color-mix(in oklch, var(--status-danger) 50%, var(--border));
+				border-left-width: 3px;
+				border-left-color: var(--status-danger);
+			}
+			.gk-card[data-state='success'] {
+				border-left: 3px solid var(--status-success);
+			}
+			.gk-card[data-state='archived'] {
+				opacity: 0.55;
+			}
+			.gk-card[data-state='disabled'] {
+				opacity: 0.45;
+				pointer-events: none;
+			}
+
+			/* Sidebar nav item states */
+			.sb-item[data-state='hover']:not(.is-active) {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.sb-item[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: -2px;
+			}
+			.sb-item[data-state='active-hover'] {
+				background: color-mix(in oklch, var(--primary-soft) 60%, var(--surface-2));
+				color: var(--foreground);
+			}
+			.sb-item[data-state='disabled'] {
+				opacity: 0.4;
+				pointer-events: none;
+			}
+
+			/* Toggle */
+			.gk-toggle {
+				width: 32px;
+				height: 18px;
+				border-radius: 999px;
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				position: relative;
+				cursor: pointer;
+				transition: background 120ms;
+				flex-shrink: 0;
+			}
+			.gk-toggle::after {
+				content: '';
+				position: absolute;
+				top: 1px;
+				left: 1px;
+				width: 14px;
+				height: 14px;
+				border-radius: 999px;
+				background: var(--surface);
+				box-shadow: var(--shadow-sm);
+				transition: left 140ms;
+			}
+			.gk-toggle[data-on='true'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-toggle[data-on='true']::after {
+				left: 16px;
+			}
+			.gk-toggle[data-state='hover'] {
+				border-color: var(--border-strong);
+			}
+			.gk-toggle[data-state='focus'] {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-toggle[data-state='disabled'] {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+
+			/* Tooltip */
+			.gk-tooltip {
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+				font-size: 11px;
+				padding: 5px 8px;
+				border-radius: 6px;
+				box-shadow: var(--shadow-md);
+				font-family: var(--font-sans);
+				position: relative;
+				white-space: nowrap;
+			}
+			.theme-light .gk-tooltip {
+				background: oklch(0.18 0.015 145);
+				color: #fff;
+			}
+			.gk-tooltip-arrow {
+				position: absolute;
+				width: 8px;
+				height: 8px;
+				background: inherit;
+				transform: rotate(45deg);
+				border: inherit;
+			}
+
+			/* Popover */
+			.gk-popover {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-lg);
+				padding: 8px;
+				min-width: 220px;
+			}
+			.gk-popover-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 8px;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 13px;
+				color: var(--foreground);
+				transition: background 100ms;
+			}
+			.gk-popover-item:hover,
+			.gk-popover-item[data-state='hover'] {
+				background: var(--surface-2);
+			}
+			.gk-popover-item[data-state='active'] {
+				background: var(--primary-soft);
+			}
+			.gk-popover-item .gk-kbd {
+				margin-left: auto;
+			}
+			.gk-popover-divider {
+				height: 1px;
+				background: var(--border);
+				margin: 6px -8px;
+			}
+			.gk-popover-label {
+				padding: 6px 8px 4px;
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+			}
+
+			/* Modal */
+			.gk-modal-backdrop {
+				position: absolute;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.1 0.02 150) 50%, transparent);
+				backdrop-filter: blur(2px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.gk-modal {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-lg);
+				width: 100%;
+				max-width: 480px;
+				display: flex;
+				flex-direction: column;
+				max-height: 86%;
+			}
+			.gk-modal-header {
+				padding: 16px 18px 12px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				border-bottom: 1px solid var(--border);
+			}
+			.gk-modal-body {
+				padding: 16px 18px;
+				overflow: auto;
+			}
+			.gk-modal-footer {
+				padding: 12px 18px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: flex-end;
+				gap: 8px;
+				background: var(--surface-2);
+				border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+			}
+
+			/* Keyboard cap */
+			.gk-kbd {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 18px;
+				height: 18px;
+				padding: 0 5px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: 4px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+			}
+
+			/* Resizer (forest top/bottom panels) */
+			.gk-resizer {
+				height: 6px;
+				cursor: row-resize;
+				background: transparent;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				flex-shrink: 0;
+				transition: background 120ms;
+			}
+			.gk-resizer:hover,
+			.gk-resizer[data-state='hover'] {
+				background: color-mix(in oklch, var(--primary) 18%, transparent);
+			}
+			.gk-resizer::after {
+				content: '';
+				width: 36px;
+				height: 3px;
+				border-radius: 2px;
+				background: var(--border-strong);
+				opacity: 0.6;
+			}
+			.gk-resizer:hover::after {
+				background: var(--primary);
+				opacity: 1;
+			}
+
+			/* Search field with results */
+			.gk-search-results {
+				position: absolute;
+				top: 100%;
+				left: 0;
+				right: 0;
+				margin-top: 6px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				box-shadow: var(--shadow-lg);
+				padding: 6px;
+				max-height: 320px;
+				overflow: auto;
+				z-index: 20;
+			}
+			.gk-search-result {
+				padding: 6px 8px;
+				border-radius: 4px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-size: 12.5px;
+				cursor: pointer;
+			}
+			.gk-search-result:hover,
+			.gk-search-result[data-state='hover'] {
+				background: var(--surface-2);
+			}
+			.gk-search-result[data-state='active'] {
+				background: var(--primary-soft);
+			}
+			.gk-search-result .gk-kbd {
+				margin-left: auto;
+			}
+
+			/* Component matrix grid */
+			.cs-matrix {
+				display: grid;
+				gap: 14px;
+			}
+			.cs-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+			.cs-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
+			.cs-state-grid {
+				display: grid;
+				grid-template-columns: 88px 1fr;
+				gap: 8px 14px;
+				align-items: center;
+			}
+			.cs-state-grid > .cs-label {
+				padding-top: 4px;
+			}
+
+			/* Toast micro animation entry */
+			@keyframes gk-toast-in {
+				from {
+					opacity: 0;
+					transform: translateY(-6px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			.gk-toast-in {
+				animation: gk-toast-in 220ms ease-out;
+			}
+
+			/* Copy-button success flash */
+			@keyframes gk-flash {
+				0% {
+					background: var(--surface-2);
+				}
+				20% {
+					background: color-mix(in oklch, var(--status-success) 24%, transparent);
+				}
+				100% {
+					background: var(--surface-2);
+				}
+			}
+			.gk-flash {
+				animation: gk-flash 800ms ease-out;
+			}
+
+			/* ============================================================
+   STATE-SHOWCASE LOCKING
+   ============================================================ */
+			[data-state]:hover,
+			[data-state]:focus,
+			.is-frozen:hover,
+			.is-frozen:focus,
+			.is-frozen :hover,
+			.is-frozen :focus {
+				/* Prevent layout shifts from filter / transform on real hover. */
+			}
+			.gk-btn[data-state]:not([data-state='']):hover,
+			.gk-btn.is-frozen:hover {
+				filter: none;
+				transform: none;
+			}
+
+			.gk-btn.is-frozen:hover {
+				background: inherit;
+				border-color: inherit;
+				box-shadow: inherit;
+			}
+			.gk-btn-primary.is-frozen:hover {
+				background: var(--primary);
+			}
+			.gk-btn-secondary.is-frozen:hover {
+				background: var(--surface);
+				border-color: var(--border);
+			}
+			.gk-btn-ghost.is-frozen:hover {
+				background: transparent;
+			}
+			.gk-btn-danger.is-frozen:hover {
+				background: transparent;
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+
+			.gk-input.is-frozen:hover,
+			.gk-textarea.is-frozen:hover,
+			.gk-select.is-frozen:hover {
+				border-color: var(--border);
+				box-shadow: none;
+			}
+			.gk-input.is-frozen:focus,
+			.gk-textarea.is-frozen:focus,
+			.gk-select.is-frozen:focus {
+				border-color: var(--border);
+				box-shadow: none;
+				outline: none;
+			}
+
+			.gk-popover-item.is-frozen:hover,
+			.gk-search-result.is-frozen:hover {
+				background: transparent;
+			}
+			.gk-tab.is-frozen:hover {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.sb-item.is-frozen:hover {
+				background: transparent;
+			}
+			.gk-card.is-frozen:hover {
+				border-color: var(--border);
+				box-shadow: var(--shadow-sm);
+			}
+
+			[data-state='disabled'],
+			.is-frozen[data-state='disabled'] {
+				pointer-events: none;
+			}
+
+			.cs-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				padding: 14px 14px 12px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				min-height: 88px;
+				position: relative;
+			}
+			.cs-cell .cs-cell-label {
+				font-size: 10px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+			.cs-cell .cs-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: flex-start;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.cs-cell.cs-cell-center .cs-cell-stage {
+				justify-content: center;
+			}
+			.cs-cell-grid {
+				display: grid;
+				gap: 10px;
+				margin-bottom: 18px;
+			}
+			.cs-cell-grid.cols-2 {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+			.cs-cell-grid.cols-3 {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+			}
+			.cs-cell-grid.cols-4 {
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+			}
+			.cs-cell-grid.cols-5 {
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+			}
+			.cs-cell-grid.cols-6 {
+				grid-template-columns: repeat(6, minmax(0, 1fr));
+			}
+
+			/* ============================================================
+   COST LINK COMPONENT — Variant A: Subtle Underline
+   ============================================================ */
+
+			/*
+  CostLink renders as an <a> element with role="link".
+  At rest it looks like plain text — no color difference, no underline.
+  Hover reveals a dotted underline in --foreground-muted color.
+  Focus shows a tight focus ring. Active (pressed) slightly dims.
+*/
+
+			.cost-link {
+				/* Inherit surrounding text styling completely */
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				color: inherit;
+				text-decoration: none;
+				cursor: pointer;
+				border-radius: 2px;
+				/* Underline drawn via border-bottom so we can animate opacity */
+				border-bottom: 1px dotted transparent;
+				/* Small padding-bottom so the underline doesn't cut into descenders */
+				padding-bottom: 1px;
+				transition:
+					border-color var(--duration-2) var(--ease-out),
+					color var(--duration-2) var(--ease-out),
+					opacity var(--duration-1) var(--ease-out);
+				outline: none;
+				/* Remove anchor default blue */
+				-webkit-tap-highlight-color: transparent;
+			}
+
+			/* SIZE VARIANTS */
+			.cost-link-sm {
+				font-size: var(--text-2xs); /* 10.5px */
+				line-height: 1.4;
+			}
+			.cost-link-md {
+				font-size: var(--text-sm); /* 12px */
+				line-height: 1.4;
+			}
+
+			/* DEFAULT state — plain text, no underline */
+			/* (no extra styles needed; base styles handle it) */
+
+			/* HOVER state — dotted underline appears */
+			.cost-link:hover {
+				border-bottom-color: var(--foreground-muted);
+			}
+
+			/* FOCUS-VISIBLE state — keyboard navigation ring */
+			.cost-link:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+				border-radius: 3px;
+				/* Hide dotted underline during focus to avoid double affordance */
+				border-bottom-color: transparent;
+			}
+
+			/* ACTIVE (pressed) state */
+			.cost-link:active {
+				opacity: 0.65;
+				border-bottom-color: var(--foreground-subtle);
+			}
+
+			/* DISABLED state */
+			.cost-link[aria-disabled='true'] {
+				opacity: 0.38;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── Frozen showcase states (static, non-interactive) ── */
+			/* These let us display each state as a static snapshot in the grid */
+
+			.cost-link.state-default {
+				border-bottom-color: transparent;
+			}
+
+			.cost-link.state-hover {
+				border-bottom-color: var(--foreground-muted);
+			}
+			/* Prevent real hover from overriding our frozen hover */
+			.cost-link.state-hover:hover {
+				border-bottom-color: var(--foreground-muted);
+			}
+
+			.cost-link.state-focus {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+				border-radius: 3px;
+				border-bottom-color: transparent;
+			}
+			.cost-link.state-focus:hover {
+				border-bottom-color: transparent;
+			}
+
+			.cost-link.state-active {
+				opacity: 0.65;
+				border-bottom-color: var(--foreground-subtle);
+			}
+			.cost-link.state-active:hover {
+				opacity: 0.65;
+				border-bottom-color: var(--foreground-subtle);
+			}
+
+			.cost-link.state-disabled {
+				opacity: 0.38;
+				border-bottom-color: transparent;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			/* ── Tooltip wrapper ── */
+			.cost-link-wrapper {
+				position: relative;
+				display: inline-flex;
+				align-items: baseline;
+			}
+
+			.cost-link-tooltip {
+				position: absolute;
+				bottom: calc(100% + 6px);
+				left: 50%;
+				transform: translateX(-50%);
+				background: oklch(0.12 0.02 150);
+				color: oklch(0.97 0.01 130);
+				border: 1px solid oklch(0.28 0.025 148);
+				font-size: 11px;
+				font-family: var(--font-sans);
+				padding: 4px 8px;
+				border-radius: 5px;
+				box-shadow: var(--shadow-md);
+				white-space: nowrap;
+				pointer-events: none;
+				opacity: 0;
+				transform: translateX(-50%) translateY(3px);
+				transition:
+					opacity var(--duration-2) var(--ease-out),
+					transform var(--duration-2) var(--ease-out);
+				z-index: var(--z-tooltip);
+			}
+
+			/* Arrow */
+			.cost-link-tooltip::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				border: 4px solid transparent;
+				border-top-color: oklch(0.28 0.025 148);
+			}
+
+			/* Show tooltip on hover of wrapper */
+			.cost-link-wrapper:hover .cost-link-tooltip {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0);
+			}
+
+			/* ── Page layout ── */
+			.mockup-page {
+				min-height: 100vh;
+				padding: 40px 32px 64px;
+				background: var(--background);
+			}
+
+			.mockup-header {
+				margin-bottom: 40px;
+			}
+
+			.mockup-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				margin: 0 0 4px 0;
+			}
+
+			.mockup-subtitle {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				margin: 0;
+				font-family: var(--font-mono);
+			}
+
+			.section {
+				margin-bottom: 48px;
+			}
+
+			.section-title {
+				font-size: var(--text-xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin: 0 0 16px 0;
+			}
+
+			/* ── State showcase grid ── */
+			.state-showcase {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 10px;
+				margin-bottom: 8px;
+			}
+
+			@media (max-width: 640px) {
+				.state-showcase {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+
+			/* ── Size comparison row ── */
+			.size-row {
+				display: flex;
+				align-items: baseline;
+				gap: 24px;
+				padding: 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				flex-wrap: wrap;
+			}
+
+			.size-item {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+
+			.size-item-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
+
+			.size-item-stage {
+				display: flex;
+				align-items: baseline;
+				gap: 6px;
+			}
+
+			/* ── Magnitude showcase ── */
+			.magnitude-row {
+				display: flex;
+				align-items: baseline;
+				gap: 32px;
+				padding: 16px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				flex-wrap: wrap;
+			}
+
+			.magnitude-item {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+
+			.magnitude-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Workspace card ── */
+			.workspace-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				width: 320px;
+				flex-shrink: 0;
+			}
+
+			.workspace-card-header {
+				padding: 14px 16px 10px;
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+			}
+
+			.workspace-accent-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				margin-top: 4px;
+				flex-shrink: 0;
+			}
+
+			.workspace-card-name {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+				margin: 0 0 2px 0;
+			}
+
+			.workspace-card-repo {
+				font-size: var(--text-sm);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				margin: 0;
+			}
+
+			.workspace-card-body {
+				padding: 0 16px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+
+			.workspace-stat-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			.workspace-stat-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground);
+			}
+
+			.workspace-card-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 10px 16px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+			}
+
+			.workspace-footer-sessions {
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			.workspace-footer-cost {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			/* ── Session sidebar panel ── */
+			.session-sidebar-demo {
+				width: 260px;
+				flex-shrink: 0;
+				background: var(--sidebar-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+			}
+
+			.session-sidebar-header {
+				padding: 12px 14px 8px;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.session-sidebar-title {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				margin: 0 0 2px 0;
+				letter-spacing: var(--tracking-snug);
+			}
+
+			.session-sidebar-model {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				margin: 0;
+			}
+
+			.session-stat-list {
+				padding: 10px 14px;
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+			}
+
+			.session-stat-item {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 5px 0;
+				border-bottom: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+			}
+
+			.session-stat-item:last-child {
+				border-bottom: none;
+			}
+
+			.session-stat-key {
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				letter-spacing: 0.02em;
+			}
+
+			.session-stat-val {
+				font-size: var(--text-2xs);
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground-muted);
+			}
+
+			/* ── Standalone strip ── */
+			.standalone-strip {
+				padding: 20px 24px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+			}
+
+			.standalone-strip strong {
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+
+			/* ── Context row layout ── */
+			.context-row {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+			}
+
+			/* ── Divider with label ── */
+			.labeled-divider {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				margin: 32px 0 24px;
+			}
+
+			.labeled-divider::before,
+			.labeled-divider::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.labeled-divider-text {
+				font-size: var(--text-xs);
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="mockup-page">
+				<!-- Variant label -->
+				<div class="mockup-header">
+					<p class="gk-eyebrow" style="margin: 0 0 10px 0">
+						CostLink Component &nbsp;·&nbsp; Variant A
+					</p>
+					<h1 class="mockup-title">Subtle Underline</h1>
+					<p class="mockup-subtitle">
+						Invisible at rest · dotted underline on hover · enriched text, not a button
+					</p>
+				</div>
+
+				<!-- ── Section 1: State Showcase ── -->
+				<section class="section">
+					<h2 class="section-title">All States — size md (12px)</h2>
+
+					<div class="state-showcase">
+						<!-- Default -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">default</span>
+							<div class="cs-cell-stage">
+								<span class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md state-default"
+										role="link"
+										href="#"
+										onclick="return false;"
+										aria-label="$4.82 — View usage details"
+										>$4.82</a
+									>
+									<span class="cost-link-tooltip">View usage details</span>
+								</span>
+							</div>
+							<p
+								style="
+									font-size: 10px;
+									font-family: var(--font-mono);
+									color: var(--foreground-subtle);
+									margin: 0;
+									line-height: 1.5;
+								"
+							>
+								Plain text. No visual distinction. Blends into surrounding content.
+							</p>
+						</div>
+
+						<!-- Hover -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">hover</span>
+							<div class="cs-cell-stage">
+								<span class="cost-link-wrapper" style="position: relative">
+									<a
+										class="cost-link cost-link-md state-hover"
+										role="link"
+										href="#"
+										onclick="return false;"
+										aria-label="$4.82 — View usage details"
+										>$4.82</a
+									>
+									<!-- Always show tooltip in hover state snapshot -->
+									<span
+										class="cost-link-tooltip"
+										style="
+											opacity: 1;
+											transform: translateX(-50%) translateY(0);
+										"
+										>View usage details</span
+									>
+								</span>
+							</div>
+							<p
+								style="
+									font-size: 10px;
+									font-family: var(--font-mono);
+									color: var(--foreground-subtle);
+									margin: 0;
+									line-height: 1.5;
+								"
+							>
+								Dotted underline + cursor:pointer. Tooltip reveals intent.
+							</p>
+						</div>
+
+						<!-- Focus -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">focus</span>
+							<div class="cs-cell-stage">
+								<a
+									class="cost-link cost-link-md state-focus"
+									role="link"
+									href="#"
+									onclick="return false;"
+									aria-label="$4.82 — View usage details"
+									>$4.82</a
+								>
+							</div>
+							<p
+								style="
+									font-size: 10px;
+									font-family: var(--font-mono);
+									color: var(--foreground-subtle);
+									margin: 0;
+									line-height: 1.5;
+								"
+							>
+								Ring from --ring token (moss-400). No underline — ring is the
+								signal.
+							</p>
+						</div>
+
+						<!-- Active -->
+						<div class="cs-cell">
+							<span class="cs-cell-label">active / pressed</span>
+							<div class="cs-cell-stage">
+								<a
+									class="cost-link cost-link-md state-active"
+									role="link"
+									href="#"
+									onclick="return false;"
+									aria-label="$4.82 — View usage details"
+									>$4.82</a
+								>
+							</div>
+							<p
+								style="
+									font-size: 10px;
+									font-family: var(--font-mono);
+									color: var(--foreground-subtle);
+									margin: 0;
+									line-height: 1.5;
+								"
+							>
+								Opacity 65% + subtle underline. Acknowledges the click.
+							</p>
+						</div>
+					</div>
+
+					<!-- Disabled state — full width, separate -->
+					<div
+						class="cs-cell"
+						style="margin-top: 10px; min-height: auto; padding: 12px 14px"
+					>
+						<span class="cs-cell-label">disabled</span>
+						<div class="cs-cell-stage" style="gap: 16px">
+							<a
+								class="cost-link cost-link-md state-disabled"
+								role="link"
+								aria-disabled="true"
+								aria-label="$4.82 (disabled)"
+								>$4.82</a
+							>
+							<span
+								style="
+									font-size: 10px;
+									font-family: var(--font-mono);
+									color: var(--foreground-subtle);
+								"
+							>
+								Opacity 38%. pointer-events:none. No cursor affordance. Used when
+								navigation is unavailable.
+							</span>
+						</div>
+					</div>
+				</section>
+
+				<!-- ── Section 2: Size Variants ── -->
+				<section class="section">
+					<h2 class="section-title">Size Variants</h2>
+
+					<div class="size-row">
+						<div class="size-item">
+							<span class="size-item-label">sm — 10.5px (cost-link-sm)</span>
+							<div class="size-item-stage">
+								<span
+									style="
+										font-size: var(--text-2xs);
+										color: var(--foreground-muted);
+									"
+									>Cost:</span
+								>
+								<span class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-sm"
+										role="link"
+										href="#"
+										onclick="return false;"
+										>$0.12</a
+									>
+									<span class="cost-link-tooltip">View usage details</span>
+								</span>
+							</div>
+						</div>
+
+						<div
+							style="
+								width: 1px;
+								height: 32px;
+								background: var(--border);
+								align-self: center;
+							"
+						></div>
+
+						<div class="size-item">
+							<span class="size-item-label">md — 12px (cost-link-md)</span>
+							<div class="size-item-stage">
+								<span
+									style="
+										font-size: var(--text-sm);
+										color: var(--foreground-muted);
+									"
+									>Total cost:</span
+								>
+								<span class="cost-link-wrapper">
+									<a
+										class="cost-link cost-link-md"
+										role="link"
+										href="#"
+										onclick="return false;"
+										>$4.82</a
+									>
+									<span class="cost-link-tooltip">View usage details</span>
+								</span>
+							</div>
+						</div>
+
+						<div
+							style="
+								width: 1px;
+								height: 32px;
+								background: var(--border);
+								align-self: center;
+							"
+						></div>
+
+						<!-- State comparison: hover visible on sm -->
+						<div class="size-item">
+							<span class="size-item-label">sm — hover state</span>
+							<div class="size-item-stage">
+								<span
+									style="
+										font-size: var(--text-2xs);
+										color: var(--foreground-muted);
+									"
+									>Cost:</span
+								>
+								<span class="cost-link-wrapper" style="position: relative">
+									<a
+										class="cost-link cost-link-sm state-hover"
+										role="link"
+										href="#"
+										onclick="return false;"
+										>$0.12</a
+									>
+									<span
+										class="cost-link-tooltip"
+										style="
+											opacity: 1;
+											transform: translateX(-50%) translateY(0);
+										"
+										>View usage details</span
+									>
+								</span>
+							</div>
+						</div>
+
+						<div
+							style="
+								width: 1px;
+								height: 32px;
+								background: var(--border);
+								align-self: center;
+							"
+						></div>
+
+						<div class="size-item">
+							<span class="size-item-label">md — hover state</span>
+							<div class="size-item-stage">
+								<span
+									style="
+										font-size: var(--text-sm);
+										color: var(--foreground-muted);
+									"
+									>Total cost:</span
+								>
+								<span class="cost-link-wrapper" style="position: relative">
+									<a
+										class="cost-link cost-link-md state-hover"
+										role="link"
+										href="#"
+										onclick="return false;"
+										>$4.82</a
+									>
+									<span
+										class="cost-link-tooltip"
+										style="
+											opacity: 1;
+											transform: translateX(-50%) translateY(0);
+										"
+										>View usage details</span
+									>
+								</span>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- ── Section 3: Cost Magnitudes ── -->
+				<section class="section">
+					<h2 class="section-title">Cost Magnitudes — hover state shown</h2>
+
+					<div class="magnitude-row">
+						<div class="magnitude-item">
+							<span class="magnitude-label">micro — cents</span>
+							<span class="cost-link-wrapper" style="position: relative">
+								<a
+									class="cost-link cost-link-md state-hover"
+									role="link"
+									href="#"
+									onclick="return false;"
+									>$0.12</a
+								>
+								<span
+									class="cost-link-tooltip"
+									style="opacity: 1; transform: translateX(-50%) translateY(0)"
+									>View usage details</span
+								>
+							</span>
+						</div>
+
+						<div class="magnitude-item">
+							<span class="magnitude-label">dollars</span>
+							<span class="cost-link-wrapper" style="position: relative">
+								<a
+									class="cost-link cost-link-md state-hover"
+									role="link"
+									href="#"
+									onclick="return false;"
+									>$4.82</a
+								>
+								<span
+									class="cost-link-tooltip"
+									style="opacity: 1; transform: translateX(-50%) translateY(0)"
+									>View usage details</span
+								>
+							</span>
+						</div>
+
+						<div class="magnitude-item">
+							<span class="magnitude-label">triple digits</span>
+							<span class="cost-link-wrapper" style="position: relative">
+								<a
+									class="cost-link cost-link-md state-hover"
+									role="link"
+									href="#"
+									onclick="return false;"
+									>$124.50</a
+								>
+								<span
+									class="cost-link-tooltip"
+									style="opacity: 1; transform: translateX(-50%) translateY(0)"
+									>View usage details</span
+								>
+							</span>
+						</div>
+
+						<!-- Same in sm size -->
+						<div
+							style="
+								width: 1px;
+								height: 32px;
+								background: var(--border);
+								align-self: center;
+							"
+						></div>
+
+						<div class="magnitude-item">
+							<span class="magnitude-label">sm / $0.12</span>
+							<span class="cost-link-wrapper" style="position: relative">
+								<a
+									class="cost-link cost-link-sm state-hover"
+									role="link"
+									href="#"
+									onclick="return false;"
+									>$0.12</a
+								>
+								<span
+									class="cost-link-tooltip"
+									style="opacity: 1; transform: translateX(-50%) translateY(0)"
+									>View usage details</span
+								>
+							</span>
+						</div>
+
+						<div class="magnitude-item">
+							<span class="magnitude-label">sm / $4.82</span>
+							<span class="cost-link-wrapper" style="position: relative">
+								<a
+									class="cost-link cost-link-sm state-hover"
+									role="link"
+									href="#"
+									onclick="return false;"
+									>$4.82</a
+								>
+								<span
+									class="cost-link-tooltip"
+									style="opacity: 1; transform: translateX(-50%) translateY(0)"
+									>View usage details</span
+								>
+							</span>
+						</div>
+
+						<div class="magnitude-item">
+							<span class="magnitude-label">sm / $124.50</span>
+							<span class="cost-link-wrapper" style="position: relative">
+								<a
+									class="cost-link cost-link-sm state-hover"
+									role="link"
+									href="#"
+									onclick="return false;"
+									>$124.50</a
+								>
+								<span
+									class="cost-link-tooltip"
+									style="opacity: 1; transform: translateX(-50%) translateY(0)"
+									>View usage details</span
+								>
+							</span>
+						</div>
+					</div>
+				</section>
+
+				<!-- ── Section 4: In-Context Usage ── -->
+				<section class="section">
+					<h2 class="section-title">In Context</h2>
+
+					<div class="context-row">
+						<!-- Workspace Card -->
+						<div class="workspace-card">
+							<div class="workspace-card-header">
+								<div
+									class="workspace-accent-dot"
+									style="background: oklch(0.64 0.13 320)"
+								></div>
+								<div>
+									<p class="workspace-card-name">Grovekeeper</p>
+									<p class="workspace-card-repo">MartinP/grovekeeper</p>
+								</div>
+							</div>
+
+							<div class="workspace-card-body">
+								<div class="workspace-stat-row">
+									<span>Active sessions</span>
+									<span class="workspace-stat-value">3</span>
+								</div>
+								<div class="workspace-stat-row">
+									<span>Open PRDs</span>
+									<span class="workspace-stat-value">7</span>
+								</div>
+								<div class="workspace-stat-row">
+									<span>Issues in progress</span>
+									<span class="workspace-stat-value">14</span>
+								</div>
+							</div>
+
+							<div class="workspace-card-footer">
+								<span class="workspace-footer-sessions">3 sessions running</span>
+								<div class="workspace-footer-cost">
+									<span>Today:</span>
+									<span class="cost-link-wrapper">
+										<a
+											class="cost-link cost-link-sm"
+											role="link"
+											href="#"
+											onclick="return false;"
+											aria-label="$4.82 today — View usage details"
+											>$4.82</a
+										>
+										<span class="cost-link-tooltip">View usage details</span>
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Workspace Card 2 — hover state shown -->
+						<div class="workspace-card">
+							<div class="workspace-card-header">
+								<div
+									class="workspace-accent-dot"
+									style="background: oklch(0.7 0.095 195)"
+								></div>
+								<div>
+									<p class="workspace-card-name">low-poly-2d-trees</p>
+									<p class="workspace-card-repo">MartinP/low-poly-2d-trees</p>
+								</div>
+							</div>
+
+							<div class="workspace-card-body">
+								<div class="workspace-stat-row">
+									<span>Active sessions</span>
+									<span class="workspace-stat-value">1</span>
+								</div>
+								<div class="workspace-stat-row">
+									<span>Open PRDs</span>
+									<span class="workspace-stat-value">2</span>
+								</div>
+								<div class="workspace-stat-row">
+									<span>Issues in progress</span>
+									<span class="workspace-stat-value">3</span>
+								</div>
+							</div>
+
+							<div class="workspace-card-footer">
+								<span class="workspace-footer-sessions">1 session running</span>
+								<div class="workspace-footer-cost">
+									<span>Today:</span>
+									<span class="cost-link-wrapper" style="position: relative">
+										<!-- Showing hover state in this card for demo -->
+										<a
+											class="cost-link cost-link-sm state-hover"
+											role="link"
+											href="#"
+											onclick="return false;"
+											aria-label="$0.12 today — View usage details"
+											>$0.12</a
+										>
+										<span
+											class="cost-link-tooltip"
+											style="
+												opacity: 1;
+												transform: translateX(-50%) translateY(0);
+											"
+											>View usage details</span
+										>
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Session Sidebar -->
+						<div class="session-sidebar-demo">
+							<div class="session-sidebar-header">
+								<p class="session-sidebar-title">PRD #90 — Session Providers</p>
+								<p class="session-sidebar-model">claude-sonnet-4-6 · running</p>
+							</div>
+
+							<div class="session-stat-list">
+								<div class="session-stat-item">
+									<span class="session-stat-key">started</span>
+									<span class="session-stat-val">14:23:05</span>
+								</div>
+								<div class="session-stat-item">
+									<span class="session-stat-key">duration</span>
+									<span class="session-stat-val">1h 42m</span>
+								</div>
+								<div class="session-stat-item">
+									<span class="session-stat-key">tokens in</span>
+									<span class="session-stat-val">841,203</span>
+								</div>
+								<div class="session-stat-item">
+									<span class="session-stat-key">tokens out</span>
+									<span class="session-stat-val">128,440</span>
+								</div>
+								<div class="session-stat-item">
+									<span class="session-stat-key">tool calls</span>
+									<span class="session-stat-val">213</span>
+								</div>
+								<div class="session-stat-item">
+									<span class="session-stat-key">cost</span>
+									<span class="session-stat-val">
+										<span class="cost-link-wrapper" style="position: relative">
+											<a
+												class="cost-link cost-link-sm"
+												role="link"
+												href="#"
+												onclick="return false;"
+												aria-label="$124.50 — View usage details"
+												>$124.50</a
+											>
+											<span class="cost-link-tooltip"
+												>View usage details</span
+											>
+										</span>
+									</span>
+								</div>
+								<div class="session-stat-item">
+									<span class="session-stat-key">today total</span>
+									<span class="session-stat-val">
+										<span class="cost-link-wrapper" style="position: relative">
+											<!-- hover state shown for this one -->
+											<a
+												class="cost-link cost-link-sm state-hover"
+												role="link"
+												href="#"
+												onclick="return false;"
+												aria-label="$4.82 — View usage details"
+												>$4.82</a
+											>
+											<span
+												class="cost-link-tooltip"
+												style="
+													opacity: 1;
+													transform: translateX(-50%) translateY(0);
+												"
+												>View usage details</span
+											>
+										</span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /context-row -->
+				</section>
+
+				<!-- ── Section 5: Standalone ── -->
+				<section class="section">
+					<h2 class="section-title">Standalone — Inline Text Usage</h2>
+
+					<div class="standalone-strip">
+						<span
+							>This session consumed <strong>841k tokens</strong> at a total cost
+							of</span
+						>
+						<span class="cost-link-wrapper">
+							<a
+								class="cost-link cost-link-md"
+								role="link"
+								href="#"
+								onclick="return false;"
+								aria-label="$124.50 — View usage details"
+								>$124.50</a
+							>
+							<span class="cost-link-tooltip">View usage details</span>
+						</span>
+						<span style="color: var(--foreground-muted)">over 1h 42m.</span>
+					</div>
+
+					<div
+						class="standalone-strip"
+						style="margin-top: 10px; font-size: var(--text-sm)"
+					>
+						<span style="font-size: var(--text-sm); color: var(--foreground-muted)">
+							3 workspaces active today · Claude Sonnet 4.6 · total spend:
+						</span>
+						<span class="cost-link-wrapper">
+							<a
+								class="cost-link cost-link-md"
+								role="link"
+								href="#"
+								onclick="return false;"
+								aria-label="$4.82 — View usage details"
+								>$4.82</a
+							>
+							<span class="cost-link-tooltip">View usage details</span>
+						</span>
+					</div>
+				</section>
+
+				<!-- ── Design notes ── -->
+				<div class="labeled-divider">
+					<span class="labeled-divider-text">design notes</span>
+				</div>
+
+				<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px">
+					<div class="cb-panel">
+						<div class="cb-panel-title">Invisibility at rest</div>
+						<p
+							style="
+								font-size: 11px;
+								color: var(--foreground-muted);
+								margin: 0;
+								line-height: 1.6;
+							"
+						>
+							The component inherits all color and weight from its parent. In a
+							workspace card footer at 10.5px, it reads identically to the surrounding
+							muted text — no color shift, no underline. Interactivity is hidden until
+							the user explores.
+						</p>
+					</div>
+					<div class="cb-panel">
+						<div class="cb-panel-title">Dotted over solid</div>
+						<p
+							style="
+								font-size: 11px;
+								color: var(--foreground-muted);
+								margin: 0;
+								line-height: 1.6;
+							"
+						>
+							A dotted underline (1px dotted --foreground-muted) signals "enriched
+							text" rather than a standard anchor link. Solid underlines imply
+							external navigation; dotted implies in-app drill-down. This matches
+							conventions used in spreadsheet formula references and IDE type hints.
+						</p>
+					</div>
+					<div class="cb-panel">
+						<div class="cb-panel-title">Tooltip as primary label</div>
+						<p
+							style="
+								font-size: 11px;
+								color: var(--foreground-muted);
+								margin: 0;
+								line-height: 1.6;
+							"
+						>
+							"View usage details" appears only on hover — not as a persistent label.
+							This keeps the data dense without cluttering stat rows with repeated
+							navigation affordances. The tooltip appears above to avoid blocking
+							adjacent values in footer rows.
+						</p>
+					</div>
+				</div>
+			</div>
+			<!-- /mockup-page -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

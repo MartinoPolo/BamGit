@@ -1,0 +1,2947 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Bulk Import Wizard — Variant A: Progressive Disclosure</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ── Grovekeeper tokens (inlined) ─────────────────────────── */
+
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+
+			/* ── Base reset ───────────────────────────────────────────── */
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+				min-height: 100vh;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ── Scrollbar ─────────────────────────────────────────────── */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ── Typography ────────────────────────────────────────────── */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			/* ── Buttons ───────────────────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn[data-state='loading'] {
+				color: transparent !important;
+				position: relative;
+				pointer-events: none;
+			}
+			.gk-btn[data-state='loading']::after {
+				content: '';
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: 12px;
+				height: 12px;
+				margin: -6px 0 0 -6px;
+				border: 2px solid var(--foreground);
+				border-right-color: transparent;
+				border-radius: 50%;
+				animation: gk-spin 0.7s linear infinite;
+			}
+			.gk-btn-primary[data-state='loading']::after {
+				border-color: var(--primary-fg);
+				border-right-color: transparent;
+			}
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			/* ── Inputs ────────────────────────────────────────────────── */
+			.gk-input,
+			.gk-select {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+			.gk-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				margin-bottom: 6px;
+				display: block;
+				letter-spacing: 0.01em;
+			}
+
+			/* ── Checkbox ──────────────────────────────────────────────── */
+			.gk-check {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 4px;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.gk-check:checked {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check:checked::after {
+				content: '';
+				position: absolute;
+				left: 4.5px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
+				border: solid var(--primary-fg);
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+			.gk-check:hover {
+				border-color: var(--ring);
+			}
+
+			/* ── Cards ─────────────────────────────────────────────────── */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
+
+			/* ── Badges ────────────────────────────────────────────────── */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+
+			/* ── Divider ───────────────────────────────────────────────── */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* ── Modal ─────────────────────────────────────────────────── */
+			.gk-modal-backdrop {
+				position: fixed;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.1 0.02 150) 50%, transparent);
+				backdrop-filter: blur(2px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: var(--z-modal);
+			}
+			.gk-modal {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-xl);
+				width: 100%;
+				max-width: 56rem;
+				display: flex;
+				flex-direction: column;
+				max-height: 90vh;
+				margin: var(--space-8);
+			}
+			.gk-modal-header {
+				padding: 16px 20px 12px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+			.gk-modal-body {
+				padding: 0;
+				overflow: auto;
+				flex: 1;
+			}
+			.gk-modal-footer {
+				padding: 12px 20px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 8px;
+				background: var(--surface-2);
+				border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+				flex-shrink: 0;
+			}
+
+			/* ── Variant label ─────────────────────────────────────────── */
+			.variant-label {
+				position: fixed;
+				top: 8px;
+				left: 8px;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				z-index: 999;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 4px 10px;
+				border-radius: var(--radius-sm);
+			}
+
+			/* ── Wizard layout ─────────────────────────────────────────── */
+			.wizard-body {
+				display: flex;
+				min-height: 480px;
+			}
+
+			/* Vertical stepper sidebar */
+			.wizard-stepper {
+				width: 200px;
+				flex-shrink: 0;
+				padding: 24px 16px;
+				border-right: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 40%, transparent);
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+			}
+
+			.step-item {
+				display: flex;
+				align-items: flex-start;
+				gap: 12px;
+				padding: 12px 0;
+				position: relative;
+			}
+
+			.step-rail {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex-shrink: 0;
+				gap: 0;
+			}
+
+			.step-circle {
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font-mono);
+				font-size: 12px;
+				font-weight: 600;
+				border: 2px solid var(--border-strong);
+				background: var(--surface);
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				transition: all 200ms ease;
+			}
+
+			.step-line {
+				width: 2px;
+				height: 32px;
+				background: var(--border);
+				margin-top: 4px;
+				transition: background 200ms ease;
+			}
+
+			/* Step states */
+			.step-item.is-complete .step-circle {
+				background: var(--primary);
+				border-color: var(--primary);
+				color: var(--primary-fg);
+			}
+			.step-item.is-complete .step-line {
+				background: var(--primary);
+			}
+
+			.step-item.is-active .step-circle {
+				border-color: var(--primary);
+				color: var(--primary);
+				box-shadow: 0 0 0 4px color-mix(in oklch, var(--primary) 16%, transparent);
+			}
+
+			.step-item.is-pending .step-circle {
+				border-color: var(--border);
+				color: var(--foreground-subtle);
+			}
+			.step-item.is-pending .step-line {
+				background: var(--border);
+			}
+
+			.step-text {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				padding-top: 3px;
+			}
+			.step-title {
+				font-size: var(--text-md);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-muted);
+				line-height: var(--leading-snug);
+			}
+			.step-item.is-active .step-title {
+				color: var(--foreground);
+			}
+			.step-item.is-complete .step-title {
+				color: var(--foreground-muted);
+			}
+			.step-desc {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				line-height: var(--leading-normal);
+			}
+
+			/* Wizard content area */
+			.wizard-content {
+				flex: 1;
+				padding: 24px;
+				overflow-y: auto;
+				min-width: 0;
+			}
+
+			/* ── Step 1: Folder Selection ──────────────────────────────── */
+			.folder-path-display {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 10px 14px;
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground-muted);
+			}
+			.folder-path-display .path-text {
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.folder-path-display .change-link {
+				font-family: var(--font-sans);
+				font-size: 12px;
+				color: var(--primary);
+				cursor: pointer;
+				flex-shrink: 0;
+				border: none;
+				background: none;
+				text-decoration: underline;
+				text-underline-offset: 2px;
+			}
+			.folder-path-display .change-link:hover {
+				color: var(--foreground);
+			}
+
+			/* Scan summary */
+			.scan-summary {
+				display: flex;
+				gap: 16px;
+				flex-wrap: wrap;
+			}
+			.scan-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+			.scan-stat-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-xl);
+				font-weight: var(--weight-bold);
+				color: var(--foreground);
+				letter-spacing: -0.02em;
+			}
+			.scan-stat-label {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.02em;
+			}
+
+			/* Folder tree */
+			.folder-tree {
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+			}
+			.tree-node {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 0;
+				font-size: var(--text-md);
+				color: var(--foreground);
+			}
+			.tree-node.is-faction {
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+			}
+			.tree-indent {
+				width: 20px;
+				flex-shrink: 0;
+			}
+			.tree-icon {
+				width: 16px;
+				height: 16px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+			}
+			.tree-icon svg {
+				width: 14px;
+				height: 14px;
+			}
+			.tree-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
+
+			/* Character list */
+			.char-list-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				padding-bottom: 8px;
+			}
+			.char-list-controls {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.char-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 8px 10px;
+				border-radius: var(--radius-sm);
+				transition: background 100ms ease;
+				min-height: 44px;
+			}
+			.char-row:hover {
+				background: var(--surface-2);
+			}
+			.char-row + .char-row {
+				border-top: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+			}
+
+			.char-avatar {
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-3);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 14px;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+				border: 1px solid var(--border);
+			}
+
+			.char-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.char-quality {
+				width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+			.char-quality svg {
+				width: 14px;
+				height: 14px;
+			}
+			.quality-good {
+				color: var(--status-success);
+			}
+			.quality-warn {
+				color: var(--status-warning);
+			}
+			.quality-bad {
+				color: var(--status-danger);
+			}
+
+			.char-scroll-area {
+				max-height: 320px;
+				overflow-y: auto;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 4px;
+			}
+
+			/* ── Step 2: Auto-Mapping Review ───────────────────────────── */
+			.mapping-rules-panel {
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+			}
+			.mapping-rules-toggle {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 10px 14px;
+				cursor: pointer;
+				border: none;
+				background: transparent;
+				width: 100%;
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+			}
+			.mapping-rules-toggle:hover {
+				background: var(--surface-3);
+			}
+			.mapping-rules-toggle svg {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+			}
+
+			.mapping-rules-body {
+				padding: 0 14px 12px;
+			}
+			.mapping-table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: var(--text-sm);
+			}
+			.mapping-table th {
+				text-align: left;
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				font-size: var(--text-xs);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				padding: 4px 0 6px;
+				border-bottom: 1px solid var(--border);
+			}
+			.mapping-table td {
+				padding: 5px 0;
+				border-bottom: 1px solid color-mix(in oklch, var(--border) 40%, transparent);
+			}
+			.mapping-table td:first-child {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--primary);
+			}
+			.mapping-table td:last-child {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+			}
+
+			/* Status bar for step 2 */
+			.batch-status-bar {
+				display: flex;
+				gap: 16px;
+				padding: 10px 14px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+			.batch-status-item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.batch-status-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			/* Accordion character row */
+			.accord-row {
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				transition: border-color 120ms ease;
+			}
+			.accord-row + .accord-row {
+				margin-top: 8px;
+			}
+			.accord-row.is-expanded {
+				border-color: var(--border-strong);
+			}
+
+			.accord-header {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 14px;
+				cursor: pointer;
+				background: transparent;
+				border: none;
+				width: 100%;
+				font-family: var(--font-sans);
+				font-size: var(--text-md);
+				color: var(--foreground);
+				transition: background 100ms ease;
+			}
+			.accord-header:hover {
+				background: var(--surface-2);
+			}
+
+			.accord-chevron {
+				width: 16px;
+				height: 16px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				transition: transform 160ms ease;
+			}
+			.is-expanded .accord-chevron {
+				transform: rotate(90deg);
+			}
+
+			.accord-header-name {
+				font-weight: var(--weight-semibold);
+				flex: 1;
+				text-align: left;
+			}
+
+			.accord-body {
+				padding: 0 14px 14px;
+				border-top: 1px solid var(--border);
+			}
+
+			/* Event slots inside accordion */
+			.event-slot-grid {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				margin-top: 10px;
+			}
+			.event-slot {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 6px 10px;
+				background: var(--surface-2);
+				border-radius: var(--radius-sm);
+				font-size: var(--text-sm);
+				min-height: 36px;
+			}
+			.event-slot-label {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				width: 140px;
+				flex-shrink: 0;
+			}
+			.event-slot-files {
+				flex: 1;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+			}
+			.event-slot-file {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				padding: 2px 8px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+			}
+			.event-slot-file .play-icon {
+				width: 12px;
+				height: 12px;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+			}
+			.event-slot-file .play-icon:hover {
+				color: var(--primary);
+			}
+
+			.event-slot-empty {
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-style: italic;
+			}
+
+			/* Pool section */
+			.pool-section {
+				margin-top: 10px;
+				padding-top: 10px;
+				border-top: 1px dashed var(--border);
+			}
+			.pool-label {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-medium);
+				margin-bottom: 6px;
+				letter-spacing: 0.02em;
+			}
+			.pool-files {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+			}
+
+			/* ── Step 3: Confirmation ──────────────────────────────────── */
+			.import-summary-grid {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+			.import-summary-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 8px 12px;
+				background: var(--surface-2);
+				border-radius: var(--radius-sm);
+				font-size: var(--text-md);
+			}
+			.import-summary-name {
+				font-weight: var(--weight-medium);
+				flex: 1;
+			}
+			.import-summary-coverage {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+			}
+
+			.info-card {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				padding: 12px 14px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.info-card-icon {
+				width: 18px;
+				height: 18px;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+				margin-top: 1px;
+			}
+			.info-card-icon svg {
+				width: 16px;
+				height: 16px;
+			}
+
+			/* Progress bar */
+			.progress-wrapper {
+				max-width: 420px;
+				margin: 0 auto;
+				text-align: center;
+			}
+			.progress-track {
+				width: 100%;
+				height: 8px;
+				background: var(--surface-2);
+				border-radius: var(--radius-full);
+				overflow: hidden;
+				border: 1px solid var(--border);
+			}
+			.progress-fill {
+				height: 100%;
+				background: linear-gradient(90deg, var(--moss-500), var(--moss-400));
+				border-radius: var(--radius-full);
+				transition: width 400ms ease;
+				box-shadow: 0 0 8px color-mix(in oklch, var(--moss-400) 40%, transparent);
+			}
+			.progress-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				margin-top: 10px;
+			}
+			.progress-current {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-top: 4px;
+				font-family: var(--font-mono);
+			}
+
+			/* ── SVG icons (inline) ─────────────────────────────────── */
+			.icon-sm {
+				width: 14px;
+				height: 14px;
+			}
+			.icon-md {
+				width: 16px;
+				height: 16px;
+			}
+			.icon-lg {
+				width: 18px;
+				height: 18px;
+			}
+
+			/* ── Utility ────────────────────────────────────────────── */
+			.flex {
+				display: flex;
+			}
+			.flex-col {
+				flex-direction: column;
+			}
+			.items-center {
+				align-items: center;
+			}
+			.justify-between {
+				justify-content: space-between;
+			}
+			.gap-2 {
+				gap: 4px;
+			}
+			.gap-3 {
+				gap: 6px;
+			}
+			.gap-4 {
+				gap: 8px;
+			}
+			.gap-6 {
+				gap: 12px;
+			}
+			.gap-8 {
+				gap: 16px;
+			}
+			.gap-10 {
+				gap: 20px;
+			}
+			.gap-12 {
+				gap: 24px;
+			}
+			.mt-2 {
+				margin-top: 4px;
+			}
+			.mt-4 {
+				margin-top: 8px;
+			}
+			.mt-6 {
+				margin-top: 12px;
+			}
+			.mt-8 {
+				margin-top: 16px;
+			}
+			.mt-12 {
+				margin-top: 24px;
+			}
+			.mb-2 {
+				margin-bottom: 4px;
+			}
+			.mb-4 {
+				margin-bottom: 8px;
+			}
+			.mb-6 {
+				margin-bottom: 12px;
+			}
+			.ml-auto {
+				margin-left: auto;
+			}
+			.w-full {
+				width: 100%;
+			}
+			.flex-1 {
+				flex: 1;
+			}
+			.shrink-0 {
+				flex-shrink: 0;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.hidden {
+				display: none;
+			}
+
+			/* ── Section spacer ─────────────────────────────────────── */
+			.section-gap {
+				margin-top: var(--space-16);
+			}
+			.section-gap-sm {
+				margin-top: var(--space-12);
+			}
+
+			/* ── Close button ────────────────────────────────────────── */
+			.close-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				border: none;
+				background: transparent;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				transition: all 120ms ease;
+			}
+			.close-btn:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+			}
+			.close-btn:active {
+				transform: scale(0.92);
+			}
+			.close-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.close-btn svg {
+				width: 16px;
+				height: 16px;
+			}
+
+			/* ── Filter input ────────────────────────────────────────── */
+			.filter-input-wrap {
+				position: relative;
+			}
+			.filter-input-wrap .search-icon-abs {
+				position: absolute;
+				left: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				color: var(--foreground-subtle);
+				pointer-events: none;
+			}
+			.filter-input-wrap .search-icon-abs svg {
+				width: 14px;
+				height: 14px;
+			}
+			.filter-input-wrap .gk-input {
+				padding-left: 30px;
+			}
+
+			/* ── Step 3 stats row ──────────────────────────────────── */
+			.confirm-stats {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 12px;
+			}
+			.confirm-stat-card {
+				padding: 14px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				text-align: center;
+			}
+			.confirm-stat-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-bold);
+				color: var(--foreground);
+				letter-spacing: -0.03em;
+				line-height: var(--leading-tight);
+			}
+			.confirm-stat-label {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-top: 4px;
+			}
+
+			/* ── Responsive ──────────────────────────────────────────── */
+			@media (max-width: 640px) {
+				.wizard-body {
+					flex-direction: column;
+				}
+				.wizard-stepper {
+					width: 100%;
+					flex-direction: row;
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+					padding: 12px 16px;
+					gap: 16px;
+					overflow-x: auto;
+				}
+				.step-line {
+					display: none;
+				}
+				.step-desc {
+					display: none;
+				}
+				.step-item {
+					padding: 8px 0;
+				}
+				.wizard-content {
+					padding: 16px;
+				}
+				.gk-modal {
+					max-width: 100%;
+					margin: 8px;
+				}
+				.confirm-stats {
+					grid-template-columns: 1fr;
+				}
+				.event-slot-label {
+					width: 100px;
+				}
+				.scan-summary {
+					flex-direction: column;
+					gap: 8px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="variant-label">VARIANT A: PROGRESSIVE DISCLOSURE</div>
+
+			<div class="gk-modal-backdrop">
+				<div class="gk-modal" style="max-width: 56rem">
+					<!-- ═══ Modal Header ═══ -->
+					<div class="gk-modal-header">
+						<div class="flex items-center gap-6">
+							<h2 class="gk-h2">Bulk Import Characters</h2>
+							<span class="gk-badge gk-badge-mono gk-badge-moss">
+								<span class="gk-badge-dot"></span>
+								Step 2 of 3
+							</span>
+						</div>
+						<button class="close-btn" aria-label="Close dialog">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
+							</svg>
+						</button>
+					</div>
+
+					<!-- ═══ Body: Stepper + Content ═══ -->
+					<div class="gk-modal-body">
+						<div class="wizard-body">
+							<!-- ── Vertical Stepper Sidebar ── -->
+							<nav class="wizard-stepper" aria-label="Wizard steps">
+								<!-- Step 1: Complete -->
+								<div class="step-item is-complete">
+									<div class="step-rail">
+										<div class="step-circle">
+											<svg
+												width="14"
+												height="14"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<polyline points="20 6 9 17 4 12" />
+											</svg>
+										</div>
+										<div class="step-line"></div>
+									</div>
+									<div class="step-text">
+										<div class="step-title">Select Folder</div>
+										<div class="step-desc">26 characters found</div>
+									</div>
+								</div>
+
+								<!-- Step 2: Active -->
+								<div class="step-item is-active">
+									<div class="step-rail">
+										<div class="step-circle">2</div>
+										<div class="step-line"></div>
+									</div>
+									<div class="step-text">
+										<div class="step-title">Review Mapping</div>
+										<div class="step-desc">Auto-map sounds</div>
+									</div>
+								</div>
+
+								<!-- Step 3: Pending -->
+								<div class="step-item is-pending">
+									<div class="step-rail">
+										<div class="step-circle">3</div>
+									</div>
+									<div class="step-text">
+										<div class="step-title">Import</div>
+										<div class="step-desc">Confirm & create</div>
+									</div>
+								</div>
+							</nav>
+
+							<!-- ── Content Area: Step 2 Shown ── -->
+							<div class="wizard-content">
+								<!-- ════════════════════════════════════════════════════════
+             STEP 1 (collapsed — shown as reference behind step 2)
+             We show Step 2 as the active view.
+             ════════════════════════════════════════════════════════ -->
+
+								<!-- ════════════════════════════════════════════════════════
+             STEP 2: AUTO-MAPPING REVIEW (Active)
+             ════════════════════════════════════════════════════════ -->
+
+								<!-- Batch status bar -->
+								<div class="batch-status-bar mb-6">
+									<div class="batch-status-item">
+										<div
+											class="batch-status-dot"
+											style="background: var(--status-success)"
+										></div>
+										<span>22 ready</span>
+									</div>
+									<div class="batch-status-item">
+										<div
+											class="batch-status-dot"
+											style="background: var(--status-warning)"
+										></div>
+										<span>3 incomplete</span>
+									</div>
+									<div class="batch-status-item">
+										<div
+											class="batch-status-dot"
+											style="background: var(--foreground-subtle)"
+										></div>
+										<span>1 skipped</span>
+									</div>
+								</div>
+
+								<!-- Mapping rules (collapsed by default, expanded here for demo) -->
+								<div class="mapping-rules-panel mb-6">
+									<button class="mapping-rules-toggle">
+										<span class="flex items-center gap-4">
+											<svg
+												class="icon-sm"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<circle cx="12" cy="12" r="10" />
+												<line x1="12" y1="16" x2="12" y2="12" />
+												<line x1="12" y1="8" x2="12.01" y2="8" />
+											</svg>
+											Auto-mapping rules applied
+										</span>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											style="
+												width: 14px;
+												height: 14px;
+												transform: rotate(180deg);
+											"
+										>
+											<polyline points="6 9 12 15 18 9" />
+										</svg>
+									</button>
+									<div class="mapping-rules-body">
+										<table class="mapping-table">
+											<thead>
+												<tr>
+													<th style="width: 45%">File Pattern</th>
+													<th>Event</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Ready*</td>
+													<td>session.start</td>
+												</tr>
+												<tr>
+													<td>What1, What2</td>
+													<td>session.needs-input</td>
+												</tr>
+												<tr>
+													<td>What3, What4</td>
+													<td>session.end</td>
+												</tr>
+												<tr>
+													<td>Death*</td>
+													<td>task.error</td>
+												</tr>
+												<tr>
+													<td>Yes*</td>
+													<td>task.acknowledge</td>
+												</tr>
+												<tr>
+													<td>YesAttack*</td>
+													<td>task.complete</td>
+												</tr>
+												<tr>
+													<td style="border-bottom: none">Pissed*</td>
+													<td style="border-bottom: none">
+														resource.limit
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+
+								<!-- Character accordion list -->
+								<div
+									class="flex-col gap-4"
+									style="display: flex; flex-direction: column; gap: 8px"
+								>
+									<!-- Character 1: Expanded, Ready -->
+									<div class="accord-row is-expanded">
+										<button class="accord-header">
+											<svg
+												class="accord-chevron"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+											<div class="char-avatar">&#9876;</div>
+											<span class="accord-header-name">Arthas</span>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10.5px"
+												>12 sounds</span
+											>
+											<span class="gk-badge gk-badge-success">
+												<svg
+													class="icon-sm"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<polyline points="20 6 9 17 4 12" />
+												</svg>
+												Ready
+											</span>
+										</button>
+										<div class="accord-body">
+											<div class="event-slot-grid">
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>session.start</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Ready1.wav
+														</span>
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Ready2.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>session.needs-input</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															What1.wav
+														</span>
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															What2.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>session.end</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															What3.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label">task.error</span>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Death1.wav
+														</span>
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Death2.wav
+														</span>
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Death3.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>task.acknowledge</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Yes1.wav
+														</span>
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Yes2.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>task.complete</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															YesAttack1.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>resource.limit</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Pissed1.wav
+														</span>
+													</div>
+												</div>
+											</div>
+											<!-- Unassigned pool -->
+											<div class="pool-section">
+												<div class="pool-label">Unassigned</div>
+												<div class="pool-files">
+													<span class="event-slot-file">
+														<svg
+															class="play-icon"
+															viewBox="0 0 24 24"
+															fill="currentColor"
+														>
+															<polygon points="5 3 19 12 5 21" />
+														</svg>
+														Warcry1.wav
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Character 2: Expanded, Incomplete -->
+									<div class="accord-row is-expanded">
+										<button class="accord-header">
+											<svg
+												class="accord-chevron"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+											<div class="char-avatar">&#9775;</div>
+											<span class="accord-header-name">Jaina</span>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10.5px"
+												>6 sounds</span
+											>
+											<span class="gk-badge gk-badge-warning">
+												<svg
+													class="icon-sm"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<path
+														d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+													/>
+													<line x1="12" y1="9" x2="12" y2="13" />
+													<line x1="12" y1="17" x2="12.01" y2="17" />
+												</svg>
+												Incomplete
+											</span>
+										</button>
+										<div class="accord-body">
+											<div class="event-slot-grid">
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>session.start</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Ready1.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>session.needs-input</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															What1.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>session.end</span
+													>
+													<span class="event-slot-empty"
+														>No match found</span
+													>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label">task.error</span>
+													<span class="event-slot-empty"
+														>No match found</span
+													>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>task.acknowledge</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Yes1.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>task.complete</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															YesAttack1.wav
+														</span>
+													</div>
+												</div>
+												<div class="event-slot">
+													<span class="event-slot-label"
+														>resource.limit</span
+													>
+													<div class="event-slot-files">
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Pissed1.wav
+														</span>
+														<span class="event-slot-file">
+															<svg
+																class="play-icon"
+																viewBox="0 0 24 24"
+																fill="currentColor"
+															>
+																<polygon points="5 3 19 12 5 21" />
+															</svg>
+															Pissed2.wav
+														</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Character 3: Collapsed, Ready -->
+									<div class="accord-row">
+										<button class="accord-header">
+											<svg
+												class="accord-chevron"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+											<div class="char-avatar">&#9752;</div>
+											<span class="accord-header-name">Thrall</span>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10.5px"
+												>14 sounds</span
+											>
+											<span class="gk-badge gk-badge-success">
+												<svg
+													class="icon-sm"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<polyline points="20 6 9 17 4 12" />
+												</svg>
+												Ready
+											</span>
+										</button>
+									</div>
+
+									<!-- Character 4: Collapsed, Ready -->
+									<div class="accord-row">
+										<button class="accord-header">
+											<svg
+												class="accord-chevron"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+											<div class="char-avatar">&#9760;</div>
+											<span class="accord-header-name">Sylvanas</span>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10.5px"
+												>9 sounds</span
+											>
+											<span class="gk-badge gk-badge-success">
+												<svg
+													class="icon-sm"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<polyline points="20 6 9 17 4 12" />
+												</svg>
+												Ready
+											</span>
+										</button>
+									</div>
+
+									<!-- Character 5: Collapsed, Incomplete -->
+									<div class="accord-row">
+										<button class="accord-header">
+											<svg
+												class="accord-chevron"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+											<div class="char-avatar">&#9733;</div>
+											<span class="accord-header-name">Illidan</span>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10.5px"
+												>5 sounds</span
+											>
+											<span class="gk-badge gk-badge-warning">
+												<svg
+													class="icon-sm"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<path
+														d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+													/>
+													<line x1="12" y1="9" x2="12" y2="13" />
+													<line x1="12" y1="17" x2="12.01" y2="17" />
+												</svg>
+												Incomplete
+											</span>
+										</button>
+									</div>
+
+									<!-- Character 6: Collapsed, Ready -->
+									<div class="accord-row">
+										<button class="accord-header">
+											<svg
+												class="accord-chevron"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+											<div class="char-avatar">&#9819;</div>
+											<span class="accord-header-name">Uther</span>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10.5px"
+												>11 sounds</span
+											>
+											<span class="gk-badge gk-badge-success">
+												<svg
+													class="icon-sm"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+												>
+													<polyline points="20 6 9 17 4 12" />
+												</svg>
+												Ready
+											</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══ Footer ═══ -->
+					<div class="gk-modal-footer">
+						<button class="gk-btn gk-btn-ghost">
+							<svg
+								class="icon-sm"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<polyline points="15 18 9 12 15 6" />
+							</svg>
+							Back
+						</button>
+						<div class="flex items-center gap-4">
+							<span class="gk-small">26 characters selected</span>
+							<button class="gk-btn gk-btn-primary">
+								Next: Confirm Import
+								<svg
+									class="icon-sm"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<polyline points="9 18 15 12 9 6" />
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ════════════════════════════════════════════════════════════
+     STEP 1 REFERENCE (separate modal showing Step 1 state)
+     ════════════════════════════════════════════════════════════ -->
+			<div
+				style="
+					margin-top: 120vh;
+					padding: 48px 24px;
+					max-width: 56rem;
+					margin-left: auto;
+					margin-right: auto;
+				"
+			>
+				<div class="gk-eyebrow mb-6" style="color: var(--primary)">
+					STEP 1 REFERENCE STATE
+				</div>
+
+				<div class="gk-card" style="overflow: hidden">
+					<div class="gk-modal-header">
+						<div class="flex items-center gap-6">
+							<h2 class="gk-h2">Bulk Import Characters</h2>
+							<span class="gk-badge gk-badge-mono gk-badge-moss">
+								<span class="gk-badge-dot"></span>
+								Step 1 of 3
+							</span>
+						</div>
+						<button class="close-btn" aria-label="Close dialog">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
+							</svg>
+						</button>
+					</div>
+
+					<div style="display: flex">
+						<!-- Stepper -->
+						<nav class="wizard-stepper" aria-label="Wizard steps">
+							<div class="step-item is-active">
+								<div class="step-rail">
+									<div class="step-circle">1</div>
+									<div class="step-line"></div>
+								</div>
+								<div class="step-text">
+									<div class="step-title">Select Folder</div>
+									<div class="step-desc">Pick source directory</div>
+								</div>
+							</div>
+							<div class="step-item is-pending">
+								<div class="step-rail">
+									<div class="step-circle">2</div>
+									<div class="step-line"></div>
+								</div>
+								<div class="step-text">
+									<div class="step-title">Review Mapping</div>
+									<div class="step-desc">Auto-map sounds</div>
+								</div>
+							</div>
+							<div class="step-item is-pending">
+								<div class="step-rail">
+									<div class="step-circle">3</div>
+								</div>
+								<div class="step-text">
+									<div class="step-title">Import</div>
+									<div class="step-desc">Confirm & create</div>
+								</div>
+							</div>
+						</nav>
+
+						<!-- Step 1 content -->
+						<div class="wizard-content">
+							<!-- Selected folder path -->
+							<div class="folder-path-display mb-6">
+								<svg
+									class="icon-md"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<path
+										d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"
+									/>
+								</svg>
+								<span class="path-text">D:\Games\WC3\Sounds\Characters</span>
+								<button class="change-link">Change</button>
+							</div>
+
+							<!-- Scan results summary -->
+							<div class="scan-summary mb-8">
+								<div class="scan-stat">
+									<div class="scan-stat-value">26</div>
+									<div class="scan-stat-label">Characters detected</div>
+								</div>
+								<div class="scan-stat">
+									<div class="scan-stat-value">4</div>
+									<div class="scan-stat-label">Faction folders</div>
+								</div>
+								<div class="scan-stat">
+									<div class="scan-stat-value">312</div>
+									<div class="scan-stat-label">Sound files</div>
+								</div>
+								<div class="scan-stat">
+									<div class="scan-stat-value">47 MB</div>
+									<div class="scan-stat-label">Total size</div>
+								</div>
+							</div>
+
+							<!-- Folder tree preview -->
+							<div class="gk-h3 mb-4">Folder Structure</div>
+							<div class="gk-card" style="padding: 12px 14px; margin-bottom: 24px">
+								<div class="folder-tree">
+									<div class="tree-node is-faction">
+										<span class="tree-icon">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="6 9 12 15 18 9" />
+											</svg>
+										</span>
+										<svg
+											class="icon-md"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--amber-400)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path
+												d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"
+											/>
+										</svg>
+										Human Alliance
+										<span class="tree-count">8 characters</span>
+									</div>
+									<div class="tree-node is-faction">
+										<span class="tree-icon">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+										</span>
+										<svg
+											class="icon-md"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--moss-400)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path
+												d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"
+											/>
+										</svg>
+										Orc Horde
+										<span class="tree-count">7 characters</span>
+									</div>
+									<div class="tree-node is-faction">
+										<span class="tree-icon">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+										</span>
+										<svg
+											class="icon-md"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--azure-400)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path
+												d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"
+											/>
+										</svg>
+										Undead Scourge
+										<span class="tree-count">6 characters</span>
+									</div>
+									<div class="tree-node is-faction">
+										<span class="tree-icon">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<polyline points="9 18 15 12 9 6" />
+											</svg>
+										</span>
+										<svg
+											class="icon-md"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="var(--bark-300)"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path
+												d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"
+											/>
+										</svg>
+										Night Elf Sentinels
+										<span class="tree-count">5 characters</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Character list header -->
+							<div class="char-list-header mb-4">
+								<div class="flex items-center gap-4">
+									<div class="gk-h3">Characters</div>
+									<span class="gk-badge gk-badge-mono">26 total</span>
+								</div>
+								<div class="char-list-controls">
+									<button class="gk-btn gk-btn-ghost gk-btn-sm">
+										Select All
+									</button>
+									<div class="filter-input-wrap">
+										<span class="search-icon-abs">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<circle cx="11" cy="11" r="8" />
+												<line x1="21" y1="21" x2="16.65" y2="16.65" />
+											</svg>
+										</span>
+										<input
+											type="text"
+											class="gk-input"
+											placeholder="Filter characters..."
+											style="
+												width: 180px;
+												height: 26px;
+												font-size: 12px;
+												padding-left: 30px;
+											"
+										/>
+									</div>
+								</div>
+							</div>
+
+							<!-- Character rows -->
+							<div class="char-scroll-area">
+								<!-- Human Alliance characters -->
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9876;</div>
+									<span class="char-name">Arthas</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>12</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9775;</div>
+									<span class="char-name">Jaina</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>6</span
+									>
+									<span class="char-quality quality-warn">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<path
+												d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+											/>
+											<line x1="12" y1="9" x2="12" y2="13" />
+											<line x1="12" y1="17" x2="12.01" y2="17" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9819;</div>
+									<span class="char-name">Uther</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>11</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9813;</div>
+									<span class="char-name">Muradin</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>10</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9812;</div>
+									<span class="char-name">Kael'thas</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>13</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<!-- Orc Horde characters -->
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9752;</div>
+									<span class="char-name">Thrall</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>14</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9851;</div>
+									<span class="char-name">Grom Hellscream</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>11</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9854;</div>
+									<span class="char-name">Cairne</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>9</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<!-- Undead characters -->
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9760;</div>
+									<span class="char-name">Sylvanas</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>9</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9763;</div>
+									<span class="char-name">Kel'Thuzad</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>8</span
+									>
+									<span class="char-quality quality-warn">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<path
+												d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+											/>
+											<line x1="12" y1="9" x2="12" y2="13" />
+											<line x1="12" y1="17" x2="12.01" y2="17" />
+										</svg>
+									</span>
+								</div>
+								<!-- Night Elf characters -->
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9733;</div>
+									<span class="char-name">Illidan</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>5</span
+									>
+									<span class="char-quality quality-warn">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<path
+												d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+											/>
+											<line x1="12" y1="9" x2="12" y2="13" />
+											<line x1="12" y1="17" x2="12.01" y2="17" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" checked />
+									<div class="char-avatar">&#9789;</div>
+									<span class="char-name">Tyrande</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>10</span
+									>
+									<span class="char-quality quality-good">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</span>
+								</div>
+								<div class="char-row">
+									<input type="checkbox" class="gk-check" />
+									<div class="char-avatar" style="opacity: 0.5">&#9826;</div>
+									<span
+										class="char-name"
+										style="
+											color: var(--foreground-subtle);
+											text-decoration: line-through;
+										"
+										>Furion (duplicate)</span
+									>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10.5px"
+										>3</span
+									>
+									<span class="char-quality quality-bad">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+										>
+											<line x1="18" y1="6" x2="6" y2="18" />
+											<line x1="6" y1="6" x2="18" y2="18" />
+										</svg>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Footer for Step 1 -->
+					<div class="gk-modal-footer">
+						<button class="gk-btn gk-btn-ghost" disabled>
+							<svg
+								class="icon-sm"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<polyline points="15 18 9 12 15 6" />
+							</svg>
+							Back
+						</button>
+						<div class="flex items-center gap-4">
+							<span class="gk-small">25 of 26 selected</span>
+							<button class="gk-btn gk-btn-primary">
+								Next: Review Mapping
+								<svg
+									class="icon-sm"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
+									<polyline points="9 18 15 12 9 6" />
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+       STEP 3 REFERENCE (Confirmation & Progress)
+       ═══════════════════════════════════════════════════════ -->
+
+				<div class="gk-eyebrow mb-6 mt-12" style="color: var(--primary)">
+					STEP 3 REFERENCE STATE — IMPORT IN PROGRESS
+				</div>
+
+				<div class="gk-card" style="overflow: hidden">
+					<div class="gk-modal-header">
+						<div class="flex items-center gap-6">
+							<h2 class="gk-h2">Bulk Import Characters</h2>
+							<span class="gk-badge gk-badge-mono gk-badge-moss">
+								<span class="gk-badge-dot"></span>
+								Step 3 of 3
+							</span>
+						</div>
+						<button class="close-btn" aria-label="Close dialog">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
+							</svg>
+						</button>
+					</div>
+
+					<div style="display: flex">
+						<!-- Stepper -->
+						<nav class="wizard-stepper" aria-label="Wizard steps">
+							<div class="step-item is-complete">
+								<div class="step-rail">
+									<div class="step-circle">
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</div>
+									<div class="step-line"></div>
+								</div>
+								<div class="step-text">
+									<div class="step-title">Select Folder</div>
+									<div class="step-desc">26 characters found</div>
+								</div>
+							</div>
+							<div class="step-item is-complete">
+								<div class="step-rail">
+									<div class="step-circle">
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+									</div>
+									<div class="step-line"></div>
+								</div>
+								<div class="step-text">
+									<div class="step-title">Review Mapping</div>
+									<div class="step-desc">22 ready, 3 partial</div>
+								</div>
+							</div>
+							<div class="step-item is-active">
+								<div class="step-rail">
+									<div class="step-circle">3</div>
+								</div>
+								<div class="step-text">
+									<div class="step-title">Import</div>
+									<div class="step-desc">Importing...</div>
+								</div>
+							</div>
+						</nav>
+
+						<!-- Step 3 content -->
+						<div class="wizard-content">
+							<!-- Summary stats -->
+							<div class="confirm-stats mb-8">
+								<div class="confirm-stat-card">
+									<div class="confirm-stat-value">25</div>
+									<div class="confirm-stat-label">Characters to import</div>
+								</div>
+								<div class="confirm-stat-card">
+									<div class="confirm-stat-value">309</div>
+									<div class="confirm-stat-label">Sound files</div>
+								</div>
+								<div class="confirm-stat-card">
+									<div class="confirm-stat-value">46 MB</div>
+									<div class="confirm-stat-label">Storage needed</div>
+								</div>
+							</div>
+
+							<!-- Info notices -->
+							<div
+								class="flex-col gap-4 mb-8"
+								style="display: flex; flex-direction: column; gap: 8px"
+							>
+								<div class="info-card">
+									<span class="info-card-icon">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<circle cx="12" cy="12" r="10" />
+											<line x1="12" y1="16" x2="12" y2="12" />
+											<line x1="12" y1="8" x2="12.01" y2="8" />
+										</svg>
+									</span>
+									<span
+										>No avatars detected in folder structure. Characters will
+										use a placeholder icon. You can add avatars later from the
+										character editor.</span
+									>
+								</div>
+								<div class="info-card">
+									<span
+										class="info-card-icon"
+										style="color: var(--status-warning)"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path
+												d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+											/>
+											<line x1="12" y1="9" x2="12" y2="13" />
+											<line x1="12" y1="17" x2="12.01" y2="17" />
+										</svg>
+									</span>
+									<span
+										>3 characters have incomplete event mappings. They will be
+										imported but
+										<strong style="color: var(--foreground)">disabled</strong>
+										until you assign missing sounds manually.</span
+									>
+								</div>
+							</div>
+
+							<!-- Progress (in-progress state at 60%) -->
+							<div class="progress-wrapper mt-8">
+								<div class="gk-eyebrow mb-4">Importing characters</div>
+								<div class="progress-track">
+									<div class="progress-fill" style="width: 60%"></div>
+								</div>
+								<div class="progress-label">15 / 25 characters</div>
+								<div class="progress-current">Creating Grom Hellscream...</div>
+							</div>
+
+							<!-- Character list summary (partially dimmed) -->
+							<div class="import-summary-grid mt-12">
+								<div class="import-summary-row" style="opacity: 0.5">
+									<div
+										class="char-avatar"
+										style="width: 22px; height: 22px; font-size: 11px"
+									>
+										&#9876;
+									</div>
+									<span class="import-summary-name">Arthas</span>
+									<span class="import-summary-coverage">7/7 events</span>
+									<span
+										class="gk-badge gk-badge-success"
+										style="height: 18px; font-size: 10px"
+									>
+										<svg
+											style="width: 10px; height: 10px"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="3"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+										Done
+									</span>
+								</div>
+								<div class="import-summary-row" style="opacity: 0.5">
+									<div
+										class="char-avatar"
+										style="width: 22px; height: 22px; font-size: 11px"
+									>
+										&#9775;
+									</div>
+									<span class="import-summary-name">Jaina</span>
+									<span class="import-summary-coverage">5/7 events</span>
+									<span
+										class="gk-badge gk-badge-warning"
+										style="height: 18px; font-size: 10px"
+									>
+										Done (partial)
+									</span>
+								</div>
+								<div class="import-summary-row" style="opacity: 0.5">
+									<div
+										class="char-avatar"
+										style="width: 22px; height: 22px; font-size: 11px"
+									>
+										&#9819;
+									</div>
+									<span class="import-summary-name">Uther</span>
+									<span class="import-summary-coverage">7/7 events</span>
+									<span
+										class="gk-badge gk-badge-success"
+										style="height: 18px; font-size: 10px"
+									>
+										<svg
+											style="width: 10px; height: 10px"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="3"
+											stroke-linecap="round"
+										>
+											<polyline points="20 6 9 17 4 12" />
+										</svg>
+										Done
+									</span>
+								</div>
+								<div
+									class="import-summary-row"
+									style="
+										background: color-mix(
+											in oklch,
+											var(--primary) 8%,
+											var(--surface-2)
+										);
+										border: 1px solid
+											color-mix(in oklch, var(--primary) 20%, transparent);
+										border-radius: var(--radius-sm);
+									"
+								>
+									<div
+										class="char-avatar"
+										style="width: 22px; height: 22px; font-size: 11px"
+									>
+										&#9851;
+									</div>
+									<span class="import-summary-name" style="color: var(--primary)"
+										>Grom Hellscream</span
+									>
+									<span class="import-summary-coverage">7/7 events</span>
+									<span
+										class="gk-badge gk-badge-moss"
+										style="height: 18px; font-size: 10px"
+									>
+										<span
+											class="gk-pulse"
+											style="
+												display: inline-flex;
+												width: 6px;
+												height: 6px;
+												border-radius: 50%;
+												background: var(--primary);
+											"
+										></span>
+										Importing
+									</span>
+								</div>
+								<div class="import-summary-row" style="opacity: 0.35">
+									<div
+										class="char-avatar"
+										style="width: 22px; height: 22px; font-size: 11px"
+									>
+										&#9752;
+									</div>
+									<span class="import-summary-name">Thrall</span>
+									<span class="import-summary-coverage">7/7 events</span>
+									<span class="gk-badge" style="height: 18px; font-size: 10px"
+										>Queued</span
+									>
+								</div>
+								<div class="import-summary-row" style="opacity: 0.35">
+									<div
+										class="char-avatar"
+										style="width: 22px; height: 22px; font-size: 11px"
+									>
+										&#9760;
+									</div>
+									<span class="import-summary-name">Sylvanas</span>
+									<span class="import-summary-coverage">7/7 events</span>
+									<span class="gk-badge" style="height: 18px; font-size: 10px"
+										>Queued</span
+									>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Footer for Step 3 — disabled during import -->
+					<div class="gk-modal-footer">
+						<button class="gk-btn gk-btn-ghost" disabled>
+							<svg
+								class="icon-sm"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<polyline points="15 18 9 12 15 6" />
+							</svg>
+							Back
+						</button>
+						<div class="flex items-center gap-4">
+							<button class="gk-btn gk-btn-danger gk-btn-sm">Cancel Import</button>
+							<button class="gk-btn gk-btn-primary" disabled data-state="loading">
+								Importing...
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,1831 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Session Files &amp; Stats — Variant D: Unified Scrollable Feed</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ===== FULL tokens.css INLINE ===== */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--amber-400);
+				--accent-fg: oklch(0.15 0.02 50);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+				border: 1px solid transparent;
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+			.gk-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+				gap: 2px;
+			}
+			.gk-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+			.gk-tab:hover {
+				color: var(--foreground);
+			}
+			.gk-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+			.cb-row {
+				display: grid;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				padding: 3px 0;
+				min-height: 22px;
+				font-family: var(--font-sans);
+			}
+			.cb-num {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11.5px;
+				text-align: right;
+				color: var(--foreground);
+			}
+			.cb-mute {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
+			.cb-bar {
+				height: 10px;
+				border-radius: 2px;
+				background: linear-gradient(
+					90deg,
+					oklch(0.77 0.155 75) 0%,
+					oklch(0.7 0.18 50) 60%,
+					oklch(0.64 0.205 25) 100%
+				);
+				box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06);
+				min-width: 2px;
+			}
+			.cb-bar-cool {
+				background: linear-gradient(
+					90deg,
+					oklch(0.7 0.11 200) 0%,
+					oklch(0.62 0.13 230) 60%,
+					oklch(0.56 0.15 260) 100%
+				);
+			}
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ===== VARIANT D — UNIFIED SCROLLABLE FEED ===== */
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+			}
+
+			.variant-label {
+				position: fixed;
+				top: 12px;
+				left: 12px;
+				z-index: 100;
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 4px 10px;
+				border-radius: var(--radius-sm);
+			}
+
+			.page-wrapper {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			/* ---- Session top bar (read-only context, 40% opacity) ---- */
+			.session-topbar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-6) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				opacity: 0.4;
+				pointer-events: none;
+			}
+			.session-topbar-title {
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.session-topbar-meta {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				display: flex;
+				gap: var(--space-6);
+				align-items: center;
+			}
+			.session-state-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				background: var(--status-success);
+				display: inline-block;
+				animation: state-pulse 2s ease-in-out infinite;
+			}
+			@keyframes state-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.4;
+				}
+			}
+
+			/* ---- Tab bar ---- */
+			.tab-bar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-4) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+			}
+
+			/* ---- Feed container — single column, centered ---- */
+			.feed-container {
+				flex: 1;
+				overflow-y: auto;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: var(--space-10) var(--space-8) var(--space-24);
+			}
+
+			.feed-column {
+				width: 100%;
+				max-width: 900px;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			/* ---- Files summary bar ---- */
+			.files-summary {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-7);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				margin-bottom: var(--space-2);
+			}
+
+			.files-summary-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				font-weight: var(--weight-medium);
+			}
+
+			.files-summary-stats {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				display: flex;
+				gap: var(--space-4);
+				align-items: center;
+			}
+
+			.additions {
+				color: var(--status-success);
+			}
+			.deletions {
+				color: var(--status-danger);
+			}
+
+			.files-summary-actions {
+				margin-left: auto;
+				display: flex;
+				gap: var(--space-2);
+				align-items: center;
+			}
+
+			/* ---- File card (expandable) ---- */
+			.file-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				transition:
+					border-color var(--duration-2) ease,
+					box-shadow var(--duration-2) ease;
+			}
+			.file-card:hover {
+				border-color: var(--border-strong);
+			}
+			.file-card.is-expanded {
+				box-shadow: var(--shadow-md);
+			}
+
+			.file-card-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-4) var(--space-6);
+				cursor: pointer;
+				transition: background var(--duration-2) ease;
+			}
+			.file-card-header:hover {
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+
+			.file-card-chevron {
+				flex-shrink: 0;
+				width: 16px;
+				height: 16px;
+				color: var(--foreground-subtle);
+				transition: transform var(--duration-3) var(--ease-out);
+			}
+			.file-card.is-expanded .file-card-chevron {
+				transform: rotate(90deg);
+			}
+
+			.file-card-status {
+				width: 8px;
+				height: 8px;
+				border-radius: 2px;
+				flex-shrink: 0;
+			}
+			.file-card-status.modified {
+				background: var(--amber-400);
+			}
+			.file-card-status.added {
+				background: var(--status-success);
+			}
+			.file-card-status.deleted {
+				background: var(--status-danger);
+			}
+			.file-card-status.renamed {
+				background: var(--status-info);
+			}
+
+			.file-card-path {
+				flex: 1;
+				min-width: 0;
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.file-card-path .dir {
+				color: var(--foreground-subtle);
+			}
+
+			.file-card-stats {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				white-space: nowrap;
+				flex-shrink: 0;
+				display: flex;
+				gap: var(--space-3);
+				align-items: center;
+			}
+
+			.file-card-badge {
+				flex-shrink: 0;
+			}
+
+			.file-card-actions {
+				display: flex;
+				gap: var(--space-1);
+				opacity: 0;
+				transition: opacity var(--duration-2) ease;
+			}
+			.file-card-header:hover .file-card-actions {
+				opacity: 1;
+			}
+
+			/* ---- Inline diff within file card ---- */
+			.file-card-diff {
+				border-top: 1px solid var(--border);
+			}
+
+			.diff-table {
+				width: 100%;
+				border-collapse: collapse;
+				font-family: var(--font-mono);
+				font-size: 12px;
+				line-height: 20px;
+			}
+
+			.diff-table td {
+				padding: 0 var(--space-4);
+				vertical-align: top;
+				white-space: pre-wrap;
+				word-break: break-all;
+			}
+
+			.diff-line-num {
+				width: 44px;
+				min-width: 44px;
+				color: var(--foreground-subtle);
+				text-align: right;
+				user-select: none;
+				font-size: 11px;
+				padding-right: var(--space-3) !important;
+			}
+
+			.diff-line-num-right {
+				border-right: 1px solid var(--border);
+			}
+
+			.diff-line-sign {
+				width: 20px;
+				min-width: 20px;
+				text-align: center;
+				user-select: none;
+				font-weight: var(--weight-bold);
+			}
+
+			.diff-line-content {
+				padding-left: var(--space-4) !important;
+			}
+
+			.diff-line-add {
+				background: color-mix(in oklch, var(--status-success) 10%, transparent);
+			}
+			.diff-line-add .diff-line-sign {
+				color: var(--status-success);
+			}
+
+			.diff-line-del {
+				background: color-mix(in oklch, var(--status-danger) 8%, transparent);
+			}
+			.diff-line-del .diff-line-sign {
+				color: var(--status-danger);
+			}
+
+			.diff-line-ctx .diff-line-content {
+				color: var(--foreground-muted);
+			}
+
+			.diff-hunk-header {
+				background: color-mix(in oklch, var(--status-info) 6%, transparent);
+				color: var(--foreground-subtle);
+				font-size: 11px;
+			}
+			.diff-hunk-header td {
+				padding: var(--space-2) var(--space-4);
+			}
+
+			.diff-expander {
+				text-align: center;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				font-size: 11px;
+				font-family: var(--font-mono);
+				padding: var(--space-3) 0;
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+				border-top: 1px dashed var(--border);
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease;
+			}
+			.diff-expander:hover {
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+			}
+
+			/* ---- Section separator between Files and Stats views ---- */
+			.section-separator {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-20) 0 var(--space-8);
+			}
+			.section-separator-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+			.section-separator-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				font-weight: var(--weight-semibold);
+				white-space: nowrap;
+			}
+
+			/* ---- Stats metric cards ---- */
+			.stat-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+			}
+
+			.stat-card-header {
+				padding: var(--space-5) var(--space-6) var(--space-4);
+				display: flex;
+				align-items: baseline;
+				gap: var(--space-4);
+			}
+
+			.stat-card-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+			}
+			.stat-card-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.stat-card-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+
+			.stat-card-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
+
+			.stat-card-body {
+				padding: 0 var(--space-6) var(--space-5);
+			}
+
+			/* Prominent metric value */
+			.metric-hero {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+			}
+
+			.metric-label {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				margin-bottom: 2px;
+			}
+
+			.metric-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+			}
+
+			.metric-value-sm {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+			}
+
+			.metric-sub {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+
+			/* Model breakdown row */
+			.model-row {
+				display: grid;
+				grid-template-columns: 1fr auto auto;
+				gap: var(--space-6);
+				align-items: center;
+				padding: var(--space-2) 0;
+				font-size: var(--text-sm);
+			}
+			.model-name {
+				font-family: var(--font-mono);
+				color: var(--foreground-muted);
+				font-size: 11.5px;
+			}
+			.model-cost {
+				font-family: var(--font-mono);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+				font-size: 12px;
+				text-align: right;
+			}
+			.model-pct {
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				font-size: 10.5px;
+				text-align: right;
+				min-width: 40px;
+			}
+
+			/* Token grid */
+			.token-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-6);
+			}
+
+			/* Progress bar row */
+			.progress-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-top: var(--space-3);
+			}
+			.progress-label {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				white-space: nowrap;
+				min-width: 70px;
+			}
+			.progress-track {
+				flex: 1;
+				height: 6px;
+				background: var(--surface-2);
+				border-radius: 3px;
+				overflow: hidden;
+			}
+			.progress-fill {
+				height: 100%;
+				border-radius: 3px;
+				transition: width var(--duration-5) var(--ease-out);
+			}
+			.progress-fill-primary {
+				background: var(--primary);
+			}
+			.progress-fill-cool {
+				background: linear-gradient(90deg, oklch(0.7 0.11 200), oklch(0.62 0.13 230));
+			}
+			.progress-value {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				font-size: 11px;
+				color: var(--foreground);
+				min-width: 42px;
+				text-align: right;
+			}
+
+			/* Activity grid */
+			.activity-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr 1fr;
+				gap: var(--space-6);
+			}
+
+			/* Tool usage row */
+			.tool-row {
+				display: grid;
+				grid-template-columns: 100px 1fr 44px 52px 52px;
+				gap: var(--space-4);
+				align-items: center;
+				padding: var(--space-2) 0;
+				font-size: 12px;
+			}
+			.tool-row-header {
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				font-weight: var(--weight-medium);
+				padding: var(--space-2) 0 var(--space-3);
+				border-bottom: 1px solid var(--border);
+			}
+			.tool-name {
+				font-family: var(--font-mono);
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+				font-size: 12px;
+			}
+			.tool-bar-wrap {
+				position: relative;
+				height: 6px;
+				background: var(--surface-2);
+				border-radius: 3px;
+				overflow: hidden;
+			}
+			.tool-bar-fill {
+				height: 100%;
+				border-radius: 3px;
+				background: var(--primary);
+				opacity: 0.7;
+			}
+			.tool-count {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				font-size: 11.5px;
+				color: var(--foreground);
+			}
+			.tool-meta {
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				font-size: 11px;
+				color: var(--foreground-muted);
+			}
+			.tool-success {
+				color: var(--status-success);
+			}
+
+			/* Divider inside stat cards */
+			.stat-divider {
+				height: 1px;
+				background: var(--border);
+				margin: var(--space-4) calc(-1 * var(--space-6));
+			}
+
+			/* ---- Responsive ---- */
+			@media (max-width: 640px) {
+				.feed-container {
+					padding: var(--space-6) var(--space-4) var(--space-16);
+				}
+				.token-grid {
+					grid-template-columns: 1fr;
+				}
+				.activity-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+				.tool-row {
+					grid-template-columns: 80px 1fr 36px;
+				}
+				.tool-row .tool-meta {
+					display: none;
+				}
+				.files-summary {
+					flex-wrap: wrap;
+				}
+				.files-summary-actions {
+					width: 100%;
+					justify-content: flex-end;
+				}
+			}
+		</style>
+	</head>
+	<body class="gk-root theme-dark">
+		<div class="variant-label">Variant D: Unified Scrollable Feed</div>
+		<div class="page-wrapper">
+			<!-- ============================================================
+       SESSION TOP BAR — read-only context at 40% opacity
+       ============================================================ -->
+			<header class="session-topbar">
+				<div class="session-topbar-title">Refactor session store to reactive adapter</div>
+				<div class="session-topbar-meta">
+					<span style="display: flex; align-items: center; gap: var(--space-2)">
+						<span class="session-state-dot"></span>
+						Running
+					</span>
+					<span>dev/refactor-session-store</span>
+					<span>#174</span>
+				</div>
+				<div style="margin-left: auto; display: flex; gap: var(--space-3)">
+					<span class="gk-badge gk-badge-mono gk-badge-moss">opus-4-6</span>
+					<span class="gk-badge gk-badge-mono">1h 23m</span>
+				</div>
+			</header>
+
+			<!-- ============================================================
+       TAB BAR — Files active
+       ============================================================ -->
+			<nav class="tab-bar">
+				<div class="gk-tabs">
+					<button class="gk-tab">Chat</button>
+					<button class="gk-tab is-active">Files</button>
+					<button class="gk-tab">Stats</button>
+				</div>
+			</nav>
+
+			<!-- ============================================================
+       FILES TAB — Single-column scrollable feed
+       ============================================================ -->
+			<main class="feed-container">
+				<div class="feed-column">
+					<!-- File summary bar -->
+					<div class="files-summary">
+						<span class="files-summary-count">6 files changed</span>
+						<div class="files-summary-stats">
+							<span class="additions">+289</span>
+							<span class="deletions">&minus;67</span>
+						</div>
+						<div class="files-summary-actions">
+							<button class="gk-btn gk-btn-ghost gk-btn-sm">Expand All</button>
+							<button class="gk-btn gk-btn-ghost gk-btn-sm">Collapse All</button>
+						</div>
+					</div>
+
+					<!-- ---- File 1: Expanded (modified) ---- -->
+					<article class="file-card is-expanded">
+						<div class="file-card-header">
+							<svg
+								class="file-card-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M6 3l5 5-5 5" />
+							</svg>
+							<div class="file-card-status modified"></div>
+							<div class="file-card-path">
+								<span class="dir">src/lib/modules/sessions/</span>session_store.ts
+							</div>
+							<div class="file-card-stats">
+								<span class="additions">+64</span>
+								<span class="deletions">&minus;21</span>
+							</div>
+							<div class="file-card-actions">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Copy path"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+									>
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path
+											d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="file-card-diff">
+							<table class="diff-table">
+								<tr class="diff-hunk-header">
+									<td colspan="4">
+										@@ -3,9 +3,14 @@ import type { SessionMetadata, SessionState
+										} from './types';
+									</td>
+								</tr>
+								<tr class="diff-line-ctx">
+									<td class="diff-line-num">3</td>
+									<td class="diff-line-num diff-line-num-right">3</td>
+									<td class="diff-line-sign"></td>
+									<td class="diff-line-content">
+										import { invoke } from '@tauri-apps/api/core';
+									</td>
+								</tr>
+								<tr class="diff-line-del">
+									<td class="diff-line-num">4</td>
+									<td class="diff-line-num diff-line-num-right"></td>
+									<td class="diff-line-sign">-</td>
+									<td class="diff-line-content">
+										import { writable } from 'svelte/store';
+									</td>
+								</tr>
+								<tr class="diff-line-del">
+									<td class="diff-line-num">5</td>
+									<td class="diff-line-num diff-line-num-right"></td>
+									<td class="diff-line-sign">-</td>
+									<td class="diff-line-content">
+										import type { Writable } from 'svelte/store';
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">4</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										import { SvelteMap } from 'svelte/reactivity';
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">5</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										import type { SessionAdapter, ProviderConfig } from
+										'./adapter';
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">6</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										import { createClaudeAdapter } from
+										'./adapters/claude_adapter';
+									</td>
+								</tr>
+								<tr class="diff-line-ctx">
+									<td class="diff-line-num">6</td>
+									<td class="diff-line-num diff-line-num-right">7</td>
+									<td class="diff-line-sign"></td>
+									<td class="diff-line-content"></td>
+								</tr>
+								<tr class="diff-hunk-header">
+									<td colspan="4">@@ -18,12 +23,26 @@ class SessionStore {</td>
+								</tr>
+								<tr class="diff-line-ctx">
+									<td class="diff-line-num">18</td>
+									<td class="diff-line-num diff-line-num-right">23</td>
+									<td class="diff-line-sign"></td>
+									<td class="diff-line-content">
+										private activeSessions = new SvelteMap&lt;string,
+										SessionMetadata&gt;();
+									</td>
+								</tr>
+								<tr class="diff-line-del">
+									<td class="diff-line-num">19</td>
+									<td class="diff-line-num diff-line-num-right"></td>
+									<td class="diff-line-sign">-</td>
+									<td class="diff-line-content">
+										private pollInterval: ReturnType&lt;typeof setInterval&gt; |
+										null = null;
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">24</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										private adapters = new SvelteMap&lt;string,
+										SessionAdapter&gt;();
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">25</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										private subscriptions = new Map&lt;string, () =&gt;
+										void&gt;();
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">26</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content"></td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">27</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										connectSession(id: string, config: ProviderConfig): void {
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">28</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										const adapter = createClaudeAdapter(config);
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">29</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										this.adapters.set(id, adapter);
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">30</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">adapter.connect();</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">31</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">}</td>
+								</tr>
+							</table>
+							<div class="diff-expander">Show 18 hidden lines</div>
+						</div>
+					</article>
+
+					<!-- ---- File 2: Expanded (new file) ---- -->
+					<article class="file-card is-expanded">
+						<div class="file-card-header">
+							<svg
+								class="file-card-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M6 3l5 5-5 5" />
+							</svg>
+							<div class="file-card-status added"></div>
+							<div class="file-card-path">
+								<span class="dir">src/lib/modules/sessions/</span>adapter.ts
+							</div>
+							<div class="file-card-stats">
+								<span class="additions">+93</span>
+							</div>
+							<span class="gk-badge gk-badge-success gk-badge-mono file-card-badge"
+								>new file</span
+							>
+							<div class="file-card-actions">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Copy path"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+									>
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path
+											d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="file-card-diff">
+							<table class="diff-table">
+								<tr class="diff-hunk-header">
+									<td colspan="4">@@ -0,0 +1,93 @@</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">1</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										export interface SessionAdapter {
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">2</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">readonly state: SessionState;</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">3</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										connect(): Promise&lt;void&gt;;
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">4</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">disconnect(): void;</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">5</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										sendMessage(content: string): Promise&lt;void&gt;;
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">6</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										approveToolUse(toolId: string): Promise&lt;void&gt;;
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">7</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										rejectToolUse(toolId: string, reason?: string):
+										Promise&lt;void&gt;;
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">8</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">}</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">9</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content"></td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">10</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										export interface ProviderConfig {
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">11</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">
+										provider: 'claude' | 'codex' | 'gemini-cli' | 'aider';
+									</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">12</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">workingDirectory: string;</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">13</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">model?: string;</td>
+								</tr>
+								<tr class="diff-line-add">
+									<td class="diff-line-num"></td>
+									<td class="diff-line-num diff-line-num-right">14</td>
+									<td class="diff-line-sign">+</td>
+									<td class="diff-line-content">}</td>
+								</tr>
+							</table>
+							<div class="diff-expander">Show 79 more lines</div>
+						</div>
+					</article>
+
+					<!-- ---- File 3: Collapsed (modified) ---- -->
+					<article class="file-card">
+						<div class="file-card-header">
+							<svg
+								class="file-card-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M6 3l5 5-5 5" />
+							</svg>
+							<div class="file-card-status modified"></div>
+							<div class="file-card-path">
+								<span class="dir">src/lib/components/session/</span
+								>SessionLayout.svelte
+							</div>
+							<div class="file-card-stats">
+								<span class="additions">+38</span>
+								<span class="deletions">&minus;14</span>
+							</div>
+							<div class="file-card-actions">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Copy path"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+									>
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path
+											d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</article>
+
+					<!-- ---- File 4: Collapsed (modified) ---- -->
+					<article class="file-card">
+						<div class="file-card-header">
+							<svg
+								class="file-card-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M6 3l5 5-5 5" />
+							</svg>
+							<div class="file-card-status modified"></div>
+							<div class="file-card-path">
+								<span class="dir">src-tauri/src/commands/</span>session.rs
+							</div>
+							<div class="file-card-stats">
+								<span class="additions">+52</span>
+								<span class="deletions">&minus;28</span>
+							</div>
+							<div class="file-card-actions">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Copy path"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+									>
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path
+											d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</article>
+
+					<!-- ---- File 5: Collapsed (deleted) ---- -->
+					<article class="file-card">
+						<div class="file-card-header">
+							<svg
+								class="file-card-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M6 3l5 5-5 5" />
+							</svg>
+							<div class="file-card-status deleted"></div>
+							<div class="file-card-path">
+								<span class="dir">src/lib/modules/sessions/</span>legacy_poller.ts
+							</div>
+							<div class="file-card-stats">
+								<span class="deletions">&minus;4</span>
+							</div>
+							<span class="gk-badge gk-badge-danger gk-badge-mono file-card-badge"
+								>deleted</span
+							>
+							<div class="file-card-actions">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Copy path"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+									>
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path
+											d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</article>
+
+					<!-- ---- File 6: Collapsed (renamed) ---- -->
+					<article class="file-card">
+						<div class="file-card-header">
+							<svg
+								class="file-card-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M6 3l5 5-5 5" />
+							</svg>
+							<div class="file-card-status renamed"></div>
+							<div class="file-card-path">
+								<span class="dir">src/lib/modules/sessions/</span>cost_utils.ts
+							</div>
+							<div class="file-card-stats">
+								<span class="additions">+42</span>
+							</div>
+							<span class="gk-badge gk-badge-info gk-badge-mono file-card-badge"
+								>renamed</span
+							>
+							<div class="file-card-actions">
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Copy path"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+									>
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path
+											d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</article>
+				</div>
+			</main>
+
+			<!-- ============================================================
+       STATS TAB VIEW — shown below with its own tab bar context
+       ============================================================ -->
+			<div
+				class="section-separator"
+				style="
+					max-width: 900px;
+					margin: 0 auto;
+					width: 100%;
+					padding: var(--space-20) var(--space-8) var(--space-8);
+				"
+			>
+				<div class="section-separator-line"></div>
+				<span class="section-separator-label">Stats Tab View</span>
+				<div class="section-separator-line"></div>
+			</div>
+
+			<!-- Stats tab bar context -->
+			<nav class="tab-bar">
+				<div class="gk-tabs">
+					<button class="gk-tab">Chat</button>
+					<button class="gk-tab">Files</button>
+					<button class="gk-tab is-active">Stats</button>
+				</div>
+			</nav>
+
+			<div class="feed-container">
+				<div class="feed-column">
+					<!-- ---- Cost Card ---- -->
+					<article class="stat-card">
+						<div class="stat-card-header">
+							<span class="stat-card-title">Cost</span>
+							<span class="stat-card-sub">session total</span>
+						</div>
+						<div class="stat-card-body">
+							<div
+								class="metric-hero"
+								style="color: var(--accent); margin-bottom: var(--space-5)"
+							>
+								$4.387
+							</div>
+
+							<div class="stat-divider"></div>
+
+							<div style="padding-top: var(--space-4)">
+								<div class="metric-label" style="margin-bottom: var(--space-3)">
+									By Model
+								</div>
+								<div class="model-row">
+									<div class="model-name">claude-opus-4-6</div>
+									<div class="model-cost">$3.812</div>
+									<div class="model-pct">86.9%</div>
+								</div>
+								<div class="model-row">
+									<div class="model-name">claude-sonnet-4-5</div>
+									<div class="model-cost">$0.491</div>
+									<div class="model-pct">11.2%</div>
+								</div>
+								<div class="model-row">
+									<div class="model-name">claude-haiku-3.5</div>
+									<div class="model-cost">$0.084</div>
+									<div class="model-pct">1.9%</div>
+								</div>
+							</div>
+						</div>
+					</article>
+
+					<!-- ---- Tokens Card ---- -->
+					<article class="stat-card">
+						<div class="stat-card-header">
+							<span class="stat-card-title">Tokens</span>
+							<span class="stat-card-sub">303,133 total</span>
+						</div>
+						<div class="stat-card-body">
+							<div class="token-grid" style="margin-bottom: var(--space-5)">
+								<div>
+									<div class="metric-label">Input</div>
+									<div class="metric-value">284,391</div>
+								</div>
+								<div>
+									<div class="metric-label">Output</div>
+									<div class="metric-value">18,742</div>
+								</div>
+								<div>
+									<div class="metric-label">Cache Read</div>
+									<div class="metric-value">201,208</div>
+								</div>
+								<div>
+									<div class="metric-label">Cache Write</div>
+									<div class="metric-value">83,183</div>
+								</div>
+							</div>
+
+							<div class="stat-divider"></div>
+
+							<div class="progress-row" style="margin-top: var(--space-5)">
+								<span class="progress-label">Cache Hit</span>
+								<div class="progress-track">
+									<div
+										class="progress-fill progress-fill-primary"
+										style="width: 70.8%"
+									></div>
+								</div>
+								<span class="progress-value">70.8%</span>
+							</div>
+							<div class="progress-row">
+								<span class="progress-label">Context</span>
+								<div class="progress-track">
+									<div
+										class="progress-fill progress-fill-cool"
+										style="width: 28.4%"
+									></div>
+								</div>
+								<span
+									class="progress-value"
+									style="
+										color: var(--foreground-muted);
+										font-size: 10.5px;
+										min-width: 70px;
+									"
+									>284k / 1M</span
+								>
+							</div>
+						</div>
+					</article>
+
+					<!-- ---- Activity Card ---- -->
+					<article class="stat-card">
+						<div class="stat-card-header">
+							<span class="stat-card-title">Activity</span>
+						</div>
+						<div class="stat-card-body">
+							<div class="activity-grid">
+								<div>
+									<div class="metric-label">Turns</div>
+									<div class="metric-value">17</div>
+								</div>
+								<div>
+									<div class="metric-label">Duration</div>
+									<div class="metric-value">1h 23m</div>
+								</div>
+								<div>
+									<div class="metric-label">Started</div>
+									<div class="metric-value-sm">14:32</div>
+									<div class="metric-sub">May 8, 2026</div>
+								</div>
+								<div>
+									<div class="metric-label">Status</div>
+									<div style="margin-top: 2px">
+										<span class="gk-badge gk-badge-success"
+											><span
+												style="
+													width: 6px;
+													height: 6px;
+													border-radius: 50%;
+													background: currentColor;
+													display: inline-block;
+												"
+											></span>
+											Running</span
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</article>
+
+					<!-- ---- Tool Usage Card ---- -->
+					<article class="stat-card">
+						<div class="stat-card-header">
+							<span class="stat-card-title">Tool Usage</span>
+							<span class="stat-card-sub">87 total calls</span>
+						</div>
+						<div class="stat-card-body">
+							<!-- Header row -->
+							<div class="tool-row tool-row-header">
+								<span>Tool</span>
+								<span></span>
+								<span style="text-align: right">Calls</span>
+								<span style="text-align: right">Avg ms</span>
+								<span style="text-align: right">Pass</span>
+							</div>
+
+							<!-- Tool rows -->
+							<div class="tool-row">
+								<span class="tool-name">Read</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 100%"></div>
+								</div>
+								<span class="tool-count">28</span>
+								<span class="tool-meta">142</span>
+								<span class="tool-meta tool-success">100%</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Edit</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 67.8%"></div>
+								</div>
+								<span class="tool-count">19</span>
+								<span class="tool-meta">238</span>
+								<span class="tool-meta tool-success">94.7%</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Bash</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 50%"></div>
+								</div>
+								<span class="tool-count">14</span>
+								<span class="tool-meta">1,847</span>
+								<span class="tool-meta" style="color: var(--status-warning)"
+									>85.7%</span
+								>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Grep</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 39.3%"></div>
+								</div>
+								<span class="tool-count">11</span>
+								<span class="tool-meta">89</span>
+								<span class="tool-meta tool-success">100%</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Glob</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 25%"></div>
+								</div>
+								<span class="tool-count">7</span>
+								<span class="tool-meta">34</span>
+								<span class="tool-meta tool-success">100%</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Write</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 14.3%"></div>
+								</div>
+								<span class="tool-count">4</span>
+								<span class="tool-meta">196</span>
+								<span class="tool-meta tool-success">100%</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">Agent</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 10.7%"></div>
+								</div>
+								<span class="tool-count">3</span>
+								<span class="tool-meta">12,430</span>
+								<span class="tool-meta tool-success">100%</span>
+							</div>
+							<div class="tool-row">
+								<span class="tool-name">WebFetch</span>
+								<div class="tool-bar-wrap">
+									<div class="tool-bar-fill" style="width: 3.6%"></div>
+								</div>
+								<span class="tool-count">1</span>
+								<span class="tool-meta">2,310</span>
+								<span class="tool-meta tool-success">100%</span>
+							</div>
+						</div>
+					</article>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

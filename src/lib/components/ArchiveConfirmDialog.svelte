@@ -40,7 +40,7 @@
 </script>
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
-	<Dialog.Content class="max-w-sm">
+	<Dialog.Content class="max-w-sm" onEscapeKeydown={(e) => e.stopPropagation()}>
 		{#if issue}
 			<Dialog.Header>
 				<Dialog.Title>{m.archive_confirm_title()}</Dialog.Title>

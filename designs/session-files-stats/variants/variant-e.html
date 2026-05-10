@@ -1,0 +1,2224 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Session Files &amp; Stats — Variant E: Dashboard Overview + Drill-Down</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ===== FULL tokens.css INLINE ===== */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+			}
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+				border: 1px solid transparent;
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+				gap: 2px;
+			}
+			.gk-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+			.gk-tab:hover {
+				color: var(--foreground);
+			}
+			.gk-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* cb-panel styles */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+
+			/* ===== VARIANT E CUSTOM STYLES ===== */
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+			}
+
+			.variant-label {
+				position: fixed;
+				top: 12px;
+				left: 12px;
+				z-index: 100;
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 4px 10px;
+				border-radius: var(--radius-sm);
+			}
+
+			.page-wrapper {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			/* --- Session shell context (40% opacity) --- */
+			.session-shell {
+				opacity: 0.4;
+				pointer-events: none;
+				user-select: none;
+			}
+			.session-topbar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+			}
+			.session-topbar-title {
+				font-family: var(--font-sans);
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+			}
+			.session-topbar-meta {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+
+			/* --- Tab bar --- */
+			.tab-bar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-4) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+			}
+
+			/* --- Content column --- */
+			.content-column {
+				max-width: 900px;
+				width: 100%;
+				margin: 0 auto;
+				padding: var(--space-10) var(--space-8) var(--space-16);
+			}
+
+			/* --- Section separator between Files and Stats views --- */
+			.section-separator {
+				border: none;
+				height: 2px;
+				background: var(--border);
+				margin: var(--space-16) 0 var(--space-4);
+			}
+
+			/* ========================================
+   FILES TAB — OVERVIEW + DRILL-DOWN
+   ======================================== */
+
+			/* Visual summary strip: pie + bar side by side */
+			.files-overview {
+				display: grid;
+				grid-template-columns: 220px 1fr;
+				gap: var(--space-8);
+				margin-bottom: var(--space-10);
+			}
+
+			.files-overview-pie {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-8);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--space-6);
+			}
+
+			.pie-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				align-self: flex-start;
+			}
+
+			.pie-chart {
+				width: 130px;
+				height: 130px;
+				position: relative;
+			}
+
+			.pie-center-label {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			.pie-center-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-bold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-tight);
+				line-height: 1;
+			}
+			.pie-center-text {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				margin-top: 2px;
+			}
+
+			.pie-legend {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				width: 100%;
+			}
+			.pie-legend-item {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+			}
+			.pie-legend-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 2px;
+				flex-shrink: 0;
+			}
+			.pie-legend-count {
+				margin-left: auto;
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Additions vs Deletions bar chart */
+			.files-overview-bars {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-8);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.bars-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+
+			.bar-row {
+				display: grid;
+				grid-template-columns: 140px 1fr 52px;
+				gap: var(--space-4);
+				align-items: center;
+				font-family: var(--font-mono);
+				font-size: 11px;
+			}
+			.bar-row-filename {
+				color: var(--foreground-muted);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.bar-row-track {
+				display: flex;
+				height: 14px;
+				border-radius: 3px;
+				overflow: hidden;
+				background: var(--surface-2);
+				gap: 1px;
+			}
+			.bar-segment-add {
+				background: color-mix(in oklch, var(--status-success) 65%, transparent);
+				height: 100%;
+				min-width: 2px;
+				border-radius: 2px 0 0 2px;
+			}
+			.bar-segment-del {
+				background: color-mix(in oklch, var(--status-danger) 55%, transparent);
+				height: 100%;
+				min-width: 2px;
+				border-radius: 0 2px 2px 0;
+			}
+			.bar-row-stats {
+				display: flex;
+				gap: var(--space-2);
+				justify-content: flex-end;
+				font-variant-numeric: tabular-nums;
+			}
+			.bar-stat-add {
+				color: var(--status-success);
+			}
+			.bar-stat-del {
+				color: var(--status-danger);
+			}
+
+			/* Summary counts strip */
+			.files-summary-strip {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-5) var(--space-8);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				margin-bottom: var(--space-6);
+			}
+			.files-summary-stat {
+				display: flex;
+				align-items: baseline;
+				gap: var(--space-2);
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+			}
+			.files-summary-val {
+				color: var(--foreground);
+				font-weight: var(--weight-semibold);
+			}
+			.files-summary-label {
+				color: var(--foreground-subtle);
+				font-size: 11px;
+			}
+
+			/* Drill-down: collapsible file list */
+			.drilldown-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-4) 0;
+				margin-bottom: var(--space-3);
+			}
+			.drilldown-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.drilldown-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.file-item {
+				display: grid;
+				grid-template-columns: 20px 8px 1fr auto auto;
+				gap: var(--space-4);
+				align-items: center;
+				padding: var(--space-3) var(--space-4);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition: background var(--duration-2) ease;
+			}
+			.file-item:hover {
+				background: var(--surface-2);
+			}
+
+			.file-item-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				transition: transform var(--duration-3) var(--ease-standard);
+				flex-shrink: 0;
+			}
+			.file-item.is-expanded .file-item-chevron {
+				transform: rotate(90deg);
+			}
+
+			.file-item-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 2px;
+				flex-shrink: 0;
+			}
+			.file-item-dot.modified {
+				background: var(--amber-400);
+			}
+			.file-item-dot.added {
+				background: var(--status-success);
+			}
+			.file-item-dot.deleted {
+				background: var(--status-danger);
+			}
+			.file-item-dot.renamed {
+				background: var(--status-info);
+			}
+
+			.file-item-path {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+			}
+			.file-item-dir {
+				color: var(--foreground-muted);
+			}
+
+			.file-item-stats {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				display: flex;
+				gap: var(--space-3);
+				flex-shrink: 0;
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Inline diff block */
+			.file-diff-inline {
+				margin: var(--space-2) 0 var(--space-2) 28px;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+			}
+
+			.diff-table {
+				width: 100%;
+				border-collapse: collapse;
+				font-family: var(--font-mono);
+				font-size: 12px;
+				line-height: 20px;
+			}
+			.diff-table td {
+				padding: 0 var(--space-4);
+				vertical-align: top;
+				white-space: pre-wrap;
+				word-break: break-all;
+			}
+			.diff-line-num {
+				width: 44px;
+				min-width: 44px;
+				color: var(--foreground-subtle);
+				text-align: right;
+				user-select: none;
+				font-size: 11px;
+				padding-right: var(--space-2) !important;
+				border-right: 1px solid var(--border);
+			}
+			.diff-line-sign {
+				width: 20px;
+				min-width: 20px;
+				text-align: center;
+				user-select: none;
+				font-weight: var(--weight-bold);
+			}
+			.diff-line-content {
+				padding-left: var(--space-4) !important;
+			}
+			.diff-line-add {
+				background: color-mix(in oklch, var(--status-success) 10%, transparent);
+			}
+			.diff-line-add .diff-line-sign {
+				color: var(--status-success);
+			}
+			.diff-line-del {
+				background: color-mix(in oklch, var(--status-danger) 8%, transparent);
+			}
+			.diff-line-del .diff-line-sign {
+				color: var(--status-danger);
+			}
+			.diff-line-ctx .diff-line-content {
+				color: var(--foreground-muted);
+			}
+			.diff-hunk-header {
+				background: color-mix(in oklch, var(--status-info) 6%, transparent);
+				color: var(--foreground-subtle);
+				font-size: 11px;
+			}
+			.diff-hunk-header td {
+				padding: var(--space-2) var(--space-4);
+			}
+			.diff-expander {
+				text-align: center;
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				font-size: 11px;
+				font-family: var(--font-mono);
+				padding: var(--space-3) 0;
+				background: var(--surface-2);
+				transition: background var(--duration-2) ease;
+			}
+			.diff-expander:hover {
+				background: var(--surface-3);
+				color: var(--foreground-muted);
+			}
+
+			/* ========================================
+   STATS TAB — 3x2 TILE GRID + BREAKDOWNS
+   ======================================== */
+
+			/* Metric tiles in 3x2 grid */
+			.metric-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: var(--space-4);
+				margin-bottom: var(--space-10);
+			}
+
+			.metric-tile {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-8) var(--space-8) var(--space-6);
+				position: relative;
+				overflow: hidden;
+				transition: border-color var(--duration-2) ease;
+			}
+			.metric-tile:hover {
+				border-color: var(--border-strong);
+			}
+
+			.metric-tile-accent {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 2px;
+			}
+
+			.metric-tile-icon {
+				width: 28px;
+				height: 28px;
+				color: var(--foreground-subtle);
+				opacity: 0.25;
+				position: absolute;
+				top: 14px;
+				right: 14px;
+			}
+
+			.metric-tile-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin-bottom: var(--space-4);
+			}
+
+			.metric-tile-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-3xl);
+				font-weight: var(--weight-bold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+			}
+			.metric-tile-value.accent-color {
+				color: var(--amber-400);
+			}
+
+			.metric-tile-sub {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				margin-top: var(--space-2);
+			}
+
+			/* Mini inline bar in tile */
+			.metric-tile-bar {
+				margin-top: var(--space-4);
+				height: 6px;
+				background: var(--surface-2);
+				border-radius: 3px;
+				overflow: hidden;
+			}
+			.metric-tile-bar-fill {
+				height: 100%;
+				border-radius: 3px;
+				background: var(--primary);
+				transition: width var(--duration-5) var(--ease-out);
+			}
+
+			/* Breakdown sections */
+			.breakdown-section {
+				margin-bottom: var(--space-12);
+			}
+			.breakdown-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-4);
+			}
+			.breakdown-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.breakdown-line {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* Cost breakdown card */
+			.cost-breakdown-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+			}
+			.cost-row {
+				display: grid;
+				grid-template-columns: 1fr auto auto;
+				gap: var(--space-6);
+				align-items: center;
+				padding: var(--space-4) var(--space-6);
+				border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+			}
+			.cost-row:last-child {
+				border-bottom: none;
+			}
+			.cost-model-name {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground-muted);
+			}
+			.cost-amount {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+				font-weight: var(--weight-medium);
+			}
+			.cost-pct {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				min-width: 40px;
+				text-align: right;
+			}
+
+			/* Token breakdown 2-col */
+			.token-breakdown-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-4);
+			}
+			.token-breakdown-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-6);
+			}
+			.token-bd-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+				margin-bottom: var(--space-2);
+			}
+			.token-bd-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+			.token-bd-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				margin-top: var(--space-1);
+			}
+
+			/* Cache hit ratio bar (larger) */
+			.cache-ratio-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-6);
+			}
+			.cache-ratio-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: var(--space-3);
+			}
+			.cache-ratio-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+			}
+			.cache-ratio-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-base);
+				color: var(--foreground);
+				font-weight: var(--weight-semibold);
+			}
+			.cache-bar-track {
+				height: 10px;
+				background: var(--surface-2);
+				border-radius: 5px;
+				overflow: hidden;
+			}
+			.cache-bar-fill {
+				height: 100%;
+				border-radius: 5px;
+				background: var(--primary);
+			}
+
+			/* Context window bar */
+			.context-bar-track {
+				height: 10px;
+				background: var(--surface-2);
+				border-radius: 5px;
+				overflow: hidden;
+				margin-top: var(--space-2);
+			}
+			.context-bar-fill {
+				height: 100%;
+				border-radius: 5px;
+				background: linear-gradient(90deg, oklch(0.7 0.11 200), oklch(0.62 0.13 230));
+			}
+
+			/* Session activity rows */
+			.activity-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-4);
+			}
+			.activity-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-6);
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+			}
+			.activity-card-icon {
+				width: 32px;
+				height: 32px;
+				color: var(--foreground-subtle);
+				opacity: 0.4;
+				flex-shrink: 0;
+			}
+			.activity-card-body {
+				flex: 1;
+				min-width: 0;
+			}
+			.activity-card-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+				margin-bottom: 2px;
+			}
+			.activity-card-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+			}
+
+			/* Tool usage table */
+			.tool-table {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+			}
+			.tool-table-header {
+				display: grid;
+				grid-template-columns: 120px 1fr 52px 56px;
+				gap: var(--space-4);
+				padding: var(--space-3) var(--space-6);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				border-bottom: 1px solid var(--border);
+			}
+			.tool-table-row {
+				display: grid;
+				grid-template-columns: 120px 1fr 52px 56px;
+				gap: var(--space-4);
+				align-items: center;
+				padding: var(--space-3) var(--space-6);
+				transition: background var(--duration-2) ease;
+			}
+			.tool-table-row:hover {
+				background: var(--surface-2);
+			}
+			.tool-table-row + .tool-table-row {
+				border-top: 1px solid color-mix(in oklch, var(--border) 40%, transparent);
+			}
+			.tool-name {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+			.tool-bar-track {
+				height: 6px;
+				background: var(--surface-2);
+				border-radius: 3px;
+				overflow: hidden;
+			}
+			.tool-bar-fill {
+				height: 100%;
+				border-radius: 3px;
+				background: var(--primary);
+				opacity: 0.7;
+			}
+			.tool-count {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--foreground);
+				text-align: right;
+				font-variant-numeric: tabular-nums;
+			}
+			.tool-rate {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				text-align: right;
+			}
+			.tool-rate-good {
+				color: var(--status-success);
+			}
+			.tool-rate-warn {
+				color: var(--status-warning);
+			}
+
+			/* ---- Responsive ---- */
+			@media (max-width: 768px) {
+				.files-overview {
+					grid-template-columns: 1fr;
+				}
+				.metric-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				.token-breakdown-grid {
+					grid-template-columns: 1fr;
+				}
+				.activity-grid {
+					grid-template-columns: 1fr;
+				}
+				.bar-row {
+					grid-template-columns: 100px 1fr 48px;
+				}
+			}
+			@media (max-width: 480px) {
+				.metric-grid {
+					grid-template-columns: 1fr;
+				}
+				.content-column {
+					padding: var(--space-4);
+				}
+				.files-summary-strip {
+					flex-wrap: wrap;
+					gap: var(--space-4);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="variant-label">Variant E: Dashboard Overview + Drill-Down</div>
+			<div class="page-wrapper">
+				<!-- ====== SESSION SHELL CONTEXT (40% opacity) ====== -->
+				<div class="session-shell">
+					<div class="session-topbar">
+						<span class="session-topbar-title">Refactor session cost tracking</span>
+						<span class="gk-badge gk-badge-success">
+							<span
+								style="
+									width: 6px;
+									height: 6px;
+									border-radius: 50%;
+									background: currentColor;
+									display: inline-block;
+								"
+							></span>
+							Running
+						</span>
+						<span class="gk-badge gk-badge-mono">feature/session-costs</span>
+						<div class="session-topbar-meta">
+							<span>claude-opus-4-6</span>
+							<span style="color: var(--border-strong)">|</span>
+							<span>1h 23m</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- ====== TAB BAR (Files active for first view) ====== -->
+				<div class="tab-bar">
+					<div class="gk-tabs">
+						<button class="gk-tab">Chat</button>
+						<button class="gk-tab is-active">Files</button>
+						<button class="gk-tab">Stats</button>
+					</div>
+					<div style="flex: 1"></div>
+					<button class="gk-btn gk-btn-ghost gk-btn-sm">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path d="M4 12h16M12 4v16" />
+						</svg>
+						Expand All
+					</button>
+					<button class="gk-btn gk-btn-ghost gk-btn-sm">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
+							<path d="M4 12h16" />
+						</svg>
+						Collapse All
+					</button>
+					<div class="gk-tabs" style="margin-left: var(--space-4)">
+						<button class="gk-tab is-active" style="font-size: 11px">Unified</button>
+						<button class="gk-tab" style="font-size: 11px">Split</button>
+					</div>
+				</div>
+
+				<!-- ====== FILES TAB CONTENT ====== -->
+				<div class="content-column" style="max-width: 960px">
+					<!-- Summary counts strip -->
+					<div class="files-summary-strip">
+						<div class="files-summary-stat">
+							<span class="files-summary-val">12</span>
+							<span class="files-summary-label">files changed</span>
+						</div>
+						<div style="width: 1px; height: 18px; background: var(--border)"></div>
+						<div class="files-summary-stat">
+							<span class="files-summary-val" style="color: var(--status-success)"
+								>+347</span
+							>
+							<span class="files-summary-label">additions</span>
+						</div>
+						<div class="files-summary-stat">
+							<span class="files-summary-val" style="color: var(--status-danger)"
+								>&minus;89</span
+							>
+							<span class="files-summary-label">deletions</span>
+						</div>
+					</div>
+
+					<!-- Visual Overview: Pie chart + Additions/Deletions bar chart -->
+					<div class="files-overview">
+						<!-- Pie chart: file types changed -->
+						<div class="files-overview-pie">
+							<div class="pie-label">Files by Type</div>
+							<div class="pie-chart">
+								<!-- SVG donut chart -->
+								<svg
+									viewBox="0 0 130 130"
+									style="width: 100%; height: 100%; transform: rotate(-90deg)"
+								>
+									<!-- .svelte: 5 files = 41.7% -->
+									<circle
+										cx="65"
+										cy="65"
+										r="48"
+										fill="none"
+										stroke="oklch(0.690 0.098 132)"
+										stroke-width="18"
+										stroke-dasharray="125.7 175.9"
+										stroke-dashoffset="0"
+									/>
+									<!-- .ts: 3 files = 25% -->
+									<circle
+										cx="65"
+										cy="65"
+										r="48"
+										fill="none"
+										stroke="oklch(0.660 0.120 230)"
+										stroke-width="18"
+										stroke-dasharray="75.4 226.2"
+										stroke-dashoffset="-125.7"
+									/>
+									<!-- .rs: 2 files = 16.7% -->
+									<circle
+										cx="65"
+										cy="65"
+										r="48"
+										fill="none"
+										stroke="oklch(0.770 0.155 75)"
+										stroke-width="18"
+										stroke-dasharray="50.3 251.3"
+										stroke-dashoffset="-201.1"
+									/>
+									<!-- .css: 1 file = 8.3% -->
+									<circle
+										cx="65"
+										cy="65"
+										r="48"
+										fill="none"
+										stroke="oklch(0.640 0.130 320)"
+										stroke-width="18"
+										stroke-dasharray="25.1 276.5"
+										stroke-dashoffset="-251.4"
+									/>
+									<!-- .toml: 1 file = 8.3% -->
+									<circle
+										cx="65"
+										cy="65"
+										r="48"
+										fill="none"
+										stroke="oklch(0.700 0.060 60)"
+										stroke-width="18"
+										stroke-dasharray="25.1 276.5"
+										stroke-dashoffset="-276.5"
+									/>
+								</svg>
+								<div class="pie-center-label">
+									<span class="pie-center-count">12</span>
+									<span class="pie-center-text">files</span>
+								</div>
+							</div>
+							<div class="pie-legend">
+								<div class="pie-legend-item">
+									<span
+										class="pie-legend-dot"
+										style="background: oklch(0.69 0.098 132)"
+									></span>
+									.svelte
+									<span class="pie-legend-count">5</span>
+								</div>
+								<div class="pie-legend-item">
+									<span
+										class="pie-legend-dot"
+										style="background: oklch(0.66 0.12 230)"
+									></span>
+									.ts
+									<span class="pie-legend-count">3</span>
+								</div>
+								<div class="pie-legend-item">
+									<span
+										class="pie-legend-dot"
+										style="background: oklch(0.77 0.155 75)"
+									></span>
+									.rs
+									<span class="pie-legend-count">2</span>
+								</div>
+								<div class="pie-legend-item">
+									<span
+										class="pie-legend-dot"
+										style="background: oklch(0.64 0.13 320)"
+									></span>
+									.css
+									<span class="pie-legend-count">1</span>
+								</div>
+								<div class="pie-legend-item">
+									<span
+										class="pie-legend-dot"
+										style="background: oklch(0.7 0.06 60)"
+									></span>
+									.toml
+									<span class="pie-legend-count">1</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Bar chart: additions vs deletions per file -->
+						<div class="files-overview-bars">
+							<div class="bars-label">Additions vs Deletions</div>
+							<div
+								style="
+									display: flex;
+									flex-direction: column;
+									gap: var(--space-3);
+									margin-top: var(--space-2);
+								"
+							>
+								<div class="bar-row">
+									<span class="bar-row-filename">DiffViewer.svelte</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 100%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+127</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span class="bar-row-filename">FileTree.svelte</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 100%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+53</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span class="bar-row-filename">SessionView.svelte</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 80%"></div>
+										<div class="bar-segment-del" style="width: 20%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+48</span>
+										<span class="bar-stat-del">&minus;12</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span class="bar-row-filename">session.rs</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 64%"></div>
+										<div class="bar-segment-del" style="width: 36%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+34</span>
+										<span class="bar-stat-del">&minus;19</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span class="bar-row-filename">session_store.ts</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 79%"></div>
+										<div class="bar-segment-del" style="width: 21%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+31</span>
+										<span class="bar-stat-del">&minus;8</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span class="bar-row-filename">types.ts</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 81%"></div>
+										<div class="bar-segment-del" style="width: 19%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+22</span>
+										<span class="bar-stat-del">&minus;5</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span
+										class="bar-row-filename"
+										style="color: var(--status-danger)"
+										>OldStatsPanel.svelte</span
+									>
+									<div class="bar-row-track">
+										<div class="bar-segment-del" style="width: 100%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-del">&minus;45</span>
+									</div>
+								</div>
+								<div class="bar-row">
+									<span class="bar-row-filename">cost_utils.ts</span>
+									<div class="bar-row-track">
+										<div class="bar-segment-add" style="width: 30%"></div>
+									</div>
+									<div class="bar-row-stats">
+										<span class="bar-stat-add">+4</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Drill-down: Collapsible file list -->
+					<div class="drilldown-header">
+						<span class="drilldown-title">File Details</span>
+						<span class="drilldown-line"></span>
+					</div>
+
+					<!-- File 1: expanded with diff -->
+					<div class="file-item is-expanded">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/components/</span>SessionView.svelte
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+48</span>
+							<span style="color: var(--status-danger)">&minus;12</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+					<div class="file-diff-inline">
+						<table class="diff-table">
+							<tr class="diff-hunk-header">
+								<td colspan="4">
+									@@ -14,8 +14,12 @@ import { sessionStore } from
+									'../modules/sessions/session_store';
+								</td>
+							</tr>
+							<tr class="diff-line-ctx">
+								<td class="diff-line-num">14</td>
+								<td class="diff-line-num">14</td>
+								<td class="diff-line-sign"></td>
+								<td class="diff-line-content">
+									import type { SessionMetadata } from
+									'../modules/sessions/types';
+								</td>
+							</tr>
+							<tr class="diff-line-ctx">
+								<td class="diff-line-num">15</td>
+								<td class="diff-line-num">15</td>
+								<td class="diff-line-sign"></td>
+								<td class="diff-line-content">import { onMount } from 'svelte';</td>
+							</tr>
+							<tr class="diff-line-del">
+								<td class="diff-line-num">16</td>
+								<td class="diff-line-num"></td>
+								<td class="diff-line-sign">-</td>
+								<td class="diff-line-content">
+									import { StatsPanel } from './OldStatsPanel.svelte';
+								</td>
+							</tr>
+							<tr class="diff-line-del">
+								<td class="diff-line-num">17</td>
+								<td class="diff-line-num"></td>
+								<td class="diff-line-sign">-</td>
+								<td class="diff-line-content">
+									import { computeCost } from '../modules/sessions/legacy_cost';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">16</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import { DiffViewer } from './DiffViewer.svelte';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">17</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import { FileTree } from './FileTree.svelte';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">18</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import { computeSessionCost } from
+									'../modules/sessions/cost_utils';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">19</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import type { FileDiff, ToolUsageEntry } from
+									'../modules/sessions/types';
+								</td>
+							</tr>
+							<tr class="diff-line-ctx">
+								<td class="diff-line-num">18</td>
+								<td class="diff-line-num">20</td>
+								<td class="diff-line-sign"></td>
+								<td class="diff-line-content"></td>
+							</tr>
+						</table>
+						<div class="diff-expander">Show 36 hidden lines</div>
+					</div>
+
+					<!-- File 2: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/modules/sessions/</span
+							>session_store.ts
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+31</span>
+							<span style="color: var(--status-danger)">&minus;8</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+
+					<!-- File 3: new file, expanded -->
+					<div class="file-item is-expanded">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot added"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/components/</span>DiffViewer.svelte
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+127</span>
+						</div>
+						<span class="gk-badge gk-badge-success gk-badge-mono">new file</span>
+					</div>
+					<div class="file-diff-inline">
+						<table class="diff-table">
+							<tr class="diff-hunk-header">
+								<td colspan="4">@@ -0,0 +1,127 @@</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">1</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">&lt;script lang="ts"&gt;</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">2</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import type { FileDiff } from '../modules/sessions/types';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">3</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import { parseDiffHunks } from
+									'../modules/sessions/diff_parser';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">4</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									import { getLineHighlight } from '../modules/sessions/syntax';
+								</td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">5</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content"></td>
+							</tr>
+							<tr class="diff-line-add">
+								<td class="diff-line-num"></td>
+								<td class="diff-line-num">6</td>
+								<td class="diff-line-sign">+</td>
+								<td class="diff-line-content">
+									let { diff, expanded = true }: Props = $props();
+								</td>
+							</tr>
+						</table>
+						<div class="diff-expander">Show 121 more lines</div>
+					</div>
+
+					<!-- File 4: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/modules/sessions/</span>types.ts
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+22</span>
+							<span style="color: var(--status-danger)">&minus;5</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+
+					<!-- File 5: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src-tauri/src/commands/</span>session.rs
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+34</span>
+							<span style="color: var(--status-danger)">&minus;19</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+
+					<!-- File 6: new file, collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot added"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/components/</span>FileTree.svelte
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+53</span>
+						</div>
+						<span class="gk-badge gk-badge-success gk-badge-mono">new file</span>
+					</div>
+
+					<!-- File 7: deleted -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot deleted"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/components/</span
+							>OldStatsPanel.svelte
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-danger)">&minus;45</span>
+						</div>
+						<span class="gk-badge gk-badge-danger gk-badge-mono">deleted</span>
+					</div>
+
+					<!-- File 8: renamed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot renamed"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/modules/sessions/</span
+							>cost_utils.ts
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+4</span>
+						</div>
+						<span class="gk-badge gk-badge-info gk-badge-mono">renamed</span>
+					</div>
+
+					<!-- File 9: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/lib/modules/sessions/</span
+							>diff_parser.ts
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+18</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+
+					<!-- File 10: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src-tauri/src/</span>schema.rs
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+8</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+
+					<!-- File 11: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src/styles/</span>session.css
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+14</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+
+					<!-- File 12: collapsed -->
+					<div class="file-item">
+						<svg class="file-item-chevron" viewBox="0 0 16 16" fill="currentColor">
+							<path
+								d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"
+							/>
+						</svg>
+						<div class="file-item-dot modified"></div>
+						<div class="file-item-path">
+							<span class="file-item-dir">src-tauri/</span>Cargo.toml
+						</div>
+						<div class="file-item-stats">
+							<span style="color: var(--status-success)">+2</span>
+						</div>
+						<span class="gk-badge gk-badge-warning gk-badge-mono">modified</span>
+					</div>
+				</div>
+
+				<!-- ================================================================
+       STATS TAB (shown below, separated visually)
+       ================================================================ -->
+				<hr class="section-separator" />
+
+				<!-- Repeat session shell + tab bar for Stats context -->
+				<div class="session-shell">
+					<div class="session-topbar">
+						<span class="session-topbar-title">Refactor session cost tracking</span>
+						<span class="gk-badge gk-badge-success">
+							<span
+								style="
+									width: 6px;
+									height: 6px;
+									border-radius: 50%;
+									background: currentColor;
+									display: inline-block;
+								"
+							></span>
+							Running
+						</span>
+						<span class="gk-badge gk-badge-mono">feature/session-costs</span>
+						<div class="session-topbar-meta">
+							<span>claude-opus-4-6</span>
+							<span style="color: var(--border-strong)">|</span>
+							<span>1h 23m</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-bar">
+					<div class="gk-tabs">
+						<button class="gk-tab">Chat</button>
+						<button class="gk-tab">Files</button>
+						<button class="gk-tab is-active">Stats</button>
+					</div>
+				</div>
+
+				<div class="content-column">
+					<!-- ===== 3x2 METRIC TILE GRID ===== -->
+					<div class="metric-grid">
+						<!-- Tile 1: Total Cost -->
+						<div class="metric-tile">
+							<div
+								class="metric-tile-accent"
+								style="
+									background: linear-gradient(
+										90deg,
+										var(--amber-400),
+										var(--amber-500)
+									);
+								"
+							></div>
+							<svg
+								class="metric-tile-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+							</svg>
+							<div class="metric-tile-label">Total Cost</div>
+							<div class="metric-tile-value accent-color">$4.387</div>
+							<div class="metric-tile-sub">across 3 models</div>
+						</div>
+
+						<!-- Tile 2: Input Tokens -->
+						<div class="metric-tile">
+							<div
+								class="metric-tile-accent"
+								style="
+									background: linear-gradient(
+										90deg,
+										var(--azure-400),
+										var(--azure-500)
+									);
+								"
+							></div>
+							<svg
+								class="metric-tile-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M4 14l8-8 8 8" />
+								<path d="M4 20l8-8 8 8" />
+							</svg>
+							<div class="metric-tile-label">Input Tokens</div>
+							<div class="metric-tile-value">284,391</div>
+							<div class="metric-tile-sub">context window used</div>
+						</div>
+
+						<!-- Tile 3: Output Tokens -->
+						<div class="metric-tile">
+							<div
+								class="metric-tile-accent"
+								style="
+									background: linear-gradient(
+										90deg,
+										var(--moss-400),
+										var(--moss-500)
+									);
+								"
+							></div>
+							<svg
+								class="metric-tile-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M12 5v14M5 12l7 7 7-7" />
+							</svg>
+							<div class="metric-tile-label">Output Tokens</div>
+							<div class="metric-tile-value">18,742</div>
+							<div class="metric-tile-sub">generated content</div>
+						</div>
+
+						<!-- Tile 4: Cache Hit % -->
+						<div class="metric-tile">
+							<div
+								class="metric-tile-accent"
+								style="
+									background: linear-gradient(
+										90deg,
+										var(--teal-400),
+										var(--teal-500)
+									);
+								"
+							></div>
+							<svg
+								class="metric-tile-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+							</svg>
+							<div class="metric-tile-label">Cache Hit Rate</div>
+							<div class="metric-tile-value">70.8%</div>
+							<div class="metric-tile-bar">
+								<div
+									class="metric-tile-bar-fill"
+									style="width: 70.8%; background: var(--teal-400)"
+								></div>
+							</div>
+						</div>
+
+						<!-- Tile 5: Turns -->
+						<div class="metric-tile">
+							<div
+								class="metric-tile-accent"
+								style="
+									background: linear-gradient(
+										90deg,
+										var(--plum-400),
+										var(--plum-500)
+									);
+								"
+							></div>
+							<svg
+								class="metric-tile-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<path
+									d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+								/>
+							</svg>
+							<div class="metric-tile-label">Turns</div>
+							<div class="metric-tile-value">17</div>
+							<div class="metric-tile-sub">user-assistant exchanges</div>
+						</div>
+
+						<!-- Tile 6: Duration -->
+						<div class="metric-tile">
+							<div
+								class="metric-tile-accent"
+								style="
+									background: linear-gradient(
+										90deg,
+										var(--bark-300),
+										var(--bark-500)
+									);
+								"
+							></div>
+							<svg
+								class="metric-tile-icon"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+							>
+								<circle cx="12" cy="12" r="10" />
+								<polyline points="12 6 12 12 16 14" />
+							</svg>
+							<div class="metric-tile-label">Duration</div>
+							<div class="metric-tile-value">1h 23m</div>
+							<div class="metric-tile-sub">started 14:32 &middot; May 8, 2026</div>
+						</div>
+					</div>
+
+					<!-- ===== DETAILED BREAKDOWNS ===== -->
+
+					<!-- Cost Breakdown -->
+					<div class="breakdown-section">
+						<div class="breakdown-header">
+							<span class="breakdown-title">Cost by Model</span>
+							<span class="breakdown-line"></span>
+						</div>
+						<div class="cost-breakdown-card">
+							<div class="cost-row">
+								<span class="cost-model-name">claude-opus-4-6</span>
+								<span class="cost-amount">$3.812</span>
+								<span class="cost-pct">86.9%</span>
+							</div>
+							<div class="cost-row">
+								<span class="cost-model-name">claude-sonnet-4-5</span>
+								<span class="cost-amount">$0.491</span>
+								<span class="cost-pct">11.2%</span>
+							</div>
+							<div class="cost-row">
+								<span class="cost-model-name">claude-haiku-3.5</span>
+								<span class="cost-amount">$0.084</span>
+								<span class="cost-pct">1.9%</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Token Breakdown -->
+					<div class="breakdown-section">
+						<div class="breakdown-header">
+							<span class="breakdown-title">Token Breakdown</span>
+							<span class="breakdown-line"></span>
+						</div>
+						<div class="token-breakdown-grid">
+							<div class="token-breakdown-card">
+								<div class="token-bd-label">Cache Read</div>
+								<div class="token-bd-value">201,208</div>
+								<div class="token-bd-sub">prompt tokens served from cache</div>
+							</div>
+							<div class="token-breakdown-card">
+								<div class="token-bd-label">Cache Write</div>
+								<div class="token-bd-value">83,183</div>
+								<div class="token-bd-sub">prompt tokens written to cache</div>
+							</div>
+						</div>
+						<div style="margin-top: var(--space-4)">
+							<div class="cache-ratio-card">
+								<div class="cache-ratio-header">
+									<span class="cache-ratio-label"
+										>Context Window Utilization</span
+									>
+									<span class="cache-ratio-value">284k / 1M</span>
+								</div>
+								<div class="cache-bar-track">
+									<div
+										class="context-bar-fill"
+										style="width: 28.4%; height: 100%; border-radius: 5px"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Session Activity -->
+					<div class="breakdown-section">
+						<div class="breakdown-header">
+							<span class="breakdown-title">Session Activity</span>
+							<span class="breakdown-line"></span>
+						</div>
+						<div class="activity-grid">
+							<div class="activity-card">
+								<svg
+									class="activity-card-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+								>
+									<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+									<line x1="16" y1="2" x2="16" y2="6" />
+									<line x1="8" y1="2" x2="8" y2="6" />
+									<line x1="3" y1="10" x2="21" y2="10" />
+								</svg>
+								<div class="activity-card-body">
+									<div class="activity-card-label">Started</div>
+									<div class="activity-card-value">
+										14:32 &middot; May 8, 2026
+									</div>
+								</div>
+							</div>
+							<div class="activity-card">
+								<svg
+									class="activity-card-icon"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<polyline points="12 6 12 12 16 14" />
+								</svg>
+								<div class="activity-card-body">
+									<div class="activity-card-label">Status</div>
+									<div
+										style="
+											display: flex;
+											align-items: center;
+											gap: var(--space-3);
+											margin-top: 2px;
+										"
+									>
+										<span class="gk-badge gk-badge-success">
+											<span
+												style="
+													width: 6px;
+													height: 6px;
+													border-radius: 50%;
+													background: currentColor;
+													display: inline-block;
+												"
+											></span>
+											Running
+										</span>
+										<span
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												color: var(--foreground-subtle);
+											"
+											>since 1h 23m</span
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Tool Usage -->
+					<div class="breakdown-section">
+						<div class="breakdown-header">
+							<span class="breakdown-title">Tool Usage</span>
+							<span class="breakdown-line"></span>
+							<span
+								style="
+									font-family: var(--font-mono);
+									font-size: 10.5px;
+									color: var(--foreground-subtle);
+								"
+								>87 total calls</span
+							>
+						</div>
+						<div class="tool-table">
+							<div class="tool-table-header">
+								<div>Tool</div>
+								<div></div>
+								<div style="text-align: right">Calls</div>
+								<div style="text-align: right">Success</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Read</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 100%"></div>
+								</div>
+								<div class="tool-count">28</div>
+								<div class="tool-rate tool-rate-good">100%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Edit</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 67.8%"></div>
+								</div>
+								<div class="tool-count">19</div>
+								<div class="tool-rate tool-rate-good">94.7%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Bash</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 50%"></div>
+								</div>
+								<div class="tool-count">14</div>
+								<div class="tool-rate tool-rate-warn">85.7%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Grep</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 39.3%"></div>
+								</div>
+								<div class="tool-count">11</div>
+								<div class="tool-rate tool-rate-good">100%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Glob</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 25%"></div>
+								</div>
+								<div class="tool-count">7</div>
+								<div class="tool-rate tool-rate-good">100%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Write</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 14.3%"></div>
+								</div>
+								<div class="tool-count">4</div>
+								<div class="tool-rate tool-rate-good">100%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">Agent</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 10.7%"></div>
+								</div>
+								<div class="tool-count">3</div>
+								<div class="tool-rate tool-rate-good">100%</div>
+							</div>
+							<div class="tool-table-row">
+								<div class="tool-name">WebFetch</div>
+								<div class="tool-bar-track">
+									<div class="tool-bar-fill" style="width: 3.6%"></div>
+								</div>
+								<div class="tool-count">1</div>
+								<div class="tool-rate tool-rate-good">100%</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

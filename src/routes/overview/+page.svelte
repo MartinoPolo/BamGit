@@ -2,14 +2,20 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { openPath } from '$lib/opener.js';
 	import { useBoard } from '$lib/modules/board';
+	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import WorkspaceCard from '$lib/components/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/AddWorkspaceCard.svelte';
+	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
+	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
+	const versionControl = useVersionControl();
+
+	let authWizardOpen = $state(false);
 
 	let workspaces = $state<OverviewWorkspaceData[]>([]);
 	let loading = $state(true);
@@ -66,6 +72,11 @@
 		</div>
 	</div>
 
+	<GhSetupBanner
+		authStatus={versionControl.authStatus}
+		onconnect={() => (authWizardOpen = true)}
+	/>
+
 	{#if loading}
 		<p class="text-muted-foreground">{m.overview_loading()}</p>
 	{:else if error !== null}
@@ -90,3 +101,10 @@
 		</div>
 	{/if}
 </div>
+
+{#if authWizardOpen}
+	<GitHubAuthWizard
+		bind:open={authWizardOpen}
+		onconnected={() => void versionControl.checkAuthStatus()}
+	/>
+{/if}

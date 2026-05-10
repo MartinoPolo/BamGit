@@ -14,7 +14,7 @@
 			unlocked_at: '2024-01-15T10:00:00Z',
 		},
 		{
-			kind: 'planted10-trees',
+			kind: 'created10-trees',
 			display_name: 'Getting Started',
 			description: 'Planted 10 trees',
 			threshold: 10,
@@ -22,7 +22,7 @@
 			unlocked_at: '2024-01-20T14:30:00Z',
 		},
 		{
-			kind: 'planted50-trees',
+			kind: 'created50-trees',
 			display_name: 'Forest Builder',
 			description: 'Planted 50 trees',
 			threshold: 50,

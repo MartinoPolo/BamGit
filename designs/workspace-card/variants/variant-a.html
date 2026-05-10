@@ -1,0 +1,1448 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Workspace Card — Variant A: Compact Stat Grid</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--ring: var(--moss-400);
+			}
+
+			/* ─── Base ─── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ─── Page Layout ─── */
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+			}
+
+			.page-wrapper {
+				padding: 40px 32px;
+				min-height: 100vh;
+			}
+
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin-bottom: 8px;
+			}
+
+			.page-title {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				margin: 0 0 6px 0;
+			}
+
+			.page-subtitle {
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				margin: 0 0 32px 0;
+			}
+
+			/* ─── Card Grid ─── */
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+				gap: 16px;
+			}
+
+			@media (max-width: 700px) {
+				.card-grid {
+					grid-template-columns: 1fr;
+				}
+				.page-wrapper {
+					padding: 24px 16px;
+				}
+			}
+
+			/* ─── Workspace Card ─── */
+			.ws-card {
+				--card-accent: var(--moss-400);
+				position: relative;
+				isolation: isolate;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				padding: 14px 14px 12px;
+				min-height: 196px;
+				cursor: pointer;
+				transition:
+					transform var(--duration-4) var(--ease-out),
+					border-color var(--duration-3) var(--ease-standard),
+					box-shadow var(--duration-4) var(--ease-out);
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				overflow: hidden;
+			}
+
+			/* Left accent bar */
+			.ws-card::before {
+				content: '';
+				position: absolute;
+				top: 6px;
+				bottom: 6px;
+				left: 0;
+				width: 3px;
+				background: var(--card-accent);
+				opacity: 0.85;
+				border-radius: 0 2px 2px 0;
+				z-index: 1;
+			}
+
+			/* Gradient tint overlay */
+			.ws-card::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: inherit;
+				background: linear-gradient(
+					180deg,
+					color-mix(in oklch, var(--card-accent) 8%, transparent) 0%,
+					transparent 60%
+				);
+				pointer-events: none;
+				z-index: 0;
+			}
+
+			.ws-card > * {
+				position: relative;
+				z-index: 1;
+			}
+
+			/* Hover state */
+			.ws-card:hover {
+				transform: translateY(-2px);
+				border-color: color-mix(in oklch, var(--card-accent) 50%, var(--border));
+				box-shadow:
+					var(--shadow-md),
+					0 0 0 1px color-mix(in oklch, var(--card-accent) 22%, transparent),
+					0 4px 28px -10px color-mix(in oklch, var(--card-accent) 50%, transparent);
+			}
+
+			/* ─── Card State: Active (breathing glow) ─── */
+			@keyframes ws-breathe {
+				0%,
+				100% {
+					box-shadow: inset 0 0 12px
+						color-mix(in oklch, var(--card-accent) 20%, transparent);
+				}
+				50% {
+					box-shadow: inset 0 0 20px
+						color-mix(in oklch, var(--card-accent) 35%, transparent);
+				}
+			}
+
+			.ws-card.is-active {
+				animation: ws-breathe 3.6s ease-in-out infinite;
+			}
+			.ws-card.is-active::before {
+				opacity: 1;
+			}
+
+			/* ─── Card State: Needs Attention ─── */
+			.ws-card.is-needs-attention {
+				--card-accent: oklch(0.77 0.155 75);
+			}
+
+			/* ─── Card State: Urgent ─── */
+			.ws-card.is-urgent {
+				--card-accent: oklch(0.62 0.205 25);
+			}
+
+			/* ─── Card State: Dormant ─── */
+			.ws-card.is-dormant {
+				opacity: 0.72;
+				filter: saturate(0.7);
+			}
+
+			/* ─── Card Header ─── */
+			.ws-header {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				min-height: 0;
+			}
+
+			.ws-header-text {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.ws-name {
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				margin: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.ws-subtitle {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				margin-top: 3px;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.ws-subtitle svg {
+				width: 11px;
+				height: 11px;
+				stroke: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			/* Quick access buttons (top row right) */
+			.ws-actions {
+				display: flex;
+				gap: 2px;
+				flex-shrink: 0;
+			}
+
+			.ws-action-btn {
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease;
+				padding: 0;
+			}
+			.ws-action-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.ws-action-btn:active {
+				transform: scale(0.94);
+			}
+			.ws-action-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.ws-action-btn svg {
+				width: 15px;
+				height: 15px;
+				stroke-width: 1.7;
+			}
+
+			/* Tree thumbnail */
+			.ws-thumbnail {
+				width: 92px;
+				height: 92px;
+				flex-shrink: 0;
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				position: relative;
+			}
+
+			.ws-thumbnail-placeholder {
+				width: 100%;
+				height: 100%;
+				background:
+					repeating-linear-gradient(
+						-45deg,
+						transparent,
+						transparent 4px,
+						color-mix(in oklch, var(--foreground-subtle) 10%, transparent) 4px,
+						color-mix(in oklch, var(--foreground-subtle) 10%, transparent) 5px
+					),
+					var(--surface-2);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: 1px dashed color-mix(in oklch, var(--border-strong) 60%, transparent);
+				border-radius: inherit;
+			}
+
+			.ws-thumbnail-initials {
+				font-family: var(--font-mono);
+				font-size: 22px;
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				user-select: none;
+			}
+
+			/* ─── Stats Grid (2x3) ─── */
+			.ws-stats-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				grid-template-rows: auto auto;
+				gap: 6px;
+			}
+
+			.ws-stat-cell {
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 6px 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+			}
+			.ws-stat-cell:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.ws-stat-cell:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.ws-stat-cell:active {
+				transform: scale(0.97);
+			}
+
+			.ws-stat-label {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: var(--weight-medium);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				line-height: 1;
+			}
+			.ws-stat-label svg {
+				width: 11px;
+				height: 11px;
+				stroke-width: 1.8;
+				flex-shrink: 0;
+			}
+
+			.ws-stat-value {
+				font-family: var(--font-mono);
+				font-size: 16px;
+				font-weight: var(--weight-semibold);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground);
+				line-height: 1.2;
+				display: flex;
+				align-items: baseline;
+				gap: 0;
+			}
+
+			.ws-stat-value .stat-denom {
+				font-weight: var(--weight-regular);
+				color: var(--foreground-muted);
+				font-size: 13px;
+			}
+
+			/* Stat tones */
+			.ws-stat-cell.tone-zero .ws-stat-value {
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-regular);
+			}
+
+			.ws-stat-cell.tone-warning {
+				background: color-mix(in oklch, var(--status-warning) 10%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, var(--border));
+			}
+			.ws-stat-cell.tone-warning .ws-stat-label {
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+			}
+			.ws-stat-cell.tone-warning .ws-stat-value {
+				color: var(--status-warning);
+			}
+
+			.ws-stat-cell.tone-danger {
+				background: color-mix(in oklch, var(--status-danger) 10%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--status-danger) 30%, var(--border));
+			}
+			.ws-stat-cell.tone-danger .ws-stat-label {
+				color: color-mix(in oklch, var(--status-danger) 70%, var(--foreground));
+			}
+			.ws-stat-cell.tone-danger .ws-stat-value {
+				color: var(--status-danger);
+			}
+
+			/* Pulse dot */
+			.ws-pulse-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+				animation: ws-pulse 1.8s ease-in-out infinite;
+			}
+			@keyframes ws-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.35;
+				}
+			}
+
+			/* Cost + Activity stat cells (bottom row) */
+			.ws-stat-cell.stat-cost .ws-stat-value,
+			.ws-stat-cell.stat-activity .ws-stat-value {
+				font-size: 14px;
+			}
+
+			/* ─── PRD Progress Row ─── */
+			.ws-prd-row {
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 7px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+			}
+			.ws-prd-row:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.ws-prd-row:active {
+				transform: scale(0.99);
+			}
+
+			.ws-prd-info {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				line-height: 1;
+			}
+			.ws-prd-info svg {
+				width: 12px;
+				height: 12px;
+				stroke-width: 1.8;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+			}
+			.ws-prd-info .prd-count {
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+			.ws-prd-info .prd-sep {
+				color: var(--foreground-subtle);
+			}
+			.ws-prd-info .prd-done {
+				margin-left: auto;
+				font-variant-numeric: tabular-nums;
+			}
+
+			.ws-prd-bar-track {
+				width: 100%;
+				height: 4px;
+				background: color-mix(in oklch, var(--border) 60%, var(--surface-2));
+				border-radius: 2px;
+				overflow: hidden;
+			}
+			.ws-prd-bar-fill {
+				height: 100%;
+				border-radius: 2px;
+				background: linear-gradient(90deg, var(--moss-400) 0%, var(--moss-600) 100%);
+				transition: width var(--duration-5) var(--ease-out);
+			}
+
+			/* ─── AFK Status Row (Footer) ─── */
+			.ws-footer {
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+				margin-top: auto;
+			}
+
+			.ws-footer-sep {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 2px 0 8px 0;
+				background-image: repeating-linear-gradient(
+					90deg,
+					var(--border) 0,
+					var(--border) 4px,
+					transparent 4px,
+					transparent 8px
+				);
+				background-color: transparent;
+			}
+
+			.ws-afk-row {
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 6px 10px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+			}
+			.ws-afk-row:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+
+			.ws-afk-row.afk-on {
+				border-color: color-mix(in oklch, var(--moss-400) 35%, var(--border));
+			}
+
+			/* AFK LED */
+			.ws-afk-led {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+				background: var(--foreground-subtle);
+			}
+			.ws-afk-row.afk-on .ws-afk-led {
+				background: var(--moss-400);
+				box-shadow:
+					0 0 6px color-mix(in oklch, var(--moss-400) 60%, transparent),
+					0 0 12px color-mix(in oklch, var(--moss-400) 30%, transparent);
+				animation: ws-led-pulse 2.4s ease-in-out infinite;
+			}
+			@keyframes ws-led-pulse {
+				0%,
+				100% {
+					box-shadow:
+						0 0 6px color-mix(in oklch, var(--moss-400) 60%, transparent),
+						0 0 12px color-mix(in oklch, var(--moss-400) 30%, transparent);
+					opacity: 1;
+				}
+				50% {
+					box-shadow:
+						0 0 10px color-mix(in oklch, var(--moss-400) 80%, transparent),
+						0 0 20px color-mix(in oklch, var(--moss-400) 45%, transparent);
+					opacity: 0.85;
+				}
+			}
+
+			.ws-afk-label {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				font-weight: var(--weight-regular);
+			}
+			.ws-afk-row.afk-on .ws-afk-label {
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+
+			.ws-afk-meta {
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* ─── Footer stats row ─── */
+			.ws-footer-stats {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding-top: 6px;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+			.ws-footer-stats svg {
+				width: 11px;
+				height: 11px;
+				stroke-width: 1.7;
+				vertical-align: -1px;
+				margin-right: 3px;
+			}
+
+			/* ─── Accent color overrides ─── */
+			.ws-card[data-ws-accent='moss'] {
+				--card-accent: oklch(0.69 0.098 132);
+			}
+			.ws-card[data-ws-accent='azure'] {
+				--card-accent: oklch(0.66 0.12 230);
+			}
+			.ws-card[data-ws-accent='coral'] {
+				--card-accent: oklch(0.7 0.135 30);
+			}
+			.ws-card[data-ws-accent='amber'] {
+				--card-accent: oklch(0.77 0.15 65);
+			}
+
+			/* State label badges */
+			.ws-state-badge {
+				position: absolute;
+				top: 8px;
+				right: 8px;
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				padding: 2px 6px;
+				border-radius: var(--radius-xs);
+				z-index: 2;
+			}
+			.ws-state-badge.badge-active {
+				background: color-mix(in oklch, var(--moss-400) 18%, transparent);
+				color: var(--moss-300);
+				border: 1px solid color-mix(in oklch, var(--moss-400) 30%, transparent);
+			}
+			.ws-state-badge.badge-attention {
+				background: color-mix(in oklch, var(--status-warning) 18%, transparent);
+				color: var(--status-warning);
+				border: 1px solid color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.ws-state-badge.badge-default {
+				background: color-mix(in oklch, var(--foreground-subtle) 12%, transparent);
+				color: var(--foreground-subtle);
+				border: 1px solid color-mix(in oklch, var(--foreground-subtle) 20%, transparent);
+			}
+
+			/* ─── Section annotations ─── */
+			.section-note {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				margin: 32px 0 10px 0;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.section-note::before {
+				content: '// ';
+				opacity: 0.5;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrapper">
+				<p class="variant-label">VARIANT A: COMPACT STAT GRID</p>
+				<h1 class="page-title">Workspace Overview</h1>
+				<p class="page-subtitle">4 workspaces across 3 repos</p>
+
+				<!-- ─── State: Default (moss) ─── -->
+				<p class="section-note">Default + Active + Needs Attention states</p>
+
+				<div class="card-grid">
+					<!-- Card 1: Default state, moss accent -->
+					<article
+						class="ws-card"
+						data-ws-accent="moss"
+						role="button"
+						tabindex="0"
+						aria-label="Open grovekeeper workspace"
+					>
+						<span class="ws-state-badge badge-default">default</span>
+
+						<header class="ws-header">
+							<div class="ws-header-text">
+								<h2 class="ws-name">grovekeeper</h2>
+								<div class="ws-subtitle">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M6 3v12" />
+										<path d="M18 9a3 3 0 0 1 0 6" />
+										<path d="M6 15a6 6 0 0 0 12 0" />
+									</svg>
+									dev <span style="opacity: 0.4">·</span> 4 worktrees
+								</div>
+							</div>
+							<div class="ws-actions">
+								<button
+									class="ws-action-btn"
+									title="Open on GitHub"
+									aria-label="GitHub"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-action-btn"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+							<div class="ws-thumbnail">
+								<div class="ws-thumbnail-placeholder">
+									<span class="ws-thumbnail-initials">GK</span>
+								</div>
+							</div>
+						</header>
+
+						<!-- 2x3 Stats Grid -->
+						<div class="ws-stats-grid">
+							<div
+								class="ws-stat-cell"
+								tabindex="0"
+								role="button"
+								aria-label="3 actionable of 10 issues tracked"
+							>
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M10 18h4" />
+										<path d="m10 14 2 2 4-4" />
+										<path d="M3 6h18" />
+										<path d="M3 10h18" />
+									</svg>
+									ISSUES
+								</span>
+								<span class="ws-stat-value"
+									>3<span class="stat-denom">/10</span></span
+								>
+							</div>
+
+							<div
+								class="ws-stat-cell"
+								tabindex="0"
+								role="button"
+								aria-label="2 pull requests"
+							>
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</span>
+								<span class="ws-stat-value">2</span>
+							</div>
+
+							<div
+								class="ws-stat-cell tone-zero"
+								tabindex="0"
+								role="button"
+								aria-label="0 items need attention"
+							>
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+
+							<div
+								class="ws-stat-cell tone-zero"
+								tabindex="0"
+								role="button"
+								aria-label="0 sessions waiting for human input"
+							>
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+
+							<div
+								class="ws-stat-cell stat-cost"
+								tabindex="0"
+								role="button"
+								aria-label="Today's cost: $4.82"
+							>
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M12 2v20" />
+										<path
+											d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+										/>
+									</svg>
+									COST
+								</span>
+								<span class="ws-stat-value">$4.82</span>
+							</div>
+
+							<div
+								class="ws-stat-cell stat-activity"
+								tabindex="0"
+								role="button"
+								aria-label="Last activity 12 minutes ago"
+							>
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="12" cy="12" r="10" />
+										<polyline points="12 6 12 12 16 14" />
+									</svg>
+									ACTIVITY
+								</span>
+								<span class="ws-stat-value">12m ago</span>
+							</div>
+						</div>
+
+						<!-- PRD Progress Row -->
+						<div
+							class="ws-prd-row"
+							tabindex="0"
+							role="button"
+							aria-label="3 PRDs, 12 of 31 done"
+						>
+							<div class="ws-prd-info">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+									<path
+										d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+									/>
+									<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+									<path d="M10 18v-1" />
+									<path d="M14 18v-3" />
+									<path d="M18 18v-5" />
+								</svg>
+								<span class="prd-count">3</span> PRDs
+								<span class="prd-sep" style="opacity: 0.4">·</span>
+								<span class="prd-done">12/31 done</span>
+							</div>
+							<div class="ws-prd-bar-track">
+								<div class="ws-prd-bar-fill" style="width: 38.7%"></div>
+							</div>
+						</div>
+
+						<!-- AFK + Footer -->
+						<div class="ws-footer">
+							<div
+								class="ws-afk-row"
+								tabindex="0"
+								role="button"
+								aria-label="AFK loop off"
+							>
+								<div class="ws-afk-led"></div>
+								<span class="ws-afk-label">AFK loop off</span>
+								<span class="ws-afk-meta">last 2h ago</span>
+							</div>
+						</div>
+					</article>
+
+					<!-- Card 2: Active state, azure accent -->
+					<article
+						class="ws-card is-active"
+						data-ws-accent="azure"
+						role="button"
+						tabindex="0"
+						aria-label="Open lowpoly-trees workspace"
+					>
+						<span class="ws-state-badge badge-active">active</span>
+
+						<header class="ws-header">
+							<div class="ws-header-text">
+								<h2 class="ws-name">lowpoly-trees</h2>
+								<div class="ws-subtitle">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M6 3v12" />
+										<path d="M18 9a3 3 0 0 1 0 6" />
+										<path d="M6 15a6 6 0 0 0 12 0" />
+									</svg>
+									main <span style="opacity: 0.4">·</span> 2 worktrees
+								</div>
+							</div>
+							<div class="ws-actions">
+								<button
+									class="ws-action-btn"
+									title="Open on GitHub"
+									aria-label="GitHub"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-action-btn"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+							<div class="ws-thumbnail">
+								<div class="ws-thumbnail-placeholder">
+									<span class="ws-thumbnail-initials">LT</span>
+								</div>
+							</div>
+						</header>
+
+						<div class="ws-stats-grid">
+							<div class="ws-stat-cell" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M10 18h4" />
+										<path d="m10 14 2 2 4-4" />
+										<path d="M3 6h18" />
+										<path d="M3 10h18" />
+									</svg>
+									ISSUES
+								</span>
+								<span class="ws-stat-value"
+									>5<span class="stat-denom">/14</span></span
+								>
+							</div>
+							<div class="ws-stat-cell" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</span>
+								<span class="ws-stat-value">4</span>
+							</div>
+							<div class="ws-stat-cell tone-zero" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+							<div class="ws-stat-cell tone-zero" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+							<div class="ws-stat-cell stat-cost" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M12 2v20" />
+										<path
+											d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+										/>
+									</svg>
+									COST
+								</span>
+								<span class="ws-stat-value">$11.34</span>
+							</div>
+							<div class="ws-stat-cell stat-activity" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="12" cy="12" r="10" />
+										<polyline points="12 6 12 12 16 14" />
+									</svg>
+									ACTIVITY
+								</span>
+								<span class="ws-stat-value">now</span>
+							</div>
+						</div>
+
+						<div class="ws-prd-row" tabindex="0" role="button">
+							<div class="ws-prd-info">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+									<path
+										d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+									/>
+									<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+									<path d="M10 18v-1" />
+									<path d="M14 18v-3" />
+									<path d="M18 18v-5" />
+								</svg>
+								<span class="prd-count">1</span> PRD
+								<span class="prd-sep" style="opacity: 0.4">·</span>
+								<span class="prd-done">7/9 done</span>
+							</div>
+							<div class="ws-prd-bar-track">
+								<div
+									class="ws-prd-bar-fill"
+									style="
+										width: 77.8%;
+										background: linear-gradient(
+											90deg,
+											oklch(0.66 0.12 230) 0%,
+											oklch(0.49 0.115 240) 100%
+										);
+									"
+								></div>
+							</div>
+						</div>
+
+						<div class="ws-footer">
+							<div
+								class="ws-afk-row afk-on"
+								tabindex="0"
+								role="button"
+								aria-label="AFK loop running"
+							>
+								<div class="ws-afk-led"></div>
+								<span class="ws-afk-label">AFK loop running</span>
+								<span class="ws-afk-meta">3 sessions (2 AFK)</span>
+							</div>
+						</div>
+					</article>
+
+					<!-- Card 3: Needs Attention state, coral accent (overridden to amber by state) -->
+					<article
+						class="ws-card is-needs-attention is-active"
+						data-ws-accent="coral"
+						role="button"
+						tabindex="0"
+						aria-label="Open mpx-claude-code workspace"
+					>
+						<span class="ws-state-badge badge-attention">needs-attention</span>
+
+						<header class="ws-header">
+							<div class="ws-header-text">
+								<h2 class="ws-name">mpx-claude-code</h2>
+								<div class="ws-subtitle">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M6 3v12" />
+										<path d="M18 9a3 3 0 0 1 0 6" />
+										<path d="M6 15a6 6 0 0 0 12 0" />
+									</svg>
+									main <span style="opacity: 0.4">·</span> 6 worktrees
+								</div>
+							</div>
+							<div class="ws-actions">
+								<button
+									class="ws-action-btn"
+									title="Open on GitHub"
+									aria-label="GitHub"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-action-btn"
+									title="Open folder"
+									aria-label="Open folder"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+							<div class="ws-thumbnail">
+								<div class="ws-thumbnail-placeholder">
+									<span class="ws-thumbnail-initials">MC</span>
+								</div>
+							</div>
+						</header>
+
+						<div class="ws-stats-grid">
+							<div class="ws-stat-cell" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M10 18h4" />
+										<path d="m10 14 2 2 4-4" />
+										<path d="M3 6h18" />
+										<path d="M3 10h18" />
+									</svg>
+									ISSUES
+								</span>
+								<span class="ws-stat-value"
+									>8<span class="stat-denom">/22</span></span
+								>
+							</div>
+							<div class="ws-stat-cell" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</span>
+								<span class="ws-stat-value">5</span>
+							</div>
+							<div class="ws-stat-cell tone-danger" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+									<span class="ws-pulse-dot"></span>
+								</span>
+								<span class="ws-stat-value">2</span>
+							</div>
+							<div class="ws-stat-cell tone-warning" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+									<span class="ws-pulse-dot"></span>
+								</span>
+								<span class="ws-stat-value">3</span>
+							</div>
+							<div class="ws-stat-cell stat-cost" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M12 2v20" />
+										<path
+											d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+										/>
+									</svg>
+									COST
+								</span>
+								<span class="ws-stat-value">$23.17</span>
+							</div>
+							<div class="ws-stat-cell stat-activity" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="12" cy="12" r="10" />
+										<polyline points="12 6 12 12 16 14" />
+									</svg>
+									ACTIVITY
+								</span>
+								<span class="ws-stat-value">3m ago</span>
+							</div>
+						</div>
+
+						<div class="ws-prd-row" tabindex="0" role="button">
+							<div class="ws-prd-info">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+									<path
+										d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+									/>
+									<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+									<path d="M10 18v-1" />
+									<path d="M14 18v-3" />
+									<path d="M18 18v-5" />
+								</svg>
+								<span class="prd-count">5</span> PRDs
+								<span class="prd-sep" style="opacity: 0.4">·</span>
+								<span class="prd-done">41/68 done</span>
+							</div>
+							<div class="ws-prd-bar-track">
+								<div
+									class="ws-prd-bar-fill"
+									style="
+										width: 60.3%;
+										background: linear-gradient(
+											90deg,
+											oklch(0.77 0.155 75) 0%,
+											oklch(0.69 0.165 55) 100%
+										);
+									"
+								></div>
+							</div>
+						</div>
+
+						<div class="ws-footer">
+							<div
+								class="ws-afk-row afk-on"
+								tabindex="0"
+								role="button"
+								aria-label="AFK loop running"
+							>
+								<div
+									class="ws-afk-led"
+									style="
+										background: var(--status-warning);
+										box-shadow:
+											0 0 6px
+												color-mix(
+													in oklch,
+													var(--status-warning) 60%,
+													transparent
+												),
+											0 0 12px
+												color-mix(
+													in oklch,
+													var(--status-warning) 30%,
+													transparent
+												);
+									"
+								></div>
+								<span class="ws-afk-label" style="color: var(--foreground)"
+									>AFK loop running</span
+								>
+								<span class="ws-afk-meta">6 sessions (4 AFK)</span>
+							</div>
+						</div>
+					</article>
+
+					<!-- Card 4: Default state, amber accent -->
+					<article
+						class="ws-card"
+						data-ws-accent="amber"
+						role="button"
+						tabindex="0"
+						aria-label="Open tauri-playground workspace"
+					>
+						<header class="ws-header">
+							<div class="ws-header-text">
+								<h2 class="ws-name">tauri-playground</h2>
+								<div class="ws-subtitle">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M6 3v12" />
+										<path d="M18 9a3 3 0 0 1 0 6" />
+										<path d="M6 15a6 6 0 0 0 12 0" />
+									</svg>
+									main <span style="opacity: 0.4">·</span> 1 worktree
+								</div>
+							</div>
+							<div class="ws-actions">
+								<button
+									class="ws-action-btn"
+									title="Open on GitHub"
+									aria-label="GitHub"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+										/>
+										<path d="M9 18c-4.51 2-5-2-7-2" />
+									</svg>
+								</button>
+								<button
+									class="ws-action-btn"
+									title="Open folder"
+									aria-label="Open folder"
+									style="opacity: 0.35"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+										/>
+									</svg>
+								</button>
+							</div>
+							<div class="ws-thumbnail">
+								<div class="ws-thumbnail-placeholder">
+									<span class="ws-thumbnail-initials">TP</span>
+								</div>
+							</div>
+						</header>
+
+						<div class="ws-stats-grid">
+							<div class="ws-stat-cell" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M10 18h4" />
+										<path d="m10 14 2 2 4-4" />
+										<path d="M3 6h18" />
+										<path d="M3 10h18" />
+									</svg>
+									ISSUES
+								</span>
+								<span class="ws-stat-value"
+									>1<span class="stat-denom">/6</span></span
+								>
+							</div>
+							<div class="ws-stat-cell tone-zero" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+							<div class="ws-stat-cell tone-zero" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+							<div class="ws-stat-cell tone-zero" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+								</span>
+								<span class="ws-stat-value">0</span>
+							</div>
+							<div class="ws-stat-cell stat-cost" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<path d="M12 2v20" />
+										<path
+											d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+										/>
+									</svg>
+									COST
+								</span>
+								<span class="ws-stat-value">$0.48</span>
+							</div>
+							<div class="ws-stat-cell stat-activity" tabindex="0" role="button">
+								<span class="ws-stat-label">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+										<circle cx="12" cy="12" r="10" />
+										<polyline points="12 6 12 12 16 14" />
+									</svg>
+									ACTIVITY
+								</span>
+								<span class="ws-stat-value">6h ago</span>
+							</div>
+						</div>
+
+						<div class="ws-prd-row" tabindex="0" role="button">
+							<div class="ws-prd-info">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+									<path
+										d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+									/>
+									<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+									<path d="M10 18v-1" />
+									<path d="M14 18v-3" />
+									<path d="M18 18v-5" />
+								</svg>
+								<span class="prd-count">1</span> PRD
+								<span class="prd-sep" style="opacity: 0.4">·</span>
+								<span class="prd-done">2/5 done</span>
+							</div>
+							<div class="ws-prd-bar-track">
+								<div
+									class="ws-prd-bar-fill"
+									style="
+										width: 40%;
+										background: linear-gradient(
+											90deg,
+											oklch(0.77 0.15 65) 0%,
+											oklch(0.595 0.16 48) 100%
+										);
+									"
+								></div>
+							</div>
+						</div>
+
+						<div class="ws-footer">
+							<div
+								class="ws-afk-row"
+								tabindex="0"
+								role="button"
+								aria-label="AFK loop off"
+							>
+								<div class="ws-afk-led"></div>
+								<span class="ws-afk-label">AFK loop off</span>
+								<span class="ws-afk-meta">1 session</span>
+							</div>
+						</div>
+					</article>
+				</div>
+				<!-- /card-grid -->
+			</div>
+			<!-- /page-wrapper -->
+		</div>
+		<!-- /gk-root -->
+	</body>
+</html>

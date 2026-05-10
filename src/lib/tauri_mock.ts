@@ -1,4 +1,5 @@
 import { showMockToast } from '$lib/modules/toasts/mock_toast_bridge.js';
+import { MockDesktopOnlyError } from '$lib/mock_desktop_only_error.js';
 import {
 	MOCK_ACHIEVEMENTS,
 	MOCK_ACTIONS,
@@ -44,6 +45,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'kill_workspace_process',
 	'github_device_flow_start',
 	'github_device_flow_poll',
+	'test_notification_sound',
 ]);
 
 const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
@@ -121,7 +123,6 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	github_auth_status: () => ({ status: 'not-connected' }),
 	github_logout: () => null,
 	fetch_assigned_issues: () => MOCK_ASSIGNED_ISSUES_RESULT,
-	get_deleted_assigned_issue_numbers: () => [],
 	sync_all_github_state: () => MOCK_SYNC_RESULT,
 
 	// ─── Notifications reads ──────────────────────────────────────────────────
@@ -482,6 +483,8 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	set_app_setting: () => null,
 	open_terminal: () => null,
 	update_peacock_color: () => null,
+	run_workspace_command: () => null,
+	kill_workspace_process: () => null,
 	write_raw_requirements: () => null,
 	seed_demo_workspace: () => null,
 	delete_demo_workspace: () => null,
@@ -489,13 +492,16 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 
 export async function mockInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
 	const handler = MOCK_COMMAND_HANDLERS[command];
+	if (TAURI_ONLY_COMMANDS.has(command)) {
+		showMockToast(command, args);
+		if (handler === undefined) {
+			throw new MockDesktopOnlyError(command);
+		}
+		return handler(args ?? {}) as T;
+	}
 	if (handler === undefined) {
 		console.warn(`[tauri-mock] Unhandled command: "${command}"`, args);
 		return undefined as T;
 	}
-	const result = handler(args ?? {}) as T;
-	if (TAURI_ONLY_COMMANDS.has(command)) {
-		showMockToast(command, args);
-	}
-	return result;
+	return handler(args ?? {}) as T;
 }

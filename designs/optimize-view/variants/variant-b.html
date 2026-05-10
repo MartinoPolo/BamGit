@@ -1,0 +1,2586 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Optimize View — Variant B: Checklist Report</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+
+			.theme-light,
+			[data-theme='light'] {
+				color-scheme: light;
+				--background: oklch(0.985 0.005 130);
+				--surface: oklch(1 0 0);
+				--surface-2: oklch(0.965 0.008 130);
+				--surface-hover: oklch(0.94 0.012 130);
+				--surface-3: oklch(0.94 0.012 130);
+				--foreground: oklch(0.205 0.015 145);
+				--foreground-muted: oklch(0.46 0.015 145);
+				--foreground-subtle: oklch(0.62 0.012 145);
+				--border: oklch(0.9 0.012 135);
+				--border-strong: oklch(0.815 0.018 135);
+				--primary: var(--moss-700);
+				--primary-fg: oklch(0.985 0.008 130);
+				--primary-soft: oklch(0.92 0.03 135);
+				--accent: var(--moss-500);
+				--accent-fg: oklch(0.985 0.008 130);
+				--ring: var(--moss-600);
+				--sidebar-bg: oklch(0.955 0.01 135);
+				--sidebar-fg: oklch(0.3 0.02 145);
+				--code-bg: oklch(0.955 0.01 135);
+				--sky-top: var(--sky-light-top);
+				--sky-bot: var(--sky-light-bot);
+				--ground-color: oklch(0.55 0.09 135);
+				--ground-dark: oklch(0.38 0.06 55);
+			}
+
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* ─── Base reset ──────────────────────────────────────────────────────── */
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+				min-height: 100vh;
+			}
+
+			/* ─── gk-* type utilities ─────────────────────────────────────────────── */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ─── Buttons ─────────────────────────────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-out),
+					border-color var(--duration-2) var(--ease-out),
+					color var(--duration-2) var(--ease-out),
+					transform var(--duration-1) var(--ease-out),
+					box-shadow var(--duration-2) var(--ease-out);
+				white-space: nowrap;
+				user-select: none;
+				text-decoration: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-secondary:active {
+				transform: scale(0.96);
+			}
+
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+				border-color: transparent;
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-ghost:active {
+				transform: scale(0.96);
+			}
+
+			/* ─── cb-* panel primitives (from tokens.css) ────────────────────────── */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
+
+			/* findings */
+			.cb-finding {
+				border-left: 2px solid var(--border);
+				padding: 8px 10px 9px 10px;
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			}
+			.cb-finding.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.cb-finding.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.cb-finding.is-low {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+			.cb-pri-high {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-pri-med {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-pri-low {
+				color: oklch(0.7 0.11 200);
+			}
+
+			/* scrollbar */
+			::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* ─── Page shell ──────────────────────────────────────────────────────── */
+			body {
+				margin: 0;
+			}
+
+			.page-shell {
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+				background: var(--background);
+			}
+
+			/* Simulate the surrounding app context — sidebar + main area */
+			.app-frame {
+				display: flex;
+				flex: 1;
+				min-height: 0;
+			}
+
+			.app-sidebar {
+				width: 220px;
+				flex-shrink: 0;
+				background: var(--sidebar-bg, oklch(0.18 0.022 150));
+				border-right: 1px solid var(--border);
+				padding: 12px 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.sidebar-section-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				padding: 8px 8px 4px;
+			}
+
+			.sidebar-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 8px;
+				border-radius: var(--radius-sm);
+				font-size: 13px;
+				color: var(--sidebar-fg, var(--foreground-muted));
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease;
+				user-select: none;
+			}
+			.sidebar-item:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.sidebar-item.is-active {
+				background: var(--primary-soft);
+				color: var(--foreground);
+			}
+			.sidebar-item.is-active .sidebar-icon {
+				color: var(--primary);
+			}
+			.sidebar-icon {
+				width: 16px;
+				height: 16px;
+				flex-shrink: 0;
+				opacity: 0.7;
+			}
+			.sidebar-item.is-active .sidebar-icon {
+				opacity: 1;
+			}
+
+			.main-content {
+				flex: 1;
+				min-width: 0;
+				overflow-y: auto;
+				display: flex;
+				flex-direction: column;
+			}
+
+			/* ─── View header (tab bar) ───────────────────────────────────────────── */
+			.view-header {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				padding: 0 20px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+
+			.view-tab {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 10px 14px 9px;
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				border-bottom: 2px solid transparent;
+				transition:
+					color var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+				user-select: none;
+				white-space: nowrap;
+			}
+			.view-tab:hover {
+				color: var(--foreground);
+			}
+			.view-tab.is-active {
+				color: var(--foreground);
+				border-bottom-color: var(--primary);
+			}
+
+			.view-tab-badge {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				padding: 1px 5px;
+				border-radius: 3px;
+				background: color-mix(in oklch, var(--status-danger) 18%, transparent);
+				color: var(--status-danger);
+				line-height: 1.4;
+			}
+
+			/* ─── Optimize view container ────────────────────────────────────────── */
+			.optimize-view {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ─── Score bar (sticky) ─────────────────────────────────────────────── */
+			.score-bar {
+				position: sticky;
+				top: 0;
+				z-index: var(--z-sticky);
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 0 20px;
+				height: 48px;
+				background: color-mix(in oklch, var(--surface) 95%, transparent);
+				border-bottom: 1px solid var(--border);
+				backdrop-filter: blur(8px);
+				flex-shrink: 0;
+			}
+
+			.score-grade {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				background: color-mix(in oklch, oklch(0.595 0.16 48) 22%, transparent);
+				border: 1.5px solid color-mix(in oklch, oklch(0.595 0.16 48) 55%, transparent);
+				flex-shrink: 0;
+			}
+
+			.score-grade-letter {
+				font-family: var(--font-mono);
+				font-size: 15px;
+				font-weight: 700;
+				color: oklch(0.84 0.13 78);
+				line-height: 1;
+				letter-spacing: -0.02em;
+			}
+
+			.score-value {
+				font-family: var(--font-mono);
+				font-size: 15px;
+				font-weight: 600;
+				color: var(--foreground);
+				letter-spacing: -0.02em;
+				line-height: 1;
+				flex-shrink: 0;
+			}
+
+			.score-divider {
+				width: 1px;
+				height: 20px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+
+			.score-breakdown {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-shrink: 0;
+			}
+
+			.score-breakdown-item {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				color: var(--foreground-muted);
+				white-space: nowrap;
+			}
+
+			.score-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.score-dot.is-high {
+				background: oklch(0.64 0.205 25);
+			}
+			.score-dot.is-med {
+				background: oklch(0.77 0.155 75);
+			}
+			.score-dot.is-low {
+				background: oklch(0.7 0.11 200);
+			}
+
+			.score-breakdown-sep {
+				color: var(--border-strong);
+				font-family: var(--font-mono);
+				font-size: 11px;
+				user-select: none;
+			}
+
+			.score-bar-actions {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+
+			.score-refresh-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+
+			/* ─── Findings list area ─────────────────────────────────────────────── */
+			.findings-area {
+				flex: 1;
+				overflow-y: auto;
+				padding: 16px 20px 24px;
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+			}
+
+			.findings-list-label {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				margin-bottom: 10px;
+			}
+
+			.findings-ordered {
+				list-style: none;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				counter-reset: finding-counter;
+			}
+
+			/* ─── Individual accordion item ─────────────────────────────────────── */
+			.finding-item {
+				counter-increment: finding-counter;
+				position: relative;
+			}
+
+			.finding-header {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				cursor: pointer;
+				user-select: none;
+				border-radius: var(--radius-sm);
+				transition: background var(--duration-2) ease;
+			}
+			.finding-header:hover .finding-row {
+				background: var(--surface-hover);
+			}
+
+			.finding-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				width: 100%;
+				padding: 0;
+				background: transparent;
+				border: none;
+				cursor: pointer;
+				text-align: left;
+				font-family: inherit;
+				transition: background var(--duration-2) ease;
+			}
+
+			/* The cb-finding container is the main row */
+			.finding-item .cb-finding {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 9px 12px 9px 10px;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					border-left-color var(--duration-2) ease;
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			}
+			.finding-item .cb-finding:hover {
+				background: color-mix(in oklch, var(--surface-3) 70%, transparent);
+			}
+			.finding-item .cb-finding:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: -2px;
+			}
+
+			/* Number badge */
+			.finding-num {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				width: 18px;
+				text-align: right;
+				flex-shrink: 0;
+				line-height: 1;
+			}
+
+			/* Impact severity dot */
+			.finding-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.finding-dot.is-high {
+				background: oklch(0.64 0.205 25);
+				box-shadow: 0 0 5px oklch(0.64 0.205 25 / 0.4);
+			}
+			.finding-dot.is-med {
+				background: oklch(0.77 0.155 75);
+				box-shadow: 0 0 5px oklch(0.77 0.155 75 / 0.3);
+			}
+			.finding-dot.is-low {
+				background: oklch(0.7 0.11 200);
+			}
+
+			/* Title + summary */
+			.finding-content {
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+			}
+
+			.finding-title {
+				font-size: 13px;
+				font-weight: 500;
+				color: var(--foreground);
+				line-height: var(--leading-snug);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.finding-summary {
+				font-size: 11.5px;
+				color: var(--foreground-subtle);
+				line-height: var(--leading-normal);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			/* Right-aligned meta */
+			.finding-meta {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-shrink: 0;
+				margin-left: auto;
+			}
+
+			.finding-savings {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				text-align: right;
+				white-space: nowrap;
+			}
+
+			.finding-savings .savings-tokens {
+				display: block;
+				color: var(--foreground-muted);
+				font-size: 11.5px;
+			}
+
+			.finding-savings .savings-cost {
+				display: block;
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+			}
+
+			.finding-severity-badge {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: 600;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				padding: 2px 6px;
+				border-radius: 3px;
+				flex-shrink: 0;
+				line-height: 1.4;
+			}
+			.finding-severity-badge.is-high {
+				background: color-mix(in oklch, oklch(0.64 0.205 25) 15%, transparent);
+				color: oklch(0.64 0.205 25);
+				border: 1px solid color-mix(in oklch, oklch(0.64 0.205 25) 30%, transparent);
+			}
+			.finding-severity-badge.is-med {
+				background: color-mix(in oklch, oklch(0.77 0.155 75) 15%, transparent);
+				color: oklch(0.82 0.16 85);
+				border: 1px solid color-mix(in oklch, oklch(0.77 0.155 75) 30%, transparent);
+			}
+			.finding-severity-badge.is-low {
+				background: color-mix(in oklch, oklch(0.7 0.11 200) 15%, transparent);
+				color: oklch(0.7 0.11 200);
+				border: 1px solid color-mix(in oklch, oklch(0.7 0.11 200) 30%, transparent);
+			}
+
+			/* Chevron toggle */
+			.finding-chevron {
+				flex-shrink: 0;
+				width: 16px;
+				height: 16px;
+				color: var(--foreground-subtle);
+				transition:
+					transform var(--duration-3) var(--ease-out),
+					color var(--duration-2) ease;
+			}
+			.finding-item.is-open .finding-chevron {
+				transform: rotate(90deg);
+				color: var(--foreground-muted);
+			}
+
+			/* ─── Expanded detail panel ──────────────────────────────────────────── */
+			.finding-detail {
+				display: none;
+				flex-direction: column;
+				gap: 10px;
+				padding: 12px 14px 14px 42px;
+				background: color-mix(in oklch, var(--surface) 50%, transparent);
+				border-left: 2px solid oklch(0.64 0.205 25);
+				border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+				margin-top: 1px;
+				border-bottom: 1px solid var(--border);
+				border-right: 1px solid var(--border);
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			}
+			.finding-detail.is-high-border {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.finding-detail.is-med-border {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.finding-detail.is-low-border {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+
+			.finding-item.is-open .finding-detail {
+				display: flex;
+			}
+
+			.detail-explanation {
+				font-size: 12.5px;
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
+
+			.detail-stats {
+				display: flex;
+				gap: 20px;
+				flex-wrap: wrap;
+			}
+
+			.detail-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.detail-stat-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+
+			.detail-stat-value {
+				font-family: var(--font-mono);
+				font-size: 14px;
+				font-weight: 600;
+				color: var(--foreground);
+				letter-spacing: -0.01em;
+			}
+
+			.detail-stat-value.is-danger {
+				color: oklch(0.64 0.205 25);
+			}
+			.detail-stat-value.is-warning {
+				color: oklch(0.82 0.16 85);
+			}
+
+			/* Code fix block */
+			.detail-fix-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.detail-fix-label::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.detail-code-block {
+				position: relative;
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				overflow: hidden;
+			}
+
+			.detail-code-bar {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 5px 10px;
+				background: color-mix(in oklch, var(--surface-2) 80%, transparent);
+				border-bottom: 1px solid var(--border);
+			}
+
+			.detail-code-filename {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+			}
+
+			.copy-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 22px;
+				padding: 0 8px;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 500;
+				letter-spacing: 0.02em;
+				color: var(--foreground-muted);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 3px;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+				user-select: none;
+			}
+			.copy-btn:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+				border-color: var(--border-strong);
+			}
+			.copy-btn:active {
+				transform: scale(0.96);
+			}
+			.copy-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.copy-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.copy-btn.is-copied {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+
+			.detail-code-pre {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				line-height: 1.65;
+				color: var(--foreground-muted);
+				padding: 10px 12px;
+				margin: 0;
+				overflow-x: auto;
+				tab-size: 2;
+			}
+
+			.code-comment {
+				color: var(--foreground-subtle);
+			}
+			.code-key {
+				color: var(--primary);
+			}
+			.code-val {
+				color: oklch(0.84 0.13 78);
+			}
+			.code-str {
+				color: oklch(0.7 0.11 200);
+			}
+			.code-heading {
+				color: var(--foreground-muted);
+				font-weight: 600;
+			}
+			.code-added {
+				color: oklch(0.7 0.15 145);
+			}
+
+			/* ─── Dismiss button inside detail ──────────────────────────────────── */
+			.detail-actions {
+				display: flex;
+				gap: 6px;
+				padding-top: 2px;
+			}
+
+			/* ─── Variant label banner ───────────────────────────────────────────── */
+			.variant-banner {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 7px 20px;
+				background: color-mix(in oklch, var(--primary-soft) 60%, transparent);
+				border-bottom: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
+			}
+
+			/* ─── Responsive ─────────────────────────────────────────────────────── */
+			@media (max-width: 700px) {
+				.app-sidebar {
+					display: none;
+				}
+				.score-breakdown {
+					display: none;
+				}
+				.finding-savings {
+					display: none;
+				}
+				.finding-summary {
+					display: none;
+				}
+				.findings-area {
+					padding: 12px 12px 24px;
+				}
+				.score-bar {
+					padding: 0 12px;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.view-header {
+					padding: 0 12px;
+				}
+				.view-tab {
+					padding: 10px 10px 9px;
+					font-size: 12px;
+				}
+			}
+
+			/* ─── Animations ─────────────────────────────────────────────────────── */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			@keyframes detail-expand {
+				from {
+					opacity: 0;
+					transform: translateY(-4px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			.finding-item.is-open .finding-detail {
+				animation: detail-expand var(--duration-3) var(--ease-out);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-shell">
+				<!-- Variant label -->
+				<div class="variant-banner">
+					<span class="gk-eyebrow">Optimize View</span>
+					<svg width="3" height="3" viewBox="0 0 3 3" fill="none" aria-hidden="true">
+						<circle cx="1.5" cy="1.5" r="1.5" fill="currentColor" opacity="0.35" />
+					</svg>
+					<span class="gk-eyebrow" style="color: var(--primary); letter-spacing: 0.06em"
+						>Variant B — Checklist Report</span
+					>
+				</div>
+
+				<div class="app-frame">
+					<!-- Simulated sidebar -->
+					<nav class="app-sidebar" aria-label="Main navigation">
+						<div class="sidebar-section-label">Workspace</div>
+						<div class="sidebar-item">
+							<svg
+								class="sidebar-icon"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								aria-hidden="true"
+							>
+								<rect x="2" y="2" width="5" height="5" rx="1" />
+								<rect x="9" y="2" width="5" height="5" rx="1" />
+								<rect x="2" y="9" width="5" height="5" rx="1" />
+								<rect x="9" y="9" width="5" height="5" rx="1" />
+							</svg>
+							Overview
+						</div>
+						<div class="sidebar-item">
+							<svg
+								class="sidebar-icon"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								aria-hidden="true"
+							>
+								<path d="M3 4h10M3 8h7M3 12h5" />
+							</svg>
+							Sessions
+						</div>
+						<div class="sidebar-section-label" style="margin-top: 8px">Analytics</div>
+						<div class="sidebar-item">
+							<svg
+								class="sidebar-icon"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								aria-hidden="true"
+							>
+								<path d="M2 12L5.5 7l3 3 2.5-4L14 10" />
+							</svg>
+							Usage
+						</div>
+						<div class="sidebar-item is-active">
+							<svg
+								class="sidebar-icon"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								aria-hidden="true"
+							>
+								<circle cx="8" cy="8" r="5.5" />
+								<path d="M8 5v3.5l2 1.5" />
+							</svg>
+							Optimize
+						</div>
+						<div class="sidebar-item">
+							<svg
+								class="sidebar-icon"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								aria-hidden="true"
+							>
+								<path d="M8 2v12M4 6l4-4 4 4" />
+							</svg>
+							Skills
+						</div>
+					</nav>
+
+					<!-- Main content area -->
+					<main class="main-content">
+						<!-- Tab bar (Usage view tabs) -->
+						<div class="view-header" role="tablist" aria-label="Usage dashboard tabs">
+							<button class="view-tab" role="tab" aria-selected="false">
+								Overview
+							</button>
+							<button class="view-tab" role="tab" aria-selected="false">
+								By Session
+							</button>
+							<button class="view-tab" role="tab" aria-selected="false">
+								By File
+							</button>
+							<button class="view-tab is-active" role="tab" aria-selected="true">
+								Optimize
+								<span class="view-tab-badge" aria-label="3 high priority findings"
+									>3</span
+								>
+							</button>
+						</div>
+
+						<!-- Optimize view -->
+						<div class="optimize-view" role="tabpanel" aria-label="Optimize panel">
+							<!-- ─── Sticky score bar ───────────────────────── -->
+							<div class="score-bar" aria-label="Health score summary">
+								<div
+									class="score-grade"
+									title="Grade C — needs improvement"
+									aria-label="Grade C"
+								>
+									<span class="score-grade-letter" aria-hidden="true">C</span>
+								</div>
+
+								<span class="score-value font-mono" aria-label="Score 58 out of 100"
+									>58<span
+										style="
+											font-size: 12px;
+											font-weight: 400;
+											color: var(--foreground-subtle);
+											margin-left: 1px;
+										"
+										>/100</span
+									></span
+								>
+
+								<div class="score-divider" aria-hidden="true"></div>
+
+								<div
+									class="score-breakdown"
+									aria-label="6 findings: 3 high, 2 medium, 1 low"
+								>
+									<div class="score-breakdown-item">
+										<span class="score-dot is-high" aria-hidden="true"></span>
+										<span>3 high</span>
+									</div>
+									<span class="score-breakdown-sep" aria-hidden="true">·</span>
+									<div class="score-breakdown-item">
+										<span class="score-dot is-med" aria-hidden="true"></span>
+										<span>2 medium</span>
+									</div>
+									<span class="score-breakdown-sep" aria-hidden="true">·</span>
+									<div class="score-breakdown-item">
+										<span class="score-dot is-low" aria-hidden="true"></span>
+										<span>1 low</span>
+									</div>
+								</div>
+
+								<div class="score-bar-actions">
+									<span
+										class="score-refresh-label"
+										aria-label="Last scanned 4 minutes ago"
+										>scanned 4m ago</span
+									>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Re-scan workspace"
+										aria-label="Re-scan workspace"
+									>
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.6"
+											aria-hidden="true"
+										>
+											<path
+												d="M13.5 8A5.5 5.5 0 1 1 8 2.5c2 0 3.75.98 4.8 2.5"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M13.5 2.5v3h-3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-secondary gk-btn-sm"
+										title="Export findings report"
+										aria-label="Export findings report"
+									>
+										Export
+									</button>
+								</div>
+							</div>
+
+							<!-- ─── Findings list ──────────────────────────── -->
+							<div class="findings-area">
+								<div class="findings-list-label">
+									<span class="gk-eyebrow">6 findings · sorted by impact</span>
+								</div>
+
+								<ol class="findings-ordered" aria-label="Optimization findings">
+									<!-- ══ 1. Reading junk directories — HIGH · EXPANDED ══ -->
+									<li class="finding-item is-open" id="finding-1">
+										<div
+											class="cb-finding is-high"
+											role="button"
+											tabindex="0"
+											aria-expanded="true"
+											aria-controls="detail-1"
+											onclick="toggleFinding('finding-1')"
+											onkeydown="handleFindingKey(event, 'finding-1')"
+										>
+											<span class="finding-num" aria-hidden="true">01</span>
+											<span
+												class="finding-dot is-high"
+												aria-label="High severity"
+												role="img"
+											></span>
+											<div class="finding-content">
+												<span class="finding-title"
+													>Reading junk directories</span
+												>
+												<span class="finding-summary"
+													>Claude scans
+													<code
+														style="
+															font-family: var(--font-mono);
+															font-size: 11px;
+															color: var(--foreground-muted);
+														"
+														>node_modules</code
+													>,
+													<code
+														style="
+															font-family: var(--font-mono);
+															font-size: 11px;
+															color: var(--foreground-muted);
+														"
+														>.git/objects</code
+													>, and build artifacts every session</span
+												>
+											</div>
+											<div class="finding-meta">
+												<div class="finding-savings">
+													<span class="savings-tokens">~7,200 tok</span>
+													<span class="savings-cost">~$0.04/session</span>
+												</div>
+												<span
+													class="finding-severity-badge is-high"
+													aria-label="High priority"
+													>HIGH</span
+												>
+												<svg
+													class="finding-chevron"
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													aria-hidden="true"
+												>
+													<path
+														d="M6 4l4 4-4 4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</div>
+										</div>
+
+										<div
+											class="finding-detail is-high-border"
+											id="detail-1"
+											role="region"
+											aria-label="Reading junk directories — detail"
+										>
+											<p class="detail-explanation">
+												Claude Code is traversing
+												<strong style="color: var(--foreground)"
+													>3 ignored-candidate directories</strong
+												>
+												during file search —
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>node_modules/</code
+												>
+												(1.2 GB),
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>.git/objects/</code
+												>, and
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>dist/</code
+												>. These paths are listed in
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>.gitignore</code
+												>
+												but not in a
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>.claudeignore</code
+												>. Claude reads them anyway, contributing roughly
+												7,200 tokens of noise per session.
+											</p>
+
+											<div class="detail-stats">
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Wasted tokens/session</span
+													>
+													<span class="detail-stat-value is-danger"
+														>~7,200</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Estimated daily cost</span
+													>
+													<span class="detail-stat-value is-danger"
+														>~$0.28</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Affected directories</span
+													>
+													<span class="detail-stat-value">3</span>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Fix complexity</span
+													>
+													<span
+														class="detail-stat-value"
+														style="color: var(--status-success)"
+														>Trivial</span
+													>
+												</div>
+											</div>
+
+											<div
+												style="
+													display: flex;
+													flex-direction: column;
+													gap: 6px;
+												"
+											>
+												<div class="detail-fix-label">
+													Fix — create .claudeignore
+												</div>
+												<div class="detail-code-block">
+													<div class="detail-code-bar">
+														<span class="detail-code-filename"
+															>.claudeignore</span
+														>
+														<button
+															class="copy-btn"
+															onclick="
+																copyCode(this, 'code-claudeignore')
+															"
+															aria-label="Copy .claudeignore snippet"
+														>
+															<svg
+																width="11"
+																height="11"
+																viewBox="0 0 16 16"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.8"
+																aria-hidden="true"
+															>
+																<rect
+																	x="5"
+																	y="5"
+																	width="9"
+																	height="9"
+																	rx="1.5"
+																/>
+																<path
+																	d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															Copy
+														</button>
+													</div>
+													<pre
+														class="detail-code-pre"
+														id="code-claudeignore"
+													><span class="code-comment"># Build outputs</span>
+node_modules/
+dist/
+.next/
+out/
+build/
+
+<span class="code-comment"># VCS internals</span>
+.git/
+
+<span class="code-comment"># Package manager caches</span>
+.pnpm-store/
+.yarn/cache/
+
+<span class="code-comment"># IDE artifacts</span>
+.vscode/extensions/
+.idea/
+
+<span class="code-comment"># Test coverage</span>
+coverage/
+.nyc_output/</pre>
+												</div>
+											</div>
+
+											<div class="detail-actions">
+												<button
+													class="gk-btn gk-btn-secondary gk-btn-sm"
+													onclick="dismissFinding('finding-1')"
+													aria-label="Mark as resolved"
+												>
+													Mark resolved
+												</button>
+												<button
+													class="gk-btn gk-btn-ghost gk-btn-sm"
+													aria-label="Snooze this finding"
+												>
+													Snooze
+												</button>
+											</div>
+										</div>
+									</li>
+
+									<!-- ══ 2. Duplicate file reads — HIGH ══ -->
+									<li class="finding-item" id="finding-2">
+										<div
+											class="cb-finding is-high"
+											role="button"
+											tabindex="0"
+											aria-expanded="false"
+											aria-controls="detail-2"
+											onclick="toggleFinding('finding-2')"
+											onkeydown="handleFindingKey(event, 'finding-2')"
+										>
+											<span class="finding-num" aria-hidden="true">02</span>
+											<span
+												class="finding-dot is-high"
+												aria-label="High severity"
+												role="img"
+											></span>
+											<div class="finding-content">
+												<span class="finding-title"
+													>Duplicate file reads</span
+												>
+												<span class="finding-summary"
+													>Same files re-read 3–6× per session — no
+													in-memory caching between tool calls</span
+												>
+											</div>
+											<div class="finding-meta">
+												<div class="finding-savings">
+													<span class="savings-tokens">~4,800 tok</span>
+													<span class="savings-cost">~$0.03/session</span>
+												</div>
+												<span
+													class="finding-severity-badge is-high"
+													aria-label="High priority"
+													>HIGH</span
+												>
+												<svg
+													class="finding-chevron"
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													aria-hidden="true"
+												>
+													<path
+														d="M6 4l4 4-4 4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</div>
+										</div>
+										<div
+											class="finding-detail is-high-border"
+											id="detail-2"
+											role="region"
+											aria-label="Duplicate file reads — detail"
+										>
+											<p class="detail-explanation">
+												Analysis of last 14 sessions shows
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>src-tauri/src/schema.rs</code
+												>,
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>AGENTS.md</code
+												>, and
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>src/lib/tauri_mock.ts</code
+												>
+												are each read 3–6 times in a single session. These
+												files haven't changed between reads — adding a
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>cache_ttl</code
+												>
+												hint in
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>CLAUDE.md</code
+												>
+												instructs Claude to treat them as stable within a
+												session.
+											</p>
+											<div class="detail-stats">
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Top repeated file</span
+													>
+													<span
+														class="detail-stat-value"
+														style="
+															font-size: 12px;
+															color: var(--foreground-muted);
+														"
+														>schema.rs ×5.8</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Avg duplicates/session</span
+													>
+													<span class="detail-stat-value is-danger"
+														>11.4</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Fix complexity</span
+													>
+													<span
+														class="detail-stat-value"
+														style="color: var(--status-success)"
+														>Low</span
+													>
+												</div>
+											</div>
+											<div
+												style="
+													display: flex;
+													flex-direction: column;
+													gap: 6px;
+												"
+											>
+												<div class="detail-fix-label">
+													Fix — add to CLAUDE.md
+												</div>
+												<div class="detail-code-block">
+													<div class="detail-code-bar">
+														<span class="detail-code-filename"
+															>CLAUDE.md — append section</span
+														>
+														<button
+															class="copy-btn"
+															onclick="copyCode(this, 'code-dedup')"
+															aria-label="Copy CLAUDE.md snippet"
+														>
+															<svg
+																width="11"
+																height="11"
+																viewBox="0 0 16 16"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.8"
+																aria-hidden="true"
+															>
+																<rect
+																	x="5"
+																	y="5"
+																	width="9"
+																	height="9"
+																	rx="1.5"
+																/>
+																<path
+																	d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															Copy
+														</button>
+													</div>
+													<pre
+														class="detail-code-pre"
+														id="code-dedup"
+													><span class="code-heading">## Stable Files (read once per session)</span>
+
+These files rarely change mid-session.
+Read them at most once and reuse the content:
+- <span class="code-str">src-tauri/src/schema.rs</span>
+- <span class="code-str">AGENTS.md</span>
+- <span class="code-str">src/lib/tauri_mock.ts</span>
+- <span class="code-str">src/lib/tauri_mock_data.ts</span></pre>
+												</div>
+											</div>
+											<div class="detail-actions">
+												<button
+													class="gk-btn gk-btn-secondary gk-btn-sm"
+													onclick="dismissFinding('finding-2')"
+													aria-label="Mark as resolved"
+												>
+													Mark resolved
+												</button>
+												<button class="gk-btn gk-btn-ghost gk-btn-sm">
+													Snooze
+												</button>
+											</div>
+										</div>
+									</li>
+
+									<!-- ══ 3. Low read/edit ratio — HIGH ══ -->
+									<li class="finding-item" id="finding-3">
+										<div
+											class="cb-finding is-high"
+											role="button"
+											tabindex="0"
+											aria-expanded="false"
+											aria-controls="detail-3"
+											onclick="toggleFinding('finding-3')"
+											onkeydown="handleFindingKey(event, 'finding-3')"
+										>
+											<span class="finding-num" aria-hidden="true">03</span>
+											<span
+												class="finding-dot is-high"
+												aria-label="High severity"
+												role="img"
+											></span>
+											<div class="finding-content">
+												<span class="finding-title"
+													>Low read/edit ratio</span
+												>
+												<span class="finding-summary"
+													>Claude reads 2.1 files for every 1 edit —
+													typical healthy ratio is ≤1.4×</span
+												>
+											</div>
+											<div class="finding-meta">
+												<div class="finding-savings">
+													<span class="savings-tokens">ratio 2.1:1</span>
+													<span class="savings-cost"
+														>vs 1.4 baseline</span
+													>
+												</div>
+												<span
+													class="finding-severity-badge is-high"
+													aria-label="High priority"
+													>HIGH</span
+												>
+												<svg
+													class="finding-chevron"
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													aria-hidden="true"
+												>
+													<path
+														d="M6 4l4 4-4 4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</div>
+										</div>
+										<div
+											class="finding-detail is-high-border"
+											id="detail-3"
+											role="region"
+											aria-label="Low read/edit ratio — detail"
+										>
+											<p class="detail-explanation">
+												Over the last 7 days Claude read
+												<strong style="color: var(--foreground)"
+													>347 files</strong
+												>
+												but only made edits to
+												<strong style="color: var(--foreground)"
+													>165</strong
+												>
+												— a 2.1:1 ratio. This suggests over-exploration
+												before acting. Common causes: insufficient
+												architecture context in
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>CLAUDE.md</code
+												>, or tasks scoped too broadly. A ratio below 1.4:1
+												is the healthy target.
+											</p>
+											<div class="detail-stats">
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Files read (7d)</span
+													>
+													<span class="detail-stat-value">347</span>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Files edited (7d)</span
+													>
+													<span class="detail-stat-value">165</span>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Your ratio</span
+													>
+													<span class="detail-stat-value is-danger"
+														>2.1:1</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Target ratio</span
+													>
+													<span
+														class="detail-stat-value"
+														style="color: var(--status-success)"
+														>≤1.4:1</span
+													>
+												</div>
+											</div>
+											<div
+												style="
+													display: flex;
+													flex-direction: column;
+													gap: 6px;
+												"
+											>
+												<div class="detail-fix-label">
+													Fix — add module map to CLAUDE.md
+												</div>
+												<div class="detail-code-block">
+													<div class="detail-code-bar">
+														<span class="detail-code-filename"
+															>CLAUDE.md — Architecture section</span
+														>
+														<button
+															class="copy-btn"
+															onclick="copyCode(this, 'code-ratio')"
+															aria-label="Copy module map snippet"
+														>
+															<svg
+																width="11"
+																height="11"
+																viewBox="0 0 16 16"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.8"
+																aria-hidden="true"
+															>
+																<rect
+																	x="5"
+																	y="5"
+																	width="9"
+																	height="9"
+																	rx="1.5"
+																/>
+																<path
+																	d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															Copy
+														</button>
+													</div>
+													<pre
+														class="detail-code-pre"
+														id="code-ratio"
+													><span class="code-heading">## Module Map</span>
+
+<span class="code-comment"># Where to find things — reduces exploratory reads</span>
+- Tauri commands   → <span class="code-str">src-tauri/src/commands/</span>
+- DB schema        → <span class="code-str">src-tauri/src/schema.rs</span>
+- Frontend stores  → <span class="code-str">src/lib/stores/</span>
+- Shared types     → <span class="code-str">src/lib/types/</span>
+- Mock data        → <span class="code-str">src/lib/tauri_mock_data.ts</span>
+- Components       → <span class="code-str">src/lib/components/</span></pre>
+												</div>
+											</div>
+											<div class="detail-actions">
+												<button
+													class="gk-btn gk-btn-secondary gk-btn-sm"
+													onclick="dismissFinding('finding-3')"
+													aria-label="Mark as resolved"
+												>
+													Mark resolved
+												</button>
+												<button class="gk-btn gk-btn-ghost gk-btn-sm">
+													Snooze
+												</button>
+											</div>
+										</div>
+									</li>
+
+									<!-- ══ 4. Unused MCP servers — MEDIUM ══ -->
+									<li class="finding-item" id="finding-4">
+										<div
+											class="cb-finding is-med"
+											role="button"
+											tabindex="0"
+											aria-expanded="false"
+											aria-controls="detail-4"
+											onclick="toggleFinding('finding-4')"
+											onkeydown="handleFindingKey(event, 'finding-4')"
+										>
+											<span class="finding-num" aria-hidden="true">04</span>
+											<span
+												class="finding-dot is-med"
+												aria-label="Medium severity"
+												role="img"
+											></span>
+											<div class="finding-content">
+												<span class="finding-title"
+													>Unused MCP servers</span
+												>
+												<span class="finding-summary"
+													>2 configured servers haven't been invoked in
+													14+ days — still consume context on init</span
+												>
+											</div>
+											<div class="finding-meta">
+												<div class="finding-savings">
+													<span class="savings-tokens">2 servers</span>
+													<span class="savings-cost">~180 tok/init</span>
+												</div>
+												<span
+													class="finding-severity-badge is-med"
+													aria-label="Medium priority"
+													>MED</span
+												>
+												<svg
+													class="finding-chevron"
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													aria-hidden="true"
+												>
+													<path
+														d="M6 4l4 4-4 4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</div>
+										</div>
+										<div
+											class="finding-detail is-med-border"
+											id="detail-4"
+											role="region"
+											aria-label="Unused MCP servers — detail"
+										>
+											<p class="detail-explanation">
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>mcp-server-postgres</code
+												>
+												and
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>mcp-linear</code
+												>
+												are listed in your MCP config but have zero
+												invocations over the past 14 days. Each server's
+												tool list is injected into every session's system
+												prompt, adding ~180 tokens of tool definitions even
+												when unused.
+											</p>
+											<div class="detail-stats">
+												<div class="detail-stat">
+													<span class="detail-stat-label">Last used</span>
+													<span
+														class="detail-stat-value"
+														style="
+															font-size: 12px;
+															color: var(--foreground-muted);
+														"
+														>14+ days ago</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Context overhead</span
+													>
+													<span class="detail-stat-value is-warning"
+														>~180 tok</span
+													>
+												</div>
+											</div>
+											<div
+												style="
+													display: flex;
+													flex-direction: column;
+													gap: 6px;
+												"
+											>
+												<div class="detail-fix-label">
+													Fix — comment out in .mcp.json
+												</div>
+												<div class="detail-code-block">
+													<div class="detail-code-bar">
+														<span class="detail-code-filename"
+															>.mcp.json (project scope)</span
+														>
+														<button
+															class="copy-btn"
+															onclick="copyCode(this, 'code-mcp')"
+															aria-label="Copy MCP config snippet"
+														>
+															<svg
+																width="11"
+																height="11"
+																viewBox="0 0 16 16"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.8"
+																aria-hidden="true"
+															>
+																<rect
+																	x="5"
+																	y="5"
+																	width="9"
+																	height="9"
+																	rx="1.5"
+																/>
+																<path
+																	d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															Copy
+														</button>
+													</div>
+													<pre class="detail-code-pre" id="code-mcp">{
+  <span class="code-key">"mcpServers"</span>: {
+    <span class="code-comment">// Remove or disable unused servers:</span>
+    <span class="code-comment">// "mcp-server-postgres": { ... },</span>
+    <span class="code-comment">// "mcp-linear": { ... },</span>
+
+    <span class="code-key">"context7"</span>: { <span class="code-key">"command"</span>: <span class="code-str">"npx"</span>, <span class="code-key">"args"</span>: [<span class="code-str">"@context7/mcp"</span>] },
+    <span class="code-key">"svelte"</span>:   { <span class="code-key">"command"</span>: <span class="code-str">"npx"</span>, <span class="code-key">"args"</span>: [<span class="code-str">"svelte-mcp"</span>] }
+  }
+}</pre>
+												</div>
+											</div>
+											<div class="detail-actions">
+												<button
+													class="gk-btn gk-btn-secondary gk-btn-sm"
+													onclick="dismissFinding('finding-4')"
+													aria-label="Mark as resolved"
+												>
+													Mark resolved
+												</button>
+												<button class="gk-btn gk-btn-ghost gk-btn-sm">
+													Snooze
+												</button>
+											</div>
+										</div>
+									</li>
+
+									<!-- ══ 5. Bloated CLAUDE.md — MEDIUM ══ -->
+									<li class="finding-item" id="finding-5">
+										<div
+											class="cb-finding is-med"
+											role="button"
+											tabindex="0"
+											aria-expanded="false"
+											aria-controls="detail-5"
+											onclick="toggleFinding('finding-5')"
+											onkeydown="handleFindingKey(event, 'finding-5')"
+										>
+											<span class="finding-num" aria-hidden="true">05</span>
+											<span
+												class="finding-dot is-med"
+												aria-label="Medium severity"
+												role="img"
+											></span>
+											<div class="finding-content">
+												<span class="finding-title">Bloated CLAUDE.md</span>
+												<span class="finding-summary"
+													>847 lines — top 10% of workspaces. Move stable
+													docs to @-referenced sub-files</span
+												>
+											</div>
+											<div class="finding-meta">
+												<div class="finding-savings">
+													<span class="savings-tokens">847 lines</span>
+													<span class="savings-cost">~$0.02/session</span>
+												</div>
+												<span
+													class="finding-severity-badge is-med"
+													aria-label="Medium priority"
+													>MED</span
+												>
+												<svg
+													class="finding-chevron"
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													aria-hidden="true"
+												>
+													<path
+														d="M6 4l4 4-4 4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</div>
+										</div>
+										<div
+											class="finding-detail is-med-border"
+											id="detail-5"
+											role="region"
+											aria-label="Bloated CLAUDE.md — detail"
+										>
+											<p class="detail-explanation">
+												Your
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>CLAUDE.md</code
+												>
+												is 847 lines (~21 KB). Sections like "Design System
+												Reference" and "API Endpoint Catalogue" are loaded
+												every session even for unrelated tasks. Use Claude
+												Code's
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>@path/to/file</code
+												>
+												import syntax to split stable reference content into
+												on-demand sub-files.
+											</p>
+											<div class="detail-stats">
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Current size</span
+													>
+													<span class="detail-stat-value is-warning"
+														>847 lines</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Recommended max</span
+													>
+													<span
+														class="detail-stat-value"
+														style="color: var(--status-success)"
+														>≤300 lines</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Reducible sections</span
+													>
+													<span class="detail-stat-value">4</span>
+												</div>
+											</div>
+											<div
+												style="
+													display: flex;
+													flex-direction: column;
+													gap: 6px;
+												"
+											>
+												<div class="detail-fix-label">
+													Fix — split into sub-files using @ imports
+												</div>
+												<div class="detail-code-block">
+													<div class="detail-code-bar">
+														<span class="detail-code-filename"
+															>CLAUDE.md — replace large
+															sections</span
+														>
+														<button
+															class="copy-btn"
+															onclick="copyCode(this, 'code-split')"
+															aria-label="Copy split pattern"
+														>
+															<svg
+																width="11"
+																height="11"
+																viewBox="0 0 16 16"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.8"
+																aria-hidden="true"
+															>
+																<rect
+																	x="5"
+																	y="5"
+																	width="9"
+																	height="9"
+																	rx="1.5"
+																/>
+																<path
+																	d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															Copy
+														</button>
+													</div>
+													<pre
+														class="detail-code-pre"
+														id="code-split"
+													><span class="code-comment"># Instead of inlining large reference sections:</span>
+<span class="code-comment"># @docs/design-system-reference.md   (move 280 lines here)</span>
+<span class="code-comment"># @docs/api-catalogue.md             (move 190 lines here)</span>
+<span class="code-comment"># @docs/tauri-command-reference.md   (move 140 lines here)</span>
+
+<span class="code-heading">## Design System</span>
+See <span class="code-added">@docs/design-system-reference.md</span>
+
+<span class="code-heading">## API Reference</span>
+See <span class="code-added">@docs/api-catalogue.md</span></pre>
+												</div>
+											</div>
+											<div class="detail-actions">
+												<button
+													class="gk-btn gk-btn-secondary gk-btn-sm"
+													onclick="dismissFinding('finding-5')"
+													aria-label="Mark as resolved"
+												>
+													Mark resolved
+												</button>
+												<button class="gk-btn gk-btn-ghost gk-btn-sm">
+													Snooze
+												</button>
+											</div>
+										</div>
+									</li>
+
+									<!-- ══ 6. Bash output limit — LOW ══ -->
+									<li class="finding-item" id="finding-6">
+										<div
+											class="cb-finding is-low"
+											role="button"
+											tabindex="0"
+											aria-expanded="false"
+											aria-controls="detail-6"
+											onclick="toggleFinding('finding-6')"
+											onkeydown="handleFindingKey(event, 'finding-6')"
+										>
+											<span class="finding-num" aria-hidden="true">06</span>
+											<span
+												class="finding-dot is-low"
+												aria-label="Low severity"
+												role="img"
+											></span>
+											<div class="finding-content">
+												<span class="finding-title"
+													>Bash output limit not set</span
+												>
+												<span class="finding-summary"
+													>Verbose commands (pnpm install, cargo build)
+													dump full logs — truncation would save
+													tokens</span
+												>
+											</div>
+											<div class="finding-meta">
+												<div class="finding-savings">
+													<span class="savings-tokens">~1,100 tok</span>
+													<span class="savings-cost">~$0.01/session</span>
+												</div>
+												<span
+													class="finding-severity-badge is-low"
+													aria-label="Low priority"
+													>LOW</span
+												>
+												<svg
+													class="finding-chevron"
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													aria-hidden="true"
+												>
+													<path
+														d="M6 4l4 4-4 4"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+													/>
+												</svg>
+											</div>
+										</div>
+										<div
+											class="finding-detail is-low-border"
+											id="detail-6"
+											role="region"
+											aria-label="Bash output limit — detail"
+										>
+											<p class="detail-explanation">
+												Claude Code allows setting a
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>bash_output_limit</code
+												>
+												in project settings to cap verbose command output.
+												Commands like
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>pnpm install</code
+												>
+												and
+												<code
+													style="
+														font-family: var(--font-mono);
+														font-size: 11.5px;
+													"
+													>cargo build</code
+												>
+												currently emit full logs (up to 40 KB) even when
+												only the final line matters.
+											</p>
+											<div class="detail-stats">
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Avg log dump/session</span
+													>
+													<span class="detail-stat-value"
+														>~4,400 chars</span
+													>
+												</div>
+												<div class="detail-stat">
+													<span class="detail-stat-label"
+														>Saveable with limit</span
+													>
+													<span
+														class="detail-stat-value"
+														style="color: var(--status-success)"
+														>~80%</span
+													>
+												</div>
+											</div>
+											<div
+												style="
+													display: flex;
+													flex-direction: column;
+													gap: 6px;
+												"
+											>
+												<div class="detail-fix-label">
+													Fix — add output limit instruction
+												</div>
+												<div class="detail-code-block">
+													<div class="detail-code-bar">
+														<span class="detail-code-filename"
+															>CLAUDE.md — add to Commands
+															section</span
+														>
+														<button
+															class="copy-btn"
+															onclick="copyCode(this, 'code-bash')"
+															aria-label="Copy bash limit instruction"
+														>
+															<svg
+																width="11"
+																height="11"
+																viewBox="0 0 16 16"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.8"
+																aria-hidden="true"
+															>
+																<rect
+																	x="5"
+																	y="5"
+																	width="9"
+																	height="9"
+																	rx="1.5"
+																/>
+																<path
+																	d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"
+																	stroke-linecap="round"
+																/>
+															</svg>
+															Copy
+														</button>
+													</div>
+													<pre
+														class="detail-code-pre"
+														id="code-bash"
+													><span class="code-heading">## Command Output</span>
+
+For verbose commands, pipe through tail to limit output:
+  <span class="code-added">pnpm install 2>&1 | tail -20</span>
+  <span class="code-added">cargo build 2>&1 | tail -30</span>
+
+Only show full output when diagnosing errors.</pre>
+												</div>
+											</div>
+											<div class="detail-actions">
+												<button
+													class="gk-btn gk-btn-secondary gk-btn-sm"
+													onclick="dismissFinding('finding-6')"
+													aria-label="Mark as resolved"
+												>
+													Mark resolved
+												</button>
+												<button class="gk-btn gk-btn-ghost gk-btn-sm">
+													Snooze
+												</button>
+											</div>
+										</div>
+									</li>
+								</ol>
+							</div>
+
+							<!-- Status bar -->
+							<div class="cb-statusbar" role="contentinfo" aria-label="Status bar">
+								<span class="cb-key">
+									<kbd class="cb-keycap">↵</kbd>
+									expand
+								</span>
+								<span class="cb-key">
+									<kbd class="cb-keycap">R</kbd>
+									re-scan
+								</span>
+								<span class="cb-key">
+									<kbd class="cb-keycap">⌘</kbd>
+									<kbd class="cb-keycap">C</kbd>
+									copy fix
+								</span>
+								<span style="margin-left: auto; color: var(--foreground-subtle)">
+									grovekeeper · optimize
+								</span>
+							</div>
+						</div>
+						<!-- /optimize-view -->
+					</main>
+				</div>
+				<!-- /app-frame -->
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
+
+		<script>
+			function toggleFinding(id) {
+				const item = document.getElementById(id);
+				if (!item) {
+					return;
+				}
+				const wasOpen = item.classList.contains('is-open');
+				const header = item.querySelector('[role="button"]');
+
+				if (wasOpen) {
+					item.classList.remove('is-open');
+					if (header) {
+						header.setAttribute('aria-expanded', 'false');
+					}
+				} else {
+					item.classList.add('is-open');
+					if (header) {
+						header.setAttribute('aria-expanded', 'true');
+					}
+				}
+			}
+
+			function handleFindingKey(event, id) {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					toggleFinding(id);
+				}
+			}
+
+			function copyCode(button, codeId) {
+				const codeEl = document.getElementById(codeId);
+				if (!codeEl) {
+					return;
+				}
+				const text = codeEl.innerText;
+
+				navigator.clipboard
+					.writeText(text)
+					.then(function () {
+						button.classList.add('is-copied');
+						button.innerHTML =
+							'<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8l3.5 3.5L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied';
+
+						setTimeout(function () {
+							button.classList.remove('is-copied');
+							button.innerHTML =
+								'<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M4 11H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1" stroke-linecap="round"/></svg> Copy';
+						}, 1800);
+					})
+					.catch(function () {
+						// Fallback for environments without clipboard API
+						button.textContent = 'Copied';
+						setTimeout(function () {
+							button.textContent = 'Copy';
+						}, 1800);
+					});
+			}
+
+			function dismissFinding(id) {
+				const item = document.getElementById(id);
+				if (!item) {
+					return;
+				}
+				item.style.transition = 'opacity 220ms ease, transform 220ms ease';
+				item.style.opacity = '0';
+				item.style.transform = 'translateX(8px)';
+				setTimeout(function () {
+					item.style.display = 'none';
+					updateScoreAfterDismiss();
+				}, 220);
+			}
+
+			function updateScoreAfterDismiss() {
+				// Count remaining visible items by severity
+				const items = document.querySelectorAll('.finding-item[id]');
+				let high = 0;
+				let med = 0;
+				let low = 0;
+
+				items.forEach(function (item) {
+					if (item.style.display === 'none') {
+						return;
+					}
+					const dot = item.querySelector('.finding-dot');
+					if (!dot) {
+						return;
+					}
+					if (dot.classList.contains('is-high')) {
+						high++;
+					} else if (dot.classList.contains('is-med')) {
+						med++;
+					} else if (dot.classList.contains('is-low')) {
+						low++;
+					}
+				});
+
+				// Rough score improvement heuristic
+				const baseScore = 58;
+				const originalHigh = 3;
+				const originalMed = 2;
+				const originalLow = 1;
+				const dismissed =
+					(originalHigh - high) * 12 + (originalMed - med) * 6 + (originalLow - low) * 3;
+				const newScore = Math.min(100, baseScore + dismissed);
+
+				const scoreEl = document.querySelector('.score-value');
+				if (scoreEl) {
+					scoreEl.innerHTML =
+						newScore +
+						'<span style="font-size:12px;font-weight:400;color:var(--foreground-subtle);margin-left:1px;">/100</span>';
+				}
+
+				// Update grade
+				const gradeEl = document.querySelector('.score-grade-letter');
+				const gradeCircle = document.querySelector('.score-grade');
+				if (gradeEl && gradeCircle) {
+					let grade, gradeColor, bgColor, borderColor;
+					if (newScore >= 90) {
+						grade = 'A';
+						gradeColor = 'oklch(0.700 0.150 145)';
+						bgColor = 'color-mix(in oklch, oklch(0.700 0.150 145) 20%, transparent)';
+						borderColor =
+							'color-mix(in oklch, oklch(0.700 0.150 145) 50%, transparent)';
+					} else if (newScore >= 75) {
+						grade = 'B';
+						gradeColor = 'oklch(0.690 0.098 132)';
+						bgColor = 'color-mix(in oklch, oklch(0.690 0.098 132) 20%, transparent)';
+						borderColor =
+							'color-mix(in oklch, oklch(0.690 0.098 132) 50%, transparent)';
+					} else if (newScore >= 58) {
+						grade = 'C';
+						gradeColor = 'oklch(0.840 0.130 78)';
+						bgColor = 'color-mix(in oklch, oklch(0.595 0.160 48) 22%, transparent)';
+						borderColor = 'color-mix(in oklch, oklch(0.595 0.160 48) 55%, transparent)';
+					} else {
+						grade = 'D';
+						gradeColor = 'oklch(0.640 0.205 25)';
+						bgColor = 'color-mix(in oklch, oklch(0.640 0.205 25) 20%, transparent)';
+						borderColor = 'color-mix(in oklch, oklch(0.640 0.205 25) 50%, transparent)';
+					}
+					gradeEl.textContent = grade;
+					gradeEl.style.color = gradeColor;
+					gradeCircle.style.background = bgColor;
+					gradeCircle.style.borderColor = borderColor;
+				}
+
+				// Update breakdown counts
+				const items2 = document.querySelectorAll('.score-breakdown-item');
+				if (items2.length >= 3) {
+					items2[0].lastChild.textContent = ' ' + high + ' high';
+					items2[1].lastChild.textContent = ' ' + med + ' medium';
+					items2[2].lastChild.textContent = ' ' + low + ' low';
+				}
+
+				// Update tab badge
+				const tabBadge = document.querySelector('.view-tab-badge');
+				if (tabBadge) {
+					if (high === 0) {
+						tabBadge.style.display = 'none';
+					} else {
+						tabBadge.textContent = high;
+						tabBadge.setAttribute('aria-label', high + ' high priority findings');
+					}
+				}
+			}
+		</script>
+	</body>
+</html>

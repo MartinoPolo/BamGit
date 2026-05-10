@@ -1,0 +1,3122 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Issue Accordion Row — Variant C: Grouped Sections</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ─────────────────────────────────────────────────────────────
+   INLINED tokens.css — Grovekeeper design tokens
+   ───────────────────────────────────────────────────────────── */
+
+
+			/* Dark theme — the primary mode for a Tauri dev tool */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
+
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* Grovekeeper component primitives */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					border-color var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard),
+					transform var(--duration-1) var(--ease-standard),
+					box-shadow var(--duration-2) var(--ease-standard);
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.38;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+				border-color: transparent;
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-ghost:active {
+				background: var(--surface-3);
+			}
+
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 8px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+
+			/* Badge */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-mono {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: var(--status-warning);
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+
+			/* Type scale */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
+
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+
+			/* Animations */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.4;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			/* Chevron icon rotation */
+			@keyframes chevron-open {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(90deg);
+				}
+			}
+			@keyframes chevron-close {
+				from {
+					transform: rotate(90deg);
+				}
+				to {
+					transform: rotate(0deg);
+				}
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   PAGE CHROME
+   ───────────────────────────────────────────────────────────── */
+			body {
+				margin: 0;
+				padding: 0;
+				background: #0e1210;
+			}
+
+			.page-shell {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 40px 24px 64px;
+				background: var(--background);
+			}
+
+			.variant-label {
+				align-self: flex-start;
+				margin-bottom: 32px;
+				max-width: 840px;
+				width: 100%;
+			}
+
+			.variant-label h2 {
+				font-family: var(--font-sans);
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				margin: 0 0 6px 0;
+			}
+
+			.variant-label p {
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				margin: 0;
+				line-height: var(--leading-relaxed);
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   ISSUES PANEL CONTAINER
+   ───────────────────────────────────────────────────────────── */
+			.issues-panel {
+				width: 100%;
+				max-width: 960px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				box-shadow:
+					0 4px 16px rgba(10, 18, 12, 0.28),
+					0 1px 3px rgba(10, 18, 12, 0.18);
+			}
+
+			.context-shell {
+				opacity: 0.4;
+				pointer-events: none;
+			}
+
+			/* Panel header — tab bar */
+			.panel-header {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				padding: 0 16px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+				height: 40px;
+				flex-shrink: 0;
+			}
+
+			.panel-tab {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 0 12px;
+				height: 40px;
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+				border-bottom: 2px solid transparent;
+				margin-bottom: -1px;
+				transition: color var(--duration-2) var(--ease-standard);
+			}
+			.panel-tab:hover {
+				color: var(--foreground-muted);
+			}
+			.panel-tab.is-active {
+				color: var(--foreground);
+				border-bottom-color: var(--primary);
+			}
+
+			.panel-tab-count {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 18px;
+				min-width: 18px;
+				padding: 0 5px;
+				font-size: 10.5px;
+				font-family: var(--font-mono);
+				font-weight: var(--weight-medium);
+				border-radius: var(--radius-full);
+				background: var(--surface-3);
+				color: var(--foreground-muted);
+			}
+			.panel-tab.is-active .panel-tab-count {
+				background: color-mix(in oklch, var(--primary) 18%, transparent);
+				color: var(--primary);
+			}
+
+			.panel-header-spacer {
+				flex: 1;
+			}
+
+			.panel-header-actions {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			/* Issues list scroll area */
+			.issues-list {
+				overflow-y: auto;
+				max-height: 640px;
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   GROUP SECTION HEADERS (sticky)
+   ───────────────────────────────────────────────────────────── */
+			.group-header {
+				position: sticky;
+				top: 0;
+				z-index: var(--z-sticky);
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 0 12px 0 16px;
+				height: 30px;
+				border-bottom: 1px solid var(--border);
+				/* Each group gets its own bg color set inline */
+				backdrop-filter: blur(8px);
+				user-select: none;
+			}
+
+			.group-header-bar {
+				width: 3px;
+				height: 14px;
+				border-radius: 2px;
+				flex-shrink: 0;
+				/* color set inline */
+			}
+
+			.group-header-name {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				/* color set inline */
+			}
+
+			.group-header-count {
+				font-size: var(--text-2xs);
+				font-family: var(--font-mono);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-subtle);
+				background: color-mix(in oklch, var(--foreground) 8%, transparent);
+				border-radius: var(--radius-full);
+				padding: 0 6px;
+				height: 16px;
+				display: inline-flex;
+				align-items: center;
+			}
+
+			.group-header-spacer {
+				flex: 1;
+			}
+
+			.group-header-collapse {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 20px;
+				height: 20px;
+				border-radius: var(--radius-xs);
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-standard),
+					color var(--duration-2) var(--ease-standard);
+				padding: 0;
+			}
+			.group-header-collapse:hover {
+				background: color-mix(in oklch, var(--foreground) 8%, transparent);
+				color: var(--foreground-muted);
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   ISSUE ROW — COLLAPSED (40-44px)
+   ───────────────────────────────────────────────────────────── */
+			.issue-row {
+				display: flex;
+				align-items: center;
+				gap: 0;
+				min-height: 42px;
+				padding: 0 8px 0 16px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				cursor: pointer;
+				transition: background var(--duration-2) var(--ease-standard);
+				position: relative;
+			}
+			.issue-row:last-child {
+				border-bottom: none;
+			}
+			.issue-row:hover {
+				background: var(--surface-hover);
+			}
+			.issue-row.is-expanded {
+				background: var(--surface-2);
+			}
+			.issue-row.is-expanded:hover {
+				background: var(--surface-2);
+			}
+
+			/* Left accent stripe — matches priority color */
+			.issue-row::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 8px;
+				bottom: 8px;
+				width: 2px;
+				border-radius: 0 1px 1px 0;
+				background: var(--row-accent, transparent);
+				opacity: 0.6;
+				transition: opacity var(--duration-2) var(--ease-standard);
+			}
+			.issue-row:hover::before {
+				opacity: 1;
+			}
+			.issue-row.is-expanded::before {
+				opacity: 1;
+			}
+
+			/* ── Row layout columns ──────────────────────────────────── */
+			.row-priority-icon {
+				width: 20px;
+				height: 24px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				margin-right: 8px;
+			}
+
+			.row-prd-num {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				width: 34px;
+				flex-shrink: 0;
+				letter-spacing: 0;
+			}
+
+			.row-issue-num {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				width: 40px;
+				flex-shrink: 0;
+				letter-spacing: -0.01em;
+			}
+
+			.row-name {
+				flex: 1;
+				min-width: 0;
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				padding-right: 12px;
+				letter-spacing: var(--tracking-snug);
+			}
+
+			.row-badges {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				margin-right: 8px;
+				flex-shrink: 0;
+			}
+
+			.row-session-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 10.5px;
+				font-weight: var(--weight-medium);
+				border-radius: var(--radius-full);
+				border: 1px solid;
+				white-space: nowrap;
+				flex-shrink: 0;
+				margin-right: 8px;
+				font-family: var(--font-sans);
+			}
+
+			.session-dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+
+			/* Session states */
+			.chip-running {
+				background: color-mix(in oklch, var(--session-running) 12%, transparent);
+				color: var(--session-running);
+				border-color: color-mix(in oklch, var(--session-running) 28%, transparent);
+			}
+			.chip-running .session-dot {
+				animation: gk-pulse 1.4s ease-in-out infinite;
+			}
+
+			.chip-needs-input {
+				background: color-mix(in oklch, var(--session-needs-input) 12%, transparent);
+				color: var(--session-needs-input);
+				border-color: color-mix(in oklch, var(--session-needs-input) 28%, transparent);
+			}
+
+			.chip-needs-review {
+				background: color-mix(in oklch, var(--session-needs-review) 12%, transparent);
+				color: var(--session-needs-review);
+				border-color: color-mix(in oklch, var(--session-needs-review) 28%, transparent);
+			}
+
+			.chip-idle {
+				background: color-mix(in oklch, var(--session-idle) 10%, transparent);
+				color: var(--foreground-subtle);
+				border-color: var(--border);
+			}
+
+			.chip-paused {
+				background: color-mix(in oklch, var(--session-paused) 10%, transparent);
+				color: var(--foreground-subtle);
+				border-color: var(--border);
+			}
+
+			.row-actions {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+				flex-shrink: 0;
+				opacity: 0;
+				transition: opacity var(--duration-2) var(--ease-standard);
+			}
+			.issue-row:hover .row-actions,
+			.issue-row.is-expanded .row-actions {
+				opacity: 1;
+			}
+
+			.row-chevron {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 24px;
+				height: 24px;
+				margin-left: 4px;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+				transition:
+					color var(--duration-2) var(--ease-standard),
+					transform var(--duration-3) var(--ease-out);
+			}
+			.issue-row:hover .row-chevron {
+				color: var(--foreground-muted);
+			}
+			.issue-row.is-expanded .row-chevron {
+				transform: rotate(90deg);
+				color: var(--primary);
+			}
+
+			/* SVG icons inline */
+			.icon {
+				display: block;
+				flex-shrink: 0;
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   EXPANDED SECTION
+   ───────────────────────────────────────────────────────────── */
+			.expanded-body {
+				background: var(--surface-2);
+				border-bottom: 1px solid var(--border);
+				padding: 16px 16px 16px 64px;
+				display: grid;
+				grid-template-columns: 120px 1fr;
+				gap: 16px;
+				align-items: start;
+			}
+
+			/* Tree thumbnail */
+			.tree-thumb {
+				width: 112px;
+				height: 112px;
+				border-radius: var(--radius-md);
+				border: 1px solid var(--border);
+				background: linear-gradient(
+					160deg,
+					oklch(0.175 0.025 155) 0%,
+					oklch(0.155 0.02 150) 100%
+				);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				flex-shrink: 0;
+				position: relative;
+			}
+
+			.tree-svg-wrap {
+				width: 80px;
+				height: 96px;
+			}
+
+			/* Expanded details grid */
+			.expanded-details {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+				min-width: 0;
+			}
+
+			.detail-row {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				min-width: 0;
+			}
+
+			.detail-label {
+				font-size: var(--text-xs);
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.02em;
+				width: 88px;
+				flex-shrink: 0;
+				padding-top: 1px;
+			}
+
+			.detail-value {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 5px;
+				flex: 1;
+				min-width: 0;
+			}
+
+			/* GitHub label pills */
+			.gh-label {
+				display: inline-flex;
+				align-items: center;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: var(--radius-full);
+				font-size: 10.5px;
+				font-weight: var(--weight-medium);
+				font-family: var(--font-sans);
+				border: 1px solid;
+			}
+
+			/* Dev server status row */
+			.dev-server-status {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+			}
+
+			.dev-server-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			/* Expanded action row */
+			.expanded-actions {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding-top: 4px;
+				flex-wrap: wrap;
+			}
+
+			/* Full-width action area below grid */
+			.expanded-footer {
+				background: var(--surface-2);
+				border-bottom: 1px solid var(--border);
+				padding: 10px 16px 14px 64px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				border-top: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   EMPTY STATE (within group)
+   ───────────────────────────────────────────────────────────── */
+			.group-empty {
+				padding: 12px 16px;
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-style: italic;
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   PANEL FOOTER / STATUS BAR
+   ───────────────────────────────────────────────────────────── */
+			.panel-footer {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				padding: 0 16px;
+				height: 32px;
+				border-top: 1px solid var(--border);
+				background: var(--surface-2);
+				font-size: 10.5px;
+				font-family: var(--font-mono);
+				color: var(--foreground-subtle);
+			}
+
+			.footer-dot {
+				width: 4px;
+				height: 4px;
+				border-radius: 50%;
+				background: var(--foreground-subtle);
+				opacity: 0.4;
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   PRIORITY ICON VARIANTS
+   ───────────────────────────────────────────────────────────── */
+			.priority-critical {
+				color: var(--priority-top);
+			}
+			.priority-high {
+				color: var(--priority-high);
+			}
+			.priority-medium {
+				color: var(--priority-medium);
+			}
+			.priority-low {
+				color: var(--priority-low);
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   GROUP-SPECIFIC HEADER THEMING
+   ───────────────────────────────────────────────────────────── */
+			.group-critical {
+				background: color-mix(in oklch, var(--priority-top) 9%, var(--surface-2));
+				border-top: 1px solid color-mix(in oklch, var(--priority-top) 18%, var(--border));
+			}
+			.group-critical .group-header-bar {
+				background: var(--priority-top);
+			}
+			.group-critical .group-header-name {
+				color: color-mix(in oklch, var(--priority-top) 85%, var(--foreground));
+			}
+
+			.group-high {
+				background: color-mix(in oklch, var(--priority-high) 8%, var(--surface-2));
+				border-top: 1px solid color-mix(in oklch, var(--priority-high) 16%, var(--border));
+			}
+			.group-high .group-header-bar {
+				background: var(--priority-high);
+			}
+			.group-high .group-header-name {
+				color: color-mix(in oklch, var(--priority-high) 85%, var(--foreground));
+			}
+
+			.group-medium {
+				background: color-mix(in oklch, var(--priority-medium) 7%, var(--surface-2));
+				border-top: 1px solid color-mix(in oklch, var(--priority-medium) 15%, var(--border));
+			}
+			.group-medium .group-header-bar {
+				background: var(--priority-medium);
+			}
+			.group-medium .group-header-name {
+				color: color-mix(in oklch, var(--priority-medium) 80%, var(--foreground));
+			}
+
+			.group-low {
+				background: color-mix(in oklch, var(--priority-low) 8%, var(--surface-2));
+				border-top: 1px solid color-mix(in oklch, var(--priority-low) 16%, var(--border));
+			}
+			.group-low .group-header-bar {
+				background: var(--priority-low);
+			}
+			.group-low .group-header-name {
+				color: color-mix(in oklch, var(--priority-low) 85%, var(--foreground));
+			}
+
+			/* Remove top border from first group */
+			.group-section:first-child .group-header {
+				border-top: none;
+			}
+
+			/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────── */
+			@media (max-width: 600px) {
+				.row-prd-num {
+					display: none;
+				}
+				.row-badges {
+					display: none;
+				}
+				.expanded-body {
+					grid-template-columns: 1fr;
+					padding-left: 16px;
+				}
+				.tree-thumb {
+					width: 80px;
+					height: 80px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-shell">
+				<!-- Variant label -->
+				<div class="variant-label">
+					<span class="gk-eyebrow" style="display: block; margin-bottom: 8px"
+						>Issue Accordion Row &nbsp;/&nbsp; Variant C</span
+					>
+					<h2>Grouped Sections</h2>
+					<p>
+						Rows grouped by priority with sticky section headers. Each header carries
+						its priority color, giving immediate triage orientation. Individual rows
+						stay minimal — the grouping provides the visual hierarchy.
+					</p>
+				</div>
+
+				<!-- Issues panel -->
+				<div class="issues-panel">
+					<div
+						class="gk-eyebrow"
+						style="color: var(--foreground-subtle); margin-bottom: 4px; font-size: 9px"
+					>
+						↓ PARENT CONTEXT (bottom panel) — not part of this design
+					</div>
+					<div class="context-shell">
+						<!-- Tab bar header -->
+						<div class="panel-header">
+							<button class="panel-tab">
+								PRDs <span class="panel-tab-count">10</span>
+							</button>
+							<button class="panel-tab is-active">
+								Issues <span class="panel-tab-count">7</span>
+							</button>
+							<button class="panel-tab">
+								Sessions <span class="panel-tab-count">3</span>
+							</button>
+							<div class="panel-header-spacer"></div>
+							<div class="panel-header-actions">
+								<!-- Search -->
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Search issues"
+								>
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<circle
+											cx="7"
+											cy="7"
+											r="4.5"
+											stroke="currentColor"
+											stroke-width="1.4"
+										/>
+										<path
+											d="M10.5 10.5L13 13"
+											stroke="currentColor"
+											stroke-width="1.4"
+											stroke-linecap="round"
+										/>
+									</svg>
+								</button>
+								<!-- Filter -->
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+									title="Filter"
+								>
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M2 4h12M4 8h8M6 12h4"
+											stroke="currentColor"
+											stroke-width="1.4"
+											stroke-linecap="round"
+										/>
+									</svg>
+								</button>
+								<!-- New issue -->
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									title="New issue"
+									style="gap: 4px"
+								>
+									<svg
+										class="icon"
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M6 1v10M1 6h10"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										/>
+									</svg>
+									New
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- /.context-shell -->
+
+					<!-- Issues list -->
+					<div class="issues-list">
+						<!-- ════════════════════════════════════════════════════
+           GROUP: CRITICAL (1 issue)
+           ════════════════════════════════════════════════════ -->
+						<div class="group-section">
+							<div class="group-header group-critical">
+								<div class="group-header-bar"></div>
+								<span class="group-header-name">Critical</span>
+								<span class="group-header-count">1</span>
+								<div class="group-header-spacer"></div>
+								<button
+									class="group-header-collapse"
+									title="Collapse group"
+									aria-label="Collapse critical group"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 5l3 3 3-3"
+											stroke="currentColor"
+											stroke-width="1.3"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+							</div>
+
+							<!-- Issue #164 — expanded -->
+							<div
+								class="issue-row is-expanded"
+								style="--row-accent: var(--priority-top)"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="true"
+							>
+								<div
+									class="row-priority-icon priority-critical"
+									aria-label="Critical priority"
+								>
+									<!-- Flame icon -->
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M8 2C8 2 11 5 11 8.5a3 3 0 01-6 0C5 6.5 6.5 5.5 6.5 5.5S6 7 7 7.5C7.5 6 8 4 8 2z"
+											fill="currentColor"
+											opacity="0.9"
+										/>
+										<path
+											d="M6.5 10.5a1.5 1.5 0 003 0c0-1.2-.8-1.8-.8-1.8s-.2.9-.8 1.1C7.7 9 7 8 7 8s-.5 1.2-.5 2.5z"
+											fill="currentColor"
+											opacity="0.6"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-90</span>
+								<span class="row-issue-num">#164</span>
+								<span class="row-name"
+									>Session approval mechanism ignores tool-call queue on rapid
+									resubmit</span
+								>
+								<div class="row-badges">
+									<!-- PR open badge -->
+									<span class="gk-badge gk-badge-mono gk-badge-success">
+										<span class="gk-badge-dot"></span>
+										PR #812
+									</span>
+									<!-- Branch -->
+									<span class="gk-badge gk-badge-mono" style="font-size: 10px">
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 12 12"
+											fill="none"
+											style="flex-shrink: 0"
+											aria-hidden="true"
+										>
+											<circle
+												cx="3"
+												cy="3"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<circle
+												cx="3"
+												cy="9"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<circle
+												cx="9"
+												cy="3"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<path
+												d="M3 4.5v3M3 4.5C3 6.5 9 5.5 9 4.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+										fix/approval-queue
+									</span>
+								</div>
+								<!-- Session chip: needs-input -->
+								<span class="row-session-chip chip-needs-input">
+									<span class="session-dot"></span>
+									Needs Input
+								</span>
+								<!-- Action buttons (visible on hover/expanded) -->
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+
+							<!-- Expanded body for #164 -->
+							<div class="expanded-body">
+								<!-- Tree thumbnail -->
+								<div class="tree-thumb" aria-label="Workspace tree">
+									<!-- Inline SVG low-poly tree -->
+									<svg
+										class="tree-svg-wrap"
+										viewBox="0 0 80 96"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										aria-hidden="true"
+									>
+										<!-- Ground -->
+										<ellipse
+											cx="40"
+											cy="88"
+											rx="22"
+											ry="4"
+											fill="oklch(0.240 0.040 145)"
+											opacity="0.7"
+										/>
+										<!-- Trunk -->
+										<rect
+											x="35"
+											y="68"
+											width="10"
+											height="20"
+											rx="2"
+											fill="oklch(0.380 0.055 55)"
+										/>
+										<rect
+											x="37"
+											y="68"
+											width="4"
+											height="20"
+											fill="oklch(0.345 0.050 52)"
+											opacity="0.5"
+										/>
+										<!-- Canopy layers (low-poly feel) -->
+										<polygon
+											points="40,12 22,46 58,46"
+											fill="oklch(0.320 0.065 142)"
+										/>
+										<polygon
+											points="40,12 58,46 40,38"
+											fill="oklch(0.280 0.058 145)"
+											opacity="0.6"
+										/>
+										<polygon
+											points="40,22 18,54 62,54"
+											fill="oklch(0.345 0.072 140)"
+										/>
+										<polygon
+											points="40,22 62,54 40,44"
+											fill="oklch(0.300 0.062 143)"
+											opacity="0.55"
+										/>
+										<polygon
+											points="40,32 15,68 65,68"
+											fill="oklch(0.370 0.078 138)"
+										/>
+										<polygon
+											points="40,32 65,68 40,56"
+											fill="oklch(0.325 0.068 141)"
+											opacity="0.5"
+										/>
+										<!-- Highlight -->
+										<polygon
+											points="40,14 40,38 26,42"
+											fill="oklch(0.440 0.075 135)"
+											opacity="0.35"
+										/>
+										<polygon
+											points="40,24 40,46 28,50"
+											fill="oklch(0.440 0.075 135)"
+											opacity="0.3"
+										/>
+									</svg>
+								</div>
+
+								<!-- Details -->
+								<div class="expanded-details">
+									<div class="detail-row">
+										<span class="detail-label">gh-labels</span>
+										<div class="detail-value">
+											<span
+												class="gh-label"
+												style="
+													background: color-mix(
+														in oklch,
+														oklch(0.62 0.205 25) 14%,
+														transparent
+													);
+													color: var(--status-danger);
+													border-color: color-mix(
+														in oklch,
+														oklch(0.62 0.205 25) 28%,
+														transparent
+													);
+												"
+												>bug</span
+											>
+											<span
+												class="gh-label"
+												style="
+													background: color-mix(
+														in oklch,
+														var(--priority-top) 12%,
+														transparent
+													);
+													color: var(--priority-top);
+													border-color: color-mix(
+														in oklch,
+														var(--priority-top) 25%,
+														transparent
+													);
+												"
+												>priority: critical</span
+											>
+											<span
+												class="gh-label"
+												style="
+													background: color-mix(
+														in oklch,
+														var(--azure-400) 12%,
+														transparent
+													);
+													color: var(--azure-300);
+													border-color: color-mix(
+														in oklch,
+														var(--azure-400) 25%,
+														transparent
+													);
+												"
+												>session-provider</span
+											>
+											<span
+												class="gh-label"
+												style="
+													background: color-mix(
+														in oklch,
+														var(--plum-500) 12%,
+														transparent
+													);
+													color: var(--plum-300);
+													border-color: color-mix(
+														in oklch,
+														var(--plum-500) 25%,
+														transparent
+													);
+												"
+												>PRD-90</span
+											>
+										</div>
+									</div>
+
+									<div class="detail-row">
+										<span class="detail-label">dev-server</span>
+										<div class="detail-value">
+											<div class="dev-server-status">
+												<span
+													class="dev-server-dot"
+													style="
+														background: var(--status-success);
+														box-shadow: 0 0 5px
+															color-mix(
+																in oklch,
+																var(--status-success) 60%,
+																transparent
+															);
+													"
+												></span>
+												<span
+													>Running on
+													<code
+														style="
+															font-family: var(--font-mono);
+															font-size: 10.5px;
+															color: var(--foreground-muted);
+														"
+														>localhost:1420</code
+													></span
+												>
+												<span
+													class="gk-badge gk-badge-mono gk-badge-success"
+													style="margin-left: 4px"
+													>HMR</span
+												>
+											</div>
+										</div>
+									</div>
+
+									<div class="detail-row">
+										<span class="detail-label">worktree</span>
+										<div class="detail-value">
+											<span
+												style="
+													font-family: var(--font-mono);
+													font-size: 10.5px;
+													color: var(--foreground-muted);
+												"
+												>../Grovekeeper-fix-approval-queue</span
+											>
+											<span
+												class="gk-badge gk-badge-mono"
+												style="font-size: 10px"
+											>
+												<svg
+													width="8"
+													height="8"
+													viewBox="0 0 12 12"
+													fill="none"
+													style="flex-shrink: 0"
+													aria-hidden="true"
+												>
+													<circle
+														cx="6"
+														cy="6"
+														r="2"
+														fill="currentColor"
+														opacity="0.6"
+													/>
+													<circle
+														cx="6"
+														cy="6"
+														r="4.5"
+														stroke="currentColor"
+														stroke-width="1.2"
+													/>
+												</svg>
+												3 ahead
+											</span>
+										</div>
+									</div>
+
+									<div class="detail-row">
+										<span class="detail-label">assignee</span>
+										<div class="detail-value">
+											<div
+												style="display: flex; align-items: center; gap: 6px"
+											>
+												<div
+													style="
+														width: 20px;
+														height: 20px;
+														border-radius: 50%;
+														background: linear-gradient(
+															135deg,
+															var(--moss-600),
+															var(--moss-400)
+														);
+														display: flex;
+														align-items: center;
+														justify-content: center;
+														font-size: 9px;
+														font-weight: 600;
+														color: var(--primary-fg);
+														flex-shrink: 0;
+													"
+												>
+													MP
+												</div>
+												<span
+													style="
+														font-size: 12px;
+														color: var(--foreground-muted);
+													"
+													>MartinP</span
+												>
+												<span
+													class="gk-badge gk-badge-mono"
+													style="font-size: 10px"
+													>claude-sonnet-4-6</span
+												>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Expanded footer actions -->
+							<div class="expanded-footer">
+								<button
+									class="gk-btn gk-btn-sm gk-btn-ghost"
+									style="
+										color: var(--primary);
+										border-color: color-mix(
+											in oklch,
+											var(--primary) 28%,
+											transparent
+										);
+										background: color-mix(
+											in oklch,
+											var(--primary) 8%,
+											transparent
+										);
+									"
+									onclick="event.stopPropagation()"
+								>
+									<svg
+										class="icon"
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 8h10M8 3v10"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										/>
+									</svg>
+									Resume Session
+								</button>
+								<button
+									class="gk-btn gk-btn-sm gk-btn-ghost"
+									onclick="event.stopPropagation()"
+								>
+									<svg
+										class="icon"
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<rect
+											x="2"
+											y="3"
+											width="12"
+											height="10"
+											rx="1.5"
+											stroke="currentColor"
+											stroke-width="1.3"
+										/>
+										<path
+											d="M5 7l2.5 1.5L5 10"
+											stroke="currentColor"
+											stroke-width="1.3"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									Open Terminal
+								</button>
+								<button
+									class="gk-btn gk-btn-sm gk-btn-ghost"
+									onclick="event.stopPropagation()"
+								>
+									<svg
+										class="icon"
+										width="12"
+										height="12"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M8 2a6 6 0 100 12A6 6 0 008 2zM8 5v4l2.5 1.5"
+											stroke="currentColor"
+											stroke-width="1.3"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									View on GitHub
+								</button>
+								<div style="flex: 1"></div>
+								<span
+									style="
+										font-size: 10.5px;
+										font-family: var(--font-mono);
+										color: var(--foreground-subtle);
+									"
+									>opened 2h ago · updated 14m ago</span
+								>
+							</div>
+						</div>
+
+						<!-- ════════════════════════════════════════════════════
+           GROUP: HIGH (2 issues)
+           ════════════════════════════════════════════════════ -->
+						<div class="group-section">
+							<div class="group-header group-high">
+								<div class="group-header-bar"></div>
+								<span class="group-header-name">High</span>
+								<span class="group-header-count">2</span>
+								<div class="group-header-spacer"></div>
+								<button
+									class="group-header-collapse"
+									title="Collapse group"
+									aria-label="Collapse high priority group"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 5l3 3 3-3"
+											stroke="currentColor"
+											stroke-width="1.3"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+							</div>
+
+							<!-- Issue #158 — collapsed -->
+							<div
+								class="issue-row"
+								style="--row-accent: var(--priority-high)"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="false"
+							>
+								<div
+									class="row-priority-icon priority-high"
+									aria-label="High priority"
+								>
+									<!-- Arrow-up icon -->
+									<svg
+										class="icon"
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M8 13V3M4 7l4-4 4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-93</span>
+								<span class="row-issue-num">#219</span>
+								<span class="row-name"
+									>Metrics v2 — implement aggregate cost breakdown by session
+									provider</span
+								>
+								<div class="row-badges">
+									<span class="gk-badge gk-badge-mono gk-badge-warning">
+										<svg
+											width="8"
+											height="8"
+											viewBox="0 0 12 12"
+											fill="none"
+											style="flex-shrink: 0"
+											aria-hidden="true"
+										>
+											<circle
+												cx="6"
+												cy="6"
+												r="4.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M6 3v4"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<circle cx="6" cy="8.5" r="0.8" fill="currentColor" />
+										</svg>
+										Draft PR
+									</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10px">
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 12 12"
+											fill="none"
+											style="flex-shrink: 0"
+											aria-hidden="true"
+										>
+											<circle
+												cx="3"
+												cy="3"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<circle
+												cx="3"
+												cy="9"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<circle
+												cx="9"
+												cy="3"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<path
+												d="M3 4.5v3M3 4.5C3 6.5 9 5.5 9 4.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+										feat/metrics-v2
+									</span>
+								</div>
+								<span class="row-session-chip chip-running">
+									<span class="session-dot"></span>
+									Running
+								</span>
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+
+							<!-- Issue #207 — collapsed -->
+							<div
+								class="issue-row"
+								style="--row-accent: var(--priority-high)"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="false"
+							>
+								<div
+									class="row-priority-icon priority-high"
+									aria-label="High priority"
+								>
+									<svg
+										class="icon"
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M8 13V3M4 7l4-4 4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-95</span>
+								<span class="row-issue-num">#207</span>
+								<span class="row-name"
+									>Notification sound playback queue — prevent overlapping on
+									rapid events</span
+								>
+								<div class="row-badges">
+									<span
+										class="gk-badge gk-badge-mono"
+										style="color: var(--foreground-subtle); font-size: 10px"
+										>No PR</span
+									>
+								</div>
+								<span class="row-session-chip chip-idle">
+									<span
+										class="session-dot"
+										style="background: var(--foreground-subtle)"
+									></span>
+									Idle
+								</span>
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+						</div>
+
+						<!-- ════════════════════════════════════════════════════
+           GROUP: MEDIUM (3 issues)
+           ════════════════════════════════════════════════════ -->
+						<div class="group-section">
+							<div class="group-header group-medium">
+								<div class="group-header-bar"></div>
+								<span class="group-header-name">Medium</span>
+								<span class="group-header-count">3</span>
+								<div class="group-header-spacer"></div>
+								<button
+									class="group-header-collapse"
+									title="Collapse group"
+									aria-label="Collapse medium priority group"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 5l3 3 3-3"
+											stroke="currentColor"
+											stroke-width="1.3"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+							</div>
+
+							<!-- Issue #162 — collapsed -->
+							<div
+								class="issue-row"
+								style="--row-accent: var(--priority-medium)"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="false"
+							>
+								<div
+									class="row-priority-icon priority-medium"
+									aria-label="Medium priority"
+								>
+									<svg
+										class="icon"
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M4 8h8"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										/>
+										<path
+											d="M10 5l3 3-3 3"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-90</span>
+								<span class="row-issue-num">#162</span>
+								<span class="row-name"
+									>Skill controls — add per-skill token budget override in session
+									config panel</span
+								>
+								<div class="row-badges">
+									<span class="gk-badge gk-badge-mono gk-badge-success">
+										<span class="gk-badge-dot"></span>
+										PR #798
+									</span>
+									<span class="gk-badge gk-badge-mono" style="font-size: 10px">
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 12 12"
+											fill="none"
+											style="flex-shrink: 0"
+											aria-hidden="true"
+										>
+											<circle
+												cx="3"
+												cy="3"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<circle
+												cx="3"
+												cy="9"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<circle
+												cx="9"
+												cy="3"
+												r="1.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+											/>
+											<path
+												d="M3 4.5v3M3 4.5C3 6.5 9 5.5 9 4.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+										feat/skill-budget
+									</span>
+								</div>
+								<span class="row-session-chip chip-needs-review">
+									<span class="session-dot"></span>
+									Needs Review
+								</span>
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+
+							<!-- Issue #231 — collapsed -->
+							<div
+								class="issue-row"
+								style="--row-accent: var(--priority-medium)"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="false"
+							>
+								<div
+									class="row-priority-icon priority-medium"
+									aria-label="Medium priority"
+								>
+									<svg
+										class="icon"
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M4 8h8"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										/>
+										<path
+											d="M10 5l3 3-3 3"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-87</span>
+								<span class="row-issue-num">#231</span>
+								<span class="row-name"
+									>Workspace card — surface active session count in card status
+									row</span
+								>
+								<div class="row-badges">
+									<span
+										class="gk-badge gk-badge-mono"
+										style="color: var(--foreground-subtle); font-size: 10px"
+										>No PR</span
+									>
+								</div>
+								<span class="row-session-chip chip-paused">
+									<span
+										class="session-dot"
+										style="background: var(--foreground-subtle)"
+									></span>
+									Paused
+								</span>
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+
+							<!-- Issue #244 — collapsed -->
+							<div
+								class="issue-row"
+								style="--row-accent: var(--priority-medium)"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="false"
+							>
+								<div
+									class="row-priority-icon priority-medium"
+									aria-label="Medium priority"
+								>
+									<svg
+										class="icon"
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M4 8h8"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+										/>
+										<path
+											d="M10 5l3 3-3 3"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-96</span>
+								<span class="row-issue-num">#244</span>
+								<span class="row-name"
+									>Editor config panel — per-workspace font size and tab-width
+									overrides</span
+								>
+								<div class="row-badges">
+									<span
+										class="gk-badge gk-badge-mono"
+										style="color: var(--foreground-subtle); font-size: 10px"
+										>No PR</span
+									>
+								</div>
+								<span class="row-session-chip chip-idle">
+									<span
+										class="session-dot"
+										style="background: var(--foreground-subtle)"
+									></span>
+									Idle
+								</span>
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+						</div>
+
+						<!-- ════════════════════════════════════════════════════
+           GROUP: LOW (1 issue)
+           ════════════════════════════════════════════════════ -->
+						<div class="group-section">
+							<div class="group-header group-low">
+								<div class="group-header-bar"></div>
+								<span class="group-header-name">Low</span>
+								<span class="group-header-count">1</span>
+								<div class="group-header-spacer"></div>
+								<button
+									class="group-header-collapse"
+									title="Collapse group"
+									aria-label="Collapse low priority group"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M3 5l3 3 3-3"
+											stroke="currentColor"
+											stroke-width="1.3"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+							</div>
+
+							<!-- Issue #188 — collapsed -->
+							<div
+								class="issue-row"
+								style="--row-accent: var(--priority-low); border-bottom: none"
+								onclick="toggleExpanded(this)"
+								role="button"
+								tabindex="0"
+								aria-expanded="false"
+							>
+								<div
+									class="row-priority-icon priority-low"
+									aria-label="Low priority"
+								>
+									<!-- Down arrow -->
+									<svg
+										class="icon"
+										width="13"
+										height="13"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M8 3v10M12 9l-4 4-4-4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<span class="row-prd-num">PRD-87</span>
+								<span class="row-issue-num">#188</span>
+								<span class="row-name"
+									>Sidebar nav — add tooltip delay for collapsed icon-only
+									mode</span
+								>
+								<div class="row-badges">
+									<span
+										class="gk-badge gk-badge-mono"
+										style="color: var(--foreground-subtle); font-size: 10px"
+										>No PR</span
+									>
+								</div>
+								<span class="row-session-chip chip-idle">
+									<span
+										class="session-dot"
+										style="background: var(--foreground-subtle)"
+									></span>
+									Idle
+								</span>
+								<div class="row-actions">
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Finder"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 3V2M8 3V2M11 3V2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+											<path
+												d="M5 7h6M5 10h4"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open Terminal"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<rect
+												x="2"
+												y="3"
+												width="12"
+												height="10"
+												rx="1.5"
+												stroke="currentColor"
+												stroke-width="1.3"
+											/>
+											<path
+												d="M5 7l2.5 1.5L5 10"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+											<path
+												d="M9.5 10h2"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linecap="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="Open in Editor"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<path
+												d="M3 12l2.5-.5 7-7a1 1 0 00-2-2l-7 7L3 12z"
+												stroke="currentColor"
+												stroke-width="1.3"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</button>
+									<button
+										class="gk-btn gk-btn-ghost gk-btn-sm gk-btn-icon"
+										title="More actions"
+										onclick="event.stopPropagation()"
+									>
+										<svg
+											class="icon"
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle cx="4" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="8" cy="8" r="1.2" fill="currentColor" />
+											<circle cx="12" cy="8" r="1.2" fill="currentColor" />
+										</svg>
+									</button>
+								</div>
+								<div class="row-chevron" aria-hidden="true">
+									<svg
+										class="icon"
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+									>
+										<path
+											d="M6 4l4 4-4 4"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /issues-list -->
+
+					<!-- Panel footer -->
+					<div class="panel-footer">
+						<span>7 open issues</span>
+						<span class="footer-dot"></span>
+						<span>4 groups</span>
+						<span class="footer-dot"></span>
+						<span>1 running · 1 needs input · 1 needs review</span>
+						<div style="flex: 1"></div>
+						<span>Sorted by priority</span>
+					</div>
+				</div>
+				<!-- /issues-panel -->
+			</div>
+			<!-- /page-shell -->
+		</div>
+		<!-- /gk-root -->
+
+		<script>
+			/**
+			 * Toggle expanded state on an issue row.
+			 * Creates an inline expanded body sibling when opening,
+			 * removes it when closing.
+			 */
+			function toggleExpanded(row) {
+				const isExpanded = row.classList.contains('is-expanded');
+
+				// Close all currently expanded rows first
+				document.querySelectorAll('.issue-row.is-expanded').forEach(function (openRow) {
+					if (openRow !== row) {
+						openRow.classList.remove('is-expanded');
+						openRow.setAttribute('aria-expanded', 'false');
+						// Remove the dynamically-injected expanded body if present
+						const sibling = openRow.nextElementSibling;
+						if (sibling && sibling.classList.contains('expanded-body--dynamic')) {
+							const footer = sibling.nextElementSibling;
+							if (footer && footer.classList.contains('expanded-footer--dynamic')) {
+								footer.remove();
+							}
+							sibling.remove();
+						}
+					}
+				});
+
+				if (isExpanded) {
+					// Collapse this row
+					row.classList.remove('is-expanded');
+					row.setAttribute('aria-expanded', 'false');
+					const sibling = row.nextElementSibling;
+					if (sibling && sibling.classList.contains('expanded-body--dynamic')) {
+						const footer = sibling.nextElementSibling;
+						if (footer && footer.classList.contains('expanded-footer--dynamic')) {
+							footer.remove();
+						}
+						sibling.remove();
+					}
+				} else {
+					// Expand this row
+					row.classList.add('is-expanded');
+					row.setAttribute('aria-expanded', 'true');
+
+					// Build a generic expanded body for dynamically-expanded rows
+					const issueNum = row.querySelector('.row-issue-num').textContent.trim();
+					const issueName = row.querySelector('.row-name').textContent.trim();
+
+					const body = document.createElement('div');
+					body.className = 'expanded-body expanded-body--dynamic';
+					body.innerHTML = `
+        <div class="tree-thumb" aria-label="Workspace tree">
+          <svg class="tree-svg-wrap" viewBox="0 0 80 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="40" cy="88" rx="22" ry="4" fill="oklch(0.240 0.040 145)" opacity="0.7"/>
+            <rect x="35" y="68" width="10" height="20" rx="2" fill="oklch(0.380 0.055 55)"/>
+            <rect x="37" y="68" width="4" height="20" fill="oklch(0.345 0.050 52)" opacity="0.5"/>
+            <polygon points="40,16 23,48 57,48" fill="oklch(0.310 0.065 142)"/>
+            <polygon points="40,16 57,48 40,40" fill="oklch(0.275 0.058 145)" opacity="0.55"/>
+            <polygon points="40,28 18,56 62,56" fill="oklch(0.340 0.072 140)"/>
+            <polygon points="40,28 62,56 40,46" fill="oklch(0.295 0.062 143)" opacity="0.5"/>
+            <polygon points="40,40 14,70 66,70" fill="oklch(0.365 0.078 138)"/>
+            <polygon points="40,40 66,70 40,58" fill="oklch(0.320 0.068 141)" opacity="0.48"/>
+            <polygon points="40,18 40,40 27,44" fill="oklch(0.430 0.075 135)" opacity="0.32"/>
+          </svg>
+        </div>
+        <div class="expanded-details">
+          <div class="detail-row">
+            <span class="detail-label">gh-labels</span>
+            <div class="detail-value">
+              <span class="gh-label" style="background:color-mix(in oklch,var(--primary) 12%,transparent);color:var(--primary);border-color:color-mix(in oklch,var(--primary) 25%,transparent);">enhancement</span>
+              <span class="gh-label" style="background:color-mix(in oklch,var(--azure-400) 12%,transparent);color:var(--azure-300);border-color:color-mix(in oklch,var(--azure-400) 25%,transparent);">needs-design</span>
+            </div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">dev-server</span>
+            <div class="detail-value">
+              <div class="dev-server-status">
+                <span class="dev-server-dot" style="background:var(--foreground-subtle);"></span>
+                <span style="color:var(--foreground-subtle);">Not running</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">worktree</span>
+            <div class="detail-value">
+              <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--foreground-subtle);">Not checked out</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+					const footer = document.createElement('div');
+					footer.className = 'expanded-footer expanded-footer--dynamic';
+					footer.innerHTML = `
+        <button class="gk-btn gk-btn-sm gk-btn-ghost" style="color:var(--primary);border-color:color-mix(in oklch,var(--primary) 28%,transparent);background:color-mix(in oklch,var(--primary) 8%,transparent);" onclick="event.stopPropagation()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Start Session
+        </button>
+        <button class="gk-btn gk-btn-sm gk-btn-ghost" onclick="event.stopPropagation()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 5v4l2.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          View on GitHub
+        </button>
+        <div style="flex:1;"></div>
+        <span style="font-size:10.5px;font-family:var(--font-mono);color:var(--foreground-subtle);">opened 3d ago</span>
+      `;
+
+					row.insertAdjacentElement('afterend', footer);
+					row.insertAdjacentElement('afterend', body);
+				}
+			}
+
+			// Keyboard accessibility for rows
+			document.querySelectorAll('.issue-row').forEach(function (row) {
+				row.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						toggleExpanded(row);
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
