@@ -9,8 +9,10 @@
 	import AddWorkspaceCard from '$lib/components/AddWorkspaceCard.svelte';
 	import GitHubStatusCard from '$lib/components/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import GithubIcon from '$lib/components/icons/GithubIcon.svelte';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
@@ -68,20 +70,38 @@
 			<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
 		</div>
 		<div class="flex items-center gap-2">
-			<Switch id="show-archived" bind:checked={showArchived} />
-			<Label for="show-archived" class="text-sm text-muted-foreground">Show archived</Label>
+			<Button
+				variant={showArchived ? 'primary' : 'secondary'}
+				size="icon"
+				onclick={() => (showArchived = !showArchived)}
+				aria-label="Toggle archived workspaces"
+				aria-pressed={showArchived}
+			>
+				<ArchiveIcon size={16} />
+			</Button>
+			<Popover.Root>
+				<Popover.Trigger>
+					{#snippet child({ props })}
+						<Button {...props} variant="secondary" size="icon">
+							<GithubIcon size={16} />
+						</Button>
+					{/snippet}
+				</Popover.Trigger>
+				<Popover.Content class="w-80" align="end">
+					<GitHubStatusCard
+						borderless
+						authStatus={versionControl.authStatus}
+						ghAvailability={versionControl.ghAvailability}
+						onconnect={() => (authWizardOpen = true)}
+						ondisconnect={async () => {
+							await invoke('github_logout');
+							await versionControl.checkAvailability();
+						}}
+					/>
+				</Popover.Content>
+			</Popover.Root>
 		</div>
 	</div>
-
-	<GitHubStatusCard
-		authStatus={versionControl.authStatus}
-		ghAvailability={versionControl.ghAvailability}
-		onconnect={() => (authWizardOpen = true)}
-		ondisconnect={async () => {
-			await invoke('github_logout');
-			await versionControl.checkAvailability();
-		}}
-	/>
 
 	{#if loading}
 		<p class="text-muted-foreground">{m.overview_loading()}</p>

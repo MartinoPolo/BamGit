@@ -13,9 +13,16 @@
 		ghAvailability: GhCliAvailability;
 		onconnect?: () => void;
 		ondisconnect?: () => void;
+		borderless?: boolean;
 	}
 
-	let { authStatus, ghAvailability, onconnect, ondisconnect }: Props = $props();
+	let {
+		authStatus,
+		ghAvailability,
+		onconnect,
+		ondisconnect,
+		borderless = false,
+	}: Props = $props();
 
 	const oauthConnected = $derived(authStatus.status === 'oauth-connected');
 	const cliConnected = $derived(
@@ -24,7 +31,7 @@
 	const fullyDisconnected = $derived(!oauthConnected && !cliConnected);
 </script>
 
-<div class="rounded-lg border bg-surface-1 p-4">
+<div class={borderless ? '' : 'rounded-lg border bg-surface-1 p-4'}>
 	<div class="mb-3 flex items-center justify-between">
 		<div class="flex items-center gap-2">
 			<GithubIcon size={18} />
