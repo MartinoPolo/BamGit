@@ -9,12 +9,14 @@ import {
 	GROUP_BY_OPTIONS,
 	REFRESH_STATES,
 	STALE_THRESHOLD_MS,
+	USAGE_SCOPES,
 	isChartColorTheme,
 	isGroupByOption,
 	type ChartColorTheme,
 	type GroupByOption,
 	type MetricsPeriod,
 	type RefreshState,
+	type UsageScope,
 } from './usage_types.js';
 
 type UsageContext = ReturnType<typeof createUsageContext>;
@@ -31,6 +33,7 @@ export function setUsageContext() {
 
 function createUsageContext() {
 	const activePeriod = new StateRaw<MetricsPeriod>('thirty-days');
+	const scope = new StateRaw<UsageScope>(USAGE_SCOPES.workspace);
 	const customDateRange = new StateRaw<{ start: string; end: string } | null>(null);
 	const groupBy = new Persisted({
 		key: 'gk-usage-group-by',
@@ -123,6 +126,7 @@ function createUsageContext() {
 
 	return {
 		activePeriod,
+		scope,
 		customDateRange,
 		groupBy,
 		colorTheme,
