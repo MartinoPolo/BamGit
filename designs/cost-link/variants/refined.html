@@ -1,0 +1,3081 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CostLink — Refined: Colorful + Monocolor, Light + Dark</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* ── Theme variables ─────────────────────────────────────── */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--ring: var(--moss-400);
+			}
+
+			.theme-light,
+			[data-theme='light'] {
+				color-scheme: light;
+				--background: oklch(0.985 0.005 130);
+				--surface: oklch(1 0 0);
+				--surface-2: oklch(0.965 0.008 130);
+				--surface-hover: oklch(0.94 0.012 130);
+				--surface-3: oklch(0.94 0.012 130);
+				--foreground: oklch(0.205 0.015 145);
+				--foreground-muted: oklch(0.46 0.015 145);
+				--foreground-subtle: oklch(0.62 0.012 145);
+				--border: oklch(0.9 0.012 135);
+				--border-strong: oklch(0.815 0.018 135);
+				--primary: var(--moss-700);
+				--primary-fg: oklch(0.985 0.005 130);
+				--primary-soft: oklch(0.92 0.04 135);
+				--ring: var(--moss-600);
+			}
+
+			/* ── Base ────────────────────────────────────────────────── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ── Typography ──────────────────────────────────────────── */
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+
+			/* ── Card ────────────────────────────────────────────────── */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+
+			/* ──────────────────────────────────────────────────────────
+			   CostLink — Refined Design
+
+			   Two modes: "colorful" (magnitude-coded) and "mono" (neutral).
+			   Both adapt to dark and light themes automatically.
+			   ────────────────────────────────────────────────────────── */
+
+			.cost-link {
+				display: inline;
+				text-decoration: none;
+				cursor: pointer;
+				border: none;
+				background: none;
+				padding: 0;
+				font-family: var(--font-mono);
+				font-variant-numeric: tabular-nums;
+				outline: none;
+				position: relative;
+				font-weight: var(--weight-medium);
+				transition:
+					color var(--duration-2) var(--ease-out),
+					text-shadow var(--duration-3) var(--ease-out),
+					filter var(--duration-2) var(--ease-out),
+					border-color var(--duration-2) var(--ease-out);
+				user-select: none;
+				border-bottom: 1px solid transparent;
+			}
+
+			/* ── Sizes ── */
+			.cost-link-sm {
+				font-size: var(--text-2xs);
+				letter-spacing: 0.01em;
+				line-height: 1.4;
+			}
+			.cost-link-md {
+				font-size: var(--text-sm);
+				letter-spacing: 0.01em;
+				line-height: 1.4;
+			}
+
+			/* ══════════════════════════════════════════════════════════
+			   COLORFUL MODE — Dark Theme
+			   ══════════════════════════════════════════════════════════ */
+
+			/* Low (< $1) — moss green — "all is well" */
+			.theme-dark .cost-link-low {
+				--cl-color: oklch(0.7 0.12 142);
+				--cl-color-hover: oklch(0.78 0.135 138);
+				--cl-glow: oklch(0.58 0.096 134 / 0.35);
+				--cl-underline: oklch(0.58 0.096 134 / 0.5);
+				--cl-ring: oklch(0.58 0.096 134);
+			}
+
+			/* Medium ($1-$20) — golden yellow — "watch it"
+			   Shifted toward hue 82 (more yellow) from original 68 */
+			.theme-dark .cost-link-medium {
+				--cl-color: oklch(0.8 0.15 82);
+				--cl-color-hover: oklch(0.86 0.16 80);
+				--cl-glow: oklch(0.72 0.14 80 / 0.3);
+				--cl-underline: oklch(0.72 0.14 80 / 0.5);
+				--cl-ring: oklch(0.72 0.14 80);
+			}
+
+			/* High (> $20) — red — "heads up"
+			   Shifted toward hue 8 (more red) from original 15 */
+			.theme-dark .cost-link-high {
+				--cl-color: oklch(0.68 0.17 8);
+				--cl-color-hover: oklch(0.74 0.19 6);
+				--cl-glow: oklch(0.58 0.2 10 / 0.3);
+				--cl-underline: oklch(0.58 0.17 10 / 0.5);
+				--cl-ring: oklch(0.58 0.17 8);
+			}
+
+			/* ══════════════════════════════════════════════════════════
+			   COLORFUL MODE — Light Theme
+			   Darker, more saturated versions for light backgrounds
+			   ══════════════════════════════════════════════════════════ */
+
+			/* Low — darker moss for readability on white */
+			.theme-light .cost-link-low {
+				--cl-color: oklch(0.48 0.1 140);
+				--cl-color-hover: oklch(0.42 0.11 138);
+				--cl-glow: oklch(0.48 0.1 140 / 0.15);
+				--cl-underline: oklch(0.48 0.1 140 / 0.5);
+				--cl-ring: oklch(0.48 0.1 140);
+			}
+
+			/* Medium — darker golden yellow */
+			.theme-light .cost-link-medium {
+				--cl-color: oklch(0.52 0.14 82);
+				--cl-color-hover: oklch(0.46 0.15 80);
+				--cl-glow: oklch(0.52 0.14 82 / 0.15);
+				--cl-underline: oklch(0.52 0.14 82 / 0.5);
+				--cl-ring: oklch(0.52 0.14 82);
+			}
+
+			/* High — darker red */
+			.theme-light .cost-link-high {
+				--cl-color: oklch(0.48 0.18 8);
+				--cl-color-hover: oklch(0.42 0.19 6);
+				--cl-glow: oklch(0.48 0.18 8 / 0.15);
+				--cl-underline: oklch(0.48 0.18 8 / 0.5);
+				--cl-ring: oklch(0.48 0.18 8);
+			}
+
+			/* ══════════════════════════════════════════════════════════
+			   MONOCOLOR MODE — Uses foreground-muted, no magnitude color
+			   ══════════════════════════════════════════════════════════ */
+
+			.cost-link-mono {
+				--cl-color: var(--foreground-muted);
+				--cl-color-hover: var(--foreground);
+				--cl-glow: transparent;
+				--cl-underline: var(--foreground-subtle);
+				--cl-ring: var(--foreground-subtle);
+			}
+
+			/* ── Apply color ── */
+			.cost-link-low,
+			.cost-link-medium,
+			.cost-link-high,
+			.cost-link-mono {
+				color: var(--cl-color);
+			}
+
+			/* ── Hover ── */
+			.cost-link:hover,
+			.cost-link[data-state='hover'] {
+				color: var(--cl-color-hover);
+				text-shadow: 0 0 12px var(--cl-glow);
+				border-bottom-color: var(--cl-underline);
+			}
+
+			/* ── Focus ── */
+			.cost-link:focus-visible,
+			.cost-link[data-state='focus'] {
+				outline: none;
+				box-shadow:
+					0 0 0 2px var(--background),
+					0 0 0 4px var(--cl-ring);
+				border-radius: 2px;
+			}
+
+			/* ── Active / pressed ── */
+			.cost-link:active,
+			.cost-link[data-state='active'] {
+				filter: brightness(0.82);
+			}
+
+			/* ── Disabled ── */
+			.cost-link[data-state='disabled'],
+			.cost-link:disabled,
+			.cost-link[aria-disabled='true'] {
+				color: var(--foreground-subtle) !important;
+				opacity: 0.42;
+				cursor: not-allowed;
+				pointer-events: none;
+				text-shadow: none !important;
+				border-bottom-color: transparent !important;
+			}
+
+			/* ── Popover wrapper ── */
+			.cost-link-wrapper {
+				position: relative;
+				display: inline-flex;
+				align-items: center;
+			}
+
+			/* ── Popover ── */
+			.cost-link-popover {
+				position: absolute;
+				bottom: calc(100% + 8px);
+				left: 50%;
+				transform: translateX(-50%) translateY(4px);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				box-shadow: var(--shadow-lg);
+				padding: 0;
+				min-width: 220px;
+				max-width: 280px;
+				pointer-events: none;
+				opacity: 0;
+				transition:
+					opacity var(--duration-3) var(--ease-out),
+					transform var(--duration-3) var(--ease-out);
+				z-index: var(--z-tooltip);
+				overflow: hidden;
+			}
+
+			.cost-link-popover::after {
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				border: 5px solid transparent;
+				border-top-color: var(--border);
+			}
+			.cost-link-popover::before {
+				content: '';
+				position: absolute;
+				top: calc(100% - 1px);
+				left: 50%;
+				transform: translateX(-50%);
+				border: 5px solid transparent;
+				border-top-color: var(--surface);
+				z-index: 1;
+			}
+
+			.popover-header {
+				padding: 8px 12px 6px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.popover-title {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+			.popover-total {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				font-weight: var(--weight-semibold);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Popover total inherits magnitude color */
+			.theme-dark .cost-link-wrapper[data-magnitude='low'] .popover-total {
+				color: oklch(0.7 0.12 142);
+			}
+			.theme-dark .cost-link-wrapper[data-magnitude='medium'] .popover-total {
+				color: oklch(0.8 0.15 82);
+			}
+			.theme-dark .cost-link-wrapper[data-magnitude='high'] .popover-total {
+				color: oklch(0.68 0.17 8);
+			}
+			.theme-light .cost-link-wrapper[data-magnitude='low'] .popover-total {
+				color: oklch(0.48 0.1 140);
+			}
+			.theme-light .cost-link-wrapper[data-magnitude='medium'] .popover-total {
+				color: oklch(0.52 0.14 82);
+			}
+			.theme-light .cost-link-wrapper[data-magnitude='high'] .popover-total {
+				color: oklch(0.48 0.18 8);
+			}
+			.cost-link-wrapper[data-magnitude='mono'] .popover-total {
+				color: var(--foreground);
+			}
+
+			.popover-body {
+				padding: 6px 12px 8px;
+			}
+			.popover-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 4px 0;
+				font-size: 11px;
+				gap: 12px;
+			}
+			.popover-row + .popover-row {
+				border-top: 1px dashed color-mix(in oklch, var(--border) 50%, transparent);
+			}
+			.popover-model {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 140px;
+			}
+			.popover-model-cost {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: var(--weight-medium);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground);
+				white-space: nowrap;
+			}
+
+			.popover-footer {
+				padding: 6px 12px 8px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+			.popover-nav-link {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				text-decoration: none;
+				cursor: pointer;
+				transition: color var(--duration-2) var(--ease-out);
+			}
+			.popover-nav-link:hover {
+				color: var(--foreground);
+			}
+			.popover-nav-link svg {
+				flex-shrink: 0;
+			}
+
+			/* Show popover on hover/focus */
+			.cost-link-wrapper:hover .cost-link-popover,
+			.cost-link-wrapper:focus-within .cost-link-popover,
+			.cost-link-wrapper[data-show-popover] .cost-link-popover {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0);
+				pointer-events: auto;
+			}
+
+			/* Popover bar */
+			.popover-bar {
+				height: 3px;
+				border-radius: 1.5px;
+				flex-shrink: 0;
+				margin-top: 2px;
+			}
+			.theme-dark .cost-link-wrapper[data-magnitude='low'] .popover-bar {
+				background: oklch(0.7 0.12 142);
+			}
+			.theme-dark .cost-link-wrapper[data-magnitude='medium'] .popover-bar {
+				background: oklch(0.8 0.15 82);
+			}
+			.theme-dark .cost-link-wrapper[data-magnitude='high'] .popover-bar {
+				background: oklch(0.68 0.17 8);
+			}
+			.theme-light .cost-link-wrapper[data-magnitude='low'] .popover-bar {
+				background: oklch(0.48 0.1 140);
+			}
+			.theme-light .cost-link-wrapper[data-magnitude='medium'] .popover-bar {
+				background: oklch(0.52 0.14 82);
+			}
+			.theme-light .cost-link-wrapper[data-magnitude='high'] .popover-bar {
+				background: oklch(0.48 0.18 8);
+			}
+			.cost-link-wrapper[data-magnitude='mono'] .popover-bar {
+				background: var(--foreground-subtle);
+			}
+
+			/* ── Showcase layout ─────────────────────────────────────── */
+			.showcase-page {
+				min-height: 100vh;
+				padding: 40px 48px 80px;
+				max-width: 1100px;
+				margin: 0 auto;
+			}
+
+			.showcase-header {
+				margin-bottom: 48px;
+			}
+
+			.showcase-section {
+				margin-bottom: 56px;
+			}
+
+			.showcase-section-title {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				margin-bottom: 16px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+			.showcase-section-title::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* Theme panels side by side */
+			.theme-panels {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 2px;
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				border: 1px solid var(--border);
+			}
+			.theme-panel {
+				padding: 24px;
+				position: relative;
+			}
+			.theme-panel-label {
+				position: absolute;
+				top: 10px;
+				right: 12px;
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				opacity: 0.7;
+			}
+
+			/* State grid */
+			.state-grid {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: 12px;
+			}
+			.state-cell {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				padding: 14px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+			}
+			.state-cell-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: lowercase;
+			}
+			.state-cell-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			/* Color swatch */
+			.color-swatch {
+				display: inline-block;
+				width: 12px;
+				height: 12px;
+				border-radius: 3px;
+				vertical-align: middle;
+				border: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+			}
+
+			/* Magnitude label row */
+			.magnitude-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				flex-wrap: wrap;
+				padding: 14px 18px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				margin-bottom: 8px;
+			}
+			.magnitude-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				min-width: 80px;
+			}
+
+			/* Context cards */
+			.workspace-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				width: 280px;
+			}
+			.workspace-card-accent {
+				height: 3px;
+				background: linear-gradient(90deg, var(--moss-500) 0%, var(--moss-400) 100%);
+			}
+			.workspace-card-body {
+				padding: 14px 14px 10px;
+			}
+			.workspace-card-name {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				margin-bottom: 2px;
+			}
+			.workspace-card-meta {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				margin-bottom: 10px;
+			}
+			.workspace-card-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 8px 14px;
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface-2) 50%, transparent);
+			}
+			.workspace-footer-left {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+			.session-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: var(--session-running);
+				flex-shrink: 0;
+			}
+
+			/* Inline flow */
+			.inline-demo {
+				padding: 20px 24px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				line-height: 1.7;
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				max-width: 560px;
+			}
+
+			@media (max-width: 860px) {
+				.theme-panels {
+					grid-template-columns: 1fr;
+				}
+				.state-grid {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+				.showcase-page {
+					padding: 24px 20px 60px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="showcase-page">
+				<!-- ── Header ── -->
+				<div class="showcase-header">
+					<div class="gk-eyebrow" style="margin-bottom: 10px">
+						Refined &middot; CostLink
+					</div>
+					<h1 class="gk-h2" style="margin-bottom: 6px">
+						Colorful + Monocolor Modes
+					</h1>
+					<p
+						class="gk-small"
+						style="max-width: 620px; line-height: var(--leading-relaxed)"
+					>
+						Two rendering modes: <strong>Colorful</strong> encodes cost magnitude
+						via color (green/yellow/red). <strong>Monocolor</strong> uses neutral
+						foreground text for contexts where color would be noisy. Both adapt
+						to dark and light themes.
+					</p>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 1: Color Scale — Dark vs Light
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Color Scale — Both Themes</div>
+					<div class="theme-panels">
+						<!-- Dark panel -->
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<div
+								style="
+									display: flex;
+									gap: 28px;
+									flex-wrap: wrap;
+									align-items: center;
+								"
+							>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: oklch(0.7 0.12 142)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>Low</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-low"
+										style="cursor: default"
+										>$0.42</span
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: oklch(0.8 0.15 82)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>Medium</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-medium"
+										style="cursor: default"
+										>$7.20</span
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: oklch(0.68 0.17 8)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>High</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-high"
+										style="cursor: default"
+										>$34.50</span
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: var(--foreground-muted)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>Mono</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-mono"
+										style="cursor: default"
+										>$4.38</span
+									>
+								</div>
+							</div>
+						</div>
+						<!-- Light panel -->
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<div
+								style="
+									display: flex;
+									gap: 28px;
+									flex-wrap: wrap;
+									align-items: center;
+								"
+							>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: oklch(0.48 0.1 140)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>Low</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-low"
+										style="cursor: default"
+										>$0.42</span
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: oklch(0.52 0.14 82)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>Medium</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-medium"
+										style="cursor: default"
+										>$7.20</span
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: oklch(0.48 0.18 8)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>High</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-high"
+										style="cursor: default"
+										>$34.50</span
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 8px">
+									<span
+										class="color-swatch"
+										style="background: var(--foreground-muted)"
+									></span>
+									<span class="gk-tiny" style="color: var(--foreground-muted)"
+										>Mono</span
+									>
+									<span
+										class="cost-link cost-link-md cost-link-mono"
+										style="cursor: default"
+										>$4.38</span
+									>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 2: Full State Matrix — COLORFUL — Dark
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Colorful States — Dark Theme
+					</div>
+					<div style="overflow-x: auto">
+						<table
+							style="border-collapse: collapse; width: 100%; min-width: 520px"
+						>
+							<thead>
+								<tr>
+									<th
+										style="
+											text-align: left;
+											padding: 8px 14px 8px 0;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											letter-spacing: 0.06em;
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+										"
+									>
+										State
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										low &lt; $1
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										mid $1-$20
+									</th>
+									<th
+										style="
+											padding: 8px 14px;
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											text-transform: uppercase;
+											border-bottom: 1px solid var(--border);
+											font-weight: 500;
+											text-align: center;
+										"
+									>
+										high &gt; $20
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td
+										style="
+											padding: 12px 14px 12px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										default
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<tr>
+									<td
+										style="
+											padding: 12px 14px 12px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										hover
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="hover"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="hover"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="hover"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<tr>
+									<td
+										style="
+											padding: 12px 14px 12px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										focus
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="focus"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="focus"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="focus"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<tr>
+									<td
+										style="
+											padding: 12px 14px 12px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+										"
+									>
+										active
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="active"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="active"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td
+										style="
+											padding: 12px 14px;
+											border-bottom: 1px solid
+												color-mix(in oklch, var(--border) 50%, transparent);
+											text-align: center;
+										"
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="active"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+								<tr>
+									<td
+										style="
+											padding: 12px 14px 12px 0;
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: var(--foreground-subtle);
+										"
+									>
+										disabled
+									</td>
+									<td style="padding: 12px 14px; text-align: center">
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											data-state="disabled"
+											aria-disabled="true"
+											href="#"
+											tabindex="-1"
+											>$0.12</a
+										>
+									</td>
+									<td style="padding: 12px 14px; text-align: center">
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											data-state="disabled"
+											aria-disabled="true"
+											href="#"
+											tabindex="-1"
+											>$4.38</a
+										>
+									</td>
+									<td style="padding: 12px 14px; text-align: center">
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											data-state="disabled"
+											aria-disabled="true"
+											href="#"
+											tabindex="-1"
+											>$28.75</a
+										>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 3: Full State Matrix — COLORFUL — Light
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Colorful States — Light Theme
+					</div>
+					<div
+						class="gk-root theme-light"
+						data-theme="light"
+						style="
+							border-radius: var(--radius-lg);
+							border: 1px solid var(--border);
+							padding: 24px;
+						"
+					>
+						<div style="overflow-x: auto">
+							<table
+								style="
+									border-collapse: collapse;
+									width: 100%;
+									min-width: 520px;
+								"
+							>
+								<thead>
+									<tr>
+										<th
+											style="
+												text-align: left;
+												padding: 8px 14px 8px 0;
+												font-family: var(--font-mono);
+												font-size: 10px;
+												color: var(--foreground-subtle);
+												text-transform: uppercase;
+												border-bottom: 1px solid var(--border);
+												font-weight: 500;
+											"
+										>
+											State
+										</th>
+										<th
+											style="
+												padding: 8px 14px;
+												font-family: var(--font-mono);
+												font-size: 10px;
+												color: var(--foreground-subtle);
+												text-transform: uppercase;
+												border-bottom: 1px solid var(--border);
+												font-weight: 500;
+												text-align: center;
+											"
+										>
+											low &lt; $1
+										</th>
+										<th
+											style="
+												padding: 8px 14px;
+												font-family: var(--font-mono);
+												font-size: 10px;
+												color: var(--foreground-subtle);
+												text-transform: uppercase;
+												border-bottom: 1px solid var(--border);
+												font-weight: 500;
+												text-align: center;
+											"
+										>
+											mid $1-$20
+										</th>
+										<th
+											style="
+												padding: 8px 14px;
+												font-family: var(--font-mono);
+												font-size: 10px;
+												color: var(--foreground-subtle);
+												text-transform: uppercase;
+												border-bottom: 1px solid var(--border);
+												font-weight: 500;
+												text-align: center;
+											"
+										>
+											high &gt; $20
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td
+											style="
+												padding: 12px 14px 12px 0;
+												font-family: var(--font-mono);
+												font-size: 11px;
+												color: var(--foreground-subtle);
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+											"
+										>
+											default
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												href="#"
+												tabindex="-1"
+												>$0.12</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												href="#"
+												tabindex="-1"
+												>$4.38</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												href="#"
+												tabindex="-1"
+												>$28.75</a
+											>
+										</td>
+									</tr>
+									<tr>
+										<td
+											style="
+												padding: 12px 14px 12px 0;
+												font-family: var(--font-mono);
+												font-size: 11px;
+												color: var(--foreground-subtle);
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+											"
+										>
+											hover
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="hover"
+												href="#"
+												tabindex="-1"
+												>$0.12</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="hover"
+												href="#"
+												tabindex="-1"
+												>$4.38</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="hover"
+												href="#"
+												tabindex="-1"
+												>$28.75</a
+											>
+										</td>
+									</tr>
+									<tr>
+										<td
+											style="
+												padding: 12px 14px 12px 0;
+												font-family: var(--font-mono);
+												font-size: 11px;
+												color: var(--foreground-subtle);
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+											"
+										>
+											focus
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="focus"
+												href="#"
+												tabindex="-1"
+												>$0.12</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="focus"
+												href="#"
+												tabindex="-1"
+												>$4.38</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="focus"
+												href="#"
+												tabindex="-1"
+												>$28.75</a
+											>
+										</td>
+									</tr>
+									<tr>
+										<td
+											style="
+												padding: 12px 14px 12px 0;
+												font-family: var(--font-mono);
+												font-size: 11px;
+												color: var(--foreground-subtle);
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+											"
+										>
+											active
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="active"
+												href="#"
+												tabindex="-1"
+												>$0.12</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="active"
+												href="#"
+												tabindex="-1"
+												>$4.38</a
+											>
+										</td>
+										<td
+											style="
+												padding: 12px 14px;
+												border-bottom: 1px solid
+													color-mix(
+														in oklch,
+														var(--border) 50%,
+														transparent
+													);
+												text-align: center;
+											"
+										>
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="active"
+												href="#"
+												tabindex="-1"
+												>$28.75</a
+											>
+										</td>
+									</tr>
+									<tr>
+										<td
+											style="
+												padding: 12px 14px 12px 0;
+												font-family: var(--font-mono);
+												font-size: 11px;
+												color: var(--foreground-subtle);
+											"
+										>
+											disabled
+										</td>
+										<td style="padding: 12px 14px; text-align: center">
+											<a
+												class="cost-link cost-link-md cost-link-low"
+												data-state="disabled"
+												aria-disabled="true"
+												href="#"
+												tabindex="-1"
+												>$0.12</a
+											>
+										</td>
+										<td style="padding: 12px 14px; text-align: center">
+											<a
+												class="cost-link cost-link-md cost-link-medium"
+												data-state="disabled"
+												aria-disabled="true"
+												href="#"
+												tabindex="-1"
+												>$4.38</a
+											>
+										</td>
+										<td style="padding: 12px 14px; text-align: center">
+											<a
+												class="cost-link cost-link-md cost-link-high"
+												data-state="disabled"
+												aria-disabled="true"
+												href="#"
+												tabindex="-1"
+												>$28.75</a
+											>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 4: Monocolor States — Both Themes
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Monocolor States — Dark + Light
+					</div>
+					<div class="theme-panels">
+						<!-- Dark mono -->
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<div style="display: flex; flex-direction: column; gap: 12px">
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>default</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>hover</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="hover"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>focus</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="focus"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>active</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="active"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>disabled</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="disabled"
+										aria-disabled="true"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+							</div>
+						</div>
+						<!-- Light mono -->
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<div style="display: flex; flex-direction: column; gap: 12px">
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>default</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>hover</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="hover"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>focus</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="focus"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>active</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="active"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+								<div style="display: flex; align-items: center; gap: 20px">
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 10px;
+											color: var(--foreground-subtle);
+											min-width: 52px;
+										"
+										>disabled</span
+									>
+									<a
+										class="cost-link cost-link-md cost-link-mono"
+										data-state="disabled"
+										aria-disabled="true"
+										href="#"
+										tabindex="-1"
+										>$4.38</a
+									>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 5: Sizes — sm + md
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Sizes — sm (10.5px) &amp; md (12px)</div>
+					<div class="theme-panels">
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<div
+								style="
+									display: flex;
+									gap: 32px;
+									flex-wrap: wrap;
+									align-items: baseline;
+								"
+							>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-low" href="#"
+										>$0.12</a
+									>
+									<span class="gk-tiny">sm / low</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-low" href="#"
+										>$0.12</a
+									>
+									<span class="gk-tiny">md / low</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-medium" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">sm / mid</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-medium" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">md / mid</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-high" href="#"
+										>$28.75</a
+									>
+									<span class="gk-tiny">sm / high</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-high" href="#"
+										>$28.75</a
+									>
+									<span class="gk-tiny">md / high</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-mono" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">sm / mono</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-mono" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">md / mono</span>
+								</div>
+							</div>
+						</div>
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<div
+								style="
+									display: flex;
+									gap: 32px;
+									flex-wrap: wrap;
+									align-items: baseline;
+								"
+							>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-low" href="#"
+										>$0.12</a
+									>
+									<span class="gk-tiny">sm / low</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-low" href="#"
+										>$0.12</a
+									>
+									<span class="gk-tiny">md / low</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-medium" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">sm / mid</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-medium" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">md / mid</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-high" href="#"
+										>$28.75</a
+									>
+									<span class="gk-tiny">sm / high</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-high" href="#"
+										>$28.75</a
+									>
+									<span class="gk-tiny">md / high</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-sm cost-link-mono" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">sm / mono</span>
+								</div>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										gap: 6px;
+										align-items: flex-start;
+									"
+								>
+									<a class="cost-link cost-link-md cost-link-mono" href="#"
+										>$4.38</a
+									>
+									<span class="gk-tiny">md / mono</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 6: Popover — Both themes
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Hover Popover — Cost Breakdown
+					</div>
+					<div class="theme-panels">
+						<!-- Dark popovers -->
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<div
+								style="
+									display: flex;
+									gap: 40px;
+									flex-wrap: wrap;
+									align-items: flex-end;
+									padding-top: 56px;
+								"
+							>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										align-items: center;
+										gap: 8px;
+									"
+								>
+									<div
+										class="cost-link-wrapper"
+										data-magnitude="low"
+										data-show-popover
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											href="#"
+											>$0.12</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Cost Breakdown</span>
+												<span class="popover-total">$0.12</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model">claude-haiku-4</span>
+													<span class="popover-model-cost">$0.08</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-sonnet-4</span>
+													<span class="popover-model-cost">$0.04</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+									<span class="gk-tiny">low</span>
+								</div>
+
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										align-items: center;
+										gap: 8px;
+									"
+								>
+									<div
+										class="cost-link-wrapper"
+										data-magnitude="medium"
+										data-show-popover
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											href="#"
+											>$4.38</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Cost Breakdown</span>
+												<span class="popover-total">$4.38</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$2.91</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$1.22</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-haiku-4</span
+													>
+													<span class="popover-model-cost">$0.25</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+									<span class="gk-tiny">medium</span>
+								</div>
+
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										align-items: center;
+										gap: 8px;
+									"
+								>
+									<div
+										class="cost-link-wrapper"
+										data-magnitude="high"
+										data-show-popover
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											href="#"
+											>$28.75</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Cost Breakdown</span>
+												<span class="popover-total">$28.75</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$18.40</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$7.62</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-haiku-4</span
+													>
+													<span class="popover-model-cost">$1.85</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+									<span class="gk-tiny">high</span>
+								</div>
+							</div>
+						</div>
+						<!-- Light popovers -->
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<div
+								style="
+									display: flex;
+									gap: 40px;
+									flex-wrap: wrap;
+									align-items: flex-end;
+									padding-top: 56px;
+								"
+							>
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										align-items: center;
+										gap: 8px;
+									"
+								>
+									<div
+										class="cost-link-wrapper"
+										data-magnitude="low"
+										data-show-popover
+									>
+										<a
+											class="cost-link cost-link-md cost-link-low"
+											href="#"
+											>$0.12</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Cost Breakdown</span>
+												<span class="popover-total">$0.12</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model">claude-haiku-4</span>
+													<span class="popover-model-cost">$0.08</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-sonnet-4</span>
+													<span class="popover-model-cost">$0.04</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+									<span class="gk-tiny">low</span>
+								</div>
+
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										align-items: center;
+										gap: 8px;
+									"
+								>
+									<div
+										class="cost-link-wrapper"
+										data-magnitude="medium"
+										data-show-popover
+									>
+										<a
+											class="cost-link cost-link-md cost-link-medium"
+											href="#"
+											>$4.38</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Cost Breakdown</span>
+												<span class="popover-total">$4.38</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$2.91</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$1.22</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-haiku-4</span
+													>
+													<span class="popover-model-cost">$0.25</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+									<span class="gk-tiny">medium</span>
+								</div>
+
+								<div
+									style="
+										display: flex;
+										flex-direction: column;
+										align-items: center;
+										gap: 8px;
+									"
+								>
+									<div
+										class="cost-link-wrapper"
+										data-magnitude="high"
+										data-show-popover
+									>
+										<a
+											class="cost-link cost-link-md cost-link-high"
+											href="#"
+											>$28.75</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Cost Breakdown</span>
+												<span class="popover-total">$28.75</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$18.40</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$7.62</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-haiku-4</span
+													>
+													<span class="popover-model-cost">$1.85</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+									<span class="gk-tiny">high</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 7: In-Context — Workspace Card (dark + light)
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						In Context — Workspace Card Footer
+					</div>
+					<div class="theme-panels">
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<div class="workspace-card">
+								<div class="workspace-card-accent"></div>
+								<div class="workspace-card-body">
+									<div class="workspace-card-name">grovekeeper</div>
+									<div class="workspace-card-meta">
+										~/dev/grovekeeper &middot; main
+									</div>
+								</div>
+								<div class="workspace-card-footer">
+									<div class="workspace-footer-left">
+										<span class="session-dot"></span>
+										<span>3 running</span>
+									</div>
+									<div class="cost-link-wrapper" data-magnitude="medium">
+										<a
+											class="cost-link cost-link-sm cost-link-medium"
+											href="#"
+											>$4.38</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Today</span>
+												<span class="popover-total">$4.38</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$2.91</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$1.22</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<div class="workspace-card">
+								<div class="workspace-card-accent"></div>
+								<div class="workspace-card-body">
+									<div class="workspace-card-name">grovekeeper</div>
+									<div class="workspace-card-meta">
+										~/dev/grovekeeper &middot; main
+									</div>
+								</div>
+								<div class="workspace-card-footer">
+									<div class="workspace-footer-left">
+										<span class="session-dot"></span>
+										<span>3 running</span>
+									</div>
+									<div class="cost-link-wrapper" data-magnitude="medium">
+										<a
+											class="cost-link cost-link-sm cost-link-medium"
+											href="#"
+											>$4.38</a
+										>
+										<div class="cost-link-popover">
+											<div class="popover-header">
+												<span class="popover-title">Today</span>
+												<span class="popover-total">$4.38</span>
+											</div>
+											<div class="popover-body">
+												<div class="popover-row">
+													<span class="popover-model"
+														>claude-sonnet-4</span
+													>
+													<span class="popover-model-cost">$2.91</span>
+												</div>
+												<div class="popover-row">
+													<span class="popover-model">claude-opus-4</span>
+													<span class="popover-model-cost">$1.22</span>
+												</div>
+											</div>
+											<div class="popover-footer">
+												<a class="popover-nav-link" href="#">
+													View in Usage
+													<svg
+														width="10"
+														height="10"
+														viewBox="0 0 10 10"
+														fill="none"
+													>
+														<path
+															d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+															stroke="currentColor"
+															stroke-width="1.2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														/>
+													</svg>
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 8: Inline Text Flow — Both Themes
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Inline Text Flow</div>
+					<div class="theme-panels">
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<p
+								style="
+									font-size: var(--text-md);
+									color: var(--foreground-muted);
+									max-width: 420px;
+									line-height: 1.7;
+									margin: 0;
+								"
+							>
+								Session "fix auth" used
+								<span class="cost-link-wrapper" data-magnitude="low" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-low"
+										href="#"
+										style="display: inline"
+										>$0.12</a
+									>
+								</span>
+								over 14 tool calls. Workspace total:
+								<span class="cost-link-wrapper" data-magnitude="medium" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-medium"
+										href="#"
+										style="display: inline"
+										>$4.38</a
+									>
+								</span>
+								across 3 sessions. MTD:
+								<span class="cost-link-wrapper" data-magnitude="high" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-high"
+										href="#"
+										style="display: inline"
+										>$28.75</a
+									>
+								</span>
+								(62% of budget).
+							</p>
+						</div>
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<p
+								style="
+									font-size: var(--text-md);
+									color: var(--foreground-muted);
+									max-width: 420px;
+									line-height: 1.7;
+									margin: 0;
+								"
+							>
+								Session "fix auth" used
+								<span class="cost-link-wrapper" data-magnitude="low" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-low"
+										href="#"
+										style="display: inline"
+										>$0.12</a
+									>
+								</span>
+								over 14 tool calls. Workspace total:
+								<span class="cost-link-wrapper" data-magnitude="medium" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-medium"
+										href="#"
+										style="display: inline"
+										>$4.38</a
+									>
+								</span>
+								across 3 sessions. MTD:
+								<span class="cost-link-wrapper" data-magnitude="high" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-high"
+										href="#"
+										style="display: inline"
+										>$28.75</a
+									>
+								</span>
+								(62% of budget).
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 9: Inline Mono Mode — Both Themes
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Inline Mono Mode — No Color Noise</div>
+					<div class="theme-panels">
+						<div class="theme-panel gk-root theme-dark" data-theme="dark">
+							<span class="theme-panel-label">dark</span>
+							<p
+								style="
+									font-size: var(--text-md);
+									color: var(--foreground-muted);
+									max-width: 420px;
+									line-height: 1.7;
+									margin: 0;
+								"
+							>
+								Session "fix auth" used
+								<span class="cost-link-wrapper" data-magnitude="mono" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-mono"
+										href="#"
+										style="display: inline"
+										>$0.12</a
+									>
+								</span>
+								over 14 tool calls. Workspace total:
+								<span class="cost-link-wrapper" data-magnitude="mono" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-mono"
+										href="#"
+										style="display: inline"
+										>$4.38</a
+									>
+								</span>
+								across 3 sessions. MTD:
+								<span class="cost-link-wrapper" data-magnitude="mono" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-mono"
+										href="#"
+										style="display: inline"
+										>$28.75</a
+									>
+								</span>
+								(62% of budget).
+							</p>
+						</div>
+						<div class="theme-panel gk-root theme-light" data-theme="light">
+							<span class="theme-panel-label">light</span>
+							<p
+								style="
+									font-size: var(--text-md);
+									color: var(--foreground-muted);
+									max-width: 420px;
+									line-height: 1.7;
+									margin: 0;
+								"
+							>
+								Session "fix auth" used
+								<span class="cost-link-wrapper" data-magnitude="mono" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-mono"
+										href="#"
+										style="display: inline"
+										>$0.12</a
+									>
+								</span>
+								over 14 tool calls. Workspace total:
+								<span class="cost-link-wrapper" data-magnitude="mono" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-mono"
+										href="#"
+										style="display: inline"
+										>$4.38</a
+									>
+								</span>
+								across 3 sessions. MTD:
+								<span class="cost-link-wrapper" data-magnitude="mono" style="display: inline">
+									<a
+										class="cost-link cost-link-sm cost-link-mono"
+										href="#"
+										style="display: inline"
+										>$28.75</a
+									>
+								</span>
+								(62% of budget).
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 10: Live Interactive
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">
+						Live — Hover for Popover, Tab for Focus
+					</div>
+					<div
+						style="
+							display: flex;
+							gap: 24px;
+							flex-wrap: wrap;
+							align-items: center;
+							padding: 20px 24px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-md);
+						"
+					>
+						<span class="gk-small">Hover each:</span>
+						<div class="cost-link-wrapper" data-magnitude="low">
+							<a
+								class="cost-link cost-link-md cost-link-low"
+								href="#"
+								aria-label="$0.12 — View cost breakdown"
+								>$0.12</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$0.12</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-haiku-4</span>
+										<span class="popover-model-cost">$0.08</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$0.04</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div class="cost-link-wrapper" data-magnitude="medium">
+							<a
+								class="cost-link cost-link-md cost-link-medium"
+								href="#"
+								aria-label="$4.38 — View cost breakdown"
+								>$4.38</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$4.38</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$2.91</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-opus-4</span>
+										<span class="popover-model-cost">$1.22</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-haiku-4</span>
+										<span class="popover-model-cost">$0.25</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div class="cost-link-wrapper" data-magnitude="high">
+							<a
+								class="cost-link cost-link-md cost-link-high"
+								href="#"
+								aria-label="$28.75 — View cost breakdown"
+								>$28.75</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$28.75</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-opus-4</span>
+										<span class="popover-model-cost">$18.40</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$7.62</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-haiku-4</span>
+										<span class="popover-model-cost">$1.85</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div class="cost-link-wrapper" data-magnitude="mono">
+							<a
+								class="cost-link cost-link-md cost-link-mono"
+								href="#"
+								aria-label="$4.38 — View cost breakdown"
+								>$4.38</a
+							>
+							<div class="cost-link-popover">
+								<div class="popover-header">
+									<span class="popover-title">Breakdown</span>
+									<span class="popover-total">$4.38</span>
+								</div>
+								<div class="popover-body">
+									<div class="popover-row">
+										<span class="popover-model">claude-sonnet-4</span>
+										<span class="popover-model-cost">$2.91</span>
+									</div>
+									<div class="popover-row">
+										<span class="popover-model">claude-opus-4</span>
+										<span class="popover-model-cost">$1.22</span>
+									</div>
+								</div>
+								<div class="popover-footer">
+									<a class="popover-nav-link" href="#">
+										View in Usage
+										<svg
+											width="10"
+											height="10"
+											viewBox="0 0 10 10"
+											fill="none"
+										>
+											<path
+												d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5"
+												stroke="currentColor"
+												stroke-width="1.2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ═══════════════════════════════════════════════════════
+				     SECTION 11: Token Reference
+				     ═══════════════════════════════════════════════════════ -->
+				<div class="showcase-section">
+					<div class="showcase-section-title">Color Token Reference</div>
+					<div
+						style="
+							padding: 20px 24px;
+							background: var(--surface);
+							border: 1px solid var(--border);
+							border-radius: var(--radius-md);
+							font-family: var(--font-mono);
+							font-size: 11px;
+							line-height: 2;
+							color: var(--foreground-muted);
+						"
+					>
+						<div><strong style="color: var(--foreground)">Dark Theme:</strong></div>
+						<div>
+							<span
+								class="color-swatch"
+								style="background: oklch(0.7 0.12 142); margin-right: 8px"
+							></span>
+							low: oklch(0.7 0.12 142) — near --moss-400
+						</div>
+						<div>
+							<span
+								class="color-swatch"
+								style="background: oklch(0.8 0.15 82); margin-right: 8px"
+							></span>
+							medium: oklch(0.8 0.15 82) — near --amber-300, shifted yellow
+						</div>
+						<div>
+							<span
+								class="color-swatch"
+								style="background: oklch(0.68 0.17 8); margin-right: 8px"
+							></span>
+							high: oklch(0.68 0.17 8) — near --rose-400, shifted red
+						</div>
+						<div style="margin-top: 12px">
+							<strong style="color: var(--foreground)">Light Theme:</strong>
+						</div>
+						<div>
+							<span
+								class="color-swatch"
+								style="background: oklch(0.48 0.1 140); margin-right: 8px"
+							></span>
+							low: oklch(0.48 0.1 140) — near --moss-600
+						</div>
+						<div>
+							<span
+								class="color-swatch"
+								style="background: oklch(0.52 0.14 82); margin-right: 8px"
+							></span>
+							medium: oklch(0.52 0.14 82) — between --gold-500 and --amber-600
+						</div>
+						<div>
+							<span
+								class="color-swatch"
+								style="background: oklch(0.48 0.18 8); margin-right: 8px"
+							></span>
+							high: oklch(0.48 0.18 8) — near --rose-700, redder
+						</div>
+						<div style="margin-top: 12px">
+							<strong style="color: var(--foreground)">Mono:</strong> Uses
+							--foreground-muted (both themes)
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

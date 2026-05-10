@@ -1,0 +1,3 @@
+I like variant B the most.
+
+However, please align it with the styles and the general feel of refined variant of character-creator-editor C:\_MP_projects\Grovekeeper\designs\character-creator-editor\refined.html Please understand the decisions we made there and the finished summary so that these pages don't collide. I like the visuals of the variant B here in the Balkin for Wizard, but let's check that the styles match so that we have unified styles for importing characters. C:\_MP_projects\Grovekeeper\designs\character-creator-editor

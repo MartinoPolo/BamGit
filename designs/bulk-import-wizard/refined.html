@@ -1,0 +1,1746 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Bulk Import Wizard — Refined</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../tokens.css" />
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+
+			/* ── Refined eyebrow tag ─────────────────── */
+			.refined-tag {
+				position: fixed;
+				top: 10px;
+				left: 10px;
+				z-index: 100;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				padding: 4px 10px;
+				color: var(--foreground-subtle);
+				user-select: none;
+			}
+
+			/* ── Modal dialog ────────────────────────── */
+			.wizard-dialog {
+				width: 96vw;
+				max-width: 1280px;
+				height: 88vh;
+				max-height: 820px;
+				display: flex;
+				flex-direction: column;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-xl);
+				overflow: hidden;
+			}
+
+			/* ── Top toolbar ─────────────────────────── */
+			.wizard-toolbar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-5) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+				min-height: 56px;
+			}
+
+			.toolbar-left {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex: 1;
+				min-width: 0;
+			}
+
+			.toolbar-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				white-space: nowrap;
+				flex-shrink: 0;
+				color: var(--foreground);
+			}
+
+			.toolbar-divider {
+				width: 1px;
+				height: 22px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+
+			.toolbar-path {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				background: var(--background);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: var(--space-2) var(--space-4);
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				min-width: 0;
+				flex: 1;
+				max-width: 400px;
+			}
+
+			.toolbar-path-text {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				direction: rtl;
+				text-align: left;
+			}
+
+			.toolbar-path-icon {
+				flex-shrink: 0;
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+			}
+
+			.toolbar-stats {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex-shrink: 0;
+			}
+
+			.toolbar-stat {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+			}
+
+			.toolbar-stat-value {
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+			}
+
+			.toolbar-close {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background 120ms,
+					color 120ms;
+				flex-shrink: 0;
+			}
+			.toolbar-close:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+			}
+			.toolbar-close:active {
+				transform: scale(0.94);
+			}
+			.toolbar-close:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			/* ── Three-panel split layout ────────────── */
+			.wizard-body {
+				display: flex;
+				flex: 1;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ── Left panel: folder tree ─────────────── */
+			.panel-tree {
+				width: 300px;
+				min-width: 260px;
+				display: flex;
+				flex-direction: column;
+				border-right: 1px solid var(--border);
+				background: var(--background);
+				flex-shrink: 0;
+			}
+
+			.panel-tree-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-5) var(--space-6);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+
+			.panel-tree-header .gk-input {
+				height: 28px;
+				font-size: 12px;
+				background: var(--surface);
+				flex: 1;
+			}
+
+			.select-all-toggle {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			.panel-tree-scroll {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-3) 0;
+			}
+
+			/* Tree items */
+			.tree-faction-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-6);
+				cursor: pointer;
+				user-select: none;
+				transition: background 100ms;
+				border: none;
+				background: transparent;
+				width: 100%;
+				text-align: left;
+				font-family: inherit;
+				color: inherit;
+			}
+			.tree-faction-header:hover {
+				background: var(--surface-hover);
+			}
+
+			.tree-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				transition: transform 160ms var(--ease-out);
+			}
+			.tree-faction.is-open .tree-chevron {
+				transform: rotate(90deg);
+			}
+
+			.tree-faction-icon {
+				width: 16px;
+				height: 16px;
+				color: var(--amber-400);
+				flex-shrink: 0;
+			}
+
+			.tree-faction-name {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				flex: 1;
+			}
+
+			.tree-faction-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.tree-children {
+				overflow: hidden;
+			}
+			.tree-faction:not(.is-open) .tree-children {
+				display: none;
+			}
+
+			.tree-character {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-6);
+				padding-left: calc(var(--space-6) + 14px + var(--space-3));
+				cursor: pointer;
+				transition: background 100ms;
+				border-left: 2px solid transparent;
+				margin-left: var(--space-6);
+			}
+			.tree-character:hover {
+				background: var(--surface-hover);
+			}
+			.tree-character.is-selected {
+				background: color-mix(in oklch, var(--primary) 10%, transparent);
+				border-left-color: var(--primary);
+			}
+
+			.tree-char-name {
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.tree-char-sounds {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			.tree-char-quality {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tree-char-quality.is-ready {
+				background: var(--status-success);
+			}
+			.tree-char-quality.is-partial {
+				background: var(--status-warning);
+			}
+			.tree-char-quality.is-sparse {
+				background: var(--status-danger);
+			}
+
+			/* ── Center panel: event assignments ─────── */
+			.panel-events {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
+				background: var(--background);
+			}
+
+			/* Character detail header */
+			.detail-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-6) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 50%, var(--background));
+				flex-shrink: 0;
+			}
+
+			.detail-avatar {
+				width: 48px;
+				height: 48px;
+				border-radius: var(--radius-lg);
+				background: var(--surface-2);
+				border: 2px dashed var(--border-strong);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				overflow: hidden;
+			}
+
+			.detail-avatar-placeholder {
+				font-size: 20px;
+				opacity: 0.6;
+			}
+
+			.detail-meta {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.detail-name-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-1);
+			}
+
+			.detail-name-input {
+				font-family: var(--font-sans);
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: var(--radius-sm);
+				padding: var(--space-1) var(--space-3);
+				margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-3));
+				outline: none;
+				width: 200px;
+				transition:
+					border-color 120ms,
+					background 120ms;
+			}
+			.detail-name-input:hover {
+				border-color: var(--border);
+				background: var(--surface);
+			}
+			.detail-name-input:focus {
+				border-color: var(--ring);
+				background: var(--surface);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			.detail-subtitle {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			.detail-subtitle-sep {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			.detail-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex-shrink: 0;
+			}
+
+			/* ── Scrollable event content ────────────── */
+			.event-scroll {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-6) var(--space-8) var(--space-10);
+			}
+
+			/* ── Tier sections (matching character-editor) ── */
+			.tier-section {
+				margin-bottom: var(--space-8);
+			}
+			.tier-section:last-child {
+				margin-bottom: 0;
+			}
+
+			.tier-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				width: 100%;
+				padding: var(--space-3) var(--space-4);
+				border: none;
+				background: transparent;
+				cursor: pointer;
+				transition: background 160ms;
+				font-family: inherit;
+				color: inherit;
+				text-align: left;
+				border-radius: var(--radius-md);
+			}
+			.tier-header:hover {
+				background: color-mix(in oklch, var(--foreground) 3%, transparent);
+			}
+			.tier-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				transition: transform 160ms ease;
+				flex-shrink: 0;
+			}
+			.tier-section.is-open .tier-chevron {
+				transform: rotate(90deg);
+			}
+			.tier-marker {
+				width: 9px;
+				height: 9px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tier-marker.critical {
+				background: var(--status-danger);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--status-danger) 50%, transparent);
+			}
+			.tier-marker.important {
+				background: var(--status-warning);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--status-warning) 40%, transparent);
+			}
+			.tier-marker.normal {
+				background: var(--foreground-muted);
+			}
+			.tier-label {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground);
+			}
+			.tier-section.has-missing.tier-critical .tier-label,
+			.tier-section.has-missing.tier-critical .tier-progress {
+				color: var(--status-danger);
+			}
+			.tier-section.has-missing.tier-important .tier-label,
+			.tier-section.has-missing.tier-important .tier-progress {
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
+			}
+			.tier-progress {
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+			.tier-progress strong {
+				font-weight: var(--weight-semibold);
+				color: inherit;
+			}
+			.tier-section:not(.has-missing) .tier-progress strong {
+				color: var(--foreground);
+			}
+
+			.tier-events {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-3);
+				padding: var(--space-3) 0 0;
+			}
+			.tier-section:not(.is-open) .tier-events {
+				display: none;
+			}
+
+			/* ── Event card (matching character-editor) ── */
+			.event-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: var(--space-4) var(--space-5);
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				transition:
+					border-color 200ms,
+					background 200ms,
+					box-shadow 200ms;
+			}
+			.event-card:hover {
+				border-color: var(--border-strong);
+			}
+			.event-card.drop-target {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 6%, var(--surface));
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 15%, transparent);
+			}
+			.event-card.is-critical-empty {
+				border-color: color-mix(in oklch, var(--status-danger) 45%, var(--border));
+				background: color-mix(in oklch, var(--status-danger) 5%, var(--surface));
+			}
+			.event-card.is-important-empty {
+				border-color: color-mix(in oklch, var(--status-warning) 40%, var(--border));
+				background: color-mix(in oklch, var(--status-warning) 4%, var(--surface));
+			}
+
+			.event-card-header {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: var(--space-4);
+				margin-bottom: var(--space-2);
+			}
+			.event-name-row {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex-wrap: wrap;
+			}
+			.event-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+			}
+			.event-id {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				padding: 2px 6px;
+				border-radius: var(--radius-xs);
+				white-space: nowrap;
+			}
+			.event-count {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				white-space: nowrap;
+			}
+			.event-count.is-multi {
+				color: var(--status-success);
+			}
+
+			.event-sounds-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+			}
+
+			/* ── Sound chip (matching character-editor) ── */
+			.sound-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+				background: color-mix(in oklch, var(--primary) 10%, var(--surface-2));
+				border: 1px solid color-mix(in oklch, var(--primary) 22%, var(--border));
+				border-radius: var(--radius-sm);
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				transition:
+					background 120ms,
+					border-color 120ms;
+				min-height: 34px;
+			}
+			.sound-chip:hover {
+				background: color-mix(in oklch, var(--primary) 16%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--primary) 36%, var(--border));
+			}
+			.chip-play {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				background: var(--primary);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				border: none;
+				transition: background 120ms;
+			}
+			.chip-play:hover {
+				background: color-mix(in oklch, var(--primary) 80%, white 20%);
+			}
+			.chip-play svg {
+				width: 10px;
+				height: 10px;
+				color: var(--primary-fg);
+			}
+			.waveform {
+				display: flex;
+				align-items: center;
+				gap: 1px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+			.waveform .bar {
+				width: 2px;
+				border-radius: 1px;
+				background: var(--primary);
+				opacity: 0.55;
+			}
+			.sound-chip:hover .waveform .bar {
+				opacity: 0.85;
+			}
+			.chip-name {
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
+				flex: 1;
+			}
+			.chip-duration {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.chip-remove {
+				width: 18px;
+				height: 18px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--radius-xs);
+				cursor: pointer;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				background: transparent;
+				border: none;
+				transition:
+					color 120ms,
+					background 120ms;
+			}
+			.chip-remove:hover {
+				color: var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.chip-remove svg {
+				width: 12px;
+				height: 12px;
+			}
+
+			/* ── Drop zone (matching character-editor) ── */
+			.drop-zone {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--space-3);
+				padding: var(--space-3) var(--space-4);
+				border: 1px dashed var(--border);
+				border-radius: var(--radius-sm);
+				color: var(--foreground-subtle);
+				font-size: var(--text-sm);
+				cursor: pointer;
+				transition:
+					border-color 200ms,
+					background 200ms,
+					color 200ms;
+				min-height: 32px;
+			}
+			.drop-zone:hover {
+				border-color: var(--border-strong);
+				color: var(--foreground-muted);
+				background: color-mix(in oklch, var(--foreground) 2%, transparent);
+			}
+			.drop-zone svg {
+				width: 13px;
+				height: 13px;
+				flex-shrink: 0;
+			}
+			.event-card.is-critical-empty .drop-zone {
+				border-color: color-mix(in oklch, var(--status-danger) 40%, var(--border));
+				color: color-mix(in oklch, var(--status-danger) 70%, var(--foreground-subtle));
+			}
+			.event-card.is-important-empty .drop-zone {
+				border-color: color-mix(in oklch, var(--status-warning) 40%, var(--border));
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground-subtle));
+			}
+			.drop-zone.is-secondary {
+				min-height: 26px;
+				padding: var(--space-2) var(--space-3);
+				font-size: var(--text-xs);
+				border-style: dashed;
+			}
+
+			/* ── Right panel: sound pool sidebar (matching character-editor) ── */
+			.panel-pool {
+				width: 280px;
+				display: flex;
+				flex-direction: column;
+				border-left: 1px solid var(--border);
+				background: color-mix(in oklch, var(--surface) 90%, var(--background));
+				overflow: hidden;
+				min-height: 0;
+				flex-shrink: 0;
+			}
+			.pool-header {
+				padding: var(--space-6) var(--space-6) var(--space-4);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+			.pool-title-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: var(--space-4);
+			}
+			.pool-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				color: var(--foreground);
+			}
+			.pool-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+			.pool-count strong {
+				color: var(--foreground);
+			}
+
+			.pool-search {
+				position: relative;
+				margin: 0 var(--space-6) var(--space-4);
+				flex-shrink: 0;
+			}
+			.pool-search svg {
+				position: absolute;
+				left: 9px;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 13px;
+				height: 13px;
+				color: var(--foreground-subtle);
+				pointer-events: none;
+			}
+			.pool-search .gk-input {
+				padding-left: 30px;
+				height: 28px;
+				font-size: 12px;
+			}
+
+			.pool-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-2) var(--space-3);
+			}
+
+			.pool-item {
+				display: grid;
+				grid-template-columns: 12px 1fr auto auto;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-3);
+				border-radius: var(--radius-sm);
+				cursor: grab;
+				transition: background 120ms;
+				min-height: 36px;
+			}
+			.pool-item:hover {
+				background: var(--surface-2);
+			}
+			.pool-item:active {
+				cursor: grabbing;
+			}
+			.pool-item .drag-handle {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				opacity: 0.45;
+				transition: opacity 120ms;
+			}
+			.pool-item:hover .drag-handle {
+				opacity: 1;
+			}
+			.pool-item .drag-handle .dot-row {
+				display: flex;
+				gap: 2px;
+			}
+			.pool-item .drag-handle .dot {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: currentColor;
+			}
+			.pool-info {
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+			.pool-filename {
+				font-family: var(--font-mono);
+				font-size: 11.5px;
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.pool-meta {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+			.pool-duration {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+			}
+			.pool-assigned-to {
+				font-size: 10px;
+				color: var(--status-success);
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				white-space: nowrap;
+			}
+			.pool-assigned-to .dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--status-success);
+			}
+
+			.pool-play-btn {
+				width: 26px;
+				height: 26px;
+				border-radius: 50%;
+				background: transparent;
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				color: var(--foreground-muted);
+				transition:
+					background 120ms,
+					border-color 120ms,
+					color 120ms;
+			}
+			.pool-play-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.pool-play-btn svg {
+				width: 10px;
+				height: 10px;
+			}
+
+			.pool-footer {
+				display: flex;
+				justify-content: flex-end;
+				padding: var(--space-3) var(--space-6);
+				border-top: 1px solid var(--border);
+				flex-shrink: 0;
+				background: color-mix(in oklch, var(--surface) 70%, var(--background));
+			}
+
+			/* ── Footer ──────────────────────────────── */
+			.wizard-footer {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-4) var(--space-8);
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+
+			.footer-stats {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+			}
+
+			.footer-stat {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			.footer-stat-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			.footer-progress {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+
+			.progress-bar {
+				width: 140px;
+				height: 6px;
+				background: var(--surface-2);
+				border-radius: 3px;
+				overflow: hidden;
+				border: 1px solid var(--border);
+			}
+
+			.progress-bar-fill {
+				height: 100%;
+				border-radius: 3px;
+				transition: width 300ms var(--ease-out);
+			}
+
+			.progress-label {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+			.progress-label strong {
+				color: var(--foreground);
+				font-weight: var(--weight-semibold);
+			}
+
+			.footer-storage {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+
+			.footer-actions {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+
+			/* ── SVG icon helpers ────────────────────── */
+			.icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+
+			/* ── Responsive ──────────────────────────── */
+			@media (max-width: 900px) {
+				.wizard-dialog {
+					width: 100vw;
+					height: 100vh;
+					max-height: 100vh;
+					max-width: 100vw;
+					border-radius: 0;
+				}
+				.wizard-body {
+					flex-direction: column;
+				}
+				.panel-tree {
+					width: 100%;
+					min-width: 0;
+					max-height: 35vh;
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+				}
+				.panel-pool {
+					width: 100%;
+					border-left: none;
+					border-top: 1px solid var(--border);
+					max-height: 250px;
+				}
+				.toolbar-path {
+					display: none;
+				}
+			}
+
+			/* ── Scrollbar ───────────────────────────── */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
+		</style>
+	</head>
+	<body>
+		<div
+			class="gk-root theme-dark"
+			style="width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center"
+		>
+			<span class="refined-tag gk-eyebrow"
+				>REFINED — Variant B + character-editor style unification + sound pool sidebar</span
+			>
+
+			<!-- Backdrop -->
+			<div class="gk-modal-backdrop" style="position: absolute">
+				<!-- Dialog -->
+				<div class="wizard-dialog">
+					<!-- ════════════ TOP TOOLBAR ════════════ -->
+					<div class="wizard-toolbar">
+						<div class="toolbar-left">
+							<span class="toolbar-title">Import Folder</span>
+							<span class="toolbar-divider"></span>
+							<div class="toolbar-path">
+								<svg class="toolbar-path-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+									<path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z" />
+								</svg>
+								<span class="toolbar-path-text">D:\Games\WC3\Sounds\Voice</span>
+							</div>
+							<button class="gk-btn gk-btn-sm gk-btn-ghost" style="flex-shrink: 0">Change</button>
+						</div>
+						<div class="toolbar-stats">
+							<div class="toolbar-stat">
+								<svg class="icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+									<circle cx="8" cy="5.5" r="3" /><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" />
+								</svg>
+								<span class="toolbar-stat-value">23</span> characters
+							</div>
+							<div class="toolbar-stat">
+								<svg class="icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+									<path d="M3 3v10h10" /><path d="M6 10V7m3 3V5m3 5V3" />
+								</svg>
+								<span class="toolbar-stat-value">247</span> sounds
+							</div>
+							<div class="toolbar-stat" style="gap: var(--space-3)">
+								<span class="gk-badge gk-badge-success" style="height: 18px; font-size: 10px">
+									<span class="gk-badge-dot"></span>18 ready
+								</span>
+								<span class="gk-badge gk-badge-warning" style="height: 18px; font-size: 10px">
+									<span class="gk-badge-dot"></span>5 partial
+								</span>
+							</div>
+						</div>
+						<button class="toolbar-close" title="Close">
+							<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+								<path d="M4 4l8 8M12 4l-8 8" />
+							</svg>
+						</button>
+					</div>
+
+					<!-- ════════════ BODY: THREE PANELS ════════════ -->
+					<div class="wizard-body">
+						<!-- ──── LEFT: FILE TREE ──── -->
+						<div class="panel-tree">
+							<div class="panel-tree-header">
+								<input class="gk-input" type="text" placeholder="Filter characters..." />
+								<label class="select-all-toggle">
+									<input type="checkbox" class="gk-check" data-state="indeterminate" />
+									<span>All</span>
+								</label>
+							</div>
+
+							<div class="panel-tree-scroll">
+								<!-- Faction: Orcs (open) -->
+								<div class="tree-faction is-open">
+									<button class="tree-faction-header" type="button">
+										<svg class="tree-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+										<svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z" /></svg>
+										<span class="tree-faction-name">Orc</span>
+										<span class="tree-faction-count">7 units</span>
+									</button>
+									<div class="tree-children">
+										<div class="tree-character is-selected">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Grunt</span>
+											<span class="tree-char-sounds">14 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Peon</span>
+											<span class="tree-char-sounds">16 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Shaman</span>
+											<span class="tree-char-sounds">12 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Blademaster</span>
+											<span class="tree-char-sounds">18 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Raider</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Headhunter</span>
+											<span class="tree-char-sounds">9 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Witch Doctor</span>
+											<span class="tree-char-sounds">13 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Faction: Human -->
+								<div class="tree-faction is-open">
+									<button class="tree-faction-header" type="button">
+										<svg class="tree-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+										<svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z" /></svg>
+										<span class="tree-faction-name">Human</span>
+										<span class="tree-faction-count">6 units</span>
+									</button>
+									<div class="tree-children">
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Footman</span>
+											<span class="tree-char-sounds">12 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Paladin</span>
+											<span class="tree-char-sounds">20 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Sorceress</span>
+											<span class="tree-char-sounds">10 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" />
+											<span class="tree-char-name" style="color: var(--foreground-subtle)">Peasant</span>
+											<span class="tree-char-sounds">3 files</span>
+											<span class="tree-char-quality is-sparse"></span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Faction: Undead -->
+								<div class="tree-faction is-open">
+									<button class="tree-faction-header" type="button">
+										<svg class="tree-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+										<svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z" /></svg>
+										<span class="tree-faction-name">Undead</span>
+										<span class="tree-faction-count">5 units</span>
+									</button>
+									<div class="tree-children">
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Death Knight</span>
+											<span class="tree-char-sounds">19 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Necromancer</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Ghoul</span>
+											<span class="tree-char-sounds">7 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Night Elf (collapsed) -->
+								<div class="tree-faction">
+									<button class="tree-faction-header" type="button">
+										<svg class="tree-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+										<svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z" /></svg>
+										<span class="tree-faction-name">Night Elf</span>
+										<span class="tree-faction-count">5 units</span>
+									</button>
+									<div class="tree-children">
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<span class="tree-char-name">Archer</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- ──── CENTER: EVENT ASSIGNMENTS ──── -->
+						<div class="panel-events">
+							<!-- Character header -->
+							<div class="detail-header">
+								<div class="detail-avatar">
+									<span class="detail-avatar-placeholder">&#9876;</span>
+								</div>
+								<div class="detail-meta">
+									<div class="detail-name-row">
+										<input class="detail-name-input" type="text" value="Grunt" />
+										<span class="gk-badge gk-badge-success">
+											<span class="gk-badge-dot"></span>Ready
+										</span>
+									</div>
+									<div class="detail-subtitle">
+										<span>Orc</span>
+										<span class="detail-subtitle-sep"></span>
+										<span class="font-mono" style="font-size: 11px">14 sound files</span>
+										<span class="detail-subtitle-sep"></span>
+										<span class="font-mono" style="font-size: 11px">6 / 7 events</span>
+									</div>
+								</div>
+								<div class="detail-actions">
+									<button class="gk-btn gk-btn-sm gk-btn-ghost" title="Auto-remap">
+										<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+											<path d="M2 8a6 6 0 0110.5-4M14 8a6 6 0 01-10.5 4" />
+											<path d="M12.5 1v3h-3M3.5 15v-3h3" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+										Re-map
+									</button>
+								</div>
+							</div>
+
+							<!-- Events scroll -->
+							<div class="event-scroll">
+								<!-- ══ CRITICAL TIER ══ -->
+								<section class="tier-section tier-critical is-open">
+									<button class="tier-header" type="button" aria-expanded="true">
+										<svg class="tier-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+										<span class="tier-marker critical"></span>
+										<span class="tier-label">Critical Events</span>
+										<span class="tier-progress"><strong>3</strong> / 3 assigned</span>
+									</button>
+									<div class="tier-events">
+										<!-- session.start — 3 sounds -->
+										<div class="event-card">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Session Start</span>
+													<code class="event-id">session.start</code>
+												</div>
+												<span class="event-count is-multi">3 sounds</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:4px"></span><span class="bar" style="height:9px"></span><span class="bar" style="height:6px"></span><span class="bar" style="height:12px"></span><span class="bar" style="height:8px"></span><span class="bar" style="height:5px"></span></span>
+													<span class="chip-name">OrcGrunt_Ready1.wav</span>
+													<span class="chip-duration">1.2s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:5px"></span><span class="bar" style="height:7px"></span><span class="bar" style="height:10px"></span><span class="bar" style="height:6px"></span><span class="bar" style="height:9px"></span></span>
+													<span class="chip-name">OrcGrunt_Ready2.wav</span>
+													<span class="chip-duration">1.0s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:3px"></span><span class="bar" style="height:8px"></span><span class="bar" style="height:11px"></span><span class="bar" style="height:5px"></span><span class="bar" style="height:7px"></span></span>
+													<span class="chip-name">OrcGrunt_Ready3.wav</span>
+													<span class="chip-duration">0.9s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="drop-zone is-secondary">
+													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+													Drop another sound
+												</div>
+											</div>
+										</div>
+
+										<!-- session.needs-input — 2 sounds -->
+										<div class="event-card">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Needs Input</span>
+													<code class="event-id">session.needs-input</code>
+												</div>
+												<span class="event-count is-multi">2 sounds</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:6px"></span><span class="bar" style="height:10px"></span><span class="bar" style="height:4px"></span><span class="bar" style="height:8px"></span><span class="bar" style="height:11px"></span></span>
+													<span class="chip-name">OrcGrunt_What1.wav</span>
+													<span class="chip-duration">0.8s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:7px"></span><span class="bar" style="height:5px"></span><span class="bar" style="height:9px"></span><span class="bar" style="height:4px"></span><span class="bar" style="height:8px"></span></span>
+													<span class="chip-name">OrcGrunt_What2.wav</span>
+													<span class="chip-duration">0.7s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="drop-zone is-secondary">
+													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+													Drop another sound
+												</div>
+											</div>
+										</div>
+
+										<!-- task.error — 1 sound -->
+										<div class="event-card">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Task Error</span>
+													<code class="event-id">task.error</code>
+												</div>
+												<span class="event-count is-multi">1 sound</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:8px"></span><span class="bar" style="height:12px"></span><span class="bar" style="height:5px"></span><span class="bar" style="height:9px"></span><span class="bar" style="height:6px"></span></span>
+													<span class="chip-name">OrcGrunt_Death1.wav</span>
+													<span class="chip-duration">1.4s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="drop-zone is-secondary">
+													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+													Drop another sound
+												</div>
+											</div>
+										</div>
+									</div>
+								</section>
+
+								<!-- ══ STANDARD TIER (has missing) ══ -->
+								<section class="tier-section tier-important has-missing is-open">
+									<button class="tier-header" type="button" aria-expanded="true">
+										<svg class="tier-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+										<span class="tier-marker important"></span>
+										<span class="tier-label">Standard Events</span>
+										<span class="tier-progress"><strong>3</strong> / 4 assigned · 1 missing</span>
+									</button>
+									<div class="tier-events">
+										<!-- task.acknowledge — assigned -->
+										<div class="event-card">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Acknowledge</span>
+													<code class="event-id">task.acknowledge</code>
+												</div>
+												<span class="event-count is-multi">3 sounds</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:5px"></span><span class="bar" style="height:8px"></span><span class="bar" style="height:11px"></span><span class="bar" style="height:6px"></span></span>
+													<span class="chip-name">OrcGrunt_Yes1.wav</span>
+													<span class="chip-duration">0.6s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:6px"></span><span class="bar" style="height:9px"></span><span class="bar" style="height:4px"></span><span class="bar" style="height:7px"></span></span>
+													<span class="chip-name">OrcGrunt_Yes2.wav</span>
+													<span class="chip-duration">0.5s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:7px"></span><span class="bar" style="height:4px"></span><span class="bar" style="height:10px"></span><span class="bar" style="height:5px"></span></span>
+													<span class="chip-name">OrcGrunt_Yes3.wav</span>
+													<span class="chip-duration">0.7s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+											</div>
+										</div>
+
+										<!-- task.complete — assigned -->
+										<div class="event-card">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Task Complete</span>
+													<code class="event-id">task.complete</code>
+												</div>
+												<span class="event-count is-multi">1 sound</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:4px"></span><span class="bar" style="height:11px"></span><span class="bar" style="height:7px"></span><span class="bar" style="height:9px"></span></span>
+													<span class="chip-name">OrcGrunt_YesAttack1.wav</span>
+													<span class="chip-duration">0.9s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+											</div>
+										</div>
+
+										<!-- resource.limit — assigned -->
+										<div class="event-card">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Resource Limit</span>
+													<code class="event-id">resource.limit</code>
+												</div>
+												<span class="event-count is-multi">1 sound</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="sound-chip">
+													<button class="chip-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+													<span class="waveform"><span class="bar" style="height:10px"></span><span class="bar" style="height:6px"></span><span class="bar" style="height:8px"></span><span class="bar" style="height:12px"></span></span>
+													<span class="chip-name">OrcGrunt_Pissed1.wav</span>
+													<span class="chip-duration">1.8s</span>
+													<button class="chip-remove" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+												</div>
+											</div>
+										</div>
+
+										<!-- session.end — EMPTY (orange-tinted) -->
+										<div class="event-card is-important-empty">
+											<div class="event-card-header">
+												<div class="event-name-row">
+													<span class="event-name">Session End</span>
+													<code class="event-id">session.end</code>
+												</div>
+												<span class="event-count">0 sounds</span>
+											</div>
+											<div class="event-sounds-list">
+												<div class="drop-zone">
+													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+													No match — drag from sound pool →
+												</div>
+											</div>
+										</div>
+									</div>
+								</section>
+							</div>
+						</div>
+
+						<!-- ──── RIGHT: SOUND POOL SIDEBAR ──── -->
+						<aside class="panel-pool">
+							<div class="pool-header">
+								<div class="pool-title-row">
+									<span class="pool-title">Sound Pool</span>
+									<span class="pool-count"><strong>14</strong> files</span>
+								</div>
+							</div>
+
+							<!-- Search -->
+							<div class="pool-search">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+								<input class="gk-input" type="text" placeholder="Filter sounds..." />
+							</div>
+
+							<!-- Sound list -->
+							<div class="pool-list">
+								<!-- Assigned sounds -->
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Ready1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">1.2s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>session.start</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Ready2.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">1.0s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>session.start</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Ready3.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.9s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>session.start</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_What1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.8s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>needs-input</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_What2.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.7s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>needs-input</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Death1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">1.4s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>task.error</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Yes1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.6s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>acknowledge</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Yes2.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.5s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>acknowledge</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Yes3.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.7s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>acknowledge</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_YesAttack1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.9s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>task.complete</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Pissed1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">1.8s</span>
+											<span class="pool-assigned-to"><span class="dot"></span>resource.limit</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<!-- Unassigned sounds (no assigned-to tag) -->
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Warcry1.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">2.1s</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_What3.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">0.9s</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+
+								<div class="pool-item">
+									<div class="drag-handle"><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div><div class="dot-row"><span class="dot"></span><span class="dot"></span></div></div>
+									<div class="pool-info">
+										<span class="pool-filename">OrcGrunt_Pissed2.wav</span>
+										<div class="pool-meta">
+											<span class="pool-duration">2.4s</span>
+										</div>
+									</div>
+									<button class="pool-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg></button>
+								</div>
+							</div>
+
+							<div class="pool-footer">
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">
+									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M10 11v6" /><path d="M14 11v6" />
+									</svg>
+									Clear assignments
+								</button>
+							</div>
+						</aside>
+					</div>
+
+					<!-- ════════════ BOTTOM BAR ════════════ -->
+					<div class="wizard-footer">
+						<div class="footer-stats">
+							<div class="footer-stat">
+								<span class="footer-stat-dot" style="background: var(--status-success)"></span>
+								18 ready
+							</div>
+							<div class="footer-stat">
+								<span class="footer-stat-dot" style="background: var(--status-warning)"></span>
+								4 incomplete
+							</div>
+							<div class="footer-stat">
+								<span class="footer-stat-dot" style="background: var(--foreground-subtle)"></span>
+								1 skipped
+							</div>
+						</div>
+
+						<div class="footer-progress">
+							<div class="progress-bar">
+								<div class="progress-bar-fill" style="width: 86%; background: linear-gradient(90deg, var(--moss-400), var(--moss-300))"></div>
+							</div>
+							<span class="progress-label"><strong>6</strong> / 7 events</span>
+						</div>
+
+						<span class="footer-storage">~34.2 MB</span>
+
+						<div class="footer-actions">
+							<button class="gk-btn gk-btn-ghost">Cancel</button>
+							<button class="gk-btn gk-btn-primary gk-btn-lg">
+								<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+									<path d="M8 2v12M3 9l5 5 5-5" />
+								</svg>
+								Import 22 Characters
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
