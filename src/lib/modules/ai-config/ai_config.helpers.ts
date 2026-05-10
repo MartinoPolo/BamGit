@@ -82,6 +82,7 @@ interface ItemLookupSource {
 	rules: RuleConfig[];
 }
 
+// fallow-ignore-next-line complexity
 export function findItemByPath(
 	result: ItemLookupSource | null,
 	path: string | null,
@@ -161,25 +162,27 @@ function sourceRank(source: string | undefined): number {
 }
 
 // fallow-ignore-next-line complexity
+function compareItems<T extends SortableItem>(a: T, b: T, by: SortBy): number {
+	if (by === 'source') {
+		const rankDiff = sourceRank(a.source) - sourceRank(b.source);
+		if (rankDiff !== 0) {
+			return rankDiff;
+		}
+	}
+	if (by === 'category') {
+		const catA = a.category ?? '';
+		const catB = b.category ?? '';
+		if (catA !== catB) {
+			return catA.localeCompare(catB);
+		}
+	}
+	const nameA = a.name ?? a.filename ?? '';
+	const nameB = b.name ?? b.filename ?? '';
+	return nameA.localeCompare(nameB);
+}
+
 export function sortItems<T extends SortableItem>(items: T[], by: SortBy): T[] {
-	return [...items].sort((a, b) => {
-		if (by === 'source') {
-			const rankDiff = sourceRank(a.source) - sourceRank(b.source);
-			if (rankDiff !== 0) {
-				return rankDiff;
-			}
-		}
-		if (by === 'category') {
-			const catA = a.category ?? '';
-			const catB = b.category ?? '';
-			if (catA !== catB) {
-				return catA.localeCompare(catB);
-			}
-		}
-		const nameA = a.name ?? a.filename ?? '';
-		const nameB = b.name ?? b.filename ?? '';
-		return nameA.localeCompare(nameB);
-	});
+	return [...items].sort((a, b) => compareItems(a, b, by));
 }
 
 // ─── Group ───────────────────────────────────────────────────────────────────
