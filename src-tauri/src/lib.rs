@@ -11,12 +11,13 @@ mod session;
 mod window_manager;
 
 use commands::{
-    action_commands, ai_config_commands, ai_config_mutations, color_palette_commands,
-    dashboard_commands, dependency_commands, dialog_commands, git_status_commands,
-    github_auth_commands, github_commands, issue_commands, keyboard_shortcut_commands,
-    label_shape_mapping_commands, metrics_commands, notification_commands, portfolio_commands,
-    raw_requirements_commands, seed_commands, process_commands, session_commands,
-    terminal_commands, window_commands, workspace_command_commands, worktree_commands,
+    action_commands, ai_config_commands, ai_config_mutations, character_pack_commands,
+    color_palette_commands, dashboard_commands, dependency_commands, dialog_commands,
+    git_status_commands, github_auth_commands, github_commands, issue_commands,
+    keyboard_shortcut_commands, label_shape_mapping_commands, metrics_commands,
+    notification_commands, portfolio_commands, process_commands, raw_requirements_commands,
+    seed_commands, session_commands, terminal_commands, window_commands,
+    workspace_command_commands, worktree_commands,
 };
 use std::sync::Arc;
 
@@ -200,6 +201,17 @@ pub fn run() {
             notification_commands::list_sound_packs,
             notification_commands::install_sound_pack,
             notification_commands::remove_sound_pack,
+            character_pack_commands::get_character_packs,
+            character_pack_commands::get_character_pack_with_sounds,
+            character_pack_commands::create_character_pack,
+            character_pack_commands::update_character_pack,
+            character_pack_commands::delete_character_pack,
+            character_pack_commands::toggle_character_pack_enabled,
+            character_pack_commands::save_character_pack_sounds,
+            character_pack_commands::upload_character_avatar,
+            character_pack_commands::scan_folder_for_characters,
+            character_pack_commands::bulk_import_characters,
+            character_pack_commands::import_sound_files,
             color_palette_commands::get_all_color_palettes,
             color_palette_commands::get_color_palette,
             color_palette_commands::create_color_palette,

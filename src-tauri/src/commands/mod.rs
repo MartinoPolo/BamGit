@@ -1,4 +1,5 @@
 pub mod action_commands;
+pub mod character_pack_commands;
 pub mod ai_config_commands;
 pub mod ai_config_mutations;
 pub mod ai_config_providers;
