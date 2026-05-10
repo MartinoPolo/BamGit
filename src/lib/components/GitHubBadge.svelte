@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import { openUrl } from '$lib/opener.js';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import type { PullRequestState } from '$lib/types/generated';
@@ -29,14 +30,12 @@
 
 	let { type, state, number, url, disabled = false }: Props = $props();
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const ISSUE_ICONS: Record<string, any> = {
+	const ISSUE_ICONS: Record<string, Component> = {
 		open: CircleDot,
 		closed: CircleCheck,
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const PR_ICONS: Record<PullRequestState, any> = {
+	const PR_ICONS: Record<PullRequestState, Component> = {
 		open: GitPullRequest,
 		draft: GitPullRequestDraft,
 		'review-requested': Eye,
@@ -52,8 +51,7 @@
 			return null;
 		}
 		let config: StateConfig | undefined;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		let icon: any;
+		let icon: Component | undefined;
 		if (type === 'issue') {
 			config = ISSUE_STATE_CONFIG[state as keyof typeof ISSUE_STATE_CONFIG];
 			icon = ISSUE_ICONS[state];

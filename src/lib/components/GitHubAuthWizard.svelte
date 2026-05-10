@@ -63,10 +63,11 @@
 	async function startDeviceFlow() {
 		try {
 			const result = await invoke<DeviceFlowStartResult>('github_device_flow_start');
-			phase = { kind: 'initial', data: result };
+			phase = { kind: 'polling', data: result };
 			remainingSeconds = result.expires_in;
 			pollInterval = result.interval;
 			startCountdown();
+			schedulePoll();
 		} catch (error) {
 			if (error instanceof MockDesktopOnlyError) {
 				handleClose();
@@ -95,12 +96,10 @@
 	}
 
 	async function handleOpenGitHub() {
-		if (phase === null || (phase.kind !== 'initial' && phase.kind !== 'polling')) {
+		if (phase === null || phase.kind !== 'polling') {
 			return;
 		}
 		await openUrl(phase.data.verification_uri);
-		phase = { kind: 'polling', data: phase.data };
-		schedulePoll();
 	}
 
 	function schedulePoll() {
@@ -129,7 +128,6 @@
 				phase = { kind: 'success', user: result.user };
 				onconnected?.(result.user);
 			} else {
-				// Unexpected success status — treat as connected
 				phase = {
 					kind: 'error',
 					errorType: 'network_error',
@@ -139,21 +137,21 @@
 		} catch (error) {
 			const errorMessage = String(error);
 
-			if (errorMessage === 'authorization_pending') {
+			if (errorMessage.includes('authorization_pending')) {
 				schedulePoll();
 				return;
 			}
-			if (errorMessage === 'slow_down') {
+			if (errorMessage.includes('slow_down')) {
 				pollInterval += 5;
 				schedulePoll();
 				return;
 			}
-			if (errorMessage === 'expired_token') {
+			if (errorMessage.includes('expired_token')) {
 				clearAllTimers();
 				phase = { kind: 'expired' };
 				return;
 			}
-			if (errorMessage === 'access_denied') {
+			if (errorMessage.includes('access_denied')) {
 				clearAllTimers();
 				phase = {
 					kind: 'error',
@@ -173,7 +171,7 @@
 	}
 
 	async function handleCopyCode() {
-		if (phase === null || (phase.kind !== 'initial' && phase.kind !== 'polling')) {
+		if (phase === null || phase.kind !== 'polling') {
 			return;
 		}
 		try {
@@ -234,13 +232,9 @@
 				<div class="flex items-center justify-center py-8">
 					<Loader2 size={24} class="animate-spin text-muted-foreground" />
 				</div>
-			{:else if phase.kind === 'initial' || phase.kind === 'polling'}
+			{:else if phase.kind === 'polling'}
 				<p class="text-center text-sm text-muted-foreground">
-					{#if phase.kind === 'initial'}
-						Copy this code and enter it on GitHub to connect your account.
-					{:else}
-						Waiting for authorization...
-					{/if}
+					Copy this code and enter it on GitHub to connect your account.
 				</p>
 
 				<!-- User code display -->
@@ -287,12 +281,10 @@
 				</a>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 
-				{#if phase.kind === 'polling'}
-					<div class="flex items-center gap-2 text-sm text-muted-foreground">
-						<Loader2 size={14} class="animate-spin" />
-						<span>Polling for authorization...</span>
-					</div>
-				{/if}
+				<div class="flex items-center gap-2 text-sm text-muted-foreground">
+					<Loader2 size={14} class="animate-spin" />
+					<span>Waiting for authorization...</span>
+				</div>
 			{:else if phase.kind === 'expired'}
 				<div class="flex flex-col items-center gap-3 py-4">
 					<Clock size={32} class="text-status-warning" />
@@ -332,14 +324,12 @@
 		<Dialog.Footer>
 			{#if phase === null}
 				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
-			{:else if phase.kind === 'initial'}
+			{:else if phase.kind === 'polling'}
 				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
 				<Button onclick={handleOpenGitHub}>
 					<ExternalLink size={14} />
 					Open GitHub
 				</Button>
-			{:else if phase.kind === 'polling'}
-				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
 			{:else if phase.kind === 'expired'}
 				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
 				<Button onclick={handleGetNewCode}>Get New Code</Button>

@@ -162,34 +162,15 @@ async fn playback_queue_actor(mut receiver: mpsc::UnboundedReceiver<QueueMessage
                 event_type,
                 session_id,
             } => {
-                // Critical events bypass debounce
-                if !event_type.is_critical() {
-                    let debounce_key = (session_id.clone(), event_type);
-                    let debounce_window = debounce_window_for(event_type);
-                    let now = Instant::now();
-
-                    if let Some(last_fired) = debounce_map.get(&debounce_key) {
-                        if now.duration_since(*last_fired).as_millis()
-                            < u128::from(debounce_window)
-                        {
-                            log::debug!(
-                                "Debounced {} for session {}",
-                                event_type.as_str(),
-                                debounce_key.0
-                            );
-                            continue;
-                        }
-                    }
-                    debounce_map.insert(debounce_key, now);
+                if is_debounced(event_type, session_id, &mut debounce_map) {
+                    continue;
                 }
 
-                // Pick from candidates using rotation
                 let path = match pick_from_candidates(&candidates, event_type, &mut rotation_map) {
                     Some(path) => path,
                     None => continue,
                 };
 
-                // Collect any queued sounds into a batch
                 let mut batch = vec![QueuedSound { path, volume }];
                 while batch.len() < MAX_QUEUE_SIZE {
                     match receiver.try_recv() {
@@ -199,18 +180,8 @@ async fn playback_queue_actor(mut receiver: mpsc::UnboundedReceiver<QueueMessage
                             event_type: next_event_type,
                             session_id: next_session_id,
                         }) => {
-                            if !next_event_type.is_critical() {
-                                let debounce_key = (next_session_id, next_event_type);
-                                let debounce_window = debounce_window_for(next_event_type);
-                                let now = Instant::now();
-                                if let Some(last_fired) = debounce_map.get(&debounce_key) {
-                                    if now.duration_since(*last_fired).as_millis()
-                                        < u128::from(debounce_window)
-                                    {
-                                        continue;
-                                    }
-                                }
-                                debounce_map.insert(debounce_key, now);
+                            if is_debounced(next_event_type, next_session_id, &mut debounce_map) {
+                                continue;
                             }
                             if let Some(path) = pick_from_candidates(
                                 &next_candidates,
@@ -257,6 +228,31 @@ async fn playback_queue_actor(mut receiver: mpsc::UnboundedReceiver<QueueMessage
             }
         }
     }
+}
+
+fn is_debounced(
+    event_type: NotificationEventType,
+    session_id: String,
+    debounce_map: &mut HashMap<(String, NotificationEventType), Instant>,
+) -> bool {
+    if event_type.is_critical() {
+        return false;
+    }
+    let debounce_key = (session_id, event_type);
+    let debounce_window = debounce_window_for(event_type);
+    let now = Instant::now();
+    if let Some(last_fired) = debounce_map.get(&debounce_key) {
+        if now.duration_since(*last_fired).as_millis() < u128::from(debounce_window) {
+            log::debug!(
+                "Debounced {} for session {}",
+                event_type.as_str(),
+                debounce_key.0
+            );
+            return true;
+        }
+    }
+    debounce_map.insert(debounce_key, now);
+    false
 }
 
 fn debounce_window_for(event_type: NotificationEventType) -> u64 {

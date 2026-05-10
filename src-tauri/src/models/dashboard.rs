@@ -71,6 +71,7 @@ pub struct Dashboard {
     pub worktree_parent_folder: Option<String>,
     pub color_palette_id: Option<String>,
     pub accent_color: Option<String>,
+    pub chart_color_theme: Option<String>,
     pub default_shape: String,
     pub priorities_enabled: bool,
     pub status: DashboardStatus,
@@ -87,6 +88,7 @@ pub struct CreateDashboardRequest {
     pub worktree_parent_folder: Option<String>,
     pub color_palette_id: Option<String>,
     pub accent_color: Option<String>,
+    pub chart_color_theme: Option<String>,
 }
 
 /// Option<Option<T>>: absent key = no change, explicit null = clear the field
@@ -108,6 +110,8 @@ pub struct UpdateDashboardRequest {
     pub color_palette_id: Option<Option<String>>,
     #[serde(default, deserialize_with = "deserialize_optional_nullable")]
     pub accent_color: Option<Option<String>>,
+    #[serde(default, deserialize_with = "deserialize_optional_nullable")]
+    pub chart_color_theme: Option<Option<String>>,
     pub default_shape: Option<String>,
     pub priorities_enabled: Option<bool>,
 }

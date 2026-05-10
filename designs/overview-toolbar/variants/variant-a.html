@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Overview Toolbar — Variant A: Compact Icon Triggers with Popovers</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--ring: var(--moss-400);
+			}
+
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+				background: var(--background);
+			}
+
+			.page-wrapper {
+				padding: 40px 32px;
+				min-height: 100vh;
+			}
+
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin-bottom: 8px;
+			}
+
+			.page-title {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				margin: 0 0 6px 0;
+			}
+
+			.page-subtitle {
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				margin: 0 0 32px 0;
+			}
+
+			/* ─── Mock Overview header context (read-only, ~30% opacity) ─── */
+			.context-frame {
+				border: 1px dashed var(--border);
+				border-radius: var(--radius-lg);
+				padding: 20px 24px 24px;
+				background: color-mix(in oklch, var(--surface) 40%, transparent);
+				margin-bottom: 40px;
+			}
+			.context-eyebrow {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				margin: 0 0 14px 0;
+			}
+			.context-eyebrow::before {
+				content: '// ';
+				opacity: 0.45;
+			}
+
+			.overview-header {
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				min-height: 60px;
+			}
+			.overview-header-left {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				opacity: 0.3;
+				pointer-events: none;
+				flex-shrink: 0;
+			}
+			.overview-header-title {
+				font-size: 20px;
+				font-weight: 600;
+				letter-spacing: -0.025em;
+				line-height: 1.15;
+				margin: 0;
+			}
+			.overview-header-subtitle {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				margin: 0;
+			}
+
+			.overview-header-spacer {
+				flex: 1;
+			}
+
+			.overview-archived {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				opacity: 0.3;
+				pointer-events: none;
+				flex-shrink: 0;
+			}
+			.overview-archived-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				white-space: nowrap;
+			}
+
+			/* ─── Toolbar cluster (live, full opacity) ─── */
+			.toolbar-cluster {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-shrink: 0;
+			}
+			.toolbar-sep {
+				width: 1px;
+				height: 16px;
+				background: var(--border);
+				margin: 0 4px;
+				flex-shrink: 0;
+			}
+
+			/* Trigger button — extends gk-btn-ghost gk-btn-icon gk-btn-sm */
+			.tb-trigger {
+				position: relative;
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0;
+				transition:
+					background 120ms ease,
+					color 120ms ease,
+					border-color 120ms ease;
+			}
+			.tb-trigger svg {
+				width: 14px;
+				height: 14px;
+				stroke-width: 1.7;
+				display: block;
+			}
+			.tb-trigger:hover,
+			.tb-trigger[data-state='hover'] {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.tb-trigger[data-state='active'],
+			.tb-trigger:active {
+				background: var(--surface-3);
+				color: var(--foreground);
+			}
+			.tb-trigger[data-state='open'] {
+				background: var(--surface-3);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.tb-trigger:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.tb-trigger[disabled] {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
+
+			/* Accent dot for non-default state */
+			.tb-trigger[data-non-default='true']::after {
+				content: '';
+				position: absolute;
+				top: 4px;
+				right: 4px;
+				width: 4px;
+				height: 4px;
+				border-radius: 50%;
+				background: var(--primary);
+				box-shadow: 0 0 0 1.5px var(--surface);
+			}
+
+			/* ─── Workspace card placeholders (~30% opacity) ─── */
+			.cards-hint {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 16px;
+				margin-top: 18px;
+				opacity: 0.3;
+				pointer-events: none;
+			}
+			.card-placeholder {
+				height: 132px;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				position: relative;
+			}
+			.card-placeholder::before {
+				content: '';
+				position: absolute;
+				top: 6px;
+				bottom: 6px;
+				left: 0;
+				width: 3px;
+				background: var(--moss-400);
+				opacity: 0.6;
+				border-radius: 0 2px 2px 0;
+			}
+			.card-placeholder::after {
+				content: '';
+				position: absolute;
+				top: 16px;
+				left: 18px;
+				right: 18px;
+				height: 10px;
+				border-radius: 3px;
+				background: var(--surface-3);
+			}
+			.card-placeholder .ph-row {
+				position: absolute;
+				left: 18px;
+				right: 18px;
+				height: 6px;
+				border-radius: 2px;
+				background: var(--surface-2);
+			}
+			.card-placeholder .ph-row.r1 {
+				top: 38px;
+				right: 60%;
+			}
+			.card-placeholder .ph-row.r2 {
+				top: 56px;
+			}
+			.card-placeholder .ph-row.r3 {
+				top: 74px;
+				right: 35%;
+			}
+			.card-placeholder .ph-row.r4 {
+				top: 100px;
+				right: 50%;
+			}
+
+			/* ─── Section dividers ─── */
+			.section-note {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				margin: 40px 0 14px 0;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.section-note::before {
+				content: '// ';
+				opacity: 0.5;
+			}
+
+			/* ─── Popover row ─── */
+			.popover-row {
+				display: flex;
+				align-items: flex-start;
+				gap: 24px;
+				flex-wrap: wrap;
+			}
+			.popover-stack {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+			.popover-stack .gk-eyebrow {
+				color: var(--foreground-subtle);
+			}
+
+			/* Override gk-popover defaults per spec */
+			.tb-popover {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				box-shadow:
+					0 8px 24px -8px rgba(0, 0, 0, 0.55),
+					0 2px 6px -2px rgba(0, 0, 0, 0.4);
+				padding: 6px;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+			}
+			.tb-popover.size-sort {
+				width: 180px;
+			}
+			.tb-popover.size-filter {
+				width: 220px;
+			}
+			.tb-popover.size-footer {
+				width: 260px;
+			}
+
+			.tb-popover-header {
+				padding: 6px 8px 4px;
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				font-family: var(--font-sans);
+			}
+
+			.tb-popover-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				height: 32px;
+				padding: 0 8px;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				font-size: 13px;
+				color: var(--foreground-muted);
+				transition: background 100ms ease;
+				border: none;
+				background: transparent;
+				width: 100%;
+				text-align: left;
+				font-family: inherit;
+			}
+			.tb-popover-item:hover {
+				background: var(--surface-hover);
+				color: var(--foreground);
+			}
+			.tb-popover-item:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: -2px;
+			}
+			.tb-popover-item .item-label {
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.tb-popover-item .item-meta {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
+			.tb-popover-item .item-check {
+				width: 14px;
+				height: 14px;
+				stroke-width: 2;
+				color: var(--primary);
+				flex-shrink: 0;
+			}
+			.tb-popover-item .item-check-spacer {
+				width: 14px;
+				flex-shrink: 0;
+			}
+			.tb-popover-item[data-selected='true'] {
+				color: var(--foreground);
+			}
+			.tb-popover-item[data-selected='true']:hover {
+				background: var(--surface-hover);
+			}
+
+			/* Filter summary line */
+			.tb-popover-summary {
+				margin-top: 6px;
+				padding: 8px 8px 4px;
+				border-top: 1px dashed var(--border);
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
+			.tb-popover-summary .summary-num {
+				color: var(--foreground-muted);
+				font-weight: 600;
+			}
+
+			/* Footer popover preview row — matches workspace card footer */
+			.tb-footer-preview {
+				margin-top: 6px;
+				padding: 8px 10px 4px;
+				border-top: 1px dashed var(--border);
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				font-variant-numeric: tabular-nums;
+			}
+			.tb-footer-preview .preview-tag {
+				font-family: var(--font-sans);
+				font-size: 9.5px;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				opacity: 0.7;
+			}
+			.tb-footer-preview .preview-value {
+				margin-left: auto;
+			}
+
+			/* ─── States showcase ─── */
+			.states-row {
+				display: flex;
+				align-items: flex-end;
+				gap: 32px;
+				flex-wrap: wrap;
+			}
+			.state-cell {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+			}
+			.state-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+			}
+			.state-frame {
+				width: 40px;
+				height: 40px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--background);
+				border: 1px dashed var(--border);
+				border-radius: var(--radius-sm);
+			}
+
+			/* ─── Page-level eyebrow above each popover label ─── */
+			.popover-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				margin: 0;
+			}
+
+			@media (max-width: 900px) {
+				.cards-hint {
+					grid-template-columns: 1fr;
+				}
+				.cards-hint .card-placeholder:nth-child(n + 2) {
+					display: none;
+				}
+				.popover-row {
+					flex-direction: column;
+				}
+			}
+			@media (max-width: 600px) {
+				.page-wrapper {
+					padding: 24px 16px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrapper">
+				<p class="variant-label">VARIANT A: COMPACT ICON TRIGGERS WITH POPOVERS</p>
+				<h1 class="page-title">Overview Toolbar</h1>
+				<p class="page-subtitle">
+					Sort · Filter · Footer Settings — right-aligned in the existing
+					Overview header
+				</p>
+
+				<!-- ─── 1. In-context: header row + card hint ─── -->
+				<section class="context-frame">
+					<p class="context-eyebrow">In context — Overview page header</p>
+
+					<div class="overview-header">
+						<div class="overview-header-left">
+							<h2 class="overview-header-title">Grovekeeper</h2>
+							<p class="overview-header-subtitle">All workspaces</p>
+						</div>
+
+						<div class="overview-header-spacer"></div>
+
+						<div class="overview-archived">
+							<span class="gk-toggle" data-on="false" aria-hidden="true"></span>
+							<span class="overview-archived-label">Show archived</span>
+						</div>
+
+						<span class="toolbar-sep" aria-hidden="true"></span>
+
+						<div
+							class="toolbar-cluster"
+							role="toolbar"
+							aria-label="Workspace overview controls"
+						>
+							<button
+								type="button"
+								class="tb-trigger"
+								aria-label="Sort"
+								title="Sort"
+								data-non-default="true"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m3 16 4 4 4-4" />
+									<path d="M7 20V4" />
+									<path d="m21 8-4-4-4 4" />
+									<path d="M17 4v16" />
+								</svg>
+							</button>
+
+							<button
+								type="button"
+								class="tb-trigger"
+								aria-label="Filter"
+								title="Filter"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polygon
+										points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+									/>
+								</svg>
+							</button>
+
+							<button
+								type="button"
+								class="tb-trigger"
+								aria-label="Footer content"
+								title="Footer content"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<line x1="21" x2="14" y1="4" y2="4" />
+									<line x1="10" x2="3" y1="4" y2="4" />
+									<line x1="21" x2="12" y1="12" y2="12" />
+									<line x1="8" x2="3" y1="12" y2="12" />
+									<line x1="21" x2="16" y1="20" y2="20" />
+									<line x1="12" x2="3" y1="20" y2="20" />
+									<line x1="14" x2="14" y1="2" y2="6" />
+									<line x1="8" x2="8" y1="10" y2="14" />
+									<line x1="16" x2="16" y1="18" y2="22" />
+								</svg>
+							</button>
+						</div>
+					</div>
+
+					<div class="cards-hint" aria-hidden="true">
+						<div class="card-placeholder">
+							<div class="ph-row r1"></div>
+							<div class="ph-row r2"></div>
+							<div class="ph-row r3"></div>
+							<div class="ph-row r4"></div>
+						</div>
+						<div class="card-placeholder">
+							<div class="ph-row r1"></div>
+							<div class="ph-row r2"></div>
+							<div class="ph-row r3"></div>
+							<div class="ph-row r4"></div>
+						</div>
+						<div class="card-placeholder">
+							<div class="ph-row r1"></div>
+							<div class="ph-row r2"></div>
+							<div class="ph-row r3"></div>
+							<div class="ph-row r4"></div>
+						</div>
+					</div>
+				</section>
+
+				<!-- ─── 2. All popovers open side-by-side ─── -->
+				<p class="section-note">All three popovers — open simultaneously</p>
+
+				<div class="popover-row">
+					<!-- Sort popover -->
+					<div class="popover-stack">
+						<p class="popover-label">Sort popover</p>
+						<div
+							class="tb-popover size-sort"
+							role="menu"
+							aria-label="Sort options"
+						>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Name</span>
+								<span class="item-meta">A → Z</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="true"
+								data-selected="true"
+							>
+								<svg
+									class="item-check"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</svg>
+								<span class="item-label">Activity</span>
+								<span class="item-meta">recent</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Issue count</span>
+								<span class="item-meta">most</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Cost</span>
+								<span class="item-meta">today</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Filter popover -->
+					<div class="popover-stack">
+						<p class="popover-label">Filter popover</p>
+						<div
+							class="tb-popover size-filter"
+							role="menu"
+							aria-label="Filter options"
+						>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="true"
+								data-selected="true"
+							>
+								<svg
+									class="item-check"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</svg>
+								<span class="item-label">All</span>
+								<span class="item-meta">8</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Active</span>
+								<span class="item-meta">3</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Needs Attention</span>
+								<span class="item-meta">2</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Dormant</span>
+								<span class="item-meta">3</span>
+							</button>
+							<div class="tb-popover-summary">
+								<span class="summary-num">8</span> workspaces shown
+							</div>
+						</div>
+					</div>
+
+					<!-- Footer Settings popover -->
+					<div class="popover-stack">
+						<p class="popover-label">Footer settings popover</p>
+						<div
+							class="tb-popover size-footer"
+							role="menu"
+							aria-label="Workspace card footer"
+						>
+							<div class="tb-popover-header">Workspace card footer</div>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="true"
+								data-selected="true"
+							>
+								<svg
+									class="item-check"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="20 6 9 17 4 12" />
+								</svg>
+								<span class="item-label">Today's cost</span>
+								<span class="item-meta">today $X.XX</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">This week's cost</span>
+								<span class="item-meta">week $X.XX</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Total cost</span>
+								<span class="item-meta">total $X.XX</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Active sessions</span>
+								<span class="item-meta">N sessions</span>
+							</button>
+							<button
+								type="button"
+								class="tb-popover-item"
+								role="menuitemradio"
+								aria-checked="false"
+							>
+								<span class="item-check-spacer" aria-hidden="true"></span>
+								<span class="item-label">Last activity</span>
+								<span class="item-meta">3m ago</span>
+							</button>
+							<div class="tb-footer-preview">
+								<span class="preview-tag">preview</span>
+								<span class="preview-value">today $4.82</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ─── 3. States showcase ─── -->
+				<p class="section-note">Trigger states</p>
+
+				<div class="states-row">
+					<div class="state-cell">
+						<div class="state-frame">
+							<button type="button" class="tb-trigger" aria-label="Sort">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m3 16 4 4 4-4" />
+									<path d="M7 20V4" />
+									<path d="m21 8-4-4-4 4" />
+									<path d="M17 4v16" />
+								</svg>
+							</button>
+						</div>
+						<span class="state-label">Default</span>
+					</div>
+
+					<div class="state-cell">
+						<div class="state-frame">
+							<button
+								type="button"
+								class="tb-trigger"
+								data-state="hover"
+								aria-label="Sort hover"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m3 16 4 4 4-4" />
+									<path d="M7 20V4" />
+									<path d="m21 8-4-4-4 4" />
+									<path d="M17 4v16" />
+								</svg>
+							</button>
+						</div>
+						<span class="state-label">Hover</span>
+					</div>
+
+					<div class="state-cell">
+						<div class="state-frame">
+							<button
+								type="button"
+								class="tb-trigger"
+								data-non-default="true"
+								aria-label="Filter active"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polygon
+										points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+									/>
+								</svg>
+							</button>
+						</div>
+						<span class="state-label">Active filter</span>
+					</div>
+
+					<div class="state-cell">
+						<div class="state-frame">
+							<button
+								type="button"
+								class="tb-trigger"
+								data-state="open"
+								aria-label="Footer open"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<line x1="21" x2="14" y1="4" y2="4" />
+									<line x1="10" x2="3" y1="4" y2="4" />
+									<line x1="21" x2="12" y1="12" y2="12" />
+									<line x1="8" x2="3" y1="12" y2="12" />
+									<line x1="21" x2="16" y1="20" y2="20" />
+									<line x1="12" x2="3" y1="20" y2="20" />
+									<line x1="14" x2="14" y1="2" y2="6" />
+									<line x1="8" x2="8" y1="10" y2="14" />
+									<line x1="16" x2="16" y1="18" y2="22" />
+								</svg>
+							</button>
+						</div>
+						<span class="state-label">Popover open</span>
+					</div>
+
+					<div class="state-cell">
+						<div class="state-frame">
+							<button
+								type="button"
+								class="tb-trigger"
+								disabled
+								aria-label="Disabled"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m3 16 4 4 4-4" />
+									<path d="M7 20V4" />
+									<path d="m21 8-4-4-4 4" />
+									<path d="M17 4v16" />
+								</svg>
+							</button>
+						</div>
+						<span class="state-label">Disabled</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -105,10 +105,8 @@ function createBoardContext() {
 	});
 
 	$effect.pre(() => {
-		if (browser) {
-			document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-			document.documentElement.dataset.accent = accentColor.current;
-		}
+		document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+		document.documentElement.dataset.accent = accentColor.current;
 	});
 
 	// ── Public interface ───────────────────────────────────────────────────
@@ -186,7 +184,7 @@ function createBoardContext() {
 		},
 
 		async updateDashboard(request: UpdateDashboardRequest): Promise<Dashboard> {
-			return invoke('update_dashboard', { request });
+			return invoke<Dashboard>('update_dashboard', { request });
 		},
 
 		async archiveDashboard(id: string): Promise<void> {

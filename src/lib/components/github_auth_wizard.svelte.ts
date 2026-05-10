@@ -2,7 +2,6 @@ import type { DeviceFlowStartResult, GitHubUser } from '$lib/types/generated';
 
 // Wizard phase state machine
 export type WizardPhase =
-	| { kind: 'initial'; data: DeviceFlowStartResult }
 	| { kind: 'polling'; data: DeviceFlowStartResult }
 	| { kind: 'success'; user: GitHubUser }
 	| { kind: 'expired' }

@@ -1,6 +1,7 @@
 .svelte-kit/
 build/
 claude_design/
+designs/
 node_modules/
 src-tauri/
 src/lib/paraglide/

@@ -1,15 +1,18 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { openPath } from '$lib/opener.js';
+	import { invoke } from '$lib/tauri.js';
 	import { useBoard } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import WorkspaceCard from '$lib/components/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/AddWorkspaceCard.svelte';
-	import GhSetupBanner from '$lib/components/GhSetupBanner.svelte';
+	import GitHubStatusCard from '$lib/components/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import GithubIcon from '$lib/components/icons/GithubIcon.svelte';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
@@ -67,15 +70,38 @@
 			<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
 		</div>
 		<div class="flex items-center gap-2">
-			<Switch id="show-archived" bind:checked={showArchived} />
-			<Label for="show-archived" class="text-sm text-muted-foreground">Show archived</Label>
+			<Button
+				variant={showArchived ? 'primary' : 'secondary'}
+				size="icon"
+				onclick={() => (showArchived = !showArchived)}
+				aria-label="Toggle archived workspaces"
+				aria-pressed={showArchived}
+			>
+				<ArchiveIcon size={16} />
+			</Button>
+			<Popover.Root>
+				<Popover.Trigger>
+					{#snippet child({ props })}
+						<Button {...props} variant="secondary" size="icon">
+							<GithubIcon size={16} />
+						</Button>
+					{/snippet}
+				</Popover.Trigger>
+				<Popover.Content class="w-80" align="end">
+					<GitHubStatusCard
+						borderless
+						authStatus={versionControl.authStatus}
+						ghAvailability={versionControl.ghAvailability}
+						onconnect={() => (authWizardOpen = true)}
+						ondisconnect={async () => {
+							await invoke('github_logout');
+							await versionControl.checkAvailability();
+						}}
+					/>
+				</Popover.Content>
+			</Popover.Root>
 		</div>
 	</div>
-
-	<GhSetupBanner
-		authStatus={versionControl.authStatus}
-		onconnect={() => (authWizardOpen = true)}
-	/>
 
 	{#if loading}
 		<p class="text-muted-foreground">{m.overview_loading()}</p>
@@ -105,6 +131,6 @@
 {#if authWizardOpen}
 	<GitHubAuthWizard
 		bind:open={authWizardOpen}
-		onconnected={() => void versionControl.checkAuthStatus()}
+		onconnected={() => void versionControl.checkAvailability()}
 	/>
 {/if}

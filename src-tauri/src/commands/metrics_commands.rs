@@ -7,7 +7,7 @@ use ts_rs::TS;
 use crate::database::connection::DatabaseState;
 use crate::metrics::{achievement_tracker, currency, historical_import, queries};
 use crate::models::achievement::Achievement;
-use crate::models::metrics::{MetricsPeriod, UsageDashboardData};
+use crate::models::metrics::{GroupBy, MetricsPeriod, UsageDashboardData};
 
 #[derive(Debug, Clone, Serialize, TS)]
 #[ts(export)]
@@ -34,10 +34,16 @@ pub fn get_usage_dashboard(
     state: State<DatabaseState>,
     period: MetricsPeriod,
     dashboard_id: Option<String>,
+    group_by: Option<GroupBy>,
 ) -> Result<UsageDashboardData, String> {
     let connection = state.read()?;
-    queries::query_usage_dashboard(&connection, &period, dashboard_id.as_deref())
-        .map_err(|error| format!("Failed to query usage dashboard: {error}"))
+    queries::query_usage_dashboard(
+        &connection,
+        &period,
+        dashboard_id.as_deref(),
+        &group_by.unwrap_or(GroupBy::None),
+    )
+    .map_err(|error| format!("Failed to query usage dashboard: {error}"))
 }
 
 #[tauri::command]

@@ -14,6 +14,7 @@ use crate::models::session::SessionState;
 use super::playback_queue::LazyPlaybackQueue;
 use super::sound;
 use super::sound_pack;
+use super::volume;
 
 /// Manages notification dispatch across all channels (toast, sound, window attention).
 pub struct NotificationService {
@@ -126,10 +127,10 @@ impl NotificationService {
         app_handle: &AppHandle,
         database_connection: &std::sync::Arc<Mutex<Connection>>,
     ) {
-        let global_volume = self.load_global_volume(database_connection);
-        let per_sound_volume =
-            self.load_sound_volume_override(event_type, sound_file, database_connection);
-        let volume = global_volume * per_sound_volume;
+        let volume = match database_connection.lock() {
+            Ok(connection) => volume::compute_effective_volume(&connection, event_type, sound_file),
+            Err(_) => return,
+        };
 
         let candidates = self.resolve_sound_candidates(sound_file, event_type);
 
@@ -157,59 +158,25 @@ impl NotificationService {
         sound_file: &str,
         event_type: NotificationEventType,
     ) -> Vec<PathBuf> {
-        // Try to find all sounds in the same category from the pack
         if let Some(pack_prefix) = sound_file.split('/').next() {
-            // Try bundled packs first
-            let bundled_pack_dir = self.resource_directory.join("sounds").join(pack_prefix);
-            if let Ok(manifest) = sound_pack::load_manifest(&bundled_pack_dir) {
-                if let Some(sounds) = manifest.categories.get(event_type.as_str()) {
-                    if sounds.len() > 1 {
-                        let resolved: Vec<PathBuf> = sounds
-                            .iter()
-                            .filter_map(|entry| {
-                                let relative = format!("{}/{}", pack_prefix, entry.file);
-                                sound::resolve_sound_path(
-                                    &relative,
-                                    &self.resource_directory,
-                                    &self.app_data_directory,
-                                )
-                            })
-                            .collect();
-                        if !resolved.is_empty() {
-                            return resolved;
-                        }
-                    }
-                }
-            }
+            let pack_directories = [
+                self.resource_directory.join("sounds").join(pack_prefix),
+                self.app_data_directory
+                    .join("sound-packs")
+                    .join(pack_prefix),
+            ];
 
-            // Try user-installed packs
-            let user_pack_dir = self
-                .app_data_directory
-                .join("sound-packs")
-                .join(pack_prefix);
-            if let Ok(manifest) = sound_pack::load_manifest(&user_pack_dir) {
-                if let Some(sounds) = manifest.categories.get(event_type.as_str()) {
-                    if sounds.len() > 1 {
-                        let resolved: Vec<PathBuf> = sounds
-                            .iter()
-                            .filter_map(|entry| {
-                                let relative = format!("{}/{}", pack_prefix, entry.file);
-                                sound::resolve_sound_path(
-                                    &relative,
-                                    &self.resource_directory,
-                                    &self.app_data_directory,
-                                )
-                            })
-                            .collect();
-                        if !resolved.is_empty() {
-                            return resolved;
-                        }
-                    }
+            for pack_directory in &pack_directories {
+                if let Some(candidates) = self.resolve_pack_candidates(
+                    pack_directory,
+                    pack_prefix,
+                    event_type,
+                ) {
+                    return candidates;
                 }
             }
         }
 
-        // Fallback: single resolved file
         match sound::resolve_sound_path(
             sound_file,
             &self.resource_directory,
@@ -220,42 +187,33 @@ impl NotificationService {
         }
     }
 
-    fn load_global_volume(
+    fn resolve_pack_candidates(
         &self,
-        database_connection: &std::sync::Arc<Mutex<Connection>>,
-    ) -> f64 {
-        let connection = match database_connection.lock() {
-            Ok(conn) => conn,
-            Err(_) => return 0.8,
-        };
-        connection
-            .query_row(
-                "SELECT value FROM app_settings WHERE key = 'notification_volume'",
-                [],
-                |row| row.get::<_, String>(0),
-            )
-            .ok()
-            .and_then(|value| value.parse::<f64>().ok())
-            .unwrap_or(0.8)
-    }
-
-    fn load_sound_volume_override(
-        &self,
+        pack_directory: &std::path::Path,
+        pack_prefix: &str,
         event_type: NotificationEventType,
-        sound_file: &str,
-        database_connection: &std::sync::Arc<Mutex<Connection>>,
-    ) -> f64 {
-        let connection = match database_connection.lock() {
-            Ok(conn) => conn,
-            Err(_) => return 1.0,
-        };
-        connection
-            .query_row(
-                "SELECT volume FROM sound_volume_overrides WHERE event_type = ?1 AND sound_file = ?2",
-                rusqlite::params![event_type, sound_file],
-                |row| row.get::<_, f64>(0),
-            )
-            .unwrap_or(1.0)
+    ) -> Option<Vec<PathBuf>> {
+        let manifest = sound_pack::load_manifest(pack_directory).ok()?;
+        let sounds = manifest.categories.get(event_type.as_str())?;
+        if sounds.len() <= 1 {
+            return None;
+        }
+        let resolved: Vec<PathBuf> = sounds
+            .iter()
+            .filter_map(|entry| {
+                let relative = format!("{}/{}", pack_prefix, entry.file);
+                sound::resolve_sound_path(
+                    &relative,
+                    &self.resource_directory,
+                    &self.app_data_directory,
+                )
+            })
+            .collect();
+        if resolved.is_empty() {
+            None
+        } else {
+            Some(resolved)
+        }
     }
 
     fn is_issue_sound_muted(
