@@ -6,7 +6,13 @@
 	import { openPath } from '@tauri-apps/plugin-opener';
 	import { invoke } from '$lib/tauri.js';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
-	import { makeMcpKey, getParentDir, type ItemKind } from '../ai_config.helpers.js';
+	import {
+		findItemByPath,
+		findKindByPath,
+		makeMcpKey,
+		getParentDir,
+		type ItemKind,
+	} from '../ai_config.helpers.js';
 	import type { SymlinkInfo, HookConfig, McpServerConfig } from '$lib/types/generated';
 
 	// ─── Context ─────────────────────────────────────────────────────────────
@@ -24,51 +30,24 @@
 
 	const deletingPath = $derived(aiConfig.deletingItemPath);
 
-	// fallow-ignore-next-line complexity
 	const deletingItem = $derived.by(() => {
 		const path = deletingPath;
 		const result = aiConfig.discoveryResult;
-		if (path === null || result === null) {
-			return null;
+		const found = findItemByPath(result, path);
+		if (found !== null) {
+			return found;
 		}
-		return (
-			result.skills.find((s) => s.file_path === path) ??
-			result.agents.find((a) => a.file_path === path) ??
-			result.memories.find((m) => m.file_path === path) ??
-			result.instructions.find((i) => i.file_path === path) ??
-			result.rules.find((r) => r.file_path === path) ??
-			result.hooks.find((h) => h.file_path === path) ??
-			result.mcp_servers.find((s) => makeMcpKey(s) === path) ??
-			null
-		);
+		return result?.mcp_servers.find((s) => makeMcpKey(s) === path) ?? null;
 	});
 
-	// fallow-ignore-next-line complexity
 	const kind = $derived.by((): ItemKind | null => {
 		const path = deletingPath;
 		const result = aiConfig.discoveryResult;
-		if (path === null || result === null) {
-			return null;
+		const direct = findKindByPath(result, path);
+		if (direct !== null) {
+			return direct;
 		}
-		if (result.skills.some((s) => s.file_path === path)) {
-			return 'skill';
-		}
-		if (result.agents.some((a) => a.file_path === path)) {
-			return 'agent';
-		}
-		if (result.memories.some((m) => m.file_path === path)) {
-			return 'memory';
-		}
-		if (result.instructions.some((i) => i.file_path === path)) {
-			return 'instruction';
-		}
-		if (result.rules.some((r) => r.file_path === path)) {
-			return 'rule';
-		}
-		if (result.hooks.some((h) => h.file_path === path)) {
-			return 'hook';
-		}
-		if (result.mcp_servers.some((s) => makeMcpKey(s) === path)) {
+		if (result?.mcp_servers.some((s) => makeMcpKey(s) === path) === true) {
 			return 'mcp';
 		}
 		return null;

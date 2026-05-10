@@ -32,6 +32,7 @@ export function getItemTitle(item: AnyItem, kind: ItemKind): string {
 	return (item as SkillConfig | AgentConfig | McpServerConfig | MemoryConfig).name;
 }
 
+// fallow-ignore-next-line complexity
 export function getItemDescription(item: AnyItem, kind: ItemKind): string | null {
 	if (kind === 'hook') {
 		return (item as HookConfig).description ?? null;
@@ -68,6 +69,64 @@ export function getItemFileSizeLabel(item: AnyItem, kind: ItemKind): string | nu
 		return `${size} B`;
 	}
 	return `${(size / 1024).toFixed(1)} KB`;
+}
+
+// ─── Discovery lookup helpers ────────────────────────────────────────────────
+
+interface ItemLookupSource {
+	skills: SkillConfig[];
+	agents: AgentConfig[];
+	hooks: HookConfig[];
+	memories: MemoryConfig[];
+	instructions: InstructionConfig[];
+	rules: RuleConfig[];
+}
+
+export function findItemByPath(
+	result: ItemLookupSource | null,
+	path: string | null,
+): AnyItem | null {
+	if (path === null || result === null) {
+		return null;
+	}
+	return (
+		result.skills.find((s) => s.file_path === path) ??
+		result.agents.find((a) => a.file_path === path) ??
+		result.memories.find((m) => m.file_path === path) ??
+		result.instructions.find((i) => i.file_path === path) ??
+		result.rules.find((r) => r.file_path === path) ??
+		result.hooks.find((h) => h.file_path === path) ??
+		null
+	);
+}
+
+// fallow-ignore-next-line complexity
+export function findKindByPath(
+	result: ItemLookupSource | null,
+	path: string | null,
+): ItemKind | null {
+	if (path === null || result === null) {
+		return null;
+	}
+	if (result.skills.some((s) => s.file_path === path)) {
+		return 'skill';
+	}
+	if (result.agents.some((a) => a.file_path === path)) {
+		return 'agent';
+	}
+	if (result.memories.some((m) => m.file_path === path)) {
+		return 'memory';
+	}
+	if (result.instructions.some((i) => i.file_path === path)) {
+		return 'instruction';
+	}
+	if (result.rules.some((r) => r.file_path === path)) {
+		return 'rule';
+	}
+	if (result.hooks.some((h) => h.file_path === path)) {
+		return 'hook';
+	}
+	return null;
 }
 
 // ─── Path helpers ────────────────────────────────────────────────────────────

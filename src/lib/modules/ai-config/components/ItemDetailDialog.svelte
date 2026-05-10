@@ -6,7 +6,12 @@
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import { openPath } from '@tauri-apps/plugin-opener';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
-	import { deriveLanguage, getParentDir, type ItemKind } from '../ai_config.helpers.js';
+	import {
+		deriveLanguage,
+		findKindByPath,
+		getParentDir,
+		type ItemKind,
+	} from '../ai_config.helpers.js';
 	import SkillOverrideControl from './SkillOverrideControl.svelte';
 	import type {
 		SkillConfig,
@@ -26,32 +31,11 @@
 
 	const isOpen = $derived(aiConfig.selectedItemPath !== null);
 
-	// fallow-ignore-next-line complexity
 	const kind = $derived.by((): ItemKind | null => {
-		const path = aiConfig.selectedItemPath;
-		const result = aiConfig.discoveryResult;
-		if (path === null || result === null) {
-			return null;
+		const direct = findKindByPath(aiConfig.discoveryResult, aiConfig.selectedItemPath);
+		if (direct !== null) {
+			return direct;
 		}
-		if (result.skills.some((s) => s.file_path === path)) {
-			return 'skill';
-		}
-		if (result.agents.some((a) => a.file_path === path)) {
-			return 'agent';
-		}
-		if (result.hooks.some((h) => h.file_path === path)) {
-			return 'hook';
-		}
-		if (result.memories.some((m) => m.file_path === path)) {
-			return 'memory';
-		}
-		if (result.instructions.some((i) => i.file_path === path)) {
-			return 'instruction';
-		}
-		if (result.rules.some((r) => r.file_path === path)) {
-			return 'rule';
-		}
-		// MCP servers have no file_path — use name match via selectedItem
 		if (aiConfig.selectedItem !== null && 'transport_type' in aiConfig.selectedItem) {
 			return 'mcp';
 		}

@@ -8,6 +8,7 @@
 	import { openPath } from '@tauri-apps/plugin-opener';
 	import { invoke } from '$lib/tauri.js';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
+	import { findItemByPath } from '../ai_config.helpers.js';
 	import type { SymlinkInfo } from '$lib/types/generated';
 
 	// ─── Context ─────────────────────────────────────────────────────────────
@@ -47,23 +48,7 @@
 		return path.slice(0, lastSlash);
 	});
 
-	// Find item from all discovery arrays
-	// fallow-ignore-next-line complexity
-	const editingItem = $derived.by(() => {
-		const path = editingPath;
-		const result = aiConfig.discoveryResult;
-		if (path === null || result === null) {
-			return null;
-		}
-		return (
-			result.skills.find((s) => s.file_path === path) ??
-			result.agents.find((a) => a.file_path === path) ??
-			result.memories.find((m) => m.file_path === path) ??
-			result.instructions.find((i) => i.file_path === path) ??
-			result.rules.find((r) => r.file_path === path) ??
-			null
-		);
-	});
+	const editingItem = $derived(findItemByPath(aiConfig.discoveryResult, editingPath));
 
 	// ─── Effects ─────────────────────────────────────────────────────────────
 
