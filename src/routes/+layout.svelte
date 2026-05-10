@@ -25,6 +25,7 @@
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
+	import { setCharacterPacksContext } from '$lib/modules/character-packs';
 	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
 	import { setToastsContext, registerMockToastBridge } from '$lib/modules/toasts';
 	import CommandPalette from '$lib/components/CommandPalette.svelte';
@@ -47,6 +48,7 @@
 	const commandPaletteCtx = setCommandPaletteContext();
 	const toastsCtx = setToastsContext();
 	const rawRequirementsCtx = setRawRequirementsContext();
+	const characterPacksCtx = setCharacterPacksContext();
 	setCreationWizardContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
@@ -63,6 +65,7 @@
 		void preloadCode(resolve('/usage'));
 		void preloadCode(resolve('/quick-ideas'));
 		void preloadCode(resolve('/ai-config'));
+		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
 
