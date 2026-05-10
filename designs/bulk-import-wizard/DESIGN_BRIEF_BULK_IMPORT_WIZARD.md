@@ -1,5 +1,10 @@
 # Bulk Import Wizard — Design Brief
 
+> **Status**: Refined (Variant B)
+> **Refined mockup**: `designs/bulk-import-wizard/refined.html`
+> **Summary**: `designs/bulk-import-wizard/SUMMARY.md`
+> **Refinements**: character-editor style unification (3-panel layout with sound pool sidebar, event cards, sound chips, tier sections, state-tinted cards, drop zones, tokens.css-only theming)
+
 Multi-step wizard for importing many characters at once from a structured folder (e.g. WC3 voice files organized as `Faction/UnitName/*.wav`). Scans folder hierarchy, proposes characters with auto-mapped sounds, lets user review and adjust before batch-creating packs. Accessed via "Import Folder" button in Settings → Notifications & Characters. Hand this to a designer for visual exploration.
 
 ## Design Tokens

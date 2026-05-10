@@ -2,6 +2,7 @@
 	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
 	"entry": [
 		"src/lib/components/ui/*/index.ts",
+		"src/lib/components/character/index.ts",
 		"src/lib/components/Resizer.svelte",
 		"src/lib/modules/*/index.ts",
 		"src/lib/i18n/index.ts",

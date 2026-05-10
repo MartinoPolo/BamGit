@@ -2,6 +2,7 @@
 mod macros;
 
 pub mod achievement;
+pub mod character_pack;
 pub mod action;
 pub mod ai_config;
 pub mod app_setting;

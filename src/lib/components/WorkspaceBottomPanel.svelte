@@ -152,6 +152,7 @@
 		selection.showPrdOverview &&
 			defaultTab !== BOTTOM_PANEL_TABS.issues &&
 			defaultTab !== BOTTOM_PANEL_TABS.kanban &&
+			defaultTab !== BOTTOM_PANEL_TABS.dependencies &&
 			defaultTab !== BOTTOM_PANEL_TABS.assignedIssues,
 	);
 </script>
