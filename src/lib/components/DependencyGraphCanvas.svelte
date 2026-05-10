@@ -71,23 +71,16 @@
 		return () => observer.disconnect();
 	});
 
-	$effect(() => {
-		if (fitKey !== lastFitKey) {
-			lastFitKey = fitKey;
-			fitContent();
-		}
-	});
+	function isReadyToFit(): boolean {
+		return contentWidth > 0 && contentHeight > 0 && viewportWidth > 0 && viewportHeight > 0;
+	}
 
 	$effect(() => {
-		if (
-			contentWidth > 0 &&
-			contentHeight > 0 &&
-			viewportWidth > 0 &&
-			viewportHeight > 0 &&
-			scale === 1 &&
-			translateX === 0 &&
-			translateY === 0
-		) {
+		if (!isReadyToFit()) {
+			return;
+		}
+		if (fitKey !== lastFitKey) {
+			lastFitKey = fitKey;
 			fitContent();
 		}
 	});
