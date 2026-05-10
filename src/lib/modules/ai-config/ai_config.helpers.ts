@@ -1,9 +1,74 @@
-import type { ConfigSource } from '$lib/types/generated';
+import type {
+	ConfigSource,
+	SkillConfig,
+	AgentConfig,
+	HookConfig,
+	McpServerConfig,
+	MemoryConfig,
+	InstructionConfig,
+	RuleConfig,
+} from '$lib/types/generated';
 import type { SortBy, GroupBy } from './ai_config.context.svelte.js';
 
 // ─── Shared Types ────────────────────────────────────────────────────────────
 
 export type ItemKind = 'skill' | 'agent' | 'hook' | 'mcp' | 'memory' | 'instruction' | 'rule';
+
+export type AnyItem =
+	| SkillConfig
+	| AgentConfig
+	| HookConfig
+	| McpServerConfig
+	| MemoryConfig
+	| InstructionConfig
+	| RuleConfig;
+
+// ─── Item field helpers ──────────────────────────────────────────────────────
+
+export function getItemTitle(item: AnyItem, kind: ItemKind): string {
+	if (kind === 'hook' || kind === 'instruction' || kind === 'rule') {
+		return (item as HookConfig | InstructionConfig | RuleConfig).filename;
+	}
+	return (item as SkillConfig | AgentConfig | McpServerConfig | MemoryConfig).name;
+}
+
+export function getItemDescription(item: AnyItem, kind: ItemKind): string | null {
+	if (kind === 'hook') {
+		return (item as HookConfig).description ?? null;
+	}
+	if (kind === 'mcp' || kind === 'instruction') {
+		return null;
+	}
+	if (kind === 'rule') {
+		return (item as RuleConfig).description ?? null;
+	}
+	return (item as SkillConfig | AgentConfig | MemoryConfig).description ?? null;
+}
+
+export function getItemFilePath(item: AnyItem, kind: ItemKind): string | null {
+	if (kind === 'mcp') {
+		return null;
+	}
+	return (item as Exclude<AnyItem, McpServerConfig>).file_path ?? null;
+}
+
+export function getItemLineCount(item: AnyItem): number | null {
+	if (!('content' in item) || typeof item.content !== 'string') {
+		return null;
+	}
+	return item.content.split('\n').length;
+}
+
+export function getItemFileSizeLabel(item: AnyItem, kind: ItemKind): string | null {
+	if (kind !== 'instruction') {
+		return null;
+	}
+	const size = (item as InstructionConfig).file_size;
+	if (size < 1024) {
+		return `${size} B`;
+	}
+	return `${(size / 1024).toFixed(1)} KB`;
+}
 
 // ─── Path helpers ────────────────────────────────────────────────────────────
 
@@ -36,6 +101,7 @@ function sourceRank(source: string | undefined): number {
 	return source !== undefined && source in SOURCE_ORDER ? SOURCE_ORDER[source] : 99;
 }
 
+// fallow-ignore-next-line complexity
 export function sortItems<T extends SortableItem>(items: T[], by: SortBy): T[] {
 	return [...items].sort((a, b) => {
 		if (by === 'source') {

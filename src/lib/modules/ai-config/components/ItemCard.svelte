@@ -10,25 +10,25 @@
 		HookConfig,
 		McpServerConfig,
 		MemoryConfig,
-		InstructionConfig,
 		RuleConfig,
 		CustomDiscoveryPath,
 	} from '$lib/types/generated';
-	import { deriveLanguage, getParentDir, type ItemKind } from '../ai_config.helpers.js';
+	import {
+		deriveLanguage,
+		getParentDir,
+		getItemTitle,
+		getItemDescription,
+		getItemFilePath,
+		getItemLineCount,
+		getItemFileSizeLabel,
+		type AnyItem,
+		type ItemKind,
+	} from '../ai_config.helpers.js';
 	import SkillOverrideControl from './SkillOverrideControl.svelte';
 	import { cn } from '$lib/utils.js';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 
 	// ─── Types ───────────────────────────────────────────────────────────────
-
-	type AnyItem =
-		| SkillConfig
-		| AgentConfig
-		| HookConfig
-		| McpServerConfig
-		| MemoryConfig
-		| InstructionConfig
-		| RuleConfig;
 
 	interface Props {
 		item: AnyItem;
@@ -46,35 +46,11 @@
 
 	// ─── Derived ─────────────────────────────────────────────────────────────
 
-	const title = $derived.by(() => {
-		if (kind === 'hook' || kind === 'instruction' || kind === 'rule') {
-			return (item as HookConfig | InstructionConfig | RuleConfig).filename;
-		}
-		return (item as SkillConfig | AgentConfig | McpServerConfig | MemoryConfig).name;
-	});
+	const title = $derived(getItemTitle(item, kind));
 
-	const description = $derived.by((): string | null => {
-		if (kind === 'hook') {
-			return (item as HookConfig).description ?? null;
-		}
-		if (kind === 'mcp') {
-			return null;
-		}
-		if (kind === 'instruction') {
-			return null;
-		}
-		if (kind === 'rule') {
-			return (item as RuleConfig).description ?? null;
-		}
-		return (item as SkillConfig | AgentConfig | MemoryConfig).description ?? null;
-	});
+	const description = $derived(getItemDescription(item, kind));
 
-	const filePath = $derived.by((): string | null => {
-		if (kind === 'mcp') {
-			return null;
-		}
-		return (item as Exclude<AnyItem, McpServerConfig>).file_path ?? null;
-	});
+	const filePath = $derived(getItemFilePath(item, kind));
 
 	const parentDir = $derived(getParentDir(filePath));
 
@@ -102,23 +78,9 @@
 		return 'amber' as const;
 	});
 
-	const lineCount = $derived.by((): number | null => {
-		if (!('content' in item) || typeof item.content !== 'string') {
-			return null;
-		}
-		return item.content.split('\n').length;
-	});
+	const lineCount = $derived(getItemLineCount(item));
 
-	const fileSizeLabel = $derived.by((): string | null => {
-		if (kind !== 'instruction') {
-			return null;
-		}
-		const size = (item as InstructionConfig).file_size;
-		if (size < 1024) {
-			return `${size} B`;
-		}
-		return `${(size / 1024).toFixed(1)} KB`;
-	});
+	const fileSizeLabel = $derived(getItemFileSizeLabel(item, kind));
 
 	const skillItem = $derived(kind === 'skill' ? (item as SkillConfig) : null);
 

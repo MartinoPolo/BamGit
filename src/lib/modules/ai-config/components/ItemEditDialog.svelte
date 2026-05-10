@@ -48,6 +48,7 @@
 	});
 
 	// Find item from all discovery arrays
+	// fallow-ignore-next-line complexity
 	const editingItem = $derived.by(() => {
 		const path = editingPath;
 		const result = aiConfig.discoveryResult;

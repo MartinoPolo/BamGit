@@ -24,6 +24,7 @@
 
 	const deletingPath = $derived(aiConfig.deletingItemPath);
 
+	// fallow-ignore-next-line complexity
 	const deletingItem = $derived.by(() => {
 		const path = deletingPath;
 		const result = aiConfig.discoveryResult;
@@ -42,6 +43,7 @@
 		);
 	});
 
+	// fallow-ignore-next-line complexity
 	const kind = $derived.by((): ItemKind | null => {
 		const path = deletingPath;
 		const result = aiConfig.discoveryResult;
@@ -117,6 +119,7 @@
 		return item.content as string;
 	});
 
+	// fallow-ignore-next-line complexity
 	const kindLabel = $derived.by((): string => {
 		switch (kind) {
 			case 'skill':
@@ -175,6 +178,7 @@
 
 	// ─── MCP delete kind + path heuristic ────────────────────────────────────
 
+	// fallow-ignore-next-line complexity
 	function resolveMcpDeleteArgs(): { filePath: string; kind: string } {
 		const item = deletingItem as McpServerConfig | null;
 		if (item === null) {

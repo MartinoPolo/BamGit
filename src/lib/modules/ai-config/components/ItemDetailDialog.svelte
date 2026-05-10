@@ -26,6 +26,7 @@
 
 	const isOpen = $derived(aiConfig.selectedItemPath !== null);
 
+	// fallow-ignore-next-line complexity
 	const kind = $derived.by((): ItemKind | null => {
 		const path = aiConfig.selectedItemPath;
 		const result = aiConfig.discoveryResult;

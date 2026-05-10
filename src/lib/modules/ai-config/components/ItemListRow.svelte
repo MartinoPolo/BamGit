@@ -10,24 +10,22 @@
 		HookConfig,
 		McpServerConfig,
 		MemoryConfig,
-		InstructionConfig,
 		RuleConfig,
 	} from '$lib/types/generated';
-	import { deriveLanguage, getParentDir, type ItemKind } from '../ai_config.helpers.js';
+	import {
+		deriveLanguage,
+		getParentDir,
+		getItemTitle,
+		getItemFilePath,
+		getItemLineCount,
+		type AnyItem,
+		type ItemKind,
+	} from '../ai_config.helpers.js';
 	import SkillOverrideControl from './SkillOverrideControl.svelte';
 	import { cn } from '$lib/utils.js';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 
 	// ─── Types ───────────────────────────────────────────────────────────────
-
-	type AnyItem =
-		| SkillConfig
-		| AgentConfig
-		| HookConfig
-		| McpServerConfig
-		| MemoryConfig
-		| InstructionConfig
-		| RuleConfig;
 
 	interface Props {
 		item: AnyItem;
@@ -45,19 +43,9 @@
 
 	// ─── Derived ─────────────────────────────────────────────────────────────
 
-	const title = $derived.by(() => {
-		if (kind === 'hook' || kind === 'instruction' || kind === 'rule') {
-			return (item as HookConfig | InstructionConfig | RuleConfig).filename;
-		}
-		return (item as SkillConfig | AgentConfig | McpServerConfig | MemoryConfig).name;
-	});
+	const title = $derived(getItemTitle(item, kind));
 
-	const filePath = $derived.by((): string | null => {
-		if (kind === 'mcp') {
-			return null;
-		}
-		return (item as Exclude<AnyItem, McpServerConfig>).file_path ?? null;
-	});
+	const filePath = $derived(getItemFilePath(item, kind));
 
 	const parentDir = $derived(getParentDir(filePath));
 
@@ -75,12 +63,7 @@
 		return 'bg-amber-500/80';
 	});
 
-	const lineCount = $derived.by((): number | null => {
-		if (!('content' in item) || typeof item.content !== 'string') {
-			return null;
-		}
-		return item.content.split('\n').length;
-	});
+	const lineCount = $derived(getItemLineCount(item));
 
 	const skillItem = $derived(kind === 'skill' ? (item as SkillConfig) : null);
 
