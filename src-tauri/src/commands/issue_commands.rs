@@ -289,9 +289,11 @@ pub fn toggle_issue_sound_mute(
 
 #[cfg(test)]
 mod tests {
+    #[allow(unused_imports)]
     use crate::database::test_helpers::setup_test_database;
     use rusqlite::Connection;
 
+    #[allow(dead_code)]
     fn insert_dashboard(connection: &Connection, id: &str) {
         connection
             .execute(
@@ -301,6 +303,7 @@ mod tests {
             .unwrap();
     }
 
+    #[allow(dead_code)]
     fn insert_issue_with_github(
         connection: &Connection,
         id: &str,

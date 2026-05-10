@@ -2,4 +2,4 @@
 import type { ConfigSource } from "./ConfigSource";
 import type { ProviderKind } from "./ProviderKind";
 
-export type MemoryConfig = { name: string, description: string | null, file_path: string, source: ConfigSource, provider: ProviderKind, memory_type: string | null, content: string, deprecated: boolean, };
+export type DiscoverySource = { provider: ProviderKind, label: string, path: string, source_type: ConfigSource, };
