@@ -3,6 +3,7 @@
 ## App Identity
 
 Grovekeeper is a desktop developer tool for managing parallel AI coding sessions. Design priorities:
+
 - **Information density** — maximize useful data per screen area
 - **Keyboard-first** — every action accessible via keyboard
 - **Developer-focused** — monospace data, compact layouts, minimal decoration
@@ -12,14 +13,14 @@ Grovekeeper is a desktop developer tool for managing parallel AI coding sessions
 
 Full token definitions: `claude_design/tokens.css`
 
-| Category | Key values |
-|----------|-----------|
-| Fonts | Geist (sans), Geist Mono (mono) |
-| Spacing | 4px base grid (`--space-1` through `--space-32`) |
-| Control sizes | sm=26px, md=32px, lg=38px |
-| Radii | xs=4px, sm=6px, md=8px, lg=10px, xl=14px |
-| Palette | Forest Moss — moss, amber, bark, azure scales |
-| Theme class | `gk-root theme-dark` (dark primary) |
+| Category      | Key values                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| Fonts         | Geist (sans), Geist Mono (mono)                                                                              |
+| Spacing       | 4px base grid (`--space-1` through `--space-32`)                                                             |
+| Control sizes | sm=26px, md=32px, lg=38px                                                                                    |
+| Radii         | xs=4px, sm=6px, md=8px, lg=10px, xl=14px                                                                     |
+| Palette       | Forest Moss — moss, amber, bark, azure scales                                                                |
+| Theme class   | `gk-root theme-dark` (dark primary)                                                                          |
 | Accent system | 12 accents (moss/amber/bark/azure/plum/teal/rose/coral/gold/sage/indigo/fuchsia) via `data-accent` attribute |
 
 ## CSS Component Classes (from tokens.css)
@@ -71,18 +72,21 @@ src/lib/components/
 ```
 
 ### Adding shadcn Components
+
 ```bash
 pnpm dlx shadcn-svelte@latest add <name> --yes --overwrite
 ```
+
 After: rename to PascalCase, extract `<script module>` to `.ts` file, update `index.ts`.
 
 ### Component Usage
+
 ```svelte
-import { Button } from '$lib/components/ui/button';
-import * as Dialog from '$lib/components/ui/dialog';
+import {Button} from '$lib/components/ui/button'; import * as Dialog from '$lib/components/ui/dialog';
 ```
 
 ### Icons — path-based imports for tree-shaking:
+
 ```svelte
 import SearchIcon from '@lucide/svelte/icons/search';
 ```
@@ -91,13 +95,13 @@ import SearchIcon from '@lucide/svelte/icons/search';
 
 ## Context7 Library IDs
 
-| Library | ID |
-|---------|-----|
-| shadcn-svelte | `/huntabyte/shadcn-svelte` |
-| Bits UI | `/huntabyte/bits-ui` |
-| Tailwind CSS | `/tailwindlabs/tailwindcss` |
-| Lucide | `/lucide-icons/lucide` |
-| Svelte | `/sveltejs/svelte` |
+| Library       | ID                          |
+| ------------- | --------------------------- |
+| shadcn-svelte | `/huntabyte/shadcn-svelte`  |
+| Bits UI       | `/huntabyte/bits-ui`        |
+| Tailwind CSS  | `/tailwindlabs/tailwindcss` |
+| Lucide        | `/lucide-icons/lucide`      |
+| Svelte        | `/sveltejs/svelte`          |
 
 ## Storybook
 
@@ -106,11 +110,13 @@ Stories: `src/lib/components/**/*.stories.svelte` — run `pnpm storybook`
 ## File Conventions
 
 ### Design Briefs
+
 - Location: `claude_design/design_briefs/`
 - No underscore prefix = ready for mockup (unfinished)
 - Underscore prefix (`_NAME.md`) = completed (has final design)
 
 ### Mockups
+
 - Variants: `claude_design/mockups/variants/<component-name>/variant-{a,b,c}.html`
 - Finals: `claude_design/mockups/<component-name>.html`
 - Format: self-contained HTML, `tokens.css` inlined, `gk-root theme-dark` wrapper, Geist font via CDN

@@ -231,7 +231,6 @@
 	"assigned_title": "Assigned to me ({count})",
 	"assigned_load_more": "Load more",
 	"assigned_linked_heading": "Already in dashboard",
-	"assigned_deleted_heading": "Previously removed",
 	"assigned_wizard_open": "Add to dashboard",
 	"assigned_quick_worktree": "Quick add with worktree",
 

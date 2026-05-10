@@ -1,1917 +1,2381 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimize View — Variant D: Priority Matrix</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Optimize View — Variant D: Priority Matrix</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
    Grovekeeper design tokens — Forest Moss palette
    (inlined from tokens.css)
    ============================================================ */
 
-:root {
-  /* Brand greens (deep moss + olive) */
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
 
-  /* Olive / amber accent (autumn fruit) */
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			/* Dark theme */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-  /* Bark (warm brown for trunks, secondary accents) */
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
 
-  /* Azure (cool blue accent scale) */
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-  /* Plum (purple accent) */
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-  /* Teal (blue-green accent) */
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
+			/* Component primitives */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-  /* Rose (warm pink-red accent) */
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
 
-  /* Coral (warm orange-red accent) */
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
+			/* Type scale */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-  /* Gold (warm yellow accent) */
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-  /* Sage (muted green accent) */
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-  /* Indigo (deep blue-violet accent) */
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-  /* Fuchsia (vivid magenta accent) */
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
+			/* CodeBurn panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
 
-  /* Sky (gradient bg for forest view) */
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
+			/* findings */
+			.cb-finding {
+				border-left: 2px solid var(--border);
+				padding: 8px 10px 9px 10px;
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			}
+			.cb-finding.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.cb-finding.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.cb-finding.is-low {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+			.cb-pri-high {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-pri-med {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-pri-low {
+				color: oklch(0.7 0.11 200);
+			}
 
-  /* Status accents */
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
+			/* Animations */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			@keyframes gk-flash {
+				0% {
+					background: var(--surface-2);
+				}
+				20% {
+					background: color-mix(in oklch, var(--status-success) 24%, transparent);
+				}
+				100% {
+					background: var(--surface-2);
+				}
+			}
+			.gk-flash {
+				animation: gk-flash 800ms ease-out;
+			}
 
-  /* Priority levels */
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
-
-  /* GitHub state colors */
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
-
-  /* Session state colors */
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
-
-  /* Typography */
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-
-  /* Spacing scale (4px base) */
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-
-  /* Radii */
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  /* Borders */
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  /* Sizing */
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  /* Z-index */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-
-  /* Motion */
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-
-  /* Layout */
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
-
-/* Dark theme */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
-
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.gk-root, .gk-root * {
-  box-sizing: border-box;
-}
-
-.font-mono { font-family: var(--font-mono); }
-
-/* Component primitives */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap;
-  user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.gk-btn-primary {
-  background: var(--primary);
-  color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost {
-  background: transparent;
-  color: var(--foreground-muted);
-}
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-
-/* Badges */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-
-/* Type scale */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-
-/* Divider */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
-
-/* Card */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-.gk-card-padded { padding: 16px; }
-
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
-
-/* CodeBurn panel */
-.cb-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-.cb-panel-title {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--foreground-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed var(--border);
-}
-.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
-.cb-panel-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
-.cb-panel-sub {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 400;
-  color: var(--foreground-subtle);
-  text-transform: none;
-  letter-spacing: 0;
-  margin-left: auto;
-}
-
-/* findings */
-.cb-finding {
-  border-left: 2px solid var(--border);
-  padding: 8px 10px 9px 10px;
-  background: color-mix(in oklch, var(--surface-2) 60%, transparent);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-}
-.cb-finding.is-high { border-left-color: oklch(0.640 0.205 25); }
-.cb-finding.is-med  { border-left-color: oklch(0.770 0.155 75); }
-.cb-finding.is-low  { border-left-color: oklch(0.700 0.110 200); }
-.cb-pri-high { color: oklch(0.640 0.205 25); }
-.cb-pri-med  { color: oklch(0.770 0.155 75); }
-.cb-pri-low  { color: oklch(0.700 0.110 200); }
-
-/* Animations */
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-@keyframes gk-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-@keyframes gk-flash {
-  0% { background: var(--surface-2); }
-  20% { background: color-mix(in oklch, var(--status-success) 24%, transparent); }
-  100% { background: var(--surface-2); }
-}
-.gk-flash { animation: gk-flash 800ms ease-out; }
-
-
-/* ============================================================
+			/* ============================================================
    OPTIMIZE VIEW -- Variant D: Priority Matrix
    ============================================================ */
 
-/* Page wrapper */
-.ov-page {
-  min-height: 100vh;
-  padding: var(--space-16);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-  max-width: 1280px;
-  margin: 0 auto;
-}
+			/* Page wrapper */
+			.ov-page {
+				min-height: 100vh;
+				padding: var(--space-16);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-16);
+				max-width: 1280px;
+				margin: 0 auto;
+			}
 
-/* Usage page header -- read-only context at 40% opacity */
-.ov-page-header-context {
-  opacity: 0.4;
-  pointer-events: none;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--border);
-}
+			/* Usage page header -- read-only context at 40% opacity */
+			.ov-page-header-context {
+				opacity: 0.4;
+				pointer-events: none;
+				user-select: none;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding-bottom: var(--space-8);
+				border-bottom: 1px solid var(--border);
+			}
 
-.ov-page-header-context .ov-page-title {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.03em;
-  line-height: var(--leading-tight);
-}
+			.ov-page-header-context .ov-page-title {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: -0.03em;
+				line-height: var(--leading-tight);
+			}
 
-.ov-page-header-context .ov-page-nav {
-  display: flex;
-  gap: var(--space-2);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  padding: 3px;
-  border-radius: var(--radius-md);
-}
+			.ov-page-header-context .ov-page-nav {
+				display: flex;
+				gap: var(--space-2);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+			}
 
-.ov-page-header-context .ov-page-nav-item {
-  padding: 5px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 6px;
-  color: var(--foreground-muted);
-  background: transparent;
-  border: none;
-  font-family: var(--font-sans);
-}
+			.ov-page-header-context .ov-page-nav-item {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				background: transparent;
+				border: none;
+				font-family: var(--font-sans);
+			}
 
-.ov-page-header-context .ov-page-nav-item.is-active {
-  background: var(--surface);
-  color: var(--foreground);
-  box-shadow: var(--shadow-sm);
-}
+			.ov-page-header-context .ov-page-nav-item.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
 
-/* Variant label banner */
-.ov-variant-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-3) var(--space-6);
-  background: color-mix(in oklch, var(--primary) 10%, transparent);
-  border: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
-  border-radius: var(--radius-sm);
-  width: fit-content;
-}
+			/* Variant label banner */
+			.ov-variant-banner {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-3) var(--space-6);
+				background: color-mix(in oklch, var(--primary) 10%, transparent);
+				border: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
+				border-radius: var(--radius-sm);
+				width: fit-content;
+			}
 
-/* ---- Top bar: section title + health score badge ---- */
-.ov-top-bar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-8);
-  flex-wrap: wrap;
-}
+			/* ---- Top bar: section title + health score badge ---- */
+			.ov-top-bar {
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: var(--space-8);
+				flex-wrap: wrap;
+			}
 
-.ov-top-bar-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
+			.ov-top-bar-left {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-3);
+			}
 
-.ov-section-title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.02em;
-  line-height: var(--leading-tight);
-}
+			.ov-section-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: -0.02em;
+				line-height: var(--leading-tight);
+			}
 
-.ov-section-subtitle {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
+			.ov-section-subtitle {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
 
-/* Health score badge (top-right) */
-.ov-health-badge {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-5) var(--space-8);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  flex-shrink: 0;
-}
+			/* Health score badge (top-right) */
+			.ov-health-badge {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-8);
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				flex-shrink: 0;
+			}
 
-.ov-health-ring-mini {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-}
+			.ov-health-ring-mini {
+				position: relative;
+				width: 48px;
+				height: 48px;
+				flex-shrink: 0;
+			}
 
-.ov-health-ring-mini svg {
-  width: 48px;
-  height: 48px;
-  transform: rotate(-90deg);
-}
+			.ov-health-ring-mini svg {
+				width: 48px;
+				height: 48px;
+				transform: rotate(-90deg);
+			}
 
-.ov-health-ring-mini .ring-track {
-  fill: none;
-  stroke: var(--border);
-  stroke-width: 4;
-}
+			.ov-health-ring-mini .ring-track {
+				fill: none;
+				stroke: var(--border);
+				stroke-width: 4;
+			}
 
-.ov-health-ring-mini .ring-fill {
-  fill: none;
-  stroke: oklch(0.770 0.150 65);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-dasharray: 113;
-  /* 72% of 113 = offset = 113 * (1 - 0.72) = 31.64 */
-  stroke-dashoffset: 31.64;
-  filter: drop-shadow(0 0 4px oklch(0.770 0.150 65 / 0.45));
-}
+			.ov-health-ring-mini .ring-fill {
+				fill: none;
+				stroke: oklch(0.77 0.15 65);
+				stroke-width: 4;
+				stroke-linecap: round;
+				stroke-dasharray: 113;
+				/* 72% of 113 = offset = 113 * (1 - 0.72) = 31.64 */
+				stroke-dashoffset: 31.64;
+				filter: drop-shadow(0 0 4px oklch(0.77 0.15 65 / 0.45));
+			}
 
-.ov-health-ring-mini .ring-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: var(--weight-bold);
-  letter-spacing: -0.02em;
-  color: oklch(0.770 0.150 65);
-}
+			.ov-health-ring-mini .ring-label {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font-sans);
+				font-size: 15px;
+				font-weight: var(--weight-bold);
+				letter-spacing: -0.02em;
+				color: oklch(0.77 0.15 65);
+			}
 
-.ov-health-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+			.ov-health-meta {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
 
-.ov-health-grade {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: oklch(0.770 0.150 65);
-  letter-spacing: 0.02em;
-}
+			.ov-health-grade {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: oklch(0.77 0.15 65);
+				letter-spacing: 0.02em;
+			}
 
-.ov-health-penalties {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-}
+			.ov-health-penalties {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
 
-.ov-health-savings {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--status-success);
-}
+			.ov-health-savings {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--status-success);
+			}
 
-/* ============================================================
+			/* ============================================================
    THE MATRIX
    2x2 grid: X = effort (easy -> hard), Y = savings (low -> high)
    ============================================================ */
 
-.ov-matrix-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-/* Matrix with axis labels */
-.ov-matrix-outer {
-  display: grid;
-  grid-template-columns: 28px 1fr;
-  grid-template-rows: 1fr 24px;
-  gap: 0;
-}
-
-/* Y-axis label */
-.ov-axis-y {
-  grid-column: 1;
-  grid-row: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ov-axis-y-text {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* X-axis label */
-.ov-axis-x {
-  grid-column: 2;
-  grid-row: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ov-axis-x-text {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* The 2x2 grid */
-.ov-matrix-grid {
-  grid-column: 2;
-  grid-row: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 2px;
-  min-height: 420px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  background: var(--border);
-}
-
-/* Individual quadrant */
-.ov-quadrant {
-  background: var(--surface);
-  padding: var(--space-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  position: relative;
-  min-height: 200px;
-}
-
-.ov-quadrant-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: var(--weight-semibold);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-}
-
-.ov-quadrant-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-/* Quadrant highlight for "Quick Wins" (top-left: high savings, easy fix) */
-.ov-quadrant.is-quick-wins {
-  background: color-mix(in oklch, var(--status-success) 5%, var(--surface));
-}
-
-.ov-quadrant.is-quick-wins .ov-quadrant-label {
-  color: var(--status-success);
-}
-
-.ov-quadrant.is-quick-wins::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--status-success), color-mix(in oklch, var(--status-success) 30%, transparent));
-}
-
-/* Quadrant: "Major Projects" (top-right: high savings, hard fix) */
-.ov-quadrant.is-major-projects .ov-quadrant-label {
-  color: oklch(0.770 0.150 65);
-}
-
-/* Quadrant: "Fill-Ins" (bottom-left: low savings, easy fix) */
-.ov-quadrant.is-fill-ins .ov-quadrant-label {
-  color: var(--foreground-subtle);
-}
-
-/* Quadrant: "Ignore" (bottom-right: low savings, hard fix) */
-.ov-quadrant.is-ignore .ov-quadrant-label {
-  color: var(--foreground-subtle);
-  opacity: 0.6;
-}
-
-/* ---- Finding dots / cards inside the matrix ---- */
-.ov-matrix-dot {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  background: color-mix(in oklch, var(--surface-2) 80%, transparent);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background var(--duration-2) var(--ease-out), border-color var(--duration-2) var(--ease-out), box-shadow var(--duration-2) var(--ease-out);
-  position: relative;
-}
-
-.ov-matrix-dot:hover {
-  background: var(--surface-2);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
-}
-
-.ov-matrix-dot:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-.ov-matrix-dot.is-active {
-  border-color: var(--primary);
-  background: color-mix(in oklch, var(--primary) 8%, var(--surface-2));
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 20%, transparent);
-}
-
-.ov-dot-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.ov-dot-indicator.is-high { background: oklch(0.640 0.205 25); box-shadow: 0 0 6px oklch(0.640 0.205 25 / 0.4); }
-.ov-dot-indicator.is-med  { background: oklch(0.770 0.155 75); box-shadow: 0 0 6px oklch(0.770 0.155 75 / 0.3); }
-.ov-dot-indicator.is-low  { background: oklch(0.700 0.110 200); box-shadow: 0 0 6px oklch(0.700 0.110 200 / 0.3); }
-
-.ov-dot-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.ov-dot-title {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: var(--leading-snug);
-}
-
-.ov-dot-savings {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  margin-top: 1px;
-}
-
-/* Axis tick labels */
-.ov-axis-ticks {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 28px 0 28px;
-}
-
-.ov-axis-tick {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-}
-
-.ov-axis-ticks-y {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: space-between;
-  padding: 0 4px;
-  position: absolute;
-  top: 0;
-  bottom: 24px;
-  left: 0;
-}
-
-/* ---- Expanded finding details (below matrix) ---- */
-.ov-details-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.ov-details-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-/* Expandable finding card */
-.ov-detail-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left-width: 3px;
-  border-left-color: var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  transition: border-color var(--duration-2) var(--ease-out), box-shadow var(--duration-2) var(--ease-out);
-}
-
-.ov-detail-card:hover {
-  border-color: var(--border-strong);
-}
-
-.ov-detail-card.is-high { border-left-color: oklch(0.640 0.205 25); }
-.ov-detail-card.is-med  { border-left-color: oklch(0.770 0.155 75); }
-.ov-detail-card.is-low  { border-left-color: oklch(0.700 0.110 200); }
-
-/* Detail card header (always visible) */
-.ov-detail-card-header {
-  display: grid;
-  grid-template-columns: 8px 1fr auto auto auto;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-5) var(--space-8);
-  cursor: pointer;
-  transition: background var(--duration-2) ease;
-  width: 100%;
-  background: transparent;
-  border: none;
-  text-align: left;
-  font-family: var(--font-sans);
-  color: var(--foreground);
-}
-
-.ov-detail-card-header:hover {
-  background: color-mix(in oklch, var(--foreground) 3%, transparent);
-}
-
-.ov-detail-card-header:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-}
-
-.ov-detail-card-header:active {
-  background: color-mix(in oklch, var(--foreground) 5%, transparent);
-}
-
-.ov-dch-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.ov-dch-dot.is-high { background: oklch(0.640 0.205 25); }
-.ov-dch-dot.is-med  { background: oklch(0.770 0.155 75); }
-.ov-dch-dot.is-low  { background: oklch(0.700 0.110 200); }
-
-.ov-dch-title {
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ov-dch-quadrant {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.ov-dch-savings {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--status-success);
-  white-space: nowrap;
-}
-
-.ov-dch-chevron {
-  width: 14px;
-  height: 14px;
-  color: var(--foreground-subtle);
-  transition: transform var(--duration-3) var(--ease-out);
-  flex-shrink: 0;
-}
-
-.ov-detail-card.is-expanded .ov-dch-chevron {
-  transform: rotate(180deg);
-}
-
-/* Detail card body (expanded) */
-.ov-detail-card-body {
-  display: none;
-  padding: 0 var(--space-8) var(--space-8) var(--space-8);
-  flex-direction: column;
-  gap: var(--space-8);
-  border-top: 1px solid var(--border);
-  margin-top: 0;
-  padding-top: var(--space-8);
-}
-
-.ov-detail-card.is-expanded .ov-detail-card-body {
-  display: flex;
-}
-
-.ov-detail-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
-}
-
-.ov-detail-block {}
-
-.ov-detail-label {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: var(--space-3);
-}
-
-.ov-detail-text {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-relaxed);
-}
-
-/* Stats mini grid */
-.ov-detail-stats {
-  display: flex;
-  gap: var(--space-8);
-  flex-wrap: wrap;
-}
-
-.ov-detail-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ov-detail-stat-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.ov-detail-stat-value {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.ov-detail-stat-value.is-bad { color: oklch(0.640 0.205 25); }
-.ov-detail-stat-value.is-target { color: var(--status-success); }
-
-/* Command block */
-.ov-command-block {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-5) var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.ov-command-text {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--primary);
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ov-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 3px 8px;
-  height: 22px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  transition: background var(--duration-2) ease, border-color var(--duration-2) ease, color var(--duration-2) ease;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.ov-copy-btn:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-  color: var(--foreground);
-}
-
-.ov-copy-btn:active { transform: scale(0.96); }
-
-.ov-copy-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-.ov-copy-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.ov-copy-btn.copied {
-  animation: gk-flash 800ms ease-out;
-  color: var(--status-success);
-  border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
-}
-
-/* Matrix legend */
-.ov-matrix-legend {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  padding-top: var(--space-4);
-}
-
-.ov-legend-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-}
-
-.ov-legend-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-/* Impact badge pill */
-.ov-impact-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border: 1px solid;
-  flex-shrink: 0;
-  height: 18px;
-}
-
-.ov-impact-badge.is-high {
-  background: color-mix(in oklch, oklch(0.640 0.205 25) 13%, transparent);
-  color: oklch(0.640 0.205 25);
-  border-color: color-mix(in oklch, oklch(0.640 0.205 25) 28%, transparent);
-}
-
-.ov-impact-badge.is-med {
-  background: color-mix(in oklch, oklch(0.770 0.155 75) 13%, transparent);
-  color: oklch(0.820 0.135 75);
-  border-color: color-mix(in oklch, oklch(0.770 0.155 75) 28%, transparent);
-}
-
-.ov-impact-badge.is-low {
-  background: color-mix(in oklch, oklch(0.700 0.110 200) 13%, transparent);
-  color: oklch(0.700 0.110 200);
-  border-color: color-mix(in oklch, oklch(0.700 0.110 200) 28%, transparent);
-}
-
-/* Status bar */
-.ov-statusbar {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 5px 14px;
-  background: var(--surface-2);
-  border-top: 1px solid var(--border);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-muted);
-  margin: 0 calc(var(--space-16) * -1);
-  margin-bottom: calc(var(--space-16) * -1);
-}
-
-.ov-statusbar .cb-key {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.ov-statusbar .cb-keycap {
-  display: inline-block;
-  min-width: 14px;
-  padding: 0 4px;
-  text-align: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  font-size: 10px;
-  line-height: 14px;
-  color: var(--foreground);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .ov-page {
-    padding: var(--space-8);
-    gap: var(--space-10);
-  }
-
-  .ov-matrix-grid {
-    min-height: 600px;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
-  }
-
-  .ov-quadrant {
-    min-height: 140px;
-  }
-
-  .ov-top-bar {
-    flex-direction: column;
-  }
-
-  .ov-detail-row {
-    grid-template-columns: 1fr;
-  }
-
-  .ov-detail-card-header {
-    grid-template-columns: 8px 1fr auto;
-  }
-
-  .ov-dch-quadrant { display: none; }
-  .ov-dch-savings { display: none; }
-}
-
-@media (max-width: 480px) {
-  .ov-matrix-outer {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-  }
-
-  .ov-axis-y,
-  .ov-axis-x { display: none; }
-
-  .ov-matrix-grid {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .ov-page-header-context { display: none; }
-}
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="ov-page">
-
-    <!-- Usage page header context (read-only, faded) -->
-    <div class="ov-page-header-context" aria-hidden="true">
-      <span class="ov-page-title">Usage Dashboard</span>
-      <div class="ov-page-nav">
-        <span class="ov-page-nav-item">Overview</span>
-        <span class="ov-page-nav-item">Sessions</span>
-        <span class="ov-page-nav-item">Costs</span>
-        <span class="ov-page-nav-item is-active">Optimize</span>
-        <span class="ov-page-nav-item">Tools</span>
-      </div>
-    </div>
-
-    <!-- Variant label -->
-    <div class="ov-variant-banner">
-      <span class="gk-eyebrow">Variant D — Priority Matrix</span>
-      <span class="gk-tiny">&middot; Optimize View &middot; Effort vs Savings</span>
-    </div>
-
-    <!-- ---- Top bar: title + health score badge ---- -->
-    <div class="ov-top-bar">
-      <div class="ov-top-bar-left">
-        <h1 class="ov-section-title">Optimization Findings</h1>
-        <p class="ov-section-subtitle">
-          47 sessions analysed across 3 workspaces &mdash; last 30 days.
-          Findings mapped by effort to fix vs. potential savings.
-        </p>
-      </div>
-
-      <!-- Health score badge -->
-      <div class="ov-health-badge" role="img" aria-label="Health score: 72 out of 100, grade C">
-        <div class="ov-health-ring-mini">
-          <svg viewBox="0 0 48 48" aria-hidden="true">
-            <circle class="ring-track" cx="24" cy="24" r="18" />
-            <circle class="ring-fill" cx="24" cy="24" r="18" />
-          </svg>
-          <span class="ring-label">C</span>
-        </div>
-        <div class="ov-health-meta">
-          <span class="ov-health-grade">Grade C &middot; 72/100</span>
-          <span class="ov-health-penalties">2 high + 3 med + 2 low</span>
-          <span class="ov-health-savings">&darr; ~$0.12/session recoverable</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================
+			.ov-matrix-wrapper {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			/* Matrix with axis labels */
+			.ov-matrix-outer {
+				display: grid;
+				grid-template-columns: 28px 1fr;
+				grid-template-rows: 1fr 24px;
+				gap: 0;
+			}
+
+			/* Y-axis label */
+			.ov-axis-y {
+				grid-column: 1;
+				grid-row: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.ov-axis-y-text {
+				writing-mode: vertical-lr;
+				transform: rotate(180deg);
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				white-space: nowrap;
+			}
+
+			/* X-axis label */
+			.ov-axis-x {
+				grid-column: 2;
+				grid-row: 2;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.ov-axis-x-text {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			/* The 2x2 grid */
+			.ov-matrix-grid {
+				grid-column: 2;
+				grid-row: 1;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				grid-template-rows: 1fr 1fr;
+				gap: 2px;
+				min-height: 420px;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				background: var(--border);
+			}
+
+			/* Individual quadrant */
+			.ov-quadrant {
+				background: var(--surface);
+				padding: var(--space-8);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-6);
+				position: relative;
+				min-height: 200px;
+			}
+
+			.ov-quadrant-label {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+			}
+
+			.ov-quadrant-icon {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+
+			/* Quadrant highlight for "Quick Wins" (top-left: high savings, easy fix) */
+			.ov-quadrant.is-quick-wins {
+				background: color-mix(in oklch, var(--status-success) 5%, var(--surface));
+			}
+
+			.ov-quadrant.is-quick-wins .ov-quadrant-label {
+				color: var(--status-success);
+			}
+
+			.ov-quadrant.is-quick-wins::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: linear-gradient(
+					90deg,
+					var(--status-success),
+					color-mix(in oklch, var(--status-success) 30%, transparent)
+				);
+			}
+
+			/* Quadrant: "Major Projects" (top-right: high savings, hard fix) */
+			.ov-quadrant.is-major-projects .ov-quadrant-label {
+				color: oklch(0.77 0.15 65);
+			}
+
+			/* Quadrant: "Fill-Ins" (bottom-left: low savings, easy fix) */
+			.ov-quadrant.is-fill-ins .ov-quadrant-label {
+				color: var(--foreground-subtle);
+			}
+
+			/* Quadrant: "Ignore" (bottom-right: low savings, hard fix) */
+			.ov-quadrant.is-ignore .ov-quadrant-label {
+				color: var(--foreground-subtle);
+				opacity: 0.6;
+			}
+
+			/* ---- Finding dots / cards inside the matrix ---- */
+			.ov-matrix-dot {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-4) var(--space-5);
+				background: color-mix(in oklch, var(--surface-2) 80%, transparent);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) var(--ease-out),
+					border-color var(--duration-2) var(--ease-out),
+					box-shadow var(--duration-2) var(--ease-out);
+				position: relative;
+			}
+
+			.ov-matrix-dot:hover {
+				background: var(--surface-2);
+				border-color: var(--border-strong);
+				box-shadow: var(--shadow-md);
+			}
+
+			.ov-matrix-dot:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			.ov-matrix-dot.is-active {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 8%, var(--surface-2));
+				box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 20%, transparent);
+			}
+
+			.ov-dot-indicator {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			.ov-dot-indicator.is-high {
+				background: oklch(0.64 0.205 25);
+				box-shadow: 0 0 6px oklch(0.64 0.205 25 / 0.4);
+			}
+			.ov-dot-indicator.is-med {
+				background: oklch(0.77 0.155 75);
+				box-shadow: 0 0 6px oklch(0.77 0.155 75 / 0.3);
+			}
+			.ov-dot-indicator.is-low {
+				background: oklch(0.7 0.11 200);
+				box-shadow: 0 0 6px oklch(0.7 0.11 200 / 0.3);
+			}
+
+			.ov-dot-text {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.ov-dot-title {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				line-height: var(--leading-snug);
+			}
+
+			.ov-dot-savings {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				margin-top: 1px;
+			}
+
+			/* Axis tick labels */
+			.ov-axis-ticks {
+				display: flex;
+				justify-content: space-between;
+				padding: 0 28px 0 28px;
+			}
+
+			.ov-axis-tick {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
+
+			.ov-axis-ticks-y {
+				display: flex;
+				flex-direction: column-reverse;
+				justify-content: space-between;
+				padding: 0 4px;
+				position: absolute;
+				top: 0;
+				bottom: 24px;
+				left: 0;
+			}
+
+			/* ---- Expanded finding details (below matrix) ---- */
+			.ov-details-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.ov-details-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-4);
+			}
+
+			/* Expandable finding card */
+			.ov-detail-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-left-width: 3px;
+				border-left-color: var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				transition:
+					border-color var(--duration-2) var(--ease-out),
+					box-shadow var(--duration-2) var(--ease-out);
+			}
+
+			.ov-detail-card:hover {
+				border-color: var(--border-strong);
+			}
+
+			.ov-detail-card.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.ov-detail-card.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.ov-detail-card.is-low {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+
+			/* Detail card header (always visible) */
+			.ov-detail-card-header {
+				display: grid;
+				grid-template-columns: 8px 1fr auto auto auto;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-8);
+				cursor: pointer;
+				transition: background var(--duration-2) ease;
+				width: 100%;
+				background: transparent;
+				border: none;
+				text-align: left;
+				font-family: var(--font-sans);
+				color: var(--foreground);
+			}
+
+			.ov-detail-card-header:hover {
+				background: color-mix(in oklch, var(--foreground) 3%, transparent);
+			}
+
+			.ov-detail-card-header:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: -2px;
+			}
+
+			.ov-detail-card-header:active {
+				background: color-mix(in oklch, var(--foreground) 5%, transparent);
+			}
+
+			.ov-dch-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			.ov-dch-dot.is-high {
+				background: oklch(0.64 0.205 25);
+			}
+			.ov-dch-dot.is-med {
+				background: oklch(0.77 0.155 75);
+			}
+			.ov-dch-dot.is-low {
+				background: oklch(0.7 0.11 200);
+			}
+
+			.ov-dch-title {
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.ov-dch-quadrant {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+				white-space: nowrap;
+			}
+
+			.ov-dch-savings {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--status-success);
+				white-space: nowrap;
+			}
+
+			.ov-dch-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				transition: transform var(--duration-3) var(--ease-out);
+				flex-shrink: 0;
+			}
+
+			.ov-detail-card.is-expanded .ov-dch-chevron {
+				transform: rotate(180deg);
+			}
+
+			/* Detail card body (expanded) */
+			.ov-detail-card-body {
+				display: none;
+				padding: 0 var(--space-8) var(--space-8) var(--space-8);
+				flex-direction: column;
+				gap: var(--space-8);
+				border-top: 1px solid var(--border);
+				margin-top: 0;
+				padding-top: var(--space-8);
+			}
+
+			.ov-detail-card.is-expanded .ov-detail-card-body {
+				display: flex;
+			}
+
+			.ov-detail-row {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-8);
+			}
+
+			.ov-detail-block {
+			}
+
+			.ov-detail-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.07em;
+				margin-bottom: var(--space-3);
+			}
+
+			.ov-detail-text {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
+
+			/* Stats mini grid */
+			.ov-detail-stats {
+				display: flex;
+				gap: var(--space-8);
+				flex-wrap: wrap;
+			}
+
+			.ov-detail-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.ov-detail-stat-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			.ov-detail-stat-value {
+				font-family: var(--font-mono);
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.ov-detail-stat-value.is-bad {
+				color: oklch(0.64 0.205 25);
+			}
+			.ov-detail-stat-value.is-target {
+				color: var(--status-success);
+			}
+
+			/* Command block */
+			.ov-command-block {
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: var(--space-5) var(--space-6);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-4);
+			}
+
+			.ov-command-text {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--primary);
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.ov-copy-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 4px;
+				padding: 3px 8px;
+				height: 22px;
+				background: transparent;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				cursor: pointer;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease,
+					color var(--duration-2) ease;
+				flex-shrink: 0;
+				white-space: nowrap;
+			}
+
+			.ov-copy-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+
+			.ov-copy-btn:active {
+				transform: scale(0.96);
+			}
+
+			.ov-copy-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			.ov-copy-btn:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.ov-copy-btn.copied {
+				animation: gk-flash 800ms ease-out;
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+
+			/* Matrix legend */
+			.ov-matrix-legend {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding-top: var(--space-4);
+			}
+
+			.ov-legend-item {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+			}
+
+			.ov-legend-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			/* Impact badge pill */
+			.ov-impact-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				padding: 2px 7px;
+				border-radius: var(--radius-full);
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				border: 1px solid;
+				flex-shrink: 0;
+				height: 18px;
+			}
+
+			.ov-impact-badge.is-high {
+				background: color-mix(in oklch, oklch(0.64 0.205 25) 13%, transparent);
+				color: oklch(0.64 0.205 25);
+				border-color: color-mix(in oklch, oklch(0.64 0.205 25) 28%, transparent);
+			}
+
+			.ov-impact-badge.is-med {
+				background: color-mix(in oklch, oklch(0.77 0.155 75) 13%, transparent);
+				color: oklch(0.82 0.135 75);
+				border-color: color-mix(in oklch, oklch(0.77 0.155 75) 28%, transparent);
+			}
+
+			.ov-impact-badge.is-low {
+				background: color-mix(in oklch, oklch(0.7 0.11 200) 13%, transparent);
+				color: oklch(0.7 0.11 200);
+				border-color: color-mix(in oklch, oklch(0.7 0.11 200) 28%, transparent);
+			}
+
+			/* Status bar */
+			.ov-statusbar {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 5px 14px;
+				background: var(--surface-2);
+				border-top: 1px solid var(--border);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				margin: 0 calc(var(--space-16) * -1);
+				margin-bottom: calc(var(--space-16) * -1);
+			}
+
+			.ov-statusbar .cb-key {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+			}
+
+			.ov-statusbar .cb-keycap {
+				display: inline-block;
+				min-width: 14px;
+				padding: 0 4px;
+				text-align: center;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 3px;
+				font-size: 10px;
+				line-height: 14px;
+				color: var(--foreground);
+			}
+
+			/* Responsive */
+			@media (max-width: 768px) {
+				.ov-page {
+					padding: var(--space-8);
+					gap: var(--space-10);
+				}
+
+				.ov-matrix-grid {
+					min-height: 600px;
+					grid-template-columns: 1fr;
+					grid-template-rows: repeat(4, 1fr);
+				}
+
+				.ov-quadrant {
+					min-height: 140px;
+				}
+
+				.ov-top-bar {
+					flex-direction: column;
+				}
+
+				.ov-detail-row {
+					grid-template-columns: 1fr;
+				}
+
+				.ov-detail-card-header {
+					grid-template-columns: 8px 1fr auto;
+				}
+
+				.ov-dch-quadrant {
+					display: none;
+				}
+				.ov-dch-savings {
+					display: none;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.ov-matrix-outer {
+					grid-template-columns: 1fr;
+					grid-template-rows: 1fr;
+				}
+
+				.ov-axis-y,
+				.ov-axis-x {
+					display: none;
+				}
+
+				.ov-matrix-grid {
+					grid-column: 1;
+					grid-row: 1;
+				}
+
+				.ov-page-header-context {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="ov-page">
+				<!-- Usage page header context (read-only, faded) -->
+				<div class="ov-page-header-context" aria-hidden="true">
+					<span class="ov-page-title">Usage Dashboard</span>
+					<div class="ov-page-nav">
+						<span class="ov-page-nav-item">Overview</span>
+						<span class="ov-page-nav-item">Sessions</span>
+						<span class="ov-page-nav-item">Costs</span>
+						<span class="ov-page-nav-item is-active">Optimize</span>
+						<span class="ov-page-nav-item">Tools</span>
+					</div>
+				</div>
+
+				<!-- Variant label -->
+				<div class="ov-variant-banner">
+					<span class="gk-eyebrow">Variant D — Priority Matrix</span>
+					<span class="gk-tiny">&middot; Optimize View &middot; Effort vs Savings</span>
+				</div>
+
+				<!-- ---- Top bar: title + health score badge ---- -->
+				<div class="ov-top-bar">
+					<div class="ov-top-bar-left">
+						<h1 class="ov-section-title">Optimization Findings</h1>
+						<p class="ov-section-subtitle">
+							47 sessions analysed across 3 workspaces &mdash; last 30 days. Findings
+							mapped by effort to fix vs. potential savings.
+						</p>
+					</div>
+
+					<!-- Health score badge -->
+					<div
+						class="ov-health-badge"
+						role="img"
+						aria-label="Health score: 72 out of 100, grade C"
+					>
+						<div class="ov-health-ring-mini">
+							<svg viewBox="0 0 48 48" aria-hidden="true">
+								<circle class="ring-track" cx="24" cy="24" r="18" />
+								<circle class="ring-fill" cx="24" cy="24" r="18" />
+							</svg>
+							<span class="ring-label">C</span>
+						</div>
+						<div class="ov-health-meta">
+							<span class="ov-health-grade">Grade C &middot; 72/100</span>
+							<span class="ov-health-penalties">2 high + 3 med + 2 low</span>
+							<span class="ov-health-savings">&darr; ~$0.12/session recoverable</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- ============================================================
          THE PRIORITY MATRIX
          ============================================================ -->
-    <div class="ov-matrix-wrapper">
-      <div class="ov-matrix-outer">
-        <!-- Y-axis label -->
-        <div class="ov-axis-y" aria-hidden="true">
-          <span class="ov-axis-y-text">Potential Savings &uarr;</span>
-        </div>
+				<div class="ov-matrix-wrapper">
+					<div class="ov-matrix-outer">
+						<!-- Y-axis label -->
+						<div class="ov-axis-y" aria-hidden="true">
+							<span class="ov-axis-y-text">Potential Savings &uarr;</span>
+						</div>
 
-        <!-- The 2x2 grid -->
-        <div class="ov-matrix-grid" role="grid" aria-label="Priority matrix: effort vs savings">
+						<!-- The 2x2 grid -->
+						<div
+							class="ov-matrix-grid"
+							role="grid"
+							aria-label="Priority matrix: effort vs savings"
+						>
+							<!-- Q1: Top-left = High savings, Easy fix = QUICK WINS -->
+							<div
+								class="ov-quadrant is-quick-wins"
+								role="gridcell"
+								aria-label="Quick Wins: high savings, easy fix"
+							>
+								<div class="ov-quadrant-label">
+									<svg
+										class="ov-quadrant-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<path
+											d="M8 2L10.5 7H13L9.5 10L11 14.5L8 12L5 14.5L6.5 10L3 7H5.5L8 2Z"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linejoin="round"
+											fill="color-mix(in oklch, currentColor 15%, transparent)"
+										/>
+									</svg>
+									Quick Wins
+								</div>
 
-          <!-- Q1: Top-left = High savings, Easy fix = QUICK WINS -->
-          <div class="ov-quadrant is-quick-wins" role="gridcell" aria-label="Quick Wins: high savings, easy fix">
-            <div class="ov-quadrant-label">
-              <svg class="ov-quadrant-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M8 2L10.5 7H13L9.5 10L11 14.5L8 12L5 14.5L6.5 10L3 7H5.5L8 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="color-mix(in oklch, currentColor 15%, transparent)"/>
-              </svg>
-              Quick Wins
-            </div>
+								<!-- Finding: Junk directory reads -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="junk-dirs"
+									tabindex="0"
+									aria-label="Reading junk directories: ~7,200 tokens, high impact"
+								>
+									<span class="ov-dot-indicator is-high"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Reading junk directories</div>
+										<div class="ov-dot-savings">
+											~7,200 tok &middot; $0.04/session
+										</div>
+									</div>
+								</button>
 
-            <!-- Finding: Junk directory reads -->
-            <button class="ov-matrix-dot" data-finding="junk-dirs" tabindex="0" aria-label="Reading junk directories: ~7,200 tokens, high impact">
-              <span class="ov-dot-indicator is-high"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Reading junk directories</div>
-                <div class="ov-dot-savings">~7,200 tok &middot; $0.04/session</div>
-              </div>
-            </button>
+								<!-- Finding: Duplicate file reads -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="dup-reads"
+									tabindex="0"
+									aria-label="Duplicate file reads: ~4,800 tokens, high impact"
+								>
+									<span class="ov-dot-indicator is-high"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Duplicate file reads</div>
+										<div class="ov-dot-savings">
+											~4,800 tok &middot; $0.03/session
+										</div>
+									</div>
+								</button>
 
-            <!-- Finding: Duplicate file reads -->
-            <button class="ov-matrix-dot" data-finding="dup-reads" tabindex="0" aria-label="Duplicate file reads: ~4,800 tokens, high impact">
-              <span class="ov-dot-indicator is-high"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Duplicate file reads</div>
-                <div class="ov-dot-savings">~4,800 tok &middot; $0.03/session</div>
-              </div>
-            </button>
+								<!-- Finding: Bash output limit -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="bash-limit"
+									tabindex="0"
+									aria-label="Bash output limit not set: ~1,400 tokens, low impact"
+								>
+									<span class="ov-dot-indicator is-low"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Bash output limit not set</div>
+										<div class="ov-dot-savings">
+											~1,400 tok &middot; $0.01/session
+										</div>
+									</div>
+								</button>
+							</div>
 
-            <!-- Finding: Bash output limit -->
-            <button class="ov-matrix-dot" data-finding="bash-limit" tabindex="0" aria-label="Bash output limit not set: ~1,400 tokens, low impact">
-              <span class="ov-dot-indicator is-low"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Bash output limit not set</div>
-                <div class="ov-dot-savings">~1,400 tok &middot; $0.01/session</div>
-              </div>
-            </button>
-          </div>
+							<!-- Q2: Top-right = High savings, Hard fix = MAJOR PROJECTS -->
+							<div
+								class="ov-quadrant is-major-projects"
+								role="gridcell"
+								aria-label="Major Projects: high savings, hard fix"
+							>
+								<div class="ov-quadrant-label">
+									<svg
+										class="ov-quadrant-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<rect
+											x="2"
+											y="2"
+											width="12"
+											height="12"
+											rx="2"
+											stroke="currentColor"
+											stroke-width="1.2"
+											fill="none"
+										/>
+										<path
+											d="M5 8h6M8 5v6"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+										/>
+									</svg>
+									Major Projects
+								</div>
 
-          <!-- Q2: Top-right = High savings, Hard fix = MAJOR PROJECTS -->
-          <div class="ov-quadrant is-major-projects" role="gridcell" aria-label="Major Projects: high savings, hard fix">
-            <div class="ov-quadrant-label">
-              <svg class="ov-quadrant-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
-                <path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              Major Projects
-            </div>
+								<!-- Finding: Low read/edit ratio -->
+								<button
+									class="ov-matrix-dot is-active"
+									data-finding="read-edit"
+									tabindex="0"
+									aria-label="Low read/edit ratio: efficiency loss, high impact"
+								>
+									<span class="ov-dot-indicator is-high"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Low read/edit ratio</div>
+										<div class="ov-dot-savings">
+											efficiency loss &middot; 2.1:1 ratio
+										</div>
+									</div>
+								</button>
 
-            <!-- Finding: Low read/edit ratio -->
-            <button class="ov-matrix-dot is-active" data-finding="read-edit" tabindex="0" aria-label="Low read/edit ratio: efficiency loss, high impact">
-              <span class="ov-dot-indicator is-high"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Low read/edit ratio</div>
-                <div class="ov-dot-savings">efficiency loss &middot; 2.1:1 ratio</div>
-              </div>
-            </button>
+								<!-- Finding: Cache bloat -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="cache-bloat"
+									tabindex="0"
+									aria-label="Cache creation bloat: ~3,400 tokens, medium impact"
+								>
+									<span class="ov-dot-indicator is-med"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Cache creation bloat</div>
+										<div class="ov-dot-savings">
+											~3,400 tok &middot; $0.02/session
+										</div>
+									</div>
+								</button>
+							</div>
 
-            <!-- Finding: Cache bloat -->
-            <button class="ov-matrix-dot" data-finding="cache-bloat" tabindex="0" aria-label="Cache creation bloat: ~3,400 tokens, medium impact">
-              <span class="ov-dot-indicator is-med"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Cache creation bloat</div>
-                <div class="ov-dot-savings">~3,400 tok &middot; $0.02/session</div>
-              </div>
-            </button>
-          </div>
+							<!-- Q3: Bottom-left = Low savings, Easy fix = FILL-INS -->
+							<div
+								class="ov-quadrant is-fill-ins"
+								role="gridcell"
+								aria-label="Fill-ins: low savings, easy fix"
+							>
+								<div class="ov-quadrant-label">
+									<svg
+										class="ov-quadrant-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<circle
+											cx="8"
+											cy="8"
+											r="6"
+											stroke="currentColor"
+											stroke-width="1.2"
+											fill="none"
+										/>
+										<path
+											d="M5.5 8l2 2 3-4"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									Fill-ins
+								</div>
 
-          <!-- Q3: Bottom-left = Low savings, Easy fix = FILL-INS -->
-          <div class="ov-quadrant is-fill-ins" role="gridcell" aria-label="Fill-ins: low savings, easy fix">
-            <div class="ov-quadrant-label">
-              <svg class="ov-quadrant-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/>
-                <path d="M5.5 8l2 2 3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Fill-ins
-            </div>
+								<!-- Finding: Unused MCP servers -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="unused-mcp"
+									tabindex="0"
+									aria-label="Unused MCP servers: ~680 tokens, medium impact"
+								>
+									<span class="ov-dot-indicator is-med"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Unused MCP servers</div>
+										<div class="ov-dot-savings">
+											~680 tok overhead &middot; $0.01/session
+										</div>
+									</div>
+								</button>
 
-            <!-- Finding: Unused MCP servers -->
-            <button class="ov-matrix-dot" data-finding="unused-mcp" tabindex="0" aria-label="Unused MCP servers: ~680 tokens, medium impact">
-              <span class="ov-dot-indicator is-med"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Unused MCP servers</div>
-                <div class="ov-dot-savings">~680 tok overhead &middot; $0.01/session</div>
-              </div>
-            </button>
+								<!-- Finding: Ghost commands -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="ghost-cmds"
+									tabindex="0"
+									aria-label="Ghost slash commands: ~320 tokens, medium impact"
+								>
+									<span class="ov-dot-indicator is-med"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Ghost slash commands</div>
+										<div class="ov-dot-savings">
+											~320 tok &middot; 3 never used
+										</div>
+									</div>
+								</button>
+							</div>
 
-            <!-- Finding: Ghost commands -->
-            <button class="ov-matrix-dot" data-finding="ghost-cmds" tabindex="0" aria-label="Ghost slash commands: ~320 tokens, medium impact">
-              <span class="ov-dot-indicator is-med"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Ghost slash commands</div>
-                <div class="ov-dot-savings">~320 tok &middot; 3 never used</div>
-              </div>
-            </button>
-          </div>
+							<!-- Q4: Bottom-right = Low savings, Hard fix = IGNORE -->
+							<div
+								class="ov-quadrant is-ignore"
+								role="gridcell"
+								aria-label="Ignore for now: low savings, hard fix"
+							>
+								<div class="ov-quadrant-label">
+									<svg
+										class="ov-quadrant-icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										aria-hidden="true"
+									>
+										<circle
+											cx="8"
+											cy="8"
+											r="6"
+											stroke="currentColor"
+											stroke-width="1.2"
+											fill="none"
+										/>
+										<path
+											d="M6 6l4 4M10 6l-4 4"
+											stroke="currentColor"
+											stroke-width="1.2"
+											stroke-linecap="round"
+										/>
+									</svg>
+									Ignore for now
+								</div>
 
-          <!-- Q4: Bottom-right = Low savings, Hard fix = IGNORE -->
-          <div class="ov-quadrant is-ignore" role="gridcell" aria-label="Ignore for now: low savings, hard fix">
-            <div class="ov-quadrant-label">
-              <svg class="ov-quadrant-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/>
-                <path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              Ignore for now
-            </div>
+								<!-- Finding: Bloated CLAUDE.md -->
+								<button
+									class="ov-matrix-dot"
+									data-finding="bloated-md"
+									tabindex="0"
+									aria-label="Bloated CLAUDE.md: ~2,100 tokens, low impact"
+								>
+									<span class="ov-dot-indicator is-low"></span>
+									<div class="ov-dot-text">
+										<div class="ov-dot-title">Bloated CLAUDE.md</div>
+										<div class="ov-dot-savings">
+											~2,100 tok &middot; 847 lines
+										</div>
+									</div>
+								</button>
+							</div>
+						</div>
+						<!-- /matrix grid -->
 
-            <!-- Finding: Bloated CLAUDE.md -->
-            <button class="ov-matrix-dot" data-finding="bloated-md" tabindex="0" aria-label="Bloated CLAUDE.md: ~2,100 tokens, low impact">
-              <span class="ov-dot-indicator is-low"></span>
-              <div class="ov-dot-text">
-                <div class="ov-dot-title">Bloated CLAUDE.md</div>
-                <div class="ov-dot-savings">~2,100 tok &middot; 847 lines</div>
-              </div>
-            </button>
-          </div>
+						<!-- X-axis label -->
+						<div class="ov-axis-x" aria-hidden="true">
+							<span class="ov-axis-x-text"
+								>Easy fix
+								&larr;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;Effort
+								to
+								Fix&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&rarr;
+								Hard fix</span
+							>
+						</div>
+					</div>
 
-        </div><!-- /matrix grid -->
+					<!-- Matrix legend -->
+					<div class="ov-matrix-legend">
+						<div class="ov-legend-item">
+							<span
+								class="ov-legend-dot"
+								style="
+									background: oklch(0.64 0.205 25);
+									box-shadow: 0 0 4px oklch(0.64 0.205 25 / 0.4);
+								"
+							></span>
+							High impact
+						</div>
+						<div class="ov-legend-item">
+							<span
+								class="ov-legend-dot"
+								style="
+									background: oklch(0.77 0.155 75);
+									box-shadow: 0 0 4px oklch(0.77 0.155 75 / 0.3);
+								"
+							></span>
+							Medium
+						</div>
+						<div class="ov-legend-item">
+							<span
+								class="ov-legend-dot"
+								style="
+									background: oklch(0.7 0.11 200);
+									box-shadow: 0 0 4px oklch(0.7 0.11 200 / 0.3);
+								"
+							></span>
+							Low
+						</div>
+						<div style="margin-left: auto">
+							<button class="gk-btn gk-btn-secondary gk-btn-sm" type="button">
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M13.5 8a5.5 5.5 0 1 1-1.1-3.3"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									/>
+									<path
+										d="M13.5 3.5V7h-3.5"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								Re-scan
+							</button>
+						</div>
+					</div>
+				</div>
 
-        <!-- X-axis label -->
-        <div class="ov-axis-x" aria-hidden="true">
-          <span class="ov-axis-x-text">Easy fix &larr;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;Effort to Fix&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&rarr; Hard fix</span>
-        </div>
-      </div>
-
-      <!-- Matrix legend -->
-      <div class="ov-matrix-legend">
-        <div class="ov-legend-item">
-          <span class="ov-legend-dot" style="background: oklch(0.640 0.205 25); box-shadow: 0 0 4px oklch(0.640 0.205 25 / 0.4);"></span>
-          High impact
-        </div>
-        <div class="ov-legend-item">
-          <span class="ov-legend-dot" style="background: oklch(0.770 0.155 75); box-shadow: 0 0 4px oklch(0.770 0.155 75 / 0.3);"></span>
-          Medium
-        </div>
-        <div class="ov-legend-item">
-          <span class="ov-legend-dot" style="background: oklch(0.700 0.110 200); box-shadow: 0 0 4px oklch(0.700 0.110 200 / 0.3);"></span>
-          Low
-        </div>
-        <div style="margin-left: auto;">
-          <button class="gk-btn gk-btn-secondary gk-btn-sm" type="button">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M13.5 8a5.5 5.5 0 1 1-1.1-3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M13.5 3.5V7h-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Re-scan
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================
+				<!-- ============================================================
          EXPANDABLE FINDING DETAILS
          ============================================================ -->
-    <section class="ov-details-section" aria-label="Finding details">
-      <div class="ov-details-header">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <h2 class="gk-h2" style="font-size: var(--text-lg);">Finding Details</h2>
-          <span class="gk-badge">7 issues</span>
-        </div>
-        <span class="gk-tiny">Click a matrix item or expand below</span>
-      </div>
+				<section class="ov-details-section" aria-label="Finding details">
+					<div class="ov-details-header">
+						<div style="display: flex; align-items: center; gap: 8px">
+							<h2 class="gk-h2" style="font-size: var(--text-lg)">Finding Details</h2>
+							<span class="gk-badge">7 issues</span>
+						</div>
+						<span class="gk-tiny">Click a matrix item or expand below</span>
+					</div>
 
-      <!-- 1: Reading junk directories (HIGH, quick-win) -->
-      <article class="ov-detail-card is-high" data-finding-detail="junk-dirs">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-high"></span>
-          <span class="ov-dch-title">Reading junk directories</span>
-          <span class="ov-dch-quadrant">Quick Win</span>
-          <span class="ov-dch-savings">&darr; $0.04/session</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Why it hurts</div>
-              <p class="ov-detail-text">
-                Glob patterns without exclusions pull thousands of files into context.
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">node_modules/</code>,
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">.git/</code>, and
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">dist/</code>
-                contain no editable source and inflate context without value.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Impact stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Detected dirs</span>
-                  <span class="ov-detail-stat-value is-bad">node_modules, .git, dist</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Avg files read</span>
-                  <span class="ov-detail-stat-value is-bad">1,847 / session</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Target</span>
-                  <span class="ov-detail-stat-value is-target">&lt; 80 / session</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; add to CLAUDE.md</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">## Glob exclusions&#10;Never read: node_modules/, .git/, dist/, .next/, coverage/</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 1: Reading junk directories (HIGH, quick-win) -->
+					<article class="ov-detail-card is-high" data-finding-detail="junk-dirs">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-high"></span>
+							<span class="ov-dch-title">Reading junk directories</span>
+							<span class="ov-dch-quadrant">Quick Win</span>
+							<span class="ov-dch-savings">&darr; $0.04/session</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Why it hurts</div>
+									<p class="ov-detail-text">
+										Glob patterns without exclusions pull thousands of files
+										into context.
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>node_modules/</code
+										>,
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>.git/</code
+										>, and
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>dist/</code
+										>
+										contain no editable source and inflate context without
+										value.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Impact stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Detected dirs</span>
+											<span class="ov-detail-stat-value is-bad"
+												>node_modules, .git, dist</span
+											>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Avg files read</span>
+											<span class="ov-detail-stat-value is-bad"
+												>1,847 / session</span
+											>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Target</span>
+											<span class="ov-detail-stat-value is-target"
+												>&lt; 80 / session</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">Fix &mdash; add to CLAUDE.md</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>## Glob exclusions&#10;Never read: node_modules/, .git/,
+										dist/, .next/, coverage/</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 2: Duplicate file reads (HIGH, quick-win) -->
-      <article class="ov-detail-card is-high" data-finding-detail="dup-reads">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-high"></span>
-          <span class="ov-dch-title">Duplicate file reads</span>
-          <span class="ov-dch-quadrant">Quick Win</span>
-          <span class="ov-dch-savings">&darr; $0.03/session</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Why it hurts</div>
-              <p class="ov-detail-text">
-                Re-reading unchanged files burns input tokens on content already in the context window.
-                Top offender: <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">src/routes/+layout.svelte</code> read 6x per session.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Impact stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Top offender</span>
-                  <span class="ov-detail-stat-value is-bad">+layout.svelte x6</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Avg duplicates</span>
-                  <span class="ov-detail-stat-value is-bad">14 / session</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; add instruction</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">Do not re-read files already in context unless content has changed.</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 2: Duplicate file reads (HIGH, quick-win) -->
+					<article class="ov-detail-card is-high" data-finding-detail="dup-reads">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-high"></span>
+							<span class="ov-dch-title">Duplicate file reads</span>
+							<span class="ov-dch-quadrant">Quick Win</span>
+							<span class="ov-dch-savings">&darr; $0.03/session</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Why it hurts</div>
+									<p class="ov-detail-text">
+										Re-reading unchanged files burns input tokens on content
+										already in the context window. Top offender:
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>src/routes/+layout.svelte</code
+										>
+										read 6x per session.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Impact stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Top offender</span>
+											<span class="ov-detail-stat-value is-bad"
+												>+layout.svelte x6</span
+											>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Avg duplicates</span>
+											<span class="ov-detail-stat-value is-bad"
+												>14 / session</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">Fix &mdash; add instruction</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>Do not re-read files already in context unless content has
+										changed.</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 3: Low read/edit ratio (HIGH, major project) EXPANDED -->
-      <article class="ov-detail-card is-high is-expanded" data-finding-detail="read-edit">
-        <button class="ov-detail-card-header" type="button" aria-expanded="true">
-          <span class="ov-dch-dot is-high"></span>
-          <span class="ov-dch-title">Low read/edit ratio</span>
-          <span class="ov-dch-quadrant">Major Project</span>
-          <span class="ov-dch-savings">2.1:1 ratio</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">What this means</div>
-              <p class="ov-detail-text">
-                Exploration-heavy sessions with little output signal over-planning or unclear scope.
-                This ratio is labelled "Major Project" because improving it requires changing how you write task prompts &mdash; not a one-line config fix.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Impact stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Current ratio</span>
-                  <span class="ov-detail-stat-value is-bad">2.1 : 1</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Healthy baseline</span>
-                  <span class="ov-detail-stat-value is-target">&ge; 4.0 : 1</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Sessions affected</span>
-                  <span class="ov-detail-stat-value">31 / 47</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; add to task prompts</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">Read only files you plan to edit or directly reference in your response.</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 3: Low read/edit ratio (HIGH, major project) EXPANDED -->
+					<article
+						class="ov-detail-card is-high is-expanded"
+						data-finding-detail="read-edit"
+					>
+						<button class="ov-detail-card-header" type="button" aria-expanded="true">
+							<span class="ov-dch-dot is-high"></span>
+							<span class="ov-dch-title">Low read/edit ratio</span>
+							<span class="ov-dch-quadrant">Major Project</span>
+							<span class="ov-dch-savings">2.1:1 ratio</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">What this means</div>
+									<p class="ov-detail-text">
+										Exploration-heavy sessions with little output signal
+										over-planning or unclear scope. This ratio is labelled
+										"Major Project" because improving it requires changing how
+										you write task prompts &mdash; not a one-line config fix.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Impact stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Current ratio</span>
+											<span class="ov-detail-stat-value is-bad">2.1 : 1</span>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label"
+												>Healthy baseline</span
+											>
+											<span class="ov-detail-stat-value is-target"
+												>&ge; 4.0 : 1</span
+											>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label"
+												>Sessions affected</span
+											>
+											<span class="ov-detail-stat-value">31 / 47</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">Fix &mdash; add to task prompts</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>Read only files you plan to edit or directly reference in
+										your response.</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 4: Cache creation bloat (MED, major project) -->
-      <article class="ov-detail-card is-med" data-finding-detail="cache-bloat">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-med"></span>
-          <span class="ov-dch-title">Cache creation bloat</span>
-          <span class="ov-dch-quadrant">Major Project</span>
-          <span class="ov-dch-savings">&darr; $0.02/session</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Why it hurts</div>
-              <p class="ov-detail-text">
-                Median cache_creation_tokens is 18,400 &mdash; well above the 12,000 baseline for projects of this size.
-                Large initial caches drive up costs for short-lived sessions.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Median cache</span>
-                  <span class="ov-detail-stat-value is-bad">18,400 tok</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Baseline</span>
-                  <span class="ov-detail-stat-value is-target">~12,000 tok</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; reduce CLAUDE.md + prune MCP servers</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">Trim CLAUDE.md, remove unused MCP servers, consolidate @-imports</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 4: Cache creation bloat (MED, major project) -->
+					<article class="ov-detail-card is-med" data-finding-detail="cache-bloat">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-med"></span>
+							<span class="ov-dch-title">Cache creation bloat</span>
+							<span class="ov-dch-quadrant">Major Project</span>
+							<span class="ov-dch-savings">&darr; $0.02/session</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Why it hurts</div>
+									<p class="ov-detail-text">
+										Median cache_creation_tokens is 18,400 &mdash; well above
+										the 12,000 baseline for projects of this size. Large initial
+										caches drive up costs for short-lived sessions.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Median cache</span>
+											<span class="ov-detail-stat-value is-bad"
+												>18,400 tok</span
+											>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Baseline</span>
+											<span class="ov-detail-stat-value is-target"
+												>~12,000 tok</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">
+									Fix &mdash; reduce CLAUDE.md + prune MCP servers
+								</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>Trim CLAUDE.md, remove unused MCP servers, consolidate
+										@-imports</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 5: Unused MCP servers (MED, fill-in) -->
-      <article class="ov-detail-card is-med" data-finding-detail="unused-mcp">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-med"></span>
-          <span class="ov-dch-title">Unused MCP servers</span>
-          <span class="ov-dch-quadrant">Fill-in</span>
-          <span class="ov-dch-savings">&darr; $0.01/session</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Unused servers detected</div>
-              <p class="ov-detail-text">
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">@linear/mcp-server</code> and
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">@figma/mcp</code>
-                were loaded in 47 sessions but called 0 times. Each adds ~340 tokens of tool definitions.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Servers</span>
-                  <span class="ov-detail-stat-value is-bad">2 idle</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Tool definitions</span>
-                  <span class="ov-detail-stat-value is-bad">~680 tok</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; remove from settings</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">Remove "@linear/mcp-server" and "@figma/mcp" from .claude/settings.json mcpServers</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 5: Unused MCP servers (MED, fill-in) -->
+					<article class="ov-detail-card is-med" data-finding-detail="unused-mcp">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-med"></span>
+							<span class="ov-dch-title">Unused MCP servers</span>
+							<span class="ov-dch-quadrant">Fill-in</span>
+							<span class="ov-dch-savings">&darr; $0.01/session</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Unused servers detected</div>
+									<p class="ov-detail-text">
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>@linear/mcp-server</code
+										>
+										and
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>@figma/mcp</code
+										>
+										were loaded in 47 sessions but called 0 times. Each adds
+										~340 tokens of tool definitions.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Servers</span>
+											<span class="ov-detail-stat-value is-bad">2 idle</span>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label"
+												>Tool definitions</span
+											>
+											<span class="ov-detail-stat-value is-bad"
+												>~680 tok</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">Fix &mdash; remove from settings</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>Remove "@linear/mcp-server" and "@figma/mcp" from
+										.claude/settings.json mcpServers</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 6: Ghost slash commands (MED, fill-in) -->
-      <article class="ov-detail-card is-med" data-finding-detail="ghost-cmds">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-med"></span>
-          <span class="ov-dch-title">Ghost slash commands</span>
-          <span class="ov-dch-quadrant">Fill-in</span>
-          <span class="ov-dch-savings">~320 tok</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">What was detected</div>
-              <p class="ov-detail-text">
-                3 custom slash commands exist in
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">.claude/commands/</code>
-                but were never invoked across 47 sessions:
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">/deploy-preview</code>,
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">/db-migrate</code>,
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">/test-e2e</code>.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Unused commands</span>
-                  <span class="ov-detail-stat-value is-bad">3</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Token overhead</span>
-                  <span class="ov-detail-stat-value">~320 tok</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; remove unused commands</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">rm .claude/commands/deploy-preview.md db-migrate.md test-e2e.md</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 6: Ghost slash commands (MED, fill-in) -->
+					<article class="ov-detail-card is-med" data-finding-detail="ghost-cmds">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-med"></span>
+							<span class="ov-dch-title">Ghost slash commands</span>
+							<span class="ov-dch-quadrant">Fill-in</span>
+							<span class="ov-dch-savings">~320 tok</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">What was detected</div>
+									<p class="ov-detail-text">
+										3 custom slash commands exist in
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>.claude/commands/</code
+										>
+										but were never invoked across 47 sessions:
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>/deploy-preview</code
+										>,
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>/db-migrate</code
+										>,
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>/test-e2e</code
+										>.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label"
+												>Unused commands</span
+											>
+											<span class="ov-detail-stat-value is-bad">3</span>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Token overhead</span>
+											<span class="ov-detail-stat-value">~320 tok</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">
+									Fix &mdash; remove unused commands
+								</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>rm .claude/commands/deploy-preview.md db-migrate.md
+										test-e2e.md</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 7: Bloated CLAUDE.md (LOW, ignore) -->
-      <article class="ov-detail-card is-low" data-finding-detail="bloated-md">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-low"></span>
-          <span class="ov-dch-title">Bloated CLAUDE.md</span>
-          <span class="ov-dch-quadrant">Ignore</span>
-          <span class="ov-dch-savings">~2,100 tok</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Bloat breakdown</div>
-              <p class="ov-detail-text">
-                CLAUDE.md is 847 lines with expanded @-imports. Placed in "Ignore" because reducing it requires restructuring your project documentation &mdash; high effort for moderate savings.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Current lines</span>
-                  <span class="ov-detail-stat-value is-bad">847</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Recommended</span>
-                  <span class="ov-detail-stat-value is-target">&lt; 400</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; restructure with @-imports</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">Move verbose docs to separate files, use @file.md imports for on-demand loading</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 7: Bloated CLAUDE.md (LOW, ignore) -->
+					<article class="ov-detail-card is-low" data-finding-detail="bloated-md">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-low"></span>
+							<span class="ov-dch-title">Bloated CLAUDE.md</span>
+							<span class="ov-dch-quadrant">Ignore</span>
+							<span class="ov-dch-savings">~2,100 tok</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Bloat breakdown</div>
+									<p class="ov-detail-text">
+										CLAUDE.md is 847 lines with expanded @-imports. Placed in
+										"Ignore" because reducing it requires restructuring your
+										project documentation &mdash; high effort for moderate
+										savings.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Current lines</span>
+											<span class="ov-detail-stat-value is-bad">847</span>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label">Recommended</span>
+											<span class="ov-detail-stat-value is-target"
+												>&lt; 400</span
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">
+									Fix &mdash; restructure with @-imports
+								</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>Move verbose docs to separate files, use @file.md imports
+										for on-demand loading</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
 
-      <!-- 8: Bash output limit (LOW, quick-win) -->
-      <article class="ov-detail-card is-low" data-finding-detail="bash-limit">
-        <button class="ov-detail-card-header" type="button" aria-expanded="false">
-          <span class="ov-dch-dot is-low"></span>
-          <span class="ov-dch-title">Bash output limit not set</span>
-          <span class="ov-dch-quadrant">Quick Win</span>
-          <span class="ov-dch-savings">&darr; $0.01/session</span>
-          <svg class="ov-dch-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="ov-detail-card-body">
-          <div class="ov-detail-row">
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">What was detected</div>
-              <p class="ov-detail-text">
-                Shell deprecation warnings inflate every bash tool call output. Setting one environment variable eliminates 4 extra lines per invocation.
-              </p>
-            </div>
-            <div class="ov-detail-block">
-              <div class="ov-detail-label">Stats</div>
-              <div class="ov-detail-stats">
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Bash calls/session</span>
-                  <span class="ov-detail-stat-value">~23</span>
-                </div>
-                <div class="ov-detail-stat">
-                  <span class="ov-detail-stat-label">Warning lines/call</span>
-                  <span class="ov-detail-stat-value is-bad">4</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="ov-detail-label">Fix &mdash; add to shell profile</div>
-            <div class="ov-command-block">
-              <span class="ov-command-text">export BASH_SILENCE_DEPRECATION_WARNING=1</span>
-              <button class="ov-copy-btn" type="button" aria-label="Copy fix to clipboard">Copy</button>
-            </div>
-          </div>
-        </div>
-      </article>
+					<!-- 8: Bash output limit (LOW, quick-win) -->
+					<article class="ov-detail-card is-low" data-finding-detail="bash-limit">
+						<button class="ov-detail-card-header" type="button" aria-expanded="false">
+							<span class="ov-dch-dot is-low"></span>
+							<span class="ov-dch-title">Bash output limit not set</span>
+							<span class="ov-dch-quadrant">Quick Win</span>
+							<span class="ov-dch-savings">&darr; $0.01/session</span>
+							<svg
+								class="ov-dch-chevron"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						<div class="ov-detail-card-body">
+							<div class="ov-detail-row">
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">What was detected</div>
+									<p class="ov-detail-text">
+										Shell deprecation warnings inflate every bash tool call
+										output. Setting one environment variable eliminates 4 extra
+										lines per invocation.
+									</p>
+								</div>
+								<div class="ov-detail-block">
+									<div class="ov-detail-label">Stats</div>
+									<div class="ov-detail-stats">
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label"
+												>Bash calls/session</span
+											>
+											<span class="ov-detail-stat-value">~23</span>
+										</div>
+										<div class="ov-detail-stat">
+											<span class="ov-detail-stat-label"
+												>Warning lines/call</span
+											>
+											<span class="ov-detail-stat-value is-bad">4</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<div class="ov-detail-label">Fix &mdash; add to shell profile</div>
+								<div class="ov-command-block">
+									<span class="ov-command-text"
+										>export BASH_SILENCE_DEPRECATION_WARNING=1</span
+									>
+									<button
+										class="ov-copy-btn"
+										type="button"
+										aria-label="Copy fix to clipboard"
+									>
+										Copy
+									</button>
+								</div>
+							</div>
+						</div>
+					</article>
+				</section>
 
-    </section>
+				<!-- TUI-style status bar -->
+				<div class="ov-statusbar">
+					<span class="cb-key"><span class="cb-keycap">R</span> re-scan</span>
+					<span class="cb-key"><span class="cb-keycap">&uarr;&darr;</span> navigate</span>
+					<span class="cb-key"><span class="cb-keycap">Enter</span> expand</span>
+					<span class="cb-key"><span class="cb-keycap">C</span> copy fix</span>
+					<span style="margin-left: auto; color: var(--foreground-subtle)"
+						>scanned 2 min ago &middot; 47 sessions &middot; 3 workspaces</span
+					>
+				</div>
+			</div>
+			<!-- /ov-page -->
+		</div>
+		<!-- /gk-root -->
 
-    <!-- TUI-style status bar -->
-    <div class="ov-statusbar">
-      <span class="cb-key"><span class="cb-keycap">R</span> re-scan</span>
-      <span class="cb-key"><span class="cb-keycap">&uarr;&darr;</span> navigate</span>
-      <span class="cb-key"><span class="cb-keycap">Enter</span> expand</span>
-      <span class="cb-key"><span class="cb-keycap">C</span> copy fix</span>
-      <span style="margin-left: auto; color: var(--foreground-subtle);">scanned 2 min ago &middot; 47 sessions &middot; 3 workspaces</span>
-    </div>
+		<script>
+			// Wire expand/collapse on detail cards
+			document.querySelectorAll('.ov-detail-card-header').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					var card = btn.closest('.ov-detail-card');
+					var nowExpanded = card.classList.toggle('is-expanded');
+					btn.setAttribute('aria-expanded', String(nowExpanded));
+				});
+			});
 
-  </div><!-- /ov-page -->
-</div><!-- /gk-root -->
+			// Wire matrix dots to highlight corresponding detail card
+			document.querySelectorAll('.ov-matrix-dot').forEach(function (dot) {
+				dot.addEventListener('click', function () {
+					var findingId = dot.getAttribute('data-finding');
 
-<script>
-  // Wire expand/collapse on detail cards
-  document.querySelectorAll('.ov-detail-card-header').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var card = btn.closest('.ov-detail-card');
-      var nowExpanded = card.classList.toggle('is-expanded');
-      btn.setAttribute('aria-expanded', String(nowExpanded));
-    });
-  });
+					// Remove active from all dots
+					document.querySelectorAll('.ov-matrix-dot').forEach(function (d) {
+						d.classList.remove('is-active');
+					});
+					dot.classList.add('is-active');
 
-  // Wire matrix dots to highlight corresponding detail card
-  document.querySelectorAll('.ov-matrix-dot').forEach(function (dot) {
-    dot.addEventListener('click', function () {
-      var findingId = dot.getAttribute('data-finding');
+					// Find and expand corresponding detail card
+					var detailCard = document.querySelector(
+						'[data-finding-detail="' + findingId + '"]',
+					);
+					if (detailCard) {
+						// Collapse others
+						document
+							.querySelectorAll('.ov-detail-card.is-expanded')
+							.forEach(function (c) {
+								if (c !== detailCard) {
+									c.classList.remove('is-expanded');
+									var headerBtn = c.querySelector('.ov-detail-card-header');
+									if (headerBtn) {
+										headerBtn.setAttribute('aria-expanded', 'false');
+									}
+								}
+							});
 
-      // Remove active from all dots
-      document.querySelectorAll('.ov-matrix-dot').forEach(function (d) {
-        d.classList.remove('is-active');
-      });
-      dot.classList.add('is-active');
+						// Expand target
+						detailCard.classList.add('is-expanded');
+						var headerBtn = detailCard.querySelector('.ov-detail-card-header');
+						if (headerBtn) {
+							headerBtn.setAttribute('aria-expanded', 'true');
+						}
 
-      // Find and expand corresponding detail card
-      var detailCard = document.querySelector('[data-finding-detail="' + findingId + '"]');
-      if (detailCard) {
-        // Collapse others
-        document.querySelectorAll('.ov-detail-card.is-expanded').forEach(function (c) {
-          if (c !== detailCard) {
-            c.classList.remove('is-expanded');
-            var headerBtn = c.querySelector('.ov-detail-card-header');
-            if (headerBtn) {
-              headerBtn.setAttribute('aria-expanded', 'false');
-            }
-          }
-        });
+						// Scroll into view
+						detailCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+					}
+				});
+			});
 
-        // Expand target
-        detailCard.classList.add('is-expanded');
-        var headerBtn = detailCard.querySelector('.ov-detail-card-header');
-        if (headerBtn) {
-          headerBtn.setAttribute('aria-expanded', 'true');
-        }
-
-        // Scroll into view
-        detailCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    });
-  });
-
-  // Wire copy buttons
-  document.querySelectorAll('.ov-copy-btn').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var commandText = btn.closest('.ov-command-block').querySelector('.ov-command-text');
-      if (commandText && navigator.clipboard) {
-        navigator.clipboard.writeText(commandText.textContent);
-      }
-      btn.textContent = 'Copied!';
-      btn.classList.add('copied');
-      setTimeout(function () {
-        btn.textContent = 'Copy';
-        btn.classList.remove('copied');
-      }, 1800);
-    });
-  });
-</script>
-</body>
+			// Wire copy buttons
+			document.querySelectorAll('.ov-copy-btn').forEach(function (btn) {
+				btn.addEventListener('click', function (e) {
+					e.stopPropagation();
+					var commandText = btn
+						.closest('.ov-command-block')
+						.querySelector('.ov-command-text');
+					if (commandText && navigator.clipboard) {
+						navigator.clipboard.writeText(commandText.textContent);
+					}
+					btn.textContent = 'Copied!';
+					btn.classList.add('copied');
+					setTimeout(function () {
+						btn.textContent = 'Copy';
+						btn.classList.remove('copied');
+					}, 1800);
+				});
+			});
+		</script>
+	</body>
 </html>

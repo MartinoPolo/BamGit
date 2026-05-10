@@ -4,4 +4,4 @@ import type { AssignedIssueLabel } from "./AssignedIssueLabel";
 /**
  * A GitHub issue assigned to the current user, returned by `gh issue list --assignee @me`.
  */
-export type AssignedIssue = { number: number, title: string, state: string, url: string, labels: Array<AssignedIssueLabel>, };
+export type AssignedIssue = { number: number, title: string, state: string, url: string, labels: Array<AssignedIssueLabel>, parent_issue_number: number | null, };

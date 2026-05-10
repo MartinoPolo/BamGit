@@ -48,7 +48,7 @@
 </script>
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
-	<Dialog.Content class="max-w-lg">
+	<Dialog.Content class="max-w-lg" onEscapeKeydown={(e) => e.stopPropagation()}>
 		<Dialog.Header>
 			<Dialog.Title>{m.prune_title()}</Dialog.Title>
 			<Dialog.Description>{m.prune_description()}</Dialog.Description>

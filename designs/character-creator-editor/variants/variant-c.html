@@ -1,1256 +1,1714 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Character Creator — Variant C: Wizard Steps</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Character Creator — Variant C: Wizard Steps</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
    GROVEKEEPER DESIGN TOKENS — inlined from tokens.css
    ============================================================ */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
 
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
 
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
-
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
-
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
-
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
-
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
-
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
-
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
-
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
-
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
-
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  --border-width-1: 1px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out: cubic-bezier(.16,.84,.44,1);
-}
-
-.theme-dark {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --code-bg:           oklch(0.215 0.020 150);
-}
-
-/* ============================================================
+			/* ============================================================
    BASE CLASSES
    ============================================================ */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-/* Buttons */
-.gk-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
-  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
-  border: 1px solid transparent; cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, box-shadow 120ms ease;
-  white-space: nowrap; user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary {
-  background: var(--primary); color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost { background: transparent; color: var(--foreground-muted); }
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-danger { background: transparent; color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 35%, transparent); }
-.gk-btn-danger:hover { background: color-mix(in oklch, var(--status-danger) 12%, transparent); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-/* Inputs */
-.gk-input, .gk-select {
-  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  color: var(--foreground); width: 100%; outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.gk-input::placeholder { color: var(--foreground-subtle); }
-.gk-input:focus { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
+			/* Inputs */
+			.gk-input,
+			.gk-select {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
 
-/* Badge */
-.gk-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  height: 20px; padding: 0 7px; font-size: 11px; font-weight: 500;
-  border-radius: 999px; background: var(--surface-2); color: var(--foreground-muted);
-  border: 1px solid var(--border); font-family: var(--font-sans); white-space: nowrap;
-}
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-moss    { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+			/* Badge */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				white-space: nowrap;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
 
-/* Card */
-.gk-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-/* Tabs */
-.gk-tabs { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); padding: 3px; border-radius: var(--radius-md); gap: 2px; }
-.gk-tab { padding: 5px 12px; font-size: 12px; font-weight: 500; border-radius: 6px; color: var(--foreground-muted); cursor: pointer; transition: all 120ms ease; border: none; background: transparent; font-family: var(--font-sans); }
-.gk-tab:hover { color: var(--foreground); }
-.gk-tab.is-active { background: var(--surface); color: var(--foreground); box-shadow: var(--shadow-sm); }
+			/* Tabs */
+			.gk-tabs {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px;
+				border-radius: var(--radius-md);
+				gap: 2px;
+			}
+			.gk-tab {
+				padding: 5px 12px;
+				font-size: 12px;
+				font-weight: 500;
+				border-radius: 6px;
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				border: none;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+			.gk-tab:hover {
+				color: var(--foreground);
+			}
+			.gk-tab.is-active {
+				background: var(--surface);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
 
-/* HR */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+			/* HR */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-/* ============================================================
+			/* ============================================================
    VARIANT C — WIZARD STEPS
    ============================================================ */
 
-.wizard-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
-}
+			.wizard-shell {
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+				max-height: 100vh;
+				overflow: hidden;
+			}
 
-/* -- Top bar -- */
-.wizard-topbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-6) var(--space-12);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  min-height: 52px;
-}
-.wizard-topbar-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--foreground-muted);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 120ms;
-  border: none;
-  background: none;
-  font-family: var(--font-sans);
-  padding: 4px 0;
-}
-.wizard-topbar-back:hover { color: var(--foreground); }
-.wizard-topbar-back svg { flex-shrink: 0; }
+			/* -- Top bar -- */
+			.wizard-topbar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-6) var(--space-12);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+				min-height: 52px;
+			}
+			.wizard-topbar-back {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				color: var(--foreground-muted);
+				font-size: var(--text-sm);
+				font-weight: 500;
+				cursor: pointer;
+				text-decoration: none;
+				transition: color 120ms;
+				border: none;
+				background: none;
+				font-family: var(--font-sans);
+				padding: 4px 0;
+			}
+			.wizard-topbar-back:hover {
+				color: var(--foreground);
+			}
+			.wizard-topbar-back svg {
+				flex-shrink: 0;
+			}
 
-.wizard-topbar-title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-}
-.wizard-topbar-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--border);
-}
+			.wizard-topbar-title {
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.wizard-topbar-divider {
+				width: 1px;
+				height: 20px;
+				background: var(--border);
+			}
 
-/* Character mini-identity in topbar (visible on steps 2-4) */
-.wizard-topbar-identity {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-left: auto;
-}
-.wizard-topbar-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.wizard-topbar-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.wizard-topbar-charname {
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-}
+			/* Character mini-identity in topbar (visible on steps 2-4) */
+			.wizard-topbar-identity {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-left: auto;
+			}
+			.wizard-topbar-avatar {
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+			}
+			.wizard-topbar-avatar img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+			.wizard-topbar-charname {
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+			}
 
-/* -- Stepper -- */
-.wizard-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: var(--space-8) var(--space-12);
-  background: var(--background);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.wizard-step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  position: relative;
-}
-.wizard-step-num {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  flex-shrink: 0;
-  transition: all var(--duration-3) var(--ease-standard);
-}
-.wizard-step-label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  white-space: nowrap;
-  transition: color var(--duration-3);
-}
+			/* -- Stepper -- */
+			.wizard-stepper {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0;
+				padding: var(--space-8) var(--space-12);
+				background: var(--background);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+			.wizard-step {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				position: relative;
+			}
+			.wizard-step-num {
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-full);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				flex-shrink: 0;
+				transition: all var(--duration-3) var(--ease-standard);
+			}
+			.wizard-step-label {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				white-space: nowrap;
+				transition: color var(--duration-3);
+			}
 
-/* Step states */
-.wizard-step.is-completed .wizard-step-num {
-  background: var(--primary);
-  color: var(--primary-fg);
-  border: none;
-}
-.wizard-step.is-completed .wizard-step-label {
-  color: var(--foreground-muted);
-}
-.wizard-step.is-active .wizard-step-num {
-  background: var(--primary);
-  color: var(--primary-fg);
-  border: none;
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 25%, transparent);
-}
-.wizard-step.is-active .wizard-step-label {
-  color: var(--foreground);
-}
-.wizard-step.is-pending .wizard-step-num {
-  background: var(--surface-2);
-  color: var(--foreground-subtle);
-  border: 1px solid var(--border);
-}
-.wizard-step.is-pending .wizard-step-label {
-  color: var(--foreground-subtle);
-}
+			/* Step states */
+			.wizard-step.is-completed .wizard-step-num {
+				background: var(--primary);
+				color: var(--primary-fg);
+				border: none;
+			}
+			.wizard-step.is-completed .wizard-step-label {
+				color: var(--foreground-muted);
+			}
+			.wizard-step.is-active .wizard-step-num {
+				background: var(--primary);
+				color: var(--primary-fg);
+				border: none;
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 25%, transparent);
+			}
+			.wizard-step.is-active .wizard-step-label {
+				color: var(--foreground);
+			}
+			.wizard-step.is-pending .wizard-step-num {
+				background: var(--surface-2);
+				color: var(--foreground-subtle);
+				border: 1px solid var(--border);
+			}
+			.wizard-step.is-pending .wizard-step-label {
+				color: var(--foreground-subtle);
+			}
 
-/* Connector line between steps */
-.wizard-step-connector {
-  width: 56px;
-  height: 2px;
-  margin: 0 var(--space-6);
-  border-radius: 1px;
-  flex-shrink: 0;
-}
-.wizard-step-connector.is-filled {
-  background: var(--primary);
-}
-.wizard-step-connector.is-half {
-  background: linear-gradient(90deg, var(--primary) 50%, var(--border) 50%);
-}
-.wizard-step-connector.is-empty {
-  background: var(--border);
-}
+			/* Connector line between steps */
+			.wizard-step-connector {
+				width: 56px;
+				height: 2px;
+				margin: 0 var(--space-6);
+				border-radius: 1px;
+				flex-shrink: 0;
+			}
+			.wizard-step-connector.is-filled {
+				background: var(--primary);
+			}
+			.wizard-step-connector.is-half {
+				background: linear-gradient(90deg, var(--primary) 50%, var(--border) 50%);
+			}
+			.wizard-step-connector.is-empty {
+				background: var(--border);
+			}
 
-/* -- Body -- */
-.wizard-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-12);
-  display: flex;
-  flex-direction: column;
-}
+			/* -- Body -- */
+			.wizard-body {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-12);
+				display: flex;
+				flex-direction: column;
+			}
 
-/* -- Footer -- */
-.wizard-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6) var(--space-12);
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  min-height: 56px;
-}
-.wizard-footer-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-.wizard-footer-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-.wizard-footer-validation {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-sm);
-}
-.wizard-footer-validation svg { flex-shrink: 0; }
+			/* -- Footer -- */
+			.wizard-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-6) var(--space-12);
+				border-top: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+				min-height: 56px;
+			}
+			.wizard-footer-left {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+			.wizard-footer-right {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+			.wizard-footer-validation {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+			}
+			.wizard-footer-validation svg {
+				flex-shrink: 0;
+			}
 
-/* ============================================================
+			/* ============================================================
    STEP 3 — Assign Sounds to Events
    ============================================================ */
 
-.step3-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: var(--space-12);
-  flex: 1;
-  min-height: 0;
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
-}
+			.step3-layout {
+				display: grid;
+				grid-template-columns: 260px 1fr;
+				gap: var(--space-12);
+				flex: 1;
+				min-height: 0;
+				max-width: 1100px;
+				width: 100%;
+				margin: 0 auto;
+			}
 
-/* -- Sound Pool sidebar (step 3) -- */
-.sound-pool {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-height: 0;
-}
-.sound-pool-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-.sound-pool-count {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--foreground-muted);
-}
-.sound-pool-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-right: var(--space-2);
-}
-.sound-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
-  cursor: grab;
-  transition: background 100ms;
-  min-height: 36px;
-  position: relative;
-}
-.sound-item:hover {
-  background: var(--surface-2);
-}
-.sound-item.is-assigned {
-  opacity: 0.5;
-}
-.sound-item-grip {
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-  cursor: grab;
-}
-.sound-item-name {
-  font-size: var(--text-sm);
-  color: var(--foreground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
-.sound-item-dur {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}
-.sound-item-play {
-  width: 22px;
-  height: 22px;
-  border-radius: var(--radius-xs);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: color 100ms, background 100ms;
-}
-.sound-item-play:hover { color: var(--foreground); background: var(--surface-3); }
+			/* -- Sound Pool sidebar (step 3) -- */
+			.sound-pool {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+				min-height: 0;
+			}
+			.sound-pool-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-4);
+			}
+			.sound-pool-count {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+			}
+			.sound-pool-list {
+				flex: 1;
+				overflow-y: auto;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				padding-right: var(--space-2);
+			}
+			.sound-item {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-3) var(--space-4);
+				border-radius: var(--radius-sm);
+				cursor: grab;
+				transition: background 100ms;
+				min-height: 36px;
+				position: relative;
+			}
+			.sound-item:hover {
+				background: var(--surface-2);
+			}
+			.sound-item.is-assigned {
+				opacity: 0.5;
+			}
+			.sound-item-grip {
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				cursor: grab;
+			}
+			.sound-item-name {
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				flex: 1;
+				min-width: 0;
+			}
+			.sound-item-dur {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				font-variant-numeric: tabular-nums;
+			}
+			.sound-item-play {
+				width: 22px;
+				height: 22px;
+				border-radius: var(--radius-xs);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: transparent;
+				border: none;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				flex-shrink: 0;
+				transition:
+					color 100ms,
+					background 100ms;
+			}
+			.sound-item-play:hover {
+				color: var(--foreground);
+				background: var(--surface-3);
+			}
 
-.sound-item-status {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.sound-item-status.is-used {
-  background: var(--status-success);
-}
+			.sound-item-status {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.sound-item-status.is-used {
+				background: var(--status-success);
+			}
 
-/* -- Event Assignment area -- */
-.event-assignment {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  overflow-y: auto;
-  min-height: 0;
-  padding-right: var(--space-2);
-}
+			/* -- Event Assignment area -- */
+			.event-assignment {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-8);
+				overflow-y: auto;
+				min-height: 0;
+				padding-right: var(--space-2);
+			}
 
-/* Tier tabs */
-.tier-tabs-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex-shrink: 0;
-}
+			/* Tier tabs */
+			.tier-tabs-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				flex-shrink: 0;
+			}
 
-.tier-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-6);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  transition: all 120ms ease;
-  font-family: var(--font-sans);
-  color: var(--foreground-muted);
-}
-.tier-tab:hover { background: var(--surface-2); color: var(--foreground); }
-.tier-tab.is-active {
-  background: var(--surface);
-  border-color: var(--border);
-  color: var(--foreground);
-  box-shadow: var(--shadow-sm);
-}
-.tier-tab-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.tier-tab-count {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  margin-left: var(--space-1);
-}
+			.tier-tab {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-3) var(--space-6);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				cursor: pointer;
+				transition: all 120ms ease;
+				font-family: var(--font-sans);
+				color: var(--foreground-muted);
+			}
+			.tier-tab:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.tier-tab.is-active {
+				background: var(--surface);
+				border-color: var(--border);
+				color: var(--foreground);
+				box-shadow: var(--shadow-sm);
+			}
+			.tier-tab-dot {
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tier-tab-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				margin-left: var(--space-1);
+			}
 
-/* Tier section header */
-.tier-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border);
-}
-.tier-header-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.tier-header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.tier-header-label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-}
-.tier-header-desc {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-}
-.tier-header-progress {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-}
+			/* Tier section header */
+			.tier-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding-bottom: var(--space-4);
+				border-bottom: 1px solid var(--border);
+			}
+			.tier-header-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tier-header-text {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+			.tier-header-label {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.tier-header-desc {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+			.tier-header-progress {
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
 
-/* Event slots grid */
-.event-slots {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
+			/* Event slots grid */
+			.event-slots {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
 
-.event-slot {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-6);
-  align-items: start;
-  padding: var(--space-5) var(--space-6);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  transition: border-color 160ms, background 160ms;
-  min-height: 56px;
-}
-.event-slot:hover {
-  border-color: var(--border-strong);
-}
+			.event-slot {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-6);
+				align-items: start;
+				padding: var(--space-5) var(--space-6);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				background: var(--surface);
+				transition:
+					border-color 160ms,
+					background 160ms;
+				min-height: 56px;
+			}
+			.event-slot:hover {
+				border-color: var(--border-strong);
+			}
 
-.event-slot-info {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.event-slot-name {
-  font-size: var(--text-md);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-}
-.event-slot-event-id {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-.event-slot-desc {
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-  margin-top: 2px;
-}
+			.event-slot-info {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+			.event-slot-name {
+				font-size: var(--text-md);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+			}
+			.event-slot-event-id {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+			.event-slot-desc {
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+				margin-top: 2px;
+			}
 
-/* Drop zone */
-.event-slot-dropzone {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-height: 36px;
-}
+			/* Drop zone */
+			.event-slot-dropzone {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				min-height: 36px;
+			}
 
-/* Sound chip in drop zone */
-.sound-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  height: 28px;
-  padding: 0 var(--space-4);
-  padding-right: var(--space-2);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  color: var(--foreground);
-  max-width: 100%;
-  transition: border-color 120ms, background 120ms;
-}
-.sound-chip:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-3);
-}
-.sound-chip-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
-.sound-chip-dur {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-.sound-chip-play {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  border-radius: var(--radius-xs);
-  flex-shrink: 0;
-  transition: color 100ms, background 100ms;
-}
-.sound-chip-play:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 8%, transparent); }
-.sound-chip-remove {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  border-radius: var(--radius-xs);
-  flex-shrink: 0;
-  transition: color 100ms, background 100ms;
-}
-.sound-chip-remove:hover { color: var(--status-danger); background: color-mix(in oklch, var(--status-danger) 10%, transparent); }
+			/* Sound chip in drop zone */
+			.sound-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-3);
+				height: 28px;
+				padding: 0 var(--space-4);
+				padding-right: var(--space-2);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				max-width: 100%;
+				transition:
+					border-color 120ms,
+					background 120ms;
+			}
+			.sound-chip:hover {
+				border-color: var(--border-strong);
+				background: var(--surface-3);
+			}
+			.sound-chip-name {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				flex: 1;
+				min-width: 0;
+			}
+			.sound-chip-dur {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+			.sound-chip-play {
+				width: 20px;
+				height: 20px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				border-radius: var(--radius-xs);
+				flex-shrink: 0;
+				transition:
+					color 100ms,
+					background 100ms;
+			}
+			.sound-chip-play:hover {
+				color: var(--foreground);
+				background: color-mix(in oklch, var(--foreground) 8%, transparent);
+			}
+			.sound-chip-remove {
+				width: 20px;
+				height: 20px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				border-radius: var(--radius-xs);
+				flex-shrink: 0;
+				transition:
+					color 100ms,
+					background 100ms;
+			}
+			.sound-chip-remove:hover {
+				color: var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+			}
 
-/* Empty drop zone placeholder */
-.dropzone-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  height: 36px;
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  transition: border-color 160ms, background 160ms, color 160ms;
-}
-.dropzone-empty:hover {
-  border-color: var(--border-strong);
-  color: var(--foreground-muted);
-}
-.dropzone-empty.is-critical {
-  border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
-  color: color-mix(in oklch, var(--status-danger) 60%, var(--foreground-subtle));
-  background: color-mix(in oklch, var(--status-danger) 4%, transparent);
-}
-.dropzone-empty.is-dragover {
-  border-color: var(--primary);
-  background: color-mix(in oklch, var(--primary) 8%, transparent);
-  color: var(--primary);
-  border-style: solid;
-}
+			/* Empty drop zone placeholder */
+			.dropzone-empty {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--space-3);
+				height: 36px;
+				border: 1.5px dashed var(--border);
+				border-radius: var(--radius-sm);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				transition:
+					border-color 160ms,
+					background 160ms,
+					color 160ms;
+			}
+			.dropzone-empty:hover {
+				border-color: var(--border-strong);
+				color: var(--foreground-muted);
+			}
+			.dropzone-empty.is-critical {
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+				color: color-mix(in oklch, var(--status-danger) 60%, var(--foreground-subtle));
+				background: color-mix(in oklch, var(--status-danger) 4%, transparent);
+			}
+			.dropzone-empty.is-dragover {
+				border-color: var(--primary);
+				background: color-mix(in oklch, var(--primary) 8%, transparent);
+				color: var(--primary);
+				border-style: solid;
+			}
 
-/* Variant label */
-.variant-label {
-  position: fixed;
-  top: var(--space-4);
-  right: var(--space-4);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  color: var(--foreground-subtle);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-xs);
-  z-index: 100;
-  text-transform: uppercase;
-}
+			/* Variant label */
+			.variant-label {
+				position: fixed;
+				top: var(--space-4);
+				right: var(--space-4);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: var(--space-2) var(--space-4);
+				border-radius: var(--radius-xs);
+				z-index: 100;
+				text-transform: uppercase;
+			}
 
-/* ============================================================
+			/* ============================================================
    RESPONSIVE
    ============================================================ */
-@media (max-width: 768px) {
-  .step3-layout {
-    grid-template-columns: 1fr;
-  }
-  .sound-pool {
-    max-height: 200px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: var(--space-4);
-  }
-  .wizard-stepper {
-    padding: var(--space-4) var(--space-6);
-    gap: 0;
-  }
-  .wizard-step-label {
-    display: none;
-  }
-  .wizard-step-connector {
-    width: 32px;
-    margin: 0 var(--space-3);
-  }
-  .wizard-body {
-    padding: var(--space-6);
-  }
-  .event-slot {
-    grid-template-columns: 1fr;
-  }
-  .wizard-topbar {
-    padding: var(--space-4) var(--space-6);
-  }
-  .wizard-footer {
-    padding: var(--space-4) var(--space-6);
-  }
-}
+			@media (max-width: 768px) {
+				.step3-layout {
+					grid-template-columns: 1fr;
+				}
+				.sound-pool {
+					max-height: 200px;
+					border-bottom: 1px solid var(--border);
+					padding-bottom: var(--space-4);
+				}
+				.wizard-stepper {
+					padding: var(--space-4) var(--space-6);
+					gap: 0;
+				}
+				.wizard-step-label {
+					display: none;
+				}
+				.wizard-step-connector {
+					width: 32px;
+					margin: 0 var(--space-3);
+				}
+				.wizard-body {
+					padding: var(--space-6);
+				}
+				.event-slot {
+					grid-template-columns: 1fr;
+				}
+				.wizard-topbar {
+					padding: var(--space-4) var(--space-6);
+				}
+				.wizard-footer {
+					padding: var(--space-4) var(--space-6);
+				}
+			}
 
-@media (max-width: 480px) {
-  .tier-tabs-row {
-    overflow-x: auto;
-    padding-bottom: var(--space-2);
-  }
-}
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="variant-label">Variant C: Wizard Steps</div>
+			@media (max-width: 480px) {
+				.tier-tabs-row {
+					overflow-x: auto;
+					padding-bottom: var(--space-2);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="variant-label">Variant C: Wizard Steps</div>
 
-  <div class="wizard-shell">
+			<div class="wizard-shell">
+				<!-- ==================== TOP BAR ==================== -->
+				<header class="wizard-topbar">
+					<button class="wizard-topbar-back">
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="m15 18-6-6 6-6" />
+						</svg>
+						Back to Settings
+					</button>
 
-    <!-- ==================== TOP BAR ==================== -->
-    <header class="wizard-topbar">
-      <button class="wizard-topbar-back">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        Back to Settings
-      </button>
+					<div class="wizard-topbar-divider"></div>
+					<span class="wizard-topbar-title">Create Character</span>
 
-      <div class="wizard-topbar-divider"></div>
-      <span class="wizard-topbar-title">Create Character</span>
+					<!-- Character identity shows after step 1 -->
+					<div class="wizard-topbar-identity">
+						<div class="wizard-topbar-avatar">
+							<!-- Placeholder avatar: a simple knight silhouette -->
+							<svg
+								width="18"
+								height="18"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								style="color: var(--foreground-subtle)"
+							>
+								<path d="M12 2a5 5 0 0 1 5 5v1a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z" />
+								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+							</svg>
+						</div>
+						<span class="wizard-topbar-charname">Footman</span>
+						<span class="gk-badge gk-badge-moss" style="font-size: 10px; height: 18px"
+							>8 sounds</span
+						>
+					</div>
+				</header>
 
-      <!-- Character identity shows after step 1 -->
-      <div class="wizard-topbar-identity">
-        <div class="wizard-topbar-avatar">
-          <!-- Placeholder avatar: a simple knight silhouette -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--foreground-subtle)">
-            <path d="M12 2a5 5 0 0 1 5 5v1a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/>
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          </svg>
-        </div>
-        <span class="wizard-topbar-charname">Footman</span>
-        <span class="gk-badge gk-badge-moss" style="font-size: 10px; height: 18px;">8 sounds</span>
-      </div>
-    </header>
+				<!-- ==================== STEPPER ==================== -->
+				<nav class="wizard-stepper" aria-label="Wizard progress">
+					<!-- Step 1: Completed -->
+					<div class="wizard-step is-completed">
+						<div class="wizard-step-num">
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="3"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<polyline points="20 6 9 17 4 12" />
+							</svg>
+						</div>
+						<span class="wizard-step-label">Name & Avatar</span>
+					</div>
 
-    <!-- ==================== STEPPER ==================== -->
-    <nav class="wizard-stepper" aria-label="Wizard progress">
-      <!-- Step 1: Completed -->
-      <div class="wizard-step is-completed">
-        <div class="wizard-step-num">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="wizard-step-label">Name & Avatar</span>
-      </div>
+					<div class="wizard-step-connector is-filled"></div>
 
-      <div class="wizard-step-connector is-filled"></div>
+					<!-- Step 2: Completed -->
+					<div class="wizard-step is-completed">
+						<div class="wizard-step-num">
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="3"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<polyline points="20 6 9 17 4 12" />
+							</svg>
+						</div>
+						<span class="wizard-step-label">Import Sounds</span>
+					</div>
 
-      <!-- Step 2: Completed -->
-      <div class="wizard-step is-completed">
-        <div class="wizard-step-num">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="wizard-step-label">Import Sounds</span>
-      </div>
+					<div class="wizard-step-connector is-half"></div>
 
-      <div class="wizard-step-connector is-half"></div>
+					<!-- Step 3: Active -->
+					<div class="wizard-step is-active">
+						<div class="wizard-step-num">3</div>
+						<span class="wizard-step-label">Assign to Events</span>
+					</div>
 
-      <!-- Step 3: Active -->
-      <div class="wizard-step is-active">
-        <div class="wizard-step-num">3</div>
-        <span class="wizard-step-label">Assign to Events</span>
-      </div>
+					<div class="wizard-step-connector is-empty"></div>
 
-      <div class="wizard-step-connector is-empty"></div>
+					<!-- Step 4: Pending -->
+					<div class="wizard-step is-pending">
+						<div class="wizard-step-num">4</div>
+						<span class="wizard-step-label">Review & Save</span>
+					</div>
+				</nav>
 
-      <!-- Step 4: Pending -->
-      <div class="wizard-step is-pending">
-        <div class="wizard-step-num">4</div>
-        <span class="wizard-step-label">Review & Save</span>
-      </div>
-    </nav>
+				<!-- ==================== BODY — STEP 3 ==================== -->
+				<main class="wizard-body">
+					<div class="step3-layout">
+						<!-- ===== SOUND POOL (left sidebar) ===== -->
+						<aside class="sound-pool">
+							<div class="sound-pool-header">
+								<span class="sound-pool-count">8 sounds imported</span>
+								<button
+									class="gk-btn gk-btn-ghost gk-btn-sm"
+									style="font-size: 11px; padding: 0 6px; height: 22px"
+								>
+									<svg
+										width="12"
+										height="12"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="11" cy="11" r="8" />
+										<line x1="21" y1="21" x2="16.65" y2="16.65" />
+									</svg>
+									Filter
+								</button>
+							</div>
 
-    <!-- ==================== BODY — STEP 3 ==================== -->
-    <main class="wizard-body">
-      <div class="step3-layout">
+							<div class="sound-pool-list">
+								<!-- Sound 1 — assigned -->
+								<div class="sound-item is-assigned">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_alert_horn.wav</span>
+									<span class="sound-item-dur">0.8s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+									<span class="sound-item-status is-used"></span>
+								</div>
 
-        <!-- ===== SOUND POOL (left sidebar) ===== -->
-        <aside class="sound-pool">
-          <div class="sound-pool-header">
-            <span class="sound-pool-count">8 sounds imported</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm" style="font-size: 11px; padding: 0 6px; height: 22px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              Filter
-            </button>
-          </div>
+								<!-- Sound 2 — assigned -->
+								<div class="sound-item is-assigned">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_task_done.wav</span>
+									<span class="sound-item-dur">1.2s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+									<span class="sound-item-status is-used"></span>
+								</div>
 
-          <div class="sound-pool-list">
-            <!-- Sound 1 — assigned -->
-            <div class="sound-item is-assigned">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_alert_horn.wav</span>
-              <span class="sound-item-dur">0.8s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-              <span class="sound-item-status is-used"></span>
-            </div>
+								<!-- Sound 3 — assigned -->
+								<div class="sound-item is-assigned">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_session_end.ogg</span>
+									<span class="sound-item-dur">1.5s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+									<span class="sound-item-status is-used"></span>
+								</div>
 
-            <!-- Sound 2 — assigned -->
-            <div class="sound-item is-assigned">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_task_done.wav</span>
-              <span class="sound-item-dur">1.2s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-              <span class="sound-item-status is-used"></span>
-            </div>
+								<!-- Sound 4 — assigned -->
+								<div class="sound-item is-assigned">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_error_buzz.wav</span>
+									<span class="sound-item-dur">0.6s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+									<span class="sound-item-status is-used"></span>
+								</div>
 
-            <!-- Sound 3 — assigned -->
-            <div class="sound-item is-assigned">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_session_end.ogg</span>
-              <span class="sound-item-dur">1.5s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-              <span class="sound-item-status is-used"></span>
-            </div>
+								<!-- Sound 5 — unassigned -->
+								<div class="sound-item">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_merge_clash.mp3</span>
+									<span class="sound-item-dur">0.9s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+								</div>
 
-            <!-- Sound 4 — assigned -->
-            <div class="sound-item is-assigned">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_error_buzz.wav</span>
-              <span class="sound-item-dur">0.6s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-              <span class="sound-item-status is-used"></span>
-            </div>
+								<!-- Sound 6 — unassigned -->
+								<div class="sound-item">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_pr_fanfare.ogg</span>
+									<span class="sound-item-dur">2.1s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+								</div>
 
-            <!-- Sound 5 — unassigned -->
-            <div class="sound-item">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_merge_clash.mp3</span>
-              <span class="sound-item-dur">0.9s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-            </div>
+								<!-- Sound 7 — unassigned -->
+								<div class="sound-item">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_ack_grunt.wav</span>
+									<span class="sound-item-dur">0.4s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+								</div>
 
-            <!-- Sound 6 — unassigned -->
-            <div class="sound-item">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_pr_fanfare.ogg</span>
-              <span class="sound-item-dur">2.1s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-            </div>
+								<!-- Sound 8 — unassigned -->
+								<div class="sound-item">
+									<span class="sound-item-grip">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<circle cx="9" cy="5" r="1.5" />
+											<circle cx="15" cy="5" r="1.5" />
+											<circle cx="9" cy="12" r="1.5" />
+											<circle cx="15" cy="12" r="1.5" />
+											<circle cx="9" cy="19" r="1.5" />
+											<circle cx="15" cy="19" r="1.5" />
+										</svg>
+									</span>
+									<span class="sound-item-name">hm_start_march.wav</span>
+									<span class="sound-item-dur">1.8s</span>
+									<button class="sound-item-play">
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											fill="currentColor"
+										>
+											<polygon points="5 3 19 12 5 21 5 3" />
+										</svg>
+									</button>
+								</div>
+							</div>
 
-            <!-- Sound 7 — unassigned -->
-            <div class="sound-item">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_ack_grunt.wav</span>
-              <span class="sound-item-dur">0.4s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-            </div>
+							<div
+								style="
+									padding-top: var(--space-4);
+									border-top: 1px solid var(--border);
+								"
+							>
+								<div
+									style="
+										display: flex;
+										align-items: center;
+										gap: var(--space-3);
+										margin-bottom: var(--space-3);
+									"
+								>
+									<span class="sound-item-status is-used"></span>
+									<span class="gk-tiny">4 assigned</span>
+									<span style="flex: 1"></span>
+									<span class="gk-tiny">4 remaining</span>
+								</div>
+								<div
+									style="
+										height: 4px;
+										background: var(--surface-2);
+										border-radius: 2px;
+										overflow: hidden;
+									"
+								>
+									<div
+										style="
+											width: 50%;
+											height: 100%;
+											background: var(--primary);
+											border-radius: 2px;
+											transition: width 300ms var(--ease-out);
+										"
+									></div>
+								</div>
+							</div>
+						</aside>
 
-            <!-- Sound 8 — unassigned -->
-            <div class="sound-item">
-              <span class="sound-item-grip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
-              </span>
-              <span class="sound-item-name">hm_start_march.wav</span>
-              <span class="sound-item-dur">1.8s</span>
-              <button class="sound-item-play">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </button>
-            </div>
-          </div>
+						<!-- ===== EVENT ASSIGNMENT AREA ===== -->
+						<section class="event-assignment">
+							<!-- Tier tabs -->
+							<div class="tier-tabs-row">
+								<button class="tier-tab">
+									<span
+										class="tier-tab-dot"
+										style="background: var(--status-danger)"
+									></span>
+									Critical
+									<span class="tier-tab-count">2/2</span>
+								</button>
 
-          <div style="padding-top: var(--space-4); border-top: 1px solid var(--border);">
-            <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);">
-              <span class="sound-item-status is-used"></span>
-              <span class="gk-tiny">4 assigned</span>
-              <span style="flex:1"></span>
-              <span class="gk-tiny">4 remaining</span>
-            </div>
-            <div style="height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden;">
-              <div style="width: 50%; height: 100%; background: var(--primary); border-radius: 2px; transition: width 300ms var(--ease-out);"></div>
-            </div>
-          </div>
-        </aside>
+								<button class="tier-tab is-active">
+									<span
+										class="tier-tab-dot"
+										style="background: var(--status-warning)"
+									></span>
+									Important
+									<span class="tier-tab-count">2/6</span>
+								</button>
 
-        <!-- ===== EVENT ASSIGNMENT AREA ===== -->
-        <section class="event-assignment">
+								<button class="tier-tab">
+									<span
+										class="tier-tab-dot"
+										style="background: var(--foreground-muted)"
+									></span>
+									Normal
+									<span class="tier-tab-count">0/7</span>
+								</button>
+							</div>
 
-          <!-- Tier tabs -->
-          <div class="tier-tabs-row">
-            <button class="tier-tab">
-              <span class="tier-tab-dot" style="background: var(--status-danger);"></span>
-              Critical
-              <span class="tier-tab-count">2/2</span>
-            </button>
+							<!-- Tier header — Important -->
+							<div class="tier-header">
+								<span
+									class="tier-header-dot"
+									style="background: var(--status-warning)"
+								></span>
+								<div class="tier-header-text">
+									<span
+										class="tier-header-label"
+										style="color: var(--status-warning)"
+										>Important</span
+									>
+									<span class="tier-header-desc"
+										>Errors, conflicts, and review requests that need
+										attention</span
+									>
+								</div>
+								<span class="tier-header-progress">2 of 6 assigned</span>
+							</div>
 
-            <button class="tier-tab is-active">
-              <span class="tier-tab-dot" style="background: var(--status-warning);"></span>
-              Important
-              <span class="tier-tab-count">2/6</span>
-            </button>
+							<!-- Event slots for Important tier -->
+							<div class="event-slots">
+								<!-- session.error — assigned -->
+								<div class="event-slot">
+									<div class="event-slot-info">
+										<span class="event-slot-name">Session Error</span>
+										<span class="event-slot-event-id">session.error</span>
+										<span class="event-slot-desc"
+											>Agent session crashed or hit an unrecoverable
+											error</span
+										>
+									</div>
+									<div class="event-slot-dropzone">
+										<div class="sound-chip">
+											<span class="sound-chip-name">hm_error_buzz.wav</span>
+											<span class="sound-chip-dur">0.6s</span>
+											<button class="sound-chip-play">
+												<svg
+													width="11"
+													height="11"
+													viewBox="0 0 24 24"
+													fill="currentColor"
+												>
+													<polygon points="5 3 19 12 5 21 5 3" />
+												</svg>
+											</button>
+											<button class="sound-chip-remove">
+												<svg
+													width="11"
+													height="11"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+												>
+													<line x1="18" y1="6" x2="6" y2="18" />
+													<line x1="6" y1="6" x2="18" y2="18" />
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
 
-            <button class="tier-tab">
-              <span class="tier-tab-dot" style="background: var(--foreground-muted);"></span>
-              Normal
-              <span class="tier-tab-count">0/7</span>
-            </button>
-          </div>
+								<!-- task.error — assigned -->
+								<div class="event-slot">
+									<div class="event-slot-info">
+										<span class="event-slot-name">Task Error</span>
+										<span class="event-slot-event-id">task.error</span>
+										<span class="event-slot-desc"
+											>A sub-task within a session failed with an error</span
+										>
+									</div>
+									<div class="event-slot-dropzone">
+										<div class="sound-chip">
+											<span class="sound-chip-name">hm_error_buzz.wav</span>
+											<span class="sound-chip-dur">0.6s</span>
+											<button class="sound-chip-play">
+												<svg
+													width="11"
+													height="11"
+													viewBox="0 0 24 24"
+													fill="currentColor"
+												>
+													<polygon points="5 3 19 12 5 21 5 3" />
+												</svg>
+											</button>
+											<button class="sound-chip-remove">
+												<svg
+													width="11"
+													height="11"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+												>
+													<line x1="18" y1="6" x2="6" y2="18" />
+													<line x1="6" y1="6" x2="18" y2="18" />
+												</svg>
+											</button>
+										</div>
+									</div>
+								</div>
 
-          <!-- Tier header — Important -->
-          <div class="tier-header">
-            <span class="tier-header-dot" style="background: var(--status-warning);"></span>
-            <div class="tier-header-text">
-              <span class="tier-header-label" style="color: var(--status-warning);">Important</span>
-              <span class="tier-header-desc">Errors, conflicts, and review requests that need attention</span>
-            </div>
-            <span class="tier-header-progress">2 of 6 assigned</span>
-          </div>
+								<!-- merge.conflict — empty, dragover state shown -->
+								<div class="event-slot">
+									<div class="event-slot-info">
+										<span class="event-slot-name">Merge Conflict</span>
+										<span class="event-slot-event-id">merge.conflict</span>
+										<span class="event-slot-desc"
+											>Git merge conflict detected in the working branch</span
+										>
+									</div>
+									<div class="event-slot-dropzone">
+										<div class="dropzone-empty is-dragover">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<circle cx="12" cy="12" r="10" />
+												<line x1="12" y1="8" x2="12" y2="16" />
+												<line x1="8" y1="12" x2="16" y2="12" />
+											</svg>
+											Drop sound here
+										</div>
+									</div>
+								</div>
 
-          <!-- Event slots for Important tier -->
-          <div class="event-slots">
+								<!-- resource.limit — empty -->
+								<div class="event-slot">
+									<div class="event-slot-info">
+										<span class="event-slot-name">Resource Limit</span>
+										<span class="event-slot-event-id">resource.limit</span>
+										<span class="event-slot-desc"
+											>Token budget or rate limit reached for the
+											session</span
+										>
+									</div>
+									<div class="event-slot-dropzone">
+										<div class="dropzone-empty">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<circle cx="12" cy="12" r="10" />
+												<line x1="12" y1="8" x2="12" y2="16" />
+												<line x1="8" y1="12" x2="16" y2="12" />
+											</svg>
+											Drag a sound here
+										</div>
+									</div>
+								</div>
 
-            <!-- session.error — assigned -->
-            <div class="event-slot">
-              <div class="event-slot-info">
-                <span class="event-slot-name">Session Error</span>
-                <span class="event-slot-event-id">session.error</span>
-                <span class="event-slot-desc">Agent session crashed or hit an unrecoverable error</span>
-              </div>
-              <div class="event-slot-dropzone">
-                <div class="sound-chip">
-                  <span class="sound-chip-name">hm_error_buzz.wav</span>
-                  <span class="sound-chip-dur">0.6s</span>
-                  <button class="sound-chip-play">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  </button>
-                  <button class="sound-chip-remove">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+								<!-- pr.ready — empty -->
+								<div class="event-slot">
+									<div class="event-slot-info">
+										<span class="event-slot-name">PR Ready</span>
+										<span class="event-slot-event-id">pr.ready</span>
+										<span class="event-slot-desc"
+											>Pull request is ready for review after all checks
+											pass</span
+										>
+									</div>
+									<div class="event-slot-dropzone">
+										<div class="dropzone-empty">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<circle cx="12" cy="12" r="10" />
+												<line x1="12" y1="8" x2="12" y2="16" />
+												<line x1="8" y1="12" x2="16" y2="12" />
+											</svg>
+											Drag a sound here
+										</div>
+									</div>
+								</div>
 
-            <!-- task.error — assigned -->
-            <div class="event-slot">
-              <div class="event-slot-info">
-                <span class="event-slot-name">Task Error</span>
-                <span class="event-slot-event-id">task.error</span>
-                <span class="event-slot-desc">A sub-task within a session failed with an error</span>
-              </div>
-              <div class="event-slot-dropzone">
-                <div class="sound-chip">
-                  <span class="sound-chip-name">hm_error_buzz.wav</span>
-                  <span class="sound-chip-dur">0.6s</span>
-                  <button class="sound-chip-play">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  </button>
-                  <button class="sound-chip-remove">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+								<!-- pr.review-requested — empty -->
+								<div class="event-slot">
+									<div class="event-slot-info">
+										<span class="event-slot-name">Review Requested</span>
+										<span class="event-slot-event-id">pr.review-requested</span>
+										<span class="event-slot-desc"
+											>Someone requested your review on a pull request</span
+										>
+									</div>
+									<div class="event-slot-dropzone">
+										<div class="dropzone-empty">
+											<svg
+												width="13"
+												height="13"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+											>
+												<circle cx="12" cy="12" r="10" />
+												<line x1="12" y1="8" x2="12" y2="16" />
+												<line x1="8" y1="12" x2="16" y2="12" />
+											</svg>
+											Drag a sound here
+										</div>
+									</div>
+								</div>
+							</div>
+						</section>
+					</div>
+				</main>
 
-            <!-- merge.conflict — empty, dragover state shown -->
-            <div class="event-slot">
-              <div class="event-slot-info">
-                <span class="event-slot-name">Merge Conflict</span>
-                <span class="event-slot-event-id">merge.conflict</span>
-                <span class="event-slot-desc">Git merge conflict detected in the working branch</span>
-              </div>
-              <div class="event-slot-dropzone">
-                <div class="dropzone-empty is-dragover">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                  Drop sound here
-                </div>
-              </div>
-            </div>
+				<!-- ==================== FOOTER ==================== -->
+				<footer class="wizard-footer">
+					<div class="wizard-footer-left">
+						<button class="gk-btn gk-btn-ghost">
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="m15 18-6-6 6-6" />
+							</svg>
+							Back
+						</button>
+					</div>
 
-            <!-- resource.limit — empty -->
-            <div class="event-slot">
-              <div class="event-slot-info">
-                <span class="event-slot-name">Resource Limit</span>
-                <span class="event-slot-event-id">resource.limit</span>
-                <span class="event-slot-desc">Token budget or rate limit reached for the session</span>
-              </div>
-              <div class="event-slot-dropzone">
-                <div class="dropzone-empty">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                  Drag a sound here
-                </div>
-              </div>
-            </div>
+					<div class="wizard-footer-validation" style="color: var(--status-warning)">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<circle cx="12" cy="12" r="10" />
+							<line x1="12" y1="8" x2="12" y2="12" />
+							<line x1="12" y1="16" x2="12.01" y2="16" />
+						</svg>
+						4 important events still unassigned
+					</div>
 
-            <!-- pr.ready — empty -->
-            <div class="event-slot">
-              <div class="event-slot-info">
-                <span class="event-slot-name">PR Ready</span>
-                <span class="event-slot-event-id">pr.ready</span>
-                <span class="event-slot-desc">Pull request is ready for review after all checks pass</span>
-              </div>
-              <div class="event-slot-dropzone">
-                <div class="dropzone-empty">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                  Drag a sound here
-                </div>
-              </div>
-            </div>
-
-            <!-- pr.review-requested — empty -->
-            <div class="event-slot">
-              <div class="event-slot-info">
-                <span class="event-slot-name">Review Requested</span>
-                <span class="event-slot-event-id">pr.review-requested</span>
-                <span class="event-slot-desc">Someone requested your review on a pull request</span>
-              </div>
-              <div class="event-slot-dropzone">
-                <div class="dropzone-empty">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                  Drag a sound here
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </section>
-      </div>
-    </main>
-
-    <!-- ==================== FOOTER ==================== -->
-    <footer class="wizard-footer">
-      <div class="wizard-footer-left">
-        <button class="gk-btn gk-btn-ghost">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          Back
-        </button>
-      </div>
-
-      <div class="wizard-footer-validation" style="color: var(--status-warning);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        4 important events still unassigned
-      </div>
-
-      <div class="wizard-footer-right">
-        <button class="gk-btn gk-btn-ghost">Skip tier</button>
-        <button class="gk-btn gk-btn-primary">
-          Next: Normal Events
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
-      </div>
-    </footer>
-
-  </div><!-- /wizard-shell -->
-</div>
-</body>
+					<div class="wizard-footer-right">
+						<button class="gk-btn gk-btn-ghost">Skip tier</button>
+						<button class="gk-btn gk-btn-primary">
+							Next: Normal Events
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="m9 18 6-6-6-6" />
+							</svg>
+						</button>
+					</div>
+				</footer>
+			</div>
+			<!-- /wizard-shell -->
+		</div>
+	</body>
 </html>

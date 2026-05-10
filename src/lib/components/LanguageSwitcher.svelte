@@ -3,6 +3,7 @@
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import SidebarCollapsedItem from './SidebarCollapsedItem.svelte';
 	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
+	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
 
 	interface Props {
 		collapsed?: boolean;
@@ -32,13 +33,11 @@
 {:else}
 	<Tabs class="w-full [&>*]:flex-1 [&>*]:justify-center">
 		{#each locales as locale (locale)}
-			<Tab
-				active={getLocale() === locale}
-				onclick={() => setLocale(locale)}
-				title={LOCALE_LABELS[locale] ?? locale}
-			>
-				<span>{LOCALE_LABELS[locale] ?? locale}</span>
-			</Tab>
+			<SimpleTooltip text={LOCALE_LABELS[locale] ?? locale}>
+				<Tab active={getLocale() === locale} onclick={() => setLocale(locale)}>
+					<span>{LOCALE_LABELS[locale] ?? locale}</span>
+				</Tab>
+			</SimpleTooltip>
 		{/each}
 	</Tabs>
 {/if}

@@ -256,7 +256,7 @@
 					>
 						<SparklesIcon class="size-5 text-foreground-subtle" />
 						<span class="text-xs font-medium text-foreground-muted">
-							Newly planted — open to track issues
+							Newly created — open to track issues
 						</span>
 					</div>
 				{:else}

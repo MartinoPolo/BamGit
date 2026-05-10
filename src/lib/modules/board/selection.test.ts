@@ -9,7 +9,7 @@ import {
 } from './selection.js';
 
 describe('BOTTOM_PANEL_TABS', () => {
-	it('has exactly 6 entries with correct values', () => {
+	it('has exactly 7 entries with correct values', () => {
 		expect(BOTTOM_PANEL_TABS).toEqual({
 			issues: 'issues',
 			kanban: 'kanban',
@@ -17,8 +17,9 @@ describe('BOTTOM_PANEL_TABS', () => {
 			dependencies: 'dependencies',
 			activity: 'activity',
 			session: 'session',
+			assignedIssues: 'assigned-issues',
 		});
-		expect(Object.keys(BOTTOM_PANEL_TABS)).toHaveLength(6);
+		expect(Object.keys(BOTTOM_PANEL_TABS)).toHaveLength(7);
 	});
 });
 

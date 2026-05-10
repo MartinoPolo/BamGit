@@ -1,1826 +1,2514 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Variant E — Stepper Card — GitHub Auth Wizard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Variant E — Stepper Card — GitHub Auth Wizard</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
    TOKENS.CSS — Grovekeeper Design System (inlined)
    ============================================================ */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
 
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
 
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, white 12%);
+			}
+			.theme-dark .gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-success {
+				background: var(--status-success);
+				color: oklch(0.15 0.02 145);
+				border-color: transparent;
+			}
 
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
 
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+			/* Typography */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
+			/* Animations */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
 
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
+			@keyframes gk-glow-ring {
+				0%,
+				100% {
+					box-shadow:
+						0 0 0 4px color-mix(in oklch, var(--status-success) 20%, transparent),
+						0 0 20px color-mix(in oklch, var(--status-success) 10%, transparent);
+				}
+				50% {
+					box-shadow:
+						0 0 0 6px color-mix(in oklch, var(--status-success) 30%, transparent),
+						0 0 28px color-mix(in oklch, var(--status-success) 18%, transparent);
+				}
+			}
 
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  --z-base: 0;
-  --z-overlay: 40;
-  --z-modal: 50;
-
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-}
-
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --code-bg:           oklch(0.215 0.020 150);
-}
-
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
-
-/* Buttons */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap;
-  user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary {
-  background: var(--primary);
-  color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, white 12%); }
-.theme-dark .gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost {
-  background: transparent;
-  color: var(--foreground-muted);
-}
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-danger {
-  background: transparent;
-  color: var(--status-danger);
-  border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
-}
-.gk-btn-danger:hover { background: color-mix(in oklch, var(--status-danger) 12%, transparent); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled, .gk-btn[data-state="disabled"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-success {
-  background: var(--status-success);
-  color: oklch(0.15 0.02 145);
-  border-color: transparent;
-}
-
-/* Badges */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-.gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-
-/* Typography */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-
-/* Animations */
-@keyframes gk-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-.gk-pulse { animation: gk-pulse 1.8s ease-in-out infinite; }
-
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-
-@keyframes gk-glow-ring {
-  0%, 100% { box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-success) 20%, transparent), 0 0 20px color-mix(in oklch, var(--status-success) 10%, transparent); }
-  50% { box-shadow: 0 0 0 6px color-mix(in oklch, var(--status-success) 30%, transparent), 0 0 28px color-mix(in oklch, var(--status-success) 18%, transparent); }
-}
-
-/* ============================================================
+			/* ============================================================
    VARIANT E — STEPPER CARD
    ============================================================ */
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
 
-body {
-  margin: 0;
-  padding: 0;
-  background: oklch(0.120 0.015 150);
-  min-height: 100vh;
-  font-family: var(--font-sans);
-}
+			body {
+				margin: 0;
+				padding: 0;
+				background: oklch(0.12 0.015 150);
+				min-height: 100vh;
+				font-family: var(--font-sans);
+			}
 
-/* Page layout */
-.mockup-page {
-  display: flex;
-  flex-direction: column;
-  gap: 64px;
-  padding: 32px 0 64px;
-}
+			/* Page layout */
+			.mockup-page {
+				display: flex;
+				flex-direction: column;
+				gap: 64px;
+				padding: 32px 0 64px;
+			}
 
-/* Variant label */
-.variant-label {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 100;
-}
+			/* Variant label */
+			.variant-label {
+				position: fixed;
+				top: 16px;
+				left: 16px;
+				z-index: 100;
+			}
 
-/* Section labels */
-.section-label {
-  max-width: 1280px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 0 16px;
-}
-.section-label h2 {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-  margin-bottom: 4px;
-}
-.section-label p {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
+			/* Section labels */
+			.section-label {
+				max-width: 1280px;
+				margin: 0 auto;
+				width: 100%;
+				padding: 0 16px;
+			}
+			.section-label h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				margin-bottom: 4px;
+			}
+			.section-label p {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
 
-/* Scene wrapper */
-.scene {
-  position: relative;
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  height: 620px;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
+			/* Scene wrapper */
+			.scene {
+				position: relative;
+				width: 100%;
+				max-width: 1280px;
+				margin: 0 auto;
+				height: 620px;
+				border-radius: var(--radius-xl);
+				overflow: hidden;
+				border: 1px solid var(--border);
+			}
 
-/* Simulated app background */
-.app-backdrop {
-  position: absolute;
-  inset: 0;
-  background: var(--background);
-  display: flex;
-  flex-direction: column;
-}
-.app-backdrop-header {
-  height: 48px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 12px;
-}
-.app-backdrop-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--surface-3);
-}
-.app-backdrop-title {
-  font-size: 12px;
-  color: var(--foreground-subtle);
-  font-family: var(--font-mono);
-}
-.app-backdrop-body {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 220px 1fr;
-}
-.app-backdrop-sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.app-backdrop-nav-item {
-  height: 32px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  opacity: 0.4;
-}
-.app-backdrop-nav-item:nth-child(2) { opacity: 0.3; width: 80%; }
-.app-backdrop-nav-item:nth-child(3) { opacity: 0.2; width: 70%; }
-.app-backdrop-content {
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.app-backdrop-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  height: 64px;
-  opacity: 0.3;
-}
-.app-backdrop-block:nth-child(2) { height: 120px; opacity: 0.2; }
-.app-backdrop-block:nth-child(3) { height: 80px; opacity: 0.15; }
+			/* Simulated app background */
+			.app-backdrop {
+				position: absolute;
+				inset: 0;
+				background: var(--background);
+				display: flex;
+				flex-direction: column;
+			}
+			.app-backdrop-header {
+				height: 48px;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				padding: 0 20px;
+				gap: 12px;
+			}
+			.app-backdrop-dot {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: var(--surface-3);
+			}
+			.app-backdrop-title {
+				font-size: 12px;
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+			}
+			.app-backdrop-body {
+				flex: 1;
+				display: grid;
+				grid-template-columns: 220px 1fr;
+			}
+			.app-backdrop-sidebar {
+				background: var(--surface);
+				border-right: 1px solid var(--border);
+				padding: 16px 12px;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.app-backdrop-nav-item {
+				height: 32px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				opacity: 0.4;
+			}
+			.app-backdrop-nav-item:nth-child(2) {
+				opacity: 0.3;
+				width: 80%;
+			}
+			.app-backdrop-nav-item:nth-child(3) {
+				opacity: 0.2;
+				width: 70%;
+			}
+			.app-backdrop-content {
+				padding: 32px;
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+			.app-backdrop-block {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				height: 64px;
+				opacity: 0.3;
+			}
+			.app-backdrop-block:nth-child(2) {
+				height: 120px;
+				opacity: 0.2;
+			}
+			.app-backdrop-block:nth-child(3) {
+				height: 80px;
+				opacity: 0.15;
+			}
 
-/* Backdrop overlay */
-.backdrop-overlay {
-  position: absolute;
-  inset: 0;
-  background: oklch(0.08 0.01 150 / 0.60);
-  backdrop-filter: blur(6px);
-  z-index: var(--z-overlay);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+			/* Backdrop overlay */
+			.backdrop-overlay {
+				position: absolute;
+				inset: 0;
+				background: oklch(0.08 0.01 150 / 0.6);
+				backdrop-filter: blur(6px);
+				z-index: var(--z-overlay);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
 
-/* ---- Stepper Card ---- */
-.stepper-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-xl);
-  width: 540px;
-  max-width: calc(100% - 32px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: card-enter 360ms var(--ease-out) both;
-}
+			/* ---- Stepper Card ---- */
+			.stepper-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-2xl);
+				box-shadow: var(--shadow-xl);
+				width: 540px;
+				max-width: calc(100% - 32px);
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				animation: card-enter 360ms var(--ease-out) both;
+			}
 
-@keyframes card-enter {
-  from { transform: translateY(12px) scale(0.97); opacity: 0; }
-  to   { transform: translateY(0) scale(1); opacity: 1; }
-}
+			@keyframes card-enter {
+				from {
+					transform: translateY(12px) scale(0.97);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0) scale(1);
+					opacity: 1;
+				}
+			}
 
-/* Card header */
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 24px 16px;
-  border-bottom: 1px solid var(--border);
-}
-.card-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.card-github-icon {
-  width: 22px;
-  height: 22px;
-  color: var(--foreground-muted);
-}
-.card-title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-}
-.card-close {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  transition: background 120ms ease, color 120ms ease;
-}
-.card-close:hover { background: var(--surface-2); color: var(--foreground); }
-.card-close:active { transform: scale(0.92); }
-.card-close:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+			/* Card header */
+			.card-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 18px 24px 16px;
+				border-bottom: 1px solid var(--border);
+			}
+			.card-header-left {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+			.card-github-icon {
+				width: 22px;
+				height: 22px;
+				color: var(--foreground-muted);
+			}
+			.card-title {
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.card-close {
+				width: 28px;
+				height: 28px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--radius-sm);
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					color 120ms ease;
+			}
+			.card-close:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.card-close:active {
+				transform: scale(0.92);
+			}
+			.card-close:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
 
-/* Card body -- stepper layout */
-.card-body {
-  display: flex;
-  padding: 0;
-  min-height: 340px;
-}
+			/* Card body -- stepper layout */
+			.card-body {
+				display: flex;
+				padding: 0;
+				min-height: 340px;
+			}
 
-/* ---- Left stepper rail ---- */
-.stepper-rail {
-  width: 56px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 28px 0;
-  background: var(--surface-2);
-  border-right: 1px solid var(--border);
-  position: relative;
-}
+			/* ---- Left stepper rail ---- */
+			.stepper-rail {
+				width: 56px;
+				flex-shrink: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 28px 0;
+				background: var(--surface-2);
+				border-right: 1px solid var(--border);
+				position: relative;
+			}
 
-/* Vertical line through stepper circles */
-.stepper-line {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  background: var(--border);
-  border-radius: 1px;
-}
+			/* Vertical line through stepper circles */
+			.stepper-line {
+				position: absolute;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 2px;
+				background: var(--border);
+				border-radius: 1px;
+			}
 
-/* Stepper node */
-.stepper-node {
-  position: relative;
-  z-index: 2;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-}
+			/* Stepper node */
+			.stepper-node {
+				position: relative;
+				z-index: 2;
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				transition:
+					background 220ms ease,
+					border-color 220ms ease,
+					box-shadow 220ms ease;
+			}
 
-/* Completed node */
-.stepper-node--done {
-  background: var(--status-success);
-}
-.stepper-node--done svg {
-  width: 14px;
-  height: 14px;
-  color: oklch(0.15 0.02 145);
-}
+			/* Completed node */
+			.stepper-node--done {
+				background: var(--status-success);
+			}
+			.stepper-node--done svg {
+				width: 14px;
+				height: 14px;
+				color: oklch(0.15 0.02 145);
+			}
 
-/* Active node */
-.stepper-node--active {
-  background: var(--primary);
-  box-shadow: 0 0 0 4px color-mix(in oklch, var(--primary) 22%, transparent);
-}
-.stepper-node-number {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  color: var(--primary-fg);
-  line-height: 1;
-}
+			/* Active node */
+			.stepper-node--active {
+				background: var(--primary);
+				box-shadow: 0 0 0 4px color-mix(in oklch, var(--primary) 22%, transparent);
+			}
+			.stepper-node-number {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-bold);
+				color: var(--primary-fg);
+				line-height: 1;
+			}
 
-/* Upcoming node */
-.stepper-node--upcoming {
-  background: transparent;
-  border: 2px solid var(--border-strong);
-}
-.stepper-node--upcoming .stepper-node-number {
-  color: var(--foreground-subtle);
-}
+			/* Upcoming node */
+			.stepper-node--upcoming {
+				background: transparent;
+				border: 2px solid var(--border-strong);
+			}
+			.stepper-node--upcoming .stepper-node-number {
+				color: var(--foreground-subtle);
+			}
 
-/* Success (final completed) node */
-.stepper-node--success {
-  background: var(--status-success);
-  animation: gk-glow-ring 2.4s ease-in-out infinite;
-}
-.stepper-node--success svg {
-  width: 14px;
-  height: 14px;
-  color: oklch(0.15 0.02 145);
-}
+			/* Success (final completed) node */
+			.stepper-node--success {
+				background: var(--status-success);
+				animation: gk-glow-ring 2.4s ease-in-out infinite;
+			}
+			.stepper-node--success svg {
+				width: 14px;
+				height: 14px;
+				color: oklch(0.15 0.02 145);
+			}
 
-/* Spacing between nodes */
-.stepper-spacer {
-  flex: 1;
-  min-height: 32px;
-}
+			/* Spacing between nodes */
+			.stepper-spacer {
+				flex: 1;
+				min-height: 32px;
+			}
 
-/* Step label on rail */
-.stepper-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  margin-top: 8px;
-  display: none; /* hidden by default, show on wider views */
-}
+			/* Step label on rail */
+			.stepper-label {
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: var(--weight-medium);
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				writing-mode: vertical-rl;
+				text-orientation: mixed;
+				margin-top: 8px;
+				display: none; /* hidden by default, show on wider views */
+			}
 
-/* ---- Right content panel ---- */
-.step-content-panel {
-  flex: 1;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
+			/* ---- Right content panel ---- */
+			.step-content-panel {
+				flex: 1;
+				padding: 24px;
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+				overflow-y: auto;
+			}
 
-/* Step heading inside content panel */
-.step-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.step-heading-label {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-}
-.step-heading-badge {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-medium);
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-}
+			/* Step heading inside content panel */
+			.step-heading {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.step-heading-label {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.step-heading-badge {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
 
-/* Completed step summary (collapsed) */
-.step-completed-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: color-mix(in oklch, var(--status-success) 5%, transparent);
-  border: 1px solid color-mix(in oklch, var(--status-success) 14%, transparent);
-  border-radius: var(--radius-md);
-}
-.step-completed-check {
-  width: 16px;
-  height: 16px;
-  color: var(--status-success);
-  flex-shrink: 0;
-}
-.step-completed-text {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  font-weight: var(--weight-medium);
-}
-.step-completed-time {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  margin-left: auto;
-}
+			/* Completed step summary (collapsed) */
+			.step-completed-row {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 8px 12px;
+				background: color-mix(in oklch, var(--status-success) 5%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-success) 14%, transparent);
+				border-radius: var(--radius-md);
+			}
+			.step-completed-check {
+				width: 16px;
+				height: 16px;
+				color: var(--status-success);
+				flex-shrink: 0;
+			}
+			.step-completed-text {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				font-weight: var(--weight-medium);
+			}
+			.step-completed-time {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-left: auto;
+			}
 
-/* Code display */
-.code-display {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 20px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.code-eyebrow {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-.code-value {
-  font-family: var(--font-mono);
-  font-size: 34px;
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.14em;
-  color: var(--foreground);
-  line-height: 1;
-  user-select: all;
-}
-.code-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-}
-.copy-btn:hover { background: var(--surface-3); border-color: var(--border-strong); color: var(--foreground); }
-.copy-btn:active { transform: scale(0.96); }
-.copy-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.copy-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.copy-btn svg { width: 13px; height: 13px; }
+			/* Code display */
+			.code-display {
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				padding: 20px 16px 16px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 12px;
+			}
+			.code-eyebrow {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-medium);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+			}
+			.code-value {
+				font-family: var(--font-mono);
+				font-size: 34px;
+				font-weight: var(--weight-bold);
+				letter-spacing: 0.14em;
+				color: var(--foreground);
+				line-height: 1;
+				user-select: all;
+			}
+			.code-actions {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.copy-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				font-family: var(--font-sans);
+				font-size: 12px;
+				font-weight: 500;
+				height: 28px;
+				padding: 0 10px;
+				border-radius: var(--radius-sm);
+				border: 1px solid var(--border);
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease;
+			}
+			.copy-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.copy-btn:active {
+				transform: scale(0.96);
+			}
+			.copy-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.copy-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.copy-btn svg {
+				width: 13px;
+				height: 13px;
+			}
 
-/* QR placeholder */
-.qr-code {
-  width: 80px;
-  height: 80px;
-  background: var(--foreground);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-.qr-code::after {
-  content: "QR";
-  position: absolute;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: var(--weight-bold);
-  color: var(--background);
-  letter-spacing: 0.08em;
-}
-/* QR grid pattern */
-.qr-code-pattern {
-  position: absolute;
-  inset: 4px;
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(9, 1fr);
-  gap: 1px;
-}
-.qr-cell {
-  border-radius: 1px;
-}
-.qr-cell--dark { background: oklch(0.18 0.015 150); }
-.qr-cell--light { background: var(--foreground); }
+			/* QR placeholder */
+			.qr-code {
+				width: 80px;
+				height: 80px;
+				background: var(--foreground);
+				border-radius: var(--radius-sm);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				overflow: hidden;
+			}
+			.qr-code::after {
+				content: 'QR';
+				position: absolute;
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: var(--weight-bold);
+				color: var(--background);
+				letter-spacing: 0.08em;
+			}
+			/* QR grid pattern */
+			.qr-code-pattern {
+				position: absolute;
+				inset: 4px;
+				display: grid;
+				grid-template-columns: repeat(9, 1fr);
+				grid-template-rows: repeat(9, 1fr);
+				gap: 1px;
+			}
+			.qr-cell {
+				border-radius: 1px;
+			}
+			.qr-cell--dark {
+				background: oklch(0.18 0.015 150);
+			}
+			.qr-cell--light {
+				background: var(--foreground);
+			}
 
-/* Code + QR side-by-side */
-.code-and-qr {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.code-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.qr-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-.qr-label {
-  font-size: 9px;
-  color: var(--foreground-subtle);
-  font-weight: var(--weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
+			/* Code + QR side-by-side */
+			.code-and-qr {
+				display: flex;
+				align-items: center;
+				gap: 20px;
+			}
+			.code-main {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 12px;
+			}
+			.qr-section {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 6px;
+			}
+			.qr-label {
+				font-size: 9px;
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-medium);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
 
-/* Timer */
-.timer-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.timer-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--foreground-subtle);
-}
-.timer-value {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--foreground-muted);
-  font-variant-numeric: tabular-nums;
-}
-.timer-value--warning { color: var(--status-warning); }
-.timer-value--danger { color: var(--status-danger); }
-.timer-label {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-}
+			/* Timer */
+			.timer-row {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+			}
+			.timer-icon {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+			}
+			.timer-value {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+			.timer-value--warning {
+				color: var(--status-warning);
+			}
+			.timer-value--danger {
+				color: var(--status-danger);
+			}
+			.timer-label {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
 
-/* Progress bar (countdown) */
-.timer-bar-track {
-  width: 100%;
-  height: 4px;
-  background: var(--surface-3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.timer-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--primary);
-  transition: width 1s linear, background 300ms ease;
-}
-.timer-bar-fill--warning { background: var(--status-warning); }
-.timer-bar-fill--danger { background: var(--status-danger); }
+			/* Progress bar (countdown) */
+			.timer-bar-track {
+				width: 100%;
+				height: 4px;
+				background: var(--surface-3);
+				border-radius: 2px;
+				overflow: hidden;
+			}
+			.timer-bar-fill {
+				height: 100%;
+				border-radius: 2px;
+				background: var(--primary);
+				transition:
+					width 1s linear,
+					background 300ms ease;
+			}
+			.timer-bar-fill--warning {
+				background: var(--status-warning);
+			}
+			.timer-bar-fill--danger {
+				background: var(--status-danger);
+			}
 
-/* Polling status */
-.polling-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: color-mix(in oklch, var(--primary) 6%, transparent);
-  border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
-  border-radius: var(--radius-md);
-}
-.polling-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid color-mix(in oklch, var(--primary) 30%, transparent);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: gk-spin 0.8s linear infinite;
-  flex-shrink: 0;
-}
-.polling-text {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
+			/* Polling status */
+			.polling-status {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 12px;
+				background: color-mix(in oklch, var(--primary) 6%, transparent);
+				border: 1px solid color-mix(in oklch, var(--primary) 16%, transparent);
+				border-radius: var(--radius-md);
+			}
+			.polling-spinner {
+				width: 16px;
+				height: 16px;
+				border: 2px solid color-mix(in oklch, var(--primary) 30%, transparent);
+				border-top-color: var(--primary);
+				border-radius: 50%;
+				animation: gk-spin 0.8s linear infinite;
+				flex-shrink: 0;
+			}
+			.polling-text {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
 
-/* URL link */
-.github-url {
-  text-align: center;
-}
-.github-url a {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 120ms ease;
-}
-.github-url a:hover { color: color-mix(in oklch, var(--primary) 80%, white 20%); text-decoration: underline; }
-.github-url a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 2px; }
+			/* URL link */
+			.github-url {
+				text-align: center;
+			}
+			.github-url a {
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				color: var(--primary);
+				text-decoration: none;
+				transition: color 120ms ease;
+			}
+			.github-url a:hover {
+				color: color-mix(in oklch, var(--primary) 80%, white 20%);
+				text-decoration: underline;
+			}
+			.github-url a:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+				border-radius: 2px;
+			}
 
-/* Action row */
-.action-row {
-  display: flex;
-  gap: 8px;
-}
-.action-row .gk-btn { flex: 1; }
+			/* Action row */
+			.action-row {
+				display: flex;
+				gap: 8px;
+			}
+			.action-row .gk-btn {
+				flex: 1;
+			}
 
-/* GitHub mark in button */
-.gh-mark { width: 16px; height: 16px; }
+			/* GitHub mark in button */
+			.gh-mark {
+				width: 16px;
+				height: 16px;
+			}
 
-/* Card footer */
-.card-footer {
-  padding: 14px 24px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--surface-2);
-  border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
-}
-.card-footer-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+			/* Card footer */
+			.card-footer {
+				padding: 14px 24px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background: var(--surface-2);
+				border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+			}
+			.card-footer-info {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
 
-/* ---- Success content ---- */
-.success-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.success-user-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  background: color-mix(in oklch, var(--status-success) 6%, transparent);
-  border: 1px solid color-mix(in oklch, var(--status-success) 18%, transparent);
-  border-radius: var(--radius-lg);
-}
-.success-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--surface-3);
-  border: 2px solid var(--status-success);
-  overflow: hidden;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.success-avatar svg {
-  width: 28px;
-  height: 28px;
-  color: var(--foreground-muted);
-}
-.success-user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.success-username {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-}
-.success-handle {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  font-family: var(--font-mono);
-}
-.success-scopes {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.scope-tag {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  padding: 2px 6px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  color: var(--foreground-subtle);
-}
+			/* ---- Success content ---- */
+			.success-content {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+			.success-user-card {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 16px;
+				background: color-mix(in oklch, var(--status-success) 6%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-success) 18%, transparent);
+				border-radius: var(--radius-lg);
+			}
+			.success-avatar {
+				width: 48px;
+				height: 48px;
+				border-radius: 50%;
+				background: var(--surface-3);
+				border: 2px solid var(--status-success);
+				overflow: hidden;
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.success-avatar svg {
+				width: 28px;
+				height: 28px;
+				color: var(--foreground-muted);
+			}
+			.success-user-info {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.success-username {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+			}
+			.success-handle {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				font-family: var(--font-mono);
+			}
+			.success-scopes {
+				display: flex;
+				gap: 6px;
+				flex-wrap: wrap;
+			}
+			.scope-tag {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				padding: 2px 6px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				color: var(--foreground-subtle);
+			}
 
-/* ---- Error content ---- */
-.error-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
-  border-left: 3px solid var(--status-danger);
-  background: color-mix(in oklch, var(--status-danger) 8%, transparent);
-}
-.error-banner-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--status-danger);
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.error-banner-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.error-banner-title {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--status-danger);
-}
-.error-banner-text {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
+			/* ---- Error content ---- */
+			.error-banner {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				padding: 12px 14px;
+				border-radius: var(--radius-md);
+				border-left: 3px solid var(--status-danger);
+				background: color-mix(in oklch, var(--status-danger) 8%, transparent);
+			}
+			.error-banner-icon {
+				width: 16px;
+				height: 16px;
+				color: var(--status-danger);
+				flex-shrink: 0;
+				margin-top: 1px;
+			}
+			.error-banner-body {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.error-banner-title {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--status-danger);
+			}
+			.error-banner-text {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
 
-/* Stepper line segments (colored) */
-.stepper-line-done {
-  background: var(--status-success) !important;
-}
-.stepper-line-active {
-  background: linear-gradient(to bottom, var(--primary), var(--border)) !important;
-}
+			/* Stepper line segments (colored) */
+			.stepper-line-done {
+				background: var(--status-success) !important;
+			}
+			.stepper-line-active {
+				background: linear-gradient(to bottom, var(--primary), var(--border)) !important;
+			}
 
-/* ---- Responsive ---- */
-@media (max-width: 600px) {
-  .stepper-card { width: 100%; border-radius: var(--radius-lg); }
-  .card-body { flex-direction: column; }
-  .stepper-rail {
-    width: 100%;
-    flex-direction: row;
-    padding: 12px 20px;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .stepper-spacer { min-height: 0; min-width: 24px; }
-  .stepper-line { display: none; }
-  .code-and-qr { flex-direction: column; }
-  .step-content-panel { padding: 16px; }
-}
-</style>
-</head>
+			/* ---- Responsive ---- */
+			@media (max-width: 600px) {
+				.stepper-card {
+					width: 100%;
+					border-radius: var(--radius-lg);
+				}
+				.card-body {
+					flex-direction: column;
+				}
+				.stepper-rail {
+					width: 100%;
+					flex-direction: row;
+					padding: 12px 20px;
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+				}
+				.stepper-spacer {
+					min-height: 0;
+					min-width: 24px;
+				}
+				.stepper-line {
+					display: none;
+				}
+				.code-and-qr {
+					flex-direction: column;
+				}
+				.step-content-panel {
+					padding: 16px;
+				}
+			}
+		</style>
+	</head>
 
-<body>
-<div class="gk-root theme-dark">
+	<body>
+		<div class="gk-root theme-dark">
+			<!-- Variant Label -->
+			<div class="variant-label">
+				<span class="gk-eyebrow">VARIANT E: STEPPER CARD</span>
+			</div>
 
-  <!-- Variant Label -->
-  <div class="variant-label">
-    <span class="gk-eyebrow">VARIANT E: STEPPER CARD</span>
-  </div>
-
-  <div class="mockup-page">
-
-    <!-- ============================================================
+			<div class="mockup-page">
+				<!-- ============================================================
          STATE 1: STEP 1 — Enter Code (initial state)
          ============================================================ -->
-    <div class="section-label">
-      <h2 class="gk-h2">Step 1 -- Enter Code</h2>
-      <p class="gk-small">Code just generated. User sees code, QR, copy button. Timer at full. Step 1 active on the stepper.</p>
-    </div>
+				<div class="section-label">
+					<h2 class="gk-h2">Step 1 -- Enter Code</h2>
+					<p class="gk-small">
+						Code just generated. User sees code, QR, copy button. Timer at full. Step 1
+						active on the stepper.
+					</p>
+				</div>
 
-    <div class="scene">
-      <div class="app-backdrop">
-        <div class="app-backdrop-header">
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <span class="app-backdrop-title">Grovekeeper</span>
-        </div>
-        <div class="app-backdrop-body">
-          <div class="app-backdrop-sidebar">
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-          </div>
-          <div class="app-backdrop-content">
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-          </div>
-        </div>
-      </div>
+				<div class="scene">
+					<div class="app-backdrop">
+						<div class="app-backdrop-header">
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<span class="app-backdrop-title">Grovekeeper</span>
+						</div>
+						<div class="app-backdrop-body">
+							<div class="app-backdrop-sidebar">
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+							</div>
+							<div class="app-backdrop-content">
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+							</div>
+						</div>
+					</div>
 
-      <div class="backdrop-overlay">
-        <div class="stepper-card">
-          <!-- Header -->
-          <div class="card-header">
-            <div class="card-header-left">
-              <svg class="card-github-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-              </svg>
-              <span class="card-title">Connect to GitHub</span>
-            </div>
-            <button class="card-close" aria-label="Close" title="Cancel authentication">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M4 4l8 8M12 4l-8 8"/>
-              </svg>
-            </button>
-          </div>
+					<div class="backdrop-overlay">
+						<div class="stepper-card">
+							<!-- Header -->
+							<div class="card-header">
+								<div class="card-header-left">
+									<svg
+										class="card-github-icon"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+									>
+										<path
+											d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+										/>
+									</svg>
+									<span class="card-title">Connect to GitHub</span>
+								</div>
+								<button
+									class="card-close"
+									aria-label="Close"
+									title="Cancel authentication"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<path d="M4 4l8 8M12 4l-8 8" />
+									</svg>
+								</button>
+							</div>
 
-          <div class="card-body">
-            <!-- Stepper Rail -->
-            <div class="stepper-rail">
-              <!-- Line segment 1->2 -->
-              <div class="stepper-line" style="top: 28px; bottom: calc(50% + 14px);"></div>
-              <!-- Line segment 2->3 -->
-              <div class="stepper-line" style="top: calc(50% + 14px); bottom: 28px;"></div>
+							<div class="card-body">
+								<!-- Stepper Rail -->
+								<div class="stepper-rail">
+									<!-- Line segment 1->2 -->
+									<div
+										class="stepper-line"
+										style="top: 28px; bottom: calc(50% + 14px)"
+									></div>
+									<!-- Line segment 2->3 -->
+									<div
+										class="stepper-line"
+										style="top: calc(50% + 14px); bottom: 28px"
+									></div>
 
-              <!-- Node 1: Active -->
-              <div class="stepper-node stepper-node--active">
-                <span class="stepper-node-number">1</span>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 2: Upcoming -->
-              <div class="stepper-node stepper-node--upcoming">
-                <span class="stepper-node-number">2</span>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 3: Upcoming -->
-              <div class="stepper-node stepper-node--upcoming">
-                <span class="stepper-node-number">3</span>
-              </div>
-            </div>
+									<!-- Node 1: Active -->
+									<div class="stepper-node stepper-node--active">
+										<span class="stepper-node-number">1</span>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 2: Upcoming -->
+									<div class="stepper-node stepper-node--upcoming">
+										<span class="stepper-node-number">2</span>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 3: Upcoming -->
+									<div class="stepper-node stepper-node--upcoming">
+										<span class="stepper-node-number">3</span>
+									</div>
+								</div>
 
-            <!-- Step 1 Content -->
-            <div class="step-content-panel">
-              <div class="step-heading">
-                <span class="step-heading-label">Enter Code on GitHub</span>
-                <span class="step-heading-badge">Step 1 of 3</span>
-              </div>
+								<!-- Step 1 Content -->
+								<div class="step-content-panel">
+									<div class="step-heading">
+										<span class="step-heading-label">Enter Code on GitHub</span>
+										<span class="step-heading-badge">Step 1 of 3</span>
+									</div>
 
-              <p class="gk-small">Copy the code below and enter it at GitHub to connect your account.</p>
+									<p class="gk-small">
+										Copy the code below and enter it at GitHub to connect your
+										account.
+									</p>
 
-              <!-- Code + QR -->
-              <div class="code-display">
-                <div class="code-and-qr">
-                  <div class="code-main">
-                    <span class="code-eyebrow">Verification code</span>
-                    <span class="code-value">WDJB-3F7K</span>
-                    <div class="code-actions">
-                      <button class="copy-btn">
-                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                          <rect x="5" y="5" width="8" height="8" rx="1.5"/>
-                          <path d="M3 11V3.5A.5.5 0 013.5 3H11"/>
-                        </svg>
-                        Copy code
-                      </button>
-                    </div>
-                  </div>
-                  <div class="qr-section">
-                    <div class="qr-code">
-                      <div class="qr-code-pattern">
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div>
-                        <div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div>
-                        <div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--light"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div><div class="qr-cell qr-cell--dark"></div>
-                      </div>
-                    </div>
-                    <span class="qr-label">Scan to open</span>
-                  </div>
-                </div>
-              </div>
+									<!-- Code + QR -->
+									<div class="code-display">
+										<div class="code-and-qr">
+											<div class="code-main">
+												<span class="code-eyebrow">Verification code</span>
+												<span class="code-value">WDJB-3F7K</span>
+												<div class="code-actions">
+													<button class="copy-btn">
+														<svg
+															viewBox="0 0 16 16"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="1.5"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+														>
+															<rect
+																x="5"
+																y="5"
+																width="8"
+																height="8"
+																rx="1.5"
+															/>
+															<path d="M3 11V3.5A.5.5 0 013.5 3H11" />
+														</svg>
+														Copy code
+													</button>
+												</div>
+											</div>
+											<div class="qr-section">
+												<div class="qr-code">
+													<div class="qr-code-pattern">
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--light"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+														<div class="qr-cell qr-cell--dark"></div>
+													</div>
+												</div>
+												<span class="qr-label">Scan to open</span>
+											</div>
+										</div>
+									</div>
 
-              <!-- Timer -->
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div class="timer-row">
-                  <svg class="timer-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                    <circle cx="8" cy="9" r="5.5"/>
-                    <path d="M8 6.5V9l2 1.5"/>
-                    <path d="M6.5 2h3"/>
-                  </svg>
-                  <span class="timer-value">14:58</span>
-                  <span class="timer-label">remaining</span>
-                </div>
-                <div class="timer-bar-track">
-                  <div class="timer-bar-fill" style="width: 99%;"></div>
-                </div>
-              </div>
+									<!-- Timer -->
+									<div style="display: flex; flex-direction: column; gap: 6px">
+										<div class="timer-row">
+											<svg
+												class="timer-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+											>
+												<circle cx="8" cy="9" r="5.5" />
+												<path d="M8 6.5V9l2 1.5" />
+												<path d="M6.5 2h3" />
+											</svg>
+											<span class="timer-value">14:58</span>
+											<span class="timer-label">remaining</span>
+										</div>
+										<div class="timer-bar-track">
+											<div class="timer-bar-fill" style="width: 99%"></div>
+										</div>
+									</div>
 
-              <!-- Open GitHub action -->
-              <div class="action-row">
-                <button class="gk-btn gk-btn-primary gk-btn-lg">
-                  <svg class="gh-mark" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-                  </svg>
-                  Open GitHub
-                </button>
-              </div>
-              <div class="github-url">
-                <a href="https://github.com/login/device" target="_blank" rel="noopener noreferrer">github.com/login/device</a>
-              </div>
-            </div>
-          </div>
+									<!-- Open GitHub action -->
+									<div class="action-row">
+										<button class="gk-btn gk-btn-primary gk-btn-lg">
+											<svg
+												class="gh-mark"
+												viewBox="0 0 24 24"
+												fill="currentColor"
+											>
+												<path
+													d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+												/>
+											</svg>
+											Open GitHub
+										</button>
+									</div>
+									<div class="github-url">
+										<a
+											href="https://github.com/login/device"
+											target="_blank"
+											rel="noopener noreferrer"
+											>github.com/login/device</a
+										>
+									</div>
+								</div>
+							</div>
 
-          <!-- Footer -->
-          <div class="card-footer">
-            <span class="gk-tiny">One-time setup</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
+							<!-- Footer -->
+							<div class="card-footer">
+								<span class="gk-tiny">One-time setup</span>
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-
-    <!-- ============================================================
+				<!-- ============================================================
          STATE 2: STEP 2 — Polling (waiting for verification)
          ============================================================ -->
-    <div class="section-label">
-      <h2 class="gk-h2">Step 2 -- Verify</h2>
-      <p class="gk-small">Step 1 completed (checkmark). Step 2 active -- polling GitHub. Code still visible. Timer at 12:30.</p>
-    </div>
+				<div class="section-label">
+					<h2 class="gk-h2">Step 2 -- Verify</h2>
+					<p class="gk-small">
+						Step 1 completed (checkmark). Step 2 active -- polling GitHub. Code still
+						visible. Timer at 12:30.
+					</p>
+				</div>
 
-    <div class="scene">
-      <div class="app-backdrop">
-        <div class="app-backdrop-header">
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <span class="app-backdrop-title">Grovekeeper</span>
-        </div>
-        <div class="app-backdrop-body">
-          <div class="app-backdrop-sidebar">
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-          </div>
-          <div class="app-backdrop-content">
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-          </div>
-        </div>
-      </div>
+				<div class="scene">
+					<div class="app-backdrop">
+						<div class="app-backdrop-header">
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<span class="app-backdrop-title">Grovekeeper</span>
+						</div>
+						<div class="app-backdrop-body">
+							<div class="app-backdrop-sidebar">
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+							</div>
+							<div class="app-backdrop-content">
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+							</div>
+						</div>
+					</div>
 
-      <div class="backdrop-overlay">
-        <div class="stepper-card" style="animation: none;">
-          <div class="card-header">
-            <div class="card-header-left">
-              <svg class="card-github-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-              </svg>
-              <span class="card-title">Connect to GitHub</span>
-            </div>
-            <button class="card-close" aria-label="Close" title="Cancel authentication">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M4 4l8 8M12 4l-8 8"/>
-              </svg>
-            </button>
-          </div>
+					<div class="backdrop-overlay">
+						<div class="stepper-card" style="animation: none">
+							<div class="card-header">
+								<div class="card-header-left">
+									<svg
+										class="card-github-icon"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+									>
+										<path
+											d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+										/>
+									</svg>
+									<span class="card-title">Connect to GitHub</span>
+								</div>
+								<button
+									class="card-close"
+									aria-label="Close"
+									title="Cancel authentication"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<path d="M4 4l8 8M12 4l-8 8" />
+									</svg>
+								</button>
+							</div>
 
-          <div class="card-body">
-            <div class="stepper-rail">
-              <!-- Line 1->2: done -->
-              <div class="stepper-line stepper-line-done" style="top: 28px; bottom: calc(50% + 14px);"></div>
-              <!-- Line 2->3: active gradient -->
-              <div class="stepper-line stepper-line-active" style="top: calc(50% + 14px); bottom: 28px;"></div>
+							<div class="card-body">
+								<div class="stepper-rail">
+									<!-- Line 1->2: done -->
+									<div
+										class="stepper-line stepper-line-done"
+										style="top: 28px; bottom: calc(50% + 14px)"
+									></div>
+									<!-- Line 2->3: active gradient -->
+									<div
+										class="stepper-line stepper-line-active"
+										style="top: calc(50% + 14px); bottom: 28px"
+									></div>
 
-              <!-- Node 1: Completed -->
-              <div class="stepper-node stepper-node--done">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 2: Active -->
-              <div class="stepper-node stepper-node--active">
-                <span class="stepper-node-number">2</span>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 3: Upcoming -->
-              <div class="stepper-node stepper-node--upcoming">
-                <span class="stepper-node-number">3</span>
-              </div>
-            </div>
+									<!-- Node 1: Completed -->
+									<div class="stepper-node stepper-node--done">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 2: Active -->
+									<div class="stepper-node stepper-node--active">
+										<span class="stepper-node-number">2</span>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 3: Upcoming -->
+									<div class="stepper-node stepper-node--upcoming">
+										<span class="stepper-node-number">3</span>
+									</div>
+								</div>
 
-            <div class="step-content-panel">
-              <!-- Completed step 1 summary -->
-              <div class="step-completed-row">
-                <svg class="step-completed-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5" stroke-width="1.5"/>
-                  <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-                </svg>
-                <span class="step-completed-text">Code copied &amp; GitHub opened</span>
-                <span class="step-completed-time">0:32 ago</span>
-              </div>
+								<div class="step-content-panel">
+									<!-- Completed step 1 summary -->
+									<div class="step-completed-row">
+										<svg
+											class="step-completed-check"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" stroke-width="1.5" />
+											<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+										</svg>
+										<span class="step-completed-text"
+											>Code copied &amp; GitHub opened</span
+										>
+										<span class="step-completed-time">0:32 ago</span>
+									</div>
 
-              <div class="step-heading">
-                <span class="step-heading-label">Waiting for Verification</span>
-                <span class="step-heading-badge">Step 2 of 3</span>
-              </div>
+									<div class="step-heading">
+										<span class="step-heading-label"
+											>Waiting for Verification</span
+										>
+										<span class="step-heading-badge">Step 2 of 3</span>
+									</div>
 
-              <!-- Code still visible during polling -->
-              <div class="code-display">
-                <span class="code-eyebrow">Your verification code</span>
-                <span class="code-value">WDJB-3F7K</span>
-                <button class="copy-btn">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="5" y="5" width="8" height="8" rx="1.5"/>
-                    <path d="M3 11V3.5A.5.5 0 013.5 3H11"/>
-                  </svg>
-                  Copy code
-                </button>
-              </div>
+									<!-- Code still visible during polling -->
+									<div class="code-display">
+										<span class="code-eyebrow">Your verification code</span>
+										<span class="code-value">WDJB-3F7K</span>
+										<button class="copy-btn">
+											<svg
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<rect x="5" y="5" width="8" height="8" rx="1.5" />
+												<path d="M3 11V3.5A.5.5 0 013.5 3H11" />
+											</svg>
+											Copy code
+										</button>
+									</div>
 
-              <!-- Timer -->
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div class="timer-row">
-                  <svg class="timer-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                    <circle cx="8" cy="9" r="5.5"/>
-                    <path d="M8 6.5V9l2 1.5"/>
-                    <path d="M6.5 2h3"/>
-                  </svg>
-                  <span class="timer-value">12:30</span>
-                  <span class="timer-label">remaining</span>
-                </div>
-                <div class="timer-bar-track">
-                  <div class="timer-bar-fill" style="width: 83%;"></div>
-                </div>
-              </div>
+									<!-- Timer -->
+									<div style="display: flex; flex-direction: column; gap: 6px">
+										<div class="timer-row">
+											<svg
+												class="timer-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+											>
+												<circle cx="8" cy="9" r="5.5" />
+												<path d="M8 6.5V9l2 1.5" />
+												<path d="M6.5 2h3" />
+											</svg>
+											<span class="timer-value">12:30</span>
+											<span class="timer-label">remaining</span>
+										</div>
+										<div class="timer-bar-track">
+											<div class="timer-bar-fill" style="width: 83%"></div>
+										</div>
+									</div>
 
-              <!-- Polling indicator -->
-              <div class="polling-status">
-                <div class="polling-spinner"></div>
-                <span class="polling-text">Waiting for you to enter the code on GitHub...</span>
-              </div>
+									<!-- Polling indicator -->
+									<div class="polling-status">
+										<div class="polling-spinner"></div>
+										<span class="polling-text"
+											>Waiting for you to enter the code on GitHub...</span
+										>
+									</div>
 
-              <!-- Re-open GitHub (ghost, secondary since already opened) -->
-              <div class="action-row">
-                <button class="gk-btn gk-btn-secondary">
-                  <svg class="gh-mark" viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;">
-                    <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-                  </svg>
-                  Re-open GitHub
-                </button>
-              </div>
-            </div>
-          </div>
+									<!-- Re-open GitHub (ghost, secondary since already opened) -->
+									<div class="action-row">
+										<button class="gk-btn gk-btn-secondary">
+											<svg
+												class="gh-mark"
+												viewBox="0 0 24 24"
+												fill="currentColor"
+												style="width: 14px; height: 14px"
+											>
+												<path
+													d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+												/>
+											</svg>
+											Re-open GitHub
+										</button>
+									</div>
+								</div>
+							</div>
 
-          <div class="card-footer">
-            <span class="gk-tiny">Checking every 5 seconds</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
+							<div class="card-footer">
+								<span class="gk-tiny">Checking every 5 seconds</span>
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-
-    <!-- ============================================================
+				<!-- ============================================================
          STATE 3: STEP 2 — Timer Warning (<2 min remaining)
          ============================================================ -->
-    <div class="section-label">
-      <h2 class="gk-h2">Step 2 -- Timer Warning</h2>
-      <p class="gk-small">Under 2 minutes remaining. Timer and progress bar shift to danger color. Urgency signaling.</p>
-    </div>
+				<div class="section-label">
+					<h2 class="gk-h2">Step 2 -- Timer Warning</h2>
+					<p class="gk-small">
+						Under 2 minutes remaining. Timer and progress bar shift to danger color.
+						Urgency signaling.
+					</p>
+				</div>
 
-    <div class="scene">
-      <div class="app-backdrop">
-        <div class="app-backdrop-header">
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <span class="app-backdrop-title">Grovekeeper</span>
-        </div>
-        <div class="app-backdrop-body">
-          <div class="app-backdrop-sidebar">
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-          </div>
-          <div class="app-backdrop-content">
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-          </div>
-        </div>
-      </div>
+				<div class="scene">
+					<div class="app-backdrop">
+						<div class="app-backdrop-header">
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<span class="app-backdrop-title">Grovekeeper</span>
+						</div>
+						<div class="app-backdrop-body">
+							<div class="app-backdrop-sidebar">
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+							</div>
+							<div class="app-backdrop-content">
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+							</div>
+						</div>
+					</div>
 
-      <div class="backdrop-overlay">
-        <div class="stepper-card" style="animation: none;">
-          <div class="card-header">
-            <div class="card-header-left">
-              <svg class="card-github-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-              </svg>
-              <span class="card-title">Connect to GitHub</span>
-            </div>
-            <button class="card-close" aria-label="Close" title="Cancel authentication">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M4 4l8 8M12 4l-8 8"/>
-              </svg>
-            </button>
-          </div>
+					<div class="backdrop-overlay">
+						<div class="stepper-card" style="animation: none">
+							<div class="card-header">
+								<div class="card-header-left">
+									<svg
+										class="card-github-icon"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+									>
+										<path
+											d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+										/>
+									</svg>
+									<span class="card-title">Connect to GitHub</span>
+								</div>
+								<button
+									class="card-close"
+									aria-label="Close"
+									title="Cancel authentication"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<path d="M4 4l8 8M12 4l-8 8" />
+									</svg>
+								</button>
+							</div>
 
-          <div class="card-body">
-            <div class="stepper-rail">
-              <div class="stepper-line stepper-line-done" style="top: 28px; bottom: calc(50% + 14px);"></div>
-              <div class="stepper-line stepper-line-active" style="top: calc(50% + 14px); bottom: 28px;"></div>
+							<div class="card-body">
+								<div class="stepper-rail">
+									<div
+										class="stepper-line stepper-line-done"
+										style="top: 28px; bottom: calc(50% + 14px)"
+									></div>
+									<div
+										class="stepper-line stepper-line-active"
+										style="top: calc(50% + 14px); bottom: 28px"
+									></div>
 
-              <div class="stepper-node stepper-node--done">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <div class="stepper-node stepper-node--active">
-                <span class="stepper-node-number">2</span>
-              </div>
-              <div class="stepper-spacer"></div>
-              <div class="stepper-node stepper-node--upcoming">
-                <span class="stepper-node-number">3</span>
-              </div>
-            </div>
+									<div class="stepper-node stepper-node--done">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<div class="stepper-node stepper-node--active">
+										<span class="stepper-node-number">2</span>
+									</div>
+									<div class="stepper-spacer"></div>
+									<div class="stepper-node stepper-node--upcoming">
+										<span class="stepper-node-number">3</span>
+									</div>
+								</div>
 
-            <div class="step-content-panel">
-              <div class="step-completed-row">
-                <svg class="step-completed-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5" stroke-width="1.5"/>
-                  <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-                </svg>
-                <span class="step-completed-text">Code copied &amp; GitHub opened</span>
-                <span class="step-completed-time">13:12 ago</span>
-              </div>
+								<div class="step-content-panel">
+									<div class="step-completed-row">
+										<svg
+											class="step-completed-check"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" stroke-width="1.5" />
+											<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+										</svg>
+										<span class="step-completed-text"
+											>Code copied &amp; GitHub opened</span
+										>
+										<span class="step-completed-time">13:12 ago</span>
+									</div>
 
-              <div class="step-heading">
-                <span class="step-heading-label">Waiting for Verification</span>
-                <span class="gk-badge gk-badge-danger" style="font-size:10px; height:18px;">Expiring soon</span>
-              </div>
+									<div class="step-heading">
+										<span class="step-heading-label"
+											>Waiting for Verification</span
+										>
+										<span
+											class="gk-badge gk-badge-danger"
+											style="font-size: 10px; height: 18px"
+											>Expiring soon</span
+										>
+									</div>
 
-              <div class="code-display">
-                <span class="code-eyebrow">Your verification code</span>
-                <span class="code-value">WDJB-3F7K</span>
-                <button class="copy-btn">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="5" y="5" width="8" height="8" rx="1.5"/>
-                    <path d="M3 11V3.5A.5.5 0 013.5 3H11"/>
-                  </svg>
-                  Copy code
-                </button>
-              </div>
+									<div class="code-display">
+										<span class="code-eyebrow">Your verification code</span>
+										<span class="code-value">WDJB-3F7K</span>
+										<button class="copy-btn">
+											<svg
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<rect x="5" y="5" width="8" height="8" rx="1.5" />
+												<path d="M3 11V3.5A.5.5 0 013.5 3H11" />
+											</svg>
+											Copy code
+										</button>
+									</div>
 
-              <!-- Timer at danger -->
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div class="timer-row">
-                  <svg class="timer-icon" viewBox="0 0 16 16" fill="none" stroke="var(--status-danger)" stroke-width="1.5" stroke-linecap="round">
-                    <circle cx="8" cy="9" r="5.5"/>
-                    <path d="M8 6.5V9l2 1.5"/>
-                    <path d="M6.5 2h3"/>
-                  </svg>
-                  <span class="timer-value timer-value--danger">1:48</span>
-                  <span class="timer-label" style="color: var(--status-danger);">remaining</span>
-                </div>
-                <div class="timer-bar-track">
-                  <div class="timer-bar-fill timer-bar-fill--danger" style="width: 12%;"></div>
-                </div>
-              </div>
+									<!-- Timer at danger -->
+									<div style="display: flex; flex-direction: column; gap: 6px">
+										<div class="timer-row">
+											<svg
+												class="timer-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="var(--status-danger)"
+												stroke-width="1.5"
+												stroke-linecap="round"
+											>
+												<circle cx="8" cy="9" r="5.5" />
+												<path d="M8 6.5V9l2 1.5" />
+												<path d="M6.5 2h3" />
+											</svg>
+											<span class="timer-value timer-value--danger"
+												>1:48</span
+											>
+											<span
+												class="timer-label"
+												style="color: var(--status-danger)"
+												>remaining</span
+											>
+										</div>
+										<div class="timer-bar-track">
+											<div
+												class="timer-bar-fill timer-bar-fill--danger"
+												style="width: 12%"
+											></div>
+										</div>
+									</div>
 
-              <div class="polling-status" style="border-color: color-mix(in oklch, var(--status-danger) 20%, transparent); background: color-mix(in oklch, var(--status-danger) 6%, transparent);">
-                <div class="polling-spinner" style="border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); border-top-color: var(--status-danger);"></div>
-                <span class="polling-text">Still waiting... enter the code before it expires</span>
-              </div>
+									<div
+										class="polling-status"
+										style="
+											border-color: color-mix(
+												in oklch,
+												var(--status-danger) 20%,
+												transparent
+											);
+											background: color-mix(
+												in oklch,
+												var(--status-danger) 6%,
+												transparent
+											);
+										"
+									>
+										<div
+											class="polling-spinner"
+											style="
+												border-color: color-mix(
+													in oklch,
+													var(--status-danger) 30%,
+													transparent
+												);
+												border-top-color: var(--status-danger);
+											"
+										></div>
+										<span class="polling-text"
+											>Still waiting... enter the code before it expires</span
+										>
+									</div>
 
-              <div class="action-row">
-                <button class="gk-btn gk-btn-secondary">
-                  <svg class="gh-mark" viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;">
-                    <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-                  </svg>
-                  Re-open GitHub
-                </button>
-              </div>
-            </div>
-          </div>
+									<div class="action-row">
+										<button class="gk-btn gk-btn-secondary">
+											<svg
+												class="gh-mark"
+												viewBox="0 0 24 24"
+												fill="currentColor"
+												style="width: 14px; height: 14px"
+											>
+												<path
+													d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+												/>
+											</svg>
+											Re-open GitHub
+										</button>
+									</div>
+								</div>
+							</div>
 
-          <div class="card-footer">
-            <span class="gk-tiny" style="color: var(--status-danger);">Code expires soon</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
+							<div class="card-footer">
+								<span class="gk-tiny" style="color: var(--status-danger)"
+									>Code expires soon</span
+								>
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-
-    <!-- ============================================================
+				<!-- ============================================================
          STATE 4: STEP 3 — Connected (success)
          ============================================================ -->
-    <div class="section-label">
-      <h2 class="gk-h2">Step 3 -- Connected</h2>
-      <p class="gk-small">All three steps completed. Stepper fully green. Avatar, username, OAuth badge displayed. Done button.</p>
-    </div>
+				<div class="section-label">
+					<h2 class="gk-h2">Step 3 -- Connected</h2>
+					<p class="gk-small">
+						All three steps completed. Stepper fully green. Avatar, username, OAuth
+						badge displayed. Done button.
+					</p>
+				</div>
 
-    <div class="scene">
-      <div class="app-backdrop">
-        <div class="app-backdrop-header">
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <span class="app-backdrop-title">Grovekeeper</span>
-        </div>
-        <div class="app-backdrop-body">
-          <div class="app-backdrop-sidebar">
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-          </div>
-          <div class="app-backdrop-content">
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-          </div>
-        </div>
-      </div>
+				<div class="scene">
+					<div class="app-backdrop">
+						<div class="app-backdrop-header">
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<span class="app-backdrop-title">Grovekeeper</span>
+						</div>
+						<div class="app-backdrop-body">
+							<div class="app-backdrop-sidebar">
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+							</div>
+							<div class="app-backdrop-content">
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+							</div>
+						</div>
+					</div>
 
-      <div class="backdrop-overlay" style="background: oklch(0.08 0.01 150 / 0.45);">
-        <div class="stepper-card" style="animation: none;">
-          <div class="card-header">
-            <div class="card-header-left">
-              <svg class="card-github-icon" viewBox="0 0 24 24" fill="currentColor" style="color: var(--status-success);">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-              </svg>
-              <span class="card-title">Connect to GitHub</span>
-            </div>
-            <button class="card-close" aria-label="Close" title="Close">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M4 4l8 8M12 4l-8 8"/>
-              </svg>
-            </button>
-          </div>
+					<div class="backdrop-overlay" style="background: oklch(0.08 0.01 150 / 0.45)">
+						<div class="stepper-card" style="animation: none">
+							<div class="card-header">
+								<div class="card-header-left">
+									<svg
+										class="card-github-icon"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+										style="color: var(--status-success)"
+									>
+										<path
+											d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+										/>
+									</svg>
+									<span class="card-title">Connect to GitHub</span>
+								</div>
+								<button class="card-close" aria-label="Close" title="Close">
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<path d="M4 4l8 8M12 4l-8 8" />
+									</svg>
+								</button>
+							</div>
 
-          <div class="card-body">
-            <div class="stepper-rail">
-              <!-- All lines green -->
-              <div class="stepper-line stepper-line-done" style="top: 28px; bottom: 28px;"></div>
+							<div class="card-body">
+								<div class="stepper-rail">
+									<!-- All lines green -->
+									<div
+										class="stepper-line stepper-line-done"
+										style="top: 28px; bottom: 28px"
+									></div>
 
-              <!-- Node 1: Done -->
-              <div class="stepper-node stepper-node--done">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 2: Done -->
-              <div class="stepper-node stepper-node--done">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 3: Success glow -->
-              <div class="stepper-node stepper-node--success">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-            </div>
+									<!-- Node 1: Done -->
+									<div class="stepper-node stepper-node--done">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 2: Done -->
+									<div class="stepper-node stepper-node--done">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 3: Success glow -->
+									<div class="stepper-node stepper-node--success">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+								</div>
 
-            <div class="step-content-panel">
-              <!-- Completed step 1 -->
-              <div class="step-completed-row">
-                <svg class="step-completed-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5" stroke-width="1.5"/>
-                  <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-                </svg>
-                <span class="step-completed-text">Code entered</span>
-                <span class="step-completed-time">0:32</span>
-              </div>
+								<div class="step-content-panel">
+									<!-- Completed step 1 -->
+									<div class="step-completed-row">
+										<svg
+											class="step-completed-check"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" stroke-width="1.5" />
+											<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+										</svg>
+										<span class="step-completed-text">Code entered</span>
+										<span class="step-completed-time">0:32</span>
+									</div>
 
-              <!-- Completed step 2 -->
-              <div class="step-completed-row">
-                <svg class="step-completed-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5" stroke-width="1.5"/>
-                  <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-                </svg>
-                <span class="step-completed-text">Verified on GitHub</span>
-                <span class="step-completed-time">2:14</span>
-              </div>
+									<!-- Completed step 2 -->
+									<div class="step-completed-row">
+										<svg
+											class="step-completed-check"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" stroke-width="1.5" />
+											<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+										</svg>
+										<span class="step-completed-text">Verified on GitHub</span>
+										<span class="step-completed-time">2:14</span>
+									</div>
 
-              <!-- Active step 3: Connected -->
-              <div class="step-heading">
-                <span class="step-heading-label" style="color: var(--status-success);">Connected</span>
-              </div>
+									<!-- Active step 3: Connected -->
+									<div class="step-heading">
+										<span
+											class="step-heading-label"
+											style="color: var(--status-success)"
+											>Connected</span
+										>
+									</div>
 
-              <div class="success-content">
-                <div class="success-user-card">
-                  <div class="success-avatar">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM12 10c-1.654 0-3-1.346-3-3s1.346-3 3-3 3 1.346 3 3-1.346 3-3 3zM21 21v-1c0-3.859-3.141-7-7-7h-4c-3.86 0-7 3.141-7 7v1h2v-1c0-2.757 2.243-5 5-5h4c2.757 0 5 2.243 5 5v1h2z"/>
-                    </svg>
-                  </div>
-                  <div class="success-user-info">
-                    <span class="success-username">Martin Pavilonis</span>
-                    <span class="success-handle">@MartinPav</span>
-                  </div>
-                </div>
+									<div class="success-content">
+										<div class="success-user-card">
+											<div class="success-avatar">
+												<svg viewBox="0 0 24 24" fill="currentColor">
+													<path
+														d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5zM12 10c-1.654 0-3-1.346-3-3s1.346-3 3-3 3 1.346 3 3-1.346 3-3 3zM21 21v-1c0-3.859-3.141-7-7-7h-4c-3.86 0-7 3.141-7 7v1h2v-1c0-2.757 2.243-5 5-5h4c2.757 0 5 2.243 5 5v1h2z"
+													/>
+												</svg>
+											</div>
+											<div class="success-user-info">
+												<span class="success-username"
+													>Martin Pavilonis</span
+												>
+												<span class="success-handle">@MartinPav</span>
+											</div>
+										</div>
 
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                  <span class="gk-badge gk-badge-success">
-                    <span class="gk-badge-dot"></span>
-                    Connected via OAuth
-                  </span>
-                </div>
+										<div
+											style="
+												display: flex;
+												align-items: center;
+												gap: 8px;
+												flex-wrap: wrap;
+											"
+										>
+											<span class="gk-badge gk-badge-success">
+												<span class="gk-badge-dot"></span>
+												Connected via OAuth
+											</span>
+										</div>
 
-                <div class="success-scopes">
-                  <span class="scope-tag">repo</span>
-                  <span class="scope-tag">read:org</span>
-                  <span class="scope-tag">read:user</span>
-                </div>
-              </div>
-            </div>
-          </div>
+										<div class="success-scopes">
+											<span class="scope-tag">repo</span>
+											<span class="scope-tag">read:org</span>
+											<span class="scope-tag">read:user</span>
+										</div>
+									</div>
+								</div>
+							</div>
 
-          <div class="card-footer">
-            <div class="card-footer-info">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="var(--status-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="8" cy="8" r="6"/>
-                <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-              </svg>
-              <span class="gk-small">Authentication complete</span>
-            </div>
-            <button class="gk-btn gk-btn-primary">Done</button>
-          </div>
-        </div>
-      </div>
-    </div>
+							<div class="card-footer">
+								<div class="card-footer-info">
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="var(--status-success)"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="8" cy="8" r="6" />
+										<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+									</svg>
+									<span class="gk-small">Authentication complete</span>
+								</div>
+								<button class="gk-btn gk-btn-primary">Done</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-
-    <!-- ============================================================
+				<!-- ============================================================
          STATE 5: Error — Code Expired
          ============================================================ -->
-    <div class="section-label">
-      <h2 class="gk-h2">Error -- Code Expired</h2>
-      <p class="gk-small">Timer reached zero. Code is invalid. Error banner with "Get New Code" to restart the flow.</p>
-    </div>
+				<div class="section-label">
+					<h2 class="gk-h2">Error -- Code Expired</h2>
+					<p class="gk-small">
+						Timer reached zero. Code is invalid. Error banner with "Get New Code" to
+						restart the flow.
+					</p>
+				</div>
 
-    <div class="scene">
-      <div class="app-backdrop">
-        <div class="app-backdrop-header">
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <span class="app-backdrop-title">Grovekeeper</span>
-        </div>
-        <div class="app-backdrop-body">
-          <div class="app-backdrop-sidebar">
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-          </div>
-          <div class="app-backdrop-content">
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-          </div>
-        </div>
-      </div>
+				<div class="scene">
+					<div class="app-backdrop">
+						<div class="app-backdrop-header">
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<span class="app-backdrop-title">Grovekeeper</span>
+						</div>
+						<div class="app-backdrop-body">
+							<div class="app-backdrop-sidebar">
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+							</div>
+							<div class="app-backdrop-content">
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+							</div>
+						</div>
+					</div>
 
-      <div class="backdrop-overlay">
-        <div class="stepper-card" style="animation: none;">
-          <div class="card-header">
-            <div class="card-header-left">
-              <svg class="card-github-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-              </svg>
-              <span class="card-title">Connect to GitHub</span>
-            </div>
-            <button class="card-close" aria-label="Close" title="Cancel authentication">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M4 4l8 8M12 4l-8 8"/>
-              </svg>
-            </button>
-          </div>
+					<div class="backdrop-overlay">
+						<div class="stepper-card" style="animation: none">
+							<div class="card-header">
+								<div class="card-header-left">
+									<svg
+										class="card-github-icon"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+									>
+										<path
+											d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+										/>
+									</svg>
+									<span class="card-title">Connect to GitHub</span>
+								</div>
+								<button
+									class="card-close"
+									aria-label="Close"
+									title="Cancel authentication"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<path d="M4 4l8 8M12 4l-8 8" />
+									</svg>
+								</button>
+							</div>
 
-          <div class="card-body">
-            <div class="stepper-rail">
-              <div class="stepper-line stepper-line-done" style="top: 28px; bottom: calc(50% + 14px);"></div>
-              <div class="stepper-line" style="top: calc(50% + 14px); bottom: 28px;"></div>
+							<div class="card-body">
+								<div class="stepper-rail">
+									<div
+										class="stepper-line stepper-line-done"
+										style="top: 28px; bottom: calc(50% + 14px)"
+									></div>
+									<div
+										class="stepper-line"
+										style="top: calc(50% + 14px); bottom: 28px"
+									></div>
 
-              <div class="stepper-node stepper-node--done">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <!-- Node 2: Error state (red ring) -->
-              <div class="stepper-node" style="background: var(--status-danger); box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-danger) 22%, transparent);">
-                <svg viewBox="0 0 16 16" fill="none" stroke="oklch(0.15 0.02 25)" stroke-width="2" stroke-linecap="round" width="14" height="14">
-                  <path d="M5.5 5.5l5 5M10.5 5.5l-5 5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <div class="stepper-node stepper-node--upcoming">
-                <span class="stepper-node-number">3</span>
-              </div>
-            </div>
+									<div class="stepper-node stepper-node--done">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<!-- Node 2: Error state (red ring) -->
+									<div
+										class="stepper-node"
+										style="
+											background: var(--status-danger);
+											box-shadow: 0 0 0 4px
+												color-mix(
+													in oklch,
+													var(--status-danger) 22%,
+													transparent
+												);
+										"
+									>
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="oklch(0.15 0.02 25)"
+											stroke-width="2"
+											stroke-linecap="round"
+											width="14"
+											height="14"
+										>
+											<path d="M5.5 5.5l5 5M10.5 5.5l-5 5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<div class="stepper-node stepper-node--upcoming">
+										<span class="stepper-node-number">3</span>
+									</div>
+								</div>
 
-            <div class="step-content-panel">
-              <div class="step-completed-row">
-                <svg class="step-completed-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5" stroke-width="1.5"/>
-                  <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-                </svg>
-                <span class="step-completed-text">Code generated</span>
-                <span class="step-completed-time">15:00 ago</span>
-              </div>
+								<div class="step-content-panel">
+									<div class="step-completed-row">
+										<svg
+											class="step-completed-check"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" stroke-width="1.5" />
+											<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+										</svg>
+										<span class="step-completed-text">Code generated</span>
+										<span class="step-completed-time">15:00 ago</span>
+									</div>
 
-              <div class="step-heading">
-                <span class="step-heading-label">Verification Failed</span>
-              </div>
+									<div class="step-heading">
+										<span class="step-heading-label">Verification Failed</span>
+									</div>
 
-              <!-- Error banner -->
-              <div class="error-banner">
-                <svg class="error-banner-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5"/>
-                  <path d="M8 5v3.5"/>
-                  <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
-                </svg>
-                <div class="error-banner-body">
-                  <span class="error-banner-title">Code expired</span>
-                  <span class="error-banner-text">The verification code has expired. Please generate a new code and try again.</span>
-                </div>
-              </div>
+									<!-- Error banner -->
+									<div class="error-banner">
+										<svg
+											class="error-banner-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" />
+											<path d="M8 5v3.5" />
+											<circle cx="8" cy="11" r="0.5" fill="currentColor" />
+										</svg>
+										<div class="error-banner-body">
+											<span class="error-banner-title">Code expired</span>
+											<span class="error-banner-text"
+												>The verification code has expired. Please generate
+												a new code and try again.</span
+											>
+										</div>
+									</div>
 
-              <!-- Expired code (dimmed) -->
-              <div class="code-display" style="opacity: 0.4; pointer-events: none;">
-                <span class="code-eyebrow">Expired code</span>
-                <span class="code-value" style="text-decoration: line-through; text-decoration-color: var(--status-danger);">WDJB-3F7K</span>
-              </div>
+									<!-- Expired code (dimmed) -->
+									<div
+										class="code-display"
+										style="opacity: 0.4; pointer-events: none"
+									>
+										<span class="code-eyebrow">Expired code</span>
+										<span
+											class="code-value"
+											style="
+												text-decoration: line-through;
+												text-decoration-color: var(--status-danger);
+											"
+											>WDJB-3F7K</span
+										>
+									</div>
 
-              <!-- Timer at zero -->
-              <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div class="timer-row">
-                  <svg class="timer-icon" viewBox="0 0 16 16" fill="none" stroke="var(--status-danger)" stroke-width="1.5" stroke-linecap="round">
-                    <circle cx="8" cy="9" r="5.5"/>
-                    <path d="M8 6.5V9l2 1.5"/>
-                    <path d="M6.5 2h3"/>
-                  </svg>
-                  <span class="timer-value timer-value--danger">0:00</span>
-                  <span class="timer-label" style="color: var(--status-danger);">expired</span>
-                </div>
-                <div class="timer-bar-track">
-                  <div class="timer-bar-fill timer-bar-fill--danger" style="width: 0%;"></div>
-                </div>
-              </div>
+									<!-- Timer at zero -->
+									<div style="display: flex; flex-direction: column; gap: 6px">
+										<div class="timer-row">
+											<svg
+												class="timer-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="var(--status-danger)"
+												stroke-width="1.5"
+												stroke-linecap="round"
+											>
+												<circle cx="8" cy="9" r="5.5" />
+												<path d="M8 6.5V9l2 1.5" />
+												<path d="M6.5 2h3" />
+											</svg>
+											<span class="timer-value timer-value--danger"
+												>0:00</span
+											>
+											<span
+												class="timer-label"
+												style="color: var(--status-danger)"
+												>expired</span
+											>
+										</div>
+										<div class="timer-bar-track">
+											<div
+												class="timer-bar-fill timer-bar-fill--danger"
+												style="width: 0%"
+											></div>
+										</div>
+									</div>
 
-              <!-- Retry action -->
-              <div class="action-row">
-                <button class="gk-btn gk-btn-primary">
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2.5 8a5.5 5.5 0 019.5-3.5"/>
-                    <path d="M13.5 2v3h-3"/>
-                    <path d="M13.5 8a5.5 5.5 0 01-9.5 3.5"/>
-                    <path d="M2.5 14v-3h3"/>
-                  </svg>
-                  Get New Code
-                </button>
-              </div>
-            </div>
-          </div>
+									<!-- Retry action -->
+									<div class="action-row">
+										<button class="gk-btn gk-btn-primary">
+											<svg
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<path d="M2.5 8a5.5 5.5 0 019.5-3.5" />
+												<path d="M13.5 2v3h-3" />
+												<path d="M13.5 8a5.5 5.5 0 01-9.5 3.5" />
+												<path d="M2.5 14v-3h3" />
+											</svg>
+											Get New Code
+										</button>
+									</div>
+								</div>
+							</div>
 
-          <div class="card-footer">
-            <span class="gk-tiny" style="color: var(--status-danger);">Code expired after 15 minutes</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
+							<div class="card-footer">
+								<span class="gk-tiny" style="color: var(--status-danger)"
+									>Code expired after 15 minutes</span
+								>
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-
-    <!-- ============================================================
+				<!-- ============================================================
          STATE 6: Error — Access Denied
          ============================================================ -->
-    <div class="section-label">
-      <h2 class="gk-h2">Error -- Access Denied</h2>
-      <p class="gk-small">User cancelled on GitHub's authorization page. Error with retry option.</p>
-    </div>
+				<div class="section-label">
+					<h2 class="gk-h2">Error -- Access Denied</h2>
+					<p class="gk-small">
+						User cancelled on GitHub's authorization page. Error with retry option.
+					</p>
+				</div>
 
-    <div class="scene">
-      <div class="app-backdrop">
-        <div class="app-backdrop-header">
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <div class="app-backdrop-dot"></div>
-          <span class="app-backdrop-title">Grovekeeper</span>
-        </div>
-        <div class="app-backdrop-body">
-          <div class="app-backdrop-sidebar">
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-            <div class="app-backdrop-nav-item"></div>
-          </div>
-          <div class="app-backdrop-content">
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-            <div class="app-backdrop-block"></div>
-          </div>
-        </div>
-      </div>
+				<div class="scene">
+					<div class="app-backdrop">
+						<div class="app-backdrop-header">
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<div class="app-backdrop-dot"></div>
+							<span class="app-backdrop-title">Grovekeeper</span>
+						</div>
+						<div class="app-backdrop-body">
+							<div class="app-backdrop-sidebar">
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+								<div class="app-backdrop-nav-item"></div>
+							</div>
+							<div class="app-backdrop-content">
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+								<div class="app-backdrop-block"></div>
+							</div>
+						</div>
+					</div>
 
-      <div class="backdrop-overlay">
-        <div class="stepper-card" style="animation: none;">
-          <div class="card-header">
-            <div class="card-header-left">
-              <svg class="card-github-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
-              </svg>
-              <span class="card-title">Connect to GitHub</span>
-            </div>
-            <button class="card-close" aria-label="Close" title="Cancel authentication">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M4 4l8 8M12 4l-8 8"/>
-              </svg>
-            </button>
-          </div>
+					<div class="backdrop-overlay">
+						<div class="stepper-card" style="animation: none">
+							<div class="card-header">
+								<div class="card-header-left">
+									<svg
+										class="card-github-icon"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+									>
+										<path
+											d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"
+										/>
+									</svg>
+									<span class="card-title">Connect to GitHub</span>
+								</div>
+								<button
+									class="card-close"
+									aria-label="Close"
+									title="Cancel authentication"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									>
+										<path d="M4 4l8 8M12 4l-8 8" />
+									</svg>
+								</button>
+							</div>
 
-          <div class="card-body">
-            <div class="stepper-rail">
-              <div class="stepper-line stepper-line-done" style="top: 28px; bottom: calc(50% + 14px);"></div>
-              <div class="stepper-line" style="top: calc(50% + 14px); bottom: 28px;"></div>
+							<div class="card-body">
+								<div class="stepper-rail">
+									<div
+										class="stepper-line stepper-line-done"
+										style="top: 28px; bottom: calc(50% + 14px)"
+									></div>
+									<div
+										class="stepper-line"
+										style="top: calc(50% + 14px); bottom: 28px"
+									></div>
 
-              <div class="stepper-node stepper-node--done">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3.5 8.5 6.5 11.5 12.5 5.5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <div class="stepper-node" style="background: var(--status-danger); box-shadow: 0 0 0 4px color-mix(in oklch, var(--status-danger) 22%, transparent);">
-                <svg viewBox="0 0 16 16" fill="none" stroke="oklch(0.15 0.02 25)" stroke-width="2" stroke-linecap="round" width="14" height="14">
-                  <path d="M5.5 5.5l5 5M10.5 5.5l-5 5"/>
-                </svg>
-              </div>
-              <div class="stepper-spacer"></div>
-              <div class="stepper-node stepper-node--upcoming">
-                <span class="stepper-node-number">3</span>
-              </div>
-            </div>
+									<div class="stepper-node stepper-node--done">
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<polyline points="3.5 8.5 6.5 11.5 12.5 5.5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<div
+										class="stepper-node"
+										style="
+											background: var(--status-danger);
+											box-shadow: 0 0 0 4px
+												color-mix(
+													in oklch,
+													var(--status-danger) 22%,
+													transparent
+												);
+										"
+									>
+										<svg
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="oklch(0.15 0.02 25)"
+											stroke-width="2"
+											stroke-linecap="round"
+											width="14"
+											height="14"
+										>
+											<path d="M5.5 5.5l5 5M10.5 5.5l-5 5" />
+										</svg>
+									</div>
+									<div class="stepper-spacer"></div>
+									<div class="stepper-node stepper-node--upcoming">
+										<span class="stepper-node-number">3</span>
+									</div>
+								</div>
 
-            <div class="step-content-panel">
-              <div class="step-completed-row">
-                <svg class="step-completed-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="8" r="6.5" stroke-width="1.5"/>
-                  <polyline points="5.5 8.2 7.2 10 10.5 6.5"/>
-                </svg>
-                <span class="step-completed-text">Code generated</span>
-                <span class="step-completed-time">3:47 ago</span>
-              </div>
+								<div class="step-content-panel">
+									<div class="step-completed-row">
+										<svg
+											class="step-completed-check"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<circle cx="8" cy="8" r="6.5" stroke-width="1.5" />
+											<polyline points="5.5 8.2 7.2 10 10.5 6.5" />
+										</svg>
+										<span class="step-completed-text">Code generated</span>
+										<span class="step-completed-time">3:47 ago</span>
+									</div>
 
-              <div class="step-heading">
-                <span class="step-heading-label">Authorization Denied</span>
-              </div>
+									<div class="step-heading">
+										<span class="step-heading-label">Authorization Denied</span>
+									</div>
 
-              <div class="error-banner">
-                <svg class="error-banner-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M8 1.5l6.5 12H1.5z"/>
-                  <path d="M8 6.5v3"/>
-                  <circle cx="8" cy="11.5" r="0.5" fill="currentColor"/>
-                </svg>
-                <div class="error-banner-body">
-                  <span class="error-banner-title">Authorization was denied</span>
-                  <span class="error-banner-text">You cancelled the authorization on GitHub. To connect, try again and click "Authorize" when prompted.</span>
-                </div>
-              </div>
+									<div class="error-banner">
+										<svg
+											class="error-banner-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M8 1.5l6.5 12H1.5z" />
+											<path d="M8 6.5v3" />
+											<circle cx="8" cy="11.5" r="0.5" fill="currentColor" />
+										</svg>
+										<div class="error-banner-body">
+											<span class="error-banner-title"
+												>Authorization was denied</span
+											>
+											<span class="error-banner-text"
+												>You cancelled the authorization on GitHub. To
+												connect, try again and click "Authorize" when
+												prompted.</span
+											>
+										</div>
+									</div>
 
-              <div class="action-row">
-                <button class="gk-btn gk-btn-primary">
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2.5 8a5.5 5.5 0 019.5-3.5"/>
-                    <path d="M13.5 2v3h-3"/>
-                    <path d="M13.5 8a5.5 5.5 0 01-9.5 3.5"/>
-                    <path d="M2.5 14v-3h3"/>
-                  </svg>
-                  Try Again
-                </button>
-              </div>
-            </div>
-          </div>
+									<div class="action-row">
+										<button class="gk-btn gk-btn-primary">
+											<svg
+												width="14"
+												height="14"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<path d="M2.5 8a5.5 5.5 0 019.5-3.5" />
+												<path d="M13.5 2v3h-3" />
+												<path d="M13.5 8a5.5 5.5 0 01-9.5 3.5" />
+												<path d="M2.5 14v-3h3" />
+											</svg>
+											Try Again
+										</button>
+									</div>
+								</div>
+							</div>
 
-          <div class="card-footer">
-            <span class="gk-tiny" style="color: var(--foreground-subtle);">Authorization not completed</span>
-            <button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end .mockup-page -->
-</div><!-- end .gk-root -->
-</body>
+							<div class="card-footer">
+								<span class="gk-tiny" style="color: var(--foreground-subtle)"
+									>Authorization not completed</span
+								>
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end .mockup-page -->
+		</div>
+		<!-- end .gk-root -->
+	</body>
 </html>

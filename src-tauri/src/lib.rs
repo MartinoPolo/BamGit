@@ -177,8 +177,6 @@ pub fn run() {
             github_commands::fetch_assigned_issues,
             github_commands::search_github_issues,
             github_commands::sync_all_github_state,
-            github_commands::record_deleted_assigned_issue,
-            github_commands::get_deleted_assigned_issue_numbers,
             worktree_commands::setup_worktree,
             worktree_commands::remove_worktree,
             worktree_commands::refresh_worktree_state,
