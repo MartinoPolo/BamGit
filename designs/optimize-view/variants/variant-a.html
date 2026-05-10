@@ -1,1828 +1,2098 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimize View — Variant A: Card Grid</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-/* ============================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Optimize View — Variant A: Card Grid</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ============================================================
    Grovekeeper design tokens — Forest Moss palette
    (inlined from tokens.css)
    ============================================================ */
 
-:root {
-  /* Brand greens (deep moss + olive) */
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
 
-  /* Olive / amber accent (autumn fruit) */
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
+			/* Light theme */
+			.theme-light,
+			[data-theme='light'] {
+				color-scheme: light;
+				--background: oklch(0.985 0.005 130);
+				--surface: oklch(1 0 0);
+				--surface-2: oklch(0.965 0.008 130);
+				--surface-hover: oklch(0.94 0.012 130);
+				--surface-3: oklch(0.94 0.012 130);
+				--foreground: oklch(0.205 0.015 145);
+				--foreground-muted: oklch(0.46 0.015 145);
+				--foreground-subtle: oklch(0.62 0.012 145);
+				--border: oklch(0.9 0.012 135);
+				--border-strong: oklch(0.815 0.018 135);
+				--primary: var(--moss-700);
+				--primary-fg: oklch(0.985 0.008 130);
+				--primary-soft: oklch(0.92 0.03 135);
+				--accent: var(--moss-500);
+				--accent-fg: oklch(0.985 0.008 130);
+				--ring: var(--moss-600);
+				--sidebar-bg: oklch(0.955 0.01 135);
+				--sidebar-fg: oklch(0.3 0.02 145);
+				--code-bg: oklch(0.955 0.01 135);
+				--sky-top: var(--sky-light-top);
+				--sky-bot: var(--sky-light-bot);
+				--ground-color: oklch(0.55 0.09 135);
+				--ground-dark: oklch(0.38 0.06 55);
+			}
 
-  /* Bark (warm brown for trunks, secondary accents) */
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
+			/* Dark theme — the primary mode for a Tauri dev tool */
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-  /* Azure (cool blue accent scale) */
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
 
-  /* Plum (purple accent) */
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
 
-  /* Teal (blue-green accent) */
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-  /* Rose (warm pink-red accent) */
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
+			/* Topographic line texture for forest canvas */
+			.gk-topo {
+				background-image: repeating-radial-gradient(
+					circle at 30% 70%,
+					transparent 0,
+					transparent 22px,
+					color-mix(in oklch, var(--foreground) 4%, transparent) 22px,
+					color-mix(in oklch, var(--foreground) 4%, transparent) 23px
+				);
+			}
 
-  /* Coral (warm orange-red accent) */
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
+			/* Grovekeeper component primitives */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, white 12%);
+			}
+			.theme-dark .gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-  /* Gold (warm yellow accent) */
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-  /* Sage (muted green accent) */
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
+			/* Badges */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
 
-  /* Indigo (deep blue-violet accent) */
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-  /* Fuchsia (vivid magenta accent) */
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
+			/* Type scale */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-  /* Sky (gradient bg for forest view) */
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 10px;
+				height: 10px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-  /* Status accents */
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
+			/* CodeBurn panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				min-width: 0;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
+			.cb-panel-sub {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 400;
+				color: var(--foreground-subtle);
+				text-transform: none;
+				letter-spacing: 0;
+				margin-left: auto;
+			}
 
-  /* Priority levels */
-  --priority-top:    oklch(0.620 0.205 25);
-  --priority-high:   oklch(0.720 0.160 55);
-  --priority-medium: oklch(0.820 0.160 85);
-  --priority-low:    oklch(0.660 0.105 220);
-  --priority-lowest: oklch(0.550 0.020 250);
+			/* findings */
+			.cb-finding {
+				border-left: 2px solid var(--border);
+				padding: 8px 10px 9px 10px;
+				background: color-mix(in oklch, var(--surface-2) 60%, transparent);
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			}
+			.cb-finding.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+			.cb-finding.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+			.cb-finding.is-low {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+			.cb-pri-high {
+				color: oklch(0.64 0.205 25);
+			}
+			.cb-pri-med {
+				color: oklch(0.77 0.155 75);
+			}
+			.cb-pri-low {
+				color: oklch(0.7 0.11 200);
+			}
 
-  /* GitHub state colors */
-  --gh-open:   oklch(0.660 0.135 145);
-  --gh-closed: oklch(0.580 0.140 310);
-  --gh-merged: oklch(0.580 0.140 310);
-  --gh-draft:  oklch(0.550 0.020 250);
+			/* Animations */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			@keyframes gk-flash {
+				0% {
+					background: var(--surface-2);
+				}
+				20% {
+					background: color-mix(in oklch, var(--status-success) 24%, transparent);
+				}
+				100% {
+					background: var(--surface-2);
+				}
+			}
+			.gk-flash {
+				animation: gk-flash 800ms ease-out;
+			}
 
-  /* Session state colors */
-  --session-running:      oklch(0.660 0.135 145);
-  --session-errored:      oklch(0.620 0.205 25);
-  --session-idle:         oklch(0.660 0.105 220);
-  --session-paused:       oklch(0.550 0.020 250);
-  --session-finished:     oklch(0.450 0.015 250);
-  --session-needs-input:  oklch(0.770 0.155 75);
-  --session-needs-review: oklch(0.660 0.105 220);
-
-  /* ── Typography ─────────────────────────────────────────── */
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-
-  /* Font sizes — minor-third-ish scale, tuned for a desktop dev tool */
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-
-  /* Line heights */
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-
-  /* Font weights */
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-
-  /* Letter spacing */
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-
-  /* ── Spacing scale (4px base) ───────────────────────────── */
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-
-  /* ── Radii ──────────────────────────────────────────────── */
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  /* ── Borders ────────────────────────────────────────────── */
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-
-  /* ── Shadows ────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  /* ── Sizing — control heights ──────────────────────────── */
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-
-  /* ── Z-index scale ─────────────────────────────────────── */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-
-  /* ── Motion ─────────────────────────────────────────────── */
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-
-  /* ── Layout ─────────────────────────────────────────────── */
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
-
-/* Light theme */
-.theme-light, [data-theme='light'] {
-  color-scheme: light;
-  --background:        oklch(0.985 0.005 130);
-  --surface:           oklch(1.000 0 0);
-  --surface-2:         oklch(0.965 0.008 130);
-  --surface-hover:     oklch(0.940 0.012 130);
-  --surface-3:         oklch(0.940 0.012 130);
-  --foreground:        oklch(0.205 0.015 145);
-  --foreground-muted:  oklch(0.460 0.015 145);
-  --foreground-subtle: oklch(0.620 0.012 145);
-  --border:            oklch(0.900 0.012 135);
-  --border-strong:     oklch(0.815 0.018 135);
-  --primary:           var(--moss-700);
-  --primary-fg:        oklch(0.985 0.008 130);
-  --primary-soft:      oklch(0.920 0.030 135);
-  --accent:            var(--moss-500);
-  --accent-fg:         oklch(0.985 0.008 130);
-  --ring:              var(--moss-600);
-  --sidebar-bg:        oklch(0.955 0.010 135);
-  --sidebar-fg:        oklch(0.300 0.020 145);
-  --code-bg:           oklch(0.955 0.010 135);
-  --sky-top:           var(--sky-light-top);
-  --sky-bot:           var(--sky-light-bot);
-  --ground-color:      oklch(0.550 0.090 135);
-  --ground-dark:       oklch(0.380 0.060 55);
-}
-
-/* Dark theme — the primary mode for a Tauri dev tool */
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
-
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.gk-root, .gk-root * {
-  box-sizing: border-box;
-}
-
-.font-mono { font-family: var(--font-mono); }
-
-/* Topographic line texture for forest canvas */
-.gk-topo {
-  background-image:
-    repeating-radial-gradient(
-      circle at 30% 70%,
-      transparent 0,
-      transparent 22px,
-      color-mix(in oklch, var(--foreground) 4%, transparent) 22px,
-      color-mix(in oklch, var(--foreground) 4%, transparent) 23px
-    );
-}
-
-/* Grovekeeper component primitives */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap;
-  user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.gk-btn-primary {
-  background: var(--primary);
-  color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, white 12%); }
-.theme-dark .gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost {
-  background: transparent;
-  color: var(--foreground-muted);
-}
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-
-/* Card */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-.gk-card-padded { padding: 16px; }
-
-/* Badges */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-
-/* Divider */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
-
-/* Type scale */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 10px; height: 10px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
-
-/* CodeBurn panel */
-.cb-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-.cb-panel-title {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--foreground-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed var(--border);
-}
-.cb-panel-title::before {
-  content: "[";
-  color: var(--foreground-subtle);
-  font-weight: 400;
-}
-.cb-panel-title::after {
-  content: "]";
-  color: var(--foreground-subtle);
-  font-weight: 400;
-  margin-right: auto;
-}
-.cb-panel-sub {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 400;
-  color: var(--foreground-subtle);
-  text-transform: none;
-  letter-spacing: 0;
-  margin-left: auto;
-}
-
-/* findings */
-.cb-finding {
-  border-left: 2px solid var(--border);
-  padding: 8px 10px 9px 10px;
-  background: color-mix(in oklch, var(--surface-2) 60%, transparent);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-}
-.cb-finding.is-high { border-left-color: oklch(0.640 0.205 25); }
-.cb-finding.is-med  { border-left-color: oklch(0.770 0.155 75); }
-.cb-finding.is-low  { border-left-color: oklch(0.700 0.110 200); }
-.cb-pri-high { color: oklch(0.640 0.205 25); }
-.cb-pri-med  { color: oklch(0.770 0.155 75); }
-.cb-pri-low  { color: oklch(0.700 0.110 200); }
-
-/* Animations */
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-@keyframes gk-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-@keyframes gk-flash {
-  0% { background: var(--surface-2); }
-  20% { background: color-mix(in oklch, var(--status-success) 24%, transparent); }
-  100% { background: var(--surface-2); }
-}
-.gk-flash { animation: gk-flash 800ms ease-out; }
-
-/* ============================================================
+			/* ============================================================
    OPTIMIZE VIEW — Variant A specific styles
    ============================================================ */
 
-/* Page wrapper */
-.ov-page {
-  min-height: 100vh;
-  padding: var(--space-16);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-  max-width: 1280px;
-  margin: 0 auto;
-}
-
-/* Variant label banner */
-.ov-variant-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-3) var(--space-6);
-  background: color-mix(in oklch, var(--primary) 10%, transparent);
-  border: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
-  border-radius: var(--radius-sm);
-  width: fit-content;
-}
-
-/* ── Hero health score card ─────────────────────────────── */
-.ov-hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  padding: var(--space-12) var(--space-16);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--space-12) var(--space-16);
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.ov-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-radial-gradient(
-      circle at 90% 50%,
-      transparent 0,
-      transparent 28px,
-      color-mix(in oklch, var(--foreground) 3%, transparent) 28px,
-      color-mix(in oklch, var(--foreground) 3%, transparent) 29px
-    );
-  pointer-events: none;
-}
-
-/* Ring chart */
-.ov-ring-wrap {
-  position: relative;
-  width: 104px;
-  height: 104px;
-  flex-shrink: 0;
-}
-
-.ov-ring-svg {
-  width: 104px;
-  height: 104px;
-  transform: rotate(-90deg);
-}
-
-.ov-ring-track {
-  fill: none;
-  stroke: var(--border);
-  stroke-width: 7;
-}
-
-.ov-ring-fill {
-  fill: none;
-  stroke: oklch(0.770 0.150 65);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-dasharray: 263;
-  stroke-dashoffset: 110;
-  filter: drop-shadow(0 0 6px oklch(0.770 0.150 65 / 0.5));
-  transition: stroke-dashoffset var(--duration-5) var(--ease-out);
-}
-
-.ov-ring-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-}
-
-.ov-grade-letter {
-  font-family: var(--font-sans);
-  font-size: 32px;
-  font-weight: var(--weight-bold);
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: oklch(0.770 0.150 65);
-}
-
-.ov-score-fraction {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.02em;
-}
-
-/* Hero text block */
-.ov-hero-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
-}
-
-.ov-hero-title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-}
-
-.ov-hero-subtitle {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
-
-/* Penalty chips row */
-.ov-penalties {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.ov-penalty-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 3px 8px 3px 6px;
-  border-radius: var(--radius-full);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  border: 1px solid;
-}
-
-.ov-penalty-chip.is-high {
-  background: color-mix(in oklch, oklch(0.640 0.205 25) 12%, transparent);
-  color: oklch(0.640 0.205 25);
-  border-color: color-mix(in oklch, oklch(0.640 0.205 25) 28%, transparent);
-}
-
-.ov-penalty-chip.is-med {
-  background: color-mix(in oklch, oklch(0.770 0.155 75) 12%, transparent);
-  color: oklch(0.800 0.140 75);
-  border-color: color-mix(in oklch, oklch(0.770 0.155 75) 28%, transparent);
-}
-
-.ov-penalty-chip.is-low {
-  background: color-mix(in oklch, oklch(0.700 0.110 200) 12%, transparent);
-  color: oklch(0.700 0.110 200);
-  border-color: color-mix(in oklch, oklch(0.700 0.110 200) 28%, transparent);
-}
-
-.ov-penalty-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-.ov-penalty-sep {
-  color: var(--border-strong);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  user-select: none;
-}
-
-/* Hero meta block (right column) */
-.ov-hero-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-6);
-  flex-shrink: 0;
-}
-
-.ov-scan-info {
-  text-align: right;
-}
-
-.ov-scan-label {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.ov-scan-value {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--foreground-muted);
-  margin-top: 2px;
-}
-
-/* Total savings estimate */
-.ov-savings-total {
-  text-align: right;
-  padding: var(--space-5) var(--space-6);
-  background: color-mix(in oklch, var(--status-success) 8%, transparent);
-  border: 1px solid color-mix(in oklch, var(--status-success) 22%, transparent);
-  border-radius: var(--radius-md);
-}
-
-.ov-savings-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--status-success);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.8;
-}
-
-.ov-savings-amount {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--status-success);
-  letter-spacing: -0.02em;
-  margin-top: 2px;
-}
-
-.ov-savings-period {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  margin-top: 1px;
-}
-
-/* ── Section header ─────────────────────────────────────── */
-.ov-section-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
-}
-
-.ov-section-rule {
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* Impact group label */
-.ov-group-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
-  margin-top: var(--space-16);
-}
-
-.ov-group-label:first-of-type {
-  margin-top: 0;
-}
-
-.ov-group-rule {
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* ── Finding cards grid ─────────────────────────────────── */
-.ov-findings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--space-8);
-}
-
-/* Individual finding card wrapper — elevates cb-finding */
-.ov-finding-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left-width: 3px;
-  border-left-color: var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  transition: box-shadow var(--duration-2) var(--ease-out), border-color var(--duration-2) var(--ease-out);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-}
-
-.ov-finding-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-strong);
-}
-
-.ov-finding-card:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-.ov-finding-card.is-high {
-  border-left-color: oklch(0.640 0.205 25);
-}
-
-.ov-finding-card.is-high:hover {
-  border-left-color: oklch(0.640 0.205 25);
-  border-color: color-mix(in oklch, oklch(0.640 0.205 25) 35%, var(--border));
-}
-
-.ov-finding-card.is-med {
-  border-left-color: oklch(0.770 0.155 75);
-}
-
-.ov-finding-card.is-med:hover {
-  border-left-color: oklch(0.770 0.155 75);
-  border-color: color-mix(in oklch, oklch(0.770 0.155 75) 35%, var(--border));
-}
-
-.ov-finding-card.is-low {
-  border-left-color: oklch(0.700 0.110 200);
-}
-
-.ov-finding-card.is-low:hover {
-  border-left-color: oklch(0.700 0.110 200);
-  border-color: color-mix(in oklch, oklch(0.700 0.110 200) 35%, var(--border));
-}
-
-/* Finding card body */
-.ov-finding-body {
-  padding: var(--space-8) var(--space-10);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.ov-finding-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.ov-finding-title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-snug);
-  line-height: var(--leading-snug);
-  color: var(--foreground);
-  flex: 1;
-  min-width: 0;
-}
-
-.ov-finding-summary {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-normal);
-}
-
-/* Savings row */
-.ov-finding-savings {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.ov-savings-token {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--foreground-muted);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  padding: 2px 6px;
-}
-
-.ov-savings-token svg {
-  color: var(--foreground-subtle);
-}
-
-.ov-savings-cost {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--status-success);
-  background: color-mix(in oklch, var(--status-success) 10%, transparent);
-  border: 1px solid color-mix(in oklch, var(--status-success) 22%, transparent);
-  border-radius: var(--radius-xs);
-  padding: 2px 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-/* Expand toggle */
-.ov-finding-expand-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-10);
-  border-top: 1px solid var(--border);
-  background: transparent;
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  width: 100%;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  color: var(--foreground-subtle);
-  transition: background var(--duration-2) ease, color var(--duration-2) ease;
-  text-align: left;
-}
-
-.ov-finding-expand-btn:hover {
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-}
-
-.ov-finding-expand-btn:active {
-  background: var(--surface-3);
-  transform: none;
-}
-
-.ov-finding-expand-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-}
-
-.ov-expand-chevron {
-  width: 14px;
-  height: 14px;
-  color: var(--foreground-subtle);
-  transition: transform var(--duration-3) var(--ease-out);
-  flex-shrink: 0;
-}
-
-.ov-finding-card.is-expanded .ov-expand-chevron {
-  transform: rotate(180deg);
-}
-
-/* Expanded detail panel */
-.ov-finding-detail {
-  display: none;
-  padding: var(--space-8) var(--space-10);
-  border-top: 1px solid var(--border);
-  background: color-mix(in oklch, var(--background) 60%, transparent);
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.ov-finding-card.is-expanded .ov-finding-detail {
-  display: flex;
-}
-
-.ov-detail-label {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: var(--space-3);
-}
-
-.ov-detail-text {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  line-height: var(--leading-relaxed);
-}
-
-/* Command block */
-.ov-command-block {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-5) var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.ov-command-text {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--primary);
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ov-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 3px 8px;
-  height: 22px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--foreground-subtle);
-  transition: background var(--duration-2) ease, border-color var(--duration-2) ease, color var(--duration-2) ease;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.ov-copy-btn:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-  color: var(--foreground);
-}
-
-.ov-copy-btn:active {
-  transform: scale(0.96);
-}
-
-.ov-copy-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-.ov-copy-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.ov-copy-btn.copied {
-  animation: gk-flash 800ms ease-out;
-  color: var(--status-success);
-  border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
-}
-
-/* Detail stat row */
-.ov-detail-stats {
-  display: flex;
-  gap: var(--space-8);
-  flex-wrap: wrap;
-}
-
-.ov-detail-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ov-detail-stat-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.ov-detail-stat-value {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.ov-detail-stat-value.is-bad {
-  color: oklch(0.640 0.205 25);
-}
-
-.ov-detail-stat-value.is-target {
-  color: var(--status-success);
-}
-
-/* Rescan button row */
-.ov-rescan-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-8);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
-}
-
-.ov-last-scan {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--foreground-subtle);
-}
-
-/* ── Grade color helpers ─────────────────────────────────── */
-.grade-a, .grade-b { color: var(--status-success); }
-.grade-c           { color: oklch(0.770 0.150 65); }
-.grade-d           { color: oklch(0.700 0.155 45); }
-.grade-f           { color: var(--status-danger); }
-
-/* Impact badge pill */
-.ov-impact-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border: 1px solid;
-  flex-shrink: 0;
-  height: 18px;
-}
-
-.ov-impact-badge.is-high {
-  background: color-mix(in oklch, oklch(0.640 0.205 25) 13%, transparent);
-  color: oklch(0.640 0.205 25);
-  border-color: color-mix(in oklch, oklch(0.640 0.205 25) 28%, transparent);
-}
-
-.ov-impact-badge.is-med {
-  background: color-mix(in oklch, oklch(0.770 0.155 75) 13%, transparent);
-  color: oklch(0.820 0.135 75);
-  border-color: color-mix(in oklch, oklch(0.770 0.155 75) 28%, transparent);
-}
-
-.ov-impact-badge.is-low {
-  background: color-mix(in oklch, oklch(0.700 0.110 200) 13%, transparent);
-  color: oklch(0.700 0.110 200);
-  border-color: color-mix(in oklch, oklch(0.700 0.110 200) 28%, transparent);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .ov-hero {
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-  }
-
-  .ov-hero-meta {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .ov-savings-total {
-    text-align: left;
-  }
-
-  .ov-scan-info {
-    text-align: left;
-  }
-}
-
-@media (max-width: 480px) {
-  .ov-page {
-    padding: var(--space-8);
-    gap: var(--space-10);
-  }
-
-  .ov-hero {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .ov-ring-wrap {
-    margin: 0 auto;
-  }
-
-  .ov-hero-meta {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .ov-savings-total {
-    text-align: center;
-  }
-
-  .ov-findings-grid {
-    grid-template-columns: 1fr;
-  }
-}
-  </style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="ov-page">
-
-    <!-- Variant label -->
-    <div class="ov-variant-banner">
-      <span class="gk-eyebrow">Variant A — Card Grid</span>
-      <span class="gk-tiny">&middot; Optimize View &middot; Waste Detection Panel</span>
-    </div>
-
-    <!-- ── Hero: Health Score ─────────────────────────────── -->
-    <div class="ov-hero">
-
-      <!-- Ring chart -->
-      <div class="ov-ring-wrap" role="img" aria-label="Health score: 58 out of 100, grade C">
-        <svg class="ov-ring-svg" viewBox="0 0 104 104" aria-hidden="true">
-          <!-- track -->
-          <circle class="ov-ring-track" cx="52" cy="52" r="42" />
-          <!-- fill: circumference ≈ 263.9; offset = 263.9 * (1 - 0.58) = 110.8 -->
-          <circle class="ov-ring-fill" cx="52" cy="52" r="42" />
-        </svg>
-        <div class="ov-ring-center">
-          <span class="ov-grade-letter grade-c">C</span>
-          <span class="ov-score-fraction">58/100</span>
-        </div>
-      </div>
-
-      <!-- Body text -->
-      <div class="ov-hero-body">
-        <h1 class="ov-hero-title">Session Health Score</h1>
-        <p class="ov-hero-subtitle">
-          Analysed 47 sessions across 3 workspaces &mdash; last 30 days.
-          Token waste patterns detected across tool usage, config, and file reads.
-        </p>
-
-        <div class="ov-penalties" role="list" aria-label="Penalty breakdown">
-          <div class="ov-penalty-chip is-high" role="listitem">
-            <span class="ov-penalty-dot" aria-hidden="true"></span>
-            3 high
-          </div>
-          <span class="ov-penalty-sep" aria-hidden="true">&middot;</span>
-          <div class="ov-penalty-chip is-med" role="listitem">
-            <span class="ov-penalty-dot" aria-hidden="true"></span>
-            2 medium
-          </div>
-          <span class="ov-penalty-sep" aria-hidden="true">&middot;</span>
-          <div class="ov-penalty-chip is-low" role="listitem">
-            <span class="ov-penalty-dot" aria-hidden="true"></span>
-            1 low
-          </div>
-        </div>
-      </div>
-
-      <!-- Meta / savings -->
-      <div class="ov-hero-meta">
-        <div class="ov-scan-info">
-          <div class="ov-scan-label">Last scan</div>
-          <div class="ov-scan-value">2 min ago</div>
-        </div>
-        <div class="ov-savings-total" aria-label="Estimated savings: $0.14 per session">
-          <div class="ov-savings-label">Est. savings / session</div>
-          <div class="ov-savings-amount">$0.14</div>
-          <div class="ov-savings-period">~12,600 tokens recoverable</div>
-        </div>
-      </div>
-
-    </div><!-- /hero -->
-
-    <!-- ── Findings ────────────────────────────────────────── -->
-    <section aria-label="Findings">
-
-      <!-- Rescan row -->
-      <div class="ov-rescan-row">
-        <div style="display:flex; align-items:center; gap: 8px;">
-          <span class="gk-h2" style="font-size: var(--text-lg);">Findings</span>
-          <span class="gk-badge">6 issues</span>
-        </div>
-        <div style="display:flex; gap: 8px; align-items:center;">
-          <span class="ov-last-scan">Scanned 47 sessions · grovekeeper-web, grovekeeper-api, low-poly-2d-trees</span>
-          <button class="gk-btn gk-btn-secondary gk-btn-sm" type="button" aria-label="Re-scan sessions">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M13.5 8a5.5 5.5 0 1 1-1.1-3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M13.5 3.5V7h-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Re-scan
-          </button>
-          <button class="gk-btn gk-btn-ghost gk-btn-sm" type="button" aria-label="Filter findings" disabled>
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M2 4h12M5 8h6M7.5 12h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            Filter
-          </button>
-        </div>
-      </div>
-
-      <!-- ── HIGH impact group ─── -->
-      <div class="ov-group-label" role="heading" aria-level="3">
-        <span class="gk-eyebrow cb-pri-high" style="font-size: 10.5px; letter-spacing: 0.08em;">High impact</span>
-        <div class="ov-group-rule" aria-hidden="true"></div>
-        <span class="gk-tiny">Fixing these recovers ~$0.10/session</span>
-      </div>
-
-      <div class="ov-findings-grid" role="list">
-
-        <!-- Card 1: Reading junk directories — HIGH, EXPANDED -->
-        <article
-          class="ov-finding-card is-high is-expanded cb-finding"
-          role="listitem"
-          tabindex="0"
-          aria-expanded="true"
-          aria-label="Finding: Reading junk directories, high impact"
-        >
-          <div class="ov-finding-body">
-            <div class="ov-finding-header">
-              <h4 class="ov-finding-title">Reading junk directories</h4>
-              <span class="ov-impact-badge is-high" aria-label="Impact: High">High</span>
-            </div>
-            <p class="ov-finding-summary">
-              Claude is reading <code style="font-family: var(--font-mono); font-size: 11px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px;">node_modules/</code>, <code style="font-family: var(--font-mono); font-size: 11px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px;">.git/</code>, and <code style="font-family: var(--font-mono); font-size: 11px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px;">dist/</code> on glob calls — contents are never edited.
-            </p>
-            <div class="ov-finding-savings" aria-label="Estimated savings">
-              <span class="ov-savings-token" aria-label="7,200 tokens saved">
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
-                  <path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                </svg>
-                ~7,200 tok
-              </span>
-              <span class="ov-savings-cost" aria-label="$0.04 saved per session">&#x2193; $0.04/session</span>
-            </div>
-          </div>
-
-          <!-- Expand toggle -->
-          <button
-            class="ov-finding-expand-btn"
-            type="button"
-            aria-expanded="true"
-            aria-controls="detail-1"
-          >
-            <span>Fix &amp; details</span>
-            <svg class="ov-expand-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-
-          <!-- Expanded detail -->
-          <div class="ov-finding-detail" id="detail-1" role="region" aria-label="Finding detail">
-            <div>
-              <div class="ov-detail-label">Why it hurts</div>
-              <p class="ov-detail-text">
-                Glob patterns without exclusions pull thousands of files into context on each invocation.
-                These directories contain no editable source &mdash; they inflate context without value.
-              </p>
-            </div>
-
-            <div class="ov-detail-stats" role="list">
-              <div class="ov-detail-stat" role="listitem">
-                <span class="ov-detail-stat-label">Detected dirs</span>
-                <span class="ov-detail-stat-value is-bad">node_modules, .git, dist</span>
-              </div>
-              <div class="ov-detail-stat" role="listitem">
-                <span class="ov-detail-stat-label">Avg files read</span>
-                <span class="ov-detail-stat-value is-bad">1,847 / session</span>
-              </div>
-              <div class="ov-detail-stat" role="listitem">
-                <span class="ov-detail-stat-label">Target</span>
-                <span class="ov-detail-stat-value is-target">&lt; 80 / session</span>
-              </div>
-            </div>
-
-            <div>
-              <div class="ov-detail-label">Recommended fix — add to CLAUDE.md</div>
-              <div class="ov-command-block">
-                <span class="ov-command-text" aria-label="CLAUDE.md rule">## Glob exclusions&#10;Never read: node_modules/, .git/, dist/, .next/, coverage/</span>
-                <button
-                  class="ov-copy-btn"
-                  type="button"
-                  aria-label="Copy fix to clipboard"
-                  onclick="
-                    this.textContent = 'Copied!';
-                    this.classList.add('copied');
-                    const self = this;
-                    setTimeout(() => {
-                      self.textContent = 'Copy';
-                      self.classList.remove('copied');
-                    }, 1800);
-                  "
-                >Copy</button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 2: Duplicate file reads — HIGH -->
-        <article
-          class="ov-finding-card is-high cb-finding"
-          role="listitem"
-          tabindex="0"
-          aria-expanded="false"
-          aria-label="Finding: Duplicate file reads, high impact"
-        >
-          <div class="ov-finding-body">
-            <div class="ov-finding-header">
-              <h4 class="ov-finding-title">Duplicate file reads</h4>
-              <span class="ov-impact-badge is-high" aria-label="Impact: High">High</span>
-            </div>
-            <p class="ov-finding-summary">
-              Same files re-read multiple times per session without edits between reads — common in long planning loops.
-            </p>
-            <div class="ov-finding-savings">
-              <span class="ov-savings-token">~4,800 tok</span>
-              <span class="ov-savings-cost">&#x2193; $0.03/session</span>
-            </div>
-          </div>
-          <button
-            class="ov-finding-expand-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="detail-2"
-            onclick="
-              const card = this.closest('.ov-finding-card');
-              const expanded = card.classList.toggle('is-expanded');
-              this.setAttribute('aria-expanded', expanded);
-            "
-          >
-            <span>Fix &amp; details</span>
-            <svg class="ov-expand-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="ov-finding-detail" id="detail-2" role="region" aria-label="Finding detail">
-            <div>
-              <div class="ov-detail-label">Why it hurts</div>
-              <p class="ov-detail-text">
-                Re-reading unchanged files burns input tokens on content already in the context window.
-                The top offender is <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">src/routes/+layout.svelte</code> — read 6× on average per session.
-              </p>
-            </div>
-            <div class="ov-detail-stats">
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Top offender</span>
-                <span class="ov-detail-stat-value is-bad">+layout.svelte ×6</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Avg duplicate reads</span>
-                <span class="ov-detail-stat-value is-bad">14 / session</span>
-              </div>
-            </div>
-            <div>
-              <div class="ov-detail-label">Recommended instruction</div>
-              <div class="ov-command-block">
-                <span class="ov-command-text">Do not re-read files already in context unless content has changed.</span>
-                <button
-                  class="ov-copy-btn"
-                  type="button"
-                  aria-label="Copy fix to clipboard"
-                  onclick="
-                    this.textContent = 'Copied!';
-                    this.classList.add('copied');
-                    const self = this;
-                    setTimeout(() => {
-                      self.textContent = 'Copy';
-                      self.classList.remove('copied');
-                    }, 1800);
-                  "
-                >Copy</button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 3: Low read/edit ratio — HIGH -->
-        <article
-          class="ov-finding-card is-high cb-finding"
-          role="listitem"
-          tabindex="0"
-          aria-expanded="false"
-          aria-label="Finding: Low read/edit ratio, high impact"
-        >
-          <div class="ov-finding-body">
-            <div class="ov-finding-header">
-              <h4 class="ov-finding-title">Low read/edit ratio</h4>
-              <span class="ov-impact-badge is-high" aria-label="Impact: High">High</span>
-            </div>
-            <p class="ov-finding-summary">
-              Current ratio is 2.1:1 — Claude reads 2.1 files for every file it edits. Healthy sessions average 4:1 or better.
-            </p>
-            <div class="ov-finding-savings">
-              <span class="ov-savings-token">efficiency loss</span>
-              <span style="
-                font-family: var(--font-mono);
-                font-size: 11px;
-                color: oklch(0.640 0.205 25);
-                background: color-mix(in oklch, oklch(0.640 0.205 25) 10%, transparent);
-                border: 1px solid color-mix(in oklch, oklch(0.640 0.205 25) 22%, transparent);
-                border-radius: var(--radius-xs);
-                padding: 2px 6px;
-                display: inline-flex;
-                align-items: center;
-              ">2.1:1 &nbsp;&nbsp;<span style="opacity:0.5;">(need ≥4:1)</span></span>
-            </div>
-          </div>
-          <button
-            class="ov-finding-expand-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="detail-3"
-            onclick="
-              const card = this.closest('.ov-finding-card');
-              const expanded = card.classList.toggle('is-expanded');
-              this.setAttribute('aria-expanded', expanded);
-            "
-          >
-            <span>Fix &amp; details</span>
-            <svg class="ov-expand-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="ov-finding-detail" id="detail-3" role="region" aria-label="Finding detail">
-            <div>
-              <div class="ov-detail-label">What this means</div>
-              <p class="ov-detail-text">
-                Exploration-heavy sessions with little output signal over-planning or unclear scope. Improving task instructions to be more specific tends to push this ratio above 4:1.
-              </p>
-            </div>
-            <div class="ov-detail-stats">
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Current ratio</span>
-                <span class="ov-detail-stat-value is-bad">2.1 : 1</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Healthy baseline</span>
-                <span class="ov-detail-stat-value is-target">≥ 4.0 : 1</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Sessions affected</span>
-                <span class="ov-detail-stat-value">31 / 47</span>
-              </div>
-            </div>
-            <div>
-              <div class="ov-detail-label">Add to task prompts</div>
-              <div class="ov-command-block">
-                <span class="ov-command-text">Read only files you plan to edit or directly reference in your response.</span>
-                <button
-                  class="ov-copy-btn"
-                  type="button"
-                  aria-label="Copy fix to clipboard"
-                  onclick="
-                    this.textContent = 'Copied!';
-                    this.classList.add('copied');
-                    const self = this;
-                    setTimeout(() => {
-                      self.textContent = 'Copy';
-                      self.classList.remove('copied');
-                    }, 1800);
-                  "
-                >Copy</button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-      </div><!-- /high grid -->
-
-      <!-- ── MEDIUM impact group ─── -->
-      <div class="ov-group-label" role="heading" aria-level="3">
-        <span class="gk-eyebrow cb-pri-med" style="font-size: 10.5px; letter-spacing: 0.08em;">Medium impact</span>
-        <div class="ov-group-rule" aria-hidden="true"></div>
-        <span class="gk-tiny">Fixing these recovers ~$0.03/session</span>
-      </div>
-
-      <div class="ov-findings-grid" role="list">
-
-        <!-- Card 4: Unused MCP servers — MEDIUM -->
-        <article
-          class="ov-finding-card is-med cb-finding"
-          role="listitem"
-          tabindex="0"
-          aria-expanded="false"
-          aria-label="Finding: Unused MCP servers, medium impact"
-        >
-          <div class="ov-finding-body">
-            <div class="ov-finding-header">
-              <h4 class="ov-finding-title">Unused MCP servers</h4>
-              <span class="ov-impact-badge is-med" aria-label="Impact: Medium">Med</span>
-            </div>
-            <p class="ov-finding-summary">
-              2 MCP servers are loaded on every session start but never called — wasting initialisation overhead and tool-list tokens.
-            </p>
-            <div class="ov-finding-savings">
-              <span class="ov-savings-token">tool context overhead</span>
-              <span class="ov-savings-cost">&#x2193; $0.01/session</span>
-            </div>
-          </div>
-          <button
-            class="ov-finding-expand-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="detail-4"
-            onclick="
-              const card = this.closest('.ov-finding-card');
-              const expanded = card.classList.toggle('is-expanded');
-              this.setAttribute('aria-expanded', expanded);
-            "
-          >
-            <span>Fix &amp; details</span>
-            <svg class="ov-expand-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="ov-finding-detail" id="detail-4" role="region" aria-label="Finding detail">
-            <div>
-              <div class="ov-detail-label">Unused servers detected</div>
-              <p class="ov-detail-text">
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">@linear/mcp-server</code> and
-                <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">@figma/mcp</code>
-                were loaded across 47 sessions but called 0 times. Each adds ~340 tokens of tool definitions to every context.
-              </p>
-            </div>
-            <div class="ov-detail-stats">
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Servers</span>
-                <span class="ov-detail-stat-value is-bad">2 idle</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Tool definitions</span>
-                <span class="ov-detail-stat-value is-bad">~680 tok overhead</span>
-              </div>
-            </div>
-            <div>
-              <div class="ov-detail-label">Remove from .claude/settings.json</div>
-              <div class="ov-command-block">
-                <span class="ov-command-text">Remove "mcpServers": { "@linear/mcp-server", "@figma/mcp" }</span>
-                <button
-                  class="ov-copy-btn"
-                  type="button"
-                  aria-label="Copy fix to clipboard"
-                  onclick="
-                    this.textContent = 'Copied!';
-                    this.classList.add('copied');
-                    const self = this;
-                    setTimeout(() => {
-                      self.textContent = 'Copy';
-                      self.classList.remove('copied');
-                    }, 1800);
-                  "
-                >Copy</button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Card 5: Bloated CLAUDE.md — MEDIUM -->
-        <article
-          class="ov-finding-card is-med cb-finding"
-          role="listitem"
-          tabindex="0"
-          aria-expanded="false"
-          aria-label="Finding: Bloated CLAUDE.md, medium impact"
-        >
-          <div class="ov-finding-body">
-            <div class="ov-finding-header">
-              <h4 class="ov-finding-title">Bloated CLAUDE.md</h4>
-              <span class="ov-impact-badge is-med" aria-label="Impact: Medium">Med</span>
-            </div>
-            <p class="ov-finding-summary">
-              Your CLAUDE.md is 847 lines — injected on every session start. Recommended maximum is 400 lines for clean context budgets.
-            </p>
-            <div class="ov-finding-savings">
-              <span class="ov-savings-token">~2,100 tok/session</span>
-              <span class="ov-savings-cost">&#x2193; $0.02/session</span>
-            </div>
-          </div>
-          <button
-            class="ov-finding-expand-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="detail-5"
-            onclick="
-              const card = this.closest('.ov-finding-card');
-              const expanded = card.classList.toggle('is-expanded');
-              this.setAttribute('aria-expanded', expanded);
-            "
-          >
-            <span>Fix &amp; details</span>
-            <svg class="ov-expand-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="ov-finding-detail" id="detail-5" role="region" aria-label="Finding detail">
-            <div>
-              <div class="ov-detail-label">Bloat breakdown</div>
-              <p class="ov-detail-text">
-                Large sections of your CLAUDE.md contain module documentation that is rarely referenced mid-session. Consider moving verbose docs to <code style="font-family: var(--font-mono); font-size: 11px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px;">@-included</code> files loaded only when relevant.
-              </p>
-            </div>
-            <div class="ov-detail-stats">
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Current lines</span>
-                <span class="ov-detail-stat-value is-bad">847</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Recommended</span>
-                <span class="ov-detail-stat-value is-target">&lt; 400</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Est. trimmed tokens</span>
-                <span class="ov-detail-stat-value is-target">~2,100</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-      </div><!-- /medium grid -->
-
-      <!-- ── LOW impact group ─── -->
-      <div class="ov-group-label" role="heading" aria-level="3">
-        <span class="gk-eyebrow cb-pri-low" style="font-size: 10.5px; letter-spacing: 0.08em;">Low impact</span>
-        <div class="ov-group-rule" aria-hidden="true"></div>
-        <span class="gk-tiny">Minor config tweaks</span>
-      </div>
-
-      <div class="ov-findings-grid" role="list">
-
-        <!-- Card 6: Bash output limit — LOW -->
-        <article
-          class="ov-finding-card is-low cb-finding"
-          role="listitem"
-          tabindex="0"
-          aria-expanded="false"
-          aria-label="Finding: Bash output limit, low impact"
-        >
-          <div class="ov-finding-body">
-            <div class="ov-finding-header">
-              <h4 class="ov-finding-title">Bash output limit not set</h4>
-              <span class="ov-impact-badge is-low" aria-label="Impact: Low">Low</span>
-            </div>
-            <p class="ov-finding-summary">
-              <code style="font-family: var(--font-mono); font-size: 11px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px;">BASH_SILENCE_DEPRECATION_WARNING</code> is not set — macOS deprecation warnings inflate bash tool output on every invocation.
-            </p>
-            <div class="ov-finding-savings">
-              <span class="ov-savings-token">~60 tok/bash call</span>
-              <span class="ov-savings-cost">&#x2193; $0.00/session</span>
-            </div>
-          </div>
-          <button
-            class="ov-finding-expand-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="detail-6"
-            onclick="
-              const card = this.closest('.ov-finding-card');
-              const expanded = card.classList.toggle('is-expanded');
-              this.setAttribute('aria-expanded', expanded);
-            "
-          >
-            <span>Fix &amp; details</span>
-            <svg class="ov-expand-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="ov-finding-detail" id="detail-6" role="region" aria-label="Finding detail">
-            <div>
-              <div class="ov-detail-label">One-line fix — add to shell profile</div>
-              <div class="ov-command-block">
-                <span class="ov-command-text">export BASH_SILENCE_DEPRECATION_WARNING=1</span>
-                <button
-                  class="ov-copy-btn"
-                  type="button"
-                  aria-label="Copy fix to clipboard"
-                  onclick="
-                    this.textContent = 'Copied!';
-                    this.classList.add('copied');
-                    const self = this;
-                    setTimeout(() => {
-                      self.textContent = 'Copy';
-                      self.classList.remove('copied');
-                    }, 1800);
-                  "
-                >Copy</button>
-              </div>
-            </div>
-            <div class="ov-detail-stats">
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Bash calls / session</span>
-                <span class="ov-detail-stat-value">~23</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">Warning lines / call</span>
-                <span class="ov-detail-stat-value is-bad">4</span>
-              </div>
-              <div class="ov-detail-stat">
-                <span class="ov-detail-stat-label">After fix</span>
-                <span class="ov-detail-stat-value is-target">0</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-      </div><!-- /low grid -->
-
-    </section><!-- /findings -->
-
-  </div><!-- /ov-page -->
-</div><!-- /gk-root -->
-
-<script>
-  // Wire all expand/collapse buttons — inline onclick on cards 2-6 is overridden here
-  // so all cards share the same logic path.
-  document.querySelectorAll('.ov-finding-expand-btn').forEach(function (btn) {
-    btn.onclick = function () {
-      const card = btn.closest('.ov-finding-card');
-      const nowExpanded = card.classList.toggle('is-expanded');
-      btn.setAttribute('aria-expanded', String(nowExpanded));
-      card.setAttribute('aria-expanded', String(nowExpanded));
-    };
-  });
-</script>
-</body>
+			/* Page wrapper */
+			.ov-page {
+				min-height: 100vh;
+				padding: var(--space-16);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-16);
+				max-width: 1280px;
+				margin: 0 auto;
+			}
+
+			/* Variant label banner */
+			.ov-variant-banner {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-3) var(--space-6);
+				background: color-mix(in oklch, var(--primary) 10%, transparent);
+				border: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
+				border-radius: var(--radius-sm);
+				width: fit-content;
+			}
+
+			/* ── Hero health score card ─────────────────────────────── */
+			.ov-hero {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-md);
+				padding: var(--space-12) var(--space-16);
+				display: grid;
+				grid-template-columns: auto 1fr auto;
+				gap: var(--space-12) var(--space-16);
+				align-items: center;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.ov-hero::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background: repeating-radial-gradient(
+					circle at 90% 50%,
+					transparent 0,
+					transparent 28px,
+					color-mix(in oklch, var(--foreground) 3%, transparent) 28px,
+					color-mix(in oklch, var(--foreground) 3%, transparent) 29px
+				);
+				pointer-events: none;
+			}
+
+			/* Ring chart */
+			.ov-ring-wrap {
+				position: relative;
+				width: 104px;
+				height: 104px;
+				flex-shrink: 0;
+			}
+
+			.ov-ring-svg {
+				width: 104px;
+				height: 104px;
+				transform: rotate(-90deg);
+			}
+
+			.ov-ring-track {
+				fill: none;
+				stroke: var(--border);
+				stroke-width: 7;
+			}
+
+			.ov-ring-fill {
+				fill: none;
+				stroke: oklch(0.77 0.15 65);
+				stroke-width: 7;
+				stroke-linecap: round;
+				stroke-dasharray: 263;
+				stroke-dashoffset: 110;
+				filter: drop-shadow(0 0 6px oklch(0.77 0.15 65 / 0.5));
+				transition: stroke-dashoffset var(--duration-5) var(--ease-out);
+			}
+
+			.ov-ring-center {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 1px;
+			}
+
+			.ov-grade-letter {
+				font-family: var(--font-sans);
+				font-size: 32px;
+				font-weight: var(--weight-bold);
+				line-height: 1;
+				letter-spacing: -0.03em;
+				color: oklch(0.77 0.15 65);
+			}
+
+			.ov-score-fraction {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.02em;
+			}
+
+			/* Hero text block */
+			.ov-hero-body {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+				min-width: 0;
+			}
+
+			.ov-hero-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+
+			.ov-hero-subtitle {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+
+			/* Penalty chips row */
+			.ov-penalties {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				margin-top: var(--space-2);
+				flex-wrap: wrap;
+			}
+
+			.ov-penalty-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-2);
+				padding: 3px 8px 3px 6px;
+				border-radius: var(--radius-full);
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 500;
+				border: 1px solid;
+			}
+
+			.ov-penalty-chip.is-high {
+				background: color-mix(in oklch, oklch(0.64 0.205 25) 12%, transparent);
+				color: oklch(0.64 0.205 25);
+				border-color: color-mix(in oklch, oklch(0.64 0.205 25) 28%, transparent);
+			}
+
+			.ov-penalty-chip.is-med {
+				background: color-mix(in oklch, oklch(0.77 0.155 75) 12%, transparent);
+				color: oklch(0.8 0.14 75);
+				border-color: color-mix(in oklch, oklch(0.77 0.155 75) 28%, transparent);
+			}
+
+			.ov-penalty-chip.is-low {
+				background: color-mix(in oklch, oklch(0.7 0.11 200) 12%, transparent);
+				color: oklch(0.7 0.11 200);
+				border-color: color-mix(in oklch, oklch(0.7 0.11 200) 28%, transparent);
+			}
+
+			.ov-penalty-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+
+			.ov-penalty-sep {
+				color: var(--border-strong);
+				font-family: var(--font-mono);
+				font-size: 12px;
+				user-select: none;
+			}
+
+			/* Hero meta block (right column) */
+			.ov-hero-meta {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-6);
+				flex-shrink: 0;
+			}
+
+			.ov-scan-info {
+				text-align: right;
+			}
+
+			.ov-scan-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+			}
+
+			.ov-scan-value {
+				font-family: var(--font-mono);
+				font-size: 13px;
+				color: var(--foreground-muted);
+				margin-top: 2px;
+			}
+
+			/* Total savings estimate */
+			.ov-savings-total {
+				text-align: right;
+				padding: var(--space-5) var(--space-6);
+				background: color-mix(in oklch, var(--status-success) 8%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-success) 22%, transparent);
+				border-radius: var(--radius-md);
+			}
+
+			.ov-savings-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--status-success);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				opacity: 0.8;
+			}
+
+			.ov-savings-amount {
+				font-family: var(--font-mono);
+				font-size: 20px;
+				font-weight: 600;
+				color: var(--status-success);
+				letter-spacing: -0.02em;
+				margin-top: 2px;
+			}
+
+			.ov-savings-period {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				margin-top: 1px;
+			}
+
+			/* ── Section header ─────────────────────────────────────── */
+			.ov-section-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-8);
+			}
+
+			.ov-section-rule {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* Impact group label */
+			.ov-group-label {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				margin-bottom: var(--space-8);
+				margin-top: var(--space-16);
+			}
+
+			.ov-group-label:first-of-type {
+				margin-top: 0;
+			}
+
+			.ov-group-rule {
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			/* ── Finding cards grid ─────────────────────────────────── */
+			.ov-findings-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+				gap: var(--space-8);
+			}
+
+			/* Individual finding card wrapper — elevates cb-finding */
+			.ov-finding-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-left-width: 3px;
+				border-left-color: var(--border);
+				border-radius: var(--radius-md);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+				transition:
+					box-shadow var(--duration-2) var(--ease-out),
+					border-color var(--duration-2) var(--ease-out);
+				cursor: pointer;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.ov-finding-card:hover {
+				box-shadow: var(--shadow-md);
+				border-color: var(--border-strong);
+			}
+
+			.ov-finding-card:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			.ov-finding-card.is-high {
+				border-left-color: oklch(0.64 0.205 25);
+			}
+
+			.ov-finding-card.is-high:hover {
+				border-left-color: oklch(0.64 0.205 25);
+				border-color: color-mix(in oklch, oklch(0.64 0.205 25) 35%, var(--border));
+			}
+
+			.ov-finding-card.is-med {
+				border-left-color: oklch(0.77 0.155 75);
+			}
+
+			.ov-finding-card.is-med:hover {
+				border-left-color: oklch(0.77 0.155 75);
+				border-color: color-mix(in oklch, oklch(0.77 0.155 75) 35%, var(--border));
+			}
+
+			.ov-finding-card.is-low {
+				border-left-color: oklch(0.7 0.11 200);
+			}
+
+			.ov-finding-card.is-low:hover {
+				border-left-color: oklch(0.7 0.11 200);
+				border-color: color-mix(in oklch, oklch(0.7 0.11 200) 35%, var(--border));
+			}
+
+			/* Finding card body */
+			.ov-finding-body {
+				padding: var(--space-8) var(--space-10);
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.ov-finding-header {
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: var(--space-4);
+			}
+
+			.ov-finding-title {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+				flex: 1;
+				min-width: 0;
+			}
+
+			.ov-finding-summary {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+
+			/* Savings row */
+			.ov-finding-savings {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-top: var(--space-2);
+				flex-wrap: wrap;
+			}
+
+			.ov-savings-token {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-muted);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				padding: 2px 6px;
+			}
+
+			.ov-savings-token svg {
+				color: var(--foreground-subtle);
+			}
+
+			.ov-savings-cost {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--status-success);
+				background: color-mix(in oklch, var(--status-success) 10%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-success) 22%, transparent);
+				border-radius: var(--radius-xs);
+				padding: 2px 6px;
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-1);
+			}
+
+			/* Expand toggle */
+			.ov-finding-expand-btn {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-4) var(--space-10);
+				border-top: 1px solid var(--border);
+				background: transparent;
+				border-left: none;
+				border-right: none;
+				border-bottom: none;
+				width: 100%;
+				cursor: pointer;
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				color: var(--foreground-subtle);
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease;
+				text-align: left;
+			}
+
+			.ov-finding-expand-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+			}
+
+			.ov-finding-expand-btn:active {
+				background: var(--surface-3);
+				transform: none;
+			}
+
+			.ov-finding-expand-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: -2px;
+			}
+
+			.ov-expand-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				transition: transform var(--duration-3) var(--ease-out);
+				flex-shrink: 0;
+			}
+
+			.ov-finding-card.is-expanded .ov-expand-chevron {
+				transform: rotate(180deg);
+			}
+
+			/* Expanded detail panel */
+			.ov-finding-detail {
+				display: none;
+				padding: var(--space-8) var(--space-10);
+				border-top: 1px solid var(--border);
+				background: color-mix(in oklch, var(--background) 60%, transparent);
+				flex-direction: column;
+				gap: var(--space-6);
+			}
+
+			.ov-finding-card.is-expanded .ov-finding-detail {
+				display: flex;
+			}
+
+			.ov-detail-label {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				font-weight: 600;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.07em;
+				margin-bottom: var(--space-3);
+			}
+
+			.ov-detail-text {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
+
+			/* Command block */
+			.ov-command-block {
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: var(--space-5) var(--space-6);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-4);
+			}
+
+			.ov-command-text {
+				font-family: var(--font-mono);
+				font-size: 12px;
+				color: var(--primary);
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.ov-copy-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 4px;
+				padding: 3px 8px;
+				height: 22px;
+				background: transparent;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xs);
+				cursor: pointer;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-subtle);
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease,
+					color var(--duration-2) ease;
+				flex-shrink: 0;
+				white-space: nowrap;
+			}
+
+			.ov-copy-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+
+			.ov-copy-btn:active {
+				transform: scale(0.96);
+			}
+
+			.ov-copy-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			.ov-copy-btn:disabled {
+				opacity: 0.4;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.ov-copy-btn.copied {
+				animation: gk-flash 800ms ease-out;
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+
+			/* Detail stat row */
+			.ov-detail-stats {
+				display: flex;
+				gap: var(--space-8);
+				flex-wrap: wrap;
+			}
+
+			.ov-detail-stat {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
+
+			.ov-detail-stat-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			.ov-detail-stat-value {
+				font-family: var(--font-mono);
+				font-size: 13px;
+				font-weight: 600;
+				color: var(--foreground);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.ov-detail-stat-value.is-bad {
+				color: oklch(0.64 0.205 25);
+			}
+
+			.ov-detail-stat-value.is-target {
+				color: var(--status-success);
+			}
+
+			/* Rescan button row */
+			.ov-rescan-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: var(--space-8);
+				padding-top: var(--space-4);
+				border-top: 1px solid var(--border);
+			}
+
+			.ov-last-scan {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Grade color helpers ─────────────────────────────────── */
+			.grade-a,
+			.grade-b {
+				color: var(--status-success);
+			}
+			.grade-c {
+				color: oklch(0.77 0.15 65);
+			}
+			.grade-d {
+				color: oklch(0.7 0.155 45);
+			}
+			.grade-f {
+				color: var(--status-danger);
+			}
+
+			/* Impact badge pill */
+			.ov-impact-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				padding: 2px 7px;
+				border-radius: var(--radius-full);
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				border: 1px solid;
+				flex-shrink: 0;
+				height: 18px;
+			}
+
+			.ov-impact-badge.is-high {
+				background: color-mix(in oklch, oklch(0.64 0.205 25) 13%, transparent);
+				color: oklch(0.64 0.205 25);
+				border-color: color-mix(in oklch, oklch(0.64 0.205 25) 28%, transparent);
+			}
+
+			.ov-impact-badge.is-med {
+				background: color-mix(in oklch, oklch(0.77 0.155 75) 13%, transparent);
+				color: oklch(0.82 0.135 75);
+				border-color: color-mix(in oklch, oklch(0.77 0.155 75) 28%, transparent);
+			}
+
+			.ov-impact-badge.is-low {
+				background: color-mix(in oklch, oklch(0.7 0.11 200) 13%, transparent);
+				color: oklch(0.7 0.11 200);
+				border-color: color-mix(in oklch, oklch(0.7 0.11 200) 28%, transparent);
+			}
+
+			/* Responsive */
+			@media (max-width: 768px) {
+				.ov-hero {
+					grid-template-columns: auto 1fr;
+					grid-template-rows: auto auto;
+				}
+
+				.ov-hero-meta {
+					grid-column: 1 / -1;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
+				}
+
+				.ov-savings-total {
+					text-align: left;
+				}
+
+				.ov-scan-info {
+					text-align: left;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.ov-page {
+					padding: var(--space-8);
+					gap: var(--space-10);
+				}
+
+				.ov-hero {
+					grid-template-columns: 1fr;
+					text-align: center;
+				}
+
+				.ov-ring-wrap {
+					margin: 0 auto;
+				}
+
+				.ov-hero-meta {
+					flex-direction: column;
+					align-items: stretch;
+				}
+
+				.ov-savings-total {
+					text-align: center;
+				}
+
+				.ov-findings-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="ov-page">
+				<!-- Variant label -->
+				<div class="ov-variant-banner">
+					<span class="gk-eyebrow">Variant A — Card Grid</span>
+					<span class="gk-tiny"
+						>&middot; Optimize View &middot; Waste Detection Panel</span
+					>
+				</div>
+
+				<!-- ── Hero: Health Score ─────────────────────────────── -->
+				<div class="ov-hero">
+					<!-- Ring chart -->
+					<div
+						class="ov-ring-wrap"
+						role="img"
+						aria-label="Health score: 58 out of 100, grade C"
+					>
+						<svg class="ov-ring-svg" viewBox="0 0 104 104" aria-hidden="true">
+							<!-- track -->
+							<circle class="ov-ring-track" cx="52" cy="52" r="42" />
+							<!-- fill: circumference ≈ 263.9; offset = 263.9 * (1 - 0.58) = 110.8 -->
+							<circle class="ov-ring-fill" cx="52" cy="52" r="42" />
+						</svg>
+						<div class="ov-ring-center">
+							<span class="ov-grade-letter grade-c">C</span>
+							<span class="ov-score-fraction">58/100</span>
+						</div>
+					</div>
+
+					<!-- Body text -->
+					<div class="ov-hero-body">
+						<h1 class="ov-hero-title">Session Health Score</h1>
+						<p class="ov-hero-subtitle">
+							Analysed 47 sessions across 3 workspaces &mdash; last 30 days. Token
+							waste patterns detected across tool usage, config, and file reads.
+						</p>
+
+						<div class="ov-penalties" role="list" aria-label="Penalty breakdown">
+							<div class="ov-penalty-chip is-high" role="listitem">
+								<span class="ov-penalty-dot" aria-hidden="true"></span>
+								3 high
+							</div>
+							<span class="ov-penalty-sep" aria-hidden="true">&middot;</span>
+							<div class="ov-penalty-chip is-med" role="listitem">
+								<span class="ov-penalty-dot" aria-hidden="true"></span>
+								2 medium
+							</div>
+							<span class="ov-penalty-sep" aria-hidden="true">&middot;</span>
+							<div class="ov-penalty-chip is-low" role="listitem">
+								<span class="ov-penalty-dot" aria-hidden="true"></span>
+								1 low
+							</div>
+						</div>
+					</div>
+
+					<!-- Meta / savings -->
+					<div class="ov-hero-meta">
+						<div class="ov-scan-info">
+							<div class="ov-scan-label">Last scan</div>
+							<div class="ov-scan-value">2 min ago</div>
+						</div>
+						<div
+							class="ov-savings-total"
+							aria-label="Estimated savings: $0.14 per session"
+						>
+							<div class="ov-savings-label">Est. savings / session</div>
+							<div class="ov-savings-amount">$0.14</div>
+							<div class="ov-savings-period">~12,600 tokens recoverable</div>
+						</div>
+					</div>
+				</div>
+				<!-- /hero -->
+
+				<!-- ── Findings ────────────────────────────────────────── -->
+				<section aria-label="Findings">
+					<!-- Rescan row -->
+					<div class="ov-rescan-row">
+						<div style="display: flex; align-items: center; gap: 8px">
+							<span class="gk-h2" style="font-size: var(--text-lg)">Findings</span>
+							<span class="gk-badge">6 issues</span>
+						</div>
+						<div style="display: flex; gap: 8px; align-items: center">
+							<span class="ov-last-scan"
+								>Scanned 47 sessions · grovekeeper-web, grovekeeper-api,
+								low-poly-2d-trees</span
+							>
+							<button
+								class="gk-btn gk-btn-secondary gk-btn-sm"
+								type="button"
+								aria-label="Re-scan sessions"
+							>
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M13.5 8a5.5 5.5 0 1 1-1.1-3.3"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									/>
+									<path
+										d="M13.5 3.5V7h-3.5"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								Re-scan
+							</button>
+							<button
+								class="gk-btn gk-btn-ghost gk-btn-sm"
+								type="button"
+								aria-label="Filter findings"
+								disabled
+							>
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M2 4h12M5 8h6M7.5 12h1"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+									/>
+								</svg>
+								Filter
+							</button>
+						</div>
+					</div>
+
+					<!-- ── HIGH impact group ─── -->
+					<div class="ov-group-label" role="heading" aria-level="3">
+						<span
+							class="gk-eyebrow cb-pri-high"
+							style="font-size: 10.5px; letter-spacing: 0.08em"
+							>High impact</span
+						>
+						<div class="ov-group-rule" aria-hidden="true"></div>
+						<span class="gk-tiny">Fixing these recovers ~$0.10/session</span>
+					</div>
+
+					<div class="ov-findings-grid" role="list">
+						<!-- Card 1: Reading junk directories — HIGH, EXPANDED -->
+						<article
+							class="ov-finding-card is-high is-expanded cb-finding"
+							role="listitem"
+							tabindex="0"
+							aria-expanded="true"
+							aria-label="Finding: Reading junk directories, high impact"
+						>
+							<div class="ov-finding-body">
+								<div class="ov-finding-header">
+									<h4 class="ov-finding-title">Reading junk directories</h4>
+									<span class="ov-impact-badge is-high" aria-label="Impact: High"
+										>High</span
+									>
+								</div>
+								<p class="ov-finding-summary">
+									Claude is reading
+									<code
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											background: var(--surface-2);
+											padding: 1px 4px;
+											border-radius: 3px;
+										"
+										>node_modules/</code
+									>,
+									<code
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											background: var(--surface-2);
+											padding: 1px 4px;
+											border-radius: 3px;
+										"
+										>.git/</code
+									>, and
+									<code
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											background: var(--surface-2);
+											padding: 1px 4px;
+											border-radius: 3px;
+										"
+										>dist/</code
+									>
+									on glob calls — contents are never edited.
+								</p>
+								<div class="ov-finding-savings" aria-label="Estimated savings">
+									<span class="ov-savings-token" aria-label="7,200 tokens saved">
+										<svg
+											width="11"
+											height="11"
+											viewBox="0 0 16 16"
+											fill="none"
+											aria-hidden="true"
+										>
+											<circle
+												cx="8"
+												cy="8"
+												r="6.5"
+												stroke="currentColor"
+												stroke-width="1.4"
+											/>
+											<path
+												d="M8 5v3.5l2 2"
+												stroke="currentColor"
+												stroke-width="1.4"
+												stroke-linecap="round"
+											/>
+										</svg>
+										~7,200 tok
+									</span>
+									<span
+										class="ov-savings-cost"
+										aria-label="$0.04 saved per session"
+										>&#x2193; $0.04/session</span
+									>
+								</div>
+							</div>
+
+							<!-- Expand toggle -->
+							<button
+								class="ov-finding-expand-btn"
+								type="button"
+								aria-expanded="true"
+								aria-controls="detail-1"
+							>
+								<span>Fix &amp; details</span>
+								<svg
+									class="ov-expand-chevron"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M4 6l4 4 4-4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+
+							<!-- Expanded detail -->
+							<div
+								class="ov-finding-detail"
+								id="detail-1"
+								role="region"
+								aria-label="Finding detail"
+							>
+								<div>
+									<div class="ov-detail-label">Why it hurts</div>
+									<p class="ov-detail-text">
+										Glob patterns without exclusions pull thousands of files
+										into context on each invocation. These directories contain
+										no editable source &mdash; they inflate context without
+										value.
+									</p>
+								</div>
+
+								<div class="ov-detail-stats" role="list">
+									<div class="ov-detail-stat" role="listitem">
+										<span class="ov-detail-stat-label">Detected dirs</span>
+										<span class="ov-detail-stat-value is-bad"
+											>node_modules, .git, dist</span
+										>
+									</div>
+									<div class="ov-detail-stat" role="listitem">
+										<span class="ov-detail-stat-label">Avg files read</span>
+										<span class="ov-detail-stat-value is-bad"
+											>1,847 / session</span
+										>
+									</div>
+									<div class="ov-detail-stat" role="listitem">
+										<span class="ov-detail-stat-label">Target</span>
+										<span class="ov-detail-stat-value is-target"
+											>&lt; 80 / session</span
+										>
+									</div>
+								</div>
+
+								<div>
+									<div class="ov-detail-label">
+										Recommended fix — add to CLAUDE.md
+									</div>
+									<div class="ov-command-block">
+										<span class="ov-command-text" aria-label="CLAUDE.md rule"
+											>## Glob exclusions&#10;Never read: node_modules/,
+											.git/, dist/, .next/, coverage/</span
+										>
+										<button
+											class="ov-copy-btn"
+											type="button"
+											aria-label="Copy fix to clipboard"
+											onclick="
+												this.textContent = 'Copied!';
+												this.classList.add('copied');
+												const self = this;
+												setTimeout(() => {
+													self.textContent = 'Copy';
+													self.classList.remove('copied');
+												}, 1800);
+											"
+										>
+											Copy
+										</button>
+									</div>
+								</div>
+							</div>
+						</article>
+
+						<!-- Card 2: Duplicate file reads — HIGH -->
+						<article
+							class="ov-finding-card is-high cb-finding"
+							role="listitem"
+							tabindex="0"
+							aria-expanded="false"
+							aria-label="Finding: Duplicate file reads, high impact"
+						>
+							<div class="ov-finding-body">
+								<div class="ov-finding-header">
+									<h4 class="ov-finding-title">Duplicate file reads</h4>
+									<span class="ov-impact-badge is-high" aria-label="Impact: High"
+										>High</span
+									>
+								</div>
+								<p class="ov-finding-summary">
+									Same files re-read multiple times per session without edits
+									between reads — common in long planning loops.
+								</p>
+								<div class="ov-finding-savings">
+									<span class="ov-savings-token">~4,800 tok</span>
+									<span class="ov-savings-cost">&#x2193; $0.03/session</span>
+								</div>
+							</div>
+							<button
+								class="ov-finding-expand-btn"
+								type="button"
+								aria-expanded="false"
+								aria-controls="detail-2"
+								onclick="
+									const card = this.closest('.ov-finding-card');
+									const expanded = card.classList.toggle('is-expanded');
+									this.setAttribute('aria-expanded', expanded);
+								"
+							>
+								<span>Fix &amp; details</span>
+								<svg
+									class="ov-expand-chevron"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M4 6l4 4 4-4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+							<div
+								class="ov-finding-detail"
+								id="detail-2"
+								role="region"
+								aria-label="Finding detail"
+							>
+								<div>
+									<div class="ov-detail-label">Why it hurts</div>
+									<p class="ov-detail-text">
+										Re-reading unchanged files burns input tokens on content
+										already in the context window. The top offender is
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>src/routes/+layout.svelte</code
+										>
+										— read 6× on average per session.
+									</p>
+								</div>
+								<div class="ov-detail-stats">
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Top offender</span>
+										<span class="ov-detail-stat-value is-bad"
+											>+layout.svelte ×6</span
+										>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label"
+											>Avg duplicate reads</span
+										>
+										<span class="ov-detail-stat-value is-bad"
+											>14 / session</span
+										>
+									</div>
+								</div>
+								<div>
+									<div class="ov-detail-label">Recommended instruction</div>
+									<div class="ov-command-block">
+										<span class="ov-command-text"
+											>Do not re-read files already in context unless content
+											has changed.</span
+										>
+										<button
+											class="ov-copy-btn"
+											type="button"
+											aria-label="Copy fix to clipboard"
+											onclick="
+												this.textContent = 'Copied!';
+												this.classList.add('copied');
+												const self = this;
+												setTimeout(() => {
+													self.textContent = 'Copy';
+													self.classList.remove('copied');
+												}, 1800);
+											"
+										>
+											Copy
+										</button>
+									</div>
+								</div>
+							</div>
+						</article>
+
+						<!-- Card 3: Low read/edit ratio — HIGH -->
+						<article
+							class="ov-finding-card is-high cb-finding"
+							role="listitem"
+							tabindex="0"
+							aria-expanded="false"
+							aria-label="Finding: Low read/edit ratio, high impact"
+						>
+							<div class="ov-finding-body">
+								<div class="ov-finding-header">
+									<h4 class="ov-finding-title">Low read/edit ratio</h4>
+									<span class="ov-impact-badge is-high" aria-label="Impact: High"
+										>High</span
+									>
+								</div>
+								<p class="ov-finding-summary">
+									Current ratio is 2.1:1 — Claude reads 2.1 files for every file
+									it edits. Healthy sessions average 4:1 or better.
+								</p>
+								<div class="ov-finding-savings">
+									<span class="ov-savings-token">efficiency loss</span>
+									<span
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											color: oklch(0.64 0.205 25);
+											background: color-mix(
+												in oklch,
+												oklch(0.64 0.205 25) 10%,
+												transparent
+											);
+											border: 1px solid
+												color-mix(
+													in oklch,
+													oklch(0.64 0.205 25) 22%,
+													transparent
+												);
+											border-radius: var(--radius-xs);
+											padding: 2px 6px;
+											display: inline-flex;
+											align-items: center;
+										"
+										>2.1:1 &nbsp;&nbsp;<span style="opacity: 0.5"
+											>(need ≥4:1)</span
+										></span
+									>
+								</div>
+							</div>
+							<button
+								class="ov-finding-expand-btn"
+								type="button"
+								aria-expanded="false"
+								aria-controls="detail-3"
+								onclick="
+									const card = this.closest('.ov-finding-card');
+									const expanded = card.classList.toggle('is-expanded');
+									this.setAttribute('aria-expanded', expanded);
+								"
+							>
+								<span>Fix &amp; details</span>
+								<svg
+									class="ov-expand-chevron"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M4 6l4 4 4-4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+							<div
+								class="ov-finding-detail"
+								id="detail-3"
+								role="region"
+								aria-label="Finding detail"
+							>
+								<div>
+									<div class="ov-detail-label">What this means</div>
+									<p class="ov-detail-text">
+										Exploration-heavy sessions with little output signal
+										over-planning or unclear scope. Improving task instructions
+										to be more specific tends to push this ratio above 4:1.
+									</p>
+								</div>
+								<div class="ov-detail-stats">
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Current ratio</span>
+										<span class="ov-detail-stat-value is-bad">2.1 : 1</span>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Healthy baseline</span>
+										<span class="ov-detail-stat-value is-target"
+											>≥ 4.0 : 1</span
+										>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Sessions affected</span>
+										<span class="ov-detail-stat-value">31 / 47</span>
+									</div>
+								</div>
+								<div>
+									<div class="ov-detail-label">Add to task prompts</div>
+									<div class="ov-command-block">
+										<span class="ov-command-text"
+											>Read only files you plan to edit or directly reference
+											in your response.</span
+										>
+										<button
+											class="ov-copy-btn"
+											type="button"
+											aria-label="Copy fix to clipboard"
+											onclick="
+												this.textContent = 'Copied!';
+												this.classList.add('copied');
+												const self = this;
+												setTimeout(() => {
+													self.textContent = 'Copy';
+													self.classList.remove('copied');
+												}, 1800);
+											"
+										>
+											Copy
+										</button>
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+					<!-- /high grid -->
+
+					<!-- ── MEDIUM impact group ─── -->
+					<div class="ov-group-label" role="heading" aria-level="3">
+						<span
+							class="gk-eyebrow cb-pri-med"
+							style="font-size: 10.5px; letter-spacing: 0.08em"
+							>Medium impact</span
+						>
+						<div class="ov-group-rule" aria-hidden="true"></div>
+						<span class="gk-tiny">Fixing these recovers ~$0.03/session</span>
+					</div>
+
+					<div class="ov-findings-grid" role="list">
+						<!-- Card 4: Unused MCP servers — MEDIUM -->
+						<article
+							class="ov-finding-card is-med cb-finding"
+							role="listitem"
+							tabindex="0"
+							aria-expanded="false"
+							aria-label="Finding: Unused MCP servers, medium impact"
+						>
+							<div class="ov-finding-body">
+								<div class="ov-finding-header">
+									<h4 class="ov-finding-title">Unused MCP servers</h4>
+									<span class="ov-impact-badge is-med" aria-label="Impact: Medium"
+										>Med</span
+									>
+								</div>
+								<p class="ov-finding-summary">
+									2 MCP servers are loaded on every session start but never called
+									— wasting initialisation overhead and tool-list tokens.
+								</p>
+								<div class="ov-finding-savings">
+									<span class="ov-savings-token">tool context overhead</span>
+									<span class="ov-savings-cost">&#x2193; $0.01/session</span>
+								</div>
+							</div>
+							<button
+								class="ov-finding-expand-btn"
+								type="button"
+								aria-expanded="false"
+								aria-controls="detail-4"
+								onclick="
+									const card = this.closest('.ov-finding-card');
+									const expanded = card.classList.toggle('is-expanded');
+									this.setAttribute('aria-expanded', expanded);
+								"
+							>
+								<span>Fix &amp; details</span>
+								<svg
+									class="ov-expand-chevron"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M4 6l4 4 4-4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+							<div
+								class="ov-finding-detail"
+								id="detail-4"
+								role="region"
+								aria-label="Finding detail"
+							>
+								<div>
+									<div class="ov-detail-label">Unused servers detected</div>
+									<p class="ov-detail-text">
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>@linear/mcp-server</code
+										>
+										and
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>@figma/mcp</code
+										>
+										were loaded across 47 sessions but called 0 times. Each adds
+										~340 tokens of tool definitions to every context.
+									</p>
+								</div>
+								<div class="ov-detail-stats">
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Servers</span>
+										<span class="ov-detail-stat-value is-bad">2 idle</span>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Tool definitions</span>
+										<span class="ov-detail-stat-value is-bad"
+											>~680 tok overhead</span
+										>
+									</div>
+								</div>
+								<div>
+									<div class="ov-detail-label">
+										Remove from .claude/settings.json
+									</div>
+									<div class="ov-command-block">
+										<span class="ov-command-text"
+											>Remove "mcpServers": { "@linear/mcp-server",
+											"@figma/mcp" }</span
+										>
+										<button
+											class="ov-copy-btn"
+											type="button"
+											aria-label="Copy fix to clipboard"
+											onclick="
+												this.textContent = 'Copied!';
+												this.classList.add('copied');
+												const self = this;
+												setTimeout(() => {
+													self.textContent = 'Copy';
+													self.classList.remove('copied');
+												}, 1800);
+											"
+										>
+											Copy
+										</button>
+									</div>
+								</div>
+							</div>
+						</article>
+
+						<!-- Card 5: Bloated CLAUDE.md — MEDIUM -->
+						<article
+							class="ov-finding-card is-med cb-finding"
+							role="listitem"
+							tabindex="0"
+							aria-expanded="false"
+							aria-label="Finding: Bloated CLAUDE.md, medium impact"
+						>
+							<div class="ov-finding-body">
+								<div class="ov-finding-header">
+									<h4 class="ov-finding-title">Bloated CLAUDE.md</h4>
+									<span class="ov-impact-badge is-med" aria-label="Impact: Medium"
+										>Med</span
+									>
+								</div>
+								<p class="ov-finding-summary">
+									Your CLAUDE.md is 847 lines — injected on every session start.
+									Recommended maximum is 400 lines for clean context budgets.
+								</p>
+								<div class="ov-finding-savings">
+									<span class="ov-savings-token">~2,100 tok/session</span>
+									<span class="ov-savings-cost">&#x2193; $0.02/session</span>
+								</div>
+							</div>
+							<button
+								class="ov-finding-expand-btn"
+								type="button"
+								aria-expanded="false"
+								aria-controls="detail-5"
+								onclick="
+									const card = this.closest('.ov-finding-card');
+									const expanded = card.classList.toggle('is-expanded');
+									this.setAttribute('aria-expanded', expanded);
+								"
+							>
+								<span>Fix &amp; details</span>
+								<svg
+									class="ov-expand-chevron"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M4 6l4 4 4-4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+							<div
+								class="ov-finding-detail"
+								id="detail-5"
+								role="region"
+								aria-label="Finding detail"
+							>
+								<div>
+									<div class="ov-detail-label">Bloat breakdown</div>
+									<p class="ov-detail-text">
+										Large sections of your CLAUDE.md contain module
+										documentation that is rarely referenced mid-session.
+										Consider moving verbose docs to
+										<code
+											style="
+												font-family: var(--font-mono);
+												font-size: 11px;
+												background: var(--code-bg);
+												padding: 1px 5px;
+												border-radius: 3px;
+											"
+											>@-included</code
+										>
+										files loaded only when relevant.
+									</p>
+								</div>
+								<div class="ov-detail-stats">
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Current lines</span>
+										<span class="ov-detail-stat-value is-bad">847</span>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">Recommended</span>
+										<span class="ov-detail-stat-value is-target">&lt; 400</span>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label"
+											>Est. trimmed tokens</span
+										>
+										<span class="ov-detail-stat-value is-target">~2,100</span>
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+					<!-- /medium grid -->
+
+					<!-- ── LOW impact group ─── -->
+					<div class="ov-group-label" role="heading" aria-level="3">
+						<span
+							class="gk-eyebrow cb-pri-low"
+							style="font-size: 10.5px; letter-spacing: 0.08em"
+							>Low impact</span
+						>
+						<div class="ov-group-rule" aria-hidden="true"></div>
+						<span class="gk-tiny">Minor config tweaks</span>
+					</div>
+
+					<div class="ov-findings-grid" role="list">
+						<!-- Card 6: Bash output limit — LOW -->
+						<article
+							class="ov-finding-card is-low cb-finding"
+							role="listitem"
+							tabindex="0"
+							aria-expanded="false"
+							aria-label="Finding: Bash output limit, low impact"
+						>
+							<div class="ov-finding-body">
+								<div class="ov-finding-header">
+									<h4 class="ov-finding-title">Bash output limit not set</h4>
+									<span class="ov-impact-badge is-low" aria-label="Impact: Low"
+										>Low</span
+									>
+								</div>
+								<p class="ov-finding-summary">
+									<code
+										style="
+											font-family: var(--font-mono);
+											font-size: 11px;
+											background: var(--surface-2);
+											padding: 1px 4px;
+											border-radius: 3px;
+										"
+										>BASH_SILENCE_DEPRECATION_WARNING</code
+									>
+									is not set — macOS deprecation warnings inflate bash tool output
+									on every invocation.
+								</p>
+								<div class="ov-finding-savings">
+									<span class="ov-savings-token">~60 tok/bash call</span>
+									<span class="ov-savings-cost">&#x2193; $0.00/session</span>
+								</div>
+							</div>
+							<button
+								class="ov-finding-expand-btn"
+								type="button"
+								aria-expanded="false"
+								aria-controls="detail-6"
+								onclick="
+									const card = this.closest('.ov-finding-card');
+									const expanded = card.classList.toggle('is-expanded');
+									this.setAttribute('aria-expanded', expanded);
+								"
+							>
+								<span>Fix &amp; details</span>
+								<svg
+									class="ov-expand-chevron"
+									viewBox="0 0 16 16"
+									fill="none"
+									aria-hidden="true"
+								>
+									<path
+										d="M4 6l4 4 4-4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
+							<div
+								class="ov-finding-detail"
+								id="detail-6"
+								role="region"
+								aria-label="Finding detail"
+							>
+								<div>
+									<div class="ov-detail-label">
+										One-line fix — add to shell profile
+									</div>
+									<div class="ov-command-block">
+										<span class="ov-command-text"
+											>export BASH_SILENCE_DEPRECATION_WARNING=1</span
+										>
+										<button
+											class="ov-copy-btn"
+											type="button"
+											aria-label="Copy fix to clipboard"
+											onclick="
+												this.textContent = 'Copied!';
+												this.classList.add('copied');
+												const self = this;
+												setTimeout(() => {
+													self.textContent = 'Copy';
+													self.classList.remove('copied');
+												}, 1800);
+											"
+										>
+											Copy
+										</button>
+									</div>
+								</div>
+								<div class="ov-detail-stats">
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label"
+											>Bash calls / session</span
+										>
+										<span class="ov-detail-stat-value">~23</span>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label"
+											>Warning lines / call</span
+										>
+										<span class="ov-detail-stat-value is-bad">4</span>
+									</div>
+									<div class="ov-detail-stat">
+										<span class="ov-detail-stat-label">After fix</span>
+										<span class="ov-detail-stat-value is-target">0</span>
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+					<!-- /low grid -->
+				</section>
+				<!-- /findings -->
+			</div>
+			<!-- /ov-page -->
+		</div>
+		<!-- /gk-root -->
+
+		<script>
+			// Wire all expand/collapse buttons — inline onclick on cards 2-6 is overridden here
+			// so all cards share the same logic path.
+			document.querySelectorAll('.ov-finding-expand-btn').forEach(function (btn) {
+				btn.onclick = function () {
+					const card = btn.closest('.ov-finding-card');
+					const nowExpanded = card.classList.toggle('is-expanded');
+					btn.setAttribute('aria-expanded', String(nowExpanded));
+					card.setAttribute('aria-expanded', String(nowExpanded));
+				};
+			});
+		</script>
+	</body>
 </html>

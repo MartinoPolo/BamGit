@@ -1,561 +1,840 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Session Spawning Dialog — Variant A: Single-form panel</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ========== TOKENS.CSS (inlined) ========== */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Session Spawning Dialog — Variant A: Single-form panel</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
 
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--amber-400);
-  --accent-fg:         oklch(0.15 0.02 50);
-  --ring:              var(--moss-400);
-  --sidebar-bg:        oklch(0.180 0.022 150);
-  --sidebar-fg:        oklch(0.770 0.020 140);
-  --code-bg:           oklch(0.215 0.020 150);
-  --sky-top:           var(--sky-dark-top);
-  --sky-bot:           var(--sky-dark-bot);
-  --ground-color:      oklch(0.300 0.060 140);
-  --ground-dark:       oklch(0.180 0.040 50);
-}
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--amber-400);
+				--accent-fg: oklch(0.15 0.02 50);
+				--ring: var(--moss-400);
+				--sidebar-bg: oklch(0.18 0.022 150);
+				--sidebar-fg: oklch(0.77 0.02 140);
+				--code-bg: oklch(0.215 0.02 150);
+				--sky-top: var(--sky-dark-top);
+				--sky-bot: var(--sky-dark-bot);
+				--ground-color: oklch(0.3 0.06 140);
+				--ground-dark: oklch(0.18 0.04 50);
+			}
 
-/* Base */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
+			/* Base */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-/* Buttons */
-.gk-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
-  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
-  border: 1px solid transparent; cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap; user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary {
-  background: var(--primary); color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary {
-  background: var(--surface-2); color: var(--foreground); border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost { background: transparent; color: var(--foreground-muted); }
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled, .gk-btn[data-state="disabled"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn:active:not(:disabled) { transform: scale(0.96); filter: brightness(0.95); }
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled,
+			.gk-btn[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn:active:not(:disabled) {
+				transform: scale(0.96);
+				filter: brightness(0.95);
+			}
 
-/* Inputs */
-.gk-input, .gk-select, .gk-textarea {
-  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  color: var(--foreground); width: 100%; outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.gk-textarea { height: auto; padding: 8px 10px; resize: vertical; line-height: 1.5; }
-.gk-input::placeholder, .gk-textarea::placeholder { color: var(--foreground-subtle); }
-.gk-input:focus, .gk-select:focus, .gk-textarea:focus {
-  border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
-}
-.gk-label {
-  font-size: 12px; color: var(--foreground-muted); font-weight: 500;
-  margin-bottom: 6px; display: block; letter-spacing: 0.01em;
-}
+			/* Inputs */
+			.gk-input,
+			.gk-select,
+			.gk-textarea {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-textarea {
+				height: auto;
+				padding: 8px 10px;
+				resize: vertical;
+				line-height: 1.5;
+			}
+			.gk-input::placeholder,
+			.gk-textarea::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus,
+			.gk-select:focus,
+			.gk-textarea:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+			.gk-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				margin-bottom: 6px;
+				display: block;
+				letter-spacing: 0.01em;
+			}
 
-/* Checkbox */
-.gk-check {
-  appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--border-strong);
-  border-radius: 4px; background: var(--surface); cursor: pointer; position: relative;
-  transition: background 120ms ease, border-color 120ms ease; flex-shrink: 0;
-}
-.gk-check:checked { background: var(--primary); border-color: var(--primary); }
-.gk-check:checked::after {
-  content: ""; position: absolute; left: 4.5px; top: 1px; width: 4px; height: 8px;
-  border: solid var(--primary-fg); border-width: 0 2px 2px 0; transform: rotate(45deg);
-}
+			/* Checkbox */
+			.gk-check {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 4px;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.gk-check:checked {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check:checked::after {
+				content: '';
+				position: absolute;
+				left: 4.5px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
+				border: solid var(--primary-fg);
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
 
-/* Radio */
-.gk-radio {
-  appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--border-strong);
-  border-radius: 50%; background: var(--surface); cursor: pointer; position: relative;
-  transition: border-color 120ms;
-}
-.gk-radio:checked { border-color: var(--primary); }
-.gk-radio:checked::after {
-  content: ""; position: absolute; inset: 3px; background: var(--primary); border-radius: 50%;
-}
-.gk-radio:hover { border-color: var(--ring); }
+			/* Radio */
+			.gk-radio {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 50%;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition: border-color 120ms;
+			}
+			.gk-radio:checked {
+				border-color: var(--primary);
+			}
+			.gk-radio:checked::after {
+				content: '';
+				position: absolute;
+				inset: 3px;
+				background: var(--primary);
+				border-radius: 50%;
+			}
+			.gk-radio:hover {
+				border-color: var(--ring);
+			}
 
-/* Card */
-.gk-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
-}
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-/* Badge */
-.gk-badge {
-  display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px;
-  font-size: 11px; font-weight: 500; border-radius: 999px;
-  background: var(--surface-2); color: var(--foreground-muted);
-  border: 1px solid var(--border); font-family: var(--font-sans);
-  letter-spacing: 0.01em; white-space: nowrap;
-}
-.gk-badge-moss { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
+			/* Badge */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
 
-/* Modal */
-.gk-modal-backdrop {
-  position: fixed; inset: 0; background: color-mix(in oklch, oklch(0.10 0.02 150) 50%, transparent);
-  backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center;
-  z-index: var(--z-modal);
-}
-.gk-modal {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl); width: 100%; max-width: 520px;
-  display: flex; flex-direction: column; max-height: 86%;
-}
-.gk-modal-header {
-  padding: 16px 18px 12px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-.gk-modal-body { padding: 16px 18px; overflow-y: auto; }
-.gk-modal-footer {
-  padding: 12px 18px; border-top: 1px solid var(--border); display: flex;
-  justify-content: flex-end; gap: 8px; background: var(--surface-2);
-  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-}
+			/* Modal */
+			.gk-modal-backdrop {
+				position: fixed;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.1 0.02 150) 50%, transparent);
+				backdrop-filter: blur(2px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: var(--z-modal);
+			}
+			.gk-modal {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-xl);
+				width: 100%;
+				max-width: 520px;
+				display: flex;
+				flex-direction: column;
+				max-height: 86%;
+			}
+			.gk-modal-header {
+				padding: 16px 18px 12px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				border-bottom: 1px solid var(--border);
+			}
+			.gk-modal-body {
+				padding: 16px 18px;
+				overflow-y: auto;
+			}
+			.gk-modal-footer {
+				padding: 12px 18px;
+				border-top: 1px solid var(--border);
+				display: flex;
+				justify-content: flex-end;
+				gap: 8px;
+				background: var(--surface-2);
+				border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+			}
 
-/* Type scale */
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+			/* Type scale */
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-/* Kbd */
-.gk-kbd {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 18px; height: 18px; padding: 0 5px;
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 4px; font-family: var(--font-mono);
-  font-size: 10.5px; color: var(--foreground-muted);
-}
+			/* Kbd */
+			.gk-kbd {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 18px;
+				height: 18px;
+				padding: 0 5px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: 4px;
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+			}
 
-/* Toggle */
-.gk-toggle {
-  width: 32px; height: 18px; border-radius: 999px;
-  background: var(--surface-3); border: 1px solid var(--border);
-  position: relative; cursor: pointer; transition: background 120ms; flex-shrink: 0;
-}
-.gk-toggle::after {
-  content: ""; position: absolute; top: 1px; left: 1px;
-  width: 14px; height: 14px; border-radius: 999px;
-  background: var(--surface); box-shadow: var(--shadow-sm); transition: left 140ms;
-}
-.gk-toggle[data-on="true"] { background: var(--primary); border-color: var(--primary); }
-.gk-toggle[data-on="true"]::after { left: 16px; }
+			/* Toggle */
+			.gk-toggle {
+				width: 32px;
+				height: 18px;
+				border-radius: 999px;
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				position: relative;
+				cursor: pointer;
+				transition: background 120ms;
+				flex-shrink: 0;
+			}
+			.gk-toggle::after {
+				content: '';
+				position: absolute;
+				top: 1px;
+				left: 1px;
+				width: 14px;
+				height: 14px;
+				border-radius: 999px;
+				background: var(--surface);
+				box-shadow: var(--shadow-sm);
+				transition: left 140ms;
+			}
+			.gk-toggle[data-on='true'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-toggle[data-on='true']::after {
+				left: 16px;
+			}
 
-/* Divider */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+			/* Divider */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-/* ========== VARIANT-SPECIFIC STYLES ========== */
-html, body { margin: 0; padding: 0; height: 100%; }
+			/* ========== VARIANT-SPECIFIC STYLES ========== */
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
 
-.variant-label {
-  position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
-  z-index: 100; padding: 4px 14px; border-radius: var(--radius-full);
-  background: var(--surface-2); border: 1px solid var(--border);
-}
+			.variant-label {
+				position: fixed;
+				top: 8px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 100;
+				padding: 4px 14px;
+				border-radius: var(--radius-full);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+			}
 
-/* Segmented provider toggle */
-.provider-toggle {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: var(--radius-md); padding: 3px;
-}
-.provider-toggle-item {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 10px 6px 8px; border-radius: var(--radius-sm);
-  cursor: pointer; transition: all 120ms ease; border: 1px solid transparent;
-  background: transparent; font-family: var(--font-sans);
-}
-.provider-toggle-item:hover { background: var(--surface-hover); }
-.provider-toggle-item.is-selected {
-  background: var(--surface); border-color: var(--border);
-  box-shadow: var(--shadow-sm);
-}
-.provider-toggle-item:active { transform: scale(0.97); }
-.provider-toggle-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
-.provider-icon {
-  font-size: 20px; line-height: 1; display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px;
-}
-.provider-name {
-  font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--foreground);
-}
-.provider-toggle-item:not(.is-selected) .provider-name { color: var(--foreground-muted); }
+			/* Segmented provider toggle */
+			.provider-toggle {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 0;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 3px;
+			}
+			.provider-toggle-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 3px;
+				padding: 10px 6px 8px;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition: all 120ms ease;
+				border: 1px solid transparent;
+				background: transparent;
+				font-family: var(--font-sans);
+			}
+			.provider-toggle-item:hover {
+				background: var(--surface-hover);
+			}
+			.provider-toggle-item.is-selected {
+				background: var(--surface);
+				border-color: var(--border);
+				box-shadow: var(--shadow-sm);
+			}
+			.provider-toggle-item:active {
+				transform: scale(0.97);
+			}
+			.provider-toggle-item:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.provider-icon {
+				font-size: 20px;
+				line-height: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 28px;
+				height: 28px;
+			}
+			.provider-name {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+			}
+			.provider-toggle-item:not(.is-selected) .provider-name {
+				color: var(--foreground-muted);
+			}
 
-/* Field section spacing */
-.field-section { margin-top: 16px; }
-.field-section:first-child { margin-top: 0; }
+			/* Field section spacing */
+			.field-section {
+				margin-top: 16px;
+			}
+			.field-section:first-child {
+				margin-top: 0;
+			}
 
-/* Context card */
-.context-card {
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: var(--radius-md); padding: 10px 12px;
-}
-.context-issue-row {
-  display: flex; align-items: center; gap: 8px;
-}
-.context-issue-title {
-  font-size: var(--text-md); color: var(--foreground); flex: 1; min-width: 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.context-preview {
-  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
-  font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-relaxed);
-}
-.context-expand-btn {
-  background: none; border: none; color: var(--foreground-subtle); font-size: var(--text-sm);
-  cursor: pointer; padding: 0; font-family: var(--font-sans);
-  transition: color 120ms;
-}
-.context-expand-btn:hover { color: var(--foreground-muted); }
+			/* Context card */
+			.context-card {
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 10px 12px;
+			}
+			.context-issue-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.context-issue-title {
+				font-size: var(--text-md);
+				color: var(--foreground);
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.context-preview {
+				margin-top: 8px;
+				padding-top: 8px;
+				border-top: 1px solid var(--border);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+			}
+			.context-expand-btn {
+				background: none;
+				border: none;
+				color: var(--foreground-subtle);
+				font-size: var(--text-sm);
+				cursor: pointer;
+				padding: 0;
+				font-family: var(--font-sans);
+				transition: color 120ms;
+			}
+			.context-expand-btn:hover {
+				color: var(--foreground-muted);
+			}
 
-/* Permission mode */
-.permission-group { display: flex; flex-direction: column; gap: 6px; }
-.permission-option {
-  display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px;
-  border-radius: var(--radius-sm); cursor: pointer; transition: background 120ms;
-}
-.permission-option:hover { background: var(--surface-2); }
-.permission-option-text { display: flex; flex-direction: column; gap: 1px; }
-.permission-option-label {
-  font-size: var(--text-md); color: var(--foreground); font-weight: var(--weight-medium);
-}
-.permission-option-desc {
-  font-size: var(--text-xs); color: var(--foreground-subtle);
-}
+			/* Permission mode */
+			.permission-group {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+			.permission-option {
+				display: flex;
+				align-items: flex-start;
+				gap: 8px;
+				padding: 6px 8px;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition: background 120ms;
+			}
+			.permission-option:hover {
+				background: var(--surface-2);
+			}
+			.permission-option-text {
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+			}
+			.permission-option-label {
+				font-size: var(--text-md);
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+			.permission-option-desc {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
 
-/* Warning callout */
-.callout-warning {
-  display: flex; align-items: center; gap: 8px;
-  background: color-mix(in oklch, var(--status-warning) 8%, transparent);
-  border: 1px solid color-mix(in oklch, var(--status-warning) 25%, transparent);
-  border-radius: var(--radius-sm); padding: 8px 10px;
-  font-size: var(--text-sm); color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
-  margin-top: 8px;
-}
-.callout-warning-icon { font-size: 14px; flex-shrink: 0; }
+			/* Warning callout */
+			.callout-warning {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				background: color-mix(in oklch, var(--status-warning) 8%, transparent);
+				border: 1px solid color-mix(in oklch, var(--status-warning) 25%, transparent);
+				border-radius: var(--radius-sm);
+				padding: 8px 10px;
+				font-size: var(--text-sm);
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
+				margin-top: 8px;
+			}
+			.callout-warning-icon {
+				font-size: 14px;
+				flex-shrink: 0;
+			}
 
-/* Resume toggle row */
-.resume-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 0;
-}
-.resume-label-group { display: flex; flex-direction: column; gap: 2px; }
+			/* Resume toggle row */
+			.resume-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 8px 0;
+			}
+			.resume-label-group {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+			}
 
-/* Footer info */
-.footer-hint {
-  display: flex; align-items: center; gap: 6px;
-  font-size: var(--text-xs); color: var(--foreground-subtle);
-  margin-right: auto;
-}
-</style>
-</head>
-<body class="gk-root theme-dark">
+			/* Footer info */
+			.footer-hint {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-right: auto;
+			}
+		</style>
+	</head>
+	<body class="gk-root theme-dark">
+		<div class="variant-label gk-eyebrow">Variant A: Single-form panel</div>
 
-<div class="variant-label gk-eyebrow">Variant A: Single-form panel</div>
+		<div class="gk-modal-backdrop">
+			<div
+				class="gk-modal"
+				style="max-width: 520px"
+				role="dialog"
+				aria-labelledby="dialog-title"
+				aria-modal="true"
+			>
+				<!-- Header -->
+				<div class="gk-modal-header">
+					<h2 class="gk-h2" id="dialog-title" style="margin: 0">Spawn Session</h2>
+					<button
+						class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm"
+						aria-label="Close"
+						title="Close (Esc)"
+					>
+						<span style="font-size: 16px; line-height: 1">&times;</span>
+					</button>
+				</div>
 
-<div class="gk-modal-backdrop">
-  <div class="gk-modal" style="max-width: 520px;" role="dialog" aria-labelledby="dialog-title" aria-modal="true">
+				<!-- Body -->
+				<div class="gk-modal-body" style="display: flex; flex-direction: column; gap: 0">
+					<!-- Provider Toggle -->
+					<div class="field-section" style="margin-top: 0">
+						<label class="gk-label">Provider</label>
+						<div class="provider-toggle" role="radiogroup" aria-label="Select provider">
+							<button
+								class="provider-toggle-item is-selected"
+								role="radio"
+								aria-checked="true"
+								tabindex="0"
+							>
+								<span class="provider-icon" style="color: var(--moss-400)"
+									>&#9670;</span
+								>
+								<span class="provider-name">Claude Code</span>
+							</button>
+							<button
+								class="provider-toggle-item"
+								role="radio"
+								aria-checked="false"
+								tabindex="-1"
+							>
+								<span class="provider-icon" style="color: var(--azure-400)"
+									>&#9671;</span
+								>
+								<span class="provider-name">OpenCode</span>
+							</button>
+							<button
+								class="provider-toggle-item"
+								role="radio"
+								aria-checked="false"
+								tabindex="-1"
+							>
+								<span class="provider-icon" style="color: var(--amber-400)"
+									>&#9635;</span
+								>
+								<span class="provider-name">Codex</span>
+							</button>
+							<button
+								class="provider-toggle-item"
+								role="radio"
+								aria-checked="false"
+								tabindex="-1"
+							>
+								<span class="provider-icon" style="color: var(--bark-300)"
+									>&#9655;</span
+								>
+								<span class="provider-name">Cursor</span>
+							</button>
+						</div>
+						<div
+							style="
+								margin-top: 4px;
+								font-size: var(--text-xs);
+								color: var(--foreground-subtle);
+							"
+						>
+							<span class="font-mono">claude</span> CLI via stdin/stdout stream-JSON
+						</div>
+					</div>
 
-    <!-- Header -->
-    <div class="gk-modal-header">
-      <h2 class="gk-h2" id="dialog-title" style="margin: 0;">Spawn Session</h2>
-      <button class="gk-btn gk-btn-ghost gk-btn-icon gk-btn-sm" aria-label="Close" title="Close (Esc)">
-        <span style="font-size: 16px; line-height: 1;">&times;</span>
-      </button>
-    </div>
+					<!-- Model -->
+					<div class="field-section">
+						<label class="gk-label" for="model-select">Model</label>
+						<select class="gk-select" id="model-select">
+							<option selected>claude-opus-4-7 (200K)</option>
+							<option>claude-sonnet-4-6 (200K)</option>
+							<option>claude-sonnet-4 (200K)</option>
+							<option>claude-haiku-3.5 (200K)</option>
+						</select>
+					</div>
 
-    <!-- Body -->
-    <div class="gk-modal-body" style="display: flex; flex-direction: column; gap: 0;">
+					<!-- Permission Mode -->
+					<div class="field-section">
+						<label class="gk-label">Permission Mode</label>
+						<div class="permission-group">
+							<label class="permission-option">
+								<input type="radio" name="permission" class="gk-radio" checked />
+								<div class="permission-option-text">
+									<span class="permission-option-label">Approve each</span>
+									<span class="permission-option-desc"
+										>Review every file edit and command</span
+									>
+								</div>
+							</label>
+							<label class="permission-option">
+								<input type="radio" name="permission" class="gk-radio" />
+								<div class="permission-option-text">
+									<span class="permission-option-label">Auto-accept edits</span>
+									<span class="permission-option-desc"
+										>File changes apply automatically, commands still require
+										approval</span
+									>
+								</div>
+							</label>
+							<label class="permission-option">
+								<input type="radio" name="permission" class="gk-radio" />
+								<div class="permission-option-text">
+									<span class="permission-option-label">Bypass all</span>
+									<span class="permission-option-desc"
+										>Full autonomy — no approval gates</span
+									>
+								</div>
+							</label>
+						</div>
+					</div>
 
-      <!-- Provider Toggle -->
-      <div class="field-section" style="margin-top: 0;">
-        <label class="gk-label">Provider</label>
-        <div class="provider-toggle" role="radiogroup" aria-label="Select provider">
-          <button class="provider-toggle-item is-selected" role="radio" aria-checked="true" tabindex="0">
-            <span class="provider-icon" style="color: var(--moss-400);">&#9670;</span>
-            <span class="provider-name">Claude Code</span>
-          </button>
-          <button class="provider-toggle-item" role="radio" aria-checked="false" tabindex="-1">
-            <span class="provider-icon" style="color: var(--azure-400);">&#9671;</span>
-            <span class="provider-name">OpenCode</span>
-          </button>
-          <button class="provider-toggle-item" role="radio" aria-checked="false" tabindex="-1">
-            <span class="provider-icon" style="color: var(--amber-400);">&#9635;</span>
-            <span class="provider-name">Codex</span>
-          </button>
-          <button class="provider-toggle-item" role="radio" aria-checked="false" tabindex="-1">
-            <span class="provider-icon" style="color: var(--bark-300);">&#9655;</span>
-            <span class="provider-name">Cursor</span>
-          </button>
-        </div>
-        <div style="margin-top: 4px; font-size: var(--text-xs); color: var(--foreground-subtle);">
-          <span class="font-mono">claude</span> CLI via stdin/stdout stream-JSON
-        </div>
-      </div>
+					<hr class="gk-hr" style="margin: 16px 0" />
 
-      <!-- Model -->
-      <div class="field-section">
-        <label class="gk-label" for="model-select">Model</label>
-        <select class="gk-select" id="model-select">
-          <option selected>claude-opus-4-7 (200K)</option>
-          <option>claude-sonnet-4-6 (200K)</option>
-          <option>claude-sonnet-4 (200K)</option>
-          <option>claude-haiku-3.5 (200K)</option>
-        </select>
-      </div>
+					<!-- Context Attachment -->
+					<div class="field-section" style="margin-top: 0">
+						<label class="gk-label">Context</label>
+						<div class="context-card">
+							<div class="context-issue-row">
+								<input type="checkbox" class="gk-check" checked />
+								<span
+									class="gk-badge gk-badge-moss"
+									style="font-family: var(--font-mono); font-size: 10.5px"
+									>#42</span
+								>
+								<span class="context-issue-title"
+									>Fix authentication timeout on workspace switch</span
+								>
+							</div>
+							<div class="context-preview">
+								<button class="context-expand-btn">
+									&#9662; Show issue description
+								</button>
+							</div>
+						</div>
 
-      <!-- Permission Mode -->
-      <div class="field-section">
-        <label class="gk-label">Permission Mode</label>
-        <div class="permission-group">
-          <label class="permission-option">
-            <input type="radio" name="permission" class="gk-radio" checked>
-            <div class="permission-option-text">
-              <span class="permission-option-label">Approve each</span>
-              <span class="permission-option-desc">Review every file edit and command</span>
-            </div>
-          </label>
-          <label class="permission-option">
-            <input type="radio" name="permission" class="gk-radio">
-            <div class="permission-option-text">
-              <span class="permission-option-label">Auto-accept edits</span>
-              <span class="permission-option-desc">File changes apply automatically, commands still require approval</span>
-            </div>
-          </label>
-          <label class="permission-option">
-            <input type="radio" name="permission" class="gk-radio">
-            <div class="permission-option-text">
-              <span class="permission-option-label">Bypass all</span>
-              <span class="permission-option-desc">Full autonomy — no approval gates</span>
-            </div>
-          </label>
-        </div>
-      </div>
+						<div style="margin-top: 10px">
+							<label class="gk-label" for="prompt-prefix"
+								>Prompt prefix
+								<span style="color: var(--foreground-subtle); font-weight: 400"
+									>(optional)</span
+								></label
+							>
+							<textarea
+								class="gk-textarea"
+								id="prompt-prefix"
+								rows="2"
+								placeholder="e.g., Focus on the backend auth module only..."
+							></textarea>
+						</div>
+					</div>
 
-      <hr class="gk-hr" style="margin: 16px 0;">
+					<!-- Workspace Path -->
+					<div class="field-section">
+						<label class="gk-label" for="workspace-path">Workspace</label>
+						<select class="gk-select" id="workspace-path">
+							<option selected>/repos/Grovekeeper</option>
+							<option>/repos/Grovekeeper (worktree: feat/session-spawn)</option>
+							<option>/repos/low-poly-2d-trees</option>
+						</select>
+					</div>
 
-      <!-- Context Attachment -->
-      <div class="field-section" style="margin-top: 0;">
-        <label class="gk-label">Context</label>
-        <div class="context-card">
-          <div class="context-issue-row">
-            <input type="checkbox" class="gk-check" checked>
-            <span class="gk-badge gk-badge-moss" style="font-family: var(--font-mono); font-size: 10.5px;">#42</span>
-            <span class="context-issue-title">Fix authentication timeout on workspace switch</span>
-          </div>
-          <div class="context-preview">
-            <button class="context-expand-btn">
-              &#9662; Show issue description
-            </button>
-          </div>
-        </div>
+					<!-- Resume Session -->
+					<div class="field-section">
+						<div class="resume-row">
+							<div class="resume-label-group">
+								<span
+									style="
+										font-size: var(--text-md);
+										color: var(--foreground);
+										font-weight: var(--weight-medium);
+									"
+									>Resume existing session</span
+								>
+								<span
+									style="
+										font-size: var(--text-xs);
+										color: var(--foreground-subtle);
+									"
+									>Pick up where a previous session left off</span
+								>
+							</div>
+							<div
+								class="gk-toggle"
+								data-on="false"
+								role="switch"
+								aria-checked="false"
+								tabindex="0"
+							></div>
+						</div>
+					</div>
+				</div>
 
-        <div style="margin-top: 10px;">
-          <label class="gk-label" for="prompt-prefix">Prompt prefix <span style="color: var(--foreground-subtle); font-weight: 400;">(optional)</span></label>
-          <textarea class="gk-textarea" id="prompt-prefix" rows="2" placeholder="e.g., Focus on the backend auth module only..."></textarea>
-        </div>
-      </div>
-
-      <!-- Workspace Path -->
-      <div class="field-section">
-        <label class="gk-label" for="workspace-path">Workspace</label>
-        <select class="gk-select" id="workspace-path">
-          <option selected>/repos/Grovekeeper</option>
-          <option>/repos/Grovekeeper (worktree: feat/session-spawn)</option>
-          <option>/repos/low-poly-2d-trees</option>
-        </select>
-      </div>
-
-      <!-- Resume Session -->
-      <div class="field-section">
-        <div class="resume-row">
-          <div class="resume-label-group">
-            <span style="font-size: var(--text-md); color: var(--foreground); font-weight: var(--weight-medium);">Resume existing session</span>
-            <span style="font-size: var(--text-xs); color: var(--foreground-subtle);">Pick up where a previous session left off</span>
-          </div>
-          <div class="gk-toggle" data-on="false" role="switch" aria-checked="false" tabindex="0"></div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Footer -->
-    <div class="gk-modal-footer">
-      <div class="footer-hint">
-        <span class="gk-kbd">Esc</span> to close
-        <span style="margin-left: 4px;" class="gk-kbd">Enter</span> to start
-      </div>
-      <button class="gk-btn gk-btn-ghost">Cancel</button>
-      <button class="gk-btn gk-btn-primary gk-btn-lg" style="min-width: 120px;">
-        <span style="font-size: 14px;">&#9654;</span>
-        Start Session
-      </button>
-    </div>
-
-  </div>
-</div>
-
-</body>
+				<!-- Footer -->
+				<div class="gk-modal-footer">
+					<div class="footer-hint">
+						<span class="gk-kbd">Esc</span> to close
+						<span style="margin-left: 4px" class="gk-kbd">Enter</span> to start
+					</div>
+					<button class="gk-btn gk-btn-ghost">Cancel</button>
+					<button class="gk-btn gk-btn-primary gk-btn-lg" style="min-width: 120px">
+						<span style="font-size: 14px">&#9654;</span>
+						Start Session
+					</button>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

@@ -1,1105 +1,1568 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Workspace Card — Variant C: Dashboard Mini</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-<style>
-/* ── Design tokens (inlined from tokens.css) ── */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --sage-400: oklch(0.680 0.070 160);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-16: 32px;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-full: 9999px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out: cubic-bezier(.16,.84,.44,1);
-}
-
-.theme-dark {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --ring:              var(--moss-400);
-}
-
-/* ── Base ── */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; margin: 0; padding: 0; }
-.font-mono { font-family: var(--font-mono); }
-
-/* ── Page layout ── */
-.variant-page {
-  min-height: 100vh;
-  padding: 48px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.variant-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-  padding-bottom: 8px;
-  border-bottom: 1px dashed var(--border);
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-}
-
-/* ── Workspace Card — Dashboard Mini ── */
-.wc {
-  position: relative;
-  isolation: isolate;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 14px 14px 12px;
-  cursor: pointer;
-  min-height: 196px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition:
-    transform var(--duration-3) var(--ease-out),
-    border-color var(--duration-3) var(--ease-out),
-    box-shadow var(--duration-3) var(--ease-out);
-}
-
-/* Accent left bar */
-.wc::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 3px;
-  border-radius: 0 2px 2px 0;
-  background: var(--card-accent);
-  opacity: 0.85;
-}
-
-/* Accent gradient tint overlay */
-.wc::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(180deg,
-    color-mix(in oklch, var(--card-accent) 8%, transparent) 0%,
-    transparent 60%);
-  z-index: -1;
-}
-
-/* Hover */
-.wc:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in oklch, var(--card-accent) 50%, var(--border));
-  box-shadow:
-    var(--shadow-md),
-    0 0 0 1px color-mix(in oklch, var(--card-accent) 22%, transparent),
-    0 4px 28px -10px color-mix(in oklch, var(--card-accent) 50%, transparent);
-}
-
-/* Focus visible */
-.wc:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-/* Active press */
-.wc:active {
-  transform: translateY(0) scale(0.99);
-}
-
-/* ── Header ── */
-.wc-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-}
-
-/* Tree thumbnail — small 48px in header */
-.wc-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Hatched placeholder */
-.wc-thumb-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 3px,
-      color-mix(in oklch, var(--foreground) 5%, transparent) 3px,
-      color-mix(in oklch, var(--foreground) 5%, transparent) 4px
-    );
-}
-
-/* Custom SVG thumbnail */
-.wc-thumb svg {
-  width: 32px;
-  height: 32px;
-}
-
-.wc-header-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.wc-name {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.wc-accent-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: var(--radius-full);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  background: color-mix(in oklch, var(--card-accent) 16%, transparent);
-  color: var(--card-accent);
-  border: 1px solid color-mix(in oklch, var(--card-accent) 25%, transparent);
-  white-space: nowrap;
-}
-
-.wc-subtitle {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Header right: AFK LED + quick actions */
-.wc-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.wc-quick-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.wc-action-btn {
-  width: 26px;
-  height: 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--foreground-subtle);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background var(--duration-2) ease, color var(--duration-2) ease;
-}
-.wc-action-btn:hover {
-  background: var(--surface-2);
-  color: var(--foreground);
-}
-.wc-action-btn:active {
-  transform: scale(0.92);
-}
-.wc-action-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
-}
-.wc-action-btn[data-state="disabled"] {
-  opacity: 0.35;
-  cursor: default;
-}
-.wc-action-btn svg {
-  width: 15px;
-  height: 15px;
-}
-
-/* AFK LED */
-.wc-afk-led {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.wc-led-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--foreground-subtle);
-  flex-shrink: 0;
-  transition: background var(--duration-3) ease, box-shadow var(--duration-3) ease;
-}
-
-.wc-led-dot.is-active {
-  background: var(--moss-400);
-  box-shadow:
-    0 0 4px color-mix(in oklch, var(--moss-400) 70%, transparent),
-    0 0 10px color-mix(in oklch, var(--moss-400) 40%, transparent);
-  animation: led-pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes led-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.wc-led-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wide);
-  white-space: nowrap;
-}
-
-.wc-led-label.is-active {
-  color: var(--moss-400);
-  font-weight: var(--weight-medium);
-}
-
-/* ── 2x2 Metric tiles ── */
-.wc-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-
-.wc-tile {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: background var(--duration-2) ease, border-color var(--duration-2) ease;
-}
-
-.wc-tile:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-strong);
-}
-
-.wc-tile:active {
-  transform: scale(0.98);
-}
-
-.wc-tile-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-}
-
-.wc-tile-label svg {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-}
-
-.wc-tile-value {
-  font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: var(--weight-semibold);
-  font-variant-numeric: tabular-nums;
-  color: var(--foreground);
-  line-height: 1;
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-}
-
-.wc-tile-value .wc-val-denom {
-  font-weight: var(--weight-regular);
-  color: var(--foreground-muted);
-  font-size: 13px;
-}
-
-/* Pulse dot next to tile label */
-.wc-tile-pulse {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-  animation: led-pulse 1.4s ease-in-out infinite;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-/* Tone: zero */
-.wc-tile.tone-zero .wc-tile-value {
-  color: var(--foreground-subtle);
-  font-weight: var(--weight-regular);
-}
-.wc-tile.tone-zero .wc-tile-label {
-  color: color-mix(in oklch, var(--foreground-subtle) 70%, transparent);
-}
-
-/* Tone: warning */
-.wc-tile.tone-warning {
-  background: color-mix(in oklch, var(--status-warning) 8%, var(--surface-2));
-  border-color: color-mix(in oklch, var(--status-warning) 25%, var(--border));
-}
-.wc-tile.tone-warning .wc-tile-label {
-  color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
-}
-.wc-tile.tone-warning .wc-tile-value {
-  color: var(--status-warning);
-}
-
-/* Tone: danger */
-.wc-tile.tone-danger {
-  background: color-mix(in oklch, var(--status-danger) 8%, var(--surface-2));
-  border-color: color-mix(in oklch, var(--status-danger) 25%, var(--border));
-}
-.wc-tile.tone-danger .wc-tile-label {
-  color: color-mix(in oklch, var(--status-danger) 80%, var(--foreground));
-}
-.wc-tile.tone-danger .wc-tile-value {
-  color: var(--status-danger);
-}
-
-/* ── PRD row ── */
-.wc-prd-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-muted);
-  transition: background var(--duration-2) ease, border-color var(--duration-2) ease;
-}
-
-.wc-prd-row:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-strong);
-}
-
-.wc-prd-row svg {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  color: var(--foreground-subtle);
-}
-
-.wc-prd-text {
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.wc-prd-sep {
-  color: var(--foreground-subtle);
-}
-
-.wc-prd-progress-track {
-  flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: color-mix(in oklch, var(--foreground) 8%, transparent);
-  min-width: 40px;
-  overflow: hidden;
-}
-
-.wc-prd-progress-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--card-accent);
-  transition: width var(--duration-4) var(--ease-out);
-}
-
-.wc-prd-done {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  color: var(--foreground-subtle);
-}
-
-/* ── Footer ── */
-.wc-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 8px;
-  border-top: 1px dashed var(--border);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-.wc-footer-cost {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.wc-footer-cost strong {
-  color: var(--foreground-muted);
-  font-weight: var(--weight-medium);
-}
-
-.wc-footer-time {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.wc-footer-time svg {
-  width: 11px;
-  height: 11px;
-}
-
-/* ── Card state: active (breathing) ── */
-.wc.is-active {
-  animation: wc-breathe 3.6s ease-in-out infinite;
-}
-
-@keyframes wc-breathe {
-  0%, 100% {
-    box-shadow:
-      var(--shadow-sm),
-      inset 0 0 12px color-mix(in oklch, var(--card-accent) 6%, transparent);
-  }
-  50% {
-    box-shadow:
-      var(--shadow-sm),
-      inset 0 0 18px color-mix(in oklch, var(--card-accent) 12%, transparent);
-  }
-}
-
-/* ── Card state: needs-attention (amber override) ── */
-.wc.is-needs-attention {
-  --card-accent: oklch(0.770 0.155 75);
-}
-
-/* ── Card state: dormant ── */
-.wc.is-dormant {
-  opacity: 0.72;
-  filter: saturate(0.7);
-}
-
-.wc.is-dormant:hover {
-  opacity: 0.88;
-  filter: saturate(0.85);
-}
-
-/* ── State label badges (for mockup identification) ── */
-.wc-state-tag {
-  position: absolute;
-  top: -10px;
-  right: 12px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: var(--radius-xs);
-  background: var(--surface-3);
-  border: 1px solid var(--border);
-  color: var(--foreground-muted);
-  z-index: 2;
-}
-
-.wc-state-tag.tag-active {
-  background: color-mix(in oklch, var(--moss-400) 16%, var(--surface-3));
-  color: var(--moss-400);
-  border-color: color-mix(in oklch, var(--moss-400) 30%, var(--border));
-}
-
-.wc-state-tag.tag-attention {
-  background: color-mix(in oklch, var(--status-warning) 16%, var(--surface-3));
-  color: var(--status-warning);
-  border-color: color-mix(in oklch, var(--status-warning) 30%, var(--border));
-}
-
-.wc-state-tag.tag-dormant {
-  background: var(--surface-2);
-  color: var(--foreground-subtle);
-}
-
-/* ── Responsive ── */
-@media (max-width: 720px) {
-  .variant-page {
-    padding: 24px 16px;
-  }
-  .card-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-}
-
-@media (min-width: 721px) and (max-width: 1100px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-</style>
-</head>
-<body>
-<div class="gk-root theme-dark">
-  <div class="variant-page">
-    <div class="variant-label">VARIANT C: DASHBOARD MINI</div>
-
-    <div class="card-grid">
-
-      <!-- ═══════ Card 1: Default — Azure accent, AFK off ═══════ -->
-      <div class="wc" style="--card-accent: oklch(0.660 0.120 230);" tabindex="0">
-        <span class="wc-state-tag">default</span>
-        <div class="wc-header">
-          <div class="wc-thumb">
-            <div class="wc-thumb-placeholder">GK</div>
-          </div>
-          <div class="wc-header-info">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span class="wc-name">grovekeeper</span>
-              <span class="wc-accent-badge">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--card-accent);flex-shrink:0;"></span>
-                azure
-              </span>
-            </div>
-            <div class="wc-subtitle">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-              dev &middot; 3 worktrees
-            </div>
-          </div>
-          <div class="wc-header-right">
-            <div class="wc-quick-actions">
-              <button class="wc-action-btn" title="Open on GitHub" aria-label="Open on GitHub">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              </button>
-              <button class="wc-action-btn" title="Open folder" aria-label="Open folder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-              </button>
-            </div>
-            <div class="wc-afk-led">
-              <span class="wc-led-dot"></span>
-              <span class="wc-led-label">AFK off</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2x2 metric tiles -->
-        <div class="wc-metrics">
-          <div class="wc-tile">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="m3 6 2 2 4-4"/><path d="m3 12 2 2 4-4"/><path d="m3 18 2 2 4-4"/></svg>
-              ISSUES
-            </div>
-            <div class="wc-tile-value">
-              3<span class="wc-val-denom">/10</span>
-            </div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
-              PRs
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              ATTN
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              HITL
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-        </div>
-
-        <!-- PRD row -->
-        <div class="wc-prd-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-          <span class="wc-prd-text">
-            2 PRDs
-            <span class="wc-prd-sep">&middot;</span>
-          </span>
-          <div class="wc-prd-progress-track">
-            <div class="wc-prd-progress-fill" style="width: 39%;"></div>
-          </div>
-          <span class="wc-prd-done">12/31</span>
-        </div>
-
-        <!-- Footer -->
-        <div class="wc-footer">
-          <div class="wc-footer-cost">today <strong>$4.82</strong></div>
-          <div class="wc-footer-time">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            12m ago
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══════ Card 2: Active — Moss accent, AFK on, sessions running ═══════ -->
-      <div class="wc is-active" style="--card-accent: oklch(0.690 0.098 132);" tabindex="0">
-        <span class="wc-state-tag tag-active">active</span>
-        <div class="wc-header">
-          <div class="wc-thumb">
-            <!-- Simple tree SVG thumbnail -->
-            <svg viewBox="0 0 48 48" fill="none" style="width:36px;height:36px;">
-              <polygon points="24,6 10,28 38,28" fill="oklch(0.580 0.096 134)" opacity="0.7"/>
-              <polygon points="24,14 14,32 34,32" fill="oklch(0.480 0.082 138)" opacity="0.8"/>
-              <rect x="21" y="32" width="6" height="10" rx="1" fill="oklch(0.500 0.075 55)"/>
-            </svg>
-          </div>
-          <div class="wc-header-info">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span class="wc-name">low-poly-2d-trees</span>
-              <span class="wc-accent-badge">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--card-accent);flex-shrink:0;"></span>
-                moss
-              </span>
-            </div>
-            <div class="wc-subtitle">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-              main &middot; 5 worktrees
-            </div>
-          </div>
-          <div class="wc-header-right">
-            <div class="wc-quick-actions">
-              <button class="wc-action-btn" title="Open on GitHub" aria-label="Open on GitHub">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              </button>
-              <button class="wc-action-btn" title="Open folder" aria-label="Open folder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-              </button>
-            </div>
-            <div class="wc-afk-led">
-              <span class="wc-led-dot is-active"></span>
-              <span class="wc-led-label is-active">AFK on</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2x2 metric tiles -->
-        <div class="wc-metrics">
-          <div class="wc-tile">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="m3 6 2 2 4-4"/><path d="m3 12 2 2 4-4"/><path d="m3 18 2 2 4-4"/></svg>
-              ISSUES
-            </div>
-            <div class="wc-tile-value">
-              5<span class="wc-val-denom">/18</span>
-            </div>
-          </div>
-
-          <div class="wc-tile">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
-              PRs
-            </div>
-            <div class="wc-tile-value">2</div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              ATTN
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              HITL
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-        </div>
-
-        <!-- PRD row -->
-        <div class="wc-prd-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-          <span class="wc-prd-text">
-            3 PRDs
-            <span class="wc-prd-sep">&middot;</span>
-          </span>
-          <div class="wc-prd-progress-track">
-            <div class="wc-prd-progress-fill" style="width: 72%;"></div>
-          </div>
-          <span class="wc-prd-done">23/32</span>
-        </div>
-
-        <!-- Footer -->
-        <div class="wc-footer">
-          <div class="wc-footer-cost">today <strong>$11.40</strong></div>
-          <div class="wc-footer-time">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            just now
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══════ Card 3: Needs Attention — Amber override, HITL pending ═══════ -->
-      <div class="wc is-needs-attention" style="--card-accent: oklch(0.770 0.155 75);" tabindex="0">
-        <span class="wc-state-tag tag-attention">needs-attention</span>
-        <div class="wc-header">
-          <div class="wc-thumb">
-            <div class="wc-thumb-placeholder">SV</div>
-          </div>
-          <div class="wc-header-info">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span class="wc-name">servo-platform</span>
-              <span class="wc-accent-badge">
-                <span style="width:6px;height:6px;border-radius:50%;background:oklch(0.640 0.130 320);flex-shrink:0;"></span>
-                plum
-              </span>
-            </div>
-            <div class="wc-subtitle">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-              main &middot; 2 worktrees
-            </div>
-          </div>
-          <div class="wc-header-right">
-            <div class="wc-quick-actions">
-              <button class="wc-action-btn" title="Open on GitHub" aria-label="Open on GitHub">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              </button>
-              <button class="wc-action-btn" title="Open folder" aria-label="Open folder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-              </button>
-            </div>
-            <div class="wc-afk-led">
-              <span class="wc-led-dot is-active"></span>
-              <span class="wc-led-label is-active">AFK on</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2x2 metric tiles -->
-        <div class="wc-metrics">
-          <div class="wc-tile">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="m3 6 2 2 4-4"/><path d="m3 12 2 2 4-4"/><path d="m3 18 2 2 4-4"/></svg>
-              ISSUES
-            </div>
-            <div class="wc-tile-value">
-              7<span class="wc-val-denom">/24</span>
-            </div>
-          </div>
-
-          <div class="wc-tile">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
-              PRs
-            </div>
-            <div class="wc-tile-value">4</div>
-          </div>
-
-          <div class="wc-tile tone-danger">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              ATTN
-              <span class="wc-tile-pulse"></span>
-            </div>
-            <div class="wc-tile-value">1</div>
-          </div>
-
-          <div class="wc-tile tone-warning">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              HITL
-              <span class="wc-tile-pulse"></span>
-            </div>
-            <div class="wc-tile-value">3</div>
-          </div>
-        </div>
-
-        <!-- PRD row -->
-        <div class="wc-prd-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-          <span class="wc-prd-text">
-            4 PRDs
-            <span class="wc-prd-sep">&middot;</span>
-          </span>
-          <div class="wc-prd-progress-track">
-            <div class="wc-prd-progress-fill" style="width: 55%;"></div>
-          </div>
-          <span class="wc-prd-done">34/62</span>
-        </div>
-
-        <!-- Footer -->
-        <div class="wc-footer">
-          <div class="wc-footer-cost">today <strong>$8.17</strong></div>
-          <div class="wc-footer-time">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            3m ago
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══════ Card 4: Dormant — Coral accent, no activity ═══════ -->
-      <div class="wc is-dormant" style="--card-accent: oklch(0.700 0.135 30);" tabindex="0">
-        <span class="wc-state-tag tag-dormant">dormant</span>
-        <div class="wc-header">
-          <div class="wc-thumb">
-            <div class="wc-thumb-placeholder">TP</div>
-          </div>
-          <div class="wc-header-info">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span class="wc-name">topo-parser</span>
-              <span class="wc-accent-badge">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--card-accent);flex-shrink:0;"></span>
-                coral
-              </span>
-            </div>
-            <div class="wc-subtitle">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-              main &middot; 1 worktree
-            </div>
-          </div>
-          <div class="wc-header-right">
-            <div class="wc-quick-actions">
-              <button class="wc-action-btn" title="Open on GitHub" aria-label="Open on GitHub">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-              </button>
-              <button class="wc-action-btn" data-state="disabled" title="No folder set" aria-label="Open folder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-              </button>
-            </div>
-            <div class="wc-afk-led">
-              <span class="wc-led-dot"></span>
-              <span class="wc-led-label">AFK off</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2x2 metric tiles -->
-        <div class="wc-metrics">
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="m3 6 2 2 4-4"/><path d="m3 12 2 2 4-4"/><path d="m3 18 2 2 4-4"/></svg>
-              ISSUES
-            </div>
-            <div class="wc-tile-value">
-              0<span class="wc-val-denom">/4</span>
-            </div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
-              PRs
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              ATTN
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-
-          <div class="wc-tile tone-zero">
-            <div class="wc-tile-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              HITL
-            </div>
-            <div class="wc-tile-value">0</div>
-          </div>
-        </div>
-
-        <!-- PRD row -->
-        <div class="wc-prd-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-          <span class="wc-prd-text">
-            1 PRD
-            <span class="wc-prd-sep">&middot;</span>
-          </span>
-          <div class="wc-prd-progress-track">
-            <div class="wc-prd-progress-fill" style="width: 100%;"></div>
-          </div>
-          <span class="wc-prd-done">8/8</span>
-        </div>
-
-        <!-- Footer -->
-        <div class="wc-footer">
-          <div class="wc-footer-cost">today <strong>$0.00</strong></div>
-          <div class="wc-footer-time">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            3d ago
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /card-grid -->
-  </div>
-</div>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Workspace Card — Variant C: Dashboard Mini</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ── Design tokens (inlined from tokens.css) ── */
+
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--ring: var(--moss-400);
+			}
+
+			/* ── Base ── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
+
+			/* ── Page layout ── */
+			.variant-page {
+				min-height: 100vh;
+				padding: 48px 32px;
+				display: flex;
+				flex-direction: column;
+				gap: 32px;
+			}
+
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				padding-bottom: 8px;
+				border-bottom: 1px dashed var(--border);
+			}
+
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+				gap: 16px;
+			}
+
+			/* ── Workspace Card — Dashboard Mini ── */
+			.wc {
+				position: relative;
+				isolation: isolate;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				padding: 14px 14px 12px;
+				cursor: pointer;
+				min-height: 196px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				transition:
+					transform var(--duration-3) var(--ease-out),
+					border-color var(--duration-3) var(--ease-out),
+					box-shadow var(--duration-3) var(--ease-out);
+			}
+
+			/* Accent left bar */
+			.wc::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 8px;
+				bottom: 8px;
+				width: 3px;
+				border-radius: 0 2px 2px 0;
+				background: var(--card-accent);
+				opacity: 0.85;
+			}
+
+			/* Accent gradient tint overlay */
+			.wc::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: inherit;
+				pointer-events: none;
+				background: linear-gradient(
+					180deg,
+					color-mix(in oklch, var(--card-accent) 8%, transparent) 0%,
+					transparent 60%
+				);
+				z-index: -1;
+			}
+
+			/* Hover */
+			.wc:hover {
+				transform: translateY(-2px);
+				border-color: color-mix(in oklch, var(--card-accent) 50%, var(--border));
+				box-shadow:
+					var(--shadow-md),
+					0 0 0 1px color-mix(in oklch, var(--card-accent) 22%, transparent),
+					0 4px 28px -10px color-mix(in oklch, var(--card-accent) 50%, transparent);
+			}
+
+			/* Focus visible */
+			.wc:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			/* Active press */
+			.wc:active {
+				transform: translateY(0) scale(0.99);
+			}
+
+			/* ── Header ── */
+			.wc-header {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				min-height: 48px;
+			}
+
+			/* Tree thumbnail — small 48px in header */
+			.wc-thumb {
+				width: 48px;
+				height: 48px;
+				border-radius: var(--radius-md);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				position: relative;
+			}
+
+			/* Hatched placeholder */
+			.wc-thumb-placeholder {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font-mono);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				background: repeating-linear-gradient(
+					-45deg,
+					transparent,
+					transparent 3px,
+					color-mix(in oklch, var(--foreground) 5%, transparent) 3px,
+					color-mix(in oklch, var(--foreground) 5%, transparent) 4px
+				);
+			}
+
+			/* Custom SVG thumbnail */
+			.wc-thumb svg {
+				width: 32px;
+				height: 32px;
+			}
+
+			.wc-header-info {
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+
+			.wc-name {
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.wc-accent-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 18px;
+				padding: 0 6px;
+				border-radius: var(--radius-full);
+				font-family: var(--font-mono);
+				font-size: 10px;
+				font-weight: var(--weight-medium);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+				background: color-mix(in oklch, var(--card-accent) 16%, transparent);
+				color: var(--card-accent);
+				border: 1px solid color-mix(in oklch, var(--card-accent) 25%, transparent);
+				white-space: nowrap;
+			}
+
+			.wc-subtitle {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			/* Header right: AFK LED + quick actions */
+			.wc-header-right {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+
+			.wc-quick-actions {
+				display: flex;
+				align-items: center;
+				gap: 2px;
+			}
+
+			.wc-action-btn {
+				width: 26px;
+				height: 26px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition:
+					background var(--duration-2) ease,
+					color var(--duration-2) ease;
+			}
+			.wc-action-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.wc-action-btn:active {
+				transform: scale(0.92);
+			}
+			.wc-action-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 1px;
+			}
+			.wc-action-btn[data-state='disabled'] {
+				opacity: 0.35;
+				cursor: default;
+			}
+			.wc-action-btn svg {
+				width: 15px;
+				height: 15px;
+			}
+
+			/* AFK LED */
+			.wc-afk-led {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+			}
+
+			.wc-led-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background: var(--foreground-subtle);
+				flex-shrink: 0;
+				transition:
+					background var(--duration-3) ease,
+					box-shadow var(--duration-3) ease;
+			}
+
+			.wc-led-dot.is-active {
+				background: var(--moss-400);
+				box-shadow:
+					0 0 4px color-mix(in oklch, var(--moss-400) 70%, transparent),
+					0 0 10px color-mix(in oklch, var(--moss-400) 40%, transparent);
+				animation: led-pulse 1.8s ease-in-out infinite;
+			}
+
+			@keyframes led-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.5;
+				}
+			}
+
+			.wc-led-label {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				white-space: nowrap;
+			}
+
+			.wc-led-label.is-active {
+				color: var(--moss-400);
+				font-weight: var(--weight-medium);
+			}
+
+			/* ── 2x2 Metric tiles ── */
+			.wc-metrics {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 6px;
+			}
+
+			.wc-tile {
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 8px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+			}
+
+			.wc-tile:hover {
+				background: var(--surface-hover);
+				border-color: var(--border-strong);
+			}
+
+			.wc-tile:active {
+				transform: scale(0.98);
+			}
+
+			.wc-tile-label {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+			}
+
+			.wc-tile-label svg {
+				width: 12px;
+				height: 12px;
+				flex-shrink: 0;
+			}
+
+			.wc-tile-value {
+				font-family: var(--font-mono);
+				font-size: 16px;
+				font-weight: var(--weight-semibold);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground);
+				line-height: 1;
+				display: flex;
+				align-items: baseline;
+				gap: 2px;
+			}
+
+			.wc-tile-value .wc-val-denom {
+				font-weight: var(--weight-regular);
+				color: var(--foreground-muted);
+				font-size: 13px;
+			}
+
+			/* Pulse dot next to tile label */
+			.wc-tile-pulse {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: currentColor;
+				animation: led-pulse 1.4s ease-in-out infinite;
+				flex-shrink: 0;
+				margin-left: auto;
+			}
+
+			/* Tone: zero */
+			.wc-tile.tone-zero .wc-tile-value {
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-regular);
+			}
+			.wc-tile.tone-zero .wc-tile-label {
+				color: color-mix(in oklch, var(--foreground-subtle) 70%, transparent);
+			}
+
+			/* Tone: warning */
+			.wc-tile.tone-warning {
+				background: color-mix(in oklch, var(--status-warning) 8%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--status-warning) 25%, var(--border));
+			}
+			.wc-tile.tone-warning .wc-tile-label {
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
+			}
+			.wc-tile.tone-warning .wc-tile-value {
+				color: var(--status-warning);
+			}
+
+			/* Tone: danger */
+			.wc-tile.tone-danger {
+				background: color-mix(in oklch, var(--status-danger) 8%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--status-danger) 25%, var(--border));
+			}
+			.wc-tile.tone-danger .wc-tile-label {
+				color: color-mix(in oklch, var(--status-danger) 80%, var(--foreground));
+			}
+			.wc-tile.tone-danger .wc-tile-value {
+				color: var(--status-danger);
+			}
+
+			/* ── PRD row ── */
+			.wc-prd-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 6px 10px;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-muted);
+				transition:
+					background var(--duration-2) ease,
+					border-color var(--duration-2) ease;
+			}
+
+			.wc-prd-row:hover {
+				background: var(--surface-hover);
+				border-color: var(--border-strong);
+			}
+
+			.wc-prd-row svg {
+				width: 12px;
+				height: 12px;
+				flex-shrink: 0;
+				color: var(--foreground-subtle);
+			}
+
+			.wc-prd-text {
+				white-space: nowrap;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+
+			.wc-prd-sep {
+				color: var(--foreground-subtle);
+			}
+
+			.wc-prd-progress-track {
+				flex: 1;
+				height: 4px;
+				border-radius: 2px;
+				background: color-mix(in oklch, var(--foreground) 8%, transparent);
+				min-width: 40px;
+				overflow: hidden;
+			}
+
+			.wc-prd-progress-fill {
+				height: 100%;
+				border-radius: 2px;
+				background: var(--card-accent);
+				transition: width var(--duration-4) var(--ease-out);
+			}
+
+			.wc-prd-done {
+				font-variant-numeric: tabular-nums;
+				white-space: nowrap;
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Footer ── */
+			.wc-footer {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding-top: 8px;
+				border-top: 1px dashed var(--border);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.wc-footer-cost {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.wc-footer-cost strong {
+				color: var(--foreground-muted);
+				font-weight: var(--weight-medium);
+			}
+
+			.wc-footer-time {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.wc-footer-time svg {
+				width: 11px;
+				height: 11px;
+			}
+
+			/* ── Card state: active (breathing) ── */
+			.wc.is-active {
+				animation: wc-breathe 3.6s ease-in-out infinite;
+			}
+
+			@keyframes wc-breathe {
+				0%,
+				100% {
+					box-shadow:
+						var(--shadow-sm),
+						inset 0 0 12px color-mix(in oklch, var(--card-accent) 6%, transparent);
+				}
+				50% {
+					box-shadow:
+						var(--shadow-sm),
+						inset 0 0 18px color-mix(in oklch, var(--card-accent) 12%, transparent);
+				}
+			}
+
+			/* ── Card state: needs-attention (amber override) ── */
+			.wc.is-needs-attention {
+				--card-accent: oklch(0.77 0.155 75);
+			}
+
+			/* ── Card state: dormant ── */
+			.wc.is-dormant {
+				opacity: 0.72;
+				filter: saturate(0.7);
+			}
+
+			.wc.is-dormant:hover {
+				opacity: 0.88;
+				filter: saturate(0.85);
+			}
+
+			/* ── State label badges (for mockup identification) ── */
+			.wc-state-tag {
+				position: absolute;
+				top: -10px;
+				right: 12px;
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				padding: 2px 8px;
+				border-radius: var(--radius-xs);
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				color: var(--foreground-muted);
+				z-index: 2;
+			}
+
+			.wc-state-tag.tag-active {
+				background: color-mix(in oklch, var(--moss-400) 16%, var(--surface-3));
+				color: var(--moss-400);
+				border-color: color-mix(in oklch, var(--moss-400) 30%, var(--border));
+			}
+
+			.wc-state-tag.tag-attention {
+				background: color-mix(in oklch, var(--status-warning) 16%, var(--surface-3));
+				color: var(--status-warning);
+				border-color: color-mix(in oklch, var(--status-warning) 30%, var(--border));
+			}
+
+			.wc-state-tag.tag-dormant {
+				background: var(--surface-2);
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Responsive ── */
+			@media (max-width: 720px) {
+				.variant-page {
+					padding: 24px 16px;
+				}
+				.card-grid {
+					grid-template-columns: 1fr;
+					gap: 20px;
+				}
+			}
+
+			@media (min-width: 721px) and (max-width: 1100px) {
+				.card-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="variant-page">
+				<div class="variant-label">VARIANT C: DASHBOARD MINI</div>
+
+				<div class="card-grid">
+					<!-- ═══════ Card 1: Default — Azure accent, AFK off ═══════ -->
+					<div class="wc" style="--card-accent: oklch(0.66 0.12 230)" tabindex="0">
+						<span class="wc-state-tag">default</span>
+						<div class="wc-header">
+							<div class="wc-thumb">
+								<div class="wc-thumb-placeholder">GK</div>
+							</div>
+							<div class="wc-header-info">
+								<div style="display: flex; align-items: center; gap: 6px">
+									<span class="wc-name">grovekeeper</span>
+									<span class="wc-accent-badge">
+										<span
+											style="
+												width: 6px;
+												height: 6px;
+												border-radius: 50%;
+												background: var(--card-accent);
+												flex-shrink: 0;
+											"
+										></span>
+										azure
+									</span>
+								</div>
+								<div class="wc-subtitle">
+									<svg
+										width="11"
+										height="11"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									dev &middot; 3 worktrees
+								</div>
+							</div>
+							<div class="wc-header-right">
+								<div class="wc-quick-actions">
+									<button
+										class="wc-action-btn"
+										title="Open on GitHub"
+										aria-label="Open on GitHub"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+											/>
+											<path d="M9 18c-4.51 2-5-2-7-2" />
+										</svg>
+									</button>
+									<button
+										class="wc-action-btn"
+										title="Open folder"
+										aria-label="Open folder"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+											/>
+										</svg>
+									</button>
+								</div>
+								<div class="wc-afk-led">
+									<span class="wc-led-dot"></span>
+									<span class="wc-led-label">AFK off</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 2x2 metric tiles -->
+						<div class="wc-metrics">
+							<div class="wc-tile">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 6h11" />
+										<path d="M10 12h11" />
+										<path d="M10 18h11" />
+										<path d="m3 6 2 2 4-4" />
+										<path d="m3 12 2 2 4-4" />
+										<path d="m3 18 2 2 4-4" />
+									</svg>
+									ISSUES
+								</div>
+								<div class="wc-tile-value">
+									3<span class="wc-val-denom">/10</span>
+								</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+						</div>
+
+						<!-- PRD row -->
+						<div class="wc-prd-row">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+								/>
+								<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+							</svg>
+							<span class="wc-prd-text">
+								2 PRDs
+								<span class="wc-prd-sep">&middot;</span>
+							</span>
+							<div class="wc-prd-progress-track">
+								<div class="wc-prd-progress-fill" style="width: 39%"></div>
+							</div>
+							<span class="wc-prd-done">12/31</span>
+						</div>
+
+						<!-- Footer -->
+						<div class="wc-footer">
+							<div class="wc-footer-cost">today <strong>$4.82</strong></div>
+							<div class="wc-footer-time">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.8"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<polyline points="12 6 12 12 16 14" />
+								</svg>
+								12m ago
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══════ Card 2: Active — Moss accent, AFK on, sessions running ═══════ -->
+					<div
+						class="wc is-active"
+						style="--card-accent: oklch(0.69 0.098 132)"
+						tabindex="0"
+					>
+						<span class="wc-state-tag tag-active">active</span>
+						<div class="wc-header">
+							<div class="wc-thumb">
+								<!-- Simple tree SVG thumbnail -->
+								<svg
+									viewBox="0 0 48 48"
+									fill="none"
+									style="width: 36px; height: 36px"
+								>
+									<polygon
+										points="24,6 10,28 38,28"
+										fill="oklch(0.580 0.096 134)"
+										opacity="0.7"
+									/>
+									<polygon
+										points="24,14 14,32 34,32"
+										fill="oklch(0.480 0.082 138)"
+										opacity="0.8"
+									/>
+									<rect
+										x="21"
+										y="32"
+										width="6"
+										height="10"
+										rx="1"
+										fill="oklch(0.500 0.075 55)"
+									/>
+								</svg>
+							</div>
+							<div class="wc-header-info">
+								<div style="display: flex; align-items: center; gap: 6px">
+									<span class="wc-name">low-poly-2d-trees</span>
+									<span class="wc-accent-badge">
+										<span
+											style="
+												width: 6px;
+												height: 6px;
+												border-radius: 50%;
+												background: var(--card-accent);
+												flex-shrink: 0;
+											"
+										></span>
+										moss
+									</span>
+								</div>
+								<div class="wc-subtitle">
+									<svg
+										width="11"
+										height="11"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									main &middot; 5 worktrees
+								</div>
+							</div>
+							<div class="wc-header-right">
+								<div class="wc-quick-actions">
+									<button
+										class="wc-action-btn"
+										title="Open on GitHub"
+										aria-label="Open on GitHub"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+											/>
+											<path d="M9 18c-4.51 2-5-2-7-2" />
+										</svg>
+									</button>
+									<button
+										class="wc-action-btn"
+										title="Open folder"
+										aria-label="Open folder"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+											/>
+										</svg>
+									</button>
+								</div>
+								<div class="wc-afk-led">
+									<span class="wc-led-dot is-active"></span>
+									<span class="wc-led-label is-active">AFK on</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 2x2 metric tiles -->
+						<div class="wc-metrics">
+							<div class="wc-tile">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 6h11" />
+										<path d="M10 12h11" />
+										<path d="M10 18h11" />
+										<path d="m3 6 2 2 4-4" />
+										<path d="m3 12 2 2 4-4" />
+										<path d="m3 18 2 2 4-4" />
+									</svg>
+									ISSUES
+								</div>
+								<div class="wc-tile-value">
+									5<span class="wc-val-denom">/18</span>
+								</div>
+							</div>
+
+							<div class="wc-tile">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</div>
+								<div class="wc-tile-value">2</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+						</div>
+
+						<!-- PRD row -->
+						<div class="wc-prd-row">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+								/>
+								<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+							</svg>
+							<span class="wc-prd-text">
+								3 PRDs
+								<span class="wc-prd-sep">&middot;</span>
+							</span>
+							<div class="wc-prd-progress-track">
+								<div class="wc-prd-progress-fill" style="width: 72%"></div>
+							</div>
+							<span class="wc-prd-done">23/32</span>
+						</div>
+
+						<!-- Footer -->
+						<div class="wc-footer">
+							<div class="wc-footer-cost">today <strong>$11.40</strong></div>
+							<div class="wc-footer-time">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.8"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<polyline points="12 6 12 12 16 14" />
+								</svg>
+								just now
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══════ Card 3: Needs Attention — Amber override, HITL pending ═══════ -->
+					<div
+						class="wc is-needs-attention"
+						style="--card-accent: oklch(0.77 0.155 75)"
+						tabindex="0"
+					>
+						<span class="wc-state-tag tag-attention">needs-attention</span>
+						<div class="wc-header">
+							<div class="wc-thumb">
+								<div class="wc-thumb-placeholder">SV</div>
+							</div>
+							<div class="wc-header-info">
+								<div style="display: flex; align-items: center; gap: 6px">
+									<span class="wc-name">servo-platform</span>
+									<span class="wc-accent-badge">
+										<span
+											style="
+												width: 6px;
+												height: 6px;
+												border-radius: 50%;
+												background: oklch(0.64 0.13 320);
+												flex-shrink: 0;
+											"
+										></span>
+										plum
+									</span>
+								</div>
+								<div class="wc-subtitle">
+									<svg
+										width="11"
+										height="11"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									main &middot; 2 worktrees
+								</div>
+							</div>
+							<div class="wc-header-right">
+								<div class="wc-quick-actions">
+									<button
+										class="wc-action-btn"
+										title="Open on GitHub"
+										aria-label="Open on GitHub"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+											/>
+											<path d="M9 18c-4.51 2-5-2-7-2" />
+										</svg>
+									</button>
+									<button
+										class="wc-action-btn"
+										title="Open folder"
+										aria-label="Open folder"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+											/>
+										</svg>
+									</button>
+								</div>
+								<div class="wc-afk-led">
+									<span class="wc-led-dot is-active"></span>
+									<span class="wc-led-label is-active">AFK on</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 2x2 metric tiles -->
+						<div class="wc-metrics">
+							<div class="wc-tile">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 6h11" />
+										<path d="M10 12h11" />
+										<path d="M10 18h11" />
+										<path d="m3 6 2 2 4-4" />
+										<path d="m3 12 2 2 4-4" />
+										<path d="m3 18 2 2 4-4" />
+									</svg>
+									ISSUES
+								</div>
+								<div class="wc-tile-value">
+									7<span class="wc-val-denom">/24</span>
+								</div>
+							</div>
+
+							<div class="wc-tile">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</div>
+								<div class="wc-tile-value">4</div>
+							</div>
+
+							<div class="wc-tile tone-danger">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+									<span class="wc-tile-pulse"></span>
+								</div>
+								<div class="wc-tile-value">1</div>
+							</div>
+
+							<div class="wc-tile tone-warning">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+									<span class="wc-tile-pulse"></span>
+								</div>
+								<div class="wc-tile-value">3</div>
+							</div>
+						</div>
+
+						<!-- PRD row -->
+						<div class="wc-prd-row">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+								/>
+								<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+							</svg>
+							<span class="wc-prd-text">
+								4 PRDs
+								<span class="wc-prd-sep">&middot;</span>
+							</span>
+							<div class="wc-prd-progress-track">
+								<div class="wc-prd-progress-fill" style="width: 55%"></div>
+							</div>
+							<span class="wc-prd-done">34/62</span>
+						</div>
+
+						<!-- Footer -->
+						<div class="wc-footer">
+							<div class="wc-footer-cost">today <strong>$8.17</strong></div>
+							<div class="wc-footer-time">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.8"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<polyline points="12 6 12 12 16 14" />
+								</svg>
+								3m ago
+							</div>
+						</div>
+					</div>
+
+					<!-- ═══════ Card 4: Dormant — Coral accent, no activity ═══════ -->
+					<div
+						class="wc is-dormant"
+						style="--card-accent: oklch(0.7 0.135 30)"
+						tabindex="0"
+					>
+						<span class="wc-state-tag tag-dormant">dormant</span>
+						<div class="wc-header">
+							<div class="wc-thumb">
+								<div class="wc-thumb-placeholder">TP</div>
+							</div>
+							<div class="wc-header-info">
+								<div style="display: flex; align-items: center; gap: 6px">
+									<span class="wc-name">topo-parser</span>
+									<span class="wc-accent-badge">
+										<span
+											style="
+												width: 6px;
+												height: 6px;
+												border-radius: 50%;
+												background: var(--card-accent);
+												flex-shrink: 0;
+											"
+										></span>
+										coral
+									</span>
+								</div>
+								<div class="wc-subtitle">
+									<svg
+										width="11"
+										height="11"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<line x1="6" y1="3" x2="6" y2="15" />
+										<circle cx="18" cy="6" r="3" />
+										<circle cx="6" cy="18" r="3" />
+										<path d="M18 9a9 9 0 0 1-9 9" />
+									</svg>
+									main &middot; 1 worktree
+								</div>
+							</div>
+							<div class="wc-header-right">
+								<div class="wc-quick-actions">
+									<button
+										class="wc-action-btn"
+										title="Open on GitHub"
+										aria-label="Open on GitHub"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"
+											/>
+											<path d="M9 18c-4.51 2-5-2-7-2" />
+										</svg>
+									</button>
+									<button
+										class="wc-action-btn"
+										data-state="disabled"
+										title="No folder set"
+										aria-label="Open folder"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.7"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+											/>
+										</svg>
+									</button>
+								</div>
+								<div class="wc-afk-led">
+									<span class="wc-led-dot"></span>
+									<span class="wc-led-label">AFK off</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 2x2 metric tiles -->
+						<div class="wc-metrics">
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M10 6h11" />
+										<path d="M10 12h11" />
+										<path d="M10 18h11" />
+										<path d="m3 6 2 2 4-4" />
+										<path d="m3 12 2 2 4-4" />
+										<path d="m3 18 2 2 4-4" />
+									</svg>
+									ISSUES
+								</div>
+								<div class="wc-tile-value">
+									0<span class="wc-val-denom">/4</span>
+								</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="18" cy="18" r="3" />
+										<circle cx="6" cy="6" r="3" />
+										<path d="M13 6h3a2 2 0 0 1 2 2v7" />
+										<path d="M6 9v12" />
+									</svg>
+									PRs
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+										/>
+										<path d="M12 9v4" />
+										<path d="M12 17h.01" />
+									</svg>
+									ATTN
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+
+							<div class="wc-tile tone-zero">
+								<div class="wc-tile-label">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+										<circle cx="12" cy="7" r="4" />
+									</svg>
+									HITL
+								</div>
+								<div class="wc-tile-value">0</div>
+							</div>
+						</div>
+
+						<!-- PRD row -->
+						<div class="wc-prd-row">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+								/>
+								<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+							</svg>
+							<span class="wc-prd-text">
+								1 PRD
+								<span class="wc-prd-sep">&middot;</span>
+							</span>
+							<div class="wc-prd-progress-track">
+								<div class="wc-prd-progress-fill" style="width: 100%"></div>
+							</div>
+							<span class="wc-prd-done">8/8</span>
+						</div>
+
+						<!-- Footer -->
+						<div class="wc-footer">
+							<div class="wc-footer-cost">today <strong>$0.00</strong></div>
+							<div class="wc-footer-time">
+								<svg
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.8"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10" />
+									<polyline points="12 6 12 12 16 14" />
+								</svg>
+								3d ago
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /card-grid -->
+			</div>
+		</div>
+	</body>
 </html>

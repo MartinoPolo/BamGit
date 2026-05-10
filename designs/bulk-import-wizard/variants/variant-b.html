@@ -1,1371 +1,2081 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bulk Import Wizard — Variant B: Master-Detail Split</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ═══════════════════════════════════════════════════════════════
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Bulk Import Wizard — Variant B: Master-Detail Split</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ═══════════════════════════════════════════════════════════════
    TOKENS.CSS — INLINED
    ═══════════════════════════════════════════════════════════════ */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-  --border-width-1: 1px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out: cubic-bezier(.16,.84,.44,1);
-}
 
-.theme-dark {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --code-bg:           oklch(0.215 0.020 150);
-}
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
 
-/* ═══════════════════════════════════════════════════════════════
+			/* ═══════════════════════════════════════════════════════════════
    BASE COMPONENT CLASSES
    ═══════════════════════════════════════════════════════════════ */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-/* Scrollbar */
-.gk-root ::-webkit-scrollbar { width: 8px; height: 8px; }
-.gk-root ::-webkit-scrollbar-track { background: transparent; }
-.gk-root ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
-.gk-root ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: padding-box; }
+			/* Scrollbar */
+			.gk-root ::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			.gk-root ::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.gk-root ::-webkit-scrollbar-thumb {
+				background: var(--border);
+				border: 2px solid transparent;
+				background-clip: padding-box;
+				border-radius: 999px;
+			}
+			.gk-root ::-webkit-scrollbar-thumb:hover {
+				background: var(--border-strong);
+				background-clip: padding-box;
+			}
 
-/* Typography */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
+			/* Typography */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
 
-/* Buttons */
-.gk-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  font-family: var(--font-sans); font-weight: 500; font-size: 13px; line-height: 1;
-  padding: 0 12px; height: 32px; border-radius: var(--radius-md);
-  border: 1px solid transparent; cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, box-shadow 120ms ease;
-  white-space: nowrap; user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary { background: var(--primary); color: var(--primary-fg); box-shadow: var(--shadow-sm), var(--shadow-inset); }
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-secondary { background: var(--surface-2); color: var(--foreground); border-color: var(--border); }
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-ghost { background: transparent; color: var(--foreground-muted); }
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-danger { background: transparent; color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 35%, transparent); }
-.gk-btn-danger:hover { background: color-mix(in oklch, var(--status-danger) 12%, transparent); }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+			/* Buttons */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-/* Inputs */
-.gk-input {
-  font-family: var(--font-sans); font-size: 13px; height: 32px; padding: 0 10px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  color: var(--foreground); width: 100%; outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.gk-input::placeholder { color: var(--foreground-subtle); }
-.gk-input:focus { border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
+			/* Inputs */
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input::placeholder {
+				color: var(--foreground-subtle);
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
 
-/* Checkbox */
-.gk-check {
-  appearance: none; width: 16px; height: 16px;
-  border: 1.5px solid var(--border-strong); border-radius: 4px;
-  background: var(--surface); cursor: pointer; position: relative;
-  transition: background 120ms ease, border-color 120ms ease; flex-shrink: 0;
-}
-.gk-check:checked { background: var(--primary); border-color: var(--primary); }
-.gk-check:checked::after {
-  content: ""; position: absolute; left: 4.5px; top: 1px; width: 4px; height: 8px;
-  border: solid var(--primary-fg); border-width: 0 2px 2px 0; transform: rotate(45deg);
-}
-.gk-check:hover { border-color: var(--ring); }
-.gk-check[data-state="indeterminate"] { background: var(--primary); border-color: var(--primary); }
-.gk-check[data-state="indeterminate"]::after {
-  content: ""; position: absolute; left: 2.5px; top: 6.5px; width: 8px; height: 2px;
-  background: var(--primary-fg); border: 0; transform: none;
-}
+			/* Checkbox */
+			.gk-check {
+				appearance: none;
+				width: 16px;
+				height: 16px;
+				border: 1.5px solid var(--border-strong);
+				border-radius: 4px;
+				background: var(--surface);
+				cursor: pointer;
+				position: relative;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.gk-check:checked {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check:checked::after {
+				content: '';
+				position: absolute;
+				left: 4.5px;
+				top: 1px;
+				width: 4px;
+				height: 8px;
+				border: solid var(--primary-fg);
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+			.gk-check:hover {
+				border-color: var(--ring);
+			}
+			.gk-check[data-state='indeterminate'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-check[data-state='indeterminate']::after {
+				content: '';
+				position: absolute;
+				left: 2.5px;
+				top: 6.5px;
+				width: 8px;
+				height: 2px;
+				background: var(--primary-fg);
+				border: 0;
+				transform: none;
+			}
 
-/* Badge */
-.gk-badge {
-  display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px;
-  font-size: 11px; font-weight: 500; border-radius: 999px;
-  background: var(--surface-2); color: var(--foreground-muted);
-  border: 1px solid var(--border); font-family: var(--font-sans);
-  letter-spacing: 0.01em; white-space: nowrap;
-}
-.gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
-.gk-badge-moss    { background: color-mix(in oklch, var(--primary) 14%, transparent); color: var(--primary); border-color: color-mix(in oklch, var(--primary) 30%, transparent); }
+			/* Badge */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
+			.gk-badge-moss {
+				background: color-mix(in oklch, var(--primary) 14%, transparent);
+				color: var(--primary);
+				border-color: color-mix(in oklch, var(--primary) 30%, transparent);
+			}
 
-/* Card */
-.gk-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+			/* Card */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
 
-/* Modal */
-.gk-modal-backdrop {
-  position: fixed; inset: 0; background: color-mix(in oklch, oklch(0.10 0.02 150) 60%, transparent);
-  backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
-  z-index: 50;
-}
+			/* Modal */
+			.gk-modal-backdrop {
+				position: fixed;
+				inset: 0;
+				background: color-mix(in oklch, oklch(0.1 0.02 150) 60%, transparent);
+				backdrop-filter: blur(4px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 50;
+			}
 
-/* Codeburn panel */
-.cb-panel {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 8px;
-}
-.cb-panel-title {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-  color: var(--foreground-muted); text-transform: uppercase; letter-spacing: 0.08em;
-  display: flex; align-items: baseline; gap: 8px;
-  padding-bottom: 6px; border-bottom: 1px dashed var(--border);
-}
-.cb-panel-title::before { content: "["; color: var(--foreground-subtle); font-weight: 400; }
-.cb-panel-title::after { content: "]"; color: var(--foreground-subtle); font-weight: 400; margin-right: auto; }
+			/* Codeburn panel */
+			.cb-panel {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 12px 14px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+			.cb-panel-title {
+				font-family: var(--font-mono);
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--foreground-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+				display: flex;
+				align-items: baseline;
+				gap: 8px;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.cb-panel-title::before {
+				content: '[';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+			}
+			.cb-panel-title::after {
+				content: ']';
+				color: var(--foreground-subtle);
+				font-weight: 400;
+				margin-right: auto;
+			}
 
-/* Status bar */
-.cb-statusbar {
-  display: flex; align-items: center; gap: 14px; padding: 5px 14px;
-  background: var(--surface-2); border-top: 1px solid var(--border);
-  font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-muted); flex-shrink: 0;
-}
-.cb-keycap {
-  display: inline-block; min-width: 14px; padding: 0 4px; text-align: center;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 3px;
-  font-size: 10px; line-height: 14px; color: var(--foreground);
-}
+			/* Status bar */
+			.cb-statusbar {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 5px 14px;
+				background: var(--surface-2);
+				border-top: 1px solid var(--border);
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				flex-shrink: 0;
+			}
+			.cb-keycap {
+				display: inline-block;
+				min-width: 14px;
+				padding: 0 4px;
+				text-align: center;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 3px;
+				font-size: 10px;
+				line-height: 14px;
+				color: var(--foreground);
+			}
 
-/* Animations */
-@keyframes gk-spin { to { transform: rotate(360deg); } }
-@keyframes gk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
-.gk-pulse { animation: gk-pulse 1.8s ease-in-out infinite; }
+			/* Animations */
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
 
-/* ═══════════════════════════════════════════════════════════════
+			/* ═══════════════════════════════════════════════════════════════
    VARIANT B — MASTER-DETAIL SPLIT
    ═══════════════════════════════════════════════════════════════ */
 
-html, body { margin: 0; padding: 0; height: 100%; }
-
-.wizard-dialog {
-  width: 95vw;
-  max-width: 1120px;
-  height: 85vh;
-  max-height: 780px;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  overflow: hidden;
-}
-
-/* ── Top toolbar ───────────────────────────────────────── */
-.wizard-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-6) var(--space-8);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-  flex-shrink: 0;
-}
-
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.toolbar-path {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-4);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-  min-width: 0;
-  flex: 1;
-  max-width: 440px;
-}
-
-.toolbar-path-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  direction: rtl;
-  text-align: left;
-}
-
-.toolbar-path-icon {
-  flex-shrink: 0;
-  width: 14px;
-  height: 14px;
-  color: var(--foreground-subtle);
-}
-
-.toolbar-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  flex-shrink: 0;
-}
-
-.toolbar-stat {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-}
-
-.toolbar-stat-value {
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-}
-
-.toolbar-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  color: var(--foreground-subtle);
-  cursor: pointer;
-  transition: background 120ms, color 120ms;
-  flex-shrink: 0;
-}
-.toolbar-close:hover { background: var(--surface-3); color: var(--foreground); }
-.toolbar-close:active { transform: scale(0.94); }
-.toolbar-close:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-
-/* ── Split layout ──────────────────────────────────────── */
-.wizard-body {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* ── Left panel: folder tree ───────────────────────────── */
-.panel-left {
-  width: 40%;
-  min-width: 320px;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border);
-  background: var(--background);
-}
-
-.panel-left-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.panel-left-header .gk-input {
-  height: 28px;
-  font-size: 12px;
-  background: var(--surface);
-  flex: 1;
-}
-
-.select-all-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.panel-left-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-3) 0;
-}
-
-/* Tree items */
-.tree-faction {
-  padding: 0;
-}
-
-.tree-faction-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-6);
-  cursor: pointer;
-  user-select: none;
-  transition: background 100ms;
-}
-.tree-faction-header:hover { background: var(--surface-hover); }
-
-.tree-chevron {
-  width: 14px;
-  height: 14px;
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-  transition: transform 160ms var(--ease-out);
-}
-.tree-faction.is-collapsed .tree-chevron { transform: rotate(-90deg); }
-
-.tree-faction-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--amber-400);
-  flex-shrink: 0;
-}
-
-.tree-faction-name {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  flex: 1;
-}
-
-.tree-faction-count {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-}
-
-.tree-children {
-  overflow: hidden;
-}
-.tree-faction.is-collapsed .tree-children { display: none; }
-
-.tree-character {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-6);
-  padding-left: calc(var(--space-6) + 14px + var(--space-3));
-  cursor: pointer;
-  transition: background 100ms;
-  border-left: 2px solid transparent;
-  margin-left: var(--space-6);
-}
-.tree-character:hover { background: var(--surface-hover); }
-.tree-character.is-selected {
-  background: color-mix(in oklch, var(--primary) 10%, transparent);
-  border-left-color: var(--primary);
-}
-
-.tree-char-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.tree-char-name {
-  font-size: var(--text-sm);
-  color: var(--foreground);
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tree-char-sounds {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-
-.tree-char-quality {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.tree-char-quality.is-ready { background: var(--status-success); }
-.tree-char-quality.is-partial { background: var(--status-warning); }
-.tree-char-quality.is-sparse { background: var(--status-danger); }
-
-/* ── Right panel: detail ───────────────────────────────── */
-.panel-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  background: var(--background);
-}
-
-.detail-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-8) var(--space-10);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.detail-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.detail-avatar-placeholder {
-  font-size: 24px;
-  opacity: 0.6;
-}
-
-.detail-avatar-label {
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-  background: linear-gradient(to top, var(--surface-2), transparent);
-  padding: 6px 2px 2px;
-}
-
-.detail-meta {
-  flex: 1;
-  min-width: 0;
-}
-
-.detail-name-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-2);
-}
-
-.detail-name-input {
-  font-family: var(--font-sans);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
-  color: var(--foreground);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-3);
-  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-3));
-  outline: none;
-  width: 260px;
-  transition: border-color 120ms, background 120ms;
-}
-.detail-name-input:hover { border-color: var(--border); background: var(--surface); }
-.detail-name-input:focus { border-color: var(--ring); background: var(--surface); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent); }
-
-.detail-subtitle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-}
-
-.detail-subtitle-sep {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--foreground-subtle);
-  flex-shrink: 0;
-}
-
-.detail-badges {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-shrink: 0;
-}
-
-/* Sound mapping grid */
-.detail-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-8) var(--space-10);
-}
-
-.mapping-section {
-  margin-bottom: var(--space-10);
-}
-
-.mapping-section:last-child {
-  margin-bottom: 0;
-}
-
-.mapping-section-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  margin-bottom: var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-.mapping-section-title::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.mapping-slot {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-3);
-  background: var(--surface);
-  transition: border-color 120ms, background 120ms;
-}
-.mapping-slot:hover { border-color: var(--border-strong); }
-.mapping-slot.is-empty { border-style: dashed; background: transparent; }
-
-.slot-event-label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-  min-width: 130px;
-  flex-shrink: 0;
-}
-
-.slot-event-desc {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  margin-top: 1px;
-}
-
-.slot-sound {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex: 1;
-  min-width: 0;
-}
-
-.slot-sound-name {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.slot-play-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 120ms, border-color 120ms, color 120ms;
-}
-.slot-play-btn:hover { background: var(--surface-3); border-color: var(--border-strong); color: var(--foreground); }
-.slot-play-btn:active { transform: scale(0.92); }
-.slot-play-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-
-.slot-count-badge {
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-subtle);
-  background: var(--surface-2);
-  border-radius: var(--radius-xs);
-  padding: 1px 5px;
-  flex-shrink: 0;
-}
-
-.slot-empty-label {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  font-style: italic;
-}
-
-/* Unassigned pool */
-.pool-section {
-  margin-top: var(--space-8);
-}
-
-.pool-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.pool-chip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--foreground-muted);
-  cursor: grab;
-  transition: border-color 120ms, background 120ms;
-}
-.pool-chip:hover { border-color: var(--border-strong); background: var(--surface-3); }
-
-.pool-chip-drag {
-  width: 8px;
-  height: 8px;
-  color: var(--foreground-subtle);
-  flex-shrink: 0;
-  opacity: 0.5;
-}
-
-/* ── Bottom bar ────────────────────────────────────────── */
-.wizard-footer {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-5) var(--space-8);
-  border-top: 1px solid var(--border);
-  background: var(--surface-2);
-  flex-shrink: 0;
-}
-
-.footer-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  flex: 1;
-}
-
-.footer-stat {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-}
-
-.footer-stat-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.footer-storage {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-}
-
-.footer-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-/* Progress overlay */
-.import-progress {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  flex: 1;
-}
-
-.progress-bar-track {
-  flex: 1;
-  height: 6px;
-  background: var(--surface);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--moss-500), var(--moss-300));
-  border-radius: var(--radius-full);
-  transition: width 400ms var(--ease-out);
-}
-
-.progress-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--foreground-muted);
-  white-space: nowrap;
-  min-width: 120px;
-}
-
-/* ── Variant label ─────────────────────────────────────── */
-.variant-label {
-  position: fixed;
-  top: var(--space-4);
-  left: var(--space-4);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--foreground-subtle);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
-  z-index: 100;
-}
-
-/* ── Responsive ────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .wizard-dialog {
-    width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-  .wizard-body {
-    flex-direction: column;
-  }
-  .panel-left {
-    width: 100%;
-    min-width: 0;
-    max-height: 45vh;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .panel-right {
-    flex: 1;
-  }
-  .toolbar-path {
-    display: none;
-  }
-  .detail-header {
-    padding: var(--space-6);
-  }
-  .detail-scroll {
-    padding: var(--space-6);
-  }
-  .detail-name-input {
-    width: 180px;
-  }
-}
-
-/* ── SVG icon helpers ──────────────────────────────────── */
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-</style>
-</head>
-<body>
-<div class="gk-root theme-dark" style="width:100%;height:100vh;display:flex;align-items:center;justify-content:center;">
-
-<div class="variant-label">VARIANT B: MASTER-DETAIL SPLIT</div>
-
-<!-- Backdrop -->
-<div class="gk-modal-backdrop" style="position:absolute;">
-
-<!-- Dialog -->
-<div class="wizard-dialog">
-
-  <!-- ════════════ TOP TOOLBAR ════════════ -->
-  <div class="wizard-toolbar">
-    <div class="toolbar-left">
-      <span class="toolbar-title">Import Folder</span>
-      <div class="toolbar-path">
-        <svg class="toolbar-path-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"/></svg>
-        <span class="toolbar-path-text">D:\Games\WC3\Sounds\Voice</span>
-      </div>
-      <button class="gk-btn gk-btn-sm gk-btn-ghost" style="flex-shrink:0;">Change</button>
-    </div>
-    <div class="toolbar-stats">
-      <div class="toolbar-stat">
-        <svg class="icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-        <span class="toolbar-stat-value">23</span> characters
-      </div>
-      <div class="toolbar-stat">
-        <svg class="icon" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v10h10"/><path d="M6 10V7m3 3V5m3 5V3"/></svg>
-        <span class="toolbar-stat-value">247</span> sounds
-      </div>
-      <div class="toolbar-stat" style="gap:var(--space-3);">
-        <span class="gk-badge gk-badge-success" style="height:18px;font-size:10px;">
-          <span class="gk-badge-dot"></span>18 ready
-        </span>
-        <span class="gk-badge gk-badge-warning" style="height:18px;font-size:10px;">
-          <span class="gk-badge-dot"></span>5 partial
-        </span>
-      </div>
-    </div>
-    <button class="toolbar-close" title="Close">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
-    </button>
-  </div>
-
-  <!-- ════════════ BODY: SPLIT ════════════ -->
-  <div class="wizard-body">
-
-    <!-- ──── LEFT: FILE TREE ──── -->
-    <div class="panel-left">
-      <div class="panel-left-header">
-        <input class="gk-input" type="text" placeholder="Filter characters..." style="padding-left:28px;position:relative;">
-        <label class="select-all-toggle">
-          <input type="checkbox" class="gk-check" data-state="indeterminate">
-          <span>All</span>
-        </label>
-      </div>
-
-      <div class="panel-left-scroll">
-        <!-- Faction: Orcs -->
-        <div class="tree-faction">
-          <div class="tree-faction-header">
-            <svg class="tree-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-            <svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"/></svg>
-            <span class="tree-faction-name">Orc</span>
-            <span class="tree-faction-count">7 units</span>
-          </div>
-          <div class="tree-children">
-            <!-- Grunt — selected -->
-            <div class="tree-character is-selected">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Grunt</span>
-              <span class="tree-char-sounds">14 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <!-- Peon -->
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Peon</span>
-              <span class="tree-char-sounds">16 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <!-- Shaman -->
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Shaman</span>
-              <span class="tree-char-sounds">12 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <!-- Blademaster -->
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Blademaster</span>
-              <span class="tree-char-sounds">18 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <!-- Raider -->
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Raider</span>
-              <span class="tree-char-sounds">11 files</span>
-              <span class="tree-char-quality is-partial"></span>
-            </div>
-            <!-- Headhunter -->
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Headhunter</span>
-              <span class="tree-char-sounds">9 files</span>
-              <span class="tree-char-quality is-partial"></span>
-            </div>
-            <!-- Witch Doctor -->
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Witch Doctor</span>
-              <span class="tree-char-sounds">13 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Faction: Human -->
-        <div class="tree-faction">
-          <div class="tree-faction-header">
-            <svg class="tree-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-            <svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"/></svg>
-            <span class="tree-faction-name">Human</span>
-            <span class="tree-faction-count">6 units</span>
-          </div>
-          <div class="tree-children">
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Footman</span>
-              <span class="tree-char-sounds">12 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Paladin</span>
-              <span class="tree-char-sounds">20 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Sorceress</span>
-              <span class="tree-char-sounds">10 files</span>
-              <span class="tree-char-quality is-partial"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Rifleman</span>
-              <span class="tree-char-sounds">11 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Priest</span>
-              <span class="tree-char-sounds">8 files</span>
-              <span class="tree-char-quality is-partial"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check">
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name" style="color:var(--foreground-subtle);">Peasant</span>
-              <span class="tree-char-sounds">3 files</span>
-              <span class="tree-char-quality is-sparse"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Faction: Undead -->
-        <div class="tree-faction">
-          <div class="tree-faction-header">
-            <svg class="tree-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-            <svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"/></svg>
-            <span class="tree-faction-name">Undead</span>
-            <span class="tree-faction-count">5 units</span>
-          </div>
-          <div class="tree-children">
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Death Knight</span>
-              <span class="tree-char-sounds">19 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Necromancer</span>
-              <span class="tree-char-sounds">11 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Ghoul</span>
-              <span class="tree-char-sounds">7 files</span>
-              <span class="tree-char-quality is-partial"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Abomination</span>
-              <span class="tree-char-sounds">10 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Crypt Fiend</span>
-              <span class="tree-char-sounds">9 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Faction: Night Elf -->
-        <div class="tree-faction is-collapsed">
-          <div class="tree-faction-header">
-            <svg class="tree-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-            <svg class="tree-faction-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"/></svg>
-            <span class="tree-faction-name">Night Elf</span>
-            <span class="tree-faction-count">5 units</span>
-          </div>
-          <div class="tree-children">
-            <div class="tree-character">
-              <input type="checkbox" class="gk-check" checked>
-              <svg class="tree-char-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5.5" r="3"/><path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"/></svg>
-              <span class="tree-char-name">Archer</span>
-              <span class="tree-char-sounds">11 files</span>
-              <span class="tree-char-quality is-ready"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ──── RIGHT: DETAIL PANEL ──── -->
-    <div class="panel-right">
-
-      <!-- Character header -->
-      <div class="detail-header">
-        <div class="detail-avatar">
-          <span class="detail-avatar-placeholder">&#9876;</span>
-          <span class="detail-avatar-label">No avatar</span>
-        </div>
-        <div class="detail-meta">
-          <div class="detail-name-row">
-            <input class="detail-name-input" type="text" value="Grunt">
-            <span class="gk-badge gk-badge-success">
-              <span class="gk-badge-dot"></span>Ready
-            </span>
-          </div>
-          <div class="detail-subtitle">
-            <span>Orc</span>
-            <span class="detail-subtitle-sep"></span>
-            <span class="font-mono" style="font-size:11px;">14 sound files</span>
-            <span class="detail-subtitle-sep"></span>
-            <span class="font-mono" style="font-size:11px;">6 / 7 events mapped</span>
-          </div>
-        </div>
-        <div class="detail-badges">
-          <button class="gk-btn gk-btn-sm gk-btn-ghost" title="Auto-remap">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 0110.5-4M14 8a6 6 0 01-10.5 4"/><path d="M12.5 1v3h-3M3.5 15v-3h3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Re-map
-          </button>
-        </div>
-      </div>
-
-      <!-- Mapping detail -->
-      <div class="detail-scroll">
-
-        <!-- Critical events -->
-        <div class="mapping-section">
-          <div class="mapping-section-title">Critical Events</div>
-
-          <div class="mapping-slot">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Session Start</div>
-              <div class="slot-event-desc">session.start</div>
-            </div>
-            <div class="slot-sound">
-              <button class="slot-play-btn" title="Preview">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span class="slot-sound-name">OrcGrunt_Ready1.wav</span>
-              <span class="slot-count-badge">+2 alt</span>
-            </div>
-          </div>
-
-          <div class="mapping-slot">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Needs Input</div>
-              <div class="slot-event-desc">session.needs-input</div>
-            </div>
-            <div class="slot-sound">
-              <button class="slot-play-btn" title="Preview">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span class="slot-sound-name">OrcGrunt_What1.wav</span>
-              <span class="slot-count-badge">+1 alt</span>
-            </div>
-          </div>
-
-          <div class="mapping-slot">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Task Error</div>
-              <div class="slot-event-desc">task.error</div>
-            </div>
-            <div class="slot-sound">
-              <button class="slot-play-btn" title="Preview">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span class="slot-sound-name">OrcGrunt_Death1.wav</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Standard events -->
-        <div class="mapping-section">
-          <div class="mapping-section-title">Standard Events</div>
-
-          <div class="mapping-slot">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Acknowledge</div>
-              <div class="slot-event-desc">task.acknowledge</div>
-            </div>
-            <div class="slot-sound">
-              <button class="slot-play-btn" title="Preview">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span class="slot-sound-name">OrcGrunt_Yes1.wav</span>
-              <span class="slot-count-badge">+2 alt</span>
-            </div>
-          </div>
-
-          <div class="mapping-slot">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Task Complete</div>
-              <div class="slot-event-desc">task.complete</div>
-            </div>
-            <div class="slot-sound">
-              <button class="slot-play-btn" title="Preview">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span class="slot-sound-name">OrcGrunt_YesAttack1.wav</span>
-              <span class="slot-count-badge">+1 alt</span>
-            </div>
-          </div>
-
-          <div class="mapping-slot">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Resource Limit</div>
-              <div class="slot-event-desc">resource.limit</div>
-            </div>
-            <div class="slot-sound">
-              <button class="slot-play-btn" title="Preview">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span class="slot-sound-name">OrcGrunt_Pissed1.wav</span>
-              <span class="slot-count-badge">+3 alt</span>
-            </div>
-          </div>
-
-          <div class="mapping-slot is-empty">
-            <div style="flex:0 0 auto;">
-              <div class="slot-event-label">Session End</div>
-              <div class="slot-event-desc">session.end</div>
-            </div>
-            <div class="slot-sound">
-              <span class="slot-empty-label">No match found -- drag from pool below</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Unassigned pool -->
-        <div class="mapping-section pool-section">
-          <div class="mapping-section-title">Unassigned Sounds (2)</div>
-          <div class="pool-grid">
-            <div class="pool-chip">
-              <svg class="pool-chip-drag" viewBox="0 0 8 8" fill="currentColor"><circle cx="2" cy="2" r="1"/><circle cx="6" cy="2" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/></svg>
-              <button class="slot-play-btn" style="width:18px;height:18px;" title="Preview">
-                <svg width="7" height="7" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span>OrcGrunt_Warcry1.wav</span>
-            </div>
-            <div class="pool-chip">
-              <svg class="pool-chip-drag" viewBox="0 0 8 8" fill="currentColor"><circle cx="2" cy="2" r="1"/><circle cx="6" cy="2" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/></svg>
-              <button class="slot-play-btn" style="width:18px;height:18px;" title="Preview">
-                <svg width="7" height="7" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <span>OrcGrunt_What3.wav</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ════════════ BOTTOM BAR ════════════ -->
-  <div class="wizard-footer">
-    <div class="footer-stats">
-      <div class="footer-stat">
-        <span class="footer-stat-dot" style="background:var(--status-success);"></span>
-        18 ready
-      </div>
-      <div class="footer-stat">
-        <span class="footer-stat-dot" style="background:var(--status-warning);"></span>
-        4 incomplete
-      </div>
-      <div class="footer-stat">
-        <span class="footer-stat-dot" style="background:var(--foreground-subtle);"></span>
-        1 skipped
-      </div>
-      <span style="color:var(--border);margin:0 var(--space-2);">|</span>
-      <span class="footer-storage">~34.2 MB to copy</span>
-    </div>
-    <div class="footer-actions">
-      <button class="gk-btn gk-btn-ghost">Cancel</button>
-      <button class="gk-btn gk-btn-primary gk-btn-lg">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2v12M3 9l5 5 5-5"/></svg>
-        Import 22 Characters
-      </button>
-    </div>
-  </div>
-
-</div>
-</div>
-
-</div>
-</body>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+
+			.wizard-dialog {
+				width: 95vw;
+				max-width: 1120px;
+				height: 85vh;
+				max-height: 780px;
+				display: flex;
+				flex-direction: column;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-xl);
+				box-shadow: var(--shadow-xl);
+				overflow: hidden;
+			}
+
+			/* ── Top toolbar ───────────────────────────────────────── */
+			.wizard-toolbar {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+				padding: var(--space-6) var(--space-8);
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+				flex-shrink: 0;
+			}
+
+			.toolbar-left {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex: 1;
+				min-width: 0;
+			}
+
+			.toolbar-title {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			.toolbar-path {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				background: var(--background);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: var(--space-2) var(--space-4);
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				min-width: 0;
+				flex: 1;
+				max-width: 440px;
+			}
+
+			.toolbar-path-text {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				direction: rtl;
+				text-align: left;
+			}
+
+			.toolbar-path-icon {
+				flex-shrink: 0;
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+			}
+
+			.toolbar-stats {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex-shrink: 0;
+			}
+
+			.toolbar-stat {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+			}
+
+			.toolbar-stat-value {
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+			}
+
+			.toolbar-close {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 28px;
+				height: 28px;
+				border-radius: var(--radius-sm);
+				border: none;
+				background: transparent;
+				color: var(--foreground-subtle);
+				cursor: pointer;
+				transition:
+					background 120ms,
+					color 120ms;
+				flex-shrink: 0;
+			}
+			.toolbar-close:hover {
+				background: var(--surface-3);
+				color: var(--foreground);
+			}
+			.toolbar-close:active {
+				transform: scale(0.94);
+			}
+			.toolbar-close:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			/* ── Split layout ──────────────────────────────────────── */
+			.wizard-body {
+				display: flex;
+				flex: 1;
+				min-height: 0;
+				overflow: hidden;
+			}
+
+			/* ── Left panel: folder tree ───────────────────────────── */
+			.panel-left {
+				width: 40%;
+				min-width: 320px;
+				display: flex;
+				flex-direction: column;
+				border-right: 1px solid var(--border);
+				background: var(--background);
+			}
+
+			.panel-left-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-5) var(--space-6);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+
+			.panel-left-header .gk-input {
+				height: 28px;
+				font-size: 12px;
+				background: var(--surface);
+				flex: 1;
+			}
+
+			.select-all-toggle {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			.panel-left-scroll {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-3) 0;
+			}
+
+			/* Tree items */
+			.tree-faction {
+				padding: 0;
+			}
+
+			.tree-faction-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-6);
+				cursor: pointer;
+				user-select: none;
+				transition: background 100ms;
+			}
+			.tree-faction-header:hover {
+				background: var(--surface-hover);
+			}
+
+			.tree-chevron {
+				width: 14px;
+				height: 14px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				transition: transform 160ms var(--ease-out);
+			}
+			.tree-faction.is-collapsed .tree-chevron {
+				transform: rotate(-90deg);
+			}
+
+			.tree-faction-icon {
+				width: 16px;
+				height: 16px;
+				color: var(--amber-400);
+				flex-shrink: 0;
+			}
+
+			.tree-faction-name {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				flex: 1;
+			}
+
+			.tree-faction-count {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+			}
+
+			.tree-children {
+				overflow: hidden;
+			}
+			.tree-faction.is-collapsed .tree-children {
+				display: none;
+			}
+
+			.tree-character {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-6);
+				padding-left: calc(var(--space-6) + 14px + var(--space-3));
+				cursor: pointer;
+				transition: background 100ms;
+				border-left: 2px solid transparent;
+				margin-left: var(--space-6);
+			}
+			.tree-character:hover {
+				background: var(--surface-hover);
+			}
+			.tree-character.is-selected {
+				background: color-mix(in oklch, var(--primary) 10%, transparent);
+				border-left-color: var(--primary);
+			}
+
+			.tree-char-icon {
+				width: 14px;
+				height: 14px;
+				flex-shrink: 0;
+			}
+
+			.tree-char-name {
+				font-size: var(--text-sm);
+				color: var(--foreground);
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.tree-char-sounds {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			.tree-char-quality {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.tree-char-quality.is-ready {
+				background: var(--status-success);
+			}
+			.tree-char-quality.is-partial {
+				background: var(--status-warning);
+			}
+			.tree-char-quality.is-sparse {
+				background: var(--status-danger);
+			}
+
+			/* ── Right panel: detail ───────────────────────────────── */
+			.panel-right {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
+				background: var(--background);
+			}
+
+			.detail-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-8) var(--space-10);
+				border-bottom: 1px solid var(--border);
+				flex-shrink: 0;
+			}
+
+			.detail-avatar {
+				width: 56px;
+				height: 56px;
+				border-radius: var(--radius-lg);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.detail-avatar-placeholder {
+				font-size: 24px;
+				opacity: 0.6;
+			}
+
+			.detail-avatar-label {
+				position: absolute;
+				bottom: -1px;
+				left: 0;
+				right: 0;
+				text-align: center;
+				font-size: 8px;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				background: linear-gradient(to top, var(--surface-2), transparent);
+				padding: 6px 2px 2px;
+			}
+
+			.detail-meta {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.detail-name-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-2);
+			}
+
+			.detail-name-input {
+				font-family: var(--font-sans);
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: var(--radius-sm);
+				padding: var(--space-1) var(--space-3);
+				margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-3));
+				outline: none;
+				width: 260px;
+				transition:
+					border-color 120ms,
+					background 120ms;
+			}
+			.detail-name-input:hover {
+				border-color: var(--border);
+				background: var(--surface);
+			}
+			.detail-name-input:focus {
+				border-color: var(--ring);
+				background: var(--surface);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
+
+			.detail-subtitle {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			.detail-subtitle-sep {
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background: var(--foreground-subtle);
+				flex-shrink: 0;
+			}
+
+			.detail-badges {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex-shrink: 0;
+			}
+
+			/* Sound mapping grid */
+			.detail-scroll {
+				flex: 1;
+				overflow-y: auto;
+				padding: var(--space-8) var(--space-10);
+			}
+
+			.mapping-section {
+				margin-bottom: var(--space-10);
+			}
+
+			.mapping-section:last-child {
+				margin-bottom: 0;
+			}
+
+			.mapping-section-title {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin-bottom: var(--space-4);
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+			.mapping-section-title::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.mapping-slot {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				padding: var(--space-3) var(--space-5);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				margin-bottom: var(--space-3);
+				background: var(--surface);
+				transition:
+					border-color 120ms,
+					background 120ms;
+			}
+			.mapping-slot:hover {
+				border-color: var(--border-strong);
+			}
+			.mapping-slot.is-empty {
+				border-style: dashed;
+				background: transparent;
+			}
+
+			.slot-event-label {
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				min-width: 130px;
+				flex-shrink: 0;
+			}
+
+			.slot-event-desc {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-top: 1px;
+			}
+
+			.slot-sound {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex: 1;
+				min-width: 0;
+			}
+
+			.slot-sound-name {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.slot-play-btn {
+				width: 24px;
+				height: 24px;
+				border-radius: var(--radius-full);
+				border: 1px solid var(--border);
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				flex-shrink: 0;
+				transition:
+					background 120ms,
+					border-color 120ms,
+					color 120ms;
+			}
+			.slot-play-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.slot-play-btn:active {
+				transform: scale(0.92);
+			}
+			.slot-play-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+
+			.slot-count-badge {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				border-radius: var(--radius-xs);
+				padding: 1px 5px;
+				flex-shrink: 0;
+			}
+
+			.slot-empty-label {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-style: italic;
+			}
+
+			/* Unassigned pool */
+			.pool-section {
+				margin-top: var(--space-8);
+			}
+
+			.pool-grid {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--space-3);
+			}
+
+			.pool-chip {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				padding: var(--space-2) var(--space-4);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-muted);
+				cursor: grab;
+				transition:
+					border-color 120ms,
+					background 120ms;
+			}
+			.pool-chip:hover {
+				border-color: var(--border-strong);
+				background: var(--surface-3);
+			}
+
+			.pool-chip-drag {
+				width: 8px;
+				height: 8px;
+				color: var(--foreground-subtle);
+				flex-shrink: 0;
+				opacity: 0.5;
+			}
+
+			/* ── Bottom bar ────────────────────────────────────────── */
+			.wizard-footer {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				padding: var(--space-5) var(--space-8);
+				border-top: 1px solid var(--border);
+				background: var(--surface-2);
+				flex-shrink: 0;
+			}
+
+			.footer-stats {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex: 1;
+			}
+
+			.footer-stat {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			.footer-stat-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+
+			.footer-storage {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+			}
+
+			.footer-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+			}
+
+			/* Progress overlay */
+			.import-progress {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+				flex: 1;
+			}
+
+			.progress-bar-track {
+				flex: 1;
+				height: 6px;
+				background: var(--surface);
+				border-radius: var(--radius-full);
+				border: 1px solid var(--border);
+				overflow: hidden;
+			}
+
+			.progress-bar-fill {
+				height: 100%;
+				background: linear-gradient(90deg, var(--moss-500), var(--moss-300));
+				border-radius: var(--radius-full);
+				transition: width 400ms var(--ease-out);
+			}
+
+			.progress-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				white-space: nowrap;
+				min-width: 120px;
+			}
+
+			/* ── Variant label ─────────────────────────────────────── */
+			.variant-label {
+				position: fixed;
+				top: var(--space-4);
+				left: var(--space-4);
+				font-family: var(--font-mono);
+				font-size: 9px;
+				font-weight: 600;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				padding: 3px 8px;
+				border-radius: var(--radius-xs);
+				z-index: 100;
+			}
+
+			/* ── Responsive ────────────────────────────────────────── */
+			@media (max-width: 768px) {
+				.wizard-dialog {
+					width: 100vw;
+					height: 100vh;
+					max-height: 100vh;
+					border-radius: 0;
+				}
+				.wizard-body {
+					flex-direction: column;
+				}
+				.panel-left {
+					width: 100%;
+					min-width: 0;
+					max-height: 45vh;
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+				}
+				.panel-right {
+					flex: 1;
+				}
+				.toolbar-path {
+					display: none;
+				}
+				.detail-header {
+					padding: var(--space-6);
+				}
+				.detail-scroll {
+					padding: var(--space-6);
+				}
+				.detail-name-input {
+					width: 180px;
+				}
+			}
+
+			/* ── SVG icon helpers ──────────────────────────────────── */
+			.icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div
+			class="gk-root theme-dark"
+			style="
+				width: 100%;
+				height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			"
+		>
+			<div class="variant-label">VARIANT B: MASTER-DETAIL SPLIT</div>
+
+			<!-- Backdrop -->
+			<div class="gk-modal-backdrop" style="position: absolute">
+				<!-- Dialog -->
+				<div class="wizard-dialog">
+					<!-- ════════════ TOP TOOLBAR ════════════ -->
+					<div class="wizard-toolbar">
+						<div class="toolbar-left">
+							<span class="toolbar-title">Import Folder</span>
+							<div class="toolbar-path">
+								<svg
+									class="toolbar-path-icon"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+								>
+									<path
+										d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"
+									/>
+								</svg>
+								<span class="toolbar-path-text">D:\Games\WC3\Sounds\Voice</span>
+							</div>
+							<button class="gk-btn gk-btn-sm gk-btn-ghost" style="flex-shrink: 0">
+								Change
+							</button>
+						</div>
+						<div class="toolbar-stats">
+							<div class="toolbar-stat">
+								<svg
+									class="icon"
+									width="13"
+									height="13"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+								>
+									<circle cx="8" cy="5.5" r="3" />
+									<path d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" />
+								</svg>
+								<span class="toolbar-stat-value">23</span> characters
+							</div>
+							<div class="toolbar-stat">
+								<svg
+									class="icon"
+									width="13"
+									height="13"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+								>
+									<path d="M3 3v10h10" />
+									<path d="M6 10V7m3 3V5m3 5V3" />
+								</svg>
+								<span class="toolbar-stat-value">247</span> sounds
+							</div>
+							<div class="toolbar-stat" style="gap: var(--space-3)">
+								<span
+									class="gk-badge gk-badge-success"
+									style="height: 18px; font-size: 10px"
+								>
+									<span class="gk-badge-dot"></span>18 ready
+								</span>
+								<span
+									class="gk-badge gk-badge-warning"
+									style="height: 18px; font-size: 10px"
+								>
+									<span class="gk-badge-dot"></span>5 partial
+								</span>
+							</div>
+						</div>
+						<button class="toolbar-close" title="Close">
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 16 16"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							>
+								<path d="M4 4l8 8M12 4l-8 8" />
+							</svg>
+						</button>
+					</div>
+
+					<!-- ════════════ BODY: SPLIT ════════════ -->
+					<div class="wizard-body">
+						<!-- ──── LEFT: FILE TREE ──── -->
+						<div class="panel-left">
+							<div class="panel-left-header">
+								<input
+									class="gk-input"
+									type="text"
+									placeholder="Filter characters..."
+									style="padding-left: 28px; position: relative"
+								/>
+								<label class="select-all-toggle">
+									<input
+										type="checkbox"
+										class="gk-check"
+										data-state="indeterminate"
+									/>
+									<span>All</span>
+								</label>
+							</div>
+
+							<div class="panel-left-scroll">
+								<!-- Faction: Orcs -->
+								<div class="tree-faction">
+									<div class="tree-faction-header">
+										<svg
+											class="tree-chevron"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path d="M6 4l4 4-4 4" />
+										</svg>
+										<svg
+											class="tree-faction-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.3"
+										>
+											<path
+												d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"
+											/>
+										</svg>
+										<span class="tree-faction-name">Orc</span>
+										<span class="tree-faction-count">7 units</span>
+									</div>
+									<div class="tree-children">
+										<!-- Grunt — selected -->
+										<div class="tree-character is-selected">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Grunt</span>
+											<span class="tree-char-sounds">14 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<!-- Peon -->
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Peon</span>
+											<span class="tree-char-sounds">16 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<!-- Shaman -->
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Shaman</span>
+											<span class="tree-char-sounds">12 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<!-- Blademaster -->
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Blademaster</span>
+											<span class="tree-char-sounds">18 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<!-- Raider -->
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Raider</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<!-- Headhunter -->
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Headhunter</span>
+											<span class="tree-char-sounds">9 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<!-- Witch Doctor -->
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Witch Doctor</span>
+											<span class="tree-char-sounds">13 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Faction: Human -->
+								<div class="tree-faction">
+									<div class="tree-faction-header">
+										<svg
+											class="tree-chevron"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path d="M6 4l4 4-4 4" />
+										</svg>
+										<svg
+											class="tree-faction-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.3"
+										>
+											<path
+												d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"
+											/>
+										</svg>
+										<span class="tree-faction-name">Human</span>
+										<span class="tree-faction-count">6 units</span>
+									</div>
+									<div class="tree-children">
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Footman</span>
+											<span class="tree-char-sounds">12 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Paladin</span>
+											<span class="tree-char-sounds">20 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Sorceress</span>
+											<span class="tree-char-sounds">10 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Rifleman</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Priest</span>
+											<span class="tree-char-sounds">8 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span
+												class="tree-char-name"
+												style="color: var(--foreground-subtle)"
+												>Peasant</span
+											>
+											<span class="tree-char-sounds">3 files</span>
+											<span class="tree-char-quality is-sparse"></span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Faction: Undead -->
+								<div class="tree-faction">
+									<div class="tree-faction-header">
+										<svg
+											class="tree-chevron"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path d="M6 4l4 4-4 4" />
+										</svg>
+										<svg
+											class="tree-faction-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.3"
+										>
+											<path
+												d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"
+											/>
+										</svg>
+										<span class="tree-faction-name">Undead</span>
+										<span class="tree-faction-count">5 units</span>
+									</div>
+									<div class="tree-children">
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Death Knight</span>
+											<span class="tree-char-sounds">19 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Necromancer</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Ghoul</span>
+											<span class="tree-char-sounds">7 files</span>
+											<span class="tree-char-quality is-partial"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Abomination</span>
+											<span class="tree-char-sounds">10 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Crypt Fiend</span>
+											<span class="tree-char-sounds">9 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Faction: Night Elf -->
+								<div class="tree-faction is-collapsed">
+									<div class="tree-faction-header">
+										<svg
+											class="tree-chevron"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										>
+											<path d="M6 4l4 4-4 4" />
+										</svg>
+										<svg
+											class="tree-faction-icon"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.3"
+										>
+											<path
+												d="M2 4.5V12a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0014 12V6.5A1.5 1.5 0 0012.5 5H8L6.5 3H3.5A1.5 1.5 0 002 4.5z"
+											/>
+										</svg>
+										<span class="tree-faction-name">Night Elf</span>
+										<span class="tree-faction-count">5 units</span>
+									</div>
+									<div class="tree-children">
+										<div class="tree-character">
+											<input type="checkbox" class="gk-check" checked />
+											<svg
+												class="tree-char-icon"
+												viewBox="0 0 16 16"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="1.5"
+											>
+												<circle cx="8" cy="5.5" r="3" />
+												<path
+													d="M2.5 14c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5"
+												/>
+											</svg>
+											<span class="tree-char-name">Archer</span>
+											<span class="tree-char-sounds">11 files</span>
+											<span class="tree-char-quality is-ready"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- ──── RIGHT: DETAIL PANEL ──── -->
+						<div class="panel-right">
+							<!-- Character header -->
+							<div class="detail-header">
+								<div class="detail-avatar">
+									<span class="detail-avatar-placeholder">&#9876;</span>
+									<span class="detail-avatar-label">No avatar</span>
+								</div>
+								<div class="detail-meta">
+									<div class="detail-name-row">
+										<input
+											class="detail-name-input"
+											type="text"
+											value="Grunt"
+										/>
+										<span class="gk-badge gk-badge-success">
+											<span class="gk-badge-dot"></span>Ready
+										</span>
+									</div>
+									<div class="detail-subtitle">
+										<span>Orc</span>
+										<span class="detail-subtitle-sep"></span>
+										<span class="font-mono" style="font-size: 11px"
+											>14 sound files</span
+										>
+										<span class="detail-subtitle-sep"></span>
+										<span class="font-mono" style="font-size: 11px"
+											>6 / 7 events mapped</span
+										>
+									</div>
+								</div>
+								<div class="detail-badges">
+									<button
+										class="gk-btn gk-btn-sm gk-btn-ghost"
+										title="Auto-remap"
+									>
+										<svg
+											width="13"
+											height="13"
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.5"
+										>
+											<path d="M2 8a6 6 0 0110.5-4M14 8a6 6 0 01-10.5 4" />
+											<path
+												d="M12.5 1v3h-3M3.5 15v-3h3"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											/>
+										</svg>
+										Re-map
+									</button>
+								</div>
+							</div>
+
+							<!-- Mapping detail -->
+							<div class="detail-scroll">
+								<!-- Critical events -->
+								<div class="mapping-section">
+									<div class="mapping-section-title">Critical Events</div>
+
+									<div class="mapping-slot">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Session Start</div>
+											<div class="slot-event-desc">session.start</div>
+										</div>
+										<div class="slot-sound">
+											<button class="slot-play-btn" title="Preview">
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span class="slot-sound-name">OrcGrunt_Ready1.wav</span>
+											<span class="slot-count-badge">+2 alt</span>
+										</div>
+									</div>
+
+									<div class="mapping-slot">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Needs Input</div>
+											<div class="slot-event-desc">session.needs-input</div>
+										</div>
+										<div class="slot-sound">
+											<button class="slot-play-btn" title="Preview">
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span class="slot-sound-name">OrcGrunt_What1.wav</span>
+											<span class="slot-count-badge">+1 alt</span>
+										</div>
+									</div>
+
+									<div class="mapping-slot">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Task Error</div>
+											<div class="slot-event-desc">task.error</div>
+										</div>
+										<div class="slot-sound">
+											<button class="slot-play-btn" title="Preview">
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span class="slot-sound-name">OrcGrunt_Death1.wav</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Standard events -->
+								<div class="mapping-section">
+									<div class="mapping-section-title">Standard Events</div>
+
+									<div class="mapping-slot">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Acknowledge</div>
+											<div class="slot-event-desc">task.acknowledge</div>
+										</div>
+										<div class="slot-sound">
+											<button class="slot-play-btn" title="Preview">
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span class="slot-sound-name">OrcGrunt_Yes1.wav</span>
+											<span class="slot-count-badge">+2 alt</span>
+										</div>
+									</div>
+
+									<div class="mapping-slot">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Task Complete</div>
+											<div class="slot-event-desc">task.complete</div>
+										</div>
+										<div class="slot-sound">
+											<button class="slot-play-btn" title="Preview">
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span class="slot-sound-name"
+												>OrcGrunt_YesAttack1.wav</span
+											>
+											<span class="slot-count-badge">+1 alt</span>
+										</div>
+									</div>
+
+									<div class="mapping-slot">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Resource Limit</div>
+											<div class="slot-event-desc">resource.limit</div>
+										</div>
+										<div class="slot-sound">
+											<button class="slot-play-btn" title="Preview">
+												<svg
+													width="10"
+													height="10"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span class="slot-sound-name"
+												>OrcGrunt_Pissed1.wav</span
+											>
+											<span class="slot-count-badge">+3 alt</span>
+										</div>
+									</div>
+
+									<div class="mapping-slot is-empty">
+										<div style="flex: 0 0 auto">
+											<div class="slot-event-label">Session End</div>
+											<div class="slot-event-desc">session.end</div>
+										</div>
+										<div class="slot-sound">
+											<span class="slot-empty-label"
+												>No match found -- drag from pool below</span
+											>
+										</div>
+									</div>
+								</div>
+
+								<!-- Unassigned pool -->
+								<div class="mapping-section pool-section">
+									<div class="mapping-section-title">Unassigned Sounds (2)</div>
+									<div class="pool-grid">
+										<div class="pool-chip">
+											<svg
+												class="pool-chip-drag"
+												viewBox="0 0 8 8"
+												fill="currentColor"
+											>
+												<circle cx="2" cy="2" r="1" />
+												<circle cx="6" cy="2" r="1" />
+												<circle cx="2" cy="6" r="1" />
+												<circle cx="6" cy="6" r="1" />
+											</svg>
+											<button
+												class="slot-play-btn"
+												style="width: 18px; height: 18px"
+												title="Preview"
+											>
+												<svg
+													width="7"
+													height="7"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span>OrcGrunt_Warcry1.wav</span>
+										</div>
+										<div class="pool-chip">
+											<svg
+												class="pool-chip-drag"
+												viewBox="0 0 8 8"
+												fill="currentColor"
+											>
+												<circle cx="2" cy="2" r="1" />
+												<circle cx="6" cy="2" r="1" />
+												<circle cx="2" cy="6" r="1" />
+												<circle cx="6" cy="6" r="1" />
+											</svg>
+											<button
+												class="slot-play-btn"
+												style="width: 18px; height: 18px"
+												title="Preview"
+											>
+												<svg
+													width="7"
+													height="7"
+													viewBox="0 0 10 10"
+													fill="currentColor"
+												>
+													<polygon points="2,1 9,5 2,9" />
+												</svg>
+											</button>
+											<span>OrcGrunt_What3.wav</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ════════════ BOTTOM BAR ════════════ -->
+					<div class="wizard-footer">
+						<div class="footer-stats">
+							<div class="footer-stat">
+								<span
+									class="footer-stat-dot"
+									style="background: var(--status-success)"
+								></span>
+								18 ready
+							</div>
+							<div class="footer-stat">
+								<span
+									class="footer-stat-dot"
+									style="background: var(--status-warning)"
+								></span>
+								4 incomplete
+							</div>
+							<div class="footer-stat">
+								<span
+									class="footer-stat-dot"
+									style="background: var(--foreground-subtle)"
+								></span>
+								1 skipped
+							</div>
+							<span style="color: var(--border); margin: 0 var(--space-2)">|</span>
+							<span class="footer-storage">~34.2 MB to copy</span>
+						</div>
+						<div class="footer-actions">
+							<button class="gk-btn gk-btn-ghost">Cancel</button>
+							<button class="gk-btn gk-btn-primary gk-btn-lg">
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 16 16"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+								>
+									<path d="M8 2v12M3 9l5 5 5-5" />
+								</svg>
+								Import 22 Characters
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

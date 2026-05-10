@@ -1,1147 +1,1419 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Variant B: Full-Width Inline Card — GitHub Auth Wizard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-/* ================================================================
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Variant B: Full-Width Inline Card — GitHub Auth Wizard</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap"
+			<link rel="stylesheet" href="../../tokens.css" />
+			rel="stylesheet"
+		/>
+		<style>
+			/* ================================================================
    GROVEKEEPER DESIGN TOKENS — Forest Moss palette (inlined fully)
    ================================================================ */
-:root {
-  --moss-50:  oklch(0.972 0.018 130);
-  --moss-100: oklch(0.940 0.034 130);
-  --moss-200: oklch(0.880 0.058 130);
-  --moss-300: oklch(0.795 0.082 130);
-  --moss-400: oklch(0.690 0.098 132);
-  --moss-500: oklch(0.580 0.096 134);
-  --moss-600: oklch(0.480 0.082 138);
-  --moss-700: oklch(0.395 0.066 142);
-  --moss-800: oklch(0.300 0.048 145);
-  --moss-900: oklch(0.215 0.032 148);
-  --moss-950: oklch(0.155 0.024 150);
-  --amber-300: oklch(0.840 0.130 78);
-  --amber-400: oklch(0.770 0.150 65);
-  --amber-500: oklch(0.690 0.165 55);
-  --amber-600: oklch(0.595 0.160 48);
-  --bark-300: oklch(0.700 0.060 60);
-  --bark-500: oklch(0.500 0.075 55);
-  --bark-700: oklch(0.345 0.055 50);
-  --azure-300: oklch(0.750 0.090 230);
-  --azure-400: oklch(0.660 0.120 230);
-  --azure-500: oklch(0.570 0.130 235);
-  --azure-600: oklch(0.490 0.115 240);
-  --azure-700: oklch(0.400 0.095 240);
-  --plum-300: oklch(0.720 0.100 320);
-  --plum-400: oklch(0.640 0.130 320);
-  --plum-500: oklch(0.560 0.150 320);
-  --plum-600: oklch(0.480 0.130 320);
-  --plum-700: oklch(0.400 0.110 320);
-  --teal-300: oklch(0.780 0.075 195);
-  --teal-400: oklch(0.700 0.095 195);
-  --teal-500: oklch(0.620 0.110 195);
-  --teal-600: oklch(0.540 0.095 195);
-  --teal-700: oklch(0.460 0.080 195);
-  --rose-300: oklch(0.800 0.105 15);
-  --rose-400: oklch(0.720 0.135 15);
-  --rose-500: oklch(0.640 0.155 15);
-  --rose-600: oklch(0.560 0.135 15);
-  --rose-700: oklch(0.480 0.115 15);
-  --coral-300: oklch(0.780 0.105 30);
-  --coral-400: oklch(0.700 0.135 30);
-  --coral-500: oklch(0.620 0.155 30);
-  --coral-600: oklch(0.540 0.135 30);
-  --coral-700: oklch(0.460 0.115 30);
-  --gold-300: oklch(0.810 0.090 90);
-  --gold-400: oklch(0.730 0.115 90);
-  --gold-500: oklch(0.650 0.135 90);
-  --gold-600: oklch(0.570 0.115 90);
-  --gold-700: oklch(0.490 0.095 90);
-  --sage-300: oklch(0.760 0.055 160);
-  --sage-400: oklch(0.680 0.070 160);
-  --sage-500: oklch(0.600 0.085 160);
-  --sage-600: oklch(0.520 0.070 160);
-  --sage-700: oklch(0.440 0.060 160);
-  --indigo-300: oklch(0.700 0.095 275);
-  --indigo-400: oklch(0.620 0.120 275);
-  --indigo-500: oklch(0.540 0.140 275);
-  --indigo-600: oklch(0.460 0.120 275);
-  --indigo-700: oklch(0.380 0.100 275);
-  --fuchsia-300: oklch(0.740 0.105 350);
-  --fuchsia-400: oklch(0.660 0.135 350);
-  --fuchsia-500: oklch(0.580 0.155 350);
-  --fuchsia-600: oklch(0.500 0.135 350);
-  --fuchsia-700: oklch(0.420 0.115 350);
-  --sky-light-top: oklch(0.965 0.018 220);
-  --sky-light-bot: oklch(0.940 0.025 130);
-  --sky-dark-top:  oklch(0.225 0.028 240);
-  --sky-dark-bot:  oklch(0.180 0.030 150);
-  --status-success: oklch(0.660 0.135 145);
-  --status-warning: oklch(0.770 0.155 75);
-  --status-danger:  oklch(0.620 0.205 25);
-  --status-info:    oklch(0.660 0.105 220);
-  --status-merged:  oklch(0.580 0.140 310);
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
-  --text-2xs: 10.5px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-md:  13px;
-  --text-base:14px;
-  --text-lg:  15px;
-  --text-xl:  17px;
-  --text-2xl: 22px;
-  --text-3xl: 28px;
-  --text-4xl: 36px;
-  --text-5xl: 48px;
-  --leading-tight:  1.15;
-  --leading-snug:   1.25;
-  --leading-normal: 1.4;
-  --leading-relaxed:1.55;
-  --leading-loose:  1.7;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.02em;
-  --tracking-snug:   -0.01em;
-  --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-wider:  0.08em;
-  --space-0:  0;
-  --space-1:  2px;
-  --space-2:  4px;
-  --space-3:  6px;
-  --space-4:  8px;
-  --space-5:  10px;
-  --space-6:  12px;
-  --space-7:  14px;
-  --space-8:  16px;
-  --space-10: 20px;
-  --space-12: 24px;
-  --space-14: 28px;
-  --space-16: 32px;
-  --space-20: 40px;
-  --space-24: 48px;
-  --space-32: 64px;
-  --radius-none: 0;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-  --border-width-1: 1px;
-  --border-width-2: 1.5px;
-  --border-width-3: 2px;
-  --focus-ring-width: 3px;
-  --focus-ring-offset: 2px;
-  --shadow-sm: 0 1px 2px rgba(20, 30, 22, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 30, 22, 0.08), 0 1px 2px rgba(20, 30, 22, 0.04);
-  --shadow-lg: 0 12px 32px rgba(20, 30, 22, 0.14), 0 2px 6px rgba(20, 30, 22, 0.06);
-  --shadow-xl: 0 24px 56px rgba(20, 30, 22, 0.20), 0 4px 12px rgba(20, 30, 22, 0.08);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --size-control-sm: 26px;
-  --size-control-md: 32px;
-  --size-control-lg: 38px;
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 20;
-  --z-sticky: 30;
-  --z-overlay: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-tooltip: 70;
-  --duration-1: 90ms;
-  --duration-2: 120ms;
-  --duration-3: 160ms;
-  --duration-4: 220ms;
-  --duration-5: 320ms;
-  --ease-standard: cubic-bezier(.2,.7,.3,1);
-  --ease-out:      cubic-bezier(.16,.84,.44,1);
-  --ease-in:       cubic-bezier(.5,0,.75,0);
-  --sidebar-width:  240px;
-  --sidebar-width-collapsed: 56px;
-}
 
-.theme-dark, [data-theme='dark'] {
-  color-scheme: dark;
-  --background:        oklch(0.155 0.018 150);
-  --surface:           oklch(0.190 0.020 150);
-  --surface-2:         oklch(0.225 0.022 150);
-  --surface-hover:     oklch(0.265 0.024 150);
-  --surface-3:         oklch(0.265 0.024 150);
-  --foreground:        oklch(0.965 0.010 130);
-  --foreground-muted:  oklch(0.730 0.018 135);
-  --foreground-subtle: oklch(0.560 0.020 140);
-  --border:            oklch(0.295 0.022 148);
-  --border-strong:     oklch(0.380 0.028 145);
-  --primary:           var(--moss-400);
-  --primary-fg:        oklch(0.135 0.020 150);
-  --primary-soft:      oklch(0.305 0.045 145);
-  --accent:            var(--moss-400);
-  --accent-fg:         oklch(0.135 0.02 150);
-  --ring:              var(--moss-400);
-  --code-bg:           oklch(0.215 0.020 150);
-}
+			.theme-dark,
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--accent-fg: oklch(0.135 0.02 150);
+				--ring: var(--moss-400);
+				--code-bg: oklch(0.215 0.02 150);
+			}
 
-/* ── Base ──────────────────────────────────────────────────────── */
-.gk-root {
-  font-family: var(--font-sans);
-  color: var(--foreground);
-  background: var(--background);
-  font-feature-settings: "ss01", "cv11";
-  font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-.gk-root, .gk-root * { box-sizing: border-box; }
-.font-mono { font-family: var(--font-mono); }
+			/* ── Base ──────────────────────────────────────────────────────── */
+			.gk-root {
+				font-family: var(--font-sans);
+				color: var(--foreground);
+				background: var(--background);
+				font-feature-settings: 'ss01', 'cv11';
+				font-synthesis: none;
+				-webkit-font-smoothing: antialiased;
+				text-rendering: optimizeLegibility;
+			}
+			.gk-root,
+			.gk-root * {
+				box-sizing: border-box;
+			}
+			.font-mono {
+				font-family: var(--font-mono);
+			}
 
-/* ── Buttons ──────────────────────────────────────────────────── */
-.gk-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 90ms ease, filter 120ms ease, box-shadow 120ms ease;
-  white-space: nowrap;
-  user-select: none;
-}
-.gk-btn:active { transform: scale(0.96); }
-.gk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-btn-primary {
-  background: var(--primary);
-  color: var(--primary-fg);
-  box-shadow: var(--shadow-sm), var(--shadow-inset);
-}
-.gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, white 12%); }
-.theme-dark .gk-btn-primary:hover { background: color-mix(in oklch, var(--primary) 88%, black 12%); }
-.gk-btn-primary:active { transform: scale(0.96); filter: brightness(0.92); }
-.gk-btn-primary:disabled, .gk-btn-primary[data-state="disabled"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-secondary {
-  background: var(--surface-2);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.gk-btn-secondary:hover { background: var(--surface-3); border-color: var(--border-strong); }
-.gk-btn-secondary:active { transform: scale(0.96); filter: brightness(0.95); }
-.gk-btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-ghost {
-  background: transparent;
-  color: var(--foreground-muted);
-}
-.gk-btn-ghost:hover { background: var(--surface-2); color: var(--foreground); }
-.gk-btn-ghost:active { transform: scale(0.96); }
-.gk-btn-ghost:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-danger {
-  background: transparent;
-  color: var(--status-danger);
-  border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
-}
-.gk-btn-danger:hover { background: color-mix(in oklch, var(--status-danger) 12%, transparent); }
-.gk-btn-danger:active { transform: scale(0.96); }
-.gk-btn-danger:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-success {
-  background: var(--status-success);
-  color: oklch(0.15 0.02 145);
-  border-color: transparent;
-}
-.gk-btn-success:hover { background: color-mix(in oklch, var(--status-success) 88%, white 12%); }
-.gk-btn-success:active { transform: scale(0.96); }
-.gk-btn-success:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.gk-btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: var(--radius-sm); }
-.gk-btn-lg { height: 38px; padding: 0 16px; font-size: 14px; }
-.gk-btn-icon { padding: 0; width: 32px; }
-.gk-btn-icon.gk-btn-sm { width: 26px; }
-.gk-btn[data-state="disabled"], .gk-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+			/* ── Buttons ──────────────────────────────────────────────────── */
+			.gk-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				font-family: var(--font-sans);
+				font-weight: 500;
+				font-size: 13px;
+				line-height: 1;
+				padding: 0 12px;
+				height: 32px;
+				border-radius: var(--radius-md);
+				border: 1px solid transparent;
+				cursor: pointer;
+				transition:
+					background 120ms ease,
+					border-color 120ms ease,
+					color 120ms ease,
+					transform 90ms ease,
+					filter 120ms ease,
+					box-shadow 120ms ease;
+				white-space: nowrap;
+				user-select: none;
+			}
+			.gk-btn:active {
+				transform: scale(0.96);
+			}
+			.gk-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-btn-primary {
+				background: var(--primary);
+				color: var(--primary-fg);
+				box-shadow: var(--shadow-sm), var(--shadow-inset);
+			}
+			.gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, white 12%);
+			}
+			.theme-dark .gk-btn-primary:hover {
+				background: color-mix(in oklch, var(--primary) 88%, black 12%);
+			}
+			.gk-btn-primary:active {
+				transform: scale(0.96);
+				filter: brightness(0.92);
+			}
+			.gk-btn-primary:disabled,
+			.gk-btn-primary[data-state='disabled'] {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-secondary {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.gk-btn-secondary:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+			}
+			.gk-btn-secondary:active {
+				transform: scale(0.96);
+				filter: brightness(0.95);
+			}
+			.gk-btn-secondary:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-ghost {
+				background: transparent;
+				color: var(--foreground-muted);
+			}
+			.gk-btn-ghost:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+			}
+			.gk-btn-ghost:active {
+				transform: scale(0.96);
+			}
+			.gk-btn-ghost:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-danger {
+				background: transparent;
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 35%, transparent);
+			}
+			.gk-btn-danger:hover {
+				background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+			}
+			.gk-btn-danger:active {
+				transform: scale(0.96);
+			}
+			.gk-btn-danger:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-success {
+				background: var(--status-success);
+				color: oklch(0.15 0.02 145);
+				border-color: transparent;
+			}
+			.gk-btn-success:hover {
+				background: color-mix(in oklch, var(--status-success) 88%, white 12%);
+			}
+			.gk-btn-success:active {
+				transform: scale(0.96);
+			}
+			.gk-btn-success:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+			.gk-btn-sm {
+				height: 26px;
+				padding: 0 9px;
+				font-size: 12px;
+				border-radius: var(--radius-sm);
+			}
+			.gk-btn-lg {
+				height: 38px;
+				padding: 0 16px;
+				font-size: 14px;
+			}
+			.gk-btn-icon {
+				padding: 0;
+				width: 32px;
+			}
+			.gk-btn-icon.gk-btn-sm {
+				width: 26px;
+			}
+			.gk-btn[data-state='disabled'],
+			.gk-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
 
-/* ── Badges ───────────────────────────────────────────────────── */
-.gk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 20px;
-  padding: 0 7px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border);
-  font-family: var(--font-sans);
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-.gk-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.gk-badge-success { background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); border-color: color-mix(in oklch, var(--status-success) 30%, transparent); }
-.gk-badge-warning { background: color-mix(in oklch, var(--status-warning) 14%, transparent); color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground)); border-color: color-mix(in oklch, var(--status-warning) 30%, transparent); }
-.gk-badge-danger  { background: color-mix(in oklch, var(--status-danger) 14%, transparent); color: var(--status-danger); border-color: color-mix(in oklch, var(--status-danger) 30%, transparent); }
-.gk-badge-info    { background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); border-color: color-mix(in oklch, var(--status-info) 30%, transparent); }
+			/* ── Badges ───────────────────────────────────────────────────── */
+			.gk-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				height: 20px;
+				padding: 0 7px;
+				font-size: 11px;
+				font-weight: 500;
+				border-radius: 999px;
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				letter-spacing: 0.01em;
+				white-space: nowrap;
+			}
+			.gk-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: currentColor;
+				flex-shrink: 0;
+			}
+			.gk-badge-success {
+				background: color-mix(in oklch, var(--status-success) 14%, transparent);
+				color: var(--status-success);
+				border-color: color-mix(in oklch, var(--status-success) 30%, transparent);
+			}
+			.gk-badge-warning {
+				background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+				color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+				border-color: color-mix(in oklch, var(--status-warning) 30%, transparent);
+			}
+			.gk-badge-danger {
+				background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+				color: var(--status-danger);
+				border-color: color-mix(in oklch, var(--status-danger) 30%, transparent);
+			}
+			.gk-badge-info {
+				background: color-mix(in oklch, var(--status-info) 14%, transparent);
+				color: var(--status-info);
+				border-color: color-mix(in oklch, var(--status-info) 30%, transparent);
+			}
 
-/* ── Card ─────────────────────────────────────────────────────── */
-.gk-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-.gk-card-padded { padding: 16px; }
+			/* ── Card ─────────────────────────────────────────────────────── */
+			.gk-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+			}
+			.gk-card-padded {
+				padding: 16px;
+			}
 
-/* ── Typography ───────────────────────────────────────────────── */
-.gk-h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-tight); color: var(--foreground); }
-.gk-h2 { font-size: var(--text-xl); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-h3 { font-size: var(--text-base); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-snug); line-height: var(--leading-snug); color: var(--foreground); }
-.gk-body { font-size: var(--text-md); line-height: var(--leading-relaxed); color: var(--foreground); }
-.gk-small { font-size: var(--text-sm); color: var(--foreground-muted); line-height: var(--leading-normal); }
-.gk-tiny { font-size: var(--text-xs); color: var(--foreground-subtle); letter-spacing: var(--tracking-wide); }
-.gk-eyebrow { font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground-subtle); letter-spacing: var(--tracking-wider); text-transform: uppercase; }
-.gk-label {
-  font-size: 12px;
-  color: var(--foreground-muted);
-  font-weight: 500;
-  margin-bottom: 6px;
-  display: block;
-  letter-spacing: 0.01em;
-}
+			/* ── Typography ───────────────────────────────────────────────── */
+			.gk-h1 {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-tight);
+				color: var(--foreground);
+			}
+			.gk-h2 {
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-h3 {
+				font-size: var(--text-base);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-snug);
+				line-height: var(--leading-snug);
+				color: var(--foreground);
+			}
+			.gk-body {
+				font-size: var(--text-md);
+				line-height: var(--leading-relaxed);
+				color: var(--foreground);
+			}
+			.gk-small {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: var(--leading-normal);
+			}
+			.gk-tiny {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+			}
+			.gk-eyebrow {
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+			}
+			.gk-label {
+				font-size: 12px;
+				color: var(--foreground-muted);
+				font-weight: 500;
+				margin-bottom: 6px;
+				display: block;
+				letter-spacing: 0.01em;
+			}
 
-/* ── Divider ──────────────────────────────────────────────────── */
-.gk-hr { height: 1px; background: var(--border); border: none; margin: 0; }
+			/* ── Divider ──────────────────────────────────────────────────── */
+			.gk-hr {
+				height: 1px;
+				background: var(--border);
+				border: none;
+				margin: 0;
+			}
 
-/* ── Toggle ───────────────────────────────────────────────────── */
-.gk-toggle {
-  width: 32px; height: 18px; border-radius: 999px;
-  background: var(--surface-3); border: 1px solid var(--border);
-  position: relative; cursor: pointer; transition: background 120ms;
-  flex-shrink: 0;
-}
-.gk-toggle::after {
-  content: ""; position: absolute; top: 1px; left: 1px;
-  width: 14px; height: 14px; border-radius: 999px;
-  background: var(--surface); box-shadow: var(--shadow-sm);
-  transition: left 140ms;
-}
-.gk-toggle[data-on="true"] { background: var(--primary); border-color: var(--primary); }
-.gk-toggle[data-on="true"]::after { left: 16px; }
-.gk-toggle:hover { border-color: var(--border-strong); }
-.gk-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.gk-toggle:disabled, .gk-toggle[data-state="disabled"] { opacity: 0.4; cursor: not-allowed; }
+			/* ── Toggle ───────────────────────────────────────────────────── */
+			.gk-toggle {
+				width: 32px;
+				height: 18px;
+				border-radius: 999px;
+				background: var(--surface-3);
+				border: 1px solid var(--border);
+				position: relative;
+				cursor: pointer;
+				transition: background 120ms;
+				flex-shrink: 0;
+			}
+			.gk-toggle::after {
+				content: '';
+				position: absolute;
+				top: 1px;
+				left: 1px;
+				width: 14px;
+				height: 14px;
+				border-radius: 999px;
+				background: var(--surface);
+				box-shadow: var(--shadow-sm);
+				transition: left 140ms;
+			}
+			.gk-toggle[data-on='true'] {
+				background: var(--primary);
+				border-color: var(--primary);
+			}
+			.gk-toggle[data-on='true']::after {
+				left: 16px;
+			}
+			.gk-toggle:hover {
+				border-color: var(--border-strong);
+			}
+			.gk-toggle:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.gk-toggle:disabled,
+			.gk-toggle[data-state='disabled'] {
+				opacity: 0.4;
+				cursor: not-allowed;
+			}
 
-/* ── Input ────────────────────────────────────────────────────── */
-.gk-input {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--foreground);
-  width: 100%;
-  outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.gk-input:focus {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
-}
+			/* ── Input ────────────────────────────────────────────────────── */
+			.gk-input {
+				font-family: var(--font-sans);
+				font-size: 13px;
+				height: 32px;
+				padding: 0 10px;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				color: var(--foreground);
+				width: 100%;
+				outline: none;
+				transition:
+					border-color 120ms ease,
+					box-shadow 120ms ease;
+			}
+			.gk-input:focus {
+				border-color: var(--ring);
+				box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 22%, transparent);
+			}
 
-/* ── Animations ───────────────────────────────────────────────── */
-@keyframes gk-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-.gk-pulse { animation: gk-pulse 1.8s ease-in-out infinite; }
+			/* ── Animations ───────────────────────────────────────────────── */
+			@keyframes gk-pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.45;
+				}
+			}
+			.gk-pulse {
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
 
-@keyframes gk-spin {
-  to { transform: rotate(360deg); }
-}
+			@keyframes gk-spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-@keyframes gk-shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
+			@keyframes gk-shimmer {
+				from {
+					background-position: 200% 0;
+				}
+				to {
+					background-position: -200% 0;
+				}
+			}
 
-
-/* ================================================================
+			/* ================================================================
    VARIANT B — FULL-WIDTH INLINE CARD STYLES
    ================================================================ */
 
-/* Settings page layout */
-.settings-page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: var(--space-16) var(--space-12);
-}
-
-.settings-page-header {
-  margin-bottom: var(--space-16);
-}
-
-.settings-section {
-  margin-bottom: var(--space-16);
-}
-
-.settings-section-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
-}
-
-.settings-section-header .section-icon {
-  width: 20px;
-  height: 20px;
-  color: var(--foreground-muted);
-  flex-shrink: 0;
-}
-
-/* Auth inline card */
-.auth-inline-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-
-.auth-inline-card-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 280px;
-}
-
-/* Left panel — code + QR */
-.auth-left-panel {
-  padding: var(--space-12) var(--space-12) var(--space-12) var(--space-12);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-10);
-  border-right: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.auth-code-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.auth-code-label {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-
-.auth-code-display {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-}
-
-.auth-code-value {
-  font-family: var(--font-mono);
-  font-size: 36px;
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.15em;
-  color: var(--foreground);
-  line-height: var(--leading-tight);
-  user-select: all;
-}
-
-.auth-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--foreground-muted);
-  cursor: pointer;
-  transition: all 120ms ease;
-  flex-shrink: 0;
-}
-.auth-copy-btn:hover {
-  background: var(--surface-3);
-  border-color: var(--border-strong);
-  color: var(--foreground);
-}
-.auth-copy-btn:active {
-  transform: scale(0.94);
-}
-.auth-copy-btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.auth-copy-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.auth-url-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-sm);
-}
-
-.auth-url-row .url-label {
-  color: var(--foreground-subtle);
-}
-
-.auth-url-link {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: var(--weight-medium);
-  transition: color 120ms;
-}
-.auth-url-link:hover {
-  color: color-mix(in oklch, var(--primary) 80%, white 20%);
-  text-decoration: underline;
-}
-
-/* QR code area */
-.auth-qr-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin-top: auto;
-}
-
-.auth-qr-container {
-  width: 120px;
-  height: 120px;
-  border-radius: var(--radius-md);
-  background: oklch(0.985 0.005 130);
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.qr-pattern {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.auth-qr-hint {
-  font-size: var(--text-xs);
-  color: var(--foreground-subtle);
-  max-width: 180px;
-  line-height: var(--leading-normal);
-}
-
-/* Right panel — status */
-.auth-right-panel {
-  padding: var(--space-12);
-  display: flex;
-  flex-direction: column;
-  background: color-mix(in oklch, var(--surface-2) 40%, var(--surface));
-}
-
-.auth-status-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-8);
-  text-align: center;
-}
-
-/* Polling spinner */
-.auth-spinner-ring {
-  width: 48px;
-  height: 48px;
-  position: relative;
-}
-
-.auth-spinner-ring svg {
-  width: 48px;
-  height: 48px;
-  animation: gk-spin 1.6s linear infinite;
-}
-
-.auth-spinner-ring .spinner-track {
-  stroke: var(--border);
-  fill: none;
-  stroke-width: 3;
-}
-.auth-spinner-ring .spinner-arc {
-  stroke: var(--primary);
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-dasharray: 90 150;
-  stroke-dashoffset: 0;
-}
-
-.auth-github-mark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
-  color: var(--foreground-muted);
-}
-
-.auth-status-text {
-  font-size: var(--text-md);
-  color: var(--foreground-muted);
-  line-height: var(--leading-relaxed);
-  max-width: 240px;
-}
-
-.auth-timer {
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
-  font-variant-numeric: tabular-nums;
-  color: var(--foreground-subtle);
-  letter-spacing: 0.04em;
-}
-
-.auth-timer.is-warning {
-  color: var(--status-warning);
-}
-
-.auth-timer.is-danger {
-  color: var(--status-danger);
-}
-
-/* Pulsing dot next to status */
-.auth-pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
-  display: inline-block;
-  animation: gk-pulse 1.8s ease-in-out infinite;
-}
-
-.auth-status-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-}
-
-/* Actions in the right panel */
-.auth-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-12);
-}
-
-.auth-actions-row {
-  display: flex;
-  gap: var(--space-4);
-}
-
-.auth-cancel-link {
-  font-size: var(--text-sm);
-  color: var(--foreground-subtle);
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 120ms;
-  text-align: center;
-  padding-top: var(--space-3);
-}
-.auth-cancel-link:hover {
-  color: var(--foreground-muted);
-  text-decoration: underline;
-}
-
-/* ── Success state card ───────────────────────────────────────── */
-.auth-success-card {
-  border: 1px solid color-mix(in oklch, var(--status-success) 25%, var(--border));
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-8) var(--space-12);
-}
-
-.auth-success-inner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-}
-
-.auth-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 2px solid color-mix(in oklch, var(--status-success) 30%, var(--border));
-}
-
-.auth-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Avatar placeholder for mockup */
-.auth-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, var(--moss-600), var(--moss-400));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-fg);
-  font-family: var(--font-sans);
-  font-weight: var(--weight-semibold);
-  font-size: 18px;
-}
-
-.auth-user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.auth-user-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-1);
-}
-
-.auth-username {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  letter-spacing: var(--tracking-snug);
-}
-
-.auth-connected-label {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-}
-
-.auth-success-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex-shrink: 0;
-}
-
-/* ── Settings row (toggle) ────────────────────────────────────── */
-.settings-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6) 0;
-}
-
-.settings-row-label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.settings-row-title {
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-  color: var(--foreground);
-}
-
-.settings-row-desc {
-  font-size: var(--text-sm);
-  color: var(--foreground-subtle);
-}
-
-/* ── Other settings placeholder sections ──────────────────────── */
-.settings-placeholder-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.settings-placeholder-row:last-child {
-  border-bottom: none;
-}
-
-.settings-placeholder-label {
-  font-size: var(--text-md);
-  color: var(--foreground);
-}
-
-.settings-placeholder-value {
-  font-size: var(--text-sm);
-  color: var(--foreground-muted);
-  font-family: var(--font-mono);
-}
-
-/* ── Variant marker ───────────────────────────────────────────── */
-.variant-marker {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-3) var(--space-8);
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
-  z-index: 100;
-  text-align: center;
-}
-
-.variant-marker + .settings-page {
-  padding-top: calc(var(--space-32) + 28px);
-}
-
-/* Separator between polling and success demos */
-.demo-separator {
-  margin: var(--space-24) 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-}
-
-.demo-separator::before,
-.demo-separator::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.demo-separator .demo-sep-label {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground-subtle);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* ── Responsive ───────────────────────────────────────────────── */
-@media (max-width: 640px) {
-  .settings-page {
-    padding: var(--space-8) var(--space-6);
-  }
-
-  .auth-inline-card-inner {
-    grid-template-columns: 1fr;
-  }
-
-  .auth-left-panel {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: var(--space-8);
-  }
-
-  .auth-right-panel {
-    padding: var(--space-8);
-  }
-
-  .auth-code-value {
-    font-size: 28px;
-  }
-
-  .auth-qr-container {
-    width: 96px;
-    height: 96px;
-  }
-
-  .auth-success-inner {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--space-6);
-  }
-
-  .auth-success-actions {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .variant-marker + .settings-page {
-    padding-top: calc(var(--space-24) + 28px);
-  }
-}
-  </style>
-</head>
-<body>
-  <div class="gk-root theme-dark">
-
-    <!-- Variant label -->
-    <div class="variant-marker">
-      <span class="gk-eyebrow">VARIANT B: FULL-WIDTH INLINE CARD</span>
-    </div>
-
-    <div class="settings-page">
-
-      <!-- Page header -->
-      <div class="settings-page-header">
-        <h1 class="gk-h1">Settings</h1>
-      </div>
-
-      <!-- ════════════════════════════════════════════════════════
+			/* Settings page layout */
+			.settings-page {
+				max-width: 720px;
+				margin: 0 auto;
+				padding: var(--space-16) var(--space-12);
+			}
+
+			.settings-page-header {
+				margin-bottom: var(--space-16);
+			}
+
+			.settings-section {
+				margin-bottom: var(--space-16);
+			}
+
+			.settings-section-header {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-8);
+			}
+
+			.settings-section-header .section-icon {
+				width: 20px;
+				height: 20px;
+				color: var(--foreground-muted);
+				flex-shrink: 0;
+			}
+
+			/* Auth inline card */
+			.auth-inline-card {
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				overflow: hidden;
+				box-shadow: var(--shadow-sm);
+			}
+
+			.auth-inline-card-inner {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				min-height: 280px;
+			}
+
+			/* Left panel — code + QR */
+			.auth-left-panel {
+				padding: var(--space-12) var(--space-12) var(--space-12) var(--space-12);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-10);
+				border-right: 1px solid var(--border);
+				background: var(--surface);
+			}
+
+			.auth-code-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.auth-code-label {
+				font-size: var(--text-xs);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+			}
+
+			.auth-code-display {
+				display: flex;
+				align-items: center;
+				gap: var(--space-6);
+			}
+
+			.auth-code-value {
+				font-family: var(--font-mono);
+				font-size: 36px;
+				font-weight: var(--weight-bold);
+				letter-spacing: 0.15em;
+				color: var(--foreground);
+				line-height: var(--leading-tight);
+				user-select: all;
+			}
+
+			.auth-copy-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 36px;
+				height: 36px;
+				border-radius: var(--radius-md);
+				border: 1px solid var(--border);
+				background: var(--surface-2);
+				color: var(--foreground-muted);
+				cursor: pointer;
+				transition: all 120ms ease;
+				flex-shrink: 0;
+			}
+			.auth-copy-btn:hover {
+				background: var(--surface-3);
+				border-color: var(--border-strong);
+				color: var(--foreground);
+			}
+			.auth-copy-btn:active {
+				transform: scale(0.94);
+			}
+			.auth-copy-btn:focus-visible {
+				outline: 2px solid var(--ring);
+				outline-offset: 2px;
+			}
+			.auth-copy-btn:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+
+			.auth-url-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+			}
+
+			.auth-url-row .url-label {
+				color: var(--foreground-subtle);
+			}
+
+			.auth-url-link {
+				color: var(--primary);
+				text-decoration: none;
+				font-weight: var(--weight-medium);
+				transition: color 120ms;
+			}
+			.auth-url-link:hover {
+				color: color-mix(in oklch, var(--primary) 80%, white 20%);
+				text-decoration: underline;
+			}
+
+			/* QR code area */
+			.auth-qr-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-3);
+				margin-top: auto;
+			}
+
+			.auth-qr-container {
+				width: 120px;
+				height: 120px;
+				border-radius: var(--radius-md);
+				background: oklch(0.985 0.005 130);
+				padding: 8px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+			}
+
+			.qr-pattern {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+
+			.auth-qr-hint {
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				max-width: 180px;
+				line-height: var(--leading-normal);
+			}
+
+			/* Right panel — status */
+			.auth-right-panel {
+				padding: var(--space-12);
+				display: flex;
+				flex-direction: column;
+				background: color-mix(in oklch, var(--surface-2) 40%, var(--surface));
+			}
+
+			.auth-status-area {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: var(--space-8);
+				text-align: center;
+			}
+
+			/* Polling spinner */
+			.auth-spinner-ring {
+				width: 48px;
+				height: 48px;
+				position: relative;
+			}
+
+			.auth-spinner-ring svg {
+				width: 48px;
+				height: 48px;
+				animation: gk-spin 1.6s linear infinite;
+			}
+
+			.auth-spinner-ring .spinner-track {
+				stroke: var(--border);
+				fill: none;
+				stroke-width: 3;
+			}
+			.auth-spinner-ring .spinner-arc {
+				stroke: var(--primary);
+				fill: none;
+				stroke-width: 3;
+				stroke-linecap: round;
+				stroke-dasharray: 90 150;
+				stroke-dashoffset: 0;
+			}
+
+			.auth-github-mark {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: 20px;
+				height: 20px;
+				color: var(--foreground-muted);
+			}
+
+			.auth-status-text {
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				line-height: var(--leading-relaxed);
+				max-width: 240px;
+			}
+
+			.auth-timer {
+				font-family: var(--font-mono);
+				font-size: var(--text-base);
+				font-variant-numeric: tabular-nums;
+				color: var(--foreground-subtle);
+				letter-spacing: 0.04em;
+			}
+
+			.auth-timer.is-warning {
+				color: var(--status-warning);
+			}
+
+			.auth-timer.is-danger {
+				color: var(--status-danger);
+			}
+
+			/* Pulsing dot next to status */
+			.auth-pulse-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background: var(--primary);
+				display: inline-block;
+				animation: gk-pulse 1.8s ease-in-out infinite;
+			}
+
+			.auth-status-label {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			/* Actions in the right panel */
+			.auth-actions {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+				margin-top: var(--space-12);
+			}
+
+			.auth-actions-row {
+				display: flex;
+				gap: var(--space-4);
+			}
+
+			.auth-cancel-link {
+				font-size: var(--text-sm);
+				color: var(--foreground-subtle);
+				text-decoration: none;
+				cursor: pointer;
+				transition: color 120ms;
+				text-align: center;
+				padding-top: var(--space-3);
+			}
+			.auth-cancel-link:hover {
+				color: var(--foreground-muted);
+				text-decoration: underline;
+			}
+
+			/* ── Success state card ───────────────────────────────────────── */
+			.auth-success-card {
+				border: 1px solid color-mix(in oklch, var(--status-success) 25%, var(--border));
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				box-shadow: var(--shadow-sm);
+				padding: var(--space-8) var(--space-12);
+			}
+
+			.auth-success-inner {
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+			}
+
+			.auth-avatar {
+				width: 48px;
+				height: 48px;
+				border-radius: 50%;
+				overflow: hidden;
+				flex-shrink: 0;
+				border: 2px solid color-mix(in oklch, var(--status-success) 30%, var(--border));
+			}
+
+			.auth-avatar img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			/* Avatar placeholder for mockup */
+			.auth-avatar-placeholder {
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(135deg, var(--moss-600), var(--moss-400));
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--primary-fg);
+				font-family: var(--font-sans);
+				font-weight: var(--weight-semibold);
+				font-size: 18px;
+			}
+
+			.auth-user-info {
+				flex: 1;
+				min-width: 0;
+			}
+
+			.auth-user-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				margin-bottom: var(--space-1);
+			}
+
+			.auth-username {
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground);
+				letter-spacing: var(--tracking-snug);
+			}
+
+			.auth-connected-label {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+			}
+
+			.auth-success-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-4);
+				flex-shrink: 0;
+			}
+
+			/* ── Settings row (toggle) ────────────────────────────────────── */
+			.settings-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-6) 0;
+			}
+
+			.settings-row-label {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
+
+			.settings-row-title {
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+			}
+
+			.settings-row-desc {
+				font-size: var(--text-sm);
+				color: var(--foreground-subtle);
+			}
+
+			/* ── Other settings placeholder sections ──────────────────────── */
+			.settings-placeholder-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--space-6) 0;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.settings-placeholder-row:last-child {
+				border-bottom: none;
+			}
+
+			.settings-placeholder-label {
+				font-size: var(--text-md);
+				color: var(--foreground);
+			}
+
+			.settings-placeholder-value {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				font-family: var(--font-mono);
+			}
+
+			/* ── Variant marker ───────────────────────────────────────────── */
+			.variant-marker {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				padding: var(--space-3) var(--space-8);
+				background: var(--surface-2);
+				border-bottom: 1px solid var(--border);
+				z-index: 100;
+				text-align: center;
+			}
+
+			.variant-marker + .settings-page {
+				padding-top: calc(var(--space-32) + 28px);
+			}
+
+			/* Separator between polling and success demos */
+			.demo-separator {
+				margin: var(--space-24) 0;
+				display: flex;
+				align-items: center;
+				gap: var(--space-8);
+			}
+
+			.demo-separator::before,
+			.demo-separator::after {
+				content: '';
+				flex: 1;
+				height: 1px;
+				background: var(--border);
+			}
+
+			.demo-separator .demo-sep-label {
+				font-size: var(--text-xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				white-space: nowrap;
+			}
+
+			/* ── Responsive ───────────────────────────────────────────────── */
+			@media (max-width: 640px) {
+				.settings-page {
+					padding: var(--space-8) var(--space-6);
+				}
+
+				.auth-inline-card-inner {
+					grid-template-columns: 1fr;
+				}
+
+				.auth-left-panel {
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+					padding: var(--space-8);
+				}
+
+				.auth-right-panel {
+					padding: var(--space-8);
+				}
+
+				.auth-code-value {
+					font-size: 28px;
+				}
+
+				.auth-qr-container {
+					width: 96px;
+					height: 96px;
+				}
+
+				.auth-success-inner {
+					flex-direction: column;
+					text-align: center;
+					gap: var(--space-6);
+				}
+
+				.auth-success-actions {
+					width: 100%;
+					justify-content: center;
+				}
+
+				.variant-marker + .settings-page {
+					padding-top: calc(var(--space-24) + 28px);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<!-- Variant label -->
+			<div class="variant-marker">
+				<span class="gk-eyebrow">VARIANT B: FULL-WIDTH INLINE CARD</span>
+			</div>
+
+			<div class="settings-page">
+				<!-- Page header -->
+				<div class="settings-page-header">
+					<h1 class="gk-h1">Settings</h1>
+				</div>
+
+				<!-- ════════════════════════════════════════════════════════
            Section above: General — context for inline placement
            ════════════════════════════════════════════════════════ -->
-      <section class="settings-section">
-        <div class="settings-section-header">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-          <h2 class="gk-h2">General</h2>
-        </div>
-        <div class="gk-card gk-card-padded">
-          <div class="settings-placeholder-row">
-            <span class="settings-placeholder-label">Default workspace</span>
-            <span class="settings-placeholder-value">~/projects/grovekeeper</span>
-          </div>
-          <div class="settings-placeholder-row">
-            <span class="settings-placeholder-label">Theme</span>
-            <span class="settings-placeholder-value">dark</span>
-          </div>
-          <div class="settings-placeholder-row">
-            <span class="settings-placeholder-label">Accent color</span>
-            <span class="settings-placeholder-value">moss</span>
-          </div>
-        </div>
-      </section>
+				<section class="settings-section">
+					<div class="settings-section-header">
+						<svg
+							class="section-icon"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<circle cx="12" cy="12" r="3" />
+							<path
+								d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+							/>
+						</svg>
+						<h2 class="gk-h2">General</h2>
+					</div>
+					<div class="gk-card gk-card-padded">
+						<div class="settings-placeholder-row">
+							<span class="settings-placeholder-label">Default workspace</span>
+							<span class="settings-placeholder-value">~/projects/grovekeeper</span>
+						</div>
+						<div class="settings-placeholder-row">
+							<span class="settings-placeholder-label">Theme</span>
+							<span class="settings-placeholder-value">dark</span>
+						</div>
+						<div class="settings-placeholder-row">
+							<span class="settings-placeholder-label">Accent color</span>
+							<span class="settings-placeholder-value">moss</span>
+						</div>
+					</div>
+				</section>
 
-      <!-- ════════════════════════════════════════════════════════
+				<!-- ════════════════════════════════════════════════════════
            PRIMARY: GitHub Connection — Polling State
            ════════════════════════════════════════════════════════ -->
-      <section class="settings-section">
-        <div class="settings-section-header">
-          <!-- GitHub icon -->
-          <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-          </svg>
-          <h2 class="gk-h2">GitHub Connection</h2>
-        </div>
+				<section class="settings-section">
+					<div class="settings-section-header">
+						<!-- GitHub icon -->
+						<svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+							<path
+								d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+							/>
+						</svg>
+						<h2 class="gk-h2">GitHub Connection</h2>
+					</div>
 
-        <div class="auth-inline-card">
-          <div class="auth-inline-card-inner">
+					<div class="auth-inline-card">
+						<div class="auth-inline-card-inner">
+							<!-- Left: code + QR -->
+							<div class="auth-left-panel">
+								<div class="auth-code-section">
+									<span class="auth-code-label">Your device code</span>
+									<div class="auth-code-display">
+										<span class="auth-code-value">WDJB-3F7K</span>
+										<button
+											class="auth-copy-btn"
+											title="Copy code to clipboard"
+											aria-label="Copy code to clipboard"
+										>
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<rect
+													x="9"
+													y="9"
+													width="13"
+													height="13"
+													rx="2"
+													ry="2"
+												/>
+												<path
+													d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+												/>
+											</svg>
+										</button>
+									</div>
+									<div class="auth-url-row">
+										<span class="url-label">Enter at</span>
+										<a
+											href="https://github.com/login/device"
+											target="_blank"
+											rel="noopener"
+											class="auth-url-link"
+											>github.com/login/device</a
+										>
+									</div>
+								</div>
 
-            <!-- Left: code + QR -->
-            <div class="auth-left-panel">
-              <div class="auth-code-section">
-                <span class="auth-code-label">Your device code</span>
-                <div class="auth-code-display">
-                  <span class="auth-code-value">WDJB-3F7K</span>
-                  <button class="auth-copy-btn" title="Copy code to clipboard" aria-label="Copy code to clipboard">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="auth-url-row">
-                  <span class="url-label">Enter at</span>
-                  <a href="https://github.com/login/device" target="_blank" rel="noopener" class="auth-url-link">github.com/login/device</a>
-                </div>
-              </div>
+								<!-- QR code -->
+								<div class="auth-qr-section">
+									<div class="auth-qr-container">
+										<!-- Realistic QR code pattern using SVG -->
+										<svg
+											class="qr-pattern"
+											viewBox="0 0 100 100"
+											fill="oklch(0.18 0.02 150)"
+										>
+											<!-- Finder patterns (three corners) -->
+											<!-- Top-left -->
+											<rect x="2" y="2" width="22" height="22" rx="2" />
+											<rect
+												x="5"
+												y="5"
+												width="16"
+												height="16"
+												rx="1"
+												fill="oklch(0.985 0.005 130)"
+											/>
+											<rect
+												x="8"
+												y="8"
+												width="10"
+												height="10"
+												rx="1"
+												fill="oklch(0.18 0.02 150)"
+											/>
+											<!-- Top-right -->
+											<rect x="76" y="2" width="22" height="22" rx="2" />
+											<rect
+												x="79"
+												y="5"
+												width="16"
+												height="16"
+												rx="1"
+												fill="oklch(0.985 0.005 130)"
+											/>
+											<rect
+												x="82"
+												y="8"
+												width="10"
+												height="10"
+												rx="1"
+												fill="oklch(0.18 0.02 150)"
+											/>
+											<!-- Bottom-left -->
+											<rect x="2" y="76" width="22" height="22" rx="2" />
+											<rect
+												x="5"
+												y="79"
+												width="16"
+												height="16"
+												rx="1"
+												fill="oklch(0.985 0.005 130)"
+											/>
+											<rect
+												x="8"
+												y="82"
+												width="10"
+												height="10"
+												rx="1"
+												fill="oklch(0.18 0.02 150)"
+											/>
+											<!-- Timing patterns -->
+											<rect x="28" y="8" width="4" height="4" />
+											<rect x="36" y="8" width="4" height="4" />
+											<rect x="44" y="8" width="4" height="4" />
+											<rect x="52" y="8" width="4" height="4" />
+											<rect x="60" y="8" width="4" height="4" />
+											<rect x="68" y="8" width="4" height="4" />
+											<rect x="8" y="28" width="4" height="4" />
+											<rect x="8" y="36" width="4" height="4" />
+											<rect x="8" y="44" width="4" height="4" />
+											<rect x="8" y="52" width="4" height="4" />
+											<rect x="8" y="60" width="4" height="4" />
+											<rect x="8" y="68" width="4" height="4" />
+											<!-- Data modules — scattered to look realistic -->
+											<rect x="28" y="16" width="4" height="4" />
+											<rect x="36" y="16" width="4" height="4" />
+											<rect x="52" y="16" width="4" height="4" />
+											<rect x="60" y="20" width="4" height="4" />
+											<rect x="28" y="28" width="4" height="4" />
+											<rect x="40" y="28" width="4" height="4" />
+											<rect x="48" y="28" width="4" height="4" />
+											<rect x="60" y="28" width="4" height="4" />
+											<rect x="72" y="28" width="4" height="4" />
+											<rect x="84" y="28" width="4" height="4" />
+											<rect x="28" y="36" width="4" height="4" />
+											<rect x="44" y="36" width="4" height="4" />
+											<rect x="56" y="36" width="4" height="4" />
+											<rect x="68" y="36" width="4" height="4" />
+											<rect x="80" y="36" width="4" height="4" />
+											<rect x="92" y="36" width="4" height="4" />
+											<rect x="28" y="44" width="4" height="4" />
+											<rect x="36" y="44" width="4" height="4" />
+											<rect x="48" y="44" width="4" height="4" />
+											<rect x="64" y="44" width="4" height="4" />
+											<rect x="76" y="44" width="4" height="4" />
+											<rect x="88" y="44" width="4" height="4" />
+											<rect x="16" y="52" width="4" height="4" />
+											<rect x="36" y="52" width="4" height="4" />
+											<rect x="44" y="52" width="4" height="4" />
+											<rect x="60" y="52" width="4" height="4" />
+											<rect x="76" y="52" width="4" height="4" />
+											<rect x="92" y="52" width="4" height="4" />
+											<rect x="20" y="60" width="4" height="4" />
+											<rect x="32" y="60" width="4" height="4" />
+											<rect x="48" y="60" width="4" height="4" />
+											<rect x="56" y="60" width="4" height="4" />
+											<rect x="68" y="60" width="4" height="4" />
+											<rect x="84" y="60" width="4" height="4" />
+											<rect x="28" y="68" width="4" height="4" />
+											<rect x="40" y="68" width="4" height="4" />
+											<rect x="52" y="68" width="4" height="4" />
+											<rect x="64" y="68" width="4" height="4" />
+											<rect x="80" y="68" width="4" height="4" />
+											<rect x="92" y="68" width="4" height="4" />
+											<rect x="28" y="76" width="4" height="4" />
+											<rect x="36" y="76" width="4" height="4" />
+											<rect x="44" y="80" width="4" height="4" />
+											<rect x="56" y="76" width="4" height="4" />
+											<rect x="68" y="80" width="4" height="4" />
+											<rect x="84" y="76" width="4" height="4" />
+											<rect x="32" y="84" width="4" height="4" />
+											<rect x="44" y="88" width="4" height="4" />
+											<rect x="56" y="84" width="4" height="4" />
+											<rect x="64" y="92" width="4" height="4" />
+											<rect x="76" y="84" width="4" height="4" />
+											<rect x="88" y="88" width="4" height="4" />
+											<rect x="28" y="92" width="4" height="4" />
+											<rect x="40" y="92" width="4" height="4" />
+											<rect x="52" y="92" width="4" height="4" />
+											<rect x="72" y="92" width="4" height="4" />
+											<rect x="80" y="92" width="4" height="4" />
+											<rect x="92" y="92" width="4" height="4" />
+											<!-- Alignment pattern -->
+											<rect x="72" y="72" width="10" height="10" rx="1" />
+											<rect
+												x="74"
+												y="74"
+												width="6"
+												height="6"
+												rx="0.5"
+												fill="oklch(0.985 0.005 130)"
+											/>
+											<rect
+												x="76"
+												y="76"
+												width="2"
+												height="2"
+												fill="oklch(0.18 0.02 150)"
+											/>
+										</svg>
+									</div>
+									<span class="auth-qr-hint"
+										>Scan to open github.com/login/device on your phone</span
+									>
+								</div>
+							</div>
 
-              <!-- QR code -->
-              <div class="auth-qr-section">
-                <div class="auth-qr-container">
-                  <!-- Realistic QR code pattern using SVG -->
-                  <svg class="qr-pattern" viewBox="0 0 100 100" fill="oklch(0.18 0.02 150)">
-                    <!-- Finder patterns (three corners) -->
-                    <!-- Top-left -->
-                    <rect x="2" y="2" width="22" height="22" rx="2"/>
-                    <rect x="5" y="5" width="16" height="16" rx="1" fill="oklch(0.985 0.005 130)"/>
-                    <rect x="8" y="8" width="10" height="10" rx="1" fill="oklch(0.18 0.02 150)"/>
-                    <!-- Top-right -->
-                    <rect x="76" y="2" width="22" height="22" rx="2"/>
-                    <rect x="79" y="5" width="16" height="16" rx="1" fill="oklch(0.985 0.005 130)"/>
-                    <rect x="82" y="8" width="10" height="10" rx="1" fill="oklch(0.18 0.02 150)"/>
-                    <!-- Bottom-left -->
-                    <rect x="2" y="76" width="22" height="22" rx="2"/>
-                    <rect x="5" y="79" width="16" height="16" rx="1" fill="oklch(0.985 0.005 130)"/>
-                    <rect x="8" y="82" width="10" height="10" rx="1" fill="oklch(0.18 0.02 150)"/>
-                    <!-- Timing patterns -->
-                    <rect x="28" y="8" width="4" height="4"/><rect x="36" y="8" width="4" height="4"/><rect x="44" y="8" width="4" height="4"/><rect x="52" y="8" width="4" height="4"/><rect x="60" y="8" width="4" height="4"/><rect x="68" y="8" width="4" height="4"/>
-                    <rect x="8" y="28" width="4" height="4"/><rect x="8" y="36" width="4" height="4"/><rect x="8" y="44" width="4" height="4"/><rect x="8" y="52" width="4" height="4"/><rect x="8" y="60" width="4" height="4"/><rect x="8" y="68" width="4" height="4"/>
-                    <!-- Data modules — scattered to look realistic -->
-                    <rect x="28" y="16" width="4" height="4"/><rect x="36" y="16" width="4" height="4"/><rect x="52" y="16" width="4" height="4"/><rect x="60" y="20" width="4" height="4"/>
-                    <rect x="28" y="28" width="4" height="4"/><rect x="40" y="28" width="4" height="4"/><rect x="48" y="28" width="4" height="4"/><rect x="60" y="28" width="4" height="4"/><rect x="72" y="28" width="4" height="4"/><rect x="84" y="28" width="4" height="4"/>
-                    <rect x="28" y="36" width="4" height="4"/><rect x="44" y="36" width="4" height="4"/><rect x="56" y="36" width="4" height="4"/><rect x="68" y="36" width="4" height="4"/><rect x="80" y="36" width="4" height="4"/><rect x="92" y="36" width="4" height="4"/>
-                    <rect x="28" y="44" width="4" height="4"/><rect x="36" y="44" width="4" height="4"/><rect x="48" y="44" width="4" height="4"/><rect x="64" y="44" width="4" height="4"/><rect x="76" y="44" width="4" height="4"/><rect x="88" y="44" width="4" height="4"/>
-                    <rect x="16" y="52" width="4" height="4"/><rect x="36" y="52" width="4" height="4"/><rect x="44" y="52" width="4" height="4"/><rect x="60" y="52" width="4" height="4"/><rect x="76" y="52" width="4" height="4"/><rect x="92" y="52" width="4" height="4"/>
-                    <rect x="20" y="60" width="4" height="4"/><rect x="32" y="60" width="4" height="4"/><rect x="48" y="60" width="4" height="4"/><rect x="56" y="60" width="4" height="4"/><rect x="68" y="60" width="4" height="4"/><rect x="84" y="60" width="4" height="4"/>
-                    <rect x="28" y="68" width="4" height="4"/><rect x="40" y="68" width="4" height="4"/><rect x="52" y="68" width="4" height="4"/><rect x="64" y="68" width="4" height="4"/><rect x="80" y="68" width="4" height="4"/><rect x="92" y="68" width="4" height="4"/>
-                    <rect x="28" y="76" width="4" height="4"/><rect x="36" y="76" width="4" height="4"/><rect x="44" y="80" width="4" height="4"/><rect x="56" y="76" width="4" height="4"/><rect x="68" y="80" width="4" height="4"/><rect x="84" y="76" width="4" height="4"/>
-                    <rect x="32" y="84" width="4" height="4"/><rect x="44" y="88" width="4" height="4"/><rect x="56" y="84" width="4" height="4"/><rect x="64" y="92" width="4" height="4"/><rect x="76" y="84" width="4" height="4"/><rect x="88" y="88" width="4" height="4"/>
-                    <rect x="28" y="92" width="4" height="4"/><rect x="40" y="92" width="4" height="4"/><rect x="52" y="92" width="4" height="4"/><rect x="72" y="92" width="4" height="4"/><rect x="80" y="92" width="4" height="4"/><rect x="92" y="92" width="4" height="4"/>
-                    <!-- Alignment pattern -->
-                    <rect x="72" y="72" width="10" height="10" rx="1"/>
-                    <rect x="74" y="74" width="6" height="6" rx="0.5" fill="oklch(0.985 0.005 130)"/>
-                    <rect x="76" y="76" width="2" height="2" fill="oklch(0.18 0.02 150)"/>
-                  </svg>
-                </div>
-                <span class="auth-qr-hint">Scan to open github.com/login/device on your phone</span>
-              </div>
-            </div>
+							<!-- Right: status area -->
+							<div class="auth-right-panel">
+								<div class="auth-status-area">
+									<!-- Spinner with GitHub mark -->
+									<div class="auth-spinner-ring">
+										<svg viewBox="0 0 50 50">
+											<circle class="spinner-track" cx="25" cy="25" r="20" />
+											<circle class="spinner-arc" cx="25" cy="25" r="20" />
+										</svg>
+										<div class="auth-github-mark">
+											<svg
+												viewBox="0 0 24 24"
+												fill="currentColor"
+												width="20"
+												height="20"
+											>
+												<path
+													d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+												/>
+											</svg>
+										</div>
+									</div>
 
-            <!-- Right: status area -->
-            <div class="auth-right-panel">
-              <div class="auth-status-area">
-                <!-- Spinner with GitHub mark -->
-                <div class="auth-spinner-ring">
-                  <svg viewBox="0 0 50 50">
-                    <circle class="spinner-track" cx="25" cy="25" r="20"/>
-                    <circle class="spinner-arc" cx="25" cy="25" r="20"/>
-                  </svg>
-                  <div class="auth-github-mark">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-                    </svg>
-                  </div>
-                </div>
+									<div
+										style="
+											display: flex;
+											flex-direction: column;
+											gap: 6px;
+											align-items: center;
+										"
+									>
+										<div class="auth-status-label">
+											<span class="auth-pulse-dot"></span>
+											<span>Polling</span>
+										</div>
+										<p class="auth-status-text">
+											Waiting for you to enter the code on GitHub...
+										</p>
+									</div>
 
-                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
-                  <div class="auth-status-label">
-                    <span class="auth-pulse-dot"></span>
-                    <span>Polling</span>
-                  </div>
-                  <p class="auth-status-text">Waiting for you to enter the code on GitHub...</p>
-                </div>
+									<div class="auth-timer">12:30</div>
+								</div>
 
-                <div class="auth-timer">12:30</div>
-              </div>
+								<div class="auth-actions">
+									<div class="auth-actions-row">
+										<a
+											href="https://github.com/login/device"
+											target="_blank"
+											rel="noopener"
+											class="gk-btn gk-btn-primary"
+											style="flex: 1; text-decoration: none"
+										>
+											<!-- GitHub mark inline -->
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="currentColor"
+											>
+												<path
+													d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+												/>
+											</svg>
+											Open GitHub
+										</a>
+										<button
+											class="gk-btn gk-btn-ghost gk-btn-icon"
+											title="Copy code"
+											aria-label="Copy code"
+										>
+											<svg
+												width="14"
+												height="14"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+											>
+												<rect
+													x="9"
+													y="9"
+													width="13"
+													height="13"
+													rx="2"
+													ry="2"
+												/>
+												<path
+													d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+												/>
+											</svg>
+										</button>
+									</div>
+									<a href="#" class="auth-cancel-link">Cancel authentication</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
 
-              <div class="auth-actions">
-                <div class="auth-actions-row">
-                  <a href="https://github.com/login/device" target="_blank" rel="noopener" class="gk-btn gk-btn-primary" style="flex: 1; text-decoration: none;">
-                    <!-- GitHub mark inline -->
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-                    </svg>
-                    Open GitHub
-                  </a>
-                  <button class="gk-btn gk-btn-ghost gk-btn-icon" title="Copy code" aria-label="Copy code">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                    </svg>
-                  </button>
-                </div>
-                <a href="#" class="auth-cancel-link">Cancel authentication</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ════════════════════════════════════════════════════════
+				<!-- ════════════════════════════════════════════════════════
            Section below: other settings — shows inline context
            ════════════════════════════════════════════════════════ -->
-      <section class="settings-section">
-        <div class="settings-section-header">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-          </svg>
-          <h2 class="gk-h2">Editor</h2>
-        </div>
-        <div class="gk-card gk-card-padded">
-          <div class="settings-placeholder-row">
-            <span class="settings-placeholder-label">Font size</span>
-            <span class="settings-placeholder-value">13px</span>
-          </div>
-          <div class="settings-placeholder-row">
-            <span class="settings-placeholder-label">Tab width</span>
-            <span class="settings-placeholder-value">2 spaces</span>
-          </div>
-          <div class="settings-placeholder-row">
-            <span class="settings-placeholder-label">Word wrap</span>
-            <span class="settings-placeholder-value">on</span>
-          </div>
-        </div>
-      </section>
+				<section class="settings-section">
+					<div class="settings-section-header">
+						<svg
+							class="section-icon"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M12 20h9" />
+							<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+						</svg>
+						<h2 class="gk-h2">Editor</h2>
+					</div>
+					<div class="gk-card gk-card-padded">
+						<div class="settings-placeholder-row">
+							<span class="settings-placeholder-label">Font size</span>
+							<span class="settings-placeholder-value">13px</span>
+						</div>
+						<div class="settings-placeholder-row">
+							<span class="settings-placeholder-label">Tab width</span>
+							<span class="settings-placeholder-value">2 spaces</span>
+						</div>
+						<div class="settings-placeholder-row">
+							<span class="settings-placeholder-label">Word wrap</span>
+							<span class="settings-placeholder-value">on</span>
+						</div>
+					</div>
+				</section>
 
-
-      <!-- ════════════════════════════════════════════════════════
+				<!-- ════════════════════════════════════════════════════════
            DEMO SEPARATOR: success state below
            ════════════════════════════════════════════════════════ -->
-      <div class="demo-separator">
-        <span class="demo-sep-label">Success state (after auth completes)</span>
-      </div>
+				<div class="demo-separator">
+					<span class="demo-sep-label">Success state (after auth completes)</span>
+				</div>
 
-
-      <!-- ════════════════════════════════════════════════════════
+				<!-- ════════════════════════════════════════════════════════
            SUCCESS STATE: GitHub Connection
            ════════════════════════════════════════════════════════ -->
-      <section class="settings-section">
-        <div class="settings-section-header">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-          </svg>
-          <h2 class="gk-h2">GitHub Connection</h2>
-        </div>
+				<section class="settings-section">
+					<div class="settings-section-header">
+						<svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+							<path
+								d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+							/>
+						</svg>
+						<h2 class="gk-h2">GitHub Connection</h2>
+					</div>
 
-        <div class="auth-success-card">
-          <div class="auth-success-inner">
-            <div class="auth-avatar">
-              <div class="auth-avatar-placeholder">M</div>
-            </div>
-            <div class="auth-user-info">
-              <div class="auth-user-row">
-                <span class="auth-username">MartinP</span>
-                <span class="gk-badge gk-badge-success">
-                  <span class="gk-badge-dot"></span>
-                  Connected via OAuth
-                </span>
-              </div>
-              <span class="auth-connected-label">Connected as MartinP</span>
-            </div>
-            <div class="auth-success-actions">
-              <button class="gk-btn gk-btn-ghost gk-btn-sm">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                </svg>
-                Refresh
-              </button>
-              <button class="gk-btn gk-btn-danger gk-btn-sm">Disconnect</button>
-            </div>
-          </div>
-        </div>
+					<div class="auth-success-card">
+						<div class="auth-success-inner">
+							<div class="auth-avatar">
+								<div class="auth-avatar-placeholder">M</div>
+							</div>
+							<div class="auth-user-info">
+								<div class="auth-user-row">
+									<span class="auth-username">MartinP</span>
+									<span class="gk-badge gk-badge-success">
+										<span class="gk-badge-dot"></span>
+										Connected via OAuth
+									</span>
+								</div>
+								<span class="auth-connected-label">Connected as MartinP</span>
+							</div>
+							<div class="auth-success-actions">
+								<button class="gk-btn gk-btn-ghost gk-btn-sm">
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M1 4v6h6" />
+										<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+									</svg>
+									Refresh
+								</button>
+								<button class="gk-btn gk-btn-danger gk-btn-sm">Disconnect</button>
+							</div>
+						</div>
+					</div>
 
-        <!-- Toggle below connected card -->
-        <div style="margin-top: var(--space-6);">
-          <hr class="gk-hr">
-          <div class="settings-row">
-            <div class="settings-row-label">
-              <span class="settings-row-title">Use gh CLI instead of built-in auth</span>
-              <span class="settings-row-desc gk-small">Fall back to the GitHub CLI for authentication if installed</span>
-            </div>
-            <div class="gk-toggle" role="switch" aria-checked="false" tabindex="0"></div>
-          </div>
-        </div>
-      </section>
-
-    </div><!-- /.settings-page -->
-  </div><!-- /.gk-root -->
-</body>
+					<!-- Toggle below connected card -->
+					<div style="margin-top: var(--space-6)">
+						<hr class="gk-hr" />
+						<div class="settings-row">
+							<div class="settings-row-label">
+								<span class="settings-row-title"
+									>Use gh CLI instead of built-in auth</span
+								>
+								<span class="settings-row-desc gk-small"
+									>Fall back to the GitHub CLI for authentication if
+									installed</span
+								>
+							</div>
+							<div
+								class="gk-toggle"
+								role="switch"
+								aria-checked="false"
+								tabindex="0"
+							></div>
+						</div>
+					</div>
+				</section>
+			</div>
+			<!-- /.settings-page -->
+		</div>
+		<!-- /.gk-root -->
+	</body>
 </html>
