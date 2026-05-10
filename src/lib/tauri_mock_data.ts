@@ -67,6 +67,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		worktree_parent_folder: 'C:/_MP_projects/worktrees',
 		color_palette_id: PALETTE_VIVID,
 		accent_color: '#62874b',
+		chart_color_theme: 'monochrome',
 		default_shape: 'oak',
 		priorities_enabled: true,
 		status: 'active',
@@ -81,6 +82,7 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		worktree_parent_folder: null,
 		color_palette_id: null,
 		accent_color: null,
+		chart_color_theme: null,
 		default_shape: 'pine',
 		priorities_enabled: true,
 		status: 'active',
@@ -1483,11 +1485,20 @@ export const MOCK_USAGE_DASHBOARD = {
 		cost_delta_percent: -18.0,
 		session_count_delta: 9,
 	},
-	daily_costs: Array.from({ length: 30 }, (_, i) => ({
+	time_bucket_costs: Array.from({ length: 30 }, (_, i) => ({
 		date: `2026-04-${String(i + 1).padStart(2, '0')}`,
-		cost_usd: Math.random() * 1.5,
+		cost_usd: +(Math.random() * 1.5).toFixed(2),
 		session_count: Math.floor(Math.random() * 5) + 1,
 	})),
+	grouped_costs: [
+		{ date: '2026-04-28', group: 'claude-opus-4-6', cost_usd: 0.82, session_count: 3 },
+		{ date: '2026-04-28', group: 'claude-sonnet-4-6', cost_usd: 0.34, session_count: 5 },
+		{ date: '2026-04-29', group: 'claude-opus-4-6', cost_usd: 1.1, session_count: 4 },
+		{ date: '2026-04-29', group: 'claude-sonnet-4-6', cost_usd: 0.21, session_count: 2 },
+		{ date: '2026-04-29', group: 'claude-haiku-4-5', cost_usd: 0.05, session_count: 1 },
+		{ date: '2026-04-30', group: 'claude-opus-4-6', cost_usd: 0.95, session_count: 3 },
+		{ date: '2026-04-30', group: 'claude-sonnet-4-6', cost_usd: 0.41, session_count: 4 },
+	],
 	activity_breakdown: [
 		{ category: 'coding', cost_usd: 4.2, turn_count: 89, one_shot_percent: 82.0 },
 		{ category: 'debugging', cost_usd: 2.8, turn_count: 52, one_shot_percent: 61.0 },
