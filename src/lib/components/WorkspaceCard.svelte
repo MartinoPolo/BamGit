@@ -14,6 +14,7 @@
 	import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list';
 	import ClockIcon from '@lucide/svelte/icons/clock';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
+	import CostLink from '$lib/components/usage/CostLink.svelte';
 	import { cn } from '$lib/utils.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 	import {
@@ -148,13 +149,6 @@
 			return m.workspace_yesterday();
 		}
 		return m.time_days_ago({ count: String(diffDays) });
-	}
-
-	function formatCost(cost: number | null): string {
-		if (cost == null || cost === 0) {
-			return '$0.00';
-		}
-		return `$${cost.toFixed(2)}`;
 	}
 
 	function handleIconClick(event: MouseEvent, handler?: () => void) {
@@ -345,8 +339,15 @@
 			<div
 				class="mt-2.5 flex items-center justify-between border-t border-dashed border-border pt-2"
 			>
-				<span class="font-mono text-[10.5px] text-foreground-subtle">
-					today {formatCost(workspace.total_cost_usd)}
+				<span
+					class="flex items-center gap-1 font-mono text-[10.5px] text-foreground-subtle"
+				>
+					today <CostLink
+						costUsd={workspace.total_cost_usd ?? 0}
+						period="today"
+						scope="workspace"
+						size="sm"
+					/>
 				</span>
 				<span
 					class="flex items-center gap-1 font-mono text-[10.5px] text-foreground-subtle"

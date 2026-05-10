@@ -5,24 +5,65 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { cn } from '$lib/utils.js';
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
+	import { initUsageUrlStateSync } from '$lib/modules/usage/url_state_sync.svelte.js';
+	import { useWindow } from '$lib/modules/window/window.context.svelte.js';
 	import {
 		PERIODS,
+		USAGE_SCOPES,
+		isMetricsPeriod,
+		isUsageScope,
+		isGroupByOption,
 		type MetricsPeriod,
 		type GroupByOption,
+		type UsageScope,
 	} from '$lib/modules/usage/usage_types.js';
+	import { exportUsageCsv } from '$lib/components/usage/csv_export.js';
+	import { formatCostDisplay } from '$lib/components/usage/cost_link_utils.js';
 
 	import CostChart from '$lib/components/usage/CostChart.svelte';
 	import RefreshIndicator from '$lib/components/usage/RefreshIndicator.svelte';
 	import ColorThemePicker from '$lib/components/usage/ColorThemePicker.svelte';
 	import GroupByDropdown from '$lib/components/usage/GroupByDropdown.svelte';
+	import ScopeToggle from '$lib/components/usage/ScopeToggle.svelte';
 	import AchievementsDialog from '$lib/components/usage/AchievementsDialog.svelte';
 	import DateRangePicker from '$lib/components/usage/DateRangePicker.svelte';
 
 	const ctx = setUsageContext();
+	const windowCtx = useWindow();
 
-	function formatCost(value: number): string {
-		return `$${value.toFixed(2)}`;
+	if (windowCtx.isOverview) {
+		ctx.scope.current = USAGE_SCOPES.global;
 	}
+
+	initUsageUrlStateSync({
+		get activePeriod() {
+			return ctx.activePeriod.current;
+		},
+		get scope() {
+			return ctx.scope.current;
+		},
+		get groupBy() {
+			return ctx.groupBy.current;
+		},
+		get customDateRange() {
+			return ctx.customDateRange.current;
+		},
+		restoreFromUrl(period, scope, groupBy, customFrom, customTo) {
+			if (isMetricsPeriod(period)) {
+				ctx.activePeriod.current = period;
+			}
+			if (isUsageScope(scope)) {
+				ctx.scope.current = scope;
+			}
+			if (isGroupByOption(groupBy)) {
+				ctx.groupBy.current = groupBy;
+			}
+			if (customFrom !== null && customTo !== null) {
+				ctx.customDateRange.current = { start: customFrom, end: customTo };
+			}
+			void ctx.loadData(windowCtx.boundDashboardId ?? undefined);
+		},
+	});
 
 	function formatDelta(value: number | null | undefined): string {
 		if (value == null) {
@@ -71,23 +112,36 @@
 	function handlePeriodChange(period: MetricsPeriod) {
 		ctx.activePeriod.current = period;
 		ctx.customDateRange.current = null;
-		void ctx.loadData();
+		void ctx.loadData(windowCtx.boundDashboardId ?? undefined);
 	}
 
 	function handleCustomRange(range: { start: string; end: string }) {
 		ctx.customDateRange.current = range;
 		ctx.activePeriod.current = 'custom';
-		void ctx.loadData();
+		void ctx.loadData(windowCtx.boundDashboardId ?? undefined);
 	}
 
 	function handleGroupByChange(option: GroupByOption) {
 		ctx.groupBy.current = option;
-		void ctx.loadData();
+		void ctx.loadData(windowCtx.boundDashboardId ?? undefined);
+	}
+
+	function handleScopeChange(scope: UsageScope) {
+		ctx.scope.current = scope;
+		void ctx.loadData(
+			scope === USAGE_SCOPES.workspace
+				? (windowCtx.boundDashboardId ?? undefined)
+				: undefined,
+		);
+	}
+
+	function handleExportCsv() {
+		if (ctx.dashboardData.current) {
+			void exportUsageCsv(ctx.dashboardData.current, ctx.activePeriod.current);
+		}
 	}
 
 	onMount(() => {
-		// TODO(#247): listen('metrics-updated', () => ctx.notifyNewData()) — blocked by backend event wiring
-		void ctx.loadData();
 		return () => {
 			ctx.clearTimers();
 		};
@@ -111,9 +165,9 @@
 			<RefreshIndicator
 				refreshState={ctx.refreshState.current}
 				lastUpdatedAt={ctx.lastUpdatedAt.current}
-				onrefresh={() => ctx.loadData()}
+				onrefresh={() => ctx.loadData(windowCtx.boundDashboardId ?? undefined)}
 			/>
-			<Button variant="secondary" size="sm">
+			<Button variant="secondary" size="sm" onclick={handleExportCsv}>
 				<DownloadIcon />
 				Export CSV
 			</Button>
@@ -141,6 +195,7 @@
 				active={ctx.activePeriod.current === 'custom'}
 			/>
 		</div>
+		<ScopeToggle value={ctx.scope.current} onchange={handleScopeChange} />
 		<GroupByDropdown value={ctx.groupBy.current} onchange={handleGroupByChange} />
 	</div>
 
@@ -154,7 +209,9 @@
 			<Card.Card>
 				<div class="p-4">
 					<div class="text-sm text-muted-foreground">Total cost</div>
-					<div class="text-2xl font-bold">{formatCost(data.stats.total_cost_usd)}</div>
+					<div class="text-2xl font-bold">
+						{formatCostDisplay(data.stats.total_cost_usd)}
+					</div>
 					<div class={cn('text-xs', deltaTone(data.stats.cost_delta_percent))}>
 						{formatDelta(data.stats.cost_delta_percent)} vs prev period
 					</div>
@@ -184,7 +241,7 @@
 					<div class="text-sm text-muted-foreground">Cache hit</div>
 					<div class="text-2xl font-bold">{data.stats.cache_hit_ratio.toFixed(0)}%</div>
 					<div class="text-xs text-muted-foreground">
-						saving ≈ {formatCost(
+						saving ≈ {formatCostDisplay(
 							data.stats.total_cost_usd * (data.stats.cache_hit_ratio / 100) * 0.9,
 						)}/mo
 					</div>
@@ -240,7 +297,7 @@
 									></div>
 								</div>
 								<span class="text-right text-sm tabular-nums"
-									>{formatCost(activity.cost_usd)}</span
+									>{formatCostDisplay(activity.cost_usd)}</span
 								>
 								<span class="text-right text-sm tabular-nums text-muted-foreground"
 									>{activity.turn_count}</span
@@ -288,7 +345,7 @@
 										>
 									</div>
 									<span class="shrink-0 tabular-nums font-medium"
-										>{formatCost(session.cost_usd)}</span
+										>{formatCostDisplay(session.cost_usd)}</span
 									>
 								</div>
 							{/each}

@@ -226,6 +226,7 @@ pub fn run() {
             seed_commands::seed_demo_workspace,
             seed_commands::delete_demo_workspace,
             dialog_commands::pick_folder,
+            dialog_commands::save_file,
             github_commands::list_user_repos,
             github_commands::search_github_repos,
             github_auth_commands::github_device_flow_start,
