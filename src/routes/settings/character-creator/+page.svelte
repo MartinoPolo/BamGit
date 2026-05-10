@@ -190,6 +190,25 @@
 		eventAssignments.clear();
 	}
 
+	function buildAssignmentsFromMap(): SaveSoundAssignment[] {
+		const result: SaveSoundAssignment[] = [];
+		for (const [eventType, sounds] of eventAssignments) {
+			for (let i = 0; i < sounds.length; i++) {
+				result.push({
+					event_type: eventType,
+					sound_file: sounds[i].fileName,
+					label: null,
+					sort_order: i,
+				});
+			}
+		}
+		return result;
+	}
+
+	function resolveDisplayName(): string {
+		return displayName.trim().length > 0 ? displayName.trim() : characterName.trim();
+	}
+
 	async function handleSave() {
 		if (canSave === false || packId === null) {
 			return;
@@ -197,28 +216,15 @@
 
 		saving = true;
 		try {
-			const assignments: SaveSoundAssignment[] = [];
-			for (const [eventType, sounds] of eventAssignments) {
-				for (let i = 0; i < sounds.length; i++) {
-					assignments.push({
-						event_type: eventType,
-						sound_file: sounds[i].fileName,
-						label: null,
-						sort_order: i,
-					});
-				}
-			}
-
 			if (isEditMode) {
 				await characterPacks.updatePack({
 					id: packId,
-					display_name:
-						displayName.trim().length > 0 ? displayName.trim() : characterName.trim(),
+					display_name: resolveDisplayName(),
 					language,
 				});
 			}
 
-			await characterPacks.saveSounds(packId, assignments);
+			await characterPacks.saveSounds(packId, buildAssignmentsFromMap());
 			await goto(resolve('/settings'));
 		} catch (err) {
 			console.error('Failed to save character pack:', err);
