@@ -11,12 +11,12 @@ mod session;
 mod window_manager;
 
 use commands::{
-    action_commands, ai_config_commands, color_palette_commands, dashboard_commands,
-    dependency_commands, dialog_commands, git_status_commands, github_auth_commands,
-    github_commands, issue_commands, keyboard_shortcut_commands, label_shape_mapping_commands,
-    metrics_commands, notification_commands, portfolio_commands, raw_requirements_commands,
-    seed_commands, process_commands, session_commands, terminal_commands, window_commands,
-    workspace_command_commands, worktree_commands,
+    action_commands, ai_config_commands, ai_config_mutations, color_palette_commands,
+    dashboard_commands, dependency_commands, dialog_commands, git_status_commands,
+    github_auth_commands, github_commands, issue_commands, keyboard_shortcut_commands,
+    label_shape_mapping_commands, metrics_commands, notification_commands, portfolio_commands,
+    raw_requirements_commands, seed_commands, process_commands, session_commands,
+    terminal_commands, window_commands, workspace_command_commands, worktree_commands,
 };
 use std::sync::Arc;
 
@@ -235,6 +235,15 @@ pub fn run() {
             ai_config_commands::discover_ai_config,
             ai_config_commands::get_custom_discovery_paths,
             ai_config_commands::set_custom_discovery_paths,
+            ai_config_commands::detect_installed_providers,
+            ai_config_mutations::inspect_symlink,
+            ai_config_mutations::write_ai_config_file,
+            ai_config_mutations::delete_ai_config_file,
+            ai_config_mutations::delete_hook_from_settings,
+            ai_config_mutations::delete_mcp_from_settings,
+            ai_config_mutations::set_skill_override,
+            ai_config_mutations::read_provider_settings,
+            ai_config_mutations::write_provider_settings,
             metrics_commands::get_usage_dashboard,
             metrics_commands::get_achievements,
             metrics_commands::import_historical_sessions,
