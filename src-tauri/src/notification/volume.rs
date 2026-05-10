@@ -4,6 +4,8 @@ use crate::models::notification::NotificationEventType;
 
 use super::{DEFAULT_NOTIFICATION_VOLUME, DEFAULT_SOUND_VOLUME_OVERRIDE};
 
+/// Shared volume-loading queries used by both NotificationService and Tauri commands.
+
 pub fn load_global_volume(connection: &Connection) -> f64 {
     connection
         .query_row(
