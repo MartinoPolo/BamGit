@@ -64,6 +64,12 @@
 		}
 	}
 
+	function syncInputDisplay() {
+		if (inputRef) {
+			inputRef.value = value;
+		}
+	}
+
 	function handleOpenChange(isOpen: boolean) {
 		open = isOpen;
 		if (isOpen) {
@@ -109,8 +115,16 @@
 			}
 			searchValue = '';
 			searchResults = [];
+			syncInputDisplay();
 		}
 	}
+
+	$effect(() => {
+		value;
+		if (!open) {
+			syncInputDisplay();
+		}
+	});
 </script>
 
 <Combobox.Root
