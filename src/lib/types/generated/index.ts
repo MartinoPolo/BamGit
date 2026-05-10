@@ -1,7 +1,11 @@
 // Barrel export for ts-rs generated types.
 // Re-run `cargo test` in src-tauri/ to regenerate individual files.
 
+export type { Achievement } from './Achievement';
+export type { AchievementKind } from './AchievementKind';
 export type { Action } from './Action';
+export type { ActivityBreakdown } from './ActivityBreakdown';
+export type { ActivityCategory } from './ActivityCategory';
 export type { AgentConfig } from './AgentConfig';
 export type { AiConfigDiscoveryResult } from './AiConfigDiscoveryResult';
 export type { ApprovalDecision } from './ApprovalDecision';
@@ -15,7 +19,6 @@ export type { ColorPalette } from './ColorPalette';
 export type { CommandCategory } from './CommandCategory';
 export type { ConfigSource } from './ConfigSource';
 export type { CustomDiscoveryPath } from './CustomDiscoveryPath';
-export type { DailyCost } from './DailyCost';
 export type { Dashboard } from './Dashboard';
 export type { DashboardStatus } from './DashboardStatus';
 export type { DeviceFlowStartResult } from './DeviceFlowStartResult';
@@ -29,6 +32,7 @@ export type { GhAuthStatus } from './GhAuthStatus';
 export type { GhCliAvailability } from './GhCliAvailability';
 export type { GitHubUser } from './GitHubUser';
 export type { GitStatusCache } from './GitStatusCache';
+export type { GroupedCostEntry } from './GroupedCostEntry';
 export type { GrovekeeperManifest } from './GrovekeeperManifest';
 export type { HookConfig } from './HookConfig';
 export type { ImportanceTier } from './ImportanceTier';
@@ -60,6 +64,11 @@ export type { SoundEntry } from './SoundEntry';
 export type { SoundPackInfo } from './SoundPackInfo';
 export type { SoundVolumeOverride } from './SoundVolumeOverride';
 export type { SyncAllResult } from './SyncAllResult';
+export type { TimeBucketCost } from './TimeBucketCost';
+export type { ToolUsageBreakdown } from './ToolUsageBreakdown';
+export type { TopSession } from './TopSession';
+export type { UsageDashboardData } from './UsageDashboardData';
+export type { UsageStats } from './UsageStats';
 export type { WindowWorkspaceBinding } from './WindowWorkspaceBinding';
 export type { WorkspaceCommand } from './WorkspaceCommand';
 export type { WorktreeProgressPayload } from './WorktreeProgressPayload';

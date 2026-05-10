@@ -57,7 +57,8 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
         })?;
 
     connection.execute_batch(
-        "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');",
+        "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');
+         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('chart_color_theme', 'monochrome');",
     )?;
     connection.execute(
         "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('notification_volume', ?1)",

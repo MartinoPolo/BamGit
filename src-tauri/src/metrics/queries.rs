@@ -1,8 +1,8 @@
 use rusqlite::Connection;
 
 use crate::models::metrics::{
-    ActivityBreakdown, ActivityCategory, DailyCost, MetricsPeriod, TopSession, ToolUsageBreakdown,
-    UsageDashboardData, UsageStats,
+    ActivityBreakdown, ActivityCategory, GroupBy, GroupedCostEntry, MetricsPeriod, TimeBucketCost,
+    TopSession, ToolUsageBreakdown, UsageDashboardData, UsageStats,
 };
 
 fn period_where_clause(filter: Option<&str>, column: &str) -> String {
@@ -15,36 +15,21 @@ fn period_where_clause(filter: Option<&str>, column: &str) -> String {
     }
 }
 
-fn workspace_join_session_metrics(dashboard_id: Option<&str>) -> (String, String) {
-    match dashboard_id {
-        Some(_) => (
-            " JOIN sessions _ws ON session_metrics.session_id = _ws.id \
-              JOIN issues _wi ON _ws.issue_id = _wi.id"
-                .to_string(),
-            " AND _wi.dashboard_id = :dashboard_id".to_string(),
-        ),
-        None => (String::new(), String::new()),
+fn bucket_expression(period: &MetricsPeriod, column: &str) -> String {
+    match period {
+        MetricsPeriod::Today => format!("strftime('%Y-%m-%d %H:00', {column})"),
+        MetricsPeriod::All => format!("strftime('%Y-W%W', {column})"),
+        _ => format!("date({column})"),
     }
 }
 
-fn workspace_join_turn_metrics(dashboard_id: Option<&str>) -> (String, String) {
+fn workspace_join(table: &str, dashboard_id: Option<&str>) -> (String, String) {
     match dashboard_id {
         Some(_) => (
-            " JOIN sessions _ws ON turn_metrics.session_id = _ws.id \
-              JOIN issues _wi ON _ws.issue_id = _wi.id"
-                .to_string(),
-            " AND _wi.dashboard_id = :dashboard_id".to_string(),
-        ),
-        None => (String::new(), String::new()),
-    }
-}
-
-fn workspace_join_tool_usage(dashboard_id: Option<&str>) -> (String, String) {
-    match dashboard_id {
-        Some(_) => (
-            " JOIN sessions _ws ON tool_usage.session_id = _ws.id \
-              JOIN issues _wi ON _ws.issue_id = _wi.id"
-                .to_string(),
+            format!(
+                " JOIN sessions _ws ON {table}.session_id = _ws.id \
+                 JOIN issues _wi ON _ws.issue_id = _wi.id"
+            ),
             " AND _wi.dashboard_id = :dashboard_id".to_string(),
         ),
         None => (String::new(), String::new()),
@@ -90,7 +75,7 @@ pub fn query_usage_stats(
 ) -> Result<UsageStats, rusqlite::Error> {
     let date_filter = period.to_sql_date_filter();
     let current_where = period_where_clause(date_filter.as_deref(), "started_at");
-    let (ws_join, ws_filter) = workspace_join_session_metrics(dashboard_id);
+    let (ws_join, ws_filter) = workspace_join("session_metrics", dashboard_id);
 
     let stats_sql = format!(
         "SELECT COALESCE(SUM(session_metrics.cost_usd), 0.0), COUNT(*) FROM session_metrics{ws_join} {current_where}{ws_filter}"
@@ -154,29 +139,113 @@ pub fn query_usage_stats(
     })
 }
 
-pub fn query_daily_costs(
+pub fn query_time_bucket_costs(
     conn: &Connection,
     period: &MetricsPeriod,
     dashboard_id: Option<&str>,
-) -> Result<Vec<DailyCost>, rusqlite::Error> {
+) -> Result<Vec<TimeBucketCost>, rusqlite::Error> {
     let date_filter = period.to_sql_date_filter();
     let where_clause = period_where_clause(date_filter.as_deref(), "started_at");
-    let (ws_join, ws_filter) = workspace_join_session_metrics(dashboard_id);
+    let (ws_join, ws_filter) = workspace_join("session_metrics", dashboard_id);
+
+    let bucket_expr = bucket_expression(period, "session_metrics.started_at");
 
     let sql = format!(
-        "SELECT date(session_metrics.started_at) as day, COALESCE(SUM(session_metrics.cost_usd), 0), COUNT(*)
+        "SELECT {bucket_expr} as bucket, COALESCE(SUM(session_metrics.cost_usd), 0), COUNT(*)
          FROM session_metrics{ws_join}
          {where_clause}{ws_filter}
-         GROUP BY day
-         ORDER BY day ASC"
+         GROUP BY bucket
+         ORDER BY bucket ASC"
     );
 
     let mut stmt = conn.prepare(&sql)?;
     let mapper = |row: &rusqlite::Row| {
-        Ok(DailyCost {
+        Ok(TimeBucketCost {
             date: row.get::<_, String>(0)?,
             cost_usd: row.get::<_, f64>(1)?,
             session_count: row.get::<_, i64>(2)?,
+        })
+    };
+
+    if let Some(did) = dashboard_id {
+        stmt.query_map(&[(":dashboard_id", did)], mapper)?.collect()
+    } else {
+        stmt.query_map([], mapper)?.collect()
+    }
+}
+
+pub fn query_grouped_costs(
+    conn: &Connection,
+    period: &MetricsPeriod,
+    dashboard_id: Option<&str>,
+    group_by: &GroupBy,
+) -> Result<Vec<GroupedCostEntry>, rusqlite::Error> {
+    let date_filter = period.to_sql_date_filter();
+    let where_clause = period_where_clause(date_filter.as_deref(), "started_at");
+    let (ws_join, ws_filter) = workspace_join("session_metrics", dashboard_id);
+
+    let bucket_expr = bucket_expression(period, "session_metrics.started_at");
+
+    let group_expr = match group_by {
+        GroupBy::Model => "COALESCE(session_metrics.model, 'unknown')",
+        GroupBy::Provider => "COALESCE(session_metrics.provider, 'unknown')",
+        GroupBy::Category => {
+            return query_grouped_costs_by_category(conn, period, dashboard_id);
+        }
+        GroupBy::None => unreachable!(),
+    };
+
+    let sql = format!(
+        "SELECT {bucket_expr} as bucket, {group_expr} as grp, COALESCE(SUM(session_metrics.cost_usd), 0), COUNT(*)
+         FROM session_metrics{ws_join}
+         {where_clause}{ws_filter}
+         GROUP BY bucket, grp
+         ORDER BY bucket ASC, grp ASC"
+    );
+
+    let mut stmt = conn.prepare(&sql)?;
+    let mapper = |row: &rusqlite::Row| {
+        Ok(GroupedCostEntry {
+            date: row.get::<_, String>(0)?,
+            group: row.get::<_, String>(1)?,
+            cost_usd: row.get::<_, f64>(2)?,
+            session_count: row.get::<_, i64>(3)?,
+        })
+    };
+
+    if let Some(did) = dashboard_id {
+        stmt.query_map(&[(":dashboard_id", did)], mapper)?.collect()
+    } else {
+        stmt.query_map([], mapper)?.collect()
+    }
+}
+
+fn query_grouped_costs_by_category(
+    conn: &Connection,
+    period: &MetricsPeriod,
+    dashboard_id: Option<&str>,
+) -> Result<Vec<GroupedCostEntry>, rusqlite::Error> {
+    let date_filter = period.to_sql_date_filter();
+    let where_clause = period_where_clause(date_filter.as_deref(), "timestamp");
+    let (ws_join, ws_filter) = workspace_join("turn_metrics", dashboard_id);
+
+    let bucket_expr = bucket_expression(period, "turn_metrics.timestamp");
+
+    let sql = format!(
+        "SELECT {bucket_expr} as bucket, turn_metrics.category as grp, COALESCE(SUM(turn_metrics.cost_usd), 0), COUNT(DISTINCT turn_metrics.session_id)
+         FROM turn_metrics{ws_join}
+         {where_clause}{ws_filter}
+         GROUP BY bucket, grp
+         ORDER BY bucket ASC, grp ASC"
+    );
+
+    let mut stmt = conn.prepare(&sql)?;
+    let mapper = |row: &rusqlite::Row| {
+        Ok(GroupedCostEntry {
+            date: row.get::<_, String>(0)?,
+            group: row.get::<_, String>(1)?,
+            cost_usd: row.get::<_, f64>(2)?,
+            session_count: row.get::<_, i64>(3)?,
         })
     };
 
@@ -194,7 +263,7 @@ pub fn query_activity_breakdown(
 ) -> Result<Vec<ActivityBreakdown>, rusqlite::Error> {
     let date_filter = period.to_sql_date_filter();
     let where_clause = period_where_clause(date_filter.as_deref(), "timestamp");
-    let (ws_join, ws_filter) = workspace_join_turn_metrics(dashboard_id);
+    let (ws_join, ws_filter) = workspace_join("turn_metrics", dashboard_id);
 
     let sql = format!(
         "SELECT turn_metrics.category,
@@ -280,7 +349,7 @@ pub fn query_tool_usage(
 ) -> Result<Vec<ToolUsageBreakdown>, rusqlite::Error> {
     let date_filter = period.to_sql_date_filter();
     let where_clause = period_where_clause(date_filter.as_deref(), "timestamp");
-    let (ws_join, ws_filter) = workspace_join_tool_usage(dashboard_id);
+    let (ws_join, ws_filter) = workspace_join("tool_usage", dashboard_id);
 
     let sql = format!(
         "SELECT tool_usage.tool_name, COUNT(*) as cnt
@@ -310,16 +379,22 @@ pub fn query_usage_dashboard(
     conn: &Connection,
     period: &MetricsPeriod,
     dashboard_id: Option<&str>,
+    group_by: &GroupBy,
 ) -> Result<UsageDashboardData, rusqlite::Error> {
     let stats = query_usage_stats(conn, period, dashboard_id)?;
-    let daily_costs = query_daily_costs(conn, period, dashboard_id)?;
+    let time_bucket_costs = query_time_bucket_costs(conn, period, dashboard_id)?;
+    let grouped_costs = match group_by {
+        GroupBy::None => Vec::new(),
+        _ => query_grouped_costs(conn, period, dashboard_id, group_by)?,
+    };
     let activity_breakdown = query_activity_breakdown(conn, period, dashboard_id)?;
     let top_sessions = query_top_sessions(conn, period, dashboard_id, 5)?;
     let tool_usage = query_tool_usage(conn, period, dashboard_id, 10)?;
 
     Ok(UsageDashboardData {
         stats,
-        daily_costs,
+        time_bucket_costs,
+        grouped_costs,
         activity_breakdown,
         top_sessions,
         tool_usage,
@@ -468,9 +543,10 @@ mod tests {
     }
 
     #[test]
-    fn daily_costs_groups_by_day() {
+    fn time_bucket_costs_groups_by_day() {
         let conn = setup_test_database();
 
+        // Use Week period so it groups by day, and use dates on the same day vs different day.
         insert_session(&conn, "s1", "2026-05-01T08:00:00");
         insert_session(&conn, "s2", "2026-05-01T14:00:00");
         insert_session(&conn, "s3", "2026-05-02T09:00:00");
@@ -479,15 +555,20 @@ mod tests {
         insert_session_metrics(&conn, "s2", 2.0, 0, 0, 0, 0, 1, 0, "2026-05-01T14:00:00");
         insert_session_metrics(&conn, "s3", 3.0, 0, 0, 0, 0, 1, 0, "2026-05-02T09:00:00");
 
-        let daily = query_daily_costs(&conn, &MetricsPeriod::All, None).unwrap();
+        // Week period groups by day
+        let custom = MetricsPeriod::Custom {
+            start: "2026-05-01".to_string(),
+            end: "2026-05-10".to_string(),
+        };
+        let buckets = query_time_bucket_costs(&conn, &custom, None).unwrap();
 
-        assert_eq!(daily.len(), 2);
-        assert_eq!(daily[0].date, "2026-05-01");
-        assert!((daily[0].cost_usd - 3.0).abs() < 1e-9);
-        assert_eq!(daily[0].session_count, 2);
-        assert_eq!(daily[1].date, "2026-05-02");
-        assert!((daily[1].cost_usd - 3.0).abs() < 1e-9);
-        assert_eq!(daily[1].session_count, 1);
+        assert_eq!(buckets.len(), 2);
+        assert_eq!(buckets[0].date, "2026-05-01");
+        assert!((buckets[0].cost_usd - 3.0).abs() < 1e-9);
+        assert_eq!(buckets[0].session_count, 2);
+        assert_eq!(buckets[1].date, "2026-05-02");
+        assert!((buckets[1].cost_usd - 3.0).abs() < 1e-9);
+        assert_eq!(buckets[1].session_count, 1);
     }
 
     #[test]
@@ -602,10 +683,12 @@ mod tests {
         insert_turn_metrics(&conn, "t1", "s1", 0, "coding", 1.0, 1, 0, "2026-05-01T08:01:00");
         insert_tool_usage(&conn, "tu1", "s1", "Read", "2026-05-01T08:01:00");
 
-        let dashboard = query_usage_dashboard(&conn, &MetricsPeriod::All, None).unwrap();
+        let dashboard =
+            query_usage_dashboard(&conn, &MetricsPeriod::All, None, &GroupBy::None).unwrap();
 
         assert!((dashboard.stats.total_cost_usd - 2.0).abs() < 1e-9);
-        assert_eq!(dashboard.daily_costs.len(), 1);
+        assert_eq!(dashboard.time_bucket_costs.len(), 1);
+        assert_eq!(dashboard.grouped_costs.len(), 0);
         assert_eq!(dashboard.activity_breakdown.len(), 1);
         assert_eq!(dashboard.top_sessions.len(), 1);
         assert_eq!(dashboard.tool_usage.len(), 1);

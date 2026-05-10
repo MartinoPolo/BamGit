@@ -2,4 +2,4 @@
 import type { DashboardStatus } from "./DashboardStatus";
 import type { DashboardType } from "./DashboardType";
 
-export type Dashboard = { id: string, name: string, type: DashboardType, github_repo: string | null, local_folder: string | null, default_base_branch: string | null, worktree_parent_folder: string | null, color_palette_id: string | null, accent_color: string | null, default_shape: string, priorities_enabled: boolean, status: DashboardStatus, };
+export type Dashboard = { id: string, name: string, type: DashboardType, github_repo: string | null, local_folder: string | null, default_base_branch: string | null, worktree_parent_folder: string | null, color_palette_id: string | null, accent_color: string | null, chart_color_theme: string | null, default_shape: string, priorities_enabled: boolean, status: DashboardStatus, };

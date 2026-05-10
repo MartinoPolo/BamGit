@@ -57,9 +57,24 @@ impl MetricsPeriod {
             Self::ThirtyDays => Some("started_at >= datetime('now', '-30 days')".to_string()),
             Self::Month => Some("started_at >= datetime('now', 'start of month')".to_string()),
             Self::All => None,
-            Self::Custom { start, end } => Some(format!(
-                "date(started_at) >= date('{start}') AND date(started_at) <= date('{end}')"
-            )),
+            Self::Custom { start, end } => {
+                fn is_valid_date(s: &str) -> bool {
+                    s.len() == 10
+                        && s.as_bytes().iter().enumerate().all(|(i, &b)| {
+                            if i == 4 || i == 7 {
+                                b == b'-'
+                            } else {
+                                b.is_ascii_digit()
+                            }
+                        })
+                }
+                if !is_valid_date(start) || !is_valid_date(end) {
+                    return None;
+                }
+                Some(format!(
+                    "date(started_at) >= date('{start}') AND date(started_at) <= date('{end}')"
+                ))
+            }
         }
     }
 
@@ -100,11 +115,32 @@ pub struct UsageStats {
     pub session_count_delta: Option<i64>,
 }
 
-/// A single day's cost data for the bar chart.
+/// Grouping dimension for cost breakdown queries.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum GroupBy {
+    None,
+    Model,
+    Provider,
+    Category,
+}
+
+/// A single time-bucket cost entry for the bar chart.
 #[derive(Debug, Clone, Serialize, TS)]
 #[ts(export)]
-pub struct DailyCost {
+pub struct TimeBucketCost {
     pub date: String,
+    pub cost_usd: f64,
+    #[ts(type = "number")]
+    pub session_count: i64,
+}
+
+/// A grouped cost entry broken down by model, provider, or category.
+#[derive(Debug, Clone, Serialize, TS)]
+#[ts(export)]
+pub struct GroupedCostEntry {
+    pub date: String,
+    pub group: String,
     pub cost_usd: f64,
     #[ts(type = "number")]
     pub session_count: i64,
@@ -151,7 +187,8 @@ pub struct ToolUsageBreakdown {
 #[ts(export)]
 pub struct UsageDashboardData {
     pub stats: UsageStats,
-    pub daily_costs: Vec<DailyCost>,
+    pub time_bucket_costs: Vec<TimeBucketCost>,
+    pub grouped_costs: Vec<GroupedCostEntry>,
     pub activity_breakdown: Vec<ActivityBreakdown>,
     pub top_sessions: Vec<TopSession>,
     pub tool_usage: Vec<ToolUsageBreakdown>,

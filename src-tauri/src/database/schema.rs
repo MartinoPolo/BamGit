@@ -22,6 +22,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             worktree_parent_folder TEXT,
             color_palette_id TEXT REFERENCES color_palettes(id),
             accent_color TEXT,
+            chart_color_theme TEXT,
             default_shape TEXT NOT NULL DEFAULT 'cherry',
             priorities_enabled INTEGER NOT NULL DEFAULT 1,
             status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted'))
