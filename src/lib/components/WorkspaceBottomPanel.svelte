@@ -234,7 +234,7 @@
 				</div>
 			{/if}
 		{:else if defaultTab === BOTTOM_PANEL_TABS.dependencies}
-			<DependencyGraphView {issues} {dependencies} {getVisualization} />
+			<DependencyGraphView {issues} {dependencies} />
 		{:else if defaultTab === BOTTOM_PANEL_TABS.activity}
 			<div class="p-4">
 				<p class="text-sm text-muted-foreground">Activity feed coming soon</p>
