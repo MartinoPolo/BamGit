@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount, untrack } from 'svelte';
 	import { useBoard, useSelection, FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
@@ -19,25 +19,25 @@
 		CreateIssueRequest,
 		UpdateIssueRequest,
 	} from '$lib/modules/issues';
-	import OnboardingCard from '$lib/components/OnboardingCard.svelte';
-	import EmptyIssueState from '$lib/components/EmptyIssueState.svelte';
-	import TopBar from '$lib/components/TopBar.svelte';
-	import ForestView from '$lib/components/ForestView.svelte';
-	import WorkspaceDashboardLayout from '$lib/components/WorkspaceDashboardLayout.svelte';
-	import WorkspaceBottomPanel from '$lib/components/WorkspaceBottomPanel.svelte';
+	import OnboardingCard from '$lib/components/blocks/workspace/OnboardingCard.svelte';
+	import EmptyIssueState from '$lib/components/blocks/issue/EmptyIssueState.svelte';
+	import TopBar from '$lib/components/blocks/layout/TopBar.svelte';
+	import ForestView from '$lib/components/blocks/forest/ForestView.svelte';
+	import WorkspaceDashboardLayout from '$lib/components/blocks/layout/WorkspaceDashboardLayout.svelte';
+	import WorkspaceBottomPanel from '$lib/components/blocks/layout/WorkspaceBottomPanel.svelte';
 	import { computeVisualization } from '$lib/modules/visualization';
 	import type { TreeVisualization, SessionForMapping } from '$lib/modules/visualization';
-	import { CreationWizard } from '$lib/components/creation-wizard/index.js';
+	import { CreationWizard } from '$lib/components/blocks/creation-wizard/index.js';
 	import { useCreationWizard, type WizardDependencies } from '$lib/modules/creation-wizard';
-	import IssueEditDialog from '$lib/components/IssueEditDialog.svelte';
-	import ArchiveConfirmDialog from '$lib/components/ArchiveConfirmDialog.svelte';
-	import DeleteConfirmDialog from '$lib/components/DeleteConfirmDialog.svelte';
-	import IssueRenameDialog from '$lib/components/IssueRenameDialog.svelte';
-	import PruneWorktreesDialog from '$lib/components/PruneWorktreesDialog.svelte';
-	import ColorChangeDialog from '$lib/components/ColorChangeDialog.svelte';
+	import IssueEditDialog from '$lib/components/blocks/issue/IssueEditDialog.svelte';
+	import ArchiveConfirmDialog from '$lib/components/blocks/issue/ArchiveConfirmDialog.svelte';
+	import DeleteConfirmDialog from '$lib/components/blocks/issue/DeleteConfirmDialog.svelte';
+	import IssueRenameDialog from '$lib/components/blocks/issue/IssueRenameDialog.svelte';
+	import PruneWorktreesDialog from '$lib/components/blocks/workspace/PruneWorktreesDialog.svelte';
+	import ColorChangeDialog from '$lib/components/blocks/workspace/ColorChangeDialog.svelte';
 	import type { AssignedIssue, PrunableIssue } from '$lib/types/generated';
 	import { invoke } from '$lib/tauri.js';
-	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
+	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
 
 	const boardStore = useBoard();
 	const issueStore = useIssues();

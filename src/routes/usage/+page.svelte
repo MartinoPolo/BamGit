@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -17,16 +17,16 @@
 		type GroupByOption,
 		type UsageScope,
 	} from '$lib/modules/usage/usage_types.js';
-	import { exportUsageCsv } from '$lib/components/usage/csv_export.js';
-	import { formatCostDisplay } from '$lib/components/usage/cost_link_utils.js';
+	import { exportUsageCsv } from '$lib/components/blocks/usage/csv_export.js';
+	import { formatCostDisplay } from '$lib/components/blocks/usage/cost_link_utils.js';
 
-	import CostChart from '$lib/components/usage/CostChart.svelte';
-	import RefreshIndicator from '$lib/components/usage/RefreshIndicator.svelte';
-	import ColorThemePicker from '$lib/components/usage/ColorThemePicker.svelte';
-	import GroupByDropdown from '$lib/components/usage/GroupByDropdown.svelte';
-	import ScopeToggle from '$lib/components/usage/ScopeToggle.svelte';
-	import AchievementsDialog from '$lib/components/usage/AchievementsDialog.svelte';
-	import DateRangePicker from '$lib/components/usage/DateRangePicker.svelte';
+	import CostChart from '$lib/components/blocks/usage/CostChart.svelte';
+	import RefreshIndicator from '$lib/components/blocks/usage/RefreshIndicator.svelte';
+	import ColorThemePicker from '$lib/components/blocks/usage/ColorThemePicker.svelte';
+	import GroupByDropdown from '$lib/components/blocks/usage/GroupByDropdown.svelte';
+	import ScopeToggle from '$lib/components/blocks/usage/ScopeToggle.svelte';
+	import AchievementsDialog from '$lib/components/blocks/usage/AchievementsDialog.svelte';
+	import DateRangePicker from '$lib/components/blocks/usage/DateRangePicker.svelte';
 
 	const ctx = setUsageContext();
 	const windowCtx = useWindow();

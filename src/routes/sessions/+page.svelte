@@ -1,12 +1,12 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Session, DiscoveredSession } from '$lib/types/generated';
 	import { useSessions } from '$lib/modules/sessions';
 	import { useNotifications } from '$lib/modules/notifications';
 	import { onMount } from 'svelte';
-	import SessionCard from '$lib/components/SessionCard.svelte';
-	import DiscoveredSessionCard from '$lib/components/DiscoveredSessionCard.svelte';
-	import SessionChatView from '$lib/components/SessionChatView.svelte';
+	import SessionCard from '$lib/components/blocks/workspace/SessionCard.svelte';
+	import DiscoveredSessionCard from '$lib/components/blocks/workspace/DiscoveredSessionCard.svelte';
+	import SessionChatView from '$lib/components/blocks/session/SessionChatView.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 

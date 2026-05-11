@@ -1,21 +1,21 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import NotificationSettingsPanel from '$lib/components/NotificationSettingsPanel.svelte';
-	import ShortcutSettingsPanel from '$lib/components/ShortcutSettingsPanel.svelte';
+	import NotificationSettingsPanel from '$lib/components/blocks/settings/NotificationSettingsPanel.svelte';
+	import ShortcutSettingsPanel from '$lib/components/blocks/settings/ShortcutSettingsPanel.svelte';
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import GitHubStatusCard from '$lib/components/GitHubStatusCard.svelte';
-	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
+	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
+	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
 	import type { ColorPalette } from '$lib/types/generated';
 	import { invoke } from '$lib/tauri.js';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { useCharacterPacks } from '$lib/modules/character-packs';
-	import { CharacterListCard, BulkImportWizard } from '$lib/components/character';
+	import { CharacterListCard, BulkImportWizard } from '$lib/components/blocks/character/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';

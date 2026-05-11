@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import type { WorkspaceCommand, CommandCategory } from '$lib/types/generated';
 	import { useBoard } from '$lib/modules/board';
 	import { invoke } from '$lib/tauri.js';
@@ -7,11 +7,11 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { ColorPickerContent } from '$lib/components/color-picker/index.js';
-	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/color-picker/color_utils.js';
-	import PathInput from '$lib/components/PathInput.svelte';
-	import RepoCombobox from '$lib/components/RepoCombobox.svelte';
-	import WorkspaceCommandRow from '$lib/components/WorkspaceCommandRow.svelte';
+	import { ColorPickerContent } from '$lib/components/derived/color-picker/index.js';
+	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/derived/color-picker/color_utils.js';
+	import PathInput from '$lib/components/derived/path-input/PathInput.svelte';
+	import RepoCombobox from '$lib/components/derived/repo-combobox/RepoCombobox.svelte';
+	import WorkspaceCommandRow from '$lib/components/blocks/workspace/WorkspaceCommandRow.svelte';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import ServerIcon from '@lucide/svelte/icons/server';
 	import SquareCheckIcon from '@lucide/svelte/icons/square-check';

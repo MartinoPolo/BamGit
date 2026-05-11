@@ -1,17 +1,17 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { openPath } from '$lib/opener.js';
 	import { invoke } from '$lib/tauri.js';
 	import { useBoard } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
-	import WorkspaceCard from '$lib/components/WorkspaceCard.svelte';
-	import AddWorkspaceCard from '$lib/components/AddWorkspaceCard.svelte';
-	import GitHubStatusCard from '$lib/components/GitHubStatusCard.svelte';
-	import GitHubAuthWizard from '$lib/components/GitHubAuthWizard.svelte';
+	import WorkspaceCard from '$lib/components/blocks/workspace/WorkspaceCard.svelte';
+	import AddWorkspaceCard from '$lib/components/blocks/workspace/AddWorkspaceCard.svelte';
+	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
+	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import GithubIcon from '$lib/components/icons/GithubIcon.svelte';
+	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 

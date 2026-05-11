@@ -1,7 +1,7 @@
 import { createContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
-import { computeMergedBatchSelection } from '$lib/components/batch_selection_utils.js';
+import { computeMergedBatchSelection } from '$lib/components/blocks/issue/batch_selection_utils.js';
 import { BOTTOM_PANEL_TABS, shouldShowPrdOverview } from './selection.js';
 import type { BottomPanelTab } from './selection.js';
 

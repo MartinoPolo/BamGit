@@ -1,13 +1,13 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import '@fontsource/geist';
 	import '@fontsource/geist-mono';
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { preloadCode, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import DashboardSidebar from '$lib/components/DashboardSidebar.svelte';
-	import DashboardCreateDialog from '$lib/components/DashboardCreateDialog.svelte';
-	import DashboardEditDialog from '$lib/components/DashboardEditDialog.svelte';
+	import DashboardSidebar from '$lib/components/blocks/layout/DashboardSidebar.svelte';
+	import DashboardCreateDialog from '$lib/components/blocks/workspace/DashboardCreateDialog.svelte';
+	import DashboardEditDialog from '$lib/components/blocks/workspace/DashboardEditDialog.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import {
 		setBoardContext,
@@ -28,9 +28,9 @@
 	import { setCharacterPacksContext } from '$lib/modules/character-packs';
 	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
 	import { setToastsContext, registerMockToastBridge } from '$lib/modules/toasts';
-	import CommandPalette from '$lib/components/CommandPalette.svelte';
-	import RawRequirementsModal from '$lib/components/RawRequirementsModal.svelte';
-	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import CommandPalette from '$lib/components/blocks/command-palette/CommandPalette.svelte';
+	import RawRequirementsModal from '$lib/components/blocks/issue/RawRequirementsModal.svelte';
+	import ToastContainer from '$lib/components/derived/toast-container/ToastContainer.svelte';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();

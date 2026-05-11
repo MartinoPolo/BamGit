@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
@@ -15,7 +15,7 @@
 		TierSection,
 		SoundPoolPanel,
 		LanguageSelect,
-	} from '$lib/components/character';
+	} from '$lib/components/blocks/character/index.js';
 	import {
 		useCharacterPacks,
 		getEventsByTier,

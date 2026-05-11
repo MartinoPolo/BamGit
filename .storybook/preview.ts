@@ -3,6 +3,11 @@ import '../src/app.css';
 
 const preview: Preview = {
 	parameters: {
+		options: {
+			storySort: {
+				order: ['Base', 'Derived', 'Blocks', ['Chat', 'Session', 'Usage', '*']],
+			},
+		},
 		controls: {
 			matchers: {
 				color: /(background|color)$/i,

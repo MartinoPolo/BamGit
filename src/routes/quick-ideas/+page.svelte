@@ -1,8 +1,8 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import NoteCard from '$lib/components/NoteCard.svelte';
+	import NoteCard from '$lib/components/blocks/workspace/NoteCard.svelte';
 	import { useRawRequirements } from '$lib/modules/raw-requirements/index.js';
 	import { onMount } from 'svelte';
 
