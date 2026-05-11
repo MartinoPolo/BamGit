@@ -165,7 +165,7 @@
 					{BOTTOM_PANEL_TAB_LABELS[tab]}
 					{#if tab === BOTTOM_PANEL_TABS.assignedIssues && unlinkedCount > 0}
 						<span
-							class="ml-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-primary px-1.5 py-0 font-mono text-[10px] leading-[16px] text-primary-foreground"
+							class="ml-0.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-primary px-1.5 py-0 font-mono text-[10px] leading-4 text-primary-foreground"
 						>
 							{unlinkedCount}
 						</span>

@@ -40,7 +40,7 @@
 	];
 
 	const { Story } = defineMeta({
-		title: 'Usage/CostChart',
+		title: 'Blocks/Usage/CostChart',
 		component: CostChart,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],

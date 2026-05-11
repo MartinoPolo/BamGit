@@ -5,7 +5,7 @@
 	import { REFRESH_STATES } from '$lib/modules/usage/usage_types.js';
 
 	const { Story } = defineMeta({
-		title: 'Usage/RefreshIndicator',
+		title: 'Blocks/Usage/RefreshIndicator',
 		component: RefreshIndicator,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],

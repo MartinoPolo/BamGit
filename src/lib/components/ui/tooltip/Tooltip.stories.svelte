@@ -7,7 +7,7 @@
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 
 	const { Story } = defineMeta({
-		title: 'UI/Tooltip',
+		title: 'Base/Tooltip',
 		component: Tooltip.Provider,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -136,11 +136,11 @@
 					</Tooltip.Trigger>
 					<Tooltip.Content
 						side="top"
-						class="w-[220px] whitespace-normal p-2.5"
+						class="w-55 whitespace-normal p-2.5"
 						portalProps={{ disabled: true }}
 					>
 						<div class="font-semibold">#128 · Build kanban DnD</div>
-						<div class="mt-0.5 text-[10.5px] leading-[1.4] opacity-80">
+						<div class="mt-0.5 text-[10.5px] leading-undefined opacity-80">
 							Claude · 2m 14s · 3 commits ahead
 						</div>
 					</Tooltip.Content>
@@ -164,7 +164,7 @@
 					</Tooltip.Trigger>
 					<Tooltip.Content
 						side="top"
-						class="w-[200px] whitespace-normal"
+						class="w-50 whitespace-normal"
 						portalProps={{ disabled: true }}
 					>
 						Long tooltip text wraps onto multiple lines if it has to

@@ -47,7 +47,7 @@
 
 <Dialog.Root open={paletteCtx.open} onOpenChange={handleDialogOpenChange}>
 	<Dialog.Content
-		class="top-[20%] -translate-y-0 max-w-[540px] overflow-hidden p-0"
+		class="top-[20%] translate-y-0 max-w-135 overflow-hidden p-0"
 		onkeydown={handleKeydown}
 	>
 		<Dialog.Title class="sr-only">{m.command_palette_title()}</Dialog.Title>
@@ -68,7 +68,7 @@
 		</div>
 
 		<!-- Results area -->
-		<div class="max-h-[320px] overflow-y-auto p-1.5">
+		<div class="max-h-80 overflow-y-auto p-1.5">
 			{#each [...paletteCtx.groupedResults] as [category, items], groupIndex (category)}
 				{#if groupIndex > 0}
 					<Popover.Divider />
@@ -111,9 +111,7 @@
 										{item.description}
 									</Badge>
 								{:else}
-									<span
-										class="text-[length:var(--text-2xs)] text-foreground-subtle"
-									>
+									<span class="text-(length:--text-2xs) text-foreground-subtle">
 										{item.description}
 									</span>
 								{/if}
@@ -132,7 +130,7 @@
 
 		<!-- Footer -->
 		<div
-			class="flex items-center gap-3 border-t border-border px-3 py-2 text-[length:var(--text-2xs)] text-foreground-subtle"
+			class="flex items-center gap-3 border-t border-border px-3 py-2 text-(length:--text-2xs) text-foreground-subtle"
 		>
 			<span class="flex items-center gap-1">
 				<Kbd>↑↓</Kbd>

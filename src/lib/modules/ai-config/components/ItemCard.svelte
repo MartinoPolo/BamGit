@@ -148,7 +148,7 @@
 				{@const hookItem = item as HookConfig}
 				<Badge variant="default" size="compact">{hookItem.event_type}</Badge>
 				{#if hookItem.matcher}
-					<Badge variant="default" size="compact" class="max-w-[120px] truncate">
+					<Badge variant="default" size="compact" class="max-w-30 truncate">
 						{hookItem.matcher}
 					</Badge>
 				{/if}

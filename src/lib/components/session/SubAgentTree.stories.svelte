@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Session/SubAgentTree',
+		title: 'Blocks/Session/SubAgentTree',
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
 	});
@@ -162,9 +162,7 @@
 
 <Story name="Canonical Tree">
 	{#snippet template()}
-		<div
-			class="w-[260px] rounded-lg border border-border bg-[var(--sidebar-bg,var(--surface))] p-2"
-		>
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={canonicalTree} activeAgentId="explore" />
 		</div>
 	{/snippet}
@@ -172,9 +170,7 @@
 
 <Story name="Empty">
 	{#snippet template()}
-		<div
-			class="w-[260px] rounded-lg border border-border bg-[var(--sidebar-bg,var(--surface))] p-2"
-		>
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={emptyTree} />
 			<div class="py-5 text-center text-[11px] text-foreground-subtle">
 				No sub-agents spawned yet
@@ -185,9 +181,7 @@
 
 <Story name="Single Agent">
 	{#snippet template()}
-		<div
-			class="w-[260px] rounded-lg border border-border bg-[var(--sidebar-bg,var(--surface))] p-2"
-		>
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={singleAgent} />
 		</div>
 	{/snippet}
@@ -195,9 +189,7 @@
 
 <Story name="Deep Nesting (4+ levels)">
 	{#snippet template()}
-		<div
-			class="w-[260px] rounded-lg border border-border bg-[var(--sidebar-bg,var(--surface))] p-2"
-		>
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={deepTree} />
 		</div>
 	{/snippet}
@@ -205,7 +197,7 @@
 
 <Story name="Inline Expansion">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-2 p-4">
+		<div class="mx-auto max-w-225 space-y-2 p-4">
 			<div class="text-[13px] text-foreground">Assistant message before sub-agent...</div>
 			<SubAgentExpansion
 				name="Explore codebase structure"
@@ -213,7 +205,7 @@
 				toolCount={12}
 				duration="23s"
 			>
-				<div class="text-[13px] leading-[1.5] text-foreground-muted">
+				<div class="text-[13px] leading-normal text-foreground-muted">
 					Exploring the project structure to understand codebase layout.
 				</div>
 				<ToolCardCompact
@@ -240,7 +232,7 @@
 						toolInput: { file_path: 'src/main.rs' },
 					}}
 				/>
-				<div class="text-[13px] leading-[1.5] text-foreground-muted">
+				<div class="text-[13px] leading-normal text-foreground-muted">
 					Found 23 Rust source files in 4 modules.
 				</div>
 			</SubAgentExpansion>

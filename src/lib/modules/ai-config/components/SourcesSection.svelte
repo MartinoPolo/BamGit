@@ -141,7 +141,7 @@
 							sourceDotClass(source.source_type),
 						)}
 					></span>
-					<span class="max-w-[160px] truncate text-foreground" title={source.path}>
+					<span class="max-w-40 truncate text-foreground" title={source.path}>
 						{source.label}
 					</span>
 					<span class="text-foreground-muted">({count})</span>
@@ -154,7 +154,7 @@
 					class="flex items-center gap-1 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 text-xs"
 				>
 					<span class="size-1.5 shrink-0 rounded-full bg-amber-500/80"></span>
-					<span class="max-w-[160px] truncate text-foreground" title={customPath.path}>
+					<span class="max-w-40 truncate text-foreground" title={customPath.path}>
 						{customPath.label}
 					</span>
 					<span class="text-foreground-muted">({count})</span>

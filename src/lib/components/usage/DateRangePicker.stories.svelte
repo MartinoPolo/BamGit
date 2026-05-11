@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Usage/DateRangePicker',
+		title: 'Blocks/Usage/DateRangePicker',
 		component: DateRangePicker,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],

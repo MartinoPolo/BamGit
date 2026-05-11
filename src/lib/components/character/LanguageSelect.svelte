@@ -12,7 +12,7 @@
 
 <Select
 	value={value ?? ''}
-	class="h-8 w-[140px] text-xs"
+	class="h-8 w-35 text-xs"
 	onchange={(event) => {
 		const target = event.currentTarget;
 		if (target.value.length > 0) {

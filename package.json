@@ -24,6 +24,8 @@
 		"postinstall": "node scripts/fix-worktree-links.js",
 		"prepare": "husky",
 		"db:reset": "node scripts/reset-database.js",
+		"tailwind-canonical": "node scripts/canonical-classes.js",
+		"tailwind-canonical:fix": "node scripts/canonical-classes.js --fix",
 		"tauri": "tauri",
 		"storybook": "svelte-kit sync && storybook dev -p 6006",
 		"build:storybook": "svelte-kit sync && storybook build",

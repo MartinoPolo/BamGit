@@ -32,11 +32,11 @@
 		<Dialog.Header>
 			<div>
 				<div
-					class="mb-0.5 text-[length:var(--text-xs)] font-medium uppercase tracking-wider text-foreground-subtle"
+					class="mb-0.5 text-(length:--text-xs) font-medium uppercase tracking-wider text-foreground-subtle"
 				>
 					Achievements
 				</div>
-				<div class="text-[length:var(--text-lg)] font-semibold">
+				<div class="text-(length:--text-lg) font-semibold">
 					{unlockedCount} of {totalCount} unlocked
 				</div>
 			</div>

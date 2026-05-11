@@ -110,7 +110,7 @@
 </script>
 
 <div
-	class="fixed z-50 min-w-[160px] rounded-md border border-border bg-popover p-1 shadow-md"
+	class="fixed z-50 min-w-40 rounded-md border border-border bg-popover p-1 shadow-md"
 	style:left="{x}px"
 	style:top="{y}px"
 	use:clickOutside={ondismiss}
@@ -122,7 +122,7 @@
 	{#each menuItems as item, i (item.action)}
 		<button
 			type="button"
-			class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[focused]:bg-accent data-[focused]:text-accent-foreground"
+			class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-focused:bg-accent data-focused:text-accent-foreground"
 			role="menuitem"
 			disabled={!isContextMenuActionEnabled(item.action)}
 			onclick={() => handleItemClick(item.action)}

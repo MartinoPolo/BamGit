@@ -140,7 +140,7 @@
 			<p>{m.wizard_search_empty()}</p>
 		</div>
 	{:else if displayItems.length > 0}
-		<div bind:this={listElement} class="flex max-h-[360px] flex-col gap-0.5 overflow-y-auto">
+		<div bind:this={listElement} class="flex max-h-90 flex-col gap-0.5 overflow-y-auto">
 			{#if wizard.searchQuery.trim() === '' && assignedIssues.length > 0}
 				<p
 					class="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60"

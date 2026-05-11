@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Chat/ChatMessage',
+		title: 'Blocks/Chat/ChatMessage',
 		component: ChatMessage,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -27,7 +27,7 @@
 
 <Story name="User Message">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px]">
+		<div class="mx-auto max-w-225">
 			<ChatMessage
 				message={{
 					id: '1',
@@ -43,7 +43,7 @@
 
 <Story name="Assistant Message (Markdown)">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px]">
+		<div class="mx-auto max-w-225">
 			<ChatMessage
 				message={{
 					id: '2',
@@ -59,7 +59,7 @@
 
 <Story name="Assistant Message (Streaming)">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px]">
+		<div class="mx-auto max-w-225">
 			<ChatMessage
 				message={{
 					id: '3',
@@ -75,7 +75,7 @@
 
 <Story name="System Message">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-2">
+		<div class="mx-auto max-w-225 space-y-2">
 			<ChatMessage
 				message={{
 					id: '4',
@@ -98,7 +98,7 @@
 
 <Story name="Tool Cards">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-1.5">
+		<div class="mx-auto max-w-225 space-y-1.5">
 			<ChatMessage
 				message={{
 					id: '6',
@@ -154,7 +154,7 @@
 
 <Story name="Content Dimming">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-2.5">
+		<div class="mx-auto max-w-225 space-y-2.5">
 			<ContentDimmer dimmed={true}>
 				<SystemMessage content="Session started · Claude Code · feat/session-ui" />
 				<ChatMessage

@@ -16,13 +16,13 @@
 	bind:checked
 	data-slot="switch"
 	class={cn(
-		'peer relative inline-flex h-[18px] w-[32px] shrink-0 cursor-pointer items-center rounded-full border border-border bg-surface-3 px-px outline-none transition-[background,border-color] duration-[120ms] ease-[ease] hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-disabled:cursor-not-allowed data-disabled:opacity-40',
+		'peer relative inline-flex h-4.5 w-8 shrink-0 cursor-pointer items-center rounded-full border border-border bg-surface-3 px-px outline-none transition-[background,border-color] duration-120 ease-[ease] hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-disabled:cursor-not-allowed data-disabled:opacity-40',
 		className,
 	)}
 	{...restProps}
 >
 	<SwitchPrimitive.Thumb
 		data-slot="switch-thumb"
-		class="pointer-events-none block size-[14px] rounded-full bg-surface shadow-sm transition-transform duration-[140ms] data-[state=checked]:translate-x-[14px] data-[state=unchecked]:translate-x-0"
+		class="pointer-events-none block size-3.5 rounded-full bg-surface shadow-sm transition-transform duration-140 data-[state=checked]:translate-x-3.5 data-[state=unchecked]:translate-x-0"
 	/>
 </SwitchPrimitive.Root>

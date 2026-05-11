@@ -6,7 +6,7 @@
 	import BellIcon from '@lucide/svelte/icons/bell';
 
 	const { Story } = defineMeta({
-		title: 'UI/Patterns/NotificationsPopover',
+		title: 'Blocks/NotificationsPopover',
 		component: Popover.Root,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -60,21 +60,19 @@
 								<BellIcon class="size-3.5" />
 							</Button>
 							<span
-								class="absolute right-1 top-1 size-[7px] rounded-full bg-status-danger"
+								class="absolute right-1 top-1 size-1.75 rounded-full bg-status-danger"
 							></span>
 						</div>
 					{/snippet}
 				</Popover.Trigger>
-				<Popover.Content class="w-[300px] p-0" align="end" portalProps={{ disabled: true }}>
+				<Popover.Content class="w-75 p-0" align="end" portalProps={{ disabled: true }}>
 					<div
 						class="flex items-center justify-between border-b border-border px-3 py-2.5"
 					>
-						<div class="text-[length:var(--text-md)] font-semibold">
-							Inbox · 3 unread
-						</div>
+						<div class="text-(length:--text-md) font-semibold">Inbox · 3 unread</div>
 						<Button variant="ghost" size="sm">Mark all read</Button>
 					</div>
-					<div class="max-h-[320px] overflow-y-auto">
+					<div class="max-h-80 overflow-y-auto">
 						{#each NOTIFICATIONS as notification (notification.title)}
 							<div
 								class="flex gap-2.5 border-b border-border px-3 py-2.5 last:border-b-0"
@@ -94,13 +92,13 @@
 										{notification.title}
 									</div>
 									<div
-										class="mt-px text-[length:var(--text-2xs)] text-foreground-muted"
+										class="mt-px text-(length:--text-2xs) text-foreground-muted"
 									>
 										{notification.body}
 									</div>
 								</div>
 								<div
-									class="shrink-0 font-mono text-[length:var(--text-2xs)] text-foreground-subtle"
+									class="shrink-0 font-mono text-(length:--text-2xs) text-foreground-subtle"
 								>
 									{notification.time}
 								</div>

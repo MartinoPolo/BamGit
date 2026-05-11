@@ -56,14 +56,14 @@
 
 	<!-- Content -->
 	<div class="px-3 py-2.5">
-		<div class="mb-2.5 text-[13px] leading-[1.5] text-foreground">
+		<div class="mb-2.5 text-[13px] leading-normal text-foreground">
 			{question}
 		</div>
 		{#if options.length > 0}
 			<RadioGroup.Root bind:value={selectedValue} class="mb-2.5 gap-1">
 				{#each options as option, i (i)}
 					<label
-						class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-[5px] text-[12.5px]"
+						class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.25 text-[12.5px]"
 						class:bg-primary-soft={selectedIndex === i}
 						style={selectedIndex === i
 							? 'border: 1px solid color-mix(in oklch, var(--primary) 30%, var(--border))'
@@ -78,7 +78,7 @@
 		<Button
 			variant="primary"
 			size="sm"
-			class="h-[var(--size-control-md)]"
+			class="h-(--size-control-md)"
 			onclick={() => onConfirm?.(selectedIndex)}
 		>
 			Confirm <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>

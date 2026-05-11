@@ -50,7 +50,7 @@
 		</Button>
 	{/if}
 	<span
-		class="max-w-[280px] shrink-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold tracking-[-0.01em]"
+		class="max-w-70 shrink-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold tracking-[-0.01em]"
 	>
 		{truncatedTitle}
 	</span>
@@ -85,7 +85,7 @@
 			<EllipsisVerticalIcon size={14} strokeWidth={2} />
 		</Button>
 
-		<Separator orientation="vertical" class="mx-1 h-[18px]" />
+		<Separator orientation="vertical" class="mx-1 h-4.5" />
 
 		<Tabs.Root>
 			<Tabs.Tab active={activeTab === 'chat'} onclick={() => onTabChange?.('chat')}>

@@ -35,7 +35,7 @@
 	<div class="min-w-0 flex-1">
 		<div class="text-[12.5px] font-semibold text-foreground">{title}</div>
 		{#if body}
-			<div class="mt-0.5 text-[length:var(--text-sm)] text-foreground-muted">{body}</div>
+			<div class="mt-0.5 text-(length:--text-sm) text-foreground-muted">{body}</div>
 		{/if}
 	</div>
 

@@ -8,7 +8,7 @@
 	import XIcon from '@lucide/svelte/icons/x';
 
 	const { Story } = defineMeta({
-		title: 'UI/Toast',
+		title: 'Base/Toast',
 		component: Toast,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -26,7 +26,7 @@
 
 <Story name="Info">
 	{#snippet template()}
-		<div class="max-w-[540px]">
+		<div class="max-w-135">
 			<Toast
 				tone="info"
 				title="Syncing grovekeeper…"
@@ -40,7 +40,7 @@
 
 <Story name="Success">
 	{#snippet template()}
-		<div class="max-w-[540px]">
+		<div class="max-w-135">
 			<Toast
 				tone="success"
 				title="Worktree created"
@@ -54,7 +54,7 @@
 
 <Story name="Warning">
 	{#snippet template()}
-		<div class="max-w-[540px]">
+		<div class="max-w-135">
 			<Toast
 				tone="warning"
 				title="Permission required"
@@ -63,7 +63,7 @@
 				{#snippet icon()}<AlertTriangleIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
 					<button
-						class="inline-flex h-[var(--size-control-sm)] items-center rounded-[var(--radius-sm)] border border-border bg-surface-2 px-[9px] text-[length:var(--text-sm)] text-foreground hover:bg-surface-3"
+						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
 					>
 						Review
 					</button>
@@ -75,7 +75,7 @@
 
 <Story name="Danger">
 	{#snippet template()}
-		<div class="max-w-[540px]">
+		<div class="max-w-135">
 			<Toast
 				tone="danger"
 				title="Sync failed"
@@ -84,7 +84,7 @@
 				{#snippet icon()}<XIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
 					<button
-						class="inline-flex h-[var(--size-control-sm)] items-center rounded-[var(--radius-sm)] border border-border bg-surface-2 px-[9px] text-[length:var(--text-sm)] text-foreground hover:bg-surface-3"
+						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
 					>
 						Retry
 					</button>
@@ -96,7 +96,7 @@
 
 <Story name="Loading">
 	{#snippet template()}
-		<div class="max-w-[540px]">
+		<div class="max-w-135">
 			<Toast tone="loading" title="Setting up worktree…" body="Creating worktree for #142">
 				{#snippet icon()}<RefreshIcon class="size-3.5 animate-spin" />{/snippet}
 			</Toast>
@@ -106,7 +106,7 @@
 
 <Story name="Stack">
 	{#snippet template()}
-		<div class="flex max-w-[540px] flex-col gap-3">
+		<div class="flex max-w-135 flex-col gap-3">
 			<Toast
 				tone="info"
 				title="Syncing grovekeeper…"
@@ -129,7 +129,7 @@
 				{#snippet icon()}<AlertTriangleIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
 					<button
-						class="inline-flex h-[var(--size-control-sm)] items-center rounded-[var(--radius-sm)] border border-border bg-surface-2 px-[9px] text-[length:var(--text-sm)] text-foreground hover:bg-surface-3"
+						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
 					>
 						Review
 					</button>
@@ -143,7 +143,7 @@
 				{#snippet icon()}<XIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
 					<button
-						class="inline-flex h-[var(--size-control-sm)] items-center rounded-[var(--radius-sm)] border border-border bg-surface-2 px-[9px] text-[length:var(--text-sm)] text-foreground hover:bg-surface-3"
+						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
 					>
 						Retry
 					</button>

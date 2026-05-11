@@ -15,7 +15,7 @@
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 
 	const { Story } = defineMeta({
-		title: 'UI/Patterns/AccountDropdown',
+		title: 'Blocks/AccountDropdown',
 		component: Popover.Root,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -29,10 +29,10 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" class="w-[280px] justify-between" {...props}>
+						<Button variant="secondary" class="w-70 justify-between" {...props}>
 							<span class="flex items-center gap-2">
 								<span
-									class="flex size-[22px] items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground"
+									class="flex size-5.5 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground"
 								>
 									L
 								</span>
@@ -42,7 +42,7 @@
 						</Button>
 					{/snippet}
 				</Popover.Trigger>
-				<Popover.Content class="w-[280px] p-0" portalProps={{ disabled: true }}>
+				<Popover.Content class="w-70 p-0" portalProps={{ disabled: true }}>
 					<div class="flex items-center gap-2.5 border-b border-border px-3 py-3">
 						<span
 							class="flex size-8 items-center justify-center rounded-full bg-primary text-[13px] font-semibold text-primary-foreground"
@@ -50,10 +50,8 @@
 							L
 						</span>
 						<div class="min-w-0">
-							<div class="text-[length:var(--text-md)] font-medium">Lukas Hron</div>
-							<div
-								class="truncate text-[length:var(--text-2xs)] text-foreground-subtle"
-							>
+							<div class="text-(length:--text-md) font-medium">Lukas Hron</div>
+							<div class="truncate text-(length:--text-2xs) text-foreground-subtle">
 								lukas@grovekeeper.dev
 							</div>
 						</div>
@@ -63,7 +61,7 @@
 							<UserIcon class="size-3.5" />
 							Profile
 							<span
-								class="ml-auto inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] border border-border bg-surface-2 px-[5px] font-mono text-[10.5px] text-foreground-muted"
+								class="ml-auto inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-1 border border-border bg-surface-2 px-1.25 font-mono text-[10.5px] text-foreground-muted"
 							>
 								⌘P
 							</span>
@@ -72,7 +70,7 @@
 							<SettingsIcon class="size-3.5" />
 							Settings
 							<span
-								class="ml-auto inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] border border-border bg-surface-2 px-[5px] font-mono text-[10.5px] text-foreground-muted"
+								class="ml-auto inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-1 border border-border bg-surface-2 px-1.25 font-mono text-[10.5px] text-foreground-muted"
 							>
 								⌘,
 							</span>

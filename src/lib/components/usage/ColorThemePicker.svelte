@@ -53,12 +53,12 @@
 			</Button>
 		{/snippet}
 	</Popover.Trigger>
-	<Popover.Content class="w-[200px]" portalProps={{ disabled: true }}>
+	<Popover.Content class="w-50" portalProps={{ disabled: true }}>
 		<Popover.Label>Color theme</Popover.Label>
 		{#each themeOptions as option (option.value)}
 			<button
 				class={cn(
-					'flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[length:var(--text-sm)] transition-colors hover:bg-surface-2',
+					'flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-(length:--text-sm) transition-colors hover:bg-surface-2',
 					value === option.value && 'bg-surface-2',
 				)}
 				onclick={() => handleSelect(option.value)}

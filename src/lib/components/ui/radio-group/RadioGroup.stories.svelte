@@ -5,7 +5,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/RadioGroup',
+		title: 'Base/RadioGroup',
 		component: RadioGroup,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -22,19 +22,19 @@
 		<RadioGroup {...args} value="claude">
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="claude" id="r-claude" />
-				<Label for="r-claude" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+				<Label for="r-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
 					>Claude</Label
 				>
 			</div>
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="codex" id="r-codex" />
-				<Label for="r-codex" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+				<Label for="r-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
 					>Codex</Label
 				>
 			</div>
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="cursor" id="r-cursor" />
-				<Label for="r-cursor" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+				<Label for="r-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
 					>Cursor</Label
 				>
 			</div>
@@ -47,19 +47,19 @@
 		<RadioGroup {...args} value="claude" class="flex flex-row gap-4">
 			<div class="flex items-center gap-1.5">
 				<RadioGroupItem value="claude" id="rh-claude" />
-				<Label for="rh-claude" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+				<Label for="rh-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
 					>Claude</Label
 				>
 			</div>
 			<div class="flex items-center gap-1.5">
 				<RadioGroupItem value="codex" id="rh-codex" />
-				<Label for="rh-codex" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+				<Label for="rh-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
 					>Codex</Label
 				>
 			</div>
 			<div class="flex items-center gap-1.5">
 				<RadioGroupItem value="cursor" id="rh-cursor" />
-				<Label for="rh-cursor" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+				<Label for="rh-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
 					>Cursor</Label
 				>
 			</div>
@@ -72,15 +72,12 @@
 		<RadioGroup {...args} value="claude" disabled>
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="claude" id="rd-claude" />
-				<Label for="rd-claude" class="mb-0 text-[length:var(--text-md)] opacity-40"
-					>Claude</Label
+				<Label for="rd-claude" class="mb-0 text-(length:--text-md) opacity-40">Claude</Label
 				>
 			</div>
 			<div class="flex items-center gap-2">
 				<RadioGroupItem value="codex" id="rd-codex" />
-				<Label for="rd-codex" class="mb-0 text-[length:var(--text-md)] opacity-40"
-					>Codex</Label
-				>
+				<Label for="rd-codex" class="mb-0 text-(length:--text-md) opacity-40">Codex</Label>
 			</div>
 		</RadioGroup>
 	{/snippet}
@@ -118,23 +115,20 @@
 				<RadioGroup value="claude" class="flex flex-row gap-4">
 					<div class="flex items-center gap-1.5">
 						<RadioGroupItem value="claude" id="rs-claude" />
-						<Label
-							for="rs-claude"
-							class="mb-0 cursor-pointer text-[length:var(--text-md)]">Claude</Label
+						<Label for="rs-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
+							>Claude</Label
 						>
 					</div>
 					<div class="flex items-center gap-1.5">
 						<RadioGroupItem value="codex" id="rs-codex" />
-						<Label
-							for="rs-codex"
-							class="mb-0 cursor-pointer text-[length:var(--text-md)]">Codex</Label
+						<Label for="rs-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
+							>Codex</Label
 						>
 					</div>
 					<div class="flex items-center gap-1.5">
 						<RadioGroupItem value="cursor" id="rs-cursor" />
-						<Label
-							for="rs-cursor"
-							class="mb-0 cursor-pointer text-[length:var(--text-md)]">Cursor</Label
+						<Label for="rs-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
+							>Cursor</Label
 						>
 					</div>
 				</RadioGroup>

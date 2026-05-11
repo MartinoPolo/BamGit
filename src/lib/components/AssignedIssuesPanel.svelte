@@ -262,7 +262,7 @@
 
 	<!-- Selection Bar -->
 	<div
-		class="flex min-h-[34px] items-center gap-2 rounded-[var(--radius-md)] border px-2 py-1 text-xs"
+		class="flex min-h-8.5 items-center gap-2 rounded-md border px-2 py-1 text-xs"
 		style="background: {selectedCount > 0
 			? 'color-mix(in oklch, var(--primary) 10%, var(--surface))'
 			: 'transparent'}; border-color: {selectedCount > 0

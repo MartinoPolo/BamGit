@@ -42,7 +42,7 @@
 
 	<div class="max-w-2xl">
 		<Textarea
-			class="min-h-[80px] text-sm"
+			class="min-h-20 text-sm"
 			placeholder={m.raw_requirements_placeholder()}
 			value={newNoteContent}
 			oninput={(event) => {

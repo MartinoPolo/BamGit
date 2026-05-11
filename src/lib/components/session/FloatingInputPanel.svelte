@@ -39,10 +39,8 @@
 	}
 </script>
 
-<div
-	class="pointer-events-none absolute bottom-4 left-1/2 z-[15] w-full max-w-[900px] -translate-x-1/2"
->
-	<div class="pointer-events-auto rounded-[14px] border border-border bg-surface shadow-lg">
+<div class="pointer-events-none absolute bottom-4 left-1/2 z-15 w-full max-w-225 -translate-x-1/2">
+	<div class="pointer-events-auto rounded-3.5 border border-border bg-surface shadow-lg">
 		<!-- Image carousel (collapsed strip) -->
 		{#if !showImages && imageCount > 0}
 			<button
@@ -66,7 +64,7 @@
 							#{i + 1}
 						</span>
 						<button
-							class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-[3px] border-none bg-black/40 p-0 text-[8px] text-white"
+							class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-0.75 border-none bg-black/40 p-0 text-[8px] text-white"
 							onclick={() => imageCount--}
 						>
 							×
@@ -88,7 +86,7 @@
 			<Textarea
 				bind:value
 				placeholder="Message or /command…"
-				class="min-h-12 max-h-[50vh] resize-none border-none bg-transparent p-0 text-[13px] leading-[1.55] shadow-none focus-visible:ring-0"
+				class="min-h-12 max-h-[50vh] resize-none border-none bg-transparent p-0 text-[13px] leading-undefined shadow-none focus-visible:ring-0"
 				rows={3}
 				{disabled}
 				onkeydown={onKeydown}
@@ -108,11 +106,7 @@
 
 			<!-- Right group -->
 			<Button variant="ghost" size="sm" class="font-mono text-[10.5px]">Local ▾</Button>
-			<Button
-				variant="secondary"
-				size="sm"
-				class="max-w-[260px] truncate font-mono text-[10.5px]"
-			>
+			<Button variant="secondary" size="sm" class="max-w-65 truncate font-mono text-[10.5px]">
 				{providerConfig.name} · Opus 4.7 (1M) · High ▾
 			</Button>
 			<Button variant="secondary" size="sm" class="text-[10.5px]">Approve each ▾</Button>

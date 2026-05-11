@@ -67,7 +67,7 @@
 			<div class="flex items-end gap-px">
 				{#each [0.6, 1, 0.4, 0.8, 0.5] as height, index (index)}
 					<div
-						class="w-[2px] animate-pulse rounded-full bg-primary"
+						class="w-0.5 animate-pulse rounded-full bg-primary"
 						style:height="{height * 12}px"
 						style:animation-delay="{height * 200}ms"
 					></div>

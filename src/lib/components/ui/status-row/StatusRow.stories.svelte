@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/StatusRow',
+		title: 'Base/StatusRow',
 		component: StatusRow,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -23,7 +23,7 @@
 
 <Story name="Active" args={{ active: true, label: 'AFK loop running', meta: '3 sessions (2 AFK)' }}>
 	{#snippet template(args: StatusRowProps)}
-		<div class="w-[292px]">
+		<div class="w-73">
 			<StatusRow {...args} />
 		</div>
 	{/snippet}
@@ -31,7 +31,7 @@
 
 <Story name="Inactive" args={{ active: false, label: 'AFK loop off', meta: '2 sessions' }}>
 	{#snippet template(args: StatusRowProps)}
-		<div class="w-[292px]">
+		<div class="w-73">
 			<StatusRow {...args} />
 		</div>
 	{/snippet}
@@ -39,7 +39,7 @@
 
 <Story name="Active Idle" args={{ active: true, label: 'AFK loop running', meta: 'idle' }}>
 	{#snippet template(args: StatusRowProps)}
-		<div class="w-[292px]">
+		<div class="w-73">
 			<StatusRow {...args} />
 		</div>
 	{/snippet}
@@ -47,7 +47,7 @@
 
 <Story name="Custom Active Color">
 	{#snippet template(args: StatusRowProps)}
-		<div class="flex w-[292px] flex-col gap-2">
+		<div class="flex w-73 flex-col gap-2">
 			<StatusRow
 				{...args}
 				active
@@ -62,7 +62,7 @@
 
 <Story name="Active Without Meta" args={{ active: true, label: 'AFK loop running' }}>
 	{#snippet template(args: StatusRowProps)}
-		<div class="w-[292px]">
+		<div class="w-73">
 			<StatusRow {...args} />
 		</div>
 	{/snippet}
@@ -70,7 +70,7 @@
 
 <Story name="Inactive Without Meta" args={{ active: false, label: 'AFK loop off' }}>
 	{#snippet template(args: StatusRowProps)}
-		<div class="w-[292px]">
+		<div class="w-73">
 			<StatusRow {...args} />
 		</div>
 	{/snippet}
@@ -78,7 +78,7 @@
 
 <Story name="Clickable">
 	{#snippet template(args: StatusRowProps)}
-		<div class="w-[292px]">
+		<div class="w-73">
 			<StatusRow
 				{...args}
 				active

@@ -22,7 +22,7 @@
 	}
 </script>
 
-<Select {value} onchange={handleChange} class="h-8 w-auto min-w-[140px] text-sm">
+<Select {value} onchange={handleChange} class="h-8 w-auto min-w-35 text-sm">
 	{#each scopeOptions as option (option.value)}
 		<option value={option.value}>{option.label}</option>
 	{/each}

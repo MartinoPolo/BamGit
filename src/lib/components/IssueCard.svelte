@@ -198,7 +198,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-[box-shadow] duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
+	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-shadow duration-150 focus:outline-none focus-visible:outline-none {cardStateClass} {isArchived ||
 	isActive ||
 	isHovered ||
 	isBatchSelected
@@ -275,7 +275,7 @@
 			{#if priorityBadgeClass && prioritiesEnabled && issue.priority !== 'medium'}
 				<SimpleTooltip text="Change priority">
 					<button
-						class="inline-flex h-[18px] cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
+						class="inline-flex h-4.5 cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
 						onclick={(event) => {
 							event.stopPropagation();
 							if (onPriorityClick) {
@@ -353,13 +353,13 @@
 	<div class="grid items-start gap-2.5 p-2.5 pr-3" style="grid-template-columns: 100px 1fr;">
 		<!-- Tree thumbnail -->
 		<div
-			class="relative flex size-[100px] shrink-0 items-end justify-center overflow-hidden rounded-[7px] border"
+			class="relative flex size-25 shrink-0 items-end justify-center overflow-hidden rounded-1.75 border"
 			style="background: linear-gradient(180deg, color-mix(in oklch, {color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
 		>
 			{#if notificationDotColor !== null && sessionState === null}
 				<SimpleTooltip text={m.issue_card_session_needs_attention()}>
 					<span
-						class="absolute top-1.5 right-1.5 z-10 size-[7px] animate-pulse rounded-full {notificationDotColor}"
+						class="absolute top-1.5 right-1.5 z-10 size-1.75 animate-pulse rounded-full {notificationDotColor}"
 					></span>
 				</SimpleTooltip>
 			{/if}
@@ -412,7 +412,7 @@
 			</div>
 
 			<!-- Row 2: GitHub issue badge + PR badge -->
-			<div class="flex min-h-[22px] flex-wrap items-center gap-1">
+			<div class="flex min-h-5.5 flex-wrap items-center gap-1">
 				{#if cache?.github_issue_state}
 					<GitHubBadge
 						type="issue"

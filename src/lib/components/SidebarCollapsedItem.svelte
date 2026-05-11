@@ -41,8 +41,7 @@
 				>
 					<Icon size={15} class={iconClass ?? (active ? 'text-primary' : '')} />
 					{#if badge !== null}
-						<span
-							class="absolute right-[5px] top-[5px] size-1.5 rounded-full bg-primary"
+						<span class="absolute right-1.25 top-1.25 size-1.5 rounded-full bg-primary"
 						></span>
 					{/if}
 				</a>
@@ -56,8 +55,7 @@
 				>
 					<Icon size={15} class={iconClass ?? (active ? 'text-primary' : '')} />
 					{#if badge !== null}
-						<span
-							class="absolute right-[5px] top-[5px] size-1.5 rounded-full bg-primary"
+						<span class="absolute right-1.25 top-1.25 size-1.5 rounded-full bg-primary"
 						></span>
 					{/if}
 				</button>

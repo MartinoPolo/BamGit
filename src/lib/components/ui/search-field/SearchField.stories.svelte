@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/SearchField',
+		title: 'Base/SearchField',
 		component: SearchField,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -31,7 +31,7 @@
 		<div class="max-w-xs">
 			<SearchField value="forest" {...args}>
 				<div
-					class="mt-1.5 max-h-[320px] overflow-auto rounded-[var(--radius-md)] border border-border bg-surface p-1.5 shadow-lg"
+					class="mt-1.5 max-h-80 overflow-auto rounded-md border border-border bg-surface p-1.5 shadow-lg"
 				>
 					<div
 						class="px-2 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-foreground-subtle"
@@ -39,17 +39,17 @@
 						Issues
 					</div>
 					<div
-						class="flex cursor-pointer items-center gap-2 rounded-[4px] bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
+						class="flex cursor-pointer items-center gap-2 rounded-1 bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
 					>
 						<TreesIcon class="size-3" />
 						#118 · Forest view overlays
 						<span
-							class="ml-auto inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] border border-border bg-surface-2 px-[5px] font-mono text-[10.5px] text-foreground-muted"
+							class="ml-auto inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-1 border border-border bg-surface-2 px-1.25 font-mono text-[10.5px] text-foreground-muted"
 							>↵</span
 						>
 					</div>
 					<div
-						class="flex cursor-pointer items-center gap-2 rounded-[4px] px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
+						class="flex cursor-pointer items-center gap-2 rounded-1 px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
 					>
 						<TreesIcon class="size-3" />
 						#128 · Forest tag centering
@@ -60,7 +60,7 @@
 						Branches
 					</div>
 					<div
-						class="flex cursor-pointer items-center gap-2 rounded-[4px] px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
+						class="flex cursor-pointer items-center gap-2 rounded-1 px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
 					>
 						<GitBranchIcon class="size-3" />
 						feat/forest-overlays
@@ -76,7 +76,7 @@
 		<div class="max-w-xs">
 			<SearchField value="qqzzqz" {...args}>
 				<div
-					class="mt-1.5 rounded-[var(--radius-md)] border border-border bg-surface p-[18px] text-center shadow-lg"
+					class="mt-1.5 rounded-md border border-border bg-surface p-4.5 text-center shadow-lg"
 				>
 					<span class="text-[11px] text-foreground-subtle">No matches for "qqzzqz".</span>
 				</div>
@@ -96,7 +96,7 @@
 				<span class="mb-2 block text-xs text-foreground-subtle">Typing + results</span>
 				<SearchField value="forest">
 					<div
-						class="mt-1.5 max-h-[320px] overflow-auto rounded-[var(--radius-md)] border border-border bg-surface p-1.5 shadow-lg"
+						class="mt-1.5 max-h-80 overflow-auto rounded-md border border-border bg-surface p-1.5 shadow-lg"
 					>
 						<div
 							class="px-2 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-foreground-subtle"
@@ -104,13 +104,13 @@
 							Issues
 						</div>
 						<div
-							class="flex cursor-pointer items-center gap-2 rounded-[4px] bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
+							class="flex cursor-pointer items-center gap-2 rounded-1 bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
 						>
 							<TreesIcon class="size-3" />
 							#118 · Forest view overlays
 						</div>
 						<div
-							class="flex cursor-pointer items-center gap-2 rounded-[4px] px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
+							class="flex cursor-pointer items-center gap-2 rounded-1 px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
 						>
 							<TreesIcon class="size-3" />
 							#128 · Forest tag centering
@@ -122,7 +122,7 @@
 				<span class="mb-2 block text-xs text-foreground-subtle">No results</span>
 				<SearchField value="qqzzqz">
 					<div
-						class="mt-1.5 rounded-[var(--radius-md)] border border-border bg-surface p-[18px] text-center shadow-lg"
+						class="mt-1.5 rounded-md border border-border bg-surface p-4.5 text-center shadow-lg"
 					>
 						<span class="text-[11px] text-foreground-subtle"
 							>No matches for "qqzzqz".</span

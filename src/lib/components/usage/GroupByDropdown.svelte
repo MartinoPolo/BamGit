@@ -28,7 +28,7 @@
 	}
 </script>
 
-<Select {value} onchange={handleChange} class="h-8 w-auto min-w-[120px] text-sm">
+<Select {value} onchange={handleChange} class="h-8 w-auto min-w-30 text-sm">
 	{#each groupOptions as option (option.value)}
 		<option value={option.value}>{option.label}</option>
 	{/each}

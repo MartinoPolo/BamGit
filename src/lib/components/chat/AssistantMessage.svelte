@@ -12,7 +12,7 @@
 	const renderedHtml = $derived(streaming ? '' : renderMarkdown(content));
 </script>
 
-<div class="assistant-message text-[13px] leading-[1.6] text-foreground">
+<div class="assistant-message text-[13px] leading-undefined text-foreground">
 	{#if streaming}
 		<span class="whitespace-pre-wrap">{content}</span><StreamingCaret />
 	{:else}

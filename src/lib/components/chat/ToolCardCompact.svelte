@@ -17,7 +17,7 @@
 </script>
 
 <div
-	class="flex h-9 cursor-pointer items-center gap-2 rounded-md border border-border bg-surface-2 px-2.5 opacity-80 transition-opacity duration-[120ms] hover:opacity-100"
+	class="flex h-9 cursor-pointer items-center gap-2 rounded-md border border-border bg-surface-2 px-2.5 opacity-80 transition-opacity duration-120 hover:opacity-100"
 	class:border-l-2={message.isError === true}
 	class:border-l-status-danger={message.isError === true}
 	onclick={onExpand}
@@ -31,7 +31,7 @@
 	tabindex="0"
 	aria-label="Expand {message.toolName} tool card"
 >
-	<IconComponent class="size-[13px] shrink-0 text-foreground-muted" />
+	<IconComponent class="size-3.25 shrink-0 text-foreground-muted" />
 	<span class="text-xs font-semibold text-foreground">{message.toolName ?? 'Tool'}</span>
 	{#if detail}
 		<span class="flex-1 truncate font-mono text-[11px] text-foreground-muted">

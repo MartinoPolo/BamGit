@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Session/FloatingInputPanel',
+		title: 'Blocks/Session/FloatingInputPanel',
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
 	});
@@ -43,7 +43,7 @@
 
 <Story name="Idle — Ready for Input">
 	{#snippet template()}
-		<div class="relative h-[300px] w-full bg-background">
+		<div class="relative h-75 w-full bg-background">
 			<FloatingInputPanel session={idleSession} />
 		</div>
 	{/snippet}
@@ -51,7 +51,7 @@
 
 <Story name="Running — Stop Available">
 	{#snippet template()}
-		<div class="relative h-[300px] w-full bg-background">
+		<div class="relative h-75 w-full bg-background">
 			<FloatingInputPanel session={runningSession} />
 		</div>
 	{/snippet}
@@ -78,7 +78,7 @@
 
 <Story name="Skill Chips Row">
 	{#snippet template()}
-		<div class="w-full max-w-[900px] rounded-lg border border-border bg-surface p-0">
+		<div class="w-full max-w-225 rounded-lg border border-border bg-surface p-0">
 			<SkillChipsRow />
 		</div>
 	{/snippet}

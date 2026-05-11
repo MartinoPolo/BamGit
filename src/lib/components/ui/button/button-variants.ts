@@ -3,7 +3,7 @@ import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements
 import { type VariantProps, tv } from 'tailwind-variants';
 
 export const buttonVariants = tv({
-	base: 'inline-flex shrink-0 items-center justify-center gap-[6px] whitespace-nowrap rounded-md border border-transparent font-medium leading-none outline-none select-none transition-[background,border-color,color,transform,filter,box-shadow] duration-[120ms] ease-[ease] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_svg:not([class*="size-"])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+	base: 'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent font-medium leading-none outline-none select-none transition-[background,border-color,color,transform,filter,box-shadow] duration-120 ease-[ease] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_svg:not([class*="size-"])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
 	variants: {
 		variant: {
 			primary:
@@ -18,11 +18,11 @@ export const buttonVariants = tv({
 				'bg-moss-700 text-white shadow-sm hover:bg-moss-600 dark:bg-moss-600 dark:hover:bg-moss-500',
 		},
 		size: {
-			sm: 'h-[var(--size-control-sm)] px-[9px] text-[length:var(--text-sm)] rounded-[var(--radius-sm)]',
-			md: 'h-[var(--size-control-md)] px-3 text-[length:var(--text-md)]',
-			lg: 'h-[var(--size-control-lg)] px-4 text-[length:var(--text-base)]',
-			icon: 'size-[var(--size-control-md)] p-0',
-			'icon-sm': 'size-[var(--size-control-sm)] p-0',
+			sm: 'h-(--size-control-sm) px-2.25 text-(length:--text-sm) rounded-sm',
+			md: 'h-(--size-control-md) px-3 text-(length:--text-md)',
+			lg: 'h-(--size-control-lg) px-4 text-(length:--text-base)',
+			icon: 'size-(--size-control-md) p-0',
+			'icon-sm': 'size-(--size-control-sm) p-0',
 		},
 	},
 	defaultVariants: {

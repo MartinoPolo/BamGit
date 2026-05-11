@@ -36,7 +36,7 @@ export const badgeVariants = tv({
 			merged: 'bg-[color-mix(in_oklch,var(--status-merged)_14%,transparent)] text-status-merged border-[color-mix(in_oklch,var(--status-merged)_30%,transparent)]',
 		},
 		size: {
-			default: 'h-5 px-[7px] text-[11px] rounded-full',
+			default: 'h-5 px-1.75 text-[11px] rounded-full',
 			compact: 'px-1.5 py-0.5 text-[10px] leading-tight rounded',
 		},
 	},

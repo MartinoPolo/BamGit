@@ -13,7 +13,7 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 
 	const { Story } = defineMeta({
-		title: 'UI/Dialog',
+		title: 'Base/Dialog',
 		component: Dialog.Root,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -41,11 +41,11 @@
 					<Dialog.Header>
 						<div>
 							<div
-								class="mb-0.5 text-[length:var(--text-xs)] font-medium uppercase tracking-wider text-foreground-subtle"
+								class="mb-0.5 text-(length:--text-xs) font-medium uppercase tracking-wider text-foreground-subtle"
 							>
 								Modal · create issue
 							</div>
-							<div class="text-[length:var(--text-lg)] font-semibold">
+							<div class="text-(length:--text-lg) font-semibold">
 								Start a new agent session
 							</div>
 						</div>
@@ -88,7 +88,7 @@
 							<Checkbox id="worktree-checkbox" checked />
 							<Label
 								for="worktree-checkbox"
-								class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+								class="mb-0 cursor-pointer text-(length:--text-md)"
 							>
 								Auto-create worktree
 							</Label>
@@ -123,7 +123,7 @@
 						</Button>
 					{/snippet}
 				</Dialog.Trigger>
-				<Dialog.Content class="max-w-[420px]" portalProps={{ disabled: true }}>
+				<Dialog.Content class="max-w-105" portalProps={{ disabled: true }}>
 					<Dialog.Title class="sr-only">Archive issue #066</Dialog.Title>
 					<Dialog.Description class="sr-only">
 						This will remove the worktree and stop any running session.
@@ -131,13 +131,11 @@
 					<Dialog.Header>
 						<div>
 							<div
-								class="mb-0.5 text-[length:var(--text-xs)] font-medium uppercase tracking-wider text-status-danger"
+								class="mb-0.5 text-(length:--text-xs) font-medium uppercase tracking-wider text-status-danger"
 							>
 								Modal · destructive confirm
 							</div>
-							<div class="text-[length:var(--text-lg)] font-semibold">
-								Archive #066?
-							</div>
+							<div class="text-(length:--text-lg) font-semibold">Archive #066?</div>
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
@@ -148,7 +146,7 @@
 						</Dialog.Close>
 					</Dialog.Header>
 					<Dialog.Body class="grid gap-3">
-						<p class="text-[length:var(--text-sm)] text-foreground-muted">
+						<p class="text-(length:--text-sm) text-foreground-muted">
 							This will remove the worktree and stop any running session. The branch
 							and PR remain untouched on GitHub.
 						</p>
@@ -165,7 +163,7 @@
 									Deprecate polling system
 								</div>
 								<div
-									class="font-mono text-[length:var(--text-2xs)] text-foreground-muted"
+									class="font-mono text-(length:--text-2xs) text-foreground-muted"
 								>
 									#066 · feat/deprecated-polling
 								</div>
@@ -175,7 +173,7 @@
 							<Checkbox id="delete-branch-checkbox" />
 							<Label
 								for="delete-branch-checkbox"
-								class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+								class="mb-0 cursor-pointer text-(length:--text-md)"
 							>
 								Also delete the local branch
 							</Label>
@@ -210,11 +208,11 @@
 					<Dialog.Header>
 						<div>
 							<div
-								class="mb-0.5 text-[length:var(--text-xs)] font-medium uppercase tracking-wider text-foreground-subtle"
+								class="mb-0.5 text-(length:--text-xs) font-medium uppercase tracking-wider text-foreground-subtle"
 							>
 								Modal · open by default
 							</div>
-							<div class="text-[length:var(--text-lg)] font-semibold">
+							<div class="text-(length:--text-lg) font-semibold">
 								Start a new agent session
 							</div>
 						</div>

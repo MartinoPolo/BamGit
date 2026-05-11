@@ -4,7 +4,7 @@ import { type VariantProps, tv } from 'tailwind-variants';
 export const STAT_CELL_TONE_OPTIONS = ['neutral', 'zero', 'warning', 'danger'] as const;
 
 export const statCellVariants = tv({
-	base: 'flex flex-col gap-1 rounded-[var(--radius-sm)] border px-2 py-[7px] min-w-0',
+	base: 'flex flex-col gap-1 rounded-sm border px-2 py-1.75 min-w-0',
 	variants: {
 		tone: {
 			neutral: 'bg-[color-mix(in_oklch,var(--surface-2)_60%,transparent)] border-border',

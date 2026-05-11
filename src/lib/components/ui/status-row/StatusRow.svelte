@@ -15,7 +15,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	class={cn(
-		'flex items-center gap-2 rounded-[var(--radius-sm)] border px-2.5 py-2',
+		'flex items-center gap-2 rounded-sm border px-2.5 py-2',
 		onclick && 'cursor-pointer',
 		className,
 	)}

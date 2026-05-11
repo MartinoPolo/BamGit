@@ -5,7 +5,7 @@ import { tv } from 'tailwind-variants';
 export type InputState = 'default' | 'success' | 'error' | 'loading';
 
 export const inputVariants = tv({
-	base: 'h-[var(--size-control-md)] w-full rounded-[var(--radius-md)] border border-border bg-surface px-2.5 font-sans text-[length:var(--text-md)] text-foreground outline-none transition-[border-color,box-shadow] duration-[120ms] ease-[ease] placeholder:text-foreground-subtle hover:border-border-strong disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-foreground-subtle disabled:opacity-70 read-only:bg-surface-2 read-only:text-foreground-muted focus-visible:border-ring focus-visible:shadow-[0_0_0_3px_color-mix(in_oklch,var(--ring)_22%,transparent)]',
+	base: 'h-(--size-control-md) w-full rounded-md border border-border bg-surface px-2.5 font-sans text-(length:--text-md) text-foreground outline-none transition-[border-color,box-shadow] duration-120 ease-[ease] placeholder:text-foreground-subtle hover:border-border-strong disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-foreground-subtle disabled:opacity-70 read-only:bg-surface-2 read-only:text-foreground-muted focus-visible:border-ring focus-visible:shadow-[0_0_0_3px_color-mix(in_oklch,var(--ring)_22%,transparent)]',
 	variants: {
 		state: {
 			default: '',

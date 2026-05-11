@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Session/Layout',
+		title: 'Blocks/Session/Layout',
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
 	});
@@ -76,7 +76,7 @@
 
 <Story name="Sidebar — Expanded">
 	{#snippet template()}
-		<div class="flex h-[600px]">
+		<div class="flex h-150">
 			<div class="flex-1 bg-background p-4">
 				<span class="text-sm text-foreground-muted">Chat content area</span>
 			</div>
@@ -93,7 +93,7 @@
 
 <Story name="Sidebar — Quota Warning">
 	{#snippet template()}
-		<div class="flex h-[600px]">
+		<div class="flex h-150">
 			<div class="flex-1 bg-background p-4">
 				<span class="text-sm text-foreground-muted">Chat content area</span>
 			</div>
@@ -110,7 +110,7 @@
 
 <Story name="Sidebar — Errored Session">
 	{#snippet template()}
-		<div class="flex h-[600px]">
+		<div class="flex h-150">
 			<div class="flex-1 bg-background p-4">
 				<span class="text-sm text-foreground-muted">Chat content area</span>
 			</div>
@@ -126,7 +126,7 @@
 
 <Story name="Full Layout">
 	{#snippet template()}
-		<div class="flex h-[700px] w-full flex-col">
+		<div class="flex h-175 w-full flex-col">
 			<SessionTopBar
 				session={runningSession}
 				branchName="feat/session-ui"
@@ -135,7 +135,7 @@
 			/>
 			<div class="flex flex-1 overflow-hidden">
 				<div class="relative flex-1 overflow-auto bg-background p-6">
-					<div class="mx-auto max-w-[900px]">
+					<div class="mx-auto max-w-225">
 						<p class="text-sm text-foreground-muted">
 							Chat message stream content would appear here...
 						</p>

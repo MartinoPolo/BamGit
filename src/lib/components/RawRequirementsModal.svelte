@@ -53,7 +53,7 @@
 </script>
 
 <Dialog.Root open={rawRequirementsCtx.open} onOpenChange={handleDialogOpenChange}>
-	<Dialog.Content class="max-w-[700px] h-[90vh] flex flex-col p-0">
+	<Dialog.Content class="max-w-175 h-[90vh] flex flex-col p-0">
 		<Dialog.Header>
 			<Dialog.Title>{m.raw_requirements_title()}</Dialog.Title>
 		</Dialog.Header>
@@ -73,7 +73,7 @@
 		<div class="border-t border-border px-5 py-4">
 			<Textarea
 				bind:ref={newNoteTextareaElement}
-				class="min-h-[80px] text-sm"
+				class="min-h-20 text-sm"
 				placeholder={m.raw_requirements_placeholder()}
 				value={newNoteContent}
 				oninput={(event) => {

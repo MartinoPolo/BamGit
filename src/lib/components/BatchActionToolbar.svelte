@@ -62,7 +62,7 @@
 
 <Tooltip.Provider>
 	<div
-		class="flex min-h-[42px] items-center gap-3 rounded-[var(--radius-md)] border px-[14px] py-2 text-[13px] font-medium"
+		class="flex min-h-10.5 items-center gap-3 rounded-md border px-3.5 py-2 text-[13px] font-medium"
 		style="background: {toolbarBackground}; border-color: {toolbarBorderColor};"
 	>
 		{#if hasBatchSelection}

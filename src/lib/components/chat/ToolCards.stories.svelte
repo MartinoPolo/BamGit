@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Chat/ToolCards',
+		title: 'Blocks/Chat/ToolCards',
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
 	});
@@ -72,7 +72,7 @@
 
 <Story name="L2 — Bash Running">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardExpanded message={bashRunning} />
 		</div>
 	{/snippet}
@@ -80,7 +80,7 @@
 
 <Story name="L2 — Bash Error">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardExpanded message={bashError} />
 		</div>
 	{/snippet}
@@ -88,7 +88,7 @@
 
 <Story name="L2 — Read File">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardExpanded message={readFile} />
 		</div>
 	{/snippet}
@@ -96,7 +96,7 @@
 
 <Story name="L2 — Grep Matches">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardExpanded message={grepResult} />
 		</div>
 	{/snippet}
@@ -104,7 +104,7 @@
 
 <Story name="L1 Compact (click to expand)">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-1.5 p-4">
+		<div class="mx-auto max-w-225 space-y-1.5 p-4">
 			<ToolCardCompact message={readFile} />
 			<ToolCardCompact message={bashRunning} />
 			<ToolCardCompact message={bashError} />
@@ -114,7 +114,7 @@
 
 <Story name="Tool Group (collapsed)">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardGroup messages={groupMessages} />
 		</div>
 	{/snippet}

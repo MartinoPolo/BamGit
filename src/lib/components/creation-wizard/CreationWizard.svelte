@@ -359,7 +359,7 @@
 
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
 	<Dialog.Content
-		class="top-[15%] -translate-y-0 max-w-lg"
+		class="top-[15%] translate-y-0 max-w-lg"
 		onEscapeKeydown={(e) => e.preventDefault()}
 	>
 		<Dialog.Header class="flex items-center">
@@ -367,7 +367,7 @@
 				{stepLabel}
 			</Dialog.Title>
 			{#if !showWorktreeProgress}
-				<div class="ml-auto flex items-center gap-[5px]">
+				<div class="ml-auto flex items-center gap-1.25">
 					{#each navigableSteps as step, index (step)}
 						<div
 							class="h-1.5 transition-all duration-200

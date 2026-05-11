@@ -64,14 +64,14 @@
 
 	<!-- Content -->
 	<div class="flex">
-		<div class="w-[3px] shrink-0 bg-status-info"></div>
+		<div class="w-0.75 shrink-0 bg-status-info"></div>
 		<div class="flex-1 px-3 py-2.5">
-			<div class="mb-2.5 text-[13px] leading-[1.5] text-foreground">
+			<div class="mb-2.5 text-[13px] leading-normal text-foreground">
 				{message.content}
 			</div>
 			<div class="flex items-center gap-1.5">
 				<Input
-					class="max-w-[320px] flex-1 text-xs"
+					class="max-w-80 flex-1 text-xs"
 					placeholder="Enter value…"
 					bind:value={inputValue}
 					onkeydown={handleKeydown}
@@ -79,16 +79,13 @@
 				<Button
 					variant="primary"
 					size="sm"
-					class="h-[var(--size-control-md)]"
+					class="h-(--size-control-md)"
 					onclick={handleSubmit}
 				>
 					Submit <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button
-					variant="ghost"
-					size="sm"
-					class="h-[var(--size-control-md)]"
-					onclick={onCancel}>Cancel</Button
+				<Button variant="ghost" size="sm" class="h-(--size-control-md)" onclick={onCancel}
+					>Cancel</Button
 				>
 			</div>
 		</div>

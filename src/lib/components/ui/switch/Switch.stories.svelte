@@ -5,7 +5,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/Switch',
+		title: 'Base/Switch',
 		component: Switch,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -49,7 +49,7 @@
 	{#snippet template(args: SwitchProps)}
 		<div class="flex items-center gap-2.5">
 			<Switch {...args} id="auto-fetch" checked />
-			<Label for="auto-fetch" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+			<Label for="auto-fetch" class="mb-0 cursor-pointer text-(length:--text-md)"
 				>Auto-fetch</Label
 			>
 		</div>
@@ -79,9 +79,7 @@
 				<span class="text-xs text-foreground-subtle">With label</span>
 				<div class="flex items-center gap-2.5">
 					<Switch id="sw-label-demo" checked />
-					<Label
-						for="sw-label-demo"
-						class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+					<Label for="sw-label-demo" class="mb-0 cursor-pointer text-(length:--text-md)"
 						>Auto-fetch every 5 min</Label
 					>
 				</div>

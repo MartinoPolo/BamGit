@@ -5,7 +5,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/Checkbox',
+		title: 'Base/Checkbox',
 		component: Checkbox,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -53,7 +53,7 @@
 	{#snippet template(args: CheckboxProps)}
 		<div class="flex items-center gap-2">
 			<Checkbox id="worktree" checked {...args} />
-			<Label for="worktree" class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+			<Label for="worktree" class="mb-0 cursor-pointer text-(length:--text-md)"
 				>Auto-create worktree</Label
 			>
 		</div>
@@ -87,9 +87,7 @@
 				<span class="text-xs text-foreground-subtle">With label</span>
 				<div class="flex items-center gap-2">
 					<Checkbox id="cb-label-demo" checked />
-					<Label
-						for="cb-label-demo"
-						class="mb-0 cursor-pointer text-[length:var(--text-md)]"
+					<Label for="cb-label-demo" class="mb-0 cursor-pointer text-(length:--text-md)"
 						>Auto-create worktree</Label
 					>
 				</div>

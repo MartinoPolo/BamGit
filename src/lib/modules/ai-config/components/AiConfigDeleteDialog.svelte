@@ -282,7 +282,7 @@
 
 				{#if content !== null}
 					<pre
-						class="max-h-[300px] overflow-y-auto whitespace-pre-wrap rounded-md bg-surface-2 p-2 font-mono text-xs">{content}</pre>
+						class="max-h-75 overflow-y-auto whitespace-pre-wrap rounded-md bg-surface-2 p-2 font-mono text-xs">{content}</pre>
 				{/if}
 
 				<p class="text-sm text-foreground-muted">This action cannot be undone.</p>

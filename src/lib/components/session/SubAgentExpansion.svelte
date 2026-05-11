@@ -16,7 +16,7 @@
 </script>
 
 <div
-	class="my-2.5 rounded-r-md border-l-[3px] border-l-azure-400 px-3.5 py-2.5"
+	class="my-2.5 rounded-r-md border-l-0.75 border-l-azure-400 px-3.5 py-2.5"
 	style="background: color-mix(in oklch, var(--azure-400) 4%, transparent)"
 >
 	<!-- Header -->
@@ -37,7 +37,7 @@
 		{#if children}
 			{@render children()}
 		{:else}
-			<div class="text-[13px] leading-[1.5] text-foreground-muted">
+			<div class="text-[13px] leading-normal text-foreground-muted">
 				Sub-agent messages would appear here when data is available.
 			</div>
 		{/if}

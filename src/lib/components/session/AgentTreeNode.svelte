@@ -23,7 +23,7 @@
 <div>
 	<!-- Node row -->
 	<button
-		class="flex w-full cursor-pointer items-center gap-[5px] rounded-[5px] py-[5px] pr-1.5 text-xs"
+		class="flex w-full cursor-pointer items-center gap-1.25 rounded-1.25 py-1.25 pr-1.5 text-xs"
 		class:bg-primary-soft={isActive}
 		class:bg-surface-2={expanded && !isActive}
 		style="padding-left: {depth * 14 + 6}px; border-left: 2px solid {isActive
@@ -51,7 +51,7 @@
 				<ChevronRightIcon
 					size={10}
 					strokeWidth={2}
-					class="text-foreground-subtle transition-transform duration-[120ms]"
+					class="text-foreground-subtle transition-transform duration-120"
 					style="transform: {expanded ? 'rotate(90deg)' : 'none'}"
 				/>
 			</span>
@@ -62,7 +62,7 @@
 		<!-- Status indicator -->
 		{#if agent.status === 'running'}
 			<span
-				class="inline-block size-[7px] shrink-0 rounded-full bg-status-success animate-[badge-pulse_1.8s_ease-in-out_infinite]"
+				class="inline-block size-1.75 shrink-0 rounded-full bg-status-success animate-[badge-pulse_1.8s_ease-in-out_infinite]"
 			></span>
 		{:else if agent.status === 'completed'}
 			<CheckIcon size={11} strokeWidth={2.2} class="shrink-0 text-status-success" />

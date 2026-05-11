@@ -60,7 +60,7 @@
 		</span>
 		<div class="flex items-center gap-1">
 			{#if note.processed}
-				<Badge variant="default" class="text-[length:var(--text-2xs)]">
+				<Badge variant="default" class="text-(length:--text-2xs)">
 					{m.raw_requirements_processed()}
 				</Badge>
 			{/if}
@@ -91,7 +91,7 @@
 
 	{#if isEditing}
 		<Textarea
-			class="min-h-[60px] text-sm"
+			class="min-h-15 text-sm"
 			value={editContent}
 			oninput={(event) => {
 				editContent = event.currentTarget.value;

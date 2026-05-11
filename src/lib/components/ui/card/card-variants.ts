@@ -25,14 +25,14 @@ export const CARD_STATE_CLASSES: Partial<Record<CardState, string>> = {
 	focus: 'outline-2 outline-solid outline-offset-2 outline-ring',
 	dragging: '-rotate-1 scale-[1.02] shadow-lg cursor-grabbing opacity-[0.92]',
 	loading: 'relative overflow-hidden',
-	error: 'border-[color-mix(in_oklch,var(--status-danger)_50%,var(--border))] border-l-[3px] border-l-status-danger',
-	success: 'border-l-[3px] border-l-status-success',
+	error: 'border-[color-mix(in_oklch,var(--status-danger)_50%,var(--border))] border-l-0.75 border-l-status-danger',
+	success: 'border-l-0.75 border-l-status-success',
 	archived: 'opacity-55',
 	disabled: 'opacity-45 pointer-events-none',
 };
 
 export const cardVariants = tv({
-	base: 'relative bg-surface border rounded-[var(--radius-lg)] shadow-sm',
+	base: 'relative bg-surface border rounded-lg shadow-sm',
 	variants: {
 		padding: {
 			none: '',

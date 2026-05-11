@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Chat/Components',
+		title: 'Blocks/Chat/Components',
 		component: CodeBlock,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -31,7 +31,7 @@ test providers::opencode::tests::test_auth ... ok`;
 
 <Story name="CodeBlock with Language">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-4">
+		<div class="mx-auto max-w-225 space-y-4">
 			<CodeBlock language="typescript" code={typescriptCode} />
 			<CodeBlock language="bash" code={bashCode} />
 			<CodeBlock code="plain text without language label" />
@@ -41,7 +41,7 @@ test providers::opencode::tests::test_auth ... ok`;
 
 <Story name="Streaming Caret">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px]">
+		<div class="mx-auto max-w-225">
 			<p class="text-[13px] text-foreground">
 				Some text with a streaming indicator<StreamingCaret />
 			</p>
@@ -51,7 +51,7 @@ test providers::opencode::tests::test_auth ... ok`;
 
 <Story name="Inline Image">
 	{#snippet template()}
-		<div class="mx-auto flex max-w-[900px] gap-4">
+		<div class="mx-auto flex max-w-225 gap-4">
 			<InlineImage
 				src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='120'><rect fill='%23334155' width='200' height='120' rx='8'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='14'>Image #1</text></svg>"
 				imageNumber={1}

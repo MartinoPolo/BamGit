@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/StatCell',
+		title: 'Base/StatCell',
 		component: StatCell,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -34,7 +34,7 @@
 
 <Story name="Default" args={{ label: 'ISSUES', value: 12, tone: 'neutral' }}>
 	{#snippet template(args: StatCellProps)}
-		<div class="w-[70px]">
+		<div class="w-17.5">
 			<StatCell {...args} />
 		</div>
 	{/snippet}
@@ -94,7 +94,7 @@
 
 <Story name="Clickable">
 	{#snippet template(args: StatCellProps)}
-		<div class="w-[70px]">
+		<div class="w-17.5">
 			<StatCell
 				{...args}
 				label="ISSUES"
@@ -108,7 +108,7 @@
 
 <Story name="Health Grid">
 	{#snippet template(args: StatCellProps)}
-		<div class="grid w-[292px] grid-cols-4 gap-1.5">
+		<div class="grid w-73 grid-cols-4 gap-1.5">
 			<StatCell {...args} label="ISSUES" value="3/10" icon={ListChecksIcon} />
 			<StatCell label="PRs" value={4} icon={GitPrIcon} />
 			<StatCell label="ATTN" value={2} tone="danger" pulse icon={AlertIcon} />

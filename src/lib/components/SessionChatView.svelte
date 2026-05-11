@@ -202,7 +202,7 @@
 				bind:this={scrollContainer}
 				onscroll={updateScrollPosition}
 			>
-				<div class="mx-auto max-w-[900px] px-6 pb-36 pt-4">
+				<div class="mx-auto max-w-225 px-6 pb-36 pt-4">
 					<div class="flex flex-col gap-2.5">
 						{#each turns as turn, turnIndex (turn.id)}
 							{@const isDimmed =
@@ -266,7 +266,7 @@
 
 				<!-- Gradient fade -->
 				<div
-					class="pointer-events-none sticky bottom-0 -mt-[120px] h-[120px] bg-gradient-to-b from-transparent to-background"
+					class="pointer-events-none sticky bottom-0 -mt-30 h-30 bg-linear-to-b from-transparent to-background"
 				></div>
 			</div>
 

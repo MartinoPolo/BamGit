@@ -21,9 +21,7 @@
 	const providerKinds: ProviderKind[] = ['claude-code', 'open-code', 'codex', 'cursor'];
 </script>
 
-<div
-	class="flex items-center gap-1 rounded-[var(--radius-lg)] border border-border bg-surface-2 p-1"
->
+<div class="flex items-center gap-1 rounded-lg border border-border bg-surface-2 p-1">
 	{#each providerKinds as kind (kind)}
 		{@const installed = getInstalled(kind)}
 		{@const isInstalled = installed?.installed ?? false}

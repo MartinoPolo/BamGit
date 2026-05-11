@@ -65,7 +65,7 @@
 {#if collapsed}
 	<!-- Collapsed sidebar (44px) -->
 	<div
-		class="flex w-11 shrink-0 flex-col items-center gap-2.5 border-l border-border bg-[var(--sidebar-bg,var(--surface))] pt-2"
+		class="flex w-11 shrink-0 flex-col items-center gap-2.5 border-l border-border bg-(--sidebar-bg,var(--surface)) pt-2"
 	>
 		<Button variant="ghost" size="icon-sm" onclick={() => (collapsed = false)}>
 			<PanelLeftIcon size={14} strokeWidth={1.8} class="-scale-x-100" />
@@ -78,9 +78,9 @@
 		></div>
 
 		<!-- Vertical context bar -->
-		<div class="relative h-10 w-[5px] overflow-hidden rounded-[3px] bg-surface-3">
+		<div class="relative h-10 w-1.25 overflow-hidden rounded-0.75 bg-surface-3">
 			<div
-				class="absolute bottom-0 w-full rounded-[3px]"
+				class="absolute bottom-0 w-full rounded-0.75"
 				style="height: {contextPercent}%; background: {getContextColor(contextPercent)}"
 			></div>
 		</div>
@@ -105,7 +105,7 @@
 {:else}
 	<!-- Expanded sidebar (272px) -->
 	<div
-		class="flex w-[272px] shrink-0 flex-col overflow-hidden border-l border-border bg-[var(--sidebar-bg,var(--surface))]"
+		class="flex w-68 shrink-0 flex-col overflow-hidden border-l border-border bg-(--sidebar-bg,var(--surface))"
 	>
 		<!-- Header with collapse toggle -->
 		<div class="flex items-center border-b border-border px-2.5 py-2">
@@ -134,35 +134,27 @@
 			<div class="flex flex-col gap-1.5">
 				<!-- 5h quota -->
 				<div class="flex items-center gap-0">
-					<span class="w-[52px] shrink-0 text-[10.5px] text-foreground-subtle"
-						>5h quota</span
-					>
+					<span class="w-13 shrink-0 text-[10.5px] text-foreground-subtle">5h quota</span>
 					<div class="flex-1 px-2">
 						<ProgressBar
 							percent={quota5hPercent}
 							color={getQuotaColor(quota5hPercent)}
 						/>
 					</div>
-					<span
-						class="min-w-[48px] text-right font-mono text-[10px] text-foreground-subtle"
-					>
+					<span class="min-w-12 text-right font-mono text-[10px] text-foreground-subtle">
 						{quota5hRemaining}
 					</span>
 				</div>
 				<!-- 7d quota -->
 				<div class="flex items-center gap-0">
-					<span class="w-[52px] shrink-0 text-[10.5px] text-foreground-subtle"
-						>7d quota</span
-					>
+					<span class="w-13 shrink-0 text-[10.5px] text-foreground-subtle">7d quota</span>
 					<div class="flex-1 px-2">
 						<ProgressBar
 							percent={quota7dPercent}
 							color={getQuotaColor(quota7dPercent)}
 						/>
 					</div>
-					<span
-						class="min-w-[48px] text-right font-mono text-[10px] text-foreground-subtle"
-					>
+					<span class="min-w-12 text-right font-mono text-[10px] text-foreground-subtle">
 						{quota7dRemaining}
 					</span>
 				</div>
@@ -179,24 +171,20 @@
 			<div class="flex flex-col gap-1.5">
 				<!-- Context -->
 				<div class="flex items-center gap-0">
-					<span class="w-[52px] shrink-0 text-[10.5px] text-foreground-subtle"
-						>Context</span
-					>
+					<span class="w-13 shrink-0 text-[10.5px] text-foreground-subtle">Context</span>
 					<div class="flex-1 px-2">
 						<ProgressBar
 							percent={contextPercent}
 							color={getContextColor(contextPercent)}
 						/>
 					</div>
-					<span
-						class="min-w-[48px] text-right font-mono text-[10px] text-foreground-subtle"
-					>
+					<span class="min-w-12 text-right font-mono text-[10px] text-foreground-subtle">
 						{contextLabel}
 					</span>
 				</div>
 				<!-- Cost -->
 				<div class="flex items-center gap-0">
-					<span class="w-[52px] shrink-0 text-[10.5px] text-foreground-subtle">Cost</span>
+					<span class="w-13 shrink-0 text-[10.5px] text-foreground-subtle">Cost</span>
 					<span
 						class="flex-1 text-right font-mono text-[11.5px] font-semibold text-foreground"
 					>
@@ -205,9 +193,7 @@
 				</div>
 				<!-- Tokens -->
 				<div class="flex items-center gap-0">
-					<span class="w-[52px] shrink-0 text-[10.5px] text-foreground-subtle"
-						>Tokens</span
-					>
+					<span class="w-13 shrink-0 text-[10.5px] text-foreground-subtle">Tokens</span>
 					<span class="flex-1 text-right font-mono text-[10.5px] text-foreground-subtle">
 						{tokenDisplay} in · 0 out
 					</span>

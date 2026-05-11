@@ -36,7 +36,7 @@
 		onclick={onCollapse}
 		type="button"
 	>
-		<IconComponent class="size-[13px] shrink-0" style="color: {accentColor}" />
+		<IconComponent class="size-3.25 shrink-0" style="color: {accentColor}" />
 		<span class="text-xs font-semibold">{message.toolName ?? 'Tool'}</span>
 		{#if detail}
 			<span class="flex-1 truncate font-mono text-[11px] text-foreground-muted">
@@ -59,11 +59,11 @@
 	<!-- Content panel with accent border -->
 	<div class="flex">
 		<div
-			class="w-[3px] shrink-0"
+			class="w-0.75 shrink-0"
 			style="background: {(message.isError ?? false) ? 'var(--status-danger)' : accentColor}"
 		></div>
 		<pre
-			class="m-0 max-h-[260px] flex-1 overflow-auto break-all whitespace-pre-wrap px-3 py-2.5 font-mono text-[11.5px] leading-[1.55] text-foreground-muted">{output ||
+			class="m-0 max-h-65 flex-1 overflow-auto break-all whitespace-pre-wrap px-3 py-2.5 font-mono text-[11.5px] leading-undefined text-foreground-muted">{output ||
 				detail}</pre>
 	</div>
 </Card.Card>

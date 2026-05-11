@@ -37,35 +37,25 @@
 
 	<!-- Content -->
 	<div class="flex">
-		<div class="w-[3px] shrink-0 bg-status-warning"></div>
+		<div class="w-0.75 shrink-0 bg-status-warning"></div>
 		<div class="flex-1 px-3 py-2.5">
 			{#if detail}
 				<pre
-					class="m-0 mb-3 whitespace-pre-wrap font-mono text-[11.5px] leading-[1.5] text-foreground-muted">{detail}</pre>
+					class="m-0 mb-3 whitespace-pre-wrap font-mono text-[11.5px] leading-normal text-foreground-muted">{detail}</pre>
 			{/if}
 			<div class="flex gap-1.5">
-				<Button
-					variant="primary"
-					size="sm"
-					class="h-[var(--size-control-md)]"
-					onclick={onAllow}
-				>
+				<Button variant="primary" size="sm" class="h-(--size-control-md)" onclick={onAllow}>
 					Allow <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 				<Button
 					variant="secondary"
 					size="sm"
-					class="h-[var(--size-control-md)]"
+					class="h-(--size-control-md)"
 					onclick={onAllowAlways}
 				>
 					Allow Always <Kbd>⌃<CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button
-					variant="danger"
-					size="sm"
-					class="h-[var(--size-control-md)]"
-					onclick={onDeny}
-				>
+				<Button variant="danger" size="sm" class="h-(--size-control-md)" onclick={onDeny}>
 					Deny <Kbd>Esc</Kbd>
 				</Button>
 			</div>

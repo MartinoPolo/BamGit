@@ -177,18 +177,18 @@
 		{gradientTint}
 		class={cn(
 			'group relative isolate h-full cursor-pointer transition-all duration-200',
-			'hover:-translate-y-0.5 gk-ws-hover-glow',
+			'hover:translate-y-0.5 gk-ws-hover-glow',
 			isDormant && 'opacity-[0.72] saturate-[0.7]',
 		)}
 	>
 		{#if variant === 'active'}
 			<div
-				class="pointer-events-none absolute inset-0 rounded-[var(--radius-lg)] animate-ws-breathe"
+				class="pointer-events-none absolute inset-0 rounded-lg animate-ws-breathe"
 				style="box-shadow: inset 0 0 24px color-mix(in oklch, {accentColor} 22%, transparent);"
 			></div>
 		{/if}
 
-		<div class="relative z-[1] flex h-full flex-col px-3.5 pt-3.5 pb-3">
+		<div class="relative z-1 flex h-full flex-col px-3.5 pt-3.5 pb-3">
 			<!-- Header: thumbnail + name + subtitle + icon buttons -->
 			<div class="mb-2.5 flex items-start justify-between gap-2">
 				<div class="flex items-center gap-2.5 min-w-0">
@@ -219,7 +219,7 @@
 					<Button
 						variant="ghost"
 						size="icon"
-						class={cn('size-[26px]', workspace.github_repo == null && 'opacity-[0.35]')}
+						class={cn('size-6.5', workspace.github_repo == null && 'opacity-[0.35]')}
 						onclick={(event: MouseEvent) => handleIconClick(event, onGithubClick)}
 						oncontextmenu={(event: MouseEvent) =>
 							handleIconContextMenu(event, onGithubRightClick)}
@@ -229,10 +229,7 @@
 					<Button
 						variant="ghost"
 						size="icon"
-						class={cn(
-							'size-[26px]',
-							workspace.local_folder == null && 'opacity-[0.35]',
-						)}
+						class={cn('size-6.5', workspace.local_folder == null && 'opacity-[0.35]')}
 						onclick={(event: MouseEvent) => handleIconClick(event, onFolderClick)}
 						oncontextmenu={(event: MouseEvent) =>
 							handleIconContextMenu(event, onFolderRightClick)}
@@ -246,7 +243,7 @@
 				{#if isEmpty}
 					<!-- Empty placeholder content -->
 					<div
-						class="flex h-full flex-col items-center justify-center gap-2 rounded-[var(--radius-sm)] border border-dashed border-border px-4 py-6"
+						class="flex h-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-border px-4 py-6"
 					>
 						<SparklesIcon class="size-5 text-foreground-subtle" />
 						<span class="text-xs font-medium text-foreground-muted">
@@ -292,7 +289,7 @@
 					{#if workspace.prd_count > 0}
 						<button
 							type="button"
-							class="mb-1.5 flex w-full cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-border bg-surface-2 px-2.5 py-1.5 hover:border-border-strong"
+							class="mb-1.5 flex w-full cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface-2 px-2.5 py-1.5 hover:border-border-strong"
 							onclick={(event: MouseEvent) => {
 								event.stopPropagation();
 								onPrdClick?.();
@@ -322,7 +319,7 @@
 							</span>
 						</button>
 					{:else}
-						<div class="mb-1.5 h-[30px]"></div>
+						<div class="mb-1.5 h-7.5"></div>
 					{/if}
 
 					<!-- AFK status row -->

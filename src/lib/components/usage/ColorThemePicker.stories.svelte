@@ -5,7 +5,7 @@
 	import { CHART_COLOR_THEMES, type ChartColorTheme } from '$lib/modules/usage/usage_types.js';
 
 	const { Story } = defineMeta({
-		title: 'Usage/ColorThemePicker',
+		title: 'Blocks/Usage/ColorThemePicker',
 		component: ColorThemePicker,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],

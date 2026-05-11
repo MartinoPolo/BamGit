@@ -13,7 +13,7 @@
 	}
 
 	const { Story } = defineMeta({
-		title: 'Components/GitHubBadge',
+		title: 'Derived/GitHubBadge',
 		component: GitHubBadge,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],

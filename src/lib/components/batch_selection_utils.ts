@@ -29,7 +29,7 @@ export const CARD_STATE_CLASSES = {
 	dragging: 'rotate-[-1.5deg] scale-[1.02] shadow-lg opacity-92',
 	loading: 'pointer-events-none',
 	archived: 'opacity-70 grayscale-[0.8]',
-	error: 'border-l-[3px] border-l-destructive',
+	error: 'border-l-0.75 border-l-destructive',
 	disabled: 'opacity-42 pointer-events-none',
 } as const;
 

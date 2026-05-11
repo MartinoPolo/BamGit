@@ -4,7 +4,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Chat/InteractionCards',
+		title: 'Blocks/Chat/InteractionCards',
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
 	});
@@ -63,7 +63,7 @@
 
 <Story name="Permission Prompt">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardPermission message={permissionMessage} />
 		</div>
 	{/snippet}
@@ -71,7 +71,7 @@
 
 <Story name="Elicitation Prompt">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardElicitation message={elicitationMessage} />
 		</div>
 	{/snippet}
@@ -79,7 +79,7 @@
 
 <Story name="Ask User (Options)">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] p-4">
+		<div class="mx-auto max-w-225 p-4">
 			<ToolCardAskUser message={askUserMessage} />
 		</div>
 	{/snippet}
@@ -87,7 +87,7 @@
 
 <Story name="All L3 Types">
 	{#snippet template()}
-		<div class="mx-auto max-w-[900px] space-y-3 p-4">
+		<div class="mx-auto max-w-225 space-y-3 p-4">
 			<ToolCardPermission message={permissionMessage} />
 			<ToolCardElicitation message={elicitationMessage} />
 			<ToolCardAskUser message={askUserMessage} />

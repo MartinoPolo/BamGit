@@ -405,7 +405,7 @@
 		</div>
 
 		<!-- Right: Sound Pool -->
-		<div class="w-[320px] shrink-0">
+		<div class="w-80 shrink-0">
 			<SoundPoolPanel
 				sounds={soundPool}
 				{playingSoundId}

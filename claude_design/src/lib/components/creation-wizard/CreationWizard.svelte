@@ -247,7 +247,7 @@
 <svelte:window onkeydown={handleGlobalKeydown} onmouseup={handleMouseBack} />
 
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
-	<Dialog.Content class="top-[15%] -translate-y-0 max-w-lg">
+	<Dialog.Content class="top-[15%] translate-y-0 max-w-lg">
 		<Dialog.Header>
 			<Dialog.Title class="text-base font-semibold text-foreground">
 				{stepLabel}

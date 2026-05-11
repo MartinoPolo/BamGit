@@ -318,7 +318,7 @@
 				<!-- Step 2: Review & Map -->
 				<div class="flex h-[60vh]">
 					<!-- Left: Faction Tree -->
-					<div class="w-[280px] shrink-0 overflow-y-auto border-r border-border p-2">
+					<div class="w-70 shrink-0 overflow-y-auto border-r border-border p-2">
 						<div class="mb-2 flex items-center gap-2 px-2 py-1">
 							<Checkbox
 								checked={selectedCharacters.size === characters.length}

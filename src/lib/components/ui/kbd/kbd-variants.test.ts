@@ -26,7 +26,7 @@ describe('kbdVariants', () => {
 
 	it('generates 4px border radius', () => {
 		const classes = kbdVariants();
-		expect(classes).toContain('rounded-[4px]');
+		expect(classes).toContain('rounded-1');
 	});
 
 	it('generates foreground-muted text color', () => {

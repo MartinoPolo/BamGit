@@ -6,7 +6,7 @@
 	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
-		title: 'UI/Select',
+		title: 'Base/Select',
 		component: Select,
 		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
 		decorators: [() => ThemeDecorator],
@@ -80,39 +80,37 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <Story name="Custom Open Dropdown">
 	{#snippet template(args: SelectProps)}
-		<div class="relative max-w-[280px]">
+		<div class="relative max-w-70">
 			<Label>Provider</Label>
 			<button
-				class="flex h-[var(--size-control-md)] w-full cursor-default items-center justify-between rounded-[var(--radius-md)] border border-ring bg-surface px-2.5 text-left font-sans text-[length:var(--text-md)] text-foreground shadow-[0_0_0_3px_color-mix(in_oklch,var(--ring)_22%,transparent)] outline-none"
+				class="flex h-(--size-control-md) w-full cursor-default items-center justify-between rounded-md border border-ring bg-surface px-2.5 text-left font-sans text-(length:--text-md) text-foreground shadow-[0_0_0_3px_color-mix(in_oklch,var(--ring)_22%,transparent)] outline-none"
 			>
 				<span>Claude · Sonnet 4.5</span>
 				<ChevronDownIcon class="size-3.5 text-foreground-subtle" />
 			</button>
-			<div
-				class="mt-1.5 rounded-[var(--radius-lg)] border border-border bg-surface p-2 shadow-lg"
-			>
+			<div class="mt-1.5 rounded-lg border border-border bg-surface p-2 shadow-lg">
 				<div
-					class="flex cursor-pointer items-center gap-2 rounded-[6px] bg-primary-soft px-2 py-1.5 text-[length:var(--text-md)] text-foreground"
+					class="flex cursor-pointer items-center gap-2 rounded-1.5 bg-primary-soft px-2 py-1.5 text-(length:--text-md) text-foreground"
 				>
-					<CheckIcon class="size-[11px]" />
+					<CheckIcon class="size-2.75" />
 					Claude · Sonnet 4.5
 				</div>
 				<div
-					class="flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[length:var(--text-md)] text-foreground hover:bg-surface-2"
+					class="flex cursor-pointer items-center gap-2 rounded-1.5 px-2 py-1.5 text-(length:--text-md) text-foreground hover:bg-surface-2"
 				>
-					<span class="inline-block w-[11px]"></span>
+					<span class="inline-block w-2.75"></span>
 					Claude · Haiku 4.5
 				</div>
 				<div
-					class="flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[length:var(--text-md)] text-foreground hover:bg-surface-2"
+					class="flex cursor-pointer items-center gap-2 rounded-1.5 px-2 py-1.5 text-(length:--text-md) text-foreground hover:bg-surface-2"
 				>
-					<span class="inline-block w-[11px]"></span>
+					<span class="inline-block w-2.75"></span>
 					Codex · gpt-5
 				</div>
 				<div
-					class="flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[length:var(--text-md)] text-foreground hover:bg-surface-2"
+					class="flex cursor-pointer items-center gap-2 rounded-1.5 px-2 py-1.5 text-(length:--text-md) text-foreground hover:bg-surface-2"
 				>
-					<span class="inline-block w-[11px]"></span>
+					<span class="inline-block w-2.75"></span>
 					Cursor · auto
 				</div>
 			</div>

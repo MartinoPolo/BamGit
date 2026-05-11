@@ -34,10 +34,7 @@
 	{...restProps}
 >
 	{#if accentBarColor != null}
-		<div
-			class="absolute inset-y-0 left-0 z-[2] w-[3px]"
-			style:background={accentBarColor}
-		></div>
+		<div class="absolute inset-y-0 left-0 z-2 w-0.75" style:background={accentBarColor}></div>
 	{/if}
 	{@render children?.()}
 	{#if state === 'loading'}
