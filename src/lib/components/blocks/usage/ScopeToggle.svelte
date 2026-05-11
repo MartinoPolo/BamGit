@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Select } from '$lib/components/ui/select/index.js';
+	import { Select } from '$lib/components/shadcn/select/index.js';
 	import { USAGE_SCOPES, isUsageScope, type UsageScope } from '$lib/modules/usage/usage_types.js';
 
 	interface Props {

@@ -1,9 +1,9 @@
 ﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import * as Card from '$lib/components/ui/card/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { StatCell } from '$lib/components/ui/stat-cell/index.js';
-	import { StatusRow } from '$lib/components/ui/status-row/index.js';
+	import * as Card from '$lib/components/shadcn/card/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { StatCell } from '$lib/components/base/stat-cell/index.js';
+	import { StatusRow } from '$lib/components/base/status-row/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import ListChecksIcon from '@lucide/svelte/icons/list-checks';

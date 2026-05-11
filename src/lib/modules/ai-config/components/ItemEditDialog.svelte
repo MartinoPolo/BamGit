@@ -1,8 +1,8 @@
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Alert from '$lib/components/ui/alert/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import * as Alert from '$lib/components/shadcn/alert/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import { openPath } from '@tauri-apps/plugin-opener';

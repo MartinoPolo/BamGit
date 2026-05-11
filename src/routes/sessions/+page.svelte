@@ -7,8 +7,8 @@
 	import SessionCard from '$lib/components/blocks/workspace/SessionCard.svelte';
 	import DiscoveredSessionCard from '$lib/components/blocks/workspace/DiscoveredSessionCard.svelte';
 	import SessionChatView from '$lib/components/blocks/session/SessionChatView.svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
 
 	const store = useSessions();
 	const notificationStore = useNotifications();

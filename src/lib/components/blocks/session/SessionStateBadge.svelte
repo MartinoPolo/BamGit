@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SessionState } from '$lib/types/generated/SessionState.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { SESSION_BADGE_CONFIG } from './session_theme_utils.js';
 
 	interface Props {

@@ -1,8 +1,8 @@
 ﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import DownloadIcon from '@lucide/svelte/icons/download';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Card from '$lib/components/ui/card/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Card from '$lib/components/shadcn/card/index.js';
 	import { cn } from '$lib/utils.js';
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
 	import { initUsageUrlStateSync } from '$lib/modules/usage/url_state_sync.svelte.js';

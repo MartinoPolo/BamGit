@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
+	import * as ContextMenu from '$lib/components/shadcn/context-menu/index.js';
 	import type { Issue, IssueCardCallbacks } from '$lib/modules/issues';
 	import {
 		ACTION_POOL,

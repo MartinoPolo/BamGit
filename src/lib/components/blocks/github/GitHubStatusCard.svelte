@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { GhAuthStatus, GhCliAvailability } from '$lib/types/generated';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import CircleCheckBig from '@lucide/svelte/icons/circle-check-big';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';

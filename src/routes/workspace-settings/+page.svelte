@@ -2,11 +2,11 @@
 	import type { WorkspaceCommand, CommandCategory } from '$lib/types/generated';
 	import { useBoard } from '$lib/modules/board';
 	import { invoke } from '$lib/tauri.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Label } from '$lib/components/shadcn/label/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { ColorPickerContent } from '$lib/components/derived/color-picker/index.js';
 	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/derived/color-picker/color_utils.js';
 	import PathInput from '$lib/components/derived/path-input/PathInput.svelte';

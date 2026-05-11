@@ -4,9 +4,9 @@
 		type ActionId,
 		type DerivedActions,
 	} from '$lib/modules/contextual-actions';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
 	import PlayIcon from '@lucide/svelte/icons/play';
 	import HandIcon from '@lucide/svelte/icons/hand';
 	import EyeIcon from '@lucide/svelte/icons/eye';

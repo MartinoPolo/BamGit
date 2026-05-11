@@ -1,8 +1,8 @@
 <script lang="ts">
 	import TrophyIcon from '@lucide/svelte/icons/trophy';
 	import XIcon from '@lucide/svelte/icons/x';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { cn } from '$lib/utils.js';
 	import type { Achievement } from '$lib/types/generated/index.js';
 

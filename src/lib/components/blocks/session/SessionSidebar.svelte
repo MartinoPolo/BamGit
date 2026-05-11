@@ -3,8 +3,8 @@
 	import type { Session } from '$lib/types/generated/Session.js';
 	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
 	import CpuIcon from '@lucide/svelte/icons/cpu';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import ProgressBar from './ProgressBar.svelte';
 	import ProviderChip from './ProviderChip.svelte';
 	import { getContextColor, getQuotaColor, getStatePulseColor } from './session_theme_utils.js';

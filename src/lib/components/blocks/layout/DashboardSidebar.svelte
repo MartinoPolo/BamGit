@@ -16,9 +16,9 @@
 	import UserAvatar from '$lib/components/derived/user-avatar/UserAvatar.svelte';
 	import ThemeToggle from '$lib/components/derived/theme-toggle/ThemeToggle.svelte';
 	import LanguageSwitcher from '$lib/components/derived/language-switcher/LanguageSwitcher.svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {

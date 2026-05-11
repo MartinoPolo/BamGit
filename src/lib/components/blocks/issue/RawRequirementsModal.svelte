@@ -2,10 +2,10 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
 	import NoteCard from '$lib/components/blocks/workspace/NoteCard.svelte';
 	import { useRawRequirements } from '$lib/modules/raw-requirements/index.js';
 	import { resolve } from '$app/paths';

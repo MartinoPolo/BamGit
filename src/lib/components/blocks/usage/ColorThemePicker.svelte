@@ -1,8 +1,8 @@
 <script lang="ts">
 	import PaletteIcon from '@lucide/svelte/icons/palette';
 	import CheckIcon from '@lucide/svelte/icons/check';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Popover from '$lib/components/shadcn/popover/index.js';
 	import { cn } from '$lib/utils.js';
 	import { CHART_COLOR_THEMES, type ChartColorTheme } from '$lib/modules/usage/usage_types.js';
 

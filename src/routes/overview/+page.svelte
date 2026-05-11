@@ -9,8 +9,8 @@
 	import AddWorkspaceCard from '$lib/components/blocks/workspace/AddWorkspaceCard.svelte';
 	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Popover from '$lib/components/shadcn/popover/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';

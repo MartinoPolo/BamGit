@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { SearchField } from '$lib/components/ui/search-field/index.js';
+	import { SearchField } from '$lib/components/base/search-field/index.js';
 	import { onMount, untrack } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import type { AssignedIssue, SearchedGithubIssue } from '$lib/types/generated';

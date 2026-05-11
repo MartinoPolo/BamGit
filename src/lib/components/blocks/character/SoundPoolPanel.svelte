@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import PoolDropZone from './PoolDropZone.svelte';
 	import SoundPoolItem from './SoundPoolItem.svelte';
 	import type { SoundPoolEntry } from '$lib/modules/character-packs';

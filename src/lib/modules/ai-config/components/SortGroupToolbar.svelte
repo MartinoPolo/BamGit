@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Switch } from '$lib/components/ui/switch/index.js';
+	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Switch } from '$lib/components/shadcn/switch/index.js';
 	import ArrowUpDownIcon from '@lucide/svelte/icons/arrow-up-down';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import ViewModeToggle from './ViewModeToggle.svelte';

@@ -8,7 +8,7 @@
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
 	import CheckIcon from '@lucide/svelte/icons/check';
-	import { inputVariants } from '$lib/components/ui/input/index.js';
+	import { inputVariants } from '$lib/components/shadcn/input/index.js';
 
 	interface Props {
 		value: string;

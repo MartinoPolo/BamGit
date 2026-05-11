@@ -2,7 +2,7 @@
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import SidebarCollapsedItem from '$lib/components/derived/sidebar-collapsed-item/SidebarCollapsedItem.svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 
 	interface Props {
 		name: string;

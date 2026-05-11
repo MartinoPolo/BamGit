@@ -2,9 +2,9 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { useKeyboardShortcuts, eventToBinding } from '$lib/modules/keyboard-shortcuts';
 	import type { ShortcutCollision } from '$lib/modules/keyboard-shortcuts';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	const shortcutsCtx = useKeyboardShortcuts();
 

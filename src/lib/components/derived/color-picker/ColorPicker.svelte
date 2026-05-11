@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+	import * as Popover from '$lib/components/shadcn/popover/index.js';
 	import type { ColorPickerProps } from './color_picker_types.js';
 	import { DEFAULT_COLOR_PALETTE, getContrastTextColor } from './color_utils.js';
 	import ColorPickerContent from './ColorPickerContent.svelte';

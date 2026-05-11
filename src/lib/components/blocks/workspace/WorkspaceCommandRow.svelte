@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { WorkspaceCommand } from '$lib/types/generated';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Label } from '$lib/components/shadcn/label/index.js';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import GripVerticalIcon from '@lucide/svelte/icons/grip-vertical';
 

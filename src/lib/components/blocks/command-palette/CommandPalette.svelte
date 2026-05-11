@@ -1,11 +1,11 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import SearchIcon from '@lucide/svelte/icons/search';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import * as Popover from '$lib/components/shadcn/popover/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import {
 		useCommandPalette,
 		COMMAND_PALETTE_CATEGORIES,

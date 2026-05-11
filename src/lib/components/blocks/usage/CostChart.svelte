@@ -2,7 +2,7 @@
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import { scaleBand } from 'd3-scale';
 	import { BarChart } from 'layerchart';
-	import * as Chart from '$lib/components/ui/chart/index.js';
+	import * as Chart from '$lib/components/shadcn/chart/index.js';
 	import {
 		CHART_COLOR_THEMES,
 		GROUP_BY_OPTIONS,

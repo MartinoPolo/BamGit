@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setBoardContext, useBoard, ACCENT_COLORS } from '$lib/modules/board';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();

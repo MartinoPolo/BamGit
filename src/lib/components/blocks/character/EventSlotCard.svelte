@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import SoundChip from './SoundChip.svelte';
 	import type { ImportanceTier } from '$lib/types/generated';
 	import type { SoundPoolEntry } from '$lib/modules/character-packs';

@@ -15,7 +15,7 @@
 		computeStageCounts,
 	} from '$lib/modules/board';
 	import type { BottomPanelTab } from '$lib/modules/board';
-	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import PrdOverview from '$lib/components/blocks/issue/PrdOverview.svelte';
 	import DependencyGraphView from '$lib/components/blocks/dependency-graph/DependencyGraphView.svelte';
 	import IssueCardList from '$lib/components/blocks/issue/IssueCardList.svelte';

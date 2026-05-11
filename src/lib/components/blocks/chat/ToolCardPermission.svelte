@@ -2,8 +2,8 @@
 	import type { ChatMessage } from '$lib/modules/chat/index.js';
 	import AlertTriangleIcon from '@lucide/svelte/icons/alert-triangle';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 	import { extractToolDetail, getToolAccentColor } from './tool_card_utils.js';
 
 	interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import Toast from '$lib/components/ui/toast/Toast.svelte';
+	import Toast from '$lib/components/shadcn/toast/Toast.svelte';
 	import { useToasts } from '$lib/modules/toasts/index.js';
 
 	const ctx = useToasts();

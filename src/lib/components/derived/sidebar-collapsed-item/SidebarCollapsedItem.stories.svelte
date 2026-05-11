@@ -12,7 +12,7 @@
 
 <script lang="ts">
 	import type { ComponentProps } from 'svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import HomeIcon from '@lucide/svelte/icons/home';
 	import InboxIcon from '@lucide/svelte/icons/inbox';
 	import SettingsIcon from '@lucide/svelte/icons/settings';

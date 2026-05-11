@@ -22,9 +22,9 @@
 	import ItemEditDialog from '$lib/modules/ai-config/components/ItemEditDialog.svelte';
 	import AiConfigDeleteDialog from '$lib/modules/ai-config/components/AiConfigDeleteDialog.svelte';
 	import SettingsPanel from '$lib/modules/ai-config/components/SettingsPanel.svelte';
-	import { SearchField } from '$lib/components/ui/search-field/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import * as Alert from '$lib/components/ui/alert/index.js';
+	import { SearchField } from '$lib/components/base/search-field/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Alert from '$lib/components/shadcn/alert/index.js';
 	import { cn } from '$lib/utils.js';
 	import type {
 		SkillConfig,

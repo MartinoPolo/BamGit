@@ -1,10 +1,10 @@
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import { Progress } from '$lib/components/ui/progress/index.js';
-	import * as Accordion from '$lib/components/ui/accordion/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
+	import { Progress } from '$lib/components/shadcn/progress/index.js';
+	import * as Accordion from '$lib/components/shadcn/accordion/index.js';
 	import { cn } from '$lib/utils.js';
 	import EventSlotCard from './EventSlotCard.svelte';
 	import TierSection from './TierSection.svelte';

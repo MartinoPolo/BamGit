@@ -4,11 +4,11 @@
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import SessionStateBadge from './SessionStateBadge.svelte';
 
 	interface Props {

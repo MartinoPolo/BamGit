@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { GhAuthStatus } from '$lib/types/generated';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 

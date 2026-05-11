@@ -6,9 +6,9 @@
 	import ColorPicker from '$lib/components/derived/color-picker/ColorPicker.svelte';
 	import GitHubBadge from '$lib/components/derived/github-badge/GitHubBadge.svelte';
 	import WorktreeStateIcon from '$lib/components/derived/worktree-state-icon/WorktreeStateIcon.svelte';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Trash2 from '@lucide/svelte/icons/trash-2';

@@ -4,11 +4,11 @@
 	import { useNotifications, groupConfigsByTier } from '$lib/modules/notifications';
 	import { useToasts } from '$lib/modules/toasts/index.js';
 	import { onMount } from 'svelte';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { Switch } from '$lib/components/shadcn/switch/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import VolumeIcon from '@lucide/svelte/icons/volume-2';
 	import PackageIcon from '@lucide/svelte/icons/package';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';

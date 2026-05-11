@@ -101,7 +101,12 @@ export default [
 	},
 	{
 		files: ['src/**/*.ts'],
-		ignores: ['src/routes/**/+*', 'src/lib/components/ui/**', 'src/lib/hooks/**'],
+		ignores: [
+			'src/routes/**/+*',
+			'src/lib/components/shadcn/**',
+			'src/lib/components/base/**',
+			'src/lib/hooks/**',
+		],
 		plugins: { 'check-file': checkFile },
 		rules: {
 			'check-file/filename-naming-convention': [
@@ -113,7 +118,7 @@ export default [
 	},
 	{
 		files: ['src/lib/**/*.svelte'],
-		ignores: ['src/lib/components/ui/**'],
+		ignores: ['src/lib/components/shadcn/**', 'src/lib/components/base/**'],
 		plugins: { 'check-file': checkFile },
 		rules: {
 			'check-file/filename-naming-convention': [

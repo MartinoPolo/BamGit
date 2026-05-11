@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import { openPath } from '@tauri-apps/plugin-opener';

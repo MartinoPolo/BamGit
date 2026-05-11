@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Alert from '$lib/components/ui/alert/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import * as Alert from '$lib/components/shadcn/alert/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import { openPath } from '@tauri-apps/plugin-opener';
 	import { invoke } from '$lib/tauri.js';

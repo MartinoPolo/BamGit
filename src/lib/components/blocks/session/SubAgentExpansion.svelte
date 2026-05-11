@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import CpuIcon from '@lucide/svelte/icons/cpu';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 
 	interface Props {
 		name: string;

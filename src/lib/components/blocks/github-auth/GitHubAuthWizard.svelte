@@ -6,8 +6,8 @@
 	import { invoke } from '$lib/tauri.js';
 	import { MockDesktopOnlyError } from '$lib/mock_desktop_only_error.js';
 	import { openUrl } from '$lib/opener.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';

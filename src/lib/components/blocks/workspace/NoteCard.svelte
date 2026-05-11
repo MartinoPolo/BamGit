@@ -4,9 +4,9 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import XIcon from '@lucide/svelte/icons/x';
 	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { useRawRequirements } from '$lib/modules/raw-requirements/index.js';
 	import type { RawRequirementNote } from '$lib/modules/raw-requirements/index.js';
 

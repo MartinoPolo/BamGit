@@ -3,12 +3,12 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import * as Accordion from '$lib/components/ui/accordion/index.js';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import { Progress } from '$lib/components/ui/progress/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import * as Accordion from '$lib/components/shadcn/accordion/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
+	import { Progress } from '$lib/components/shadcn/progress/index.js';
 	import {
 		AvatarUpload,
 		EventSlotCard,

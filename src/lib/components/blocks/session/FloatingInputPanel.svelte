@@ -3,8 +3,8 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import PaperclipIcon from '@lucide/svelte/icons/paperclip';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
 	import SkillChipsRow from './SkillChipsRow.svelte';
 	import SendStopButton from './SendStopButton.svelte';
 	import { getProviderConfig } from './session_theme_utils.js';

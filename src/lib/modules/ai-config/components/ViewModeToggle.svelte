@@ -1,7 +1,7 @@
 <script lang="ts">
 	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
 	import ListIcon from '@lucide/svelte/icons/list';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 	import type { AiConfigTab } from '../ai_config.context.svelte.js';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 	import { cn } from '$lib/utils.js';

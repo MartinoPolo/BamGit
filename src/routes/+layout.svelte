@@ -8,7 +8,7 @@
 	import DashboardSidebar from '$lib/components/blocks/layout/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/blocks/workspace/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/blocks/workspace/DashboardEditDialog.svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import {
 		setBoardContext,
 		setSelectionContext,
@@ -144,7 +144,7 @@
 
 <svelte:window onkeydown={(event) => shortcutsCtx.handleKeydown(event)} />
 
-<Tooltip.Provider>
+<Tooltip.Provider delayDuration={300} skipDelayDuration={300}>
 	{#if windowCtx.isOverview}
 		<div class="h-screen overflow-auto bg-background text-foreground">
 			{@render children()}

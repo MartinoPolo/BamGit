@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
 	import { sidebarCollapsedItemVariants } from './sidebar_collapsed_item_variants.js';
 

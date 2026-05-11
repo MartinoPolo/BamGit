@@ -23,9 +23,8 @@
 		TRUNK_DEAD_SPACE_PERCENT,
 	} from 'low-poly-2d-trees';
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import SproutIcon from '@lucide/svelte/icons/sprout';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
 	import ForestContextMenu from './ForestContextMenu.svelte';
 	import { TREE_CONTEXT_MENU_ACTIONS } from '$lib/modules/visualization';
@@ -416,69 +415,64 @@
 			{/if}
 		</div>
 	{:else}
-		<Tooltip.Provider>
-			{#each layoutResult.items as positioned (positioned.id)}
-				{@const entry = entryById.get(positioned.id)}
-				{#if entry}
-					{@const size = getNaturalSize(entry)}
-					{@const overlayConfig = getResolvedOverlayConfig(entry)}
-					{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
-					<ForestTreeTooltip
-						issueTitle={entry.issue.name}
-						issueStatus={entry.issue.status}
-					>
-						{#snippet children(triggerProps)}
-							<button
-								{...triggerProps}
-								type="button"
-								class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
-								style:left="{positioned.x}px"
-								style:top="{positioned.y}px"
-								style:width="{size.width}px"
-								style:height="{size.height}px"
-								style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
-									100}%)) scale({positioned.scale})"
-								style:opacity={positioned.opacity}
-								style:z-index={positioned.zIndex}
-								style:pointer-events="none"
-								style:will-change="transform"
-								onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
-								onmouseleave={() => interaction.unhover()}
-								onclick={(event) => handleTreeClick(entry, event)}
-								oncontextmenu={(e) => handleContextMenu(e, entry)}
-								aria-label="Tree for issue {entry.issue.name}"
-							>
-								{#if entry.visualization.kind === 'oak'}
-									<LowPolyTree
-										config={getOakConfig(entry)}
-										{overlayConfig}
-										groundElements={groundProps.groundElements}
-										groundElementCount={groundProps.groundElementCount}
-									/>
-								{:else if entry.visualization.kind === 'tree'}
-									<LowPolyTree
-										config={entry.visualization.config}
-										toolVisibility={entry.visualization.toolVisibility}
-										{overlayConfig}
-										animateCanopySway={entry.visualization.animateCanopySway}
-										animateGrowth={entry.visualization.animateGrowth}
-										animateTools={entry.visualization.animateTools}
-										groundElements={groundProps.groundElements}
-										groundElementCount={groundProps.groundElementCount}
-									/>
-								{:else if entry.visualization.kind === 'potted-plant'}
-									<PottedPlant
-										stage={entry.visualization.stage}
-										seed={entry.visualization.seed}
-										{overlayConfig}
-									/>
-								{/if}
-							</button>
-						{/snippet}
-					</ForestTreeTooltip>
-				{/if}
-			{/each}
-		</Tooltip.Provider>
+		{#each layoutResult.items as positioned (positioned.id)}
+			{@const entry = entryById.get(positioned.id)}
+			{#if entry}
+				{@const size = getNaturalSize(entry)}
+				{@const overlayConfig = getResolvedOverlayConfig(entry)}
+				{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
+				<ForestTreeTooltip issueTitle={entry.issue.name} issueStatus={entry.issue.status}>
+					{#snippet children(triggerProps)}
+						<button
+							{...triggerProps}
+							type="button"
+							class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
+							style:left="{positioned.x}px"
+							style:top="{positioned.y}px"
+							style:width="{size.width}px"
+							style:height="{size.height}px"
+							style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
+								100}%)) scale({positioned.scale})"
+							style:opacity={positioned.opacity}
+							style:z-index={positioned.zIndex}
+							style:pointer-events="none"
+							style:will-change="transform"
+							onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
+							onmouseleave={() => interaction.unhover()}
+							onclick={(event) => handleTreeClick(entry, event)}
+							oncontextmenu={(e) => handleContextMenu(e, entry)}
+							aria-label="Tree for issue {entry.issue.name}"
+						>
+							{#if entry.visualization.kind === 'oak'}
+								<LowPolyTree
+									config={getOakConfig(entry)}
+									{overlayConfig}
+									groundElements={groundProps.groundElements}
+									groundElementCount={groundProps.groundElementCount}
+								/>
+							{:else if entry.visualization.kind === 'tree'}
+								<LowPolyTree
+									config={entry.visualization.config}
+									toolVisibility={entry.visualization.toolVisibility}
+									{overlayConfig}
+									animateCanopySway={entry.visualization.animateCanopySway}
+									animateGrowth={entry.visualization.animateGrowth}
+									animateTools={entry.visualization.animateTools}
+									groundElements={groundProps.groundElements}
+									groundElementCount={groundProps.groundElementCount}
+								/>
+							{:else if entry.visualization.kind === 'potted-plant'}
+								<PottedPlant
+									stage={entry.visualization.stage}
+									seed={entry.visualization.seed}
+									{overlayConfig}
+								/>
+							{/if}
+						</button>
+					{/snippet}
+				</ForestTreeTooltip>
+			{/if}
+		{/each}
 	{/if}
 	<button
 		type="button"

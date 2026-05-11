@@ -13,9 +13,9 @@
 	import MergeConflictBadge from '$lib/components/derived/merge-conflict-badge/MergeConflictBadge.svelte';
 	import ContextualActionButtons from './ContextualActionButtons.svelte';
 	import SessionStateChip from '$lib/components/derived/session-state-chip/SessionStateChip.svelte';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import VscodeIcon from '$lib/components/derived/icons/VscodeIcon.svelte';

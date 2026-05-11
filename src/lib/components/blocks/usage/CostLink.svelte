@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
 	import { getCostMagnitude, formatCostDisplay, type CostMagnitude } from './cost_link_utils.js';
 	import type { MetricsPeriod, UsageScope } from '$lib/modules/usage/usage_types.js';

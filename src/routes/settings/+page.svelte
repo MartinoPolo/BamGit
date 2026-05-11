@@ -4,10 +4,10 @@
 	import ShortcutSettingsPanel from '$lib/components/blocks/settings/ShortcutSettingsPanel.svelte';
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
+	import { Label } from '$lib/components/shadcn/label/index.js';
 	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
 	import type { ColorPalette } from '$lib/types/generated';
@@ -16,7 +16,7 @@
 	import { resolve } from '$app/paths';
 	import { useCharacterPacks } from '$lib/modules/character-packs';
 	import { CharacterListCard, BulkImportWizard } from '$lib/components/blocks/character/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 

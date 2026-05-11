@@ -21,11 +21,11 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { openUrl } from '$lib/opener.js';
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import { SearchField } from '$lib/components/ui/search-field/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
+	import { SearchField } from '$lib/components/base/search-field/index.js';
 	import { cn } from '$lib/utils.js';
 
 	interface Props {

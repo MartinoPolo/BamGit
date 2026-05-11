@@ -2,10 +2,10 @@
 	import type { ChatMessage } from '$lib/modules/chat/index.js';
 	import CompassIcon from '@lucide/svelte/icons/compass';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
-	import * as Card from '$lib/components/ui/card/index.js';
-	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import * as Card from '$lib/components/shadcn/card/index.js';
+	import * as RadioGroup from '$lib/components/shadcn/radio-group/index.js';
 
 	interface Props {
 		message: ChatMessage;

@@ -1,8 +1,8 @@
 ﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import DeleteIcon from '@lucide/svelte/icons/delete';
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';

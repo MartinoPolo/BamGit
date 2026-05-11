@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue } from '$lib/modules/issues';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import ColorPicker from '$lib/components/derived/color-picker/ColorPicker.svelte';
 
 	interface Props {

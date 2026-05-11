@@ -2,10 +2,10 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { PrunableIssue } from '$lib/types/generated';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 
 	interface Props {
 		open: boolean;

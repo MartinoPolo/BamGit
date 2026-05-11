@@ -1,7 +1,8 @@
 {
 	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
 	"entry": [
-		"src/lib/components/ui/*/index.ts",
+		"src/lib/components/shadcn/*/index.ts",
+		"src/lib/components/base/*/index.ts",
 		"src/lib/components/blocks/character/index.ts",
 		"src/lib/modules/*/index.ts",
 		"src/lib/i18n/index.ts",

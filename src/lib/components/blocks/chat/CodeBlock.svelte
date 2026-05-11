@@ -3,8 +3,8 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import CheckIcon from '@lucide/svelte/icons/check';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Badge } from '$lib/components/shadcn/badge/index.js';
 
 	interface Props {
 		code: string;

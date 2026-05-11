@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import type { ColorPickerContentProps } from './color_picker_types.js';
 	import { DEFAULT_COLOR_PALETTE, getContrastTextColor, isValidHexColor } from './color_utils.js';
 

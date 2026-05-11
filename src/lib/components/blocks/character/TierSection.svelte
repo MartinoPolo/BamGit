@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import * as Accordion from '$lib/components/ui/accordion/index.js';
+	import * as Accordion from '$lib/components/shadcn/accordion/index.js';
 	import type { ImportanceTier } from '$lib/types/generated';
 	import type { Snippet } from 'svelte';
 

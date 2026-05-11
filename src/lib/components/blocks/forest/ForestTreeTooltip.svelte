@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -11,7 +11,7 @@
 	let { issueTitle, issueStatus, children }: Props = $props();
 </script>
 
-<Tooltip.Root delayDuration={400}>
+<Tooltip.Root>
 	<Tooltip.Trigger>
 		{#snippet child({ props })}
 			{@render children(props)}

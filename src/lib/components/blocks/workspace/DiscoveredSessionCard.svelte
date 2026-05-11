@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { DiscoveredSession, DiscoveredSessionStatus } from '$lib/types/generated';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 
 	interface Props {
 		session: DiscoveredSession;

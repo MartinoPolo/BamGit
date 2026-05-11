@@ -6,8 +6,8 @@
 	import LightbulbIcon from '@lucide/svelte/icons/lightbulb';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TreesIcon from '@lucide/svelte/icons/trees';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		title: string;

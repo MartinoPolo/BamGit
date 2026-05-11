@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invoke } from '$lib/tauri.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 
 	interface Props {

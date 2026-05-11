@@ -2,9 +2,9 @@
 	import type { ChatMessage } from '$lib/modules/chat/index.js';
 	import DatabaseIcon from '@lucide/svelte/icons/database';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Kbd } from '$lib/components/ui/kbd/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 
 	interface Props {
 		message: ChatMessage;

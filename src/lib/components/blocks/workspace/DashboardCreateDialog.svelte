@@ -2,11 +2,11 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { CreateDashboardRequest } from '$lib/modules/board';
 	import type { Dashboard } from '$lib/types/generated';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Label } from '$lib/components/shadcn/label/index.js';
+	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { ColorPickerContent } from '$lib/components/derived/color-picker/index.js';
 	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/derived/color-picker/color_utils.js';
 	import PathInput from '$lib/components/derived/path-input/PathInput.svelte';

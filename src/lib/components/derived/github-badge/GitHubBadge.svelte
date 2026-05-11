@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import { openUrl } from '$lib/opener.js';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import type { PullRequestState } from '$lib/types/generated';
 	import {
 		VARIANT_CLASSES,

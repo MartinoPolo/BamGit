@@ -5,8 +5,8 @@
 	import Moon from '@lucide/svelte/icons/moon';
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import SidebarCollapsedItem from '$lib/components/derived/sidebar-collapsed-item/SidebarCollapsedItem.svelte';
-	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		collapsed?: boolean;

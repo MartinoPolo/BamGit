@@ -3,7 +3,7 @@
 	import { TOOL_STATUS } from '$lib/modules/chat/index.js';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import XIcon from '@lucide/svelte/icons/x';
-	import * as Card from '$lib/components/ui/card/index.js';
+	import * as Card from '$lib/components/shadcn/card/index.js';
 	import {
 		extractToolDetail,
 		extractToolOutput,

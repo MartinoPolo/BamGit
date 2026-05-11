@@ -2,8 +2,8 @@
 	import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import SidebarCollapsedItem from '$lib/components/derived/sidebar-collapsed-item/SidebarCollapsedItem.svelte';
-	import { Tabs, Tab } from '$lib/components/ui/tabs/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		collapsed?: boolean;

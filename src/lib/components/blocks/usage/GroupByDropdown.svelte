@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Select } from '$lib/components/ui/select/index.js';
+	import { Select } from '$lib/components/shadcn/select/index.js';
 	import {
 		GROUP_BY_OPTIONS,
 		isGroupByOption,

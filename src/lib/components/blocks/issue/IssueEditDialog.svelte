@@ -2,11 +2,11 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue, UpdateIssueRequest } from '$lib/modules/issues';
 	import { FALLBACK_ISSUE_COLOR } from '$lib/modules/board';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Select } from '$lib/components/ui/select/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Select } from '$lib/components/shadcn/select/index.js';
+	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { ColorPicker } from '$lib/components/derived/color-picker/index.js';
 	import { buildUpdateIssueRequest } from './dialog_helpers.js';
 

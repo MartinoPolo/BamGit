@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useAiConfig } from '../ai_config.context.svelte.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import type { ProviderKind } from '$lib/types/generated';
 	import type { InstalledProvider } from '$lib/types/generated';
 

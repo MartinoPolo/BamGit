@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { SimpleTooltip } from '$lib/components/ui/tooltip/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
 	import { REFRESH_STATES, type RefreshState } from '$lib/modules/usage/usage_types.js';
 

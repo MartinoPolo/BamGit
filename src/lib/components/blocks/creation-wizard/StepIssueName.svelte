@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { HelpText } from '$lib/components/ui/help-text/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { HelpText } from '$lib/components/base/help-text/index.js';
 	import { onMount } from 'svelte';
 	import { useCreationWizard } from '$lib/modules/creation-wizard';
 	import { generateBranchName } from '$lib/modules/creation-wizard';

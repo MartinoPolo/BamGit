@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { CalendarDate, type DateValue } from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { RangeCalendar } from '$lib/components/ui/range-calendar/index.js';
+	import * as Popover from '$lib/components/shadcn/popover/index.js';
+	import { RangeCalendar } from '$lib/components/shadcn/range-calendar/index.js';
 	import type { DateRange } from 'bits-ui';
 
 	interface Props {

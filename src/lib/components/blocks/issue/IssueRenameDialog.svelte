@@ -1,10 +1,10 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { Issue } from '$lib/modules/issues';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Label } from '$lib/components/shadcn/label/index.js';
 
 	interface Props {
 		issue: Issue | null;

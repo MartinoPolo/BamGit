@@ -3,11 +3,11 @@
 	import { invoke } from '$lib/tauri.js';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 	import { SETTINGS_BY_PROVIDER, type SettingDefinition } from './settings_definitions.js';
-	import * as Alert from '$lib/components/ui/alert/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Select } from '$lib/components/ui/select/index.js';
+	import * as Alert from '$lib/components/shadcn/alert/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Switch } from '$lib/components/shadcn/switch/index.js';
+	import { Select } from '$lib/components/shadcn/select/index.js';
 	import type { SettingsScope } from '$lib/types/generated';
 
 	type SettingsRecord = Record<string, unknown>;

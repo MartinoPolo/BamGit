@@ -1,0 +1,27 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import TooltipRoot from './tooltip.svelte';
+	import TooltipTrigger from './tooltip-trigger.svelte';
+	import TooltipContent from './tooltip-content.svelte';
+
+	interface Props {
+		text: string;
+		side?: 'top' | 'bottom' | 'left' | 'right';
+		children: Snippet;
+	}
+
+	let { text, side = 'top', children }: Props = $props();
+</script>
+
+<TooltipRoot>
+	<TooltipTrigger>
+		{#snippet child({ props })}
+			<span {...props} class="inline-flex items-center">
+				{@render children()}
+			</span>
+		{/snippet}
+	</TooltipTrigger>
+	<TooltipContent {side} sideOffset={6}>
+		{text}
+	</TooltipContent>
+</TooltipRoot>
