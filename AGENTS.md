@@ -1,6 +1,6 @@
 # Project Instructions
 
-This app is in heavy development and not in production — no backwards compatibility is required. When implementing changes, freely delete, replace, or restructure obsolete code and schemas without preservation shims.
+App is in development — no backwards compatibility is required. When implementing changes, freely delete, replace, or restructure obsolete code and schemas without preservation shims.
 
 ## Svelte
 
@@ -9,15 +9,15 @@ When editing or creating Svelte code, use Svelte MCP tools (get-documentation, s
 
 ## Main library
 
-C:\_MP_projects\low-poly-2d-trees This project relies heavily on rendering 2D trees from this library that I maintain and have full control over. Whenever it's needed, feel free to update anything in that library, but specifically mention this update at the end of the session.
+C:\_MP_projects\low-poly-2d-trees This project relies heavily on rendering 2D trees from this library that I maintain and have full control over. Whenever needed, update anything in that library, but mention this update in summary.
 
 ## Stack
 
 Tauri v2 (Rust backend) + SvelteKit (static adapter) + Vite
-TypeScript (strict) + Rust
+TypeScript (strict)
 Tailwind CSS 4
 SQLite (rusqlite, bundled)
-Vitest + Playwright
+Vitest, Playwright, Storybook
 
 ## Commands
 

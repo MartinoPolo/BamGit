@@ -1,126 +1,73 @@
 # Grovekeeper Roadmap
 
-> PRD-driven development plan. Each PRD is a standalone GitHub issue with requirements, references, dependencies, and grilling topics.
-
-Last updated: 2026-04-29
+Prioritized feature backlog. Work item state lives on GitHub. Architecture and stack decisions are in `ARCHITECTURE.md`. Detailed feature specs are in `REQUIREMENTS.md`. Implementation references (what to read before building each feature) are in `REFERENCES.md`; the feature→reference mapping is in `ARCHITECTURE.md § Reference Repositories`.
 
 ---
 
-## PRD Dependency Graph
+## P0 — Ship-Ready: Full Issue Lifecycle
 
-```
-#87 Design System ──────────────────────────────────┐
- ├── #89 Issue Management ──┐                       │
- │    ├── #88 Forest View   │                       │
- │    ├── #90 Sessions ─────┤                       │
- │    └── #91 Git/GitHub ───┤                       │
- │         ├── #92 AFK/HITL │                       │
- │         └───────┘        │                       │
- │    #90 Sessions ─────────┤                       │
- │         ├── #92 AFK/HITL │                       │
- │         └── #93 Metrics  │                       │
- ├── #94 AI Config          │                       │
- ├── #95 Notifications      │                       │
- └── #96 Platform/Settings  │                       │
-```
+Goal: go through a complete issue lifecycle without leaving Grovekeeper — see GitHub state, manage worktrees, open editor/terminal.
 
-## Priority Tiers
+| Feature                           | Notes                                                                                          |
+| --------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Overview + workspace cards polish | Entry point to the app; workspace health at a glance                                           |
+| Issue cards + workspace dashboard | Core visibility; all badge types, card state, context menus                                    |
+| Worktree lifecycle actions        | Open VS Code, terminal, folder; create/delete worktree from card                               |
+| GitHub state visibility           | Branch badge, PR state, issue state always current on cards                                    |
+| Assigned issues panel             | GitHub → Grovekeeper adoption flow; quick-add with/without worktree                            |
+| Dependency view + blocking graph  | See which issues block which; depth rows in forest match blocking                              |
+| PRD integration polish            | PRDs as special GitHub issues; sub-issue completion rollup on workspace card; PRD progress bar |
 
-### P0 — Usable App (must-have)
-
-| PRD | Title                          | Blocks        | Status                                    |
-| --- | ------------------------------ | ------------- | ----------------------------------------- |
-| #87 | Design System & Infrastructure | All PRDs      | Not started                               |
-| #89 | Issue Management & Creation    | #88, #90, #91 | Complete                                  |
-| #88 | Forest View & Visualization    | —             | State mapping grilled, sub-issues pending |
-| #90 | Session Management & Chat UI   | #92, #93      | Not started                               |
-| #91 | Git/GitHub Integration         | #92           | Not started                               |
-| #95 | Notifications & Sounds         | —             | Not started                               |
-| #96 | Platform & Settings            | —             | Not started                               |
-
-### P1 — Full Featured (planned, not blocking v1)
-
-| PRD | Title                | Blocks | Status      |
-| --- | -------------------- | ------ | ----------- |
-| #92 | AFK/HITL Workflow    | —      | Not started |
-| #93 | Metrics & Statistics | —      | Not started |
-| #94 | AI Configuration     | —      | Not started |
-
-## Suggested Execution Order
-
-1. **#87 Design System** — foundation: tokens, components, app shell, i18n, shortcuts, multi-window
-2. **#89 Issue Management** — core data model: creation wizard, color system, lifecycle, naming
-3. **#88 Forest View** + **#91 Git/GitHub** + **#95 Notifications** + **#96 Platform/Settings** — parallel after #89
-4. **#90 Sessions** — depends on #89, can overlap with step 3
-5. **#92 AFK/HITL** + **#93 Metrics** + **#94 AI Config** — P1 features after P0 is stable
+**Reference:** vibe-kanban `crates/worktree-manager/` for worktree lifecycle; obsidian-tasks-dashboard-plugin for PRD/badge patterns.
 
 ---
 
-## Current State (v0.1)
+## P1 — Claude Code Full Wiring
 
-### Backend (~70% done)
+Goal: spawn, monitor, and control sessions from inside the app; see the output of every action Grovekeeper takes.
 
-- 83 Tauri IPC commands, 14 DB tables, session actor system
-- Git/GitHub integration via `gh` CLI + `git2`
-- Stream-JSON protocol parser for Claude Code
-- Notification service (toast + sound + window flash)
-- r2d2 connection pool (4 readers + 1 writer, WAL mode)
+| Feature                        | Notes                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------- |
+| Session spawn + state tracking | Launch Claude Code as child process; issue state reflects session state in real time   |
+| Stream-JSON protocol wiring    | All event tiers parsed; execution phase drives tree accessories and session state chip |
+| Script & action log viewer     | Full stdout of setup-worktree.sh, skill invocations, and all Rust-spawned commands     |
+| Session chat UI                | Chat column, tool call cards (3-level), approval/HITL cards, floating input panel      |
+| Session adopt + monitor        | Discover externally launched Claude Code sessions via JSONL polling                    |
+| AFK/HITL workflow              | Autonomous loop picks up AFK-labeled issues; HITL blocks until resolved                |
 
-### Frontend (UI not wired)
-
-- 16 deep modules
-- 34 shadcn-svelte components
-- 5 route pages (overview, quick-ideas, sessions, settings, root dashboard)
-- ForestView.svelte with low-poly-2d-trees library integration
-- Design tokens in claude_design/ (not yet applied to app)
-
-### Remaining Open Issues
-
-- #40 — Unresolved items tracker (5 open bugs/tech debt items)
-- #76 — Monorepo migration for low-poly-2d-trees (standalone infra)
+**Reference:** t3code `provider/` + cline `api/` for provider abstraction; cline-kanban `session-state-machine` for state reducer; cline `ToolGroupRenderer` for tool call UI; c9watch + pixel-agents `agentManager.ts` for session discovery; Multica `service/autopilot.go` for AFK loop. Canonical chat spec: `claude_design/design_briefs/SESSION_CHAT_VIEW.md`.
 
 ---
 
-## Future Phases (Post-V1)
+## P2 — Metrics & Evaluation
 
-These features are designed in but not part of the current PRD plan:
+Goal: understand cost, performance, and agent quality across sessions and models.
 
-| Feature                 | Career Priority | Reference Repo          | Notes                                                   |
-| ----------------------- | --------------- | ----------------------- | ------------------------------------------------------- |
-| RAG Integration         | P1              | —                       | Vector DB + embedding pipeline for past session search  |
-| Prompt Analytics        | P2              | CodeBurn                | A/B comparison, prompt versioning, cost-per-success     |
-| Full Autopilot          | P3              | Multica                 | Webhook/cron triggers, execution pipeline state machine |
-| Agent Personality       | Low             | peon-ping, pixel-agents | Czech Warcraft voices, character assignment per tree    |
-| Model Comparison Engine | P3              | CodeBurn                | Same task on multiple providers, side-by-side results   |
-| Dev Server Management   | —               | —                       | Deterministic port assignment, embedded browser preview |
+| Feature                  | Notes                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| Usage dashboard          | Token/cost aggregates by issue, session, day; period switching               |
+| Activity classification  | Categorize turns: coding / debugging / testing / planning / git ops / etc.   |
+| One-shot success metrics | First-try success rate per category; retry cycle detection                   |
+| Optimize view            | Waste detection: duplicate reads, bloated CLAUDE.md, unused MCP servers      |
+| Model comparison         | Side-by-side model performance on same task types; cost/edit, cache hit rate |
 
-See `.mpx/REFERENCES.md` for license compatibility, tech stack overlap, and detailed repo descriptions. See `.mpx/ARCHITECTURE.md` for the feature→reference mapping table.
+**Reference:** CodeBurn `classifier.ts` (classification + one-shot), `models.ts` (pricing), `optimize.ts` (waste), `compare-stats.ts` (model comparison). All in `REFERENCES.md § CodeBurn`.
 
 ---
 
-## Issue Tracking Strategy
+## P3 — Nice-to-Have
 
-### Where to track
+Goal: personality, deeper automation, and secondary views. Not blocking any of the above.
 
-- **GitHub Issues** on Grovekeeper repo — source of truth for all work items
-- **PRDs** — one GitHub issue per phase, labeled `prd`
-- **Sub-issues** — vertical slices under each PRD, created via `/mp-prd-to-issues`
-- **This ROADMAP.md** — high-level plan and phase sequencing (update as phases complete)
-- **`.mpx/CAREER_RECOMMENDATIONS.md`** — career context and priority reasoning (don't duplicate here)
+| Feature                      | Notes                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| Notifications + sound packs  | CESP-compatible sounds, per-event config, importance tiers                  |
+| Agent character voices       | Czech Warcraft peon voices; per-issue persona assignment                    |
+| Sub-agent bird visualization | Birds in tree canopy for sub-agents (owl, robin, sparrow, cardinal…)        |
+| Autopilot (GitHub trigger)   | `grovekeeper:execute` label → auto-create issue + worktree + session        |
+| RAG / past session search    | "How did I solve X last time?" — index transcripts, inject relevant context |
+| Kanban view                  | Drag-and-drop board view as alternative to forest                           |
+| Diff viewer                  | Per-session git diff at checkpoints; inline diff for PR review              |
+| Dev server management        | Per-issue dev server commands; status badge on issue card                   |
 
-### Labeling convention
-
-| Label           | Meaning                                       |
-| --------------- | --------------------------------------------- |
-| `prd`           | PRD issue (one per major feature area)        |
-| `task`          | Implementation task (sub-issue of a PRD)      |
-| `AFK`           | Can be implemented autonomously by agent      |
-| `HITL`          | Requires human interaction / design decisions |
-| `unresolved`    | Tracks unresolved items from implementation   |
-| `area:db`       | Database layer                                |
-| `area:rust`     | Rust backend                                  |
-| `area:ui`       | Frontend UI                                   |
-| `area:git`      | Git integration                               |
-| `area:session`  | Agent session management                      |
-| `area:platform` | Cross-platform support                        |
-| `area:viz`      | Visualization / Forest View                   |
+**Reference:** peon-ping (sounds + CESP); pixel-agents `transcriptParser.ts` (sub-agent birds); Multica `service/autopilot.go` (GitHub trigger); vibe-kanban `Kanban*.tsx` + `Diff*.tsx`; see `REFERENCES.md` for all repos.
