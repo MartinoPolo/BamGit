@@ -1,13 +1,10 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { StatusRow } from './index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/StatusRow',
 		component: StatusRow,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			active: { control: 'boolean' },

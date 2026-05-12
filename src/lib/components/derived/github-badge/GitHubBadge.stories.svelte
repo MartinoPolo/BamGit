@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import GitHubBadge from './GitHubBadge.svelte';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import type { PullRequestState } from '$lib/types/generated';
 
 	interface StoryArgs {
@@ -15,8 +14,6 @@
 	const { Story } = defineMeta({
 		title: 'Derived/GitHubBadge',
 		component: GitHubBadge,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			type: { control: 'select', options: ['issue', 'pr'] },

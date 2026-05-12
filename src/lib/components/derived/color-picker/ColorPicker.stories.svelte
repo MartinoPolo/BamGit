@@ -1,13 +1,10 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { ColorPicker } from './index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Derived/ColorPicker',
 		component: ColorPicker,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			displayText: { control: 'text' },

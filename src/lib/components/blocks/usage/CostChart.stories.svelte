@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import CostChart from './CostChart.svelte';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import { CHART_COLOR_THEMES, GROUP_BY_OPTIONS } from '$lib/modules/usage/usage_types.js';
 	import type { TimeBucketCost, GroupedCostEntry } from '$lib/types/generated/index.js';
 
@@ -42,8 +41,6 @@
 	const { Story } = defineMeta({
 		title: 'Blocks/Usage/CostChart',
 		component: CostChart,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

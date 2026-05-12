@@ -3,14 +3,11 @@
 	import * as Tooltip from './index.js';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 	import { formatBindingForDisplay } from '$lib/modules/keyboard-shortcuts/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 
 	const { Story } = defineMeta({
 		title: 'Base/Tooltip',
 		component: Tooltip.Provider,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

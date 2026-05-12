@@ -1,7 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { Toast, TOAST_TONE_OPTIONS } from './index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import RefreshIcon from '@lucide/svelte/icons/refresh-cw';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import AlertTriangleIcon from '@lucide/svelte/icons/triangle-alert';
@@ -10,8 +9,6 @@
 	const { Story } = defineMeta({
 		title: 'Base/Toast',
 		component: Toast,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			tone: {

@@ -1,13 +1,10 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { Badge, BADGE_VARIANT_OPTIONS, BADGE_DOT_OPTIONS } from './index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Badge',
 		component: Badge,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			variant: {

@@ -2,7 +2,6 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import * as Popover from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import DatabaseIcon from '@lucide/svelte/icons/database';
@@ -17,8 +16,6 @@
 	const { Story } = defineMeta({
 		title: 'Blocks/AccountDropdown',
 		component: Popover.Root,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

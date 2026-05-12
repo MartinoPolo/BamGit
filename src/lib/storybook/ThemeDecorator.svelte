@@ -57,7 +57,7 @@
 			{/each}
 		</div>
 	</div>
-	<Tooltip.Provider>
+	<Tooltip.Provider delayDuration={600} skipDelayDuration={300}>
 		<div class="rounded-lg bg-background p-6 text-foreground">
 			{@render children()}
 		</div>

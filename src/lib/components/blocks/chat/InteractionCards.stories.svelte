@@ -1,12 +1,9 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import ToolCardPermission from './ToolCardPermission.svelte';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Chat/InteractionCards',
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 	});
 </script>
 

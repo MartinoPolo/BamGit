@@ -1,7 +1,9 @@
 import type { Preview } from '@storybook/svelte';
+import ThemeDecorator from '../src/lib/storybook/ThemeDecorator.svelte';
 import '../src/app.css';
 
 const preview: Preview = {
+	decorators: [() => ({ Component: ThemeDecorator })],
 	parameters: {
 		options: {
 			storySort: {

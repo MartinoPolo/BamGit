@@ -7,7 +7,6 @@
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import XIcon from '@lucide/svelte/icons/x';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash';
@@ -15,8 +14,6 @@
 	const { Story } = defineMeta({
 		title: 'Base/Dialog',
 		component: Dialog.Root,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

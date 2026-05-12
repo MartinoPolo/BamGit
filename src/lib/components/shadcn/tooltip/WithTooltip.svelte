@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import TooltipRoot from './tooltip.svelte';
+	import { Tooltip as TooltipPrimitive } from 'bits-ui';
 	import TooltipTrigger from './tooltip-trigger.svelte';
 	import TooltipContent from './tooltip-content.svelte';
 
@@ -17,7 +17,7 @@
 	let { text, side = 'top', sideOffset = 6, children, asChild }: Props = $props();
 </script>
 
-<TooltipRoot>
+<TooltipPrimitive.Root>
 	<TooltipTrigger>
 		{#snippet child({ props })}
 			{#if asChild}
@@ -32,4 +32,4 @@
 	<TooltipContent {side} {sideOffset}>
 		{text}
 	</TooltipContent>
-</TooltipRoot>
+</TooltipPrimitive.Root>

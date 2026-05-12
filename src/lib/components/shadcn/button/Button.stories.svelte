@@ -1,13 +1,10 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { Button } from './index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Button',
 		component: Button,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			variant: {

@@ -2,13 +2,10 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { Checkbox } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Checkbox',
 		component: Checkbox,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			checked: { control: 'boolean' },

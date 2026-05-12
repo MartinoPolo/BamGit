@@ -1,14 +1,11 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import RefreshIndicator from './RefreshIndicator.svelte';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import { REFRESH_STATES } from '$lib/modules/usage/usage_types.js';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Usage/RefreshIndicator',
 		component: RefreshIndicator,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

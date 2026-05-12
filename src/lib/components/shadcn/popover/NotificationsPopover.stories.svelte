@@ -2,14 +2,11 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import * as Popover from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import BellIcon from '@lucide/svelte/icons/bell';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/NotificationsPopover',
 		component: Popover.Root,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 

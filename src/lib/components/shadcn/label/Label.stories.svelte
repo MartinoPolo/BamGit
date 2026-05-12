@@ -3,13 +3,10 @@
 	import { Label } from './index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { HelpText } from '$lib/components/base/help-text/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Label',
 		component: Label,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

@@ -3,7 +3,6 @@
 	import * as Popover from './index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 	import FilterIcon from '@lucide/svelte/icons/filter';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
@@ -12,8 +11,6 @@
 	const { Story } = defineMeta({
 		title: 'Base/Popover',
 		component: Popover.Root,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>
