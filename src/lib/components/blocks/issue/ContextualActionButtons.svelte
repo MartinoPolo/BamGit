@@ -5,7 +5,7 @@
 		type DerivedActions,
 	} from '$lib/modules/contextual-actions';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
 	import PlayIcon from '@lucide/svelte/icons/play';
 	import HandIcon from '@lucide/svelte/icons/hand';
@@ -67,7 +67,7 @@
 <div class="flex items-center gap-1.5">
 	{#if derivedActions.primary}
 		{@const primaryId = derivedActions.primary}
-		<SimpleTooltip text={getLabel(primaryId)}>
+		<WithTooltip text={getLabel(primaryId)}>
 			<Button
 				variant="contextual-primary"
 				size="sm"
@@ -80,12 +80,12 @@
 				{/if}
 				{getLabel(primaryId)}
 			</Button>
-		</SimpleTooltip>
+		</WithTooltip>
 	{/if}
 
 	{#if derivedActions.secondary}
 		{@const secondaryId = derivedActions.secondary}
-		<SimpleTooltip text={getLabel(secondaryId)}>
+		<WithTooltip text={getLabel(secondaryId)}>
 			<Button
 				variant="secondary"
 				size="sm"
@@ -97,14 +97,14 @@
 				{/if}
 				{getLabel(secondaryId)}
 			</Button>
-		</SimpleTooltip>
+		</WithTooltip>
 	{/if}
 
 	{#if derivedActions.overflow.length > 0}
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
-					<SimpleTooltip text="More actions">
+					<WithTooltip text="More actions">
 						<Button
 							{...props}
 							variant="secondary"
@@ -113,7 +113,7 @@
 						>
 							<MoreHorizontalIcon />
 						</Button>
-					</SimpleTooltip>
+					</WithTooltip>
 				{/snippet}
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content align="end" sideOffset={4}>

@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import { Switch } from '$lib/components/shadcn/switch/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import VolumeIcon from '@lucide/svelte/icons/volume-2';
@@ -187,7 +187,7 @@
 						</div>
 
 						<div class="flex justify-center">
-							<SimpleTooltip
+							<WithTooltip
 								text={config.sound_enabled === true
 									? 'Disable sound'
 									: 'Enable sound'}
@@ -197,11 +197,11 @@
 									onCheckedChange={(checked) =>
 										toggleChannel(config.event_type, 'sound_enabled', checked)}
 								/>
-							</SimpleTooltip>
+							</WithTooltip>
 						</div>
 
 						<div class="flex justify-center">
-							<SimpleTooltip
+							<WithTooltip
 								text={config.toast_enabled === true
 									? 'Disable toast'
 									: 'Enable toast'}
@@ -211,11 +211,11 @@
 									onCheckedChange={(checked) =>
 										toggleChannel(config.event_type, 'toast_enabled', checked)}
 								/>
-							</SimpleTooltip>
+							</WithTooltip>
 						</div>
 
 						<div class="flex justify-center">
-							<SimpleTooltip
+							<WithTooltip
 								text={config.window_flash_enabled === true
 									? 'Disable window flash'
 									: 'Enable window flash'}
@@ -229,12 +229,12 @@
 											checked,
 										)}
 								/>
-							</SimpleTooltip>
+							</WithTooltip>
 						</div>
 
 						<div class="flex justify-center">
 							{#if config.sound_file}
-								<SimpleTooltip text="Play test sound">
+								<WithTooltip text="Play test sound">
 									<Button
 										variant="ghost"
 										size="icon-sm"
@@ -242,7 +242,7 @@
 									>
 										&#9654;
 									</Button>
-								</SimpleTooltip>
+								</WithTooltip>
 							{:else}
 								<span class="text-xs text-muted-foreground/60">—</span>
 							{/if}
@@ -297,7 +297,7 @@
 						</div>
 					</div>
 					{#if pack.name !== 'grove'}
-						<SimpleTooltip text="Remove pack">
+						<WithTooltip text="Remove pack">
 							<Button
 								variant="ghost"
 								size="icon-sm"
@@ -305,7 +305,7 @@
 							>
 								<TrashIcon class="size-4" />
 							</Button>
-						</SimpleTooltip>
+						</WithTooltip>
 					{/if}
 				</div>
 			{/each}

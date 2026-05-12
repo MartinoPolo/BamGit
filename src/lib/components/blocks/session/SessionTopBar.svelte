@@ -7,7 +7,7 @@
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import SessionStateBadge from './SessionStateBadge.svelte';
 
@@ -73,12 +73,12 @@
 	<!-- Right: actions + tabs -->
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onOpenInCli}
-			<SimpleTooltip text="Open session in CLI">
+			<WithTooltip text="Open session in CLI">
 				<Button variant="secondary" size="sm" onclick={onOpenInCli}>
 					<ExternalLinkIcon size={11} strokeWidth={1.8} />
 					<span class="text-[11px]">Open in CLI</span>
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		<Button variant="ghost" size="icon-sm">

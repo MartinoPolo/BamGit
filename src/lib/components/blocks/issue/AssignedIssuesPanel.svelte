@@ -23,7 +23,7 @@
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { SearchField } from '$lib/components/base/search-field/index.js';
 	import { cn } from '$lib/utils.js';
@@ -247,7 +247,7 @@
 		/>
 		<div class="flex items-center gap-1.5 text-[11px] text-muted-foreground">
 			<span class="whitespace-nowrap">{syncAgoText}</span>
-			<SimpleTooltip text="Refresh assigned issues">
+			<WithTooltip text="Refresh assigned issues">
 				<Button
 					variant="ghost"
 					size="icon-sm"
@@ -256,7 +256,7 @@
 				>
 					<RefreshCw size={13} class={loading ? 'animate-spin' : ''} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		</div>
 	</div>
 
@@ -435,7 +435,7 @@
 						</div>
 						<div class="flex items-center justify-end gap-0.5">
 							{#if onWizardOpen}
-								<SimpleTooltip text="Add to dashboard">
+								<WithTooltip text="Add to dashboard">
 									<Button
 										variant="ghost"
 										size="icon-sm"
@@ -446,10 +446,10 @@
 									>
 										<Plus size={12} />
 									</Button>
-								</SimpleTooltip>
+								</WithTooltip>
 							{/if}
 							{#if onQuickAddWithWorktree}
-								<SimpleTooltip text="Add with worktree">
+								<WithTooltip text="Add with worktree">
 									<Button
 										variant="ghost"
 										size="icon-sm"
@@ -460,7 +460,7 @@
 									>
 										<GitBranch size={12} />
 									</Button>
-								</SimpleTooltip>
+								</WithTooltip>
 							{/if}
 						</div>
 					</div>
@@ -547,11 +547,11 @@
 								{/each}
 							</div>
 							<div class="flex items-center justify-end">
-								<SimpleTooltip text="Already linked">
+								<WithTooltip text="Already linked">
 									<span class="text-muted-foreground">
 										<Check size={14} />
 									</span>
-								</SimpleTooltip>
+								</WithTooltip>
 							</div>
 						</div>
 					{/each}

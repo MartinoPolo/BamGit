@@ -17,8 +17,6 @@ export const BADGE_VARIANT_OPTIONS = [
 
 export const BADGE_DOT_OPTIONS = ['static', 'pulsing'] as const;
 
-export const BADGE_SIZE_OPTIONS = ['default', 'compact'] as const;
-
 export const badgeVariants = tv({
 	base: 'inline-flex items-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
 	variants: {
@@ -47,7 +45,7 @@ export const badgeVariants = tv({
 });
 
 export type BadgeVariant = VariantProps<typeof badgeVariants>['variant'];
-export type BadgeSize = VariantProps<typeof badgeVariants>['size'];
+type BadgeSize = VariantProps<typeof badgeVariants>['size'];
 export type BadgeDot = (typeof BADGE_DOT_OPTIONS)[number];
 
 export type BadgeProps = WithElementRef<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> & {

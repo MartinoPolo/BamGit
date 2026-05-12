@@ -7,7 +7,7 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		title: string;
@@ -48,32 +48,32 @@
 	<!-- Right: controls -->
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onSync}
-			<SimpleTooltip text={m.topbar_sync()}>
+			<WithTooltip text={m.topbar_sync()}>
 				<Button variant="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
 					<RefreshCwIcon size={13} class={syncing ? 'animate-spin' : ''} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
-		<SimpleTooltip text={m.topbar_notifications()}>
+		<WithTooltip text={m.topbar_notifications()}>
 			<Button variant="ghost" size="icon-sm" class="relative">
 				<BellIcon size={13} />
 				{#if hasNotifications}
 					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
 				{/if}
 			</Button>
-		</SimpleTooltip>
+		</WithTooltip>
 
 		{#if onQuickIdeas}
-			<SimpleTooltip text={m.raw_requirements_title()}>
+			<WithTooltip text={m.raw_requirements_title()}>
 				<Button variant="ghost" size="icon-sm" onclick={onQuickIdeas}>
 					<LightbulbIcon size={13} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		{#if onToggleForest}
-			<SimpleTooltip text={forestCollapsed ? m.topbar_show_forest() : m.topbar_hide_forest()}>
+			<WithTooltip text={forestCollapsed ? m.topbar_show_forest() : m.topbar_hide_forest()}>
 				<Button
 					variant={forestCollapsed ? 'ghost' : 'secondary'}
 					size="icon-sm"
@@ -81,16 +81,16 @@
 				>
 					<TreesIcon size={13} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		{#if onCreateIssue}
-			<SimpleTooltip text={m.topbar_create_issue_title()}>
+			<WithTooltip text={m.topbar_create_issue_title()}>
 				<Button variant="primary" size="sm" onclick={onCreateIssue}>
 					<PlusIcon size={12} />
 					<span>{m.topbar_create_issue()}</span>
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		{#if children}

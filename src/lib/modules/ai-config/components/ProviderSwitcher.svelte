@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import type { ProviderKind } from '$lib/types/generated';
 	import type { InstalledProvider } from '$lib/types/generated';
 
@@ -38,7 +38,7 @@
 				{PROVIDER_LABELS[kind]}
 			</Button>
 		{:else}
-			<SimpleTooltip text="Not installed">
+			<WithTooltip text="Not installed">
 				<Button
 					variant="ghost"
 					size="sm"
@@ -48,7 +48,7 @@
 				>
 					{PROVIDER_LABELS[kind]}
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 	{/each}
 </div>

@@ -7,7 +7,7 @@
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import * as Accordion from '$lib/components/shadcn/accordion/index.js';
-	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Progress } from '$lib/components/shadcn/progress/index.js';
 	import {
 		AvatarUpload,
@@ -306,21 +306,16 @@
 					{saving ? 'Saving...' : 'Save'}
 				</Button>
 			{:else}
-				<Tooltip.Root>
-					<Tooltip.Trigger>
-						{#snippet child({ props })}
-							<div {...props}>
-								<Button disabled>
-									<SaveIcon class="size-4" />
-									Save
-								</Button>
-							</div>
-						{/snippet}
-					</Tooltip.Trigger>
-					<Tooltip.Content>
-						<p>{saveTooltip}</p>
-					</Tooltip.Content>
-				</Tooltip.Root>
+				<WithTooltip text={saveTooltip}>
+					{#snippet asChild(props)}
+						<div {...props}>
+							<Button disabled>
+								<SaveIcon class="size-4" />
+								Save
+							</Button>
+						</div>
+					{/snippet}
+				</WithTooltip>
 			{/if}
 		</div>
 	</header>

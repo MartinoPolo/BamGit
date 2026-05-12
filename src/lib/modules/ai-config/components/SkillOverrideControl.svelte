@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 	import { cn } from '$lib/utils.js';
@@ -55,11 +55,11 @@
 
 {#if variant === 'chip'}
 	{#if isDisabled}
-		<SimpleTooltip text="Open a workspace to override skills">
+		<WithTooltip text="Open a workspace to override skills">
 			<Badge variant="default" size="compact" class="cursor-not-allowed opacity-50">
 				{isNonDefault ? currentLabel : 'Override'}
 			</Badge>
-		</SimpleTooltip>
+		</WithTooltip>
 	{:else if isNonDefault}
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
@@ -91,7 +91,7 @@
 	<div class="flex flex-col gap-1">
 		<span class="text-xs font-medium text-foreground-muted">Skill override</span>
 		{#if isDisabled}
-			<SimpleTooltip text="Open a workspace to override skills">
+			<WithTooltip text="Open a workspace to override skills">
 				<div>
 					<select
 						disabled
@@ -100,7 +100,7 @@
 						<option>{currentLabel}</option>
 					</select>
 				</div>
-			</SimpleTooltip>
+			</WithTooltip>
 		{:else}
 			<select
 				value={effectiveValue}

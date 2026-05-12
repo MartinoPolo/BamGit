@@ -8,7 +8,7 @@ describe('tabsContainerVariants', () => {
 		expect(classes).toContain('bg-surface-2');
 		expect(classes).toContain('border');
 		expect(classes).toMatch(/rounded/);
-		expect(classes).toMatch(/p-\[3px\]/);
+		expect(classes).toContain('p-0.75');
 		expect(classes).toMatch(/gap-0\.5/);
 	});
 

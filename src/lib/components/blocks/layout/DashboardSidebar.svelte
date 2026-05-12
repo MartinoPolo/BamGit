@@ -16,9 +16,8 @@
 	import UserAvatar from '$lib/components/derived/user-avatar/UserAvatar.svelte';
 	import ThemeToggle from '$lib/components/derived/theme-toggle/ThemeToggle.svelte';
 	import LanguageSwitcher from '$lib/components/derived/language-switcher/LanguageSwitcher.svelte';
-	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {
@@ -89,32 +88,30 @@
 			class:justify-center={collapsed}
 		>
 			{#if collapsed}
-				<Tooltip.Root>
-					<Tooltip.Trigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="icon-sm"
-								onclick={onToggleSidebar}
-								class="group relative hover:!bg-surface-hover"
-								aria-label="Expand sidebar"
+				<WithTooltip
+					text={m.sidebar_expand({ shortcut: toggleSidebarBinding })}
+					side="right"
+				>
+					{#snippet asChild(props)}
+						<Button
+							{...props}
+							variant="ghost"
+							size="icon-sm"
+							onclick={onToggleSidebar}
+							class="group relative hover:bg-surface-hover!"
+							aria-label="Expand sidebar"
+						>
+							<span class="transition-opacity group-hover:opacity-0">
+								<BrandMark size={22} />
+							</span>
+							<span
+								class="absolute inset-0 flex items-center justify-center rounded-lg bg-surface-hover opacity-0 transition-opacity group-hover:opacity-100"
 							>
-								<span class="transition-opacity group-hover:opacity-0">
-									<BrandMark size={22} />
-								</span>
-								<span
-									class="absolute inset-0 flex items-center justify-center rounded-lg bg-surface-hover opacity-0 transition-opacity group-hover:opacity-100"
-								>
-									<ChevronRightIcon size={14} />
-								</span>
-							</Button>
-						{/snippet}
-					</Tooltip.Trigger>
-					<Tooltip.Content side="right"
-						>{m.sidebar_expand({ shortcut: toggleSidebarBinding })}</Tooltip.Content
-					>
-				</Tooltip.Root>
+								<ChevronRightIcon size={14} />
+							</span>
+						</Button>
+					{/snippet}
+				</WithTooltip>
 			{:else}
 				<div class="flex items-center">
 					<div class="flex w-10 shrink-0 items-center justify-center">
@@ -122,7 +119,7 @@
 					</div>
 					<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
 				</div>
-				<SimpleTooltip
+				<WithTooltip
 					text={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
 					side="right"
 				>
@@ -134,7 +131,7 @@
 					>
 						<PanelLeftIcon size={14} />
 					</Button>
-				</SimpleTooltip>
+				</WithTooltip>
 			{/if}
 		</div>
 
@@ -218,14 +215,14 @@
 						activeCount={activeSessionCount}
 						{collapsed}
 					/>
-					<SimpleTooltip text={NAV_LABELS.settings()} side="top">
+					<WithTooltip text={NAV_LABELS.settings()} side="top">
 						<a
 							href={resolve('/settings')}
 							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
 						>
 							<SettingsIcon size={14} />
 						</a>
-					</SimpleTooltip>
+					</WithTooltip>
 				</div>
 			{/if}
 		</div>

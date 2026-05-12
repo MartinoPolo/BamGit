@@ -4,7 +4,7 @@
 	import type { ShortcutCollision } from '$lib/modules/keyboard-shortcuts';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	const shortcutsCtx = useKeyboardShortcuts();
 
@@ -117,7 +117,7 @@
 								</Button>
 							</div>
 						{:else}
-							<SimpleTooltip text={m.shortcuts_click_to_rebind()}>
+							<WithTooltip text={m.shortcuts_click_to_rebind()}>
 								<Button
 									variant="ghost"
 									size="sm"
@@ -125,9 +125,9 @@
 								>
 									<Kbd>{shortcutBinding.binding}</Kbd>
 								</Button>
-							</SimpleTooltip>
+							</WithTooltip>
 							{#if shortcutBinding.isCustom}
-								<SimpleTooltip text={m.shortcuts_reset_to_default()}>
+								<WithTooltip text={m.shortcuts_reset_to_default()}>
 									<Button
 										variant="ghost"
 										size="sm"
@@ -135,7 +135,7 @@
 									>
 										{m.shortcuts_reset()}
 									</Button>
-								</SimpleTooltip>
+								</WithTooltip>
 							{/if}
 						{/if}
 					</div>

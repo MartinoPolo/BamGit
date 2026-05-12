@@ -3,7 +3,7 @@
 	import { PRIORITY_OPTIONS } from '$lib/components/blocks/issue/issue_card_utils.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
-	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import ArchiveRestoreIcon from '@lucide/svelte/icons/archive-restore';
 	import Trash2Icon from '@lucide/svelte/icons/trash-2';
@@ -81,64 +81,55 @@
 		<!-- Batch action buttons -->
 		<div class="flex items-center gap-1.5">
 			{#if hasActiveIssues}
-				<Tooltip.Root>
-					<Tooltip.Trigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="sm"
-								onclick={onBatchArchive}
-								disabled={!hasActiveIssues}
-								aria-label="Archive selected"
-							>
-								<ArchiveIcon />
-								Archive
-							</Button>
-						{/snippet}
-					</Tooltip.Trigger>
-					<Tooltip.Content>Archive selected issues</Tooltip.Content>
-				</Tooltip.Root>
+				<WithTooltip text="Archive selected issues">
+					{#snippet asChild(props)}
+						<Button
+							{...props}
+							variant="ghost"
+							size="sm"
+							onclick={onBatchArchive}
+							disabled={!hasActiveIssues}
+							aria-label="Archive selected"
+						>
+							<ArchiveIcon />
+							Archive
+						</Button>
+					{/snippet}
+				</WithTooltip>
 			{/if}
 
 			{#if hasArchivedIssues}
-				<Tooltip.Root>
-					<Tooltip.Trigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="sm"
-								onclick={onBatchUnarchive}
-								disabled={!hasArchivedIssues}
-								aria-label="Unarchive selected"
-							>
-								<ArchiveRestoreIcon />
-								Unarchive
-							</Button>
-						{/snippet}
-					</Tooltip.Trigger>
-					<Tooltip.Content>Unarchive selected issues</Tooltip.Content>
-				</Tooltip.Root>
-			{/if}
-
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props })}
+				<WithTooltip text="Unarchive selected issues">
+					{#snippet asChild(props)}
 						<Button
 							{...props}
-							variant="danger"
+							variant="ghost"
 							size="sm"
-							onclick={onBatchDelete}
-							aria-label="Delete selected"
+							onclick={onBatchUnarchive}
+							disabled={!hasArchivedIssues}
+							aria-label="Unarchive selected"
 						>
-							<Trash2Icon />
-							Delete
+							<ArchiveRestoreIcon />
+							Unarchive
 						</Button>
 					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Content>Delete selected issues</Tooltip.Content>
-			</Tooltip.Root>
+				</WithTooltip>
+			{/if}
+
+			<WithTooltip text="Delete selected issues">
+				{#snippet asChild(props)}
+					<Button
+						{...props}
+						variant="danger"
+						size="sm"
+						onclick={onBatchDelete}
+						aria-label="Delete selected"
+					>
+						<Trash2Icon />
+						Delete
+					</Button>
+				{/snippet}
+			</WithTooltip>
 
 			<Popover.Root bind:open={priorityPopoverOpen}>
 				<Popover.Trigger>
@@ -162,23 +153,20 @@
 			</Popover.Root>
 
 			{#if hasActiveWorktrees}
-				<Tooltip.Root>
-					<Tooltip.Trigger>
-						{#snippet child({ props })}
-							<Button
-								{...props}
-								variant="ghost"
-								size="icon-sm"
-								onclick={onBatchPrune}
-								disabled={!hasActiveWorktrees}
-								aria-label="Clean selected worktrees"
-							>
-								<ScissorsIcon />
-							</Button>
-						{/snippet}
-					</Tooltip.Trigger>
-					<Tooltip.Content>Remove active worktrees for selected issues</Tooltip.Content>
-				</Tooltip.Root>
+				<WithTooltip text="Remove active worktrees for selected issues">
+					{#snippet asChild(props)}
+						<Button
+							{...props}
+							variant="ghost"
+							size="icon-sm"
+							onclick={onBatchPrune}
+							disabled={!hasActiveWorktrees}
+							aria-label="Clean selected worktrees"
+						>
+							<ScissorsIcon />
+						</Button>
+					{/snippet}
+				</WithTooltip>
 			{/if}
 
 			<Button
@@ -193,22 +181,19 @@
 	{:else}
 		<!-- Default state: Clean Up Worktrees button only -->
 		<div class="flex flex-1 items-center justify-end">
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							variant="ghost"
-							size="icon-sm"
-							onclick={onBatchPrune}
-							aria-label="Clean up worktrees"
-						>
-							<ScissorsIcon />
-						</Button>
-					{/snippet}
-				</Tooltip.Trigger>
-				<Tooltip.Content>Remove inactive and orphaned worktrees</Tooltip.Content>
-			</Tooltip.Root>
+			<WithTooltip text="Remove inactive and orphaned worktrees">
+				{#snippet asChild(props)}
+					<Button
+						{...props}
+						variant="ghost"
+						size="icon-sm"
+						onclick={onBatchPrune}
+						aria-label="Clean up worktrees"
+					>
+						<ScissorsIcon />
+					</Button>
+				{/snippet}
+			</WithTooltip>
 		</div>
 	{/if}
 </div>

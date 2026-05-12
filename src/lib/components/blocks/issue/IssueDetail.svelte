@@ -8,7 +8,7 @@
 	import WorktreeStateIcon from '$lib/components/derived/worktree-state-icon/WorktreeStateIcon.svelte';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -156,18 +156,18 @@
 
 	<!-- Action buttons -->
 	<div class="flex flex-wrap gap-1.5 border-t border-border pt-3">
-		<SimpleTooltip text={m.issue_card_edit()}>
+		<WithTooltip text={m.issue_card_edit()}>
 			<Button variant="ghost" size="sm" onclick={() => onEdit(issue)}>
 				<Pencil size={14} />
 			</Button>
-		</SimpleTooltip>
+		</WithTooltip>
 
 		{#if isStandalone && onRename}
-			<SimpleTooltip text={m.issue_card_rename()}>
+			<WithTooltip text={m.issue_card_rename()}>
 				<Button variant="ghost" size="sm" onclick={() => onRename(issue)}>
 					<PenLine size={14} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		{#if !isArchived}
@@ -182,7 +182,7 @@
 		{/if}
 
 		{#if canSetupWorktree && onSetupWorktree}
-			<SimpleTooltip
+			<WithTooltip
 				text={issue.worktree_state === 'failed'
 					? m.issue_card_retry_worktree()
 					: m.issue_card_add_worktree()}
@@ -190,11 +190,11 @@
 				<Button variant="ghost" size="sm" onclick={() => onSetupWorktree(issue)}>
 					<GitBranchPlus size={14} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		{#if canRemoveWorktree && onRemoveWorktree}
-			<SimpleTooltip text={m.issue_card_remove_worktree()}>
+			<WithTooltip text={m.issue_card_remove_worktree()}>
 				<Button
 					variant="ghost"
 					size="sm"
@@ -203,26 +203,26 @@
 				>
 					<GitBranch size={14} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
 		<div class="flex-1"></div>
 
 		{#if isArchived}
-			<SimpleTooltip text={m.issue_card_unarchive()}>
+			<WithTooltip text={m.issue_card_unarchive()}>
 				<Button variant="ghost" size="sm" onclick={() => onUnarchive(issue.id)}>
 					<ArchiveRestore size={14} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{:else}
-			<SimpleTooltip text={m.issue_card_archive()}>
+			<WithTooltip text={m.issue_card_archive()}>
 				<Button variant="ghost" size="sm" onclick={() => onArchive(issue)}>
 					<Archive size={14} />
 				</Button>
-			</SimpleTooltip>
+			</WithTooltip>
 		{/if}
 
-		<SimpleTooltip text={m.issue_card_delete()}>
+		<WithTooltip text={m.issue_card_delete()}>
 			<Button
 				variant="ghost"
 				size="sm"
@@ -231,6 +231,6 @@
 			>
 				<Trash2 size={14} />
 			</Button>
-		</SimpleTooltip>
+		</WithTooltip>
 	</div>
 </div>

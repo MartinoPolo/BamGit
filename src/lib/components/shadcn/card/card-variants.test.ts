@@ -8,7 +8,7 @@ describe('cardVariants', () => {
 		expect(classes).toContain('bg-surface');
 		expect(classes).toContain('border');
 		expect(classes).toContain('shadow-sm');
-		expect(classes).toMatch(/rounded-\[var\(--radius-lg\)\]/);
+		expect(classes).toContain('rounded-lg');
 	});
 
 	it('generates padded variant with padding', () => {

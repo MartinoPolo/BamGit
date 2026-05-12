@@ -3,7 +3,7 @@
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
-	import * as Tooltip from '$lib/components/shadcn/tooltip/index.js';
+	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
 	import NoteCard from '$lib/components/blocks/workspace/NoteCard.svelte';
@@ -84,23 +84,20 @@
 			<div class="mt-3 flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					{#if rawRequirementsCtx.hasNotes}
-						<Tooltip.Provider>
-							<Tooltip.Root>
-								<Tooltip.Trigger>
-									{#snippet child({ props })}
-										<span {...props}>
-											<Button variant="secondary" size="sm" disabled>
-												<SparklesIcon />
-												{m.raw_requirements_process()}
-											</Button>
-										</span>
-									{/snippet}
-								</Tooltip.Trigger>
-								<Tooltip.Content side="top" sideOffset={6}>
-									{m.raw_requirements_process_coming_soon()}
-								</Tooltip.Content>
-							</Tooltip.Root>
-						</Tooltip.Provider>
+						<WithTooltip
+							text={m.raw_requirements_process_coming_soon()}
+							side="top"
+							sideOffset={6}
+						>
+							{#snippet asChild(props)}
+								<span {...props}>
+									<Button variant="secondary" size="sm" disabled>
+										<SparklesIcon />
+										{m.raw_requirements_process()}
+									</Button>
+								</span>
+							{/snippet}
+						</WithTooltip>
 					{/if}
 					{#if rawRequirementsCtx.notes.length >= FULL_PAGE_NOTE_THRESHOLD}
 						<Button
