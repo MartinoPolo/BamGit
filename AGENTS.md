@@ -11,6 +11,11 @@ When editing or creating Svelte code, use Svelte MCP tools (get-documentation, s
 
 C:\_MP_projects\low-poly-2d-trees This project relies heavily on rendering 2D trees from this library that I maintain and have full control over. Whenever needed, update anything in that library, but mention this update in summary.
 
+## Cloned OSS Repositories
+
+When debugging or analyzing issues related to third-party libraries, delegate exploration to a sub-agent pointing at the cloned source in `C:\_MP_github_cloned\`
+**Available**: svelte (+sveltekit), bits-ui, shadcn-svelte, storybook, fallow, lucide, tailwindcss, paneforge, tauri (+tauri-docs)
+
 ## Stack
 
 Tauri v2 (Rust backend) + SvelteKit (static adapter) + Vite
