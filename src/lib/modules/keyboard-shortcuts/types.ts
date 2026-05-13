@@ -200,45 +200,10 @@ export function isEditableElement(element: EventTarget | null): boolean {
 
 // ─── formatBindingForDisplay ──────────────────────────────────────────────────
 
-const MACOS_MODIFIER_SYMBOLS = {
-	Ctrl: '⌘',
-	Alt: '⌥',
-	Shift: '⇧',
-	Meta: '⌘',
-} as const;
-
-const BINDING_MODIFIER_NAMES = new Set(Object.keys(MACOS_MODIFIER_SYMBOLS));
-
-function detectMacOS(): boolean {
-	if (typeof navigator === 'undefined') {
-		return false;
-	}
-	return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
-}
-
 /**
  * Format a binding string for display.
- * On macOS: Ctrl → ⌘, Alt → ⌥, Shift → ⇧, Meta → ⌘ (concatenated without separator).
- * On other platforms: returns the binding as-is.
+ * Bindings stay text-based so UI callers can render modifier icons explicitly when needed.
  */
-export function formatBindingForDisplay(binding: string, isMacOS?: boolean): string {
-	const mac = isMacOS ?? detectMacOS();
-
-	if (!mac) {
-		return binding;
-	}
-
-	const parts = binding.split('+');
-	const symbols: string[] = [];
-	const keyParts: string[] = [];
-
-	for (const part of parts) {
-		if (BINDING_MODIFIER_NAMES.has(part)) {
-			symbols.push(MACOS_MODIFIER_SYMBOLS[part as keyof typeof MACOS_MODIFIER_SYMBOLS]);
-		} else {
-			keyParts.push(part);
-		}
-	}
-
-	return symbols.join('') + keyParts.join('+');
+export function formatBindingForDisplay(binding: string, _isMacOS?: boolean): string {
+	return binding;
 }

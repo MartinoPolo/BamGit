@@ -242,27 +242,27 @@ describe('formatBindingForDisplay', () => {
 		expect(formatBindingForDisplay('Ctrl+Shift+I', false)).toBe('Ctrl+Shift+I');
 	});
 
-	it('converts Ctrl to ⌘ on macOS', () => {
-		expect(formatBindingForDisplay('Ctrl+K', true)).toBe('⌘K');
+	it('keeps Ctrl text on macOS', () => {
+		expect(formatBindingForDisplay('Ctrl+K', true)).toBe('Ctrl+K');
 	});
 
-	it('converts Ctrl+Shift to ⌘⇧ on macOS', () => {
-		expect(formatBindingForDisplay('Ctrl+Shift+I', true)).toBe('⌘⇧I');
+	it('keeps Ctrl+Shift text on macOS', () => {
+		expect(formatBindingForDisplay('Ctrl+Shift+I', true)).toBe('Ctrl+Shift+I');
 	});
 
-	it('converts Alt to ⌥ on macOS', () => {
-		expect(formatBindingForDisplay('Alt+F4', true)).toBe('⌥F4');
+	it('keeps Alt text on macOS', () => {
+		expect(formatBindingForDisplay('Alt+F4', true)).toBe('Alt+F4');
 	});
 
-	it('converts Meta to ⌘ on macOS', () => {
-		expect(formatBindingForDisplay('Meta+K', true)).toBe('⌘K');
+	it('keeps Meta text on macOS', () => {
+		expect(formatBindingForDisplay('Meta+K', true)).toBe('Meta+K');
 	});
 
 	it('returns a single key unchanged regardless of platform', () => {
 		expect(formatBindingForDisplay('Escape')).toBe('Escape');
 	});
 
-	it('concatenates macOS symbols without + separator', () => {
-		expect(formatBindingForDisplay('Ctrl+Shift+Alt+K', true)).toBe('⌘⇧⌥K');
+	it('keeps multi-modifier binding text on macOS', () => {
+		expect(formatBindingForDisplay('Ctrl+Shift+Alt+K', true)).toBe('Ctrl+Shift+Alt+K');
 	});
 });
