@@ -1,6 +1,13 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import * as Popover from './index.js';
+	import {
+		Popover,
+		PopoverTrigger,
+		PopoverContent,
+		PopoverItem,
+		PopoverDivider,
+		PopoverLabel,
+	} from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
@@ -15,7 +22,7 @@
 
 	const { Story } = defineMeta({
 		title: 'Blocks/AccountDropdown',
-		component: Popover.Root,
+		component: Popover,
 		tags: ['autodocs'],
 	});
 </script>
@@ -23,8 +30,8 @@
 <Story name="Account Dropdown">
 	{#snippet template()}
 		<div class="p-4">
-			<Popover.Root>
-				<Popover.Trigger>
+			<Popover>
+				<PopoverTrigger>
 					{#snippet child({ props })}
 						<Button variant="secondary" class="w-70 justify-between" {...props}>
 							<span class="flex items-center gap-2">
@@ -38,8 +45,8 @@
 							<ChevronDownIcon class="size-3.5" />
 						</Button>
 					{/snippet}
-				</Popover.Trigger>
-				<Popover.Content class="w-70 p-0" portalProps={{ disabled: true }}>
+				</PopoverTrigger>
+				<PopoverContent class="w-70 p-0" portalProps={{ disabled: true }}>
 					<div class="flex items-center gap-2.5 border-b border-border px-3 py-3">
 						<span
 							class="flex size-8 items-center justify-center rounded-full bg-primary text-[13px] font-semibold text-primary-foreground"
@@ -54,7 +61,7 @@
 						</div>
 					</div>
 					<div class="p-1.5">
-						<Popover.Item>
+						<PopoverItem>
 							<UserIcon class="size-3.5" />
 							Profile
 							<span
@@ -62,8 +69,8 @@
 							>
 								⌘P
 							</span>
-						</Popover.Item>
-						<Popover.Item>
+						</PopoverItem>
+						<PopoverItem>
 							<SettingsIcon class="size-3.5" />
 							Settings
 							<span
@@ -71,13 +78,13 @@
 							>
 								⌘,
 							</span>
-						</Popover.Item>
-						<Popover.Item>
+						</PopoverItem>
+						<PopoverItem>
 							<DatabaseIcon class="size-3.5" />
 							Billing &amp; usage
-						</Popover.Item>
-						<Popover.Divider />
-						<Popover.Label>Theme</Popover.Label>
+						</PopoverItem>
+						<PopoverDivider />
+						<PopoverLabel>Theme</PopoverLabel>
 						<div class="flex gap-1 px-2 pb-1.5">
 							<Button variant="secondary" size="sm" class="flex-1">
 								<SunIcon class="size-3" />
@@ -89,24 +96,24 @@
 							</Button>
 							<Button variant="secondary" size="sm" class="flex-1">Auto</Button>
 						</div>
-						<Popover.Divider />
-						<Popover.Item>
+						<PopoverDivider />
+						<PopoverItem>
 							<GlobeIcon class="size-3.5" />
 							Workspaces
 							<ChevronRightIcon class="ml-auto size-3" />
-						</Popover.Item>
-						<Popover.Item>
+						</PopoverItem>
+						<PopoverItem>
 							<GithubIcon class="size-3.5" />
 							GitHub integrations
-						</Popover.Item>
-						<Popover.Divider />
-						<Popover.Item class="text-status-danger">
+						</PopoverItem>
+						<PopoverDivider />
+						<PopoverItem class="text-status-danger">
 							<LogOutIcon class="size-3.5" />
 							Sign out
-						</Popover.Item>
+						</PopoverItem>
 					</div>
-				</Popover.Content>
-			</Popover.Root>
+				</PopoverContent>
+			</Popover>
 		</div>
 	{/snippet}
 </Story>

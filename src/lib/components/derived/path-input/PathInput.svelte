@@ -8,12 +8,16 @@
 		value: string;
 		id?: string;
 		placeholder?: string;
+		disabled?: boolean;
 		onchange?: () => void;
 	}
 
-	let { value = $bindable(''), id, placeholder, onchange }: Props = $props();
+	let { value = $bindable(''), id, placeholder, disabled = false, onchange }: Props = $props();
 
 	async function handleBrowse() {
+		if (disabled) {
+			return;
+		}
 		const selected = await invoke<string | null>('pick_folder');
 		if (selected !== null) {
 			value = selected;
@@ -23,8 +27,15 @@
 </script>
 
 <div class="flex gap-1.5">
-	<Input {id} bind:value {placeholder} oninput={() => onchange?.()} class="flex-1" />
-	<Button variant="ghost" size="icon-sm" type="button" onclick={handleBrowse} class="shrink-0">
+	<Input {id} bind:value {placeholder} {disabled} oninput={() => onchange?.()} class="flex-1" />
+	<Button
+		variant="ghost"
+		size="icon-sm"
+		type="button"
+		{disabled}
+		onclick={handleBrowse}
+		class="shrink-0"
+	>
 		<FolderIcon size={14} strokeWidth={1.7} />
 	</Button>
 </div>
