@@ -109,7 +109,7 @@ Many of these components depend on context stores (`useIssues()`, `useSessions()
 ### Sub-agent 12 — `DashboardSidebar` (layout)
 
 - **File**: `src/lib/components/blocks/layout/DashboardSidebar.svelte`
-- **Dependencies**: Read source carefully before writing anything. `DashboardSidebar` does NOT use `useBoard()` or `useSelection()` — it reads the active route directly from SvelteKit's `$app/state` (`page.url.pathname`). Its only external context is `useKeyboardShortcuts()`. The ThemeDecorator is sufficient; no additional wrapper is needed for most stories.
+- **Dependencies**: Read source carefully before writing anything. `DashboardSidebar` does NOT use `useBoard()` or `useSelection()` — it reads the active route directly from SvelteKit's `$app/state` (`page.url.pathname`). Its only external context is `useKeyboardShortcuts()`. The global ThemeDecorator is sufficient; no additional wrapper is needed for most stories.
 - **Variants**: Expanded (default), Collapsed icon-only mode, Active route = '/', Active route = '/sessions', Active route = '/settings', With notification badge, Dark mode
 
 ### Sub-agent 13 — `TopBar` (layout)
@@ -219,13 +219,10 @@ Then in the story:
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import IssueCardStoryWrapper from './IssueCardStoryWrapper.svelte';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Issue/IssueCard',
 		component: IssueCardStoryWrapper,
-		// @ts-expect-error
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

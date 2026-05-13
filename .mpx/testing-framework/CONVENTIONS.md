@@ -152,17 +152,16 @@ Pay particular attention to: `onEscapeKeydown`, `escapeKeydownBehavior` (enum: `
 
 All story files must follow this exact pattern (`.stories.svelte` extension, no `.stories.ts`):
 
+> **Global decorator**: `ThemeDecorator` is registered globally in `.storybook/preview.ts` and wraps every story automatically.
+
 ```svelte
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { MyComponent } from './index.js'; // ← from barrel export
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Category/SubCategory', // ← see Title Taxonomy below
 		component: MyComponent,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 		argTypes: {
 			variant: { control: 'select', options: ['a', 'b'] },
@@ -224,7 +223,7 @@ Every story file must have at minimum:
 - **Empty / No Data** — if the component renders a list or data-dependent content
 - **Loading** — if the component has a loading state
 - **Error / Destructive** — if the component has an error/danger variant
-- **Dark mode** — ThemeDecorator handles this via the controls panel, no explicit story needed
+- **Dark mode** — the global ThemeDecorator controls panel handles this; no explicit story needed
 
 ### Mock Data
 
@@ -245,13 +244,13 @@ For one-off local variations, define a `makeMockX()` factory function in the `<s
 
 ## 3. Context Dependencies
 
-### Tier 1 — No context needed (just props + ThemeDecorator)
+### Tier 1 — No context needed (just props)
 
-Most shadcn wrappers, base components, display-only derived components, and chat display components.
+Most shadcn wrappers, base components, display-only derived components, and chat display components. The global ThemeDecorator is always present; no extra setup required.
 
-### Tier 2 — ThemeDecorator already covers it
+### Tier 2 — Board context (covered by global ThemeDecorator)
 
-Components that call `useBoard()` for theme/accent information. The ThemeDecorator calls `setBoardContext()` so these components work automatically.
+Components that call `useBoard()` for theme/accent information. The global ThemeDecorator calls `setBoardContext()` automatically, so these components work out of the box with no extra setup.
 
 ### Tier 3 — Multi-store wrapper needed
 

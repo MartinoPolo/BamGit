@@ -1,13 +1,3 @@
-# Phase 1 — Storybook Stories: Primitives, Base & Derived Components
-
-**Status**: Not started
-**Pre-requisite**: None
-**Estimated sub-agents**: 14 (one per component group)
-**Run after**: Nothing
-**Run before**: Phase 3
-
----
-
 ## Context
 
 Read `.mpx/testing-framework/CONVENTIONS.md` in full before starting. It defines the story format, event propagation rules, conflict reporting format, and sub-agent instructions.
@@ -23,8 +13,8 @@ This phase creates Storybook stories for shadcn/base/derived components that cur
 - **Story files location**: co-located with the component, e.g. `src/lib/components/shadcn/accordion/Accordion.stories.svelte`
 - **Component imports**: always from the barrel `./index.js`, not the `.svelte` file directly
     > **Exception**: derived components (`language-switcher`, `path-input`, `repo-combobox`, `sync-badge`, `theme-toggle`) do **not** have barrel exports. Import them directly: `import SyncBadge from './SyncBadge.svelte'`.
-- **All stories must**: use `ThemeDecorator`, have `tags: ['autodocs']`, use `{#snippet template(...)}` pattern
-- **TypeScript note**: the `@ts-expect-error` comment on the decorators line is mandatory (see CONVENTIONS.md)
+- **All stories must**: have `tags: ['autodocs']`, use `{#snippet template(...)}` pattern
+- **ThemeDecorator**: applied globally
 - **bits-ui documentation**: use Context7 MCP (`mcp_context7_resolve-library-id` then `mcp_context7_get-library-docs`) to check the current API for any bits-ui primitive you write a story for — especially for `onEscapeKeydown`, focus management, and keyboard interaction props
 
 ---
@@ -137,7 +127,7 @@ Spawn one sub-agent per item. Each sub-agent reads the component source, checks 
 ### Sub-agent 14 — `ThemeToggle` (derived)
 
 - **File**: `src/lib/components/derived/theme-toggle/ThemeToggle.svelte`
-- **Note**: This component uses `useBoard()` context for the current theme. ThemeDecorator already provides this context — it will work out of the box.
+- **Note**: This component uses `useBoard()` context for the current theme. The global ThemeDecorator already provides this context — it will work out of the box.
 - **Variants needed**: Light mode active, Dark mode active, System mode active, Collapsed sidebar version
 - **Check**: The component cycles through modes on click. Does clicking it stop propagation so it doesn't trigger sidebar item navigation?
 
@@ -154,7 +144,7 @@ You are implementing a Storybook story for a specific component in the Grovekeep
    - mcp_context7_resolve-library-id({ libraryName: "bits-ui" })
    - mcp_context7_get-library-docs({ id: "<result>", topic: "<component name>" })
 4. Create the story file co-located with the component (e.g. Accordion.stories.svelte).
-5. Follow the exact format in CONVENTIONS.md (ThemeDecorator, defineMeta, snippet pattern).
+5. Follow the exact format in CONVENTIONS.md (defineMeta, snippet pattern).
 6. Cover all required variants listed for this component.
 7. If the component is an overlay/dropdown: verify event propagation (see CONVENTIONS.md §1).
    - If a violation is found, fix the component AND document in Findings Report.
@@ -179,13 +169,10 @@ You are implementing a Storybook story for a specific component in the Grovekeep
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { Accordion } from './index.js';
-	import ThemeDecorator from '$lib/storybook/ThemeDecorator.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Accordion',
 		component: Accordion,
-		// @ts-expect-error — Storybook decorator typing doesn't match Svelte 5 Component type
-		decorators: [() => ThemeDecorator],
 		tags: ['autodocs'],
 	});
 </script>

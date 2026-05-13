@@ -32,4 +32,4 @@ Each phase prompt instructs the agent to orchestrate multiple sub-agents in para
 - **Component library**: bits-ui v2 + shadcn-svelte (custom wrappers under `src/lib/components/shadcn/`)
 - **Testing stack**: Vitest + vitest-browser-svelte (browser), Storybook 10 + @storybook/addon-vitest, Playwright
 - **Mock layer**: `src/lib/tauri_mock.ts` intercepts all `invoke()` calls in browser/Storybook mode automatically
-- **Theme context**: All stories must use `ThemeDecorator` from `$lib/storybook/ThemeDecorator.svelte`
+- **Theme context**: `ThemeDecorator` is registered as a **global decorator** in `.storybook/preview.ts` — it wraps every story automatically. Do not import it or add it to `decorators` in individual story files.
