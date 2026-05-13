@@ -1,24 +1,38 @@
 import type { Snippet } from 'svelte';
 import type { WithElementRef } from '$lib/utils.js';
 import type { HTMLAttributes } from 'svelte/elements';
-import { type VariantProps, tv } from 'tailwind-variants';
+import { tv } from 'tailwind-variants';
 
 export const kbdVariants = tv({
-	base: 'inline-flex items-center justify-center gap-px min-w-4.5 h-4.5 px-1.25 rounded-1 font-mono text-[10.5px] [&_svg:not([class*="size-"])]:size-3 [&_svg]:shrink-0',
+	base: 'inline-flex h-4.5 min-w-4.5 items-center justify-center gap-px rounded-md border px-1.25 text-[10.5px] leading-none font-medium [&_svg:not([class*="size-"])]:size-3 [&_svg]:shrink-0',
 	variants: {
 		variant: {
-			default: 'bg-surface-2 border border-border text-foreground-muted',
-			inverted: 'bg-white/20 border border-white/30 text-primary-foreground',
+			default: 'font-sans',
+			lucide: 'font-sans',
+			mono: 'font-mono tabular-nums',
+		},
+		tone: {
+			neutral:
+				'border-border bg-surface-2 text-foreground-muted shadow-[0_1px_0_0_var(--border)]',
+			accent: 'border-[color-mix(in_oklch,var(--primary)_24%,var(--border))] bg-primary-soft text-foreground shadow-[0_1px_0_0_color-mix(in_oklch,var(--primary)_18%,var(--border))]',
+			inverted:
+				'border-[color-mix(in_oklch,currentColor_28%,transparent)] bg-[color-mix(in_oklch,currentColor_16%,transparent)] text-primary-foreground',
 		},
 	},
 	defaultVariants: {
 		variant: 'default',
+		tone: 'neutral',
 	},
 });
 
-export type KbdVariant = VariantProps<typeof kbdVariants>['variant'];
+export type KbdVariant = keyof typeof kbdVariants.variants.variant;
+export type KbdTone = keyof typeof kbdVariants.variants.tone;
+
+export const KBD_VARIANTS = Object.keys(kbdVariants.variants.variant) as KbdVariant[];
+export const KBD_TONES = Object.keys(kbdVariants.variants.tone) as KbdTone[];
 
 export type KbdProps = WithElementRef<HTMLAttributes<HTMLElement>, HTMLElement> & {
 	variant?: KbdVariant;
+	tone?: KbdTone;
 	children?: Snippet;
 };
