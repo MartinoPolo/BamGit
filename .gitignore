@@ -74,6 +74,7 @@ desktop.ini
 
 # Logs & debug
 *.log
+.logs/
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*

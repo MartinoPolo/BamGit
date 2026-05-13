@@ -26,6 +26,10 @@ Vitest, Playwright, Storybook
 
 ## Commands
 
+On Windows PowerShell, run pnpm through `pnpm.cmd` so execution policy does not block the `pnpm.ps1` shim.
+In sandboxed runs, pnpm may need escalation to read Corepack's pnpm install under the user profile.
+For nested PowerShell scripts, use `powershell -NoProfile -ExecutionPolicy Bypass` to avoid profile noise.
+
 `pnpm tauri dev` -- full dev (frontend + native window)
 `pnpm dev` -- frontend only
 `pnpm check:fast` -- prettier + oxlint (pre-commit tier)
@@ -34,6 +38,19 @@ Vitest, Playwright, Storybook
 `pnpm test` -- unit tests
 `pnpm test:e2e` -- E2E tests
 `pnpm db:reset` -- delete SQLite database (app recreates it on next launch)
+
+## Context Budget
+
+- Keep MCP servers disabled by default. Enable only the server needed for the current task, then disable it again.
+- Use `ToolSearch` only when a deferred tool is actually needed.
+- For Svelte edits, run `svelte-autofixer` first. Fetch Svelte docs only for unfamiliar APIs or syntax, and request the smallest relevant sections.
+- Prefer targeted shell reads: `rg -l`, path-scoped `rg`, `git diff --stat`, and `git diff -- <files>`.
+- Use `scripts/run-quiet.ps1` for noisy checks. It records the full log under `.logs/`, prints pass/fail, and prints only the tail on failure.
+- Inspect a full log only when the tail does not identify the failure.
+- Do not run full Storybook build unless changing Storybook build config, deployment output, or behavior that only appears in the production Storybook bundle.
+- For component work, prefer `pnpm check:fast`, targeted tests, Storybook dev-server viewing of affected stories, and browser screenshots over full builds.
+- Use sub-agents for broad or third-party exploration when explicitly requested or already required by these instructions. Ask them for concise findings and file paths, not full command output.
+- Keep final responses summarized; do not paste full command logs.
 
 ## Architecture
 
