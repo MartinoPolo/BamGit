@@ -240,6 +240,12 @@ import {
 
 For one-off local variations, define a `makeMockX()` factory function in the `<script lang="ts">` block.
 
+### Import Conventions
+
+> **⚠️ No dynamic `import()` calls in Storybook stories**: Storybook does NOT support dynamic `import()` calls (e.g., `const mod = await import('./index.js')`). Always use static imports at the top of the script block: `import { Root, Item, Content } from './index.js'` or the named alias `import { ComponentName } from './index.js'`.
+>
+> Static namespace imports (`import * as ContextMenu from './index.js'`) **are fine** — these are resolved at build time by Vite and work correctly in Storybook CSF. The issue is exclusively with dynamic `import()` expressions evaluated at runtime. Components like ContextMenu, Dialog, Popover, DropdownMenu, etc. that export namespaced aliases may use either static named imports or static namespace imports in stories.
+
 ---
 
 ## 3. Context Dependencies
@@ -344,3 +350,69 @@ pnpm check:all
 ```
 
 After each phase, run `pnpm check:all` and fix any TypeScript or lint errors before marking the phase complete.
+
+---
+
+## 7. Design System Consistency Checks
+
+When reviewing or creating components and stories, always verify these design system consistency rules:
+
+### Rounded Corners
+
+- All interactive sub-components (items, cells, options, rows) should use `rounded-md` or `rounded-lg` for their hover/selected backgrounds, matching the parent container's border radius
+- Avoid `rounded-1` or very small radius for selected/highlighted states — these look inconsistent against containers with `rounded-md`
+- Checkbox and other form controls: use `rounded-sm` (matches shadcn-svelte standard) for the control itself
+- Dropdown items, context menu items, select options: use `rounded-sm` for item backgrounds
+
+### Colors
+
+- All components must respect light/dark mode using CSS variables (`text-foreground-subtle`, `bg-surface-2`, etc.)
+- Shadows (`shadow-lg`) may need to be visible in dark mode — check that `shadow` colors work in both themes
+- Header/label text in menus should be `text-foreground-subtle` (not the same as item text) to be distinguishable
+
+### Icon Usage
+
+- **Never use Unicode characters as icons in UI code**: Replace ⌫, ⌘, ↵, ✓, × etc. with Lucide icon components from `@lucide/svelte`. The only exceptions are keyboard key LABELS inside `<Kbd>` components (e.g., `<Kbd>Esc</Kbd>` is fine).
+- Import pattern: `import DeleteIcon from '@lucide/svelte/icons/delete'`
+- Common substitutions: `⌫` → `<DeleteIcon />`, `↵` → `<CornerDownLeftIcon />`, `✓` → `<CheckIcon />`, `×` → `<XIcon />`, `⌘` → text `"Ctrl"`
+
+### Keyboard Accessibility
+
+- bits-ui overlays (Popover, DropdownMenu, ContextMenu, Dialog, Select) handle focus management automatically
+- Popover: Focus moves to first focusable element on open; Tab cycles through items (no focus trap); Escape closes via escape-layer system
+- Checkboxes inside popovers: Space key toggles them (native bits-ui behavior)
+- Buttons inside overlays should show `Kbd` hints for primary actions (Enter/↵ for confirm, Ctrl+R for reset)
+- Multi-key chords use `KbdGroup` wrapping multiple `Kbd` elements with `<span>+</span>` separators
+- Single-key hints on primary buttons use `<Kbd variant="inverted">` with a `CornerDownLeftIcon` for Enter
+
+### Keyboard Shortcut Notation (Platform-Adaptive)
+
+The app uses platform-adaptive keyboard shortcut display:
+
+- **Mac**: Show `⌘` (Command symbol)
+- **Windows/Linux**: Show `Ctrl`
+
+Implementation pattern:
+
+- Use a `getModifierKey()` utility (to be implemented) that returns `⌘` on Mac and `Ctrl` on Windows/Linux
+- Never hardcode `⌘` in component code — detect platform at runtime
+- For Storybook stories and current placeholder usage: use `Ctrl` (Windows/Linux default)
+- Full chord format: `Ctrl+K` on Windows, `⌘K` on Mac
+
+For keyboard shortcut display in `<Kbd>` components:
+
+- Single key: `<Kbd>Esc</Kbd>`, `<Kbd>Tab</Kbd>`, `<Kbd>Enter</Kbd>`
+- Icon key: `<Kbd><CornerDownLeftIcon /></Kbd>` for Enter
+- Delete key: `<Kbd><DeleteIcon /></Kbd>` for Backspace/Delete
+- Multi-key chord: `<KbdGroup><Kbd>Ctrl</Kbd><Kbd>K</Kbd></KbdGroup>`
+- On primary button: `<Kbd variant="inverted">...</Kbd>`
+- On ghost/secondary button: `<Kbd>...</Kbd>` (default variant)
+
+### Dialog & Modal Conventions
+
+- Primary confirm button in DESTRUCTIVE dialogs: always use `variant="primary-destructive"` (solid red)
+- Primary confirm button in non-destructive dialogs: use `variant="primary"`
+- Never use `variant="danger"` (transparent red) as the primary confirm button in a dialog
+- Always add `<Kbd>Esc</Kbd>` to Cancel/Close buttons in dialogs
+- Always add `<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>` to primary confirm buttons
+- The "Open by Default" story pattern is deprecated — it creates confusion with the real open state

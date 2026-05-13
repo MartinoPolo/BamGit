@@ -51,6 +51,12 @@ Import from: `import { expect, userEvent, within, fn } from 'storybook/test';`
 
 ---
 
+## Notes
+
+> **SearchField Escape key interactivity**: The full keyboard interactivity of SearchField (pressing Escape to close results, keyboard navigation through results) should be implemented as `play()` tests in Phase 3. This was deferred from Phase 1 because interactive state management (open/close results, keyboard nav) requires `play()` test infrastructure.
+
+---
+
 ## Task 0 — Enable Accessibility CI (1 task, not a sub-agent)
 
 **Do this first, before spawning any sub-agents.**
@@ -164,6 +170,7 @@ Spawn one sub-agent per component/group. Each sub-agent adds `play()` functions 
     - Click an option → option selected, list closes, trigger shows selected value
     - Escape → list closes, selection unchanged
     - **⚠️ Event propagation test**: Escape closes Select listbox without affecting parent layer
+- **⚠️ Note (Phase 1 upgrade)**: The Select component now has both a native `<Select>` wrapper (preserved for existing app usage) and new custom `SelectCustom*` components built on bits-ui. Phase 3 play tests for Select should test the `CustomSelectRoot` story variants, **not** the native select stories — the native `<select>` element does not support programmatic open/close via `userEvent` in the same way.
 
 ### Sub-agent 8 — `Popover`
 
