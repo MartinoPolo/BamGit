@@ -408,7 +408,7 @@
 						{#if backKbdHint === 'escape'}
 							<Kbd>Esc</Kbd>
 						{:else}
-							<Kbd><DeleteIcon /></Kbd>
+							<Kbd variant="lucide"><DeleteIcon /></Kbd>
 						{/if}
 					</Button>
 				{/if}
@@ -416,17 +416,17 @@
 					{#if navigationHint === 'vertical'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
 							{m.wizard_navigate()}
-							<Kbd><ArrowUpIcon /><ArrowDownIcon /></Kbd>
+							<Kbd variant="lucide"><ArrowUpIcon /><ArrowDownIcon /></Kbd>
 						</span>
 					{:else if navigationHint === 'horizontal'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
 							{m.wizard_navigate()}
-							<Kbd><ArrowLeftIcon /><ArrowRightIcon /></Kbd>
+							<Kbd variant="lucide"><ArrowLeftIcon /><ArrowRightIcon /></Kbd>
 						</span>
 					{:else if navigationHint === 'grid'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
 							{m.wizard_navigate()}
-							<Kbd
+							<Kbd variant="lucide"
 								><ArrowUpIcon /><ArrowDownIcon /><ArrowLeftIcon /><ArrowRightIcon
 								/></Kbd
 							>
@@ -442,13 +442,13 @@
 				{#if showNextButton}
 					<Button type="button" onclick={handleNextClick}>
 						{m.wizard_next()}
-						<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+						<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 					</Button>
 				{/if}
 				{#if isFinalStep}
 					<Button type="button" onclick={handleConfirmColor} disabled={isSubmitting}>
 						{m.wizard_confirm()}
-						<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+						<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 					</Button>
 				{/if}
 			</Dialog.Footer>

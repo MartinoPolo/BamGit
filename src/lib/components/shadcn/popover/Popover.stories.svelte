@@ -3,16 +3,24 @@
 	import * as Popover from './index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd, KbdGroup } from '$lib/components/shadcn/kbd/index.js';
 	import FilterIcon from '@lucide/svelte/icons/filter';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import CheckIcon from '@lucide/svelte/icons/check';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 
 	const { Story } = defineMeta({
 		title: 'Base/Popover',
 		component: Popover.Root,
 		tags: ['autodocs'],
 	});
+</script>
+
+<script lang="ts">
+	// Reactive state for Sort story — selecting sort/group values updates checkmarks
+	let sortBy = $state('updated');
+	let groupBy = $state('repository');
 </script>
 
 <Story name="Filter">
@@ -68,9 +76,16 @@
 						Codex
 					</label>
 					<Popover.Divider />
+					<!-- Keyboard hints: Enter = Apply, Ctrl+R = Reset. Tab/Space on checkboxes handled by bits-ui. -->
 					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
-						<Button variant="ghost" size="sm" class="flex-1">Reset</Button>
-						<Button variant="primary" size="sm" class="flex-1">Apply</Button>
+						<Button variant="ghost" size="sm" class="flex-1">
+							<KbdGroup><Kbd>Ctrl</Kbd><Kbd>R</Kbd></KbdGroup>
+							Reset
+						</Button>
+						<Button variant="primary" size="sm" class="flex-1">
+							Apply
+							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+						</Button>
 					</div>
 				</Popover.Content>
 			</Popover.Root>
@@ -92,38 +107,69 @@
 				</Popover.Trigger>
 				<Popover.Content class="w-55" portalProps={{ disabled: true }}>
 					<Popover.Label>Sort by</Popover.Label>
-					<Popover.Item active>
-						<CheckIcon class="size-2.75" />
+					<Popover.Item
+						active={sortBy === 'updated'}
+						onclick={() => (sortBy = 'updated')}
+					>
+						{#if sortBy === 'updated'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Updated · newest
 					</Popover.Item>
-					<Popover.Item>
-						<span class="size-2.75"></span>
+					<Popover.Item
+						active={sortBy === 'created'}
+						onclick={() => (sortBy = 'created')}
+					>
+						{#if sortBy === 'created'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Created · newest
 					</Popover.Item>
-					<Popover.Item>
-						<span class="size-2.75"></span>
+					<Popover.Item active={sortBy === 'number'} onclick={() => (sortBy = 'number')}>
+						{#if sortBy === 'number'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Issue # · ascending
 					</Popover.Item>
-					<Popover.Item>
-						<span class="size-2.75"></span>
+					<Popover.Item active={sortBy === 'stage'} onclick={() => (sortBy = 'stage')}>
+						{#if sortBy === 'stage'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Tree stage
 					</Popover.Item>
-					<Popover.Item>
-						<span class="size-2.75"></span>
+					<Popover.Item
+						active={sortBy === 'provider'}
+						onclick={() => (sortBy = 'provider')}
+					>
+						{#if sortBy === 'provider'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Provider
 					</Popover.Item>
 					<Popover.Divider />
 					<Popover.Label>Group by</Popover.Label>
-					<Popover.Item>
-						<span class="size-2.75"></span>
+					<Popover.Item active={groupBy === 'none'} onclick={() => (groupBy = 'none')}>
+						{#if groupBy === 'none'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						None
 					</Popover.Item>
-					<Popover.Item active>
-						<CheckIcon class="size-2.75" />
+					<Popover.Item
+						active={groupBy === 'repository'}
+						onclick={() => (groupBy = 'repository')}
+					>
+						{#if groupBy === 'repository'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Repository
 					</Popover.Item>
-					<Popover.Item>
-						<span class="size-2.75"></span>
+					<Popover.Item
+						active={groupBy === 'status'}
+						onclick={() => (groupBy = 'status')}
+					>
+						{#if groupBy === 'status'}<CheckIcon class="size-2.75" />{:else}<span
+								class="size-2.75"
+							></span>{/if}
 						Status
 					</Popover.Item>
 				</Popover.Content>
@@ -196,8 +242,158 @@
 					</label>
 					<Popover.Divider />
 					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
-						<Button variant="ghost" size="sm" class="flex-1">Reset</Button>
-						<Button variant="primary" size="sm" class="flex-1">Apply</Button>
+						<Button variant="ghost" size="sm" class="flex-1">
+							<KbdGroup><Kbd>Ctrl</Kbd><Kbd>R</Kbd></KbdGroup>
+							Reset
+						</Button>
+						<Button variant="primary" size="sm" class="flex-1">
+							Apply
+							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+						</Button>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Open">
+	{#snippet template()}
+		<div class="flex items-start gap-8 p-8" style="min-height: 420px;">
+			<!-- Filter popover open -->
+			<Popover.Root open={true}>
+				<Popover.Trigger>
+					{#snippet child({ props })}
+						<Button variant="secondary" {...props}>
+							<FilterIcon class="size-3.5" />
+							Filter
+						</Button>
+					{/snippet}
+				</Popover.Trigger>
+				<Popover.Content class="w-60" portalProps={{ disabled: true }}>
+					<Popover.Label>Status</Popover.Label>
+					<label
+						class="flex min-h-7 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) hover:bg-surface-2"
+					>
+						<Checkbox checked />
+						Running
+					</label>
+					<label
+						class="flex min-h-7 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) hover:bg-surface-2"
+					>
+						<Checkbox checked />
+						PR draft
+					</label>
+					<label
+						class="flex min-h-7 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) hover:bg-surface-2"
+					>
+						<Checkbox />
+						Approved
+					</label>
+					<label
+						class="flex min-h-7 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) hover:bg-surface-2"
+					>
+						<Checkbox />
+						Merged
+					</label>
+					<Popover.Divider />
+					<Popover.Label>Provider</Popover.Label>
+					<label
+						class="flex min-h-7 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) hover:bg-surface-2"
+					>
+						<Checkbox checked />
+						Claude
+					</label>
+					<label
+						class="flex min-h-7 cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) hover:bg-surface-2"
+					>
+						<Checkbox />
+						Codex
+					</label>
+					<Popover.Divider />
+					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
+						<Button variant="ghost" size="sm" class="flex-1">
+							<KbdGroup><Kbd>Ctrl</Kbd><Kbd>R</Kbd></KbdGroup>
+							Reset
+						</Button>
+						<Button variant="primary" size="sm" class="flex-1">
+							Apply
+							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+						</Button>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+
+			<!-- Sort popover open -->
+			<Popover.Root open={true}>
+				<Popover.Trigger>
+					{#snippet child({ props })}
+						<Button variant="secondary" {...props}>
+							<LayersIcon class="size-3.5" />
+							Sort by
+						</Button>
+					{/snippet}
+				</Popover.Trigger>
+				<Popover.Content class="w-55" portalProps={{ disabled: true }}>
+					<Popover.Label>Sort by</Popover.Label>
+					<Popover.Item active>
+						<CheckIcon class="size-2.75" />
+						Updated · newest
+					</Popover.Item>
+					<Popover.Item>
+						<span class="size-2.75"></span>
+						Created · newest
+					</Popover.Item>
+					<Popover.Item>
+						<span class="size-2.75"></span>
+						Issue # · ascending
+					</Popover.Item>
+					<Popover.Item>
+						<span class="size-2.75"></span>
+						Tree stage
+					</Popover.Item>
+					<Popover.Item>
+						<span class="size-2.75"></span>
+						Provider
+					</Popover.Item>
+					<Popover.Divider />
+					<Popover.Label>Group by</Popover.Label>
+					<Popover.Item>
+						<span class="size-2.75"></span>
+						None
+					</Popover.Item>
+					<Popover.Item active>
+						<CheckIcon class="size-2.75" />
+						Repository
+					</Popover.Item>
+					<Popover.Item>
+						<span class="size-2.75"></span>
+						Status
+					</Popover.Item>
+				</Popover.Content>
+			</Popover.Root>
+
+			<!-- Legend popover open -->
+			<Popover.Root open={true}>
+				<Popover.Trigger>
+					{#snippet child({ props })}
+						<Button variant="secondary" {...props}>
+							<SparklesIcon class="size-3.5" />
+							Legend
+						</Button>
+					{/snippet}
+				</Popover.Trigger>
+				<Popover.Content class="w-60" portalProps={{ disabled: true }}>
+					<Popover.Label>Tree state legend</Popover.Label>
+					<div class="grid gap-1.5 px-2 pb-1.5">
+						{#each [{ color: 'bg-[oklch(0.69_0.098_132)]', label: 'Growing — session active' }, { color: 'bg-[oklch(0.77_0.15_65)]', label: 'Fruiting — PR open' }, { color: 'bg-[#e8a8c0]', label: 'Flowering — approved' }, { color: 'bg-[#e8a64a]', label: 'Seasonal — review' }, { color: 'bg-foreground-subtle', label: 'Bare — merged' }, { color: 'bg-[#6c5d4e]', label: 'Dead — branch gone' }] as entry (entry.label)}
+							<div class="flex items-center gap-2">
+								<span class="size-2 shrink-0 rounded-0.5 {entry.color}"></span>
+								<span class="text-(length:--text-2xs) text-foreground"
+									>{entry.label}</span
+								>
+							</div>
+						{/each}
 					</div>
 				</Popover.Content>
 			</Popover.Root>

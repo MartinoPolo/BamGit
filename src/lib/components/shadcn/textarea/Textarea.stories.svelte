@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Textarea } from './index.js';
+	import { TEXTAREA_STATES, Textarea } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { HelpText } from '$lib/components/base/help-text/index.js';
 
@@ -11,7 +11,7 @@
 		argTypes: {
 			state: {
 				control: 'select',
-				options: ['default', 'error'],
+				options: [...TEXTAREA_STATES],
 			},
 			disabled: { control: 'boolean' },
 		},
@@ -66,6 +66,29 @@
 				value="Locked while session running"
 				{...args}
 			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template(args: TextareaProps)}
+		<div class="grid max-w-2xl grid-cols-2 gap-4">
+			{#each TEXTAREA_STATES as state (state)}
+				<div>
+					<Label>{state}</Label>
+					<Textarea
+						{...args}
+						{state}
+						rows={3}
+						value={state === 'error'
+							? ''
+							: 'Surface session failures and PR review state directly above each tree.'}
+					/>
+					{#if state === 'error'}
+						<HelpText status="error">Description is required.</HelpText>
+					{/if}
+				</div>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

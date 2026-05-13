@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
 	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
@@ -31,7 +32,7 @@
 				{...props}
 				class="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] leading-tight {colorClass}"
 			>
-				<span class="opacity-70">↓</span>
+				<ArrowDownIcon class="size-2.5 opacity-70" />
 				{behindBaseCount}
 			</span>
 		{/snippet}

@@ -3,7 +3,7 @@
 	import AlertTriangleIcon from '@lucide/svelte/icons/alert-triangle';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import { Kbd, KbdGroup } from '$lib/components/shadcn/kbd/index.js';
 	import { extractToolDetail, getToolAccentColor } from './tool_card_utils.js';
 
 	interface Props {
@@ -45,7 +45,7 @@
 			{/if}
 			<div class="flex gap-1.5">
 				<Button variant="primary" size="sm" class="h-(--size-control-md)" onclick={onAllow}>
-					Allow <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+					Allow <Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 				<Button
 					variant="secondary"
@@ -53,7 +53,11 @@
 					class="h-(--size-control-md)"
 					onclick={onAllowAlways}
 				>
-					Allow Always <Kbd>⌃<CornerDownLeftIcon /></Kbd>
+					Allow Always
+					<KbdGroup>
+						<Kbd>Ctrl</Kbd>
+						<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
+					</KbdGroup>
 				</Button>
 				<Button variant="danger" size="sm" class="h-(--size-control-md)" onclick={onDeny}>
 					Deny <Kbd>Esc</Kbd>

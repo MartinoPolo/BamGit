@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Input } from './index.js';
+	import { INPUT_STATES, Input } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { HelpText } from '$lib/components/base/help-text/index.js';
 
@@ -11,7 +11,7 @@
 		argTypes: {
 			state: {
 				control: 'select',
-				options: ['default', 'success', 'error', 'loading'],
+				options: [...INPUT_STATES],
 			},
 			disabled: { control: 'boolean' },
 			readonly: { control: 'boolean' },
@@ -79,6 +79,28 @@
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
 			<Input state="loading" value="resolving…" {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template(args: InputProps)}
+		<div class="grid max-w-2xl grid-cols-2 gap-4">
+			{#each INPUT_STATES as state (state)}
+				<div>
+					<Label>{state}</Label>
+					<Input
+						{...args}
+						{state}
+						value={state === 'loading' ? 'resolving...' : 'feat/forest-overlays'}
+					/>
+					{#if state === 'success'}
+						<HelpText status="success">Branch is available.</HelpText>
+					{:else if state === 'error'}
+						<HelpText status="error">Branch names cannot contain spaces.</HelpText>
+					{/if}
+				</div>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

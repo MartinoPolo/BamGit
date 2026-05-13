@@ -61,7 +61,7 @@
 <Story name="Two Month">
 	{#snippet template()}
 		<div class="p-4">
-			<RangeCalendar numberOfMonths={2} {placeholder} />
+			<RangeCalendar numberOfMonths={2} pagedNavigation={true} {placeholder} />
 		</div>
 	{/snippet}
 </Story>

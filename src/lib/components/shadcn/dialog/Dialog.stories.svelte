@@ -10,6 +10,8 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Dialog',
@@ -94,12 +96,13 @@
 					<Dialog.Footer>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button variant="ghost" {...props}>Cancel</Button>
+								<Button variant="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
 							{/snippet}
 						</Dialog.Close>
 						<Button variant="primary">
 							<PlusIcon class="size-3.5" />
 							Create Issue
+							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</Dialog.Footer>
 				</Dialog.Content>
@@ -179,77 +182,13 @@
 					<Dialog.Footer>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button variant="ghost" {...props}>Cancel</Button>
+								<Button variant="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
 							{/snippet}
 						</Dialog.Close>
-						<Button variant="danger">
+						<Button variant="primary-destructive">
 							<TrashIcon class="size-3.5" />
 							Archive
-						</Button>
-					</Dialog.Footer>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Open by Default">
-	{#snippet template()}
-		<div class="flex items-center justify-center p-8">
-			<Dialog.Root open={true}>
-				<Dialog.Content portalProps={{ disabled: true }}>
-					<Dialog.Title class="sr-only">Open by default</Dialog.Title>
-					<Dialog.Description class="sr-only">
-						This dialog renders open for visual testing in Storybook.
-					</Dialog.Description>
-					<Dialog.Header>
-						<div>
-							<div
-								class="mb-0.5 text-(length:--text-xs) font-medium uppercase tracking-wider text-foreground-subtle"
-							>
-								Modal · open by default
-							</div>
-							<div class="text-(length:--text-lg) font-semibold">
-								Start a new agent session
-							</div>
-						</div>
-						<Dialog.Close>
-							{#snippet child({ props })}
-								<Button variant="ghost" size="icon-sm" {...props}>
-									<XIcon class="size-3" />
-								</Button>
-							{/snippet}
-						</Dialog.Close>
-					</Dialog.Header>
-					<Dialog.Body class="grid gap-3">
-						<div>
-							<Label for="issue-select-open">Issue</Label>
-							<Select id="issue-select-open">
-								<option value="142">#142 · Add usage tracking dashboard</option>
-							</Select>
-						</div>
-						<div class="grid grid-cols-2 gap-2.5">
-							<div>
-								<Label for="provider-select-open">Provider</Label>
-								<Select id="provider-select-open">
-									<option value="claude">Claude · Sonnet 4.5</option>
-								</Select>
-							</div>
-							<div>
-								<Label for="branch-input-open">Base branch</Label>
-								<Input id="branch-input-open" class="font-mono" value="dev" />
-							</div>
-						</div>
-					</Dialog.Body>
-					<Dialog.Footer>
-						<Dialog.Close>
-							{#snippet child({ props })}
-								<Button variant="ghost" {...props}>Cancel</Button>
-							{/snippet}
-						</Dialog.Close>
-						<Button variant="primary">
-							<PlusIcon class="size-3.5" />
-							Create Issue
+							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</Dialog.Footer>
 				</Dialog.Content>

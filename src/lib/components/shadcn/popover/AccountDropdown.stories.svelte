@@ -2,8 +2,10 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import * as Popover from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd, KbdGroup } from '$lib/components/shadcn/kbd/index.js';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import CommandIcon from '@lucide/svelte/icons/command';
 	import DatabaseIcon from '@lucide/svelte/icons/database';
 	import SunIcon from '@lucide/svelte/icons/sun';
 	import MoonIcon from '@lucide/svelte/icons/moon';
@@ -57,20 +59,18 @@
 						<Popover.Item>
 							<UserIcon class="size-3.5" />
 							Profile
-							<span
-								class="ml-auto inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-1 border border-border bg-surface-2 px-1.25 font-mono text-[10.5px] text-foreground-muted"
-							>
-								⌘P
-							</span>
+							<KbdGroup class="ml-auto">
+								<Kbd variant="lucide"><CommandIcon /></Kbd>
+								<Kbd>P</Kbd>
+							</KbdGroup>
 						</Popover.Item>
 						<Popover.Item>
 							<SettingsIcon class="size-3.5" />
 							Settings
-							<span
-								class="ml-auto inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-1 border border-border bg-surface-2 px-1.25 font-mono text-[10.5px] text-foreground-muted"
-							>
-								⌘,
-							</span>
+							<KbdGroup class="ml-auto">
+								<Kbd variant="lucide"><CommandIcon /></Kbd>
+								<Kbd>,</Kbd>
+							</KbdGroup>
 						</Popover.Item>
 						<Popover.Item>
 							<DatabaseIcon class="size-3.5" />

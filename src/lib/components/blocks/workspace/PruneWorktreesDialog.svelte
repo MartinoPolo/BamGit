@@ -4,6 +4,8 @@
 	import type { PrunableIssue } from '$lib/types/generated';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 
@@ -95,9 +97,10 @@
 		<Dialog.Footer>
 			<Button variant="ghost" onclick={onClose} disabled={removing}>
 				{m.btn_cancel()}
+				<Kbd>Esc</Kbd>
 			</Button>
 			<Button
-				variant="danger"
+				variant="primary-destructive"
 				onclick={handlePrune}
 				disabled={selectedIds.size === 0 || removing}
 			>
@@ -108,6 +111,7 @@
 						? m.prune_remove_count_plural({ count: selectedIds.size })
 						: m.prune_remove_count({ count: selectedIds.size })}
 				{/if}
+				<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

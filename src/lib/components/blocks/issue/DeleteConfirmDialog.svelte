@@ -3,6 +3,8 @@
 	import type { Issue } from '$lib/modules/issues';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 
 	interface Props {
@@ -55,9 +57,11 @@
 			<Dialog.Footer>
 				<Button variant="ghost" onclick={onClose}>
 					{m.btn_cancel()}
+					<Kbd>Esc</Kbd>
 				</Button>
-				<Button variant="danger" onclick={() => onConfirm(removeWorktree)}>
+				<Button variant="primary-destructive" onclick={() => onConfirm(removeWorktree)}>
 					{m.btn_confirm_delete()}
+					<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 			</Dialog.Footer>
 		{/if}

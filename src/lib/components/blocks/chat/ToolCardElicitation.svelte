@@ -82,7 +82,7 @@
 					class="h-(--size-control-md)"
 					onclick={handleSubmit}
 				>
-					Submit <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+					Submit <Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 				<Button variant="ghost" size="sm" class="h-(--size-control-md)" onclick={onCancel}
 					>Cancel</Button

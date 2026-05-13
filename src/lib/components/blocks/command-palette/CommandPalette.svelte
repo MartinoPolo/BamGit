@@ -1,5 +1,8 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
+	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
@@ -64,7 +67,7 @@
 					paletteCtx.query = event.currentTarget.value;
 				}}
 			/>
-			<Kbd>esc</Kbd>
+			<Kbd>Esc</Kbd>
 		</div>
 
 		<!-- Results area -->
@@ -99,7 +102,7 @@
 						<span class="truncate">{item.label}</span>
 						<span class="ml-auto flex shrink-0 items-center gap-1.5">
 							{#if item.shortcut}
-								<Kbd>{item.shortcut}</Kbd>
+								<Kbd variant="mono">{item.shortcut}</Kbd>
 							{/if}
 							{#if item.description}
 								{#if item.category === COMMAND_PALETTE_CATEGORIES.issues}
@@ -133,15 +136,15 @@
 			class="flex items-center gap-3 border-t border-border px-3 py-2 text-(length:--text-2xs) text-foreground-subtle"
 		>
 			<span class="flex items-center gap-1">
-				<Kbd>↑↓</Kbd>
+				<Kbd variant="lucide"><ArrowUpIcon /><ArrowDownIcon /></Kbd>
 				{m.command_palette_navigate()}
 			</span>
 			<span class="flex items-center gap-1">
-				<Kbd>↵</Kbd>
+				<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
 				{m.command_palette_select()}
 			</span>
 			<span class="flex items-center gap-1">
-				<Kbd>esc</Kbd>
+				<Kbd>Esc</Kbd>
 				{m.command_palette_close()}
 			</span>
 			<span class="ml-auto">

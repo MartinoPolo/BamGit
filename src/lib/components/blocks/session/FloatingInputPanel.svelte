@@ -3,6 +3,7 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import PaperclipIcon from '@lucide/svelte/icons/paperclip';
+	import XIcon from '@lucide/svelte/icons/x';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
 	import SkillChipsRow from './SkillChipsRow.svelte';
@@ -64,10 +65,10 @@
 							#{i + 1}
 						</span>
 						<button
-							class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-0.75 border-none bg-black/40 p-0 text-[8px] text-white"
+							class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-0.75 border-none bg-black/40 p-0 text-white"
 							onclick={() => imageCount--}
 						>
-							×
+							<XIcon size={8} strokeWidth={2.5} />
 						</button>
 					</div>
 				{/each}

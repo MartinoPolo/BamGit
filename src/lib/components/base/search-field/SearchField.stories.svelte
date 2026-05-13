@@ -13,6 +13,7 @@
 	import type { SearchFieldProps } from './search-field-variants.js';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
+	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 </script>
 
@@ -41,7 +42,9 @@
 					>
 						<TreesIcon class="size-3" />
 						#118 · Forest view overlays
-						<Kbd class="ml-auto">↵</Kbd>
+						<span class="ml-auto">
+							<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
+						</span>
 					</div>
 					<div
 						class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"

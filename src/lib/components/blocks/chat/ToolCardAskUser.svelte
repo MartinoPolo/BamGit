@@ -81,7 +81,7 @@
 			class="h-(--size-control-md)"
 			onclick={() => onConfirm?.(selectedIndex)}
 		>
-			Confirm <Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+			Confirm <Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 		</Button>
 	</div>
 </Card.Card>

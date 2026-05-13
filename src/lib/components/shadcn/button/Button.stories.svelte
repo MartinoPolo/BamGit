@@ -26,9 +26,10 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import CommandIcon from '@lucide/svelte/icons/command';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import DeleteIcon from '@lucide/svelte/icons/delete';
-	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import { Kbd, KbdGroup } from '$lib/components/shadcn/kbd/index.js';
 </script>
 
 <Story name="Primary" args={{ variant: 'primary' }}>
@@ -173,9 +174,11 @@
 								<Button {...args} {variant} {size}>
 									Action
 									{#if variant === 'primary' || variant === 'primary-destructive' || variant === 'contextual-primary'}
-										<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+										<Kbd variant="lucide" tone="inverted"
+											><CornerDownLeftIcon /></Kbd
+										>
 									{:else}
-										<Kbd><CornerDownLeftIcon /></Kbd>
+										<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
 									{/if}
 								</Button>
 							</div>
@@ -213,32 +216,51 @@
 <Story name="With Keyboard Shortcuts">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-col gap-6">
-			<div>
-				<p class="mb-2 text-sm text-foreground-muted">Primary with Enter shortcut</p>
-				<Button variant="primary" {...args}>
-					Create
-					<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
-				</Button>
+			<div class="flex flex-wrap items-end gap-4">
+				<div>
+					<p class="mb-2 text-sm text-foreground-muted">Primary with Enter shortcut</p>
+					<Button variant="primary" {...args}>
+						Create
+						<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+					</Button>
+				</div>
+				<div>
+					<p class="mb-2 text-sm text-foreground-muted">Primary with mono shortcut</p>
+					<Button variant="primary" {...args}>
+						Inspect
+						<Kbd variant="mono" tone="inverted">I</Kbd>
+					</Button>
+				</div>
 			</div>
 			<div>
 				<p class="mb-2 text-sm text-foreground-muted">Ghost with Esc shortcut</p>
 				<Button variant="ghost" {...args}>
 					Cancel
-					<Kbd>Esc</Kbd>
+					<Kbd variant="lucide">Esc</Kbd>
 				</Button>
 			</div>
 			<div>
 				<p class="mb-2 text-sm text-foreground-muted">Ghost with Backspace shortcut</p>
 				<Button variant="ghost" {...args}>
 					Back
-					<Kbd><DeleteIcon /></Kbd>
+					<Kbd variant="lucide"><DeleteIcon /></Kbd>
 				</Button>
 			</div>
 			<div>
 				<p class="mb-2 text-sm text-foreground-muted">Secondary with Enter shortcut</p>
 				<Button variant="secondary" {...args}>
 					Confirm
-					<Kbd><CornerDownLeftIcon /></Kbd>
+					<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
+				</Button>
+			</div>
+			<div>
+				<p class="mb-2 text-sm text-foreground-muted">Secondary with command shortcut</p>
+				<Button variant="secondary" {...args}>
+					Search
+					<KbdGroup>
+						<Kbd variant="lucide"><CommandIcon /></Kbd>
+						<Kbd>K</Kbd>
+					</KbdGroup>
 				</Button>
 			</div>
 			<div>
@@ -246,16 +268,16 @@
 				<div class="flex items-center gap-2">
 					<Button variant="ghost" size="sm" {...args}>
 						Back
-						<Kbd><DeleteIcon /></Kbd>
+						<Kbd variant="lucide"><DeleteIcon /></Kbd>
 					</Button>
 					<div class="flex-1"></div>
 					<Button variant="ghost" size="sm" {...args}>
 						Cancel
-						<Kbd>Esc</Kbd>
+						<Kbd variant="lucide">Esc</Kbd>
 					</Button>
 					<Button variant="primary" size="sm" {...args}>
 						Create
-						<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+						<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 					</Button>
 				</div>
 			</div>

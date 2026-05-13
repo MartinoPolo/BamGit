@@ -9,6 +9,7 @@
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
+	import DeleteIcon from '@lucide/svelte/icons/delete';
 
 	const { Story } = defineMeta({
 		title: 'Base/DropdownMenu',
@@ -100,23 +101,23 @@
 					<DropdownMenu.Item>
 						<CopyIcon />
 						Copy
-						<DropdownMenu.Shortcut>⌘C</DropdownMenu.Shortcut>
+						<DropdownMenu.Shortcut>Ctrl+C</DropdownMenu.Shortcut>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item>
 						<ScissorsIcon />
 						Cut
-						<DropdownMenu.Shortcut>⌘X</DropdownMenu.Shortcut>
+						<DropdownMenu.Shortcut>Ctrl+X</DropdownMenu.Shortcut>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item>
 						<ClipboardIcon />
 						Paste
-						<DropdownMenu.Shortcut>⌘V</DropdownMenu.Shortcut>
+						<DropdownMenu.Shortcut>Ctrl+V</DropdownMenu.Shortcut>
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item variant="destructive">
 						<TrashIcon />
 						Delete
-						<DropdownMenu.Shortcut>⌫</DropdownMenu.Shortcut>
+						<DropdownMenu.Shortcut><DeleteIcon /></DropdownMenu.Shortcut>
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
@@ -158,7 +159,7 @@
 				<DropdownMenu.Trigger>
 					<Button variant="secondary">Open Menu</Button>
 				</DropdownMenu.Trigger>
-				<DropdownMenu.Content portalProps={{ disabled: true }}>
+				<DropdownMenu.Content class="min-w-55" portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>
 						<UserIcon />
 						Profile
@@ -166,7 +167,7 @@
 					<DropdownMenu.Item disabled>
 						<SettingsIcon />
 						Settings
-						<DropdownMenu.Shortcut>⌘,</DropdownMenu.Shortcut>
+						<DropdownMenu.Shortcut>Ctrl+,</DropdownMenu.Shortcut>
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item disabled>
@@ -176,6 +177,94 @@
 					<DropdownMenu.Item variant="destructive">
 						<LogOutIcon />
 						Sign out
+					</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex gap-6 flex-wrap items-start pt-4 px-4 h-64">
+			<!-- Dropdown 1: Icons + headers + separators -->
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<Button variant="secondary">Account</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content class="min-w-52" portalProps={{ disabled: true }}>
+					<DropdownMenu.Group>
+						<DropdownMenu.Label>My Account</DropdownMenu.Label>
+						<DropdownMenu.Item>
+							<UserIcon />
+							Profile
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
+							<SettingsIcon />
+							Settings
+						</DropdownMenu.Item>
+					</DropdownMenu.Group>
+					<DropdownMenu.Separator />
+					<DropdownMenu.Item variant="destructive">
+						<LogOutIcon />
+						Sign out
+					</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+
+			<!-- Dropdown 2: With disabled items -->
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<Button variant="secondary">Workspace</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content class="min-w-55" portalProps={{ disabled: true }}>
+					<DropdownMenu.Item>
+						<UserIcon />
+						Profile
+					</DropdownMenu.Item>
+					<DropdownMenu.Item disabled>
+						<SettingsIcon />
+						Settings
+						<DropdownMenu.Shortcut>Ctrl+,</DropdownMenu.Shortcut>
+					</DropdownMenu.Item>
+					<DropdownMenu.Separator />
+					<DropdownMenu.Item disabled>
+						<CopyIcon />
+						Duplicate workspace
+					</DropdownMenu.Item>
+					<DropdownMenu.Item variant="destructive">
+						<LogOutIcon />
+						Sign out
+					</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+
+			<!-- Dropdown 3: Destructive item with keyboard shortcut -->
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<Button variant="secondary">Edit</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content class="min-w-48" portalProps={{ disabled: true }}>
+					<DropdownMenu.Item>
+						<CopyIcon />
+						Copy
+						<DropdownMenu.Shortcut>Ctrl+C</DropdownMenu.Shortcut>
+					</DropdownMenu.Item>
+					<DropdownMenu.Item>
+						<ScissorsIcon />
+						Cut
+						<DropdownMenu.Shortcut>Ctrl+X</DropdownMenu.Shortcut>
+					</DropdownMenu.Item>
+					<DropdownMenu.Item>
+						<ClipboardIcon />
+						Paste
+						<DropdownMenu.Shortcut>Ctrl+V</DropdownMenu.Shortcut>
+					</DropdownMenu.Item>
+					<DropdownMenu.Separator />
+					<DropdownMenu.Item variant="destructive">
+						<TrashIcon />
+						Delete
+						<DropdownMenu.Shortcut><DeleteIcon /></DropdownMenu.Shortcut>
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
