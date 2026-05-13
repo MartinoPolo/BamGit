@@ -1,14 +1,5 @@
-<script lang="ts" module>
-	import { cn } from '$lib/utils.js';
-	export {
-		buttonVariants,
-		type ButtonProps,
-		type ButtonSize,
-		type ButtonVariant,
-	} from './button-variants.js';
-</script>
-
 <script lang="ts">
+	import { cn } from '$lib/utils.js';
 	import { buttonVariants, type ButtonProps } from './button-variants.js';
 
 	let {

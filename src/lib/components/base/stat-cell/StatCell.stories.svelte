@@ -83,8 +83,8 @@
 <Story name="Dual Number Format">
 	{#snippet template(args: StatCellProps)}
 		<div class="flex gap-2">
-			<StatCell {...args} label="ISSUES" value="3/10" icon={ListChecksIcon} />
-			<StatCell label="ISSUES" value="0/5" icon={ListChecksIcon} />
+			<StatCell {...args} label="ISSUES" value={3} suffix="/10" icon={ListChecksIcon} />
+			<StatCell label="ISSUES" value={0} suffix="/5" icon={ListChecksIcon} />
 		</div>
 	{/snippet}
 </Story>
@@ -106,7 +106,7 @@
 <Story name="Health Grid">
 	{#snippet template(args: StatCellProps)}
 		<div class="grid w-73 grid-cols-4 gap-1.5">
-			<StatCell {...args} label="ISSUES" value="3/10" icon={ListChecksIcon} />
+			<StatCell {...args} label="ISSUES" value={3} suffix="/10" icon={ListChecksIcon} />
 			<StatCell label="PRs" value={4} icon={GitPrIcon} />
 			<StatCell label="ATTN" value={2} tone="danger" pulse icon={AlertIcon} />
 			<StatCell label="HITL" value={1} tone="warning" pulse icon={UserIcon} />

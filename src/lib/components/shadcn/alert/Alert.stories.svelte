@@ -13,6 +13,7 @@
 	import InfoIcon from '@lucide/svelte/icons/info';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
+	import Button from '../button/Button.svelte';
 </script>
 
 <Story name="Default">
@@ -72,12 +73,40 @@
 					>A new version is available. Restart to apply the update.</AlertDescription
 				>
 				<AlertAction>
-					<button
-						class="rounded border border-current px-2 py-1 text-xs font-medium hover:opacity-80"
-					>
-						Restart now
-					</button>
+					<Button variant="secondary" size="sm">Restart now</Button>
 				</AlertAction>
+			</Alert>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex max-w-lg flex-col gap-3">
+			<Alert variant="default">
+				<InfoIcon />
+				<AlertTitle>Information</AlertTitle>
+				<AlertDescription>This is a default informational alert message.</AlertDescription>
+			</Alert>
+			<Alert variant="destructive">
+				<TriangleAlertIcon />
+				<AlertTitle>Destructive</AlertTitle>
+				<AlertDescription>This action is destructive and cannot be undone.</AlertDescription
+				>
+			</Alert>
+			<Alert>
+				<TriangleAlertIcon />
+				<AlertTitle>Update available</AlertTitle>
+				<AlertDescription
+					>A new version is available. Restart to apply the update.</AlertDescription
+				>
+				<AlertAction>
+					<Button variant="secondary" size="sm">Restart now</Button>
+				</AlertAction>
+			</Alert>
+			<Alert>
+				<InfoIcon />
+				<AlertDescription>Your changes have been saved successfully.</AlertDescription>
 			</Alert>
 		</div>
 	{/snippet}

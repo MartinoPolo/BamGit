@@ -1,6 +1,7 @@
 import type { WithElementRef } from '$lib/utils.js';
 import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
-import { type VariantProps, tv } from 'tailwind-variants';
+import { tv } from 'tailwind-variants';
+import { asExhaustiveArray } from '$lib/utils/variants.js';
 
 export const buttonVariants = tv({
 	base: 'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent font-medium leading-none outline-none select-none transition-[background,border-color,color,transform,filter,box-shadow] duration-120 ease-[ease] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_svg:not([class*="size-"])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
@@ -16,6 +17,8 @@ export const buttonVariants = tv({
 			danger: 'bg-transparent text-status-danger border-[color-mix(in_oklch,var(--status-danger)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--status-danger)_12%,transparent)]',
 			'contextual-primary':
 				'bg-moss-700 text-white shadow-sm hover:bg-moss-600 dark:bg-moss-600 dark:hover:bg-moss-500',
+			'primary-destructive':
+				'bg-status-danger text-white shadow-sm hover:bg-[color-mix(in_oklch,var(--status-danger)_88%,white_12%)] dark:hover:bg-[color-mix(in_oklch,var(--status-danger)_88%,black_12%)]',
 		},
 		size: {
 			sm: 'h-(--size-control-sm) px-2.25 text-(length:--text-sm) rounded-sm',
@@ -31,8 +34,19 @@ export const buttonVariants = tv({
 	},
 });
 
-export type ButtonVariant = VariantProps<typeof buttonVariants>['variant'];
-export type ButtonSize = VariantProps<typeof buttonVariants>['size'];
+export type ButtonVariant = keyof typeof buttonVariants.variants.variant;
+export type ButtonSize = keyof typeof buttonVariants.variants.size;
+
+export const BUTTON_VARIANTS = Object.keys(buttonVariants.variants.variant) as ButtonVariant[];
+
+export const BUTTON_TEXT_SIZES = ['sm', 'md', 'lg'] as const satisfies ReadonlyArray<ButtonSize>;
+export const BUTTON_ICON_SIZES = ['icon', 'icon-sm'] as const satisfies ReadonlyArray<ButtonSize>;
+// Exhaustiveness is enforced here: adding a new size to tv() without updating
+// BUTTON_TEXT_SIZES or BUTTON_ICON_SIZES causes a compile error on this line.
+export const BUTTON_SIZES = asExhaustiveArray<ButtonSize>()([
+	...BUTTON_TEXT_SIZES,
+	...BUTTON_ICON_SIZES,
+]);
 
 export type ButtonProps = WithElementRef<HTMLButtonAttributes> &
 	WithElementRef<HTMLAnchorAttributes> & {

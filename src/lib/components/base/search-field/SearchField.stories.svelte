@@ -13,6 +13,7 @@
 	import type { SearchFieldProps } from './search-field-variants.js';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
+	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 </script>
 
 <Story name="Rest">
@@ -36,17 +37,14 @@
 						Issues
 					</div>
 					<div
-						class="flex cursor-pointer items-center gap-2 rounded-1 bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
+						class="flex cursor-pointer items-center gap-2 rounded-md bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
 					>
 						<TreesIcon class="size-3" />
 						#118 · Forest view overlays
-						<span
-							class="ml-auto inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-1 border border-border bg-surface-2 px-1.25 font-mono text-[10.5px] text-foreground-muted"
-							>↵</span
-						>
+						<Kbd class="ml-auto">↵</Kbd>
 					</div>
 					<div
-						class="flex cursor-pointer items-center gap-2 rounded-1 px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
+						class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
 					>
 						<TreesIcon class="size-3" />
 						#128 · Forest tag centering
@@ -57,7 +55,7 @@
 						Branches
 					</div>
 					<div
-						class="flex cursor-pointer items-center gap-2 rounded-1 px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
+						class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
 					>
 						<GitBranchIcon class="size-3" />
 						feat/forest-overlays
@@ -101,13 +99,13 @@
 							Issues
 						</div>
 						<div
-							class="flex cursor-pointer items-center gap-2 rounded-1 bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
+							class="flex cursor-pointer items-center gap-2 rounded-md bg-primary-soft px-2 py-1.5 text-[12.5px] text-foreground"
 						>
 							<TreesIcon class="size-3" />
 							#118 · Forest view overlays
 						</div>
 						<div
-							class="flex cursor-pointer items-center gap-2 rounded-1 px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
+							class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] text-foreground hover:bg-surface-2"
 						>
 							<TreesIcon class="size-3" />
 							#128 · Forest tag centering

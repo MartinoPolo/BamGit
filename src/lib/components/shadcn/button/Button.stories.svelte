@@ -15,6 +15,7 @@
 					'ghost',
 					'ghost-overlay',
 					'danger',
+					'primary-destructive',
 					'contextual-primary',
 				],
 			},
@@ -28,7 +29,12 @@
 </script>
 
 <script lang="ts">
-	import type { ButtonProps } from './button-variants.js';
+	import {
+		BUTTON_VARIANTS,
+		BUTTON_TEXT_SIZES,
+		BUTTON_ICON_SIZES,
+		type ButtonProps,
+	} from './button-variants.js';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
@@ -87,6 +93,12 @@
 	{/snippet}
 </Story>
 
+<Story name="Primary Destructive">
+	{#snippet template(args: ButtonProps)}
+		<Button variant="primary-destructive" {...args}>Delete</Button>
+	{/snippet}
+</Story>
+
 <Story name="Disabled">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
@@ -101,22 +113,89 @@
 
 <Story name="All Variants">
 	{#snippet template(args: ButtonProps)}
-		<div class="flex flex-wrap items-center gap-4">
-			<Button variant="primary" {...args}>Primary</Button>
-			<Button variant="secondary" {...args}>Secondary</Button>
-			<Button variant="ghost" {...args}>Ghost</Button>
-			<Button variant="ghost-overlay" {...args}>Ghost Overlay</Button>
-			<Button variant="danger" {...args}>Danger</Button>
-		</div>
-	{/snippet}
-</Story>
+		<div class="flex flex-col gap-10">
+			<!-- Grid 1: Text buttons -->
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Text buttons</p>
+				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_TEXT_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_VARIANTS as variant (variant)}
+						<div class="text-xs text-foreground-muted">{variant}</div>
+						{#each BUTTON_TEXT_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {variant} {size} {...args}>Label</Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
 
-<Story name="All Sizes">
-	{#snippet template(args: ButtonProps)}
-		<div class="flex flex-wrap items-center gap-4">
-			<Button size="sm" {...args}>Small</Button>
-			<Button size="md" {...args}>Medium</Button>
-			<Button size="lg" {...args}>Large</Button>
+			<!-- Grid 2: Icon-only buttons (ghost-overlay excluded) -->
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Icon-only buttons</p>
+				<div class="grid grid-cols-[9rem_repeat(2,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_ICON_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_VARIANTS as variant (variant)}
+						<div class="text-xs text-foreground-muted">{variant}</div>
+						{#each BUTTON_ICON_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {variant} {size} {...args}><PlusIcon /></Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+
+			<!-- Grid 3: Icon + text buttons -->
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Icon + text</p>
+				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_TEXT_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_VARIANTS as variant (variant)}
+						<div class="text-xs text-foreground-muted">{variant}</div>
+						{#each BUTTON_TEXT_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {variant} {size} {...args}><PlusIcon /> Label</Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+
+			<!-- Grid 4: Buttons with keyboard shortcuts -->
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">With keyboard shortcuts</p>
+				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_TEXT_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_VARIANTS as variant (variant)}
+						<div class="text-xs text-foreground-muted">{variant}</div>
+						{#each BUTTON_TEXT_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {variant} {size} {...args}>
+									Action
+									{#if variant === 'primary' || variant === 'primary-destructive' || variant === 'contextual-primary'}
+										<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>
+									{:else}
+										<Kbd><CornerDownLeftIcon /></Kbd>
+									{/if}
+								</Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
 		</div>
 	{/snippet}
 </Story>
@@ -144,25 +223,6 @@
 		</div>
 	{/snippet}
 </Story>
-
-<Story name="Size x Variant Matrix">
-	{#snippet template(args: ButtonProps)}
-		<div class="flex flex-col gap-6">
-			{#each ['sm', 'md', 'lg'] as const as size (size)}
-				<div>
-					<p class="mb-2 text-sm text-foreground-muted">{size}</p>
-					<div class="flex flex-wrap items-center gap-3">
-						<Button variant="primary" {size} {...args}>Primary</Button>
-						<Button variant="secondary" {size} {...args}>Secondary</Button>
-						<Button variant="ghost" {size} {...args}>Ghost</Button>
-						<Button variant="danger" {size} {...args}>Danger</Button>
-					</div>
-				</div>
-			{/each}
-		</div>
-	{/snippet}
-</Story>
-
 <Story name="With Keyboard Shortcuts">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-col gap-6">
