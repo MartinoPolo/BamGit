@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { StatCell, STAT_CELL_TONE_OPTIONS } from './index.js';
+	import { STAT_CELL_TONES, StatCell } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/StatCell',
@@ -9,7 +9,7 @@
 		argTypes: {
 			tone: {
 				control: 'select',
-				options: [...STAT_CELL_TONE_OPTIONS],
+				options: [...STAT_CELL_TONES],
 			},
 			pulse: {
 				control: 'boolean',
@@ -40,10 +40,51 @@
 <Story name="All Tones">
 	{#snippet template(args: StatCellProps)}
 		<div class="flex gap-2">
-			<StatCell {...args} label="ISSUES" value={12} tone="neutral" icon={ListChecksIcon} />
-			<StatCell label="ISSUES" value={0} tone="zero" icon={ListChecksIcon} />
-			<StatCell label="HITL" value={3} tone="warning" icon={UserIcon} />
-			<StatCell label="ATTN" value={2} tone="danger" icon={AlertIcon} />
+			{#each STAT_CELL_TONES as tone (tone)}
+				<StatCell
+					{...args}
+					label={tone}
+					value={tone === 'zero'
+						? 0
+						: tone === 'neutral'
+							? 12
+							: tone === 'warning'
+								? 3
+								: 2}
+					{tone}
+					icon={tone === 'warning'
+						? UserIcon
+						: tone === 'danger'
+							? AlertIcon
+							: ListChecksIcon}
+				/>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template(args: StatCellProps)}
+		<div class="grid w-73 grid-cols-4 gap-1.5">
+			{#each STAT_CELL_TONES as tone (tone)}
+				<StatCell
+					{...args}
+					label={tone}
+					value={tone === 'zero'
+						? 0
+						: tone === 'neutral'
+							? 12
+							: tone === 'warning'
+								? 3
+								: 2}
+					{tone}
+					icon={tone === 'warning'
+						? UserIcon
+						: tone === 'danger'
+							? AlertIcon
+							: ListChecksIcon}
+				/>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

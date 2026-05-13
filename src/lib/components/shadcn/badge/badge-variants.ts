@@ -1,21 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { WithElementRef } from '$lib/utils.js';
 import type { HTMLAttributes } from 'svelte/elements';
-import { type VariantProps, tv } from 'tailwind-variants';
-
-export const BADGE_VARIANT_OPTIONS = [
-	'default',
-	'success',
-	'warning',
-	'danger',
-	'info',
-	'moss',
-	'amber',
-	'mono',
-	'merged',
-] as const;
-
-export const BADGE_DOT_OPTIONS = ['static', 'pulsing'] as const;
+import { tv } from 'tailwind-variants';
 
 export const badgeVariants = tv({
 	base: 'inline-flex items-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
@@ -44,8 +30,13 @@ export const badgeVariants = tv({
 	},
 });
 
-export type BadgeVariant = VariantProps<typeof badgeVariants>['variant'];
-type BadgeSize = VariantProps<typeof badgeVariants>['size'];
+export type BadgeVariant = keyof typeof badgeVariants.variants.variant;
+export type BadgeSize = keyof typeof badgeVariants.variants.size;
+
+export const BADGE_VARIANTS = Object.keys(badgeVariants.variants.variant) as BadgeVariant[];
+export const BADGE_SIZES = Object.keys(badgeVariants.variants.size) as BadgeSize[];
+
+export const BADGE_DOT_OPTIONS = ['static', 'pulsing'] as const;
 export type BadgeDot = (typeof BADGE_DOT_OPTIONS)[number];
 
 export type BadgeProps = WithElementRef<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> & {

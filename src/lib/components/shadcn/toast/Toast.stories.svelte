@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Toast, TOAST_TONE_OPTIONS } from './index.js';
+	import { TOAST_TONES, Toast } from './index.js';
 	import RefreshIcon from '@lucide/svelte/icons/refresh-cw';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import AlertTriangleIcon from '@lucide/svelte/icons/triangle-alert';
@@ -13,13 +13,37 @@
 		argTypes: {
 			tone: {
 				control: 'select',
-				options: [...TOAST_TONE_OPTIONS],
+				options: [...TOAST_TONES],
 			},
 			title: { control: 'text' },
 			body: { control: 'text' },
 		},
 	});
 </script>
+
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex max-w-135 flex-col gap-3">
+			{#each TOAST_TONES as tone (tone)}
+				<Toast {tone} title={tone} body={`Toast tone: ${tone}`}>
+					{#snippet icon()}
+						{#if tone === 'success'}
+							<CheckIcon class="size-3.5" />
+						{:else if tone === 'warning'}
+							<AlertTriangleIcon class="size-3.5" />
+						{:else if tone === 'danger'}
+							<XIcon class="size-3.5" />
+						{:else if tone === 'loading'}
+							<RefreshIcon class="size-3.5 animate-spin" />
+						{:else}
+							<RefreshIcon class="size-3.5" />
+						{/if}
+					{/snippet}
+				</Toast>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
 
 <Story name="Info">
 	{#snippet template()}

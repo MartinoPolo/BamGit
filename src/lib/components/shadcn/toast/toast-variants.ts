@@ -1,10 +1,6 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
-import { tv, type VariantProps } from 'tailwind-variants';
-
-export const TOAST_TONE_OPTIONS = ['info', 'success', 'warning', 'danger', 'loading'] as const;
-
-export type ToastTone = (typeof TOAST_TONE_OPTIONS)[number];
+import { type VariantProps, tv } from 'tailwind-variants';
 
 export const toastVariants = tv({
 	base: 'flex items-center gap-3 rounded-lg border border-border bg-surface p-3 shadow-md',
@@ -21,6 +17,10 @@ export const toastVariants = tv({
 		tone: 'info',
 	},
 });
+
+export type ToastTone = keyof typeof toastVariants.variants.tone;
+
+export const TOAST_TONES = Object.keys(toastVariants.variants.tone) as ToastTone[];
 
 export const toastIconColors = {
 	info: 'text-status-info',

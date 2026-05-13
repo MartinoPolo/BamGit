@@ -1,7 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { WithElementRef } from '$lib/utils.js';
 import type { HTMLAttributes } from 'svelte/elements';
-import { type VariantProps, tv } from 'tailwind-variants';
+import { tv } from 'tailwind-variants';
 
 export const CARD_STATE_OPTIONS = [
 	'default',
@@ -44,7 +44,9 @@ export const cardVariants = tv({
 	},
 });
 
-export type CardPadding = VariantProps<typeof cardVariants>['padding'];
+export type CardPadding = keyof typeof cardVariants.variants.padding;
+
+export const CARD_PADDING_OPTIONS = Object.keys(cardVariants.variants.padding) as CardPadding[];
 
 export type CardProps = WithElementRef<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
 	padding?: CardPadding;

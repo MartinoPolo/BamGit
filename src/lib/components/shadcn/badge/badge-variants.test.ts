@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { badgeVariants, BADGE_VARIANT_OPTIONS, BADGE_DOT_OPTIONS } from './badge-variants.js';
+import { BADGE_DOT_OPTIONS, BADGE_VARIANTS, badgeVariants } from './badge-variants.js';
 
 describe('badgeVariants', () => {
 	it('generates default variant classes with surface-2 bg, foreground-muted text, and border', () => {
@@ -59,9 +59,9 @@ describe('badgeVariants', () => {
 	});
 });
 
-describe('BADGE_VARIANT_OPTIONS', () => {
+describe('BADGE_VARIANTS', () => {
 	it('contains all expected variant keys', () => {
-		expect(BADGE_VARIANT_OPTIONS).toEqual(
+		expect(BADGE_VARIANTS).toEqual(
 			expect.arrayContaining([
 				'default',
 				'success',
@@ -71,6 +71,7 @@ describe('BADGE_VARIANT_OPTIONS', () => {
 				'moss',
 				'amber',
 				'mono',
+				'merged',
 			]),
 		);
 	});

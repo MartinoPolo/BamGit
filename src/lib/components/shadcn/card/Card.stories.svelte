@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Card, CARD_STATE_OPTIONS } from './index.js';
+	import { CARD_PADDING_OPTIONS, CARD_STATE_OPTIONS, Card } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Card',
@@ -9,7 +9,7 @@
 		argTypes: {
 			padding: {
 				control: 'select',
-				options: ['none', 'padded'],
+				options: [...CARD_PADDING_OPTIONS],
 			},
 			state: {
 				control: 'select',
@@ -45,10 +45,30 @@
 	{#snippet template(args: CardProps)}
 		<div class="grid grid-cols-2 gap-4">
 			{#each CARD_STATE_OPTIONS as state (state)}
-				<Card padding="padded" {state} {...args}>
+				<Card {...args} padding="padded" {state}>
 					<p class="text-xs font-medium text-foreground-muted">{state}</p>
 					<p class="text-sm text-foreground">Card in {state} state.</p>
 				</Card>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template(args: CardProps)}
+		<div class="grid grid-cols-[7rem_repeat(2,minmax(0,1fr))] items-stretch gap-3">
+			<div></div>
+			{#each CARD_PADDING_OPTIONS as padding (padding)}
+				<div class="text-center text-xs text-foreground-muted">{padding}</div>
+			{/each}
+			{#each CARD_STATE_OPTIONS as state (state)}
+				<div class="self-center text-xs text-foreground-muted">{state}</div>
+				{#each CARD_PADDING_OPTIONS as padding (padding)}
+					<Card {...args} {padding} {state}>
+						<p class="text-xs font-medium text-foreground-muted">{padding}</p>
+						<p class="text-sm text-foreground">{state}</p>
+					</Card>
+				{/each}
 			{/each}
 		</div>
 	{/snippet}

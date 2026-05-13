@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Button } from './index.js';
+	import { BUTTON_SIZES, BUTTON_VARIANTS, Button } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Button',
@@ -9,19 +9,11 @@
 		argTypes: {
 			variant: {
 				control: 'select',
-				options: [
-					'primary',
-					'secondary',
-					'ghost',
-					'ghost-overlay',
-					'danger',
-					'primary-destructive',
-					'contextual-primary',
-				],
+				options: [...BUTTON_VARIANTS],
 			},
 			size: {
 				control: 'select',
-				options: ['sm', 'md', 'lg', 'icon', 'icon-sm'],
+				options: [...BUTTON_SIZES],
 			},
 			disabled: { control: 'boolean' },
 		},
@@ -29,12 +21,7 @@
 </script>
 
 <script lang="ts">
-	import {
-		BUTTON_VARIANTS,
-		BUTTON_TEXT_SIZES,
-		BUTTON_ICON_SIZES,
-		type ButtonProps,
-	} from './button-variants.js';
+	import { BUTTON_TEXT_SIZES, BUTTON_ICON_SIZES, type ButtonProps } from './button-variants.js';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
@@ -113,7 +100,7 @@
 
 <Story name="All Variants">
 	{#snippet template(args: ButtonProps)}
-		<div class="flex flex-col gap-10">
+		<div class="flex flex-col gap-10 w-130">
 			<!-- Grid 1: Text buttons -->
 			<div class="flex flex-col gap-3">
 				<p class="text-sm font-medium text-foreground-muted">Text buttons</p>
@@ -126,7 +113,7 @@
 						<div class="text-xs text-foreground-muted">{variant}</div>
 						{#each BUTTON_TEXT_SIZES as size (size)}
 							<div class="flex justify-center">
-								<Button {variant} {size} {...args}>Label</Button>
+								<Button {...args} {variant} {size}>Label</Button>
 							</div>
 						{/each}
 					{/each}
@@ -145,7 +132,7 @@
 						<div class="text-xs text-foreground-muted">{variant}</div>
 						{#each BUTTON_ICON_SIZES as size (size)}
 							<div class="flex justify-center">
-								<Button {variant} {size} {...args}><PlusIcon /></Button>
+								<Button {...args} {variant} {size}><PlusIcon /></Button>
 							</div>
 						{/each}
 					{/each}
@@ -164,7 +151,7 @@
 						<div class="text-xs text-foreground-muted">{variant}</div>
 						{#each BUTTON_TEXT_SIZES as size (size)}
 							<div class="flex justify-center">
-								<Button {variant} {size} {...args}><PlusIcon /> Label</Button>
+								<Button {...args} {variant} {size}><PlusIcon /> Label</Button>
 							</div>
 						{/each}
 					{/each}
@@ -183,7 +170,7 @@
 						<div class="text-xs text-foreground-muted">{variant}</div>
 						{#each BUTTON_TEXT_SIZES as size (size)}
 							<div class="flex justify-center">
-								<Button {variant} {size} {...args}>
+								<Button {...args} {variant} {size}>
 									Action
 									{#if variant === 'primary' || variant === 'primary-destructive' || variant === 'contextual-primary'}
 										<Kbd variant="inverted"><CornerDownLeftIcon /></Kbd>

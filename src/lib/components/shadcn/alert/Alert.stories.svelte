@@ -1,15 +1,22 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Alert, AlertDescription, AlertTitle, AlertAction } from './index.js';
+	import { ALERT_VARIANTS, Alert, AlertAction, AlertDescription, AlertTitle } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Alert',
 		component: Alert,
 		tags: ['autodocs'],
+		argTypes: {
+			variant: {
+				control: 'select',
+				options: [...ALERT_VARIANTS],
+			},
+		},
 	});
 </script>
 
 <script lang="ts">
+	import type { AlertProps } from './alert-variants.js';
 	import InfoIcon from '@lucide/svelte/icons/info';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
@@ -81,19 +88,19 @@
 </Story>
 
 <Story name="All Variants">
-	{#snippet template()}
+	{#snippet template(args: AlertProps)}
 		<div class="flex max-w-lg flex-col gap-3">
-			<Alert variant="default">
-				<InfoIcon />
-				<AlertTitle>Information</AlertTitle>
-				<AlertDescription>This is a default informational alert message.</AlertDescription>
-			</Alert>
-			<Alert variant="destructive">
-				<TriangleAlertIcon />
-				<AlertTitle>Destructive</AlertTitle>
-				<AlertDescription>This action is destructive and cannot be undone.</AlertDescription
-				>
-			</Alert>
+			{#each ALERT_VARIANTS as variant (variant)}
+				<Alert {...args} {variant}>
+					{#if variant === 'destructive'}
+						<TriangleAlertIcon />
+					{:else}
+						<InfoIcon />
+					{/if}
+					<AlertTitle>{variant}</AlertTitle>
+					<AlertDescription>Alert variant: {variant}.</AlertDescription>
+				</Alert>
+			{/each}
 			<Alert>
 				<TriangleAlertIcon />
 				<AlertTitle>Update available</AlertTitle>

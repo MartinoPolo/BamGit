@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { HelpText } from './index.js';
+	import { HELP_TEXT_STATUSES, HelpText } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/HelpText',
@@ -9,7 +9,7 @@
 		argTypes: {
 			status: {
 				control: 'select',
-				options: ['default', 'error', 'success'],
+				options: [...HELP_TEXT_STATUSES],
 			},
 		},
 	});
@@ -23,6 +23,16 @@
 	{#snippet template(args: HelpTextProps)}
 		<div class="w-80">
 			<HelpText {...args}>Enter a value between 1 and 100.</HelpText>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="All Variants">
+	{#snippet template(args: HelpTextProps)}
+		<div class="flex w-80 flex-col gap-2">
+			{#each HELP_TEXT_STATUSES as status (status)}
+				<HelpText {...args} {status}>Help text status: {status}.</HelpText>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

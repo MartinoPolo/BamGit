@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { Badge, BADGE_VARIANT_OPTIONS, BADGE_DOT_OPTIONS } from './index.js';
+	import { BADGE_DOT_OPTIONS, BADGE_SIZES, BADGE_VARIANTS, Badge } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Badge',
@@ -9,7 +9,11 @@
 		argTypes: {
 			variant: {
 				control: 'select',
-				options: [...BADGE_VARIANT_OPTIONS],
+				options: [...BADGE_VARIANTS],
+			},
+			size: {
+				control: 'select',
+				options: [...BADGE_SIZES],
 			},
 			dot: {
 				control: 'select',
@@ -33,15 +37,33 @@
 
 <Story name="All Variants">
 	{#snippet template(args: BadgeProps)}
-		<div class="flex flex-wrap items-center gap-3">
-			<Badge variant="default" {...args}>Default</Badge>
-			<Badge variant="success" {...args}>Success</Badge>
-			<Badge variant="warning" {...args}>Warning</Badge>
-			<Badge variant="danger" {...args}>Danger</Badge>
-			<Badge variant="info" {...args}>Info</Badge>
-			<Badge variant="moss" {...args}>Moss</Badge>
-			<Badge variant="amber" {...args}>Amber</Badge>
-			<Badge variant="mono" {...args}>Mono</Badge>
+		<div class="flex flex-col gap-6 w-80">
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Variant x size</p>
+				<div class="grid grid-cols-[7rem_repeat(2,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BADGE_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BADGE_VARIANTS as variant (variant)}
+						<div class="text-xs text-foreground-muted">{variant}</div>
+						{#each BADGE_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Badge {...args} {variant} {size}>{variant}</Badge>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Dot states</p>
+				<div class="flex flex-wrap items-center gap-3">
+					{#each BADGE_DOT_OPTIONS as dot (dot)}
+						<Badge {...args} variant="success" {dot}>{dot}</Badge>
+					{/each}
+				</div>
+			</div>
 		</div>
 	{/snippet}
 </Story>

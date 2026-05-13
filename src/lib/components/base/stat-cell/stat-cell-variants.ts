@@ -1,7 +1,5 @@
 import type { Component } from 'svelte';
-import { type VariantProps, tv } from 'tailwind-variants';
-
-export const STAT_CELL_TONE_OPTIONS = ['neutral', 'zero', 'warning', 'danger'] as const;
+import { tv } from 'tailwind-variants';
 
 export const statCellVariants = tv({
 	base: 'flex flex-col gap-1 rounded-sm border px-2 py-1.75 min-w-0',
@@ -19,7 +17,9 @@ export const statCellVariants = tv({
 	},
 });
 
-export type StatCellTone = VariantProps<typeof statCellVariants>['tone'];
+export type StatCellTone = keyof typeof statCellVariants.variants.tone;
+
+export const STAT_CELL_TONES = Object.keys(statCellVariants.variants.tone) as StatCellTone[];
 
 export interface StatCellProps {
 	label: string;
