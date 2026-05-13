@@ -1,0 +1,17 @@
+sandbox_mode = "workspace-write"
+[mcp_servers.svelte]
+url = "https://mcp.svelte.dev/mcp"
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["chrome-devtools-mcp@latest"]
+
+[windows]
+sandbox = "elevated"
+
+[sandbox_workspace_write]
+network_access = false
