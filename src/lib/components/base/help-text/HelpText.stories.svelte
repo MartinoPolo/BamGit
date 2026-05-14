@@ -19,20 +19,20 @@
 	import type { HelpTextProps } from './help-text-variants.js';
 </script>
 
-<Story name="Default" args={{ state: 'default' }}>
-	{#snippet template(args: HelpTextProps)}
-		<div class="w-80">
-			<HelpText {...args}>Enter a value between 1 and 100.</HelpText>
-		</div>
-	{/snippet}
-</Story>
-
 <Story name="All Variants">
 	{#snippet template(args: HelpTextProps)}
 		<div class="flex w-80 flex-col gap-2">
 			{#each HELP_TEXT_STATES as state (state)}
 				<HelpText {...args} {state}>Help text state: {state}.</HelpText>
 			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Default" args={{ state: 'default' }}>
+	{#snippet template(args: HelpTextProps)}
+		<div class="w-80">
+			<HelpText {...args}>Enter a value between 1 and 100.</HelpText>
 		</div>
 	{/snippet}
 </Story>

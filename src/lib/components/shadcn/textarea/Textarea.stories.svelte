@@ -22,6 +22,29 @@
 	import type { TextareaProps } from './textarea-variants.js';
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: TextareaProps)}
+		<div class="grid max-w-2xl grid-cols-2 gap-4">
+			{#each TEXTAREA_STATES as state (state)}
+				<div>
+					<Label>{state}</Label>
+					<Textarea
+						{...args}
+						{state}
+						rows={3}
+						value={state === 'error'
+							? ''
+							: 'Surface session failures and PR review state directly above each tree.'}
+					/>
+					{#if state === 'error'}
+						<HelpText state="error">Description is required.</HelpText>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Default">
 	{#snippet template(args: TextareaProps)}
 		<div class="max-w-sm">
@@ -66,29 +89,6 @@
 				value="Locked while session running"
 				{...args}
 			/>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Variants">
-	{#snippet template(args: TextareaProps)}
-		<div class="grid max-w-2xl grid-cols-2 gap-4">
-			{#each TEXTAREA_STATES as state (state)}
-				<div>
-					<Label>{state}</Label>
-					<Textarea
-						{...args}
-						{state}
-						rows={3}
-						value={state === 'error'
-							? ''
-							: 'Surface session failures and PR review state directly above each tree.'}
-					/>
-					{#if state === 'error'}
-						<HelpText state="error">Description is required.</HelpText>
-					{/if}
-				</div>
-			{/each}
 		</div>
 	{/snippet}
 </Story>

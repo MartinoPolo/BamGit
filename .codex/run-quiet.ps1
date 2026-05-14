@@ -30,7 +30,13 @@ $logPath = Join-Path $LogDirectory "$timestamp-$safeName.log"
 "Started: $(Get-Date -Format o)" | Add-Content -LiteralPath $logPath
 "" | Add-Content -LiteralPath $logPath
 
-& $Executable @Arguments *>> $logPath
+$previousErrorActionPreference = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+try {
+    & $Executable @Arguments *>> $logPath
+} finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
 $exitCode = if ($null -eq $LASTEXITCODE) { 0 } else { $LASTEXITCODE }
 
 "" | Add-Content -LiteralPath $logPath

@@ -2,6 +2,20 @@
 
 App is in development — no backwards compatibility is required. When implementing changes, freely delete, replace, or restructure obsolete code and schemas without preservation shims.
 
+## Svelte
+
+Before finalizing any .svelte or .svelte.ts file, run svelte-autofixer and iterate until no issues remain.
+When editing or creating Svelte code, use Svelte MCP tools (get-documentation, svelte-autofixer) for up-to-date API reference.
+
+## Main library
+
+C:\_MP_projects\low-poly-2d-trees This project relies heavily on rendering 2D trees from this library that I maintain and have full control over. Whenever needed, update anything in that library, but mention this update in summary.
+
+## Cloned OSS Repositories
+
+When debugging or analyzing issues related to third-party libraries, delegate exploration to a sub-agent pointing at the cloned source in `C:\_MP_github_cloned\`
+**Available**: svelte (+sveltekit), bits-ui, shadcn-svelte, storybook, fallow, lucide, tailwindcss, paneforge, tauri (+tauri-docs)
+
 ## Stack
 
 Tauri v2 (Rust backend) + SvelteKit (static adapter) + Vite
@@ -10,22 +24,10 @@ Tailwind CSS 4
 SQLite (rusqlite, bundled)
 Vitest, Playwright, Storybook
 
-## Context Budget
-
-- Prefer targeted reads. Inspect a full log only when the tail does not identify the failure.
-- Use sub-agents for broad or third-party exploration. Ask them for concise findings, reasoning and file paths, not full command output.
-
-## Svelte
-
-Before finalizing any .svelte or .svelte.ts file, run svelte-autofixer and iterate until no issues remain.
-When editing or creating Svelte code, use Svelte MCP tools (get-documentation, svelte-autofixer) for up-to-date API reference.
-
-## Cloned Repos
-
-When debugging or analyzing issues related to third-party libraries, delegate exploration to a sub-agent pointing at the cloned source in `C:\_MP_github_cloned\`
-**Available**: svelte (+sveltekit), bits-ui, shadcn-svelte, storybook, fallow, lucide, tailwindcss, paneforge, tauri (+tauri-docs)
-
 ## Commands
+
+For nested PowerShell scripts, use `powershell -NoProfile -ExecutionPolicy Bypass` to avoid profile noise.
+For `shell_command` calls, set `login: false` if the user PowerShell profile causes startup noise or failures.
 
 `pnpm tauri dev` -- full dev (frontend + native window)
 `pnpm dev` -- frontend only
@@ -35,6 +37,16 @@ When debugging or analyzing issues related to third-party libraries, delegate ex
 `pnpm test` -- unit tests
 `pnpm test:e2e` -- E2E tests
 `pnpm db:reset` -- delete SQLite database (app recreates it on next launch)
+
+## Context Budget
+
+- For Svelte edits, run `svelte-autofixer` first. Fetch Svelte docs only for unfamiliar APIs or syntax, and request the smallest relevant sections.
+- Prefer targeted shell reads: `rg -l`, path-scoped `rg`, `git diff --stat`, and `git diff -- <files>`.
+- Use `scripts/run-quiet.ps1` for noisy checks. It records the full log under `.logs/`, prints pass/fail, and prints only the tail on failure.
+- Invoke `scripts/run-quiet.ps1` with executable then args, e.g. `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-quiet.ps1 pnpm check:all`.
+- Inspect a full log only when the tail does not identify the failure.
+- Do not run full Storybook build unless changing Storybook build config, deployment output, or behavior that only appears in the production Storybook bundle.
+- Use sub-agents for broad or third-party exploration when explicitly requested or already required by these instructions. Ask them for concise findings and file paths, not full command output.
 
 ## Architecture
 
@@ -51,6 +63,7 @@ On startup: `schema::create_tables()` (IF NOT EXISTS) then `defaults::seed_defau
 - New table: add to `schema.rs`, add demo data to `seed_commands.rs` if needed
 - Modify existing table: edit `schema.rs` directly, run `pnpm db:reset`, update `seed_commands.rs` if affected
 - New app default: update `defaults.rs::seed_defaults()`
+- Before production: switch to versioned migrations (PRAGMA user_version)
 
 ## Browser Mock Mode
 
@@ -63,3 +76,4 @@ Always fix unrelated errors you encounter (merge artifacts, stale imports, broke
 ## Testing
 
 - TDD: write tests first, then implement.
+- 80% coverage threshold enforced.

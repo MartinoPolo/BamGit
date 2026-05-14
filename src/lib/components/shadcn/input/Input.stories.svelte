@@ -23,6 +23,28 @@
 	import type { InputProps } from './input-variants.js';
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: InputProps)}
+		<div class="grid max-w-2xl grid-cols-2 gap-4">
+			{#each INPUT_STATES as state (state)}
+				<div>
+					<Label>{state}</Label>
+					<Input
+						{...args}
+						{state}
+						value={state === 'loading' ? 'resolving...' : 'feat/forest-overlays'}
+					/>
+					{#if state === 'success'}
+						<HelpText state="success">Branch is available.</HelpText>
+					{:else if state === 'error'}
+						<HelpText state="error">Branch names cannot contain spaces.</HelpText>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Default" args={{ state: 'default' }}>
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
@@ -78,29 +100,7 @@
 <Story name="Loading">
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
-			<Input state="loading" value="resolving…" {...args} />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Variants">
-	{#snippet template(args: InputProps)}
-		<div class="grid max-w-2xl grid-cols-2 gap-4">
-			{#each INPUT_STATES as state (state)}
-				<div>
-					<Label>{state}</Label>
-					<Input
-						{...args}
-						{state}
-						value={state === 'loading' ? 'resolving...' : 'feat/forest-overlays'}
-					/>
-					{#if state === 'success'}
-						<HelpText state="success">Branch is available.</HelpText>
-					{:else if state === 'error'}
-						<HelpText state="error">Branch names cannot contain spaces.</HelpText>
-					{/if}
-				</div>
-			{/each}
+			<Input state="loading" value="resolving..." {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -140,7 +140,7 @@
 			</div>
 			<div>
 				<Label>Loading</Label>
-				<Input state="loading" value="resolving…" />
+				<Input state="loading" value="resolving..." />
 			</div>
 		</div>
 	{/snippet}

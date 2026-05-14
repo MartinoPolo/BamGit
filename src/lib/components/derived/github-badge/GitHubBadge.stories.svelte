@@ -68,7 +68,7 @@
 	{/snippet}
 </Story>
 
-<Story name="All Variants (Issue + PR)">
+<Story name="All Variants">
 	{#snippet template()}
 		<div class="flex flex-col gap-4">
 			<div>

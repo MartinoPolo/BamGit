@@ -33,6 +33,91 @@
 	import { Kbd, KbdGroup } from '$lib/components/shadcn/kbd/index.js';
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex flex-col gap-10 w-130">
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Text buttons</p>
+				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_TEXT_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_INTENTS as intent (intent)}
+						<div class="text-xs text-foreground-muted">{intent}</div>
+						{#each BUTTON_TEXT_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {...args} {intent} {size}>Label</Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Icon-only buttons</p>
+				<div class="grid grid-cols-[9rem_repeat(2,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_ICON_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_INTENTS as intent (intent)}
+						<div class="text-xs text-foreground-muted">{intent}</div>
+						{#each BUTTON_ICON_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {...args} {intent} {size}
+									><PlusIcon data-icon="inline-start" /></Button
+								>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">Icon + text</p>
+				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_TEXT_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_INTENTS as intent (intent)}
+						<div class="text-xs text-foreground-muted">{intent}</div>
+						{#each BUTTON_TEXT_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {...args} {intent} {size}>
+									<PlusIcon data-icon="inline-start" /> Label
+								</Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<p class="text-sm font-medium text-foreground-muted">With keyboard shortcuts</p>
+				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
+					<div></div>
+					{#each BUTTON_TEXT_SIZES as size (size)}
+						<div class="text-center text-xs text-foreground-muted">{size}</div>
+					{/each}
+					{#each BUTTON_INTENTS as intent (intent)}
+						<div class="text-xs text-foreground-muted">{intent}</div>
+						{#each BUTTON_TEXT_SIZES as size (size)}
+							<div class="flex justify-center">
+								<Button {...args} {intent} {size}>
+									Action
+									<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
+								</Button>
+							</div>
+						{/each}
+					{/each}
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Primary" args={{ intent: 'primary' }}>
 	{#snippet template(args: ButtonProps)}
 		<Button {...args}>Primary</Button>
@@ -100,95 +185,6 @@
 			<Button intent="ghost" disabled {...args}>Ghost</Button>
 			<Button intent="ghost-overlay" disabled {...args}>Ghost Overlay</Button>
 			<Button intent="danger" disabled {...args}>Danger</Button>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Intents">
-	{#snippet template(args: ButtonProps)}
-		<div class="flex flex-col gap-10 w-130">
-			<!-- Grid 1: Text buttons -->
-			<div class="flex flex-col gap-3">
-				<p class="text-sm font-medium text-foreground-muted">Text buttons</p>
-				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
-					<div></div>
-					{#each BUTTON_TEXT_SIZES as size (size)}
-						<div class="text-center text-xs text-foreground-muted">{size}</div>
-					{/each}
-					{#each BUTTON_INTENTS as intent (intent)}
-						<div class="text-xs text-foreground-muted">{intent}</div>
-						{#each BUTTON_TEXT_SIZES as size (size)}
-							<div class="flex justify-center">
-								<Button {...args} {intent} {size}>Label</Button>
-							</div>
-						{/each}
-					{/each}
-				</div>
-			</div>
-
-			<!-- Grid 2: Icon-only buttons (ghost-overlay excluded) -->
-			<div class="flex flex-col gap-3">
-				<p class="text-sm font-medium text-foreground-muted">Icon-only buttons</p>
-				<div class="grid grid-cols-[9rem_repeat(2,minmax(0,1fr))] items-center gap-3">
-					<div></div>
-					{#each BUTTON_ICON_SIZES as size (size)}
-						<div class="text-center text-xs text-foreground-muted">{size}</div>
-					{/each}
-					{#each BUTTON_INTENTS as intent (intent)}
-						<div class="text-xs text-foreground-muted">{intent}</div>
-						{#each BUTTON_ICON_SIZES as size (size)}
-							<div class="flex justify-center">
-								<Button {...args} {intent} {size}
-									><PlusIcon data-icon="inline-start" /></Button
-								>
-							</div>
-						{/each}
-					{/each}
-				</div>
-			</div>
-
-			<!-- Grid 3: Icon + text buttons -->
-			<div class="flex flex-col gap-3">
-				<p class="text-sm font-medium text-foreground-muted">Icon + text</p>
-				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
-					<div></div>
-					{#each BUTTON_TEXT_SIZES as size (size)}
-						<div class="text-center text-xs text-foreground-muted">{size}</div>
-					{/each}
-					{#each BUTTON_INTENTS as intent (intent)}
-						<div class="text-xs text-foreground-muted">{intent}</div>
-						{#each BUTTON_TEXT_SIZES as size (size)}
-							<div class="flex justify-center">
-								<Button {...args} {intent} {size}>
-									<PlusIcon data-icon="inline-start" /> Label
-								</Button>
-							</div>
-						{/each}
-					{/each}
-				</div>
-			</div>
-
-			<!-- Grid 4: Buttons with keyboard shortcuts -->
-			<div class="flex flex-col gap-3">
-				<p class="text-sm font-medium text-foreground-muted">With keyboard shortcuts</p>
-				<div class="grid grid-cols-[9rem_repeat(3,minmax(0,1fr))] items-center gap-3">
-					<div></div>
-					{#each BUTTON_TEXT_SIZES as size (size)}
-						<div class="text-center text-xs text-foreground-muted">{size}</div>
-					{/each}
-					{#each BUTTON_INTENTS as intent (intent)}
-						<div class="text-xs text-foreground-muted">{intent}</div>
-						{#each BUTTON_TEXT_SIZES as size (size)}
-							<div class="flex justify-center">
-								<Button {...args} {intent} {size}>
-									Action
-									<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
-								</Button>
-							</div>
-						{/each}
-					{/each}
-				</div>
-			</div>
 		</div>
 	{/snippet}
 </Story>
