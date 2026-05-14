@@ -1,46 +1,5 @@
 # shadcn-Svelte Conventions Audit
 
-Created for staged Grovekeeper rollout. This is an audit gate, not approval for broad rewrites.
-
-## Base Component Variant Axes
-
-Approved axis names:
-
-| Component | Axis | Decision |
-| --- | --- | --- |
-| Alert | `tone` | Replaces `variant`; alert values are semantic tones. |
-| Badge | `tone` | Color semantics only: `neutral`, `success`, `warning`, `danger`, `info`, `primary`, `accent`, `merged`. |
-| Badge | `format` | Presentation only: `default`, `mono`. Former `mono` variant becomes `format="mono"`. |
-| Badge | `size` | Keep. |
-| Button | `intent` | Replaces `variant`; values describe action intent/treatment. |
-| Button | `size` | Keep. |
-| Card | `padding` | Keep. |
-| Card | `state` | Keep. |
-| HelpText | `state` | Replaces `status`; aligns with Input, Select, Textarea. |
-| Input | `state` | Keep. |
-| Kbd | `format` | Replaces `variant`; values describe content/font format. |
-| Kbd | `tone` | Keep. |
-| Select | `state` | Keep. |
-| StatCell | `tone` | Keep. |
-| Tabs | `active` | Keep. |
-| Textarea | `state` | Keep. |
-| Toast | `tone` | Keep. |
-
-Components without styling axes today: Accordion, Calendar, Checkbox, ContextMenu, Dialog, DropdownMenu, Label, Popover, Progress, RadioGroup, RangeCalendar, Separator, Sheet, Switch, Tooltip, SearchField, StatusRow.
-
-## Base Component Normalization
-
-- `Button` remains the template: `tv()` owns styles; keyed types and constants derive from `tv()`; stories use exported constants.
-- `Button` uses `intent`, not `variant`.
-- `Alert` uses `tone`, not `variant`.
-- `Badge` uses `tone` + `format`; no mixed color/typography variant axis.
-- `Kbd` uses `format` + `tone`.
-- `HelpText` uses `state`.
-- `Card` now keeps `padding` and `state` in `cardVariants`; no parallel `CARD_STATE_CLASSES`.
-- `Toast` no longer uses `VariantProps`; `ToastTone` derives from `toastVariants.variants.tone`.
-- `Button` Storybook includes a `Data Icon Sizing` showcase for `data-icon="inline-start"` and `data-icon="inline-end"`.
-- Repeated custom Select primitive compositions should become focused wrappers only when the call site repeats a domain API or product pattern.
-
 ## Raw Button Resolution Decisions
 
 Migration rule: plain actions become `Button`; repeated custom interaction patterns get wrappers; invisible scene hit targets, upload/drop targets, color swatches, and Storybook chrome can keep raw internals.
@@ -88,6 +47,5 @@ Base Storybook raw controls still under review:
 
 ## Review Gates
 
-- Base variant-axis renames above are applied.
 - Raw `<button>` conversions should follow the resolution table; large wrapper work remains staged.
-- `data-icon` should not become a project-wide rule until the Storybook showcase is visually approved.
+- Direct icons inside `Button` use `data-icon="inline-start"` or `data-icon="inline-end"`; Button variants own icon sizing.
