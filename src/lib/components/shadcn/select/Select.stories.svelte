@@ -70,6 +70,25 @@
 	);
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: SelectProps)}
+		<div class="grid max-w-2xl grid-cols-2 gap-4">
+			{#each SELECT_STATES as state (state)}
+				<div>
+					<Label>{state}</Label>
+					<Select {...args} {state} value={state === 'error' ? '' : 'claude'}>
+						<option value="">Choose provider...</option>
+						<option value="claude">Claude - Sonnet 4.5</option>
+					</Select>
+					{#if state === 'error'}
+						<HelpText state="error">Add a provider in Settings.</HelpText>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Default">
 	{#snippet template(args: SelectProps)}
 		<div class="max-w-xs">
@@ -268,25 +287,6 @@
 					{/each}
 				</SelectCustom.CustomContent>
 			</SelectCustom.CustomRoot>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Variants">
-	{#snippet template(args: SelectProps)}
-		<div class="grid max-w-2xl grid-cols-2 gap-4">
-			{#each SELECT_STATES as state (state)}
-				<div>
-					<Label>{state}</Label>
-					<Select {...args} {state} value={state === 'error' ? '' : 'claude'}>
-						<option value="">Choose provider...</option>
-						<option value="claude">Claude - Sonnet 4.5</option>
-					</Select>
-					{#if state === 'error'}
-						<HelpText state="error">Add a provider in Settings.</HelpText>
-					{/if}
-				</div>
-			{/each}
 		</div>
 	{/snippet}
 </Story>

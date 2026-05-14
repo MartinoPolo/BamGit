@@ -7,7 +7,8 @@ const preview: Preview = {
 	parameters: {
 		options: {
 			storySort: {
-				order: ['Base', 'Derived', 'Blocks', ['Chat', 'Session', 'Usage', '*']],
+				method: 'alphabetical',
+				order: ['Base', 'Derived', 'Blocks'],
 			},
 		},
 		controls: {

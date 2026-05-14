@@ -68,6 +68,36 @@
 	{/if}
 {/snippet}
 
+<Story name="All Variants">
+	{#snippet template(args: KbdProps)}
+		<div class="grid w-fit grid-cols-[6rem_repeat(3,minmax(5rem,1fr))] items-center gap-3">
+			<div></div>
+			{#each KBD_TONES as tone (tone)}
+				<div class="text-center text-xs text-foreground-muted">{tone}</div>
+			{/each}
+			{#each KBD_FORMATS as format (format)}
+				<div class="text-xs text-foreground-muted">{format}</div>
+				{#each KBD_TONES as tone (tone)}
+					<div
+						class={[
+							'flex justify-center rounded-md p-3',
+							tone === 'inverted' ? 'bg-primary text-primary-foreground' : 'bg-surface',
+						]}
+					>
+						<Kbd {...args} {format} {tone}>
+							{#if format === 'lucide'}
+								<CommandIcon />
+							{:else}
+								K
+							{/if}
+						</Kbd>
+					</div>
+				{/each}
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Single Key">
 	{#snippet template(args: KbdProps)}
 		<div class="grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-3">

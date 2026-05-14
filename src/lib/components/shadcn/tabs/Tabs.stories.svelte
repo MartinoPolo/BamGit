@@ -16,12 +16,23 @@
 	import UserIcon from '@lucide/svelte/icons/user';
 	import BellIcon from '@lucide/svelte/icons/bell';
 
+	const TAB_ACTIVE_OPTIONS = [false, true] as const;
 	let defaultActive = $state('Overview');
 	let iconsActive = $state('Profile');
 	let disabledActive = $state('Active');
 	let badgeActive = $state('Inbox');
 	let manyActive = $state('Day');
 </script>
+
+<Story name="All Variants">
+	{#snippet template()}
+		<Tabs>
+			{#each TAB_ACTIVE_OPTIONS as active (active)}
+				<Tab {active}>{active ? 'active' : 'inactive'}</Tab>
+			{/each}
+		</Tabs>
+	{/snippet}
+</Story>
 
 <Story name="Default">
 	{#snippet template()}

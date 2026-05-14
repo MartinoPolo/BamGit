@@ -29,40 +29,6 @@
 	import UserIcon from '@lucide/svelte/icons/user';
 </script>
 
-<Story name="Default" args={{ label: 'ISSUES', value: 12, tone: 'neutral' }}>
-	{#snippet template(args: StatCellProps)}
-		<div class="w-17.5">
-			<StatCell {...args} />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Tones">
-	{#snippet template(args: StatCellProps)}
-		<div class="flex gap-2">
-			{#each STAT_CELL_TONES as tone (tone)}
-				<StatCell
-					{...args}
-					label={tone}
-					value={tone === 'zero'
-						? 0
-						: tone === 'neutral'
-							? 12
-							: tone === 'warning'
-								? 3
-								: 2}
-					{tone}
-					icon={tone === 'warning'
-						? UserIcon
-						: tone === 'danger'
-							? AlertIcon
-							: ListChecksIcon}
-				/>
-			{/each}
-		</div>
-	{/snippet}
-</Story>
-
 <Story name="All Variants">
 	{#snippet template(args: StatCellProps)}
 		<div class="grid w-73 grid-cols-4 gap-1.5">
@@ -85,6 +51,14 @@
 							: ListChecksIcon}
 				/>
 			{/each}
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Default" args={{ label: 'ISSUES', value: 12, tone: 'neutral' }}>
+	{#snippet template(args: StatCellProps)}
+		<div class="w-17.5">
+			<StatCell {...args} />
 		</div>
 	{/snippet}
 </Story>

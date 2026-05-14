@@ -18,6 +18,21 @@
 	type CollapsedItemProps = ComponentProps<typeof SidebarCollapsedItem>;
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: CollapsedItemProps)}
+		<Tooltip.Provider>
+			<div class="flex gap-4 rounded-lg bg-sidebar p-4">
+				{#each [false, true] as active (active)}
+					<div class="flex flex-col items-center gap-2">
+						<p class="text-xs text-muted-foreground">{active ? 'active' : 'inactive'}</p>
+						<SidebarCollapsedItem {...args} icon={HomeIcon} label="Dashboard" {active} />
+					</div>
+				{/each}
+			</div>
+		</Tooltip.Provider>
+	{/snippet}
+</Story>
+
 <Story name="Default" args={{ icon: HomeIcon, label: 'Dashboard' }}>
 	{#snippet template(args: CollapsedItemProps)}
 		<Tooltip.Provider>

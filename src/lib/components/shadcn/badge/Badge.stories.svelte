@@ -33,42 +33,35 @@
 	import AlertIcon from '@lucide/svelte/icons/triangle-alert';
 </script>
 
-<Story name="Default" args={{ tone: 'neutral' }}>
+<Story name="All Variants">
 	{#snippet template(args: BadgeProps)}
-		<Badge {...args}>Default</Badge>
+		<div class="flex flex-col gap-6 w-96">
+			{#each BADGE_FORMATS as format (format)}
+				<div class="flex flex-col gap-3">
+					<p class="text-sm font-medium text-foreground-muted">{format}</p>
+					<div class="grid grid-cols-[7rem_repeat(2,minmax(0,1fr))] items-center gap-3">
+						<div></div>
+						{#each BADGE_SIZES as size (size)}
+							<div class="text-center text-xs text-foreground-muted">{size}</div>
+						{/each}
+						{#each BADGE_TONES as tone (tone)}
+							<div class="text-xs text-foreground-muted">{tone}</div>
+							{#each BADGE_SIZES as size (size)}
+								<div class="flex justify-center">
+									<Badge {...args} {tone} {format} {size}>{tone}</Badge>
+								</div>
+							{/each}
+						{/each}
+					</div>
+				</div>
+			{/each}
+		</div>
 	{/snippet}
 </Story>
 
-<Story name="All Tones">
+<Story name="Default" args={{ tone: 'neutral' }}>
 	{#snippet template(args: BadgeProps)}
-		<div class="flex flex-col gap-6 w-80">
-			<div class="flex flex-col gap-3">
-				<p class="text-sm font-medium text-foreground-muted">Tone x size</p>
-				<div class="grid grid-cols-[7rem_repeat(2,minmax(0,1fr))] items-center gap-3">
-					<div></div>
-					{#each BADGE_SIZES as size (size)}
-						<div class="text-center text-xs text-foreground-muted">{size}</div>
-					{/each}
-					{#each BADGE_TONES as tone (tone)}
-						<div class="text-xs text-foreground-muted">{tone}</div>
-						{#each BADGE_SIZES as size (size)}
-							<div class="flex justify-center">
-								<Badge {...args} {tone} {size}>{tone}</Badge>
-							</div>
-						{/each}
-					{/each}
-				</div>
-			</div>
-
-			<div class="flex flex-col gap-3">
-				<p class="text-sm font-medium text-foreground-muted">Dot states</p>
-				<div class="flex flex-wrap items-center gap-3">
-					{#each BADGE_DOT_OPTIONS as dot (dot)}
-						<Badge {...args} tone="success" {dot}>{dot}</Badge>
-					{/each}
-				</div>
-			</div>
-		</div>
+		<Badge {...args}>Default</Badge>
 	{/snippet}
 </Story>
 

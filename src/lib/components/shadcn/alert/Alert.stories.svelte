@@ -23,6 +23,38 @@
 	import Button from '../button/Button.svelte';
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: AlertProps)}
+		<div class="flex max-w-lg flex-col gap-3">
+			{#each ALERT_TONES as tone (tone)}
+				<Alert {...args} {tone}>
+					{#if tone === 'destructive'}
+						<TriangleAlertIcon />
+					{:else}
+						<InfoIcon />
+					{/if}
+					<AlertTitle>{tone}</AlertTitle>
+					<AlertDescription>Alert tone: {tone}.</AlertDescription>
+				</Alert>
+			{/each}
+			<Alert>
+				<TriangleAlertIcon />
+				<AlertTitle>Update available</AlertTitle>
+				<AlertDescription
+					>A new version is available. Restart to apply the update.</AlertDescription
+				>
+				<AlertAction>
+					<Button intent="secondary" size="sm">Restart now</Button>
+				</AlertAction>
+			</Alert>
+			<Alert>
+				<InfoIcon />
+				<AlertDescription>Your changes have been saved successfully.</AlertDescription>
+			</Alert>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Default">
 	{#snippet template(args)}
 		<div class="w-96">
@@ -82,38 +114,6 @@
 				<AlertAction>
 					<Button intent="secondary" size="sm">Restart now</Button>
 				</AlertAction>
-			</Alert>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Tones">
-	{#snippet template(args: AlertProps)}
-		<div class="flex max-w-lg flex-col gap-3">
-			{#each ALERT_TONES as tone (tone)}
-				<Alert {...args} {tone}>
-					{#if tone === 'destructive'}
-						<TriangleAlertIcon />
-					{:else}
-						<InfoIcon />
-					{/if}
-					<AlertTitle>{tone}</AlertTitle>
-					<AlertDescription>Alert tone: {tone}.</AlertDescription>
-				</Alert>
-			{/each}
-			<Alert>
-				<TriangleAlertIcon />
-				<AlertTitle>Update available</AlertTitle>
-				<AlertDescription
-					>A new version is available. Restart to apply the update.</AlertDescription
-				>
-				<AlertAction>
-					<Button intent="secondary" size="sm">Restart now</Button>
-				</AlertAction>
-			</Alert>
-			<Alert>
-				<InfoIcon />
-				<AlertDescription>Your changes have been saved successfully.</AlertDescription>
 			</Alert>
 		</div>
 	{/snippet}

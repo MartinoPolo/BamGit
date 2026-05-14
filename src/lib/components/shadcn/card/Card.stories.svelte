@@ -23,6 +23,26 @@
 	import type { CardProps } from './card-variants.js';
 </script>
 
+<Story name="All Variants">
+	{#snippet template(args: CardProps)}
+		<div class="grid grid-cols-[7rem_repeat(2,minmax(0,1fr))] items-stretch gap-3">
+			<div></div>
+			{#each CARD_PADDING_OPTIONS as padding (padding)}
+				<div class="text-center text-xs text-foreground-muted">{padding}</div>
+			{/each}
+			{#each CARD_STATE_OPTIONS as state (state)}
+				<div class="self-center text-xs text-foreground-muted">{state}</div>
+				{#each CARD_PADDING_OPTIONS as padding (padding)}
+					<Card {...args} {padding} {state}>
+						<p class="text-xs font-medium text-foreground-muted">{padding}</p>
+						<p class="text-sm text-foreground">{state}</p>
+					</Card>
+				{/each}
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Default" args={{ padding: 'padded' }}>
 	{#snippet template(args: CardProps)}
 		<Card {...args}>
@@ -49,26 +69,6 @@
 					<p class="text-xs font-medium text-foreground-muted">{state}</p>
 					<p class="text-sm text-foreground">Card in {state} state.</p>
 				</Card>
-			{/each}
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Variants">
-	{#snippet template(args: CardProps)}
-		<div class="grid grid-cols-[7rem_repeat(2,minmax(0,1fr))] items-stretch gap-3">
-			<div></div>
-			{#each CARD_PADDING_OPTIONS as padding (padding)}
-				<div class="text-center text-xs text-foreground-muted">{padding}</div>
-			{/each}
-			{#each CARD_STATE_OPTIONS as state (state)}
-				<div class="self-center text-xs text-foreground-muted">{state}</div>
-				{#each CARD_PADDING_OPTIONS as padding (padding)}
-					<Card {...args} {padding} {state}>
-						<p class="text-xs font-medium text-foreground-muted">{padding}</p>
-						<p class="text-sm text-foreground">{state}</p>
-					</Card>
-				{/each}
 			{/each}
 		</div>
 	{/snippet}
