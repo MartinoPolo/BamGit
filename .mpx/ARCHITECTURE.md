@@ -95,18 +95,22 @@ graph TB
         subgraph RCMD ["Tauri Commands (IPC layer)"]
             RC1["issue_commands"]
             RC2["session_commands"]
-            RC3["github_commands"]
+            RC3["github_commands + github_auth"]
             RC4["git_status_commands"]
-            RC5["dashboard_commands"]
+            RC5["dashboard_commands + portfolio"]
             RC6["worktree_commands"]
             RC7["action_commands"]
             RC8["notification_commands"]
             RC9["color_palette_commands"]
             RC10["label_shape_mapping_commands"]
             RC11["metrics_commands"]
-            RC12["platform_commands"]
+            RC12["terminal + dialog + process"]
             RC13["keyboard_shortcut_commands"]
             RC14["window_commands"]
+            RC15["ai_config_commands + mutations"]
+            RC16["character_pack_commands"]
+            RC17["workspace_command_commands"]
+            RC18["dependency + raw_requirements"]
         end
 
         subgraph RSESS ["Session Subsystem"]
@@ -283,19 +287,25 @@ import { Persisted } from '$lib/reactivity/persisted.svelte';
 
 | Module                | Context Hook             | Owns                                                                                  |
 | --------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
-| `board/`              | `useBoard()`             | Workspace config, palettes, theme, view modes                                         |
-| `issues/`             | `useIssues()`            | Issue CRUD, labels, worktrees, color system, priority, sorting                        |
-| `sessions/`           | `useSessions()`          | Session spawn/monitor/adopt, chat rendering, provider abstraction, sub-agent tracking |
-| `version-control/`    | `useVersionControl()`    | Git status, GitHub sync, branch badges, PR lifecycle, worktree lifecycle              |
-| `visualization/`      | Pure functions           | Forest layout, tree state computation, dependency graph, overlays                     |
-| `notifications/`      | `useNotifications()`     | CESP event routing, sound playback, window flash, per-event config                    |
 | `actions/`            | `useActions()`           | Action templates, skill invocation, quick actions                                     |
-| `keyboard-shortcuts/` | `useKeyboardShortcuts()` | Shortcut registry, key listener, inline rebinding, SQLite persistence                 |
+| `ai-config/`          | `useAiConfig()`          | AI config discovery, provider settings, sorting/grouping, 13 UI components            |
+| `board/`              | `useBoard()`             | Workspace config, palettes, theme, selection state, dashboard UI                      |
+| `character-packs/`    | `useCharacterPacks()`    | Character packs, sound assignments, language options, event tier info                 |
+| `chat/`               | (helpers)                | Message building, markdown rendering, scroll anchoring, chat types                    |
 | `command-palette/`    | `useCommandPalette()`    | `Ctrl+K` palette, fuzzy search, action/navigation/issue items                         |
-| `window/`             | `useWindow()`            | Window type detection, workspace binding, overview vs workspace mode                  |
-| `settings/`           | `useSettings()`          | AI config browser, export/import                                                      |
-| `metrics/`            | `useMetrics()`           | Token/cost tracking, statistics, achievements, aggregation, optimize, compare         |
-| `workflow/`           | `useWorkflow()`          | AFK monitoring loop, HITL session orchestration, label management                     |
+| `contextual-actions/` | (pure functions)         | Context-aware action derivation, action pool, visibility rules                        |
+| `creation-wizard/`    | `useCreationWizard()`    | Wizard context, smart naming (branch/issue names), wizard steps                       |
+| `dependency-graph/`   | (pure functions)         | DAG layout (Dagre), ready state classification, PCS grouping, filters                 |
+| `issues/`             | `useIssues()`            | Issue CRUD, labels, worktrees, color system, priority, sorting                        |
+| `keyboard-shortcuts/` | `useKeyboardShortcuts()` | Shortcut registry, key listener, inline rebinding, SQLite persistence                 |
+| `notifications/`      | `useNotifications()`     | CESP event routing, sound playback, window flash, per-event config                    |
+| `raw-requirements/`   | (helpers)                | Requirement parsing/serialization, timestamp formatting                               |
+| `sessions/`           | `useSessions()`          | Session spawn/monitor/adopt, chat rendering, provider abstraction, sub-agent tracking |
+| `toasts/`             | `useToasts()`            | Toast context, mock toast bridge for browser/Storybook mode                           |
+| `usage/`              | (page-scoped)            | Usage dashboard state, period filters, URL state sync                                 |
+| `version-control/`    | `useVersionControl()`    | Git status, GitHub sync, branch badges, PR lifecycle, worktree lifecycle              |
+| `visualization/`      | Pure functions           | Forest layout, tree state computation, depth rows, glow overlay resolution            |
+| `window/`             | `useWindow()`            | Window type detection, workspace binding, geometry save/restore, app settings         |
 
 ## Rust Backend Modules
 
@@ -549,22 +559,26 @@ The forest displays issue trees in a deterministic, equidistant arrangement with
 └─────────────────────────────────────────┘
 ```
 
-## Design System
+## Design System & Component Architecture
 
-Source of truth: `claude_design/tokens.css`
+Source of truth: `claude_design/tokens.css` for design tokens, `app.css` for `@theme inline`.
 
 - **Colors:** OKLCH (moss green primary, amber accent, bark brown, sky gradients)
 - **Typography:** Geist (sans + mono), scale from 10.5px to 48px
 - **Dark theme** primary, light theme secondary
-- **Accent switcher:** moss / amber / bark / azure (runtime CSS variable overrides)
-- **Component classes:** `.gk-btn`, `.gk-input`, `.gk-badge`, `.gk-card`, `.gk-modal`, etc.
+- **Accent switcher:** moss / amber / bark / azure + 8 more (runtime CSS variable overrides via `data-accent`)
+- **Component tiers:**
+    - `shadcn/` — 26 shadcn-svelte wrappers (bits-ui primitives). Variants extracted to `*-variants.ts` files
+    - `base/` — foundational components (HelpText, SearchField, StatCell, StatusRow)
+    - `derived/` — enhanced/specialized (ColorPicker, GitHubBadge, RepoCombobox, SessionStateChip, etc.)
+    - `blocks/` — composed feature blocks (issue cards, workspace cards, forest, chat, settings, usage, etc.)
+- **Storybook:** 57 stories, standardized format (`.stories.svelte`), global ThemeDecorator, tiered context system
+- **Testing:** Vitest (unit + component), Storybook play tests (interaction), Playwright (E2E). 80% coverage target
 
 ## Planned Improvements
 
 - **`DatabaseState::read()`/`write()` → `Result` return:** Current `.expect()` calls should return `Result` to propagate pool exhaustion / mutex poisoning errors gracefully instead of panicking.
 - **Batch refresh command:** `refreshAllForDashboard` currently makes N+1 IPC calls. A single batch Tauri command would reduce overhead.
-- **Pre-computed `childrenByParentId` map:** Replace per-parent linear scan with a `$derived` `SvelteMap` for O(1) lookups.
-- **`computeVisualization` context parameter:** Add `TreeComputeContext` parameter for session count, completed sessions, commits.
 
 ## Reference Repositories
 
