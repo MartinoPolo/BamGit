@@ -3,7 +3,7 @@ sandbox_mode = "workspace-write"
 # Keep MCP servers available but disabled by default. Enable one only for a task
 # that needs it, so their tool schemas and startup logs do not bloat context.
 [mcp_servers.svelte]
-enabled = false
+enabled = true
 url = "https://mcp.svelte.dev/mcp"
 
 [mcp_servers.context7]
