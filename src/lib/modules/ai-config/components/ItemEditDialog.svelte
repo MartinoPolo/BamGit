@@ -176,7 +176,7 @@
 
 		<Dialog.Footer class="shrink-0 justify-between">
 			<Button intent="ghost" size="sm" onclick={handleOpenInEditor}>
-				<FolderOpenIcon class="size-3.5" />
+				<FolderOpenIcon data-icon="inline-start" />
 				Open in editor
 			</Button>
 

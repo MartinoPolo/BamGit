@@ -54,7 +54,7 @@
 					{#snippet child({ props })}
 						<div class="relative inline-block">
 							<Button intent="secondary" size="icon" {...props}>
-								<BellIcon class="size-3.5" />
+								<BellIcon data-icon="inline-start" />
 							</Button>
 							<span
 								class="absolute right-1 top-1 size-1.75 rounded-full bg-status-danger"

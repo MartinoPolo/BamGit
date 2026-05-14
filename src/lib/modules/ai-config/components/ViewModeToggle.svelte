@@ -23,7 +23,7 @@
 		onclick={() => aiConfig.setViewModeFor(tab, 'card')}
 		class={aiConfig.viewModeFor(tab) === 'card' ? 'bg-surface-2 text-foreground' : ''}
 	>
-		<LayoutGridIcon />
+		<LayoutGridIcon data-icon="inline-end" />
 	</Button>
 	<Button
 		intent="ghost"
@@ -33,6 +33,6 @@
 		onclick={() => aiConfig.setViewModeFor(tab, 'list')}
 		class={aiConfig.viewModeFor(tab) === 'list' ? 'bg-surface-2 text-foreground' : ''}
 	>
-		<ListIcon />
+		<ListIcon data-icon="inline-end" />
 	</Button>
 </div>

@@ -50,14 +50,14 @@
 		{#if onSync}
 			<WithTooltip text={m.topbar_sync()}>
 				<Button intent="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
-					<RefreshCwIcon size={13} class={syncing ? 'animate-spin' : ''} />
+					<RefreshCwIcon class={syncing ? 'animate-spin' : ''} data-icon="inline-start" />
 				</Button>
 			</WithTooltip>
 		{/if}
 
 		<WithTooltip text={m.topbar_notifications()}>
 			<Button intent="ghost" size="icon-sm" class="relative">
-				<BellIcon size={13} />
+				<BellIcon data-icon="inline-start" />
 				{#if hasNotifications}
 					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
 				{/if}
@@ -67,7 +67,7 @@
 		{#if onQuickIdeas}
 			<WithTooltip text={m.raw_requirements_title()}>
 				<Button intent="ghost" size="icon-sm" onclick={onQuickIdeas}>
-					<LightbulbIcon size={13} />
+					<LightbulbIcon data-icon="inline-start" />
 				</Button>
 			</WithTooltip>
 		{/if}
@@ -79,7 +79,7 @@
 					size="icon-sm"
 					onclick={onToggleForest}
 				>
-					<TreesIcon size={13} />
+					<TreesIcon data-icon="inline-start" />
 				</Button>
 			</WithTooltip>
 		{/if}
@@ -87,7 +87,7 @@
 		{#if onCreateIssue}
 			<WithTooltip text={m.topbar_create_issue_title()}>
 				<Button intent="primary" size="sm" onclick={onCreateIssue}>
-					<PlusIcon size={12} />
+					<PlusIcon data-icon="inline-start" />
 					<span>{m.topbar_create_issue()}</span>
 				</Button>
 			</WithTooltip>

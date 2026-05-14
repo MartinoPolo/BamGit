@@ -92,7 +92,7 @@
 							{#snippet asChild(props)}
 								<span {...props}>
 									<Button intent="secondary" size="sm" disabled>
-										<SparklesIcon />
+										<SparklesIcon data-icon="inline-start" />
 										{m.raw_requirements_process()}
 									</Button>
 								</span>
@@ -108,7 +108,7 @@
 							}}
 							href={resolve('/quick-ideas')}
 						>
-							<ExternalLinkIcon />
+							<ExternalLinkIcon data-icon="inline-start" />
 							{m.raw_requirements_full_page()}
 						</Button>
 					{/if}

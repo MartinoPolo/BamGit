@@ -300,7 +300,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<FolderIcon size={14} strokeWidth={1.7} />
+						<FolderIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
 				</WithTooltip>
 				<WithTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
@@ -311,7 +311,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<TerminalIcon size={14} strokeWidth={1.7} />
+						<TerminalIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
 				</WithTooltip>
 				<WithTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
@@ -322,7 +322,7 @@
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
 						oncontextmenu={handleQuickActionContextMenu}
 					>
-						<VscodeIcon size={14} />
+						<VscodeIcon data-icon="inline-end" />
 					</Button>
 				</WithTooltip>
 
@@ -339,9 +339,9 @@
 						onclick={handleToggleMute}
 					>
 						{#if issue.is_sound_muted}
-							<VolumeXIcon size={14} strokeWidth={1.7} />
+							<VolumeXIcon strokeWidth={1.7} data-icon="inline-start" />
 						{:else}
-							<Volume2Icon size={14} strokeWidth={1.7} />
+							<Volume2Icon strokeWidth={1.7} data-icon="inline-start" />
 						{/if}
 					</Button>
 				</WithTooltip>

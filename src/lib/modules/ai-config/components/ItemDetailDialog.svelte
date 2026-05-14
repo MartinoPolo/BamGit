@@ -263,13 +263,13 @@
 				<div class="flex gap-1">
 					{#if filePath !== null}
 						<Button intent="ghost" size="sm" onclick={handleOpenFile}>
-							<FileTextIcon class="size-3.5" />
+							<FileTextIcon data-icon="inline-start" />
 							Open file
 						</Button>
 					{/if}
 					{#if parentDir !== null}
 						<Button intent="ghost" size="sm" onclick={handleOpenFolder}>
-							<FolderOpenIcon class="size-3.5" />
+							<FolderOpenIcon data-icon="inline-start" />
 							Open folder
 						</Button>
 					{/if}

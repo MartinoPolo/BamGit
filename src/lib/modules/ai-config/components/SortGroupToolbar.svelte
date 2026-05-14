@@ -79,7 +79,7 @@
 		<DropdownMenu.Trigger>
 			{#snippet child({ props })}
 				<Button {...props} intent="ghost" size="sm" class="h-7 gap-1.5 px-2 text-xs">
-					<ArrowUpDownIcon class="size-3" />
+					<ArrowUpDownIcon data-icon="inline-start" />
 					Sort: {currentSortLabel}
 				</Button>
 			{/snippet}
@@ -100,7 +100,7 @@
 		<DropdownMenu.Trigger>
 			{#snippet child({ props })}
 				<Button {...props} intent="ghost" size="sm" class="h-7 gap-1.5 px-2 text-xs">
-					<LayersIcon class="size-3" />
+					<LayersIcon data-icon="inline-start" />
 					Group: {currentGroupLabel}
 				</Button>
 			{/snippet}

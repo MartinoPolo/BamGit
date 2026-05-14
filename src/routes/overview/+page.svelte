@@ -77,13 +77,13 @@
 				aria-label="Toggle archived workspaces"
 				aria-pressed={showArchived}
 			>
-				<ArchiveIcon size={16} />
+				<ArchiveIcon data-icon="inline-end" />
 			</Button>
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button {...props} intent="secondary" size="icon">
-							<GithubIcon size={16} />
+							<GithubIcon data-icon="inline-start" />
 						</Button>
 					{/snippet}
 				</Popover.Trigger>

@@ -168,7 +168,7 @@
 			</div>
 			{#if dirty}
 				<Button onclick={handleSaveGeneral} disabled={saveStatus === 'saving'}>
-					<SaveIcon size={14} />
+					<SaveIcon data-icon="inline-start" />
 					{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
 				</Button>
 			{:else if saveStatus === 'saved'}
@@ -269,7 +269,7 @@
 						<Badge format="mono">{serverCommands.length}</Badge>
 					</div>
 					<Button intent="ghost" size="sm" onclick={() => handleAddCommand('server')}>
-						<PlusIcon size={14} />
+						<PlusIcon data-icon="inline-start" />
 						Add Server
 					</Button>
 				</div>
@@ -311,7 +311,7 @@
 						<Badge format="mono">{checkCommands.length}</Badge>
 					</div>
 					<Button intent="ghost" size="sm" onclick={() => handleAddCommand('check')}>
-						<PlusIcon size={14} />
+						<PlusIcon data-icon="inline-start" />
 						Add Check
 					</Button>
 				</div>

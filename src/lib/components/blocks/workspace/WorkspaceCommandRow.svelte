@@ -83,6 +83,6 @@
 		class="mt-1 shrink-0 text-muted-foreground hover:text-destructive"
 		onclick={() => onDelete(command.id)}
 	>
-		<TrashIcon size={14} />
+		<TrashIcon data-icon="inline-end" />
 	</Button>
 </div>

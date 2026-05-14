@@ -91,7 +91,7 @@
 							disabled={!hasActiveIssues}
 							aria-label="Archive selected"
 						>
-							<ArchiveIcon />
+							<ArchiveIcon data-icon="inline-start" />
 							Archive
 						</Button>
 					{/snippet}
@@ -109,7 +109,7 @@
 							disabled={!hasArchivedIssues}
 							aria-label="Unarchive selected"
 						>
-							<ArchiveRestoreIcon />
+							<ArchiveRestoreIcon data-icon="inline-start" />
 							Unarchive
 						</Button>
 					{/snippet}
@@ -125,7 +125,7 @@
 						onclick={onBatchDelete}
 						aria-label="Delete selected"
 					>
-						<Trash2Icon />
+						<Trash2Icon data-icon="inline-start" />
 						Delete
 					</Button>
 				{/snippet}
@@ -136,7 +136,7 @@
 					{#snippet child({ props })}
 						<Button {...props} intent="ghost" size="sm" aria-label="Change priority">
 							Change Priority
-							<ChevronDownIcon />
+							<ChevronDownIcon data-icon="inline-end" />
 						</Button>
 					{/snippet}
 				</Popover.Trigger>
@@ -163,14 +163,14 @@
 							disabled={!hasActiveWorktrees}
 							aria-label="Clean selected worktrees"
 						>
-							<ScissorsIcon />
+							<ScissorsIcon data-icon="inline-start" />
 						</Button>
 					{/snippet}
 				</WithTooltip>
 			{/if}
 
 			<Button intent="ghost" size="icon-sm" onclick={onDeselectAll} aria-label="Deselect all">
-				<XIcon />
+				<XIcon data-icon="inline-start" />
 			</Button>
 		</div>
 	{:else}
@@ -185,7 +185,7 @@
 						onclick={onBatchPrune}
 						aria-label="Clean up worktrees"
 					>
-						<ScissorsIcon />
+						<ScissorsIcon data-icon="inline-start" />
 					</Button>
 				{/snippet}
 			</WithTooltip>

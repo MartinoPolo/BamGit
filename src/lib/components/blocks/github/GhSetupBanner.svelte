@@ -20,7 +20,7 @@
 		<span class="flex-1">Connect your GitHub account to sync issues, PRs, and branches.</span>
 		{#if onconnect}
 			<Button intent="secondary" size="sm" onclick={onconnect}>
-				<GithubIcon size={14} />
+				<GithubIcon data-icon="inline-start" />
 				Connect to GitHub
 			</Button>
 		{/if}

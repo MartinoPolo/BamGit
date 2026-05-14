@@ -51,7 +51,7 @@
 			onclick={onDismiss}
 			aria-label="Dismiss"
 		>
-			<XIcon class="size-3" />
+			<XIcon data-icon="inline-start" />
 		</Button>
 	{/if}
 </div>

@@ -177,7 +177,7 @@
 					addDialogOpen = true;
 				}}
 			>
-				<PlusIcon class="size-3" />
+				<PlusIcon data-icon="inline-start" />
 				Add source
 			</Button>
 		</div>

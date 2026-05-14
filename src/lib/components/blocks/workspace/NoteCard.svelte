@@ -71,7 +71,7 @@
 					class="opacity-0 transition-opacity group-hover:opacity-100"
 					onclick={startEditing}
 				>
-					<PencilIcon />
+					<PencilIcon data-icon="inline-start" />
 					<span class="sr-only">{m.raw_requirements_edit()}</span>
 				</Button>
 				{#if showToggleProcessed}
@@ -81,7 +81,7 @@
 						class="opacity-0 transition-opacity group-hover:opacity-100"
 						onclick={() => void rawRequirementsCtx.toggleProcessed(index)}
 					>
-						<CircleCheckIcon />
+						<CircleCheckIcon data-icon="inline-start" />
 						<span class="sr-only">{m.raw_requirements_toggle_processed()}</span>
 					</Button>
 				{/if}
@@ -100,11 +100,11 @@
 		/>
 		<div class="mt-2 flex justify-end gap-1">
 			<Button intent="ghost" size="sm" onclick={cancelEditing}>
-				<XIcon />
+				<XIcon data-icon="inline-start" />
 				{m.raw_requirements_cancel_edit()}
 			</Button>
 			<Button intent="primary" size="sm" onclick={() => void saveEdit()}>
-				<CheckIcon />
+				<CheckIcon data-icon="inline-start" />
 				{m.raw_requirements_save_edit()}
 			</Button>
 		</div>

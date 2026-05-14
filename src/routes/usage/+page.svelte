@@ -168,7 +168,7 @@
 				onrefresh={() => ctx.loadData(windowCtx.boundDashboardId ?? undefined)}
 			/>
 			<Button intent="secondary" size="sm" onclick={handleExportCsv}>
-				<DownloadIcon />
+				<DownloadIcon data-icon="inline-start" />
 				Export CSV
 			</Button>
 		</div>

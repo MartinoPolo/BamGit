@@ -1,14 +1,16 @@
 <script lang="ts">
-	interface Props {
+	import type { SVGAttributes } from 'svelte/elements';
+
+	interface Props extends SVGAttributes<SVGSVGElement> {
 		size?: number;
-		class?: string;
 	}
 
-	let { size = 24, class: className = '' }: Props = $props();
+	let { size = 24, class: className = '', ...restProps }: Props = $props();
 </script>
 
 <svg
 	xmlns="http://www.w3.org/2000/svg"
+	{...restProps}
 	width={size}
 	height={size}
 	viewBox="0 0 24 24"

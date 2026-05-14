@@ -214,7 +214,7 @@
 					onclick={handleOpenFile}
 					class="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
 				>
-					<FileTextIcon class="size-3" />
+					<FileTextIcon data-icon="inline-start" />
 				</Button>
 			{/if}
 			{#if parentDir !== null}
@@ -225,7 +225,7 @@
 					onclick={handleOpenFolder}
 					class="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
 				>
-					<FolderOpenIcon class="size-3" />
+					<FolderOpenIcon data-icon="inline-start" />
 				</Button>
 			{/if}
 		</div>

@@ -69,11 +69,8 @@
 			class="relative"
 		>
 			<RefreshCwIcon
-				class={cn(
-					'size-3.5',
-					isLoading && 'animate-spin',
-					isMuted && 'text-muted-foreground',
-				)}
+				class={cn(isLoading && 'animate-spin', isMuted && 'text-muted-foreground')}
+				data-icon="inline-start"
 			/>
 			{#if showBadge}
 				<span
@@ -86,7 +83,8 @@
 {:else}
 	<Button intent="secondary" size="sm" disabled={isLoading} onclick={onrefresh} class="relative">
 		<RefreshCwIcon
-			class={cn('size-3.5', isLoading && 'animate-spin', isMuted && 'text-muted-foreground')}
+			class={cn(isLoading && 'animate-spin', isMuted && 'text-muted-foreground')}
+			data-icon="inline-start"
 		/>
 		{#if showBadge}
 			<span class="absolute right-1 top-1 size-1.5 rounded-full bg-primary" aria-hidden="true"

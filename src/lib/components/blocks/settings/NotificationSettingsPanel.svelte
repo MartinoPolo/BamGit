@@ -303,7 +303,7 @@
 								size="icon-sm"
 								onclick={() => handleRemovePack(pack.name)}
 							>
-								<TrashIcon class="size-4" />
+								<TrashIcon data-icon="inline-end" />
 							</Button>
 						</WithTooltip>
 					{/if}

@@ -57,7 +57,7 @@
 				class="h-7 px-2 text-xs text-destructive hover:bg-destructive/10"
 				onclick={() => (showClearDialog = true)}
 			>
-				<Trash2Icon class="size-3" />
+				<Trash2Icon data-icon="inline-start" />
 				Clear
 			</Button>
 		{/if}

@@ -430,7 +430,7 @@
 									class="ml-auto h-7"
 									onclick={handleReMap}
 								>
-									<RefreshCwIcon class="size-3" />
+									<RefreshCwIcon data-icon="inline-start" />
 									Re-map
 								</Button>
 							</div>

@@ -56,16 +56,22 @@
 		<div class="flex gap-4">
 			<div class="rounded-lg bg-primary p-4">
 				<div class="flex items-center gap-2">
-					<Button intent="ghost-overlay" size="icon-sm" {...args}><MailIcon /></Button>
-					<Button intent="ghost-overlay" size="icon-sm" {...args}><SettingsIcon /></Button
+					<Button intent="ghost-overlay" size="icon-sm" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost-overlay" size="icon-sm" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
 					>
 					<Button intent="ghost-overlay" {...args}>Action</Button>
 				</div>
 			</div>
 			<div class="rounded-lg bg-surface-2 p-4">
 				<div class="flex items-center gap-2">
-					<Button intent="ghost-overlay" size="icon-sm" {...args}><MailIcon /></Button>
-					<Button intent="ghost-overlay" size="icon-sm" {...args}><SettingsIcon /></Button
+					<Button intent="ghost-overlay" size="icon-sm" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost-overlay" size="icon-sm" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
 					>
 					<Button intent="ghost-overlay" {...args}>Action</Button>
 				</div>
@@ -132,7 +138,9 @@
 						<div class="text-xs text-foreground-muted">{intent}</div>
 						{#each BUTTON_ICON_SIZES as size (size)}
 							<div class="flex justify-center">
-								<Button {...args} {intent} {size}><PlusIcon /></Button>
+								<Button {...args} {intent} {size}
+									><PlusIcon data-icon="inline-start" /></Button
+								>
 							</div>
 						{/each}
 					{/each}
@@ -188,12 +196,24 @@
 <Story name="Icon Only">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
-			<Button intent="primary" size="icon" {...args}><PlusIcon /></Button>
-			<Button intent="secondary" size="icon" {...args}><SettingsIcon /></Button>
-			<Button intent="ghost" size="icon" {...args}><MailIcon /></Button>
-			<Button intent="danger" size="icon" {...args}><TrashIcon /></Button>
-			<Button intent="primary" size="icon-sm" {...args}><PlusIcon /></Button>
-			<Button intent="ghost" size="icon-sm" {...args}><SettingsIcon /></Button>
+			<Button intent="primary" size="icon" {...args}
+				><PlusIcon data-icon="inline-start" /></Button
+			>
+			<Button intent="secondary" size="icon" {...args}
+				><SettingsIcon data-icon="inline-start" /></Button
+			>
+			<Button intent="ghost" size="icon" {...args}
+				><MailIcon data-icon="inline-start" /></Button
+			>
+			<Button intent="danger" size="icon" {...args}
+				><TrashIcon data-icon="inline-start" /></Button
+			>
+			<Button intent="primary" size="icon-sm" {...args}
+				><PlusIcon data-icon="inline-start" /></Button
+			>
+			<Button intent="ghost" size="icon-sm" {...args}
+				><SettingsIcon data-icon="inline-start" /></Button
+			>
 		</div>
 	{/snippet}
 </Story>

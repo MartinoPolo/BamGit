@@ -21,8 +21,8 @@
 		class="w-full justify-start gap-2 bg-surface-2 hover:bg-surface-3"
 		{onclick}
 	>
-		<FolderIcon size={13} class="text-primary" />
+		<FolderIcon class="text-primary" data-icon="inline-start" />
 		<span class="flex-1 truncate text-[12.5px] font-medium">{name}</span>
-		<PencilIcon size={12} class="text-foreground-subtle" />
+		<PencilIcon class="text-foreground-subtle" data-icon="inline-end" />
 	</Button>
 {/if}

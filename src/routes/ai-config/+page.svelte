@@ -138,9 +138,9 @@
 			disabled={aiConfig.loading}
 		>
 			{#if aiConfig.loading}
-				<LoaderCircleIcon class="animate-spin" />
+				<LoaderCircleIcon class="animate-spin" data-icon="inline-end" />
 			{:else}
-				<RefreshCwIcon />
+				<RefreshCwIcon data-icon="inline-end" />
 			{/if}
 		</Button>
 	</div>

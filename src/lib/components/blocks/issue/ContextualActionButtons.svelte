@@ -25,6 +25,11 @@
 	import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
 	import type { Component } from 'svelte';
 
+	type ActionIconComponent = Component<{
+		size?: number;
+		'data-icon'?: 'inline-start' | 'inline-end';
+	}>;
+
 	interface Props {
 		derivedActions: DerivedActions;
 		onExecute: (actionId: ActionId) => void;
@@ -32,7 +37,7 @@
 
 	let { derivedActions, onExecute }: Props = $props();
 
-	const ICON_MAP: Record<string, Component<{ size?: number }>> = {
+	const ICON_MAP: Record<string, ActionIconComponent> = {
 		play: PlayIcon,
 		hand: HandIcon,
 		eye: EyeIcon,
@@ -54,7 +59,7 @@
 		return ACTION_POOL[actionId].label;
 	}
 
-	function getIcon(actionId: ActionId): Component<{ size?: number }> | undefined {
+	function getIcon(actionId: ActionId): ActionIconComponent | undefined {
 		return ICON_MAP[ACTION_POOL[actionId].icon];
 	}
 
@@ -76,7 +81,7 @@
 			>
 				{#if getIcon(primaryId)}
 					{@const IconComponent = getIcon(primaryId)!}
-					<IconComponent />
+					<IconComponent data-icon="inline-start" />
 				{/if}
 				{getLabel(primaryId)}
 			</Button>
@@ -93,7 +98,7 @@
 			>
 				{#if getIcon(secondaryId)}
 					{@const IconComponent = getIcon(secondaryId)!}
-					<IconComponent />
+					<IconComponent data-icon="inline-start" />
 				{/if}
 				{getLabel(secondaryId)}
 			</Button>
@@ -111,7 +116,7 @@
 							size="icon-sm"
 							onclick={(event: MouseEvent) => event.stopPropagation()}
 						>
-							<MoreHorizontalIcon />
+							<MoreHorizontalIcon data-icon="inline-end" />
 						</Button>
 					</WithTooltip>
 				{/snippet}
@@ -121,7 +126,7 @@
 					<DropdownMenu.Item onclick={() => onExecute(overflowId)}>
 						{#if getIcon(overflowId)}
 							{@const IconComponent = getIcon(overflowId)!}
-							<IconComponent size={14} />
+							<IconComponent />
 						{/if}
 						{getLabel(overflowId)}
 					</DropdownMenu.Item>

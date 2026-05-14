@@ -107,7 +107,7 @@
 							<span
 								class="absolute inset-0 flex items-center justify-center rounded-lg bg-surface-hover opacity-0 transition-opacity group-hover:opacity-100"
 							>
-								<ChevronRightIcon size={14} />
+								<ChevronRightIcon data-icon="inline-start" />
 							</span>
 						</Button>
 					{/snippet}
@@ -129,7 +129,7 @@
 						onclick={onToggleSidebar}
 						aria-label="Collapse sidebar"
 					>
-						<PanelLeftIcon size={14} />
+						<PanelLeftIcon data-icon="inline-start" />
 					</Button>
 				</WithTooltip>
 			{/if}

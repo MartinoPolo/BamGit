@@ -285,7 +285,7 @@
 			class="size-8 p-0"
 			onclick={() => void goto(resolve('/settings'))}
 		>
-			<ArrowLeftIcon class="size-4" />
+			<ArrowLeftIcon data-icon="inline-end" />
 		</Button>
 
 		<h1 class="text-lg font-semibold">
@@ -302,7 +302,7 @@
 			<Button intent="ghost" onclick={() => void goto(resolve('/settings'))}>Cancel</Button>
 			{#if canSave}
 				<Button onclick={handleSave} disabled={saving}>
-					<SaveIcon class="size-4" />
+					<SaveIcon data-icon="inline-start" />
 					{saving ? 'Saving...' : 'Save'}
 				</Button>
 			{:else}
@@ -310,7 +310,7 @@
 					{#snippet asChild(props)}
 						<div {...props}>
 							<Button disabled>
-								<SaveIcon class="size-4" />
+								<SaveIcon data-icon="inline-start" />
 								Save
 							</Button>
 						</div>

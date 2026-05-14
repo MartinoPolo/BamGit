@@ -224,7 +224,7 @@
 						oncontextmenu={(event: MouseEvent) =>
 							handleIconContextMenu(event, onGithubRightClick)}
 					>
-						<GithubIcon size={14} strokeWidth={1.7} />
+						<GithubIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
 					<Button
 						intent="ghost"
@@ -234,7 +234,7 @@
 						oncontextmenu={(event: MouseEvent) =>
 							handleIconContextMenu(event, onFolderRightClick)}
 					>
-						<FolderIcon size={14} strokeWidth={1.7} />
+						<FolderIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
 				</div>
 			</div>

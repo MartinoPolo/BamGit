@@ -24,7 +24,7 @@
 				class="pointer-events-auto shadow-md text-[11px]"
 				onclick={onJumpToPrompt}
 			>
-				<ChevronUpIcon class="size-3" />
+				<ChevronUpIcon data-icon="inline-start" />
 				{m.chat_jump_to_prompt()}
 			</Button>
 		{/if}
@@ -35,7 +35,7 @@
 				class="pointer-events-auto shadow-md text-[11px]"
 				onclick={onJumpToResponse}
 			>
-				<ChevronDownIcon class="size-3" />
+				<ChevronDownIcon data-icon="inline-start" />
 				{m.chat_jump_to_response()}
 			</Button>
 		{/if}

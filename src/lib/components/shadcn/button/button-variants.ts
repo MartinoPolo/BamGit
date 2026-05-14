@@ -7,7 +7,7 @@ const FILLED_BUTTON_KBD_CLASSES =
 	'[&_[data-slot=kbd]]:border-[color-mix(in_oklch,currentColor_28%,transparent)] [&_[data-slot=kbd]]:bg-[color-mix(in_oklch,currentColor_16%,transparent)] [&_[data-slot=kbd]]:text-current';
 
 export const buttonVariants = tv({
-	base: 'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent font-medium leading-none outline-none select-none transition-[background,border-color,color,transform,filter,box-shadow] duration-120 ease-[ease] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_svg:not([class*="size-"])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+	base: 'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent font-medium leading-none outline-none select-none transition-[background,border-color,color,transform,filter,box-shadow] duration-120 ease-[ease] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_[data-icon]]:pointer-events-none [&_[data-icon]]:shrink-0',
 	variants: {
 		intent: {
 			primary: `bg-primary text-primary-foreground shadow-sm hover:bg-[color-mix(in_oklch,var(--primary)_88%,white_12%)] dark:hover:bg-[color-mix(in_oklch,var(--primary)_88%,black_12%)] ${FILLED_BUTTON_KBD_CLASSES}`,
@@ -21,11 +21,11 @@ export const buttonVariants = tv({
 			'primary-destructive': `bg-status-danger text-white shadow-sm hover:bg-[color-mix(in_oklch,var(--status-danger)_88%,white_12%)] dark:hover:bg-[color-mix(in_oklch,var(--status-danger)_88%,black_12%)] ${FILLED_BUTTON_KBD_CLASSES}`,
 		},
 		size: {
-			sm: 'h-(--size-control-sm) px-2.25 text-(length:--text-sm) rounded-sm',
-			md: 'h-(--size-control-md) px-3 text-(length:--text-md)',
-			lg: 'h-(--size-control-lg) px-4 text-(length:--text-base)',
-			icon: 'size-(--size-control-md) p-0',
-			'icon-sm': 'size-(--size-control-sm) p-0',
+			sm: 'h-(--size-control-sm) px-2.25 text-(length:--text-sm) rounded-sm [&_[data-icon]]:size-3.5',
+			md: 'h-(--size-control-md) px-3 text-(length:--text-md) [&_[data-icon]]:size-4',
+			lg: 'h-(--size-control-lg) px-4 text-(length:--text-base) [&_[data-icon]]:size-4',
+			icon: 'size-(--size-control-md) p-0 [&_[data-icon]]:size-4',
+			'icon-sm': 'size-(--size-control-sm) p-0 [&_[data-icon]]:size-3.5',
 		},
 	},
 	defaultVariants: {

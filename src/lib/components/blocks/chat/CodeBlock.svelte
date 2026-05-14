@@ -48,9 +48,9 @@
 			aria-label={copied ? m.chat_copied() : m.chat_copy_code()}
 		>
 			{#if copied}
-				<CheckIcon class="size-3 text-status-success" />
+				<CheckIcon class="text-status-success" data-icon="inline-start" />
 			{:else}
-				<CopyIcon class="size-3" />
+				<CopyIcon data-icon="inline-start" />
 			{/if}
 		</Button>
 	</div>

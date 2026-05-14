@@ -36,6 +36,6 @@
 		onclick={handleBrowse}
 		class="shrink-0"
 	>
-		<FolderIcon size={14} strokeWidth={1.7} />
+		<FolderIcon strokeWidth={1.7} data-icon="inline-start" />
 	</Button>
 </div>

@@ -106,7 +106,7 @@
 				<DropdownMenu.Trigger>
 					{#snippet child({ props })}
 						<Button {...props} intent="ghost" size="sm" class="size-8 p-0">
-							<EllipsisVerticalIcon class="size-4" />
+							<EllipsisVerticalIcon data-icon="inline-start" />
 						</Button>
 					{/snippet}
 				</DropdownMenu.Trigger>

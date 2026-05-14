@@ -49,7 +49,7 @@
 	<Popover.Trigger>
 		{#snippet child({ props })}
 			<Button intent="secondary" size="sm" {...props}>
-				<PaletteIcon class="size-3.5" />
+				<PaletteIcon data-icon="inline-start" />
 			</Button>
 		{/snippet}
 	</Popover.Trigger>

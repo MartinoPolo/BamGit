@@ -217,11 +217,11 @@
 			</div>
 			<div class="flex gap-2">
 				<Button intent="secondary" size="sm" onclick={() => (bulkImportOpen = true)}>
-					<FolderOpenIcon class="size-4" />
+					<FolderOpenIcon data-icon="inline-start" />
 					Import Folder
 				</Button>
 				<Button size="sm" onclick={() => void goto(resolve('/settings/character-creator'))}>
-					<PlusIcon class="size-4" />
+					<PlusIcon data-icon="inline-start" />
 					Create Character
 				</Button>
 			</div>

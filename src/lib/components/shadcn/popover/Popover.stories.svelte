@@ -30,7 +30,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<FilterIcon class="size-3.5" />
+							<FilterIcon data-icon="inline-start" />
 							Filter
 						</Button>
 					{/snippet}
@@ -100,7 +100,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<LayersIcon class="size-3.5" />
+							<LayersIcon data-icon="inline-start" />
 							Sort by
 						</Button>
 					{/snippet}
@@ -185,7 +185,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<SparklesIcon class="size-3.5" />
+							<SparklesIcon data-icon="inline-start" />
 							Legend
 						</Button>
 					{/snippet}
@@ -215,7 +215,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<FilterIcon class="size-3.5" />
+							<FilterIcon data-icon="inline-start" />
 							Filter
 						</Button>
 					{/snippet}
@@ -265,7 +265,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<FilterIcon class="size-3.5" />
+							<FilterIcon data-icon="inline-start" />
 							Filter
 						</Button>
 					{/snippet}
@@ -329,7 +329,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<LayersIcon class="size-3.5" />
+							<LayersIcon data-icon="inline-start" />
 							Sort by
 						</Button>
 					{/snippet}
@@ -378,7 +378,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<Button intent="secondary" {...props}>
-							<SparklesIcon class="size-3.5" />
+							<SparklesIcon data-icon="inline-start" />
 							Legend
 						</Button>
 					{/snippet}

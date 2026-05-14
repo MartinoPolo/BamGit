@@ -46,7 +46,7 @@
 	<!-- Left: back button + title + state badge -->
 	{#if onBack}
 		<Button intent="ghost" size="icon-sm" onclick={onBack}>
-			<ArrowLeftIcon size={14} strokeWidth={2} />
+			<ArrowLeftIcon strokeWidth={2} data-icon="inline-start" />
 		</Button>
 	{/if}
 	<span
@@ -75,14 +75,14 @@
 		{#if onOpenInCli}
 			<WithTooltip text="Open session in CLI">
 				<Button intent="secondary" size="sm" onclick={onOpenInCli}>
-					<ExternalLinkIcon size={11} strokeWidth={1.8} />
+					<ExternalLinkIcon strokeWidth={1.8} data-icon="inline-start" />
 					<span class="text-[11px]">Open in CLI</span>
 				</Button>
 			</WithTooltip>
 		{/if}
 
 		<Button intent="ghost" size="icon-sm">
-			<EllipsisVerticalIcon size={14} strokeWidth={2} />
+			<EllipsisVerticalIcon strokeWidth={2} data-icon="inline-start" />
 		</Button>
 
 		<Separator orientation="vertical" class="mx-1 h-4.5" />

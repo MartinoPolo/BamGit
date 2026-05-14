@@ -73,7 +73,7 @@
 					</div>
 				{/each}
 				<Button intent="ghost" size="sm" class="shrink-0 px-2 text-[10px]">
-					<PlusIcon size={10} strokeWidth={2} />
+					<PlusIcon strokeWidth={2} data-icon="inline-start" />
 					Add
 				</Button>
 			</div>
@@ -98,7 +98,7 @@
 		<div class="flex items-center gap-1.5 border-t border-border px-3 py-1.5">
 			<!-- Left group -->
 			<Button intent="ghost" size="sm" class="text-[11px]">
-				<PlusIcon size={11} strokeWidth={2} />
+				<PlusIcon strokeWidth={2} data-icon="inline-start" />
 				Attach
 			</Button>
 			<Button intent="ghost" size="sm" class="text-[11px]">Tools ▾</Button>

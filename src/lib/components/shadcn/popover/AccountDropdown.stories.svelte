@@ -37,7 +37,7 @@
 								</span>
 								Lukas
 							</span>
-							<ChevronDownIcon class="size-3.5" />
+							<ChevronDownIcon data-icon="inline-end" />
 						</Button>
 					{/snippet}
 				</Popover.Trigger>
@@ -80,11 +80,11 @@
 						<Popover.Label>Theme</Popover.Label>
 						<div class="flex gap-1 px-2 pb-1.5">
 							<Button intent="secondary" size="sm" class="flex-1">
-								<SunIcon class="size-3" />
+								<SunIcon data-icon="inline-start" />
 								Light
 							</Button>
 							<Button intent="primary" size="sm" class="flex-1">
-								<MoonIcon class="size-3" />
+								<MoonIcon data-icon="inline-start" />
 								Dark
 							</Button>
 							<Button intent="secondary" size="sm" class="flex-1">Auto</Button>

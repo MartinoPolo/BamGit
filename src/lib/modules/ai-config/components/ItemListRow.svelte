@@ -165,7 +165,7 @@
 					onclick={handleOpenFile}
 					class="h-5 w-5"
 				>
-					<FileTextIcon class="size-3" />
+					<FileTextIcon data-icon="inline-start" />
 				</Button>
 			{/if}
 			{#if parentDir !== null}
@@ -176,7 +176,7 @@
 					onclick={handleOpenFolder}
 					class="h-5 w-5"
 				>
-					<FolderOpenIcon class="size-3" />
+					<FolderOpenIcon data-icon="inline-start" />
 				</Button>
 			{/if}
 		</div>

@@ -68,7 +68,7 @@
 		class="flex w-11 shrink-0 flex-col items-center gap-2.5 border-l border-border bg-(--sidebar-bg,var(--surface)) pt-2"
 	>
 		<Button intent="ghost" size="icon-sm" onclick={() => (collapsed = false)}>
-			<PanelLeftIcon size={14} strokeWidth={1.8} class="-scale-x-100" />
+			<PanelLeftIcon strokeWidth={1.8} class="-scale-x-100" data-icon="inline-end" />
 		</Button>
 
 		<!-- State pulse dot -->
@@ -110,7 +110,7 @@
 		<!-- Header with collapse toggle -->
 		<div class="flex items-center border-b border-border px-2.5 py-2">
 			<Button intent="ghost" size="icon-sm" onclick={() => (collapsed = true)}>
-				<PanelLeftIcon size={13} strokeWidth={1.8} class="-scale-x-100" />
+				<PanelLeftIcon strokeWidth={1.8} class="-scale-x-100" data-icon="inline-end" />
 			</Button>
 		</div>
 

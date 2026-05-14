@@ -27,7 +27,7 @@
 				<Dialog.Trigger>
 					{#snippet child({ props })}
 						<Button {...props}>
-							<PlusIcon class="size-3.5" />
+							<PlusIcon data-icon="inline-start" />
 							Create Issue
 						</Button>
 					{/snippet}
@@ -51,7 +51,7 @@
 						<Dialog.Close>
 							{#snippet child({ props })}
 								<Button intent="ghost" size="icon-sm" {...props}>
-									<XIcon class="size-3" />
+									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}
 						</Dialog.Close>
@@ -100,7 +100,7 @@
 							{/snippet}
 						</Dialog.Close>
 						<Button intent="primary">
-							<PlusIcon class="size-3.5" />
+							<PlusIcon data-icon="inline-start" />
 							Create Issue
 							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
@@ -118,7 +118,7 @@
 				<Dialog.Trigger>
 					{#snippet child({ props })}
 						<Button intent="danger" {...props}>
-							<TrashIcon class="size-3.5" />
+							<TrashIcon data-icon="inline-start" />
 							Archive issue
 						</Button>
 					{/snippet}
@@ -140,7 +140,7 @@
 						<Dialog.Close>
 							{#snippet child({ props })}
 								<Button intent="ghost" size="icon-sm" {...props}>
-									<XIcon class="size-3" />
+									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}
 						</Dialog.Close>
@@ -186,7 +186,7 @@
 							{/snippet}
 						</Dialog.Close>
 						<Button intent="primary-destructive">
-							<TrashIcon class="size-3.5" />
+							<TrashIcon data-icon="inline-start" />
 							Archive
 							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
