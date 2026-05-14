@@ -174,13 +174,7 @@
 							<div class="flex justify-center">
 								<Button {...args} {intent} {size}>
 									Action
-									{#if intent === 'primary' || intent === 'primary-destructive' || intent === 'contextual-primary'}
-										<Kbd format="lucide" tone="inverted"
-											><CornerDownLeftIcon /></Kbd
-										>
-									{:else}
-										<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
-									{/if}
+									<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
 								</Button>
 							</div>
 						{/each}

@@ -16,7 +16,7 @@ export const kbdVariants = tv({
 				'border-border bg-surface-2 text-foreground-muted shadow-[0_1px_0_0_var(--border)]',
 			accent: 'border-[color-mix(in_oklch,var(--primary)_24%,var(--border))] bg-primary-soft text-foreground shadow-[0_1px_0_0_color-mix(in_oklch,var(--primary)_18%,var(--border))]',
 			inverted:
-				'border-[color-mix(in_oklch,currentColor_28%,transparent)] bg-[color-mix(in_oklch,currentColor_16%,transparent)] text-primary-foreground',
+				'border-[color-mix(in_oklch,currentColor_28%,transparent)] bg-[color-mix(in_oklch,currentColor_16%,transparent)] text-current',
 		},
 	},
 	defaultVariants: {
