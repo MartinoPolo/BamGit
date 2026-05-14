@@ -16,7 +16,8 @@
 	let copied = $state(false);
 	let copyTimeout: ReturnType<typeof setTimeout> | undefined;
 
-	async function handleCopy() {
+	async function handleCopy(event: MouseEvent) {
+		event.stopPropagation();
 		try {
 			await navigator.clipboard.writeText(code);
 			copied = true;

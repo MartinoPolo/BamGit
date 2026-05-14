@@ -81,7 +81,9 @@
 					<div
 						class={[
 							'flex justify-center rounded-md p-3',
-							tone === 'inverted' ? 'bg-primary text-primary-foreground' : 'bg-surface',
+							tone === 'inverted'
+								? 'bg-primary text-primary-foreground'
+								: 'bg-surface',
 						]}
 					>
 						<Kbd {...args} {format} {tone}>

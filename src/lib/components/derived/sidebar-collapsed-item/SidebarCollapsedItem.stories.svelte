@@ -24,8 +24,15 @@
 			<div class="flex gap-4 rounded-lg bg-sidebar p-4">
 				{#each [false, true] as active (active)}
 					<div class="flex flex-col items-center gap-2">
-						<p class="text-xs text-muted-foreground">{active ? 'active' : 'inactive'}</p>
-						<SidebarCollapsedItem {...args} icon={HomeIcon} label="Dashboard" {active} />
+						<p class="text-xs text-muted-foreground">
+							{active ? 'active' : 'inactive'}
+						</p>
+						<SidebarCollapsedItem
+							{...args}
+							icon={HomeIcon}
+							label="Dashboard"
+							{active}
+						/>
 					</div>
 				{/each}
 			</div>
