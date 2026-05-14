@@ -408,7 +408,7 @@
 			</div>
 			<p class="text-sm text-foreground/70 font-medium">Your forest is empty</p>
 			{#if onAddIssue}
-				<Button variant="primary" onclick={onAddIssue}>
+				<Button intent="primary" onclick={onAddIssue}>
 					<SproutIcon class="size-4" />
 					Create your first issue
 				</Button>

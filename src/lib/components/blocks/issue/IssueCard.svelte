@@ -95,11 +95,11 @@
 	const worktreeBadge = $derived.by(() => {
 		switch (issue.worktree_state) {
 			case 'pending':
-				return { label: m.issue_card_setting_up(), variant: 'warning' as const };
+				return { label: m.issue_card_setting_up(), tone: 'warning' as const };
 			case 'active':
-				return { label: m.issue_card_worktree(), variant: 'success' as const };
+				return { label: m.issue_card_worktree(), tone: 'success' as const };
 			case 'failed':
-				return { label: m.issue_card_wt_failed(), variant: 'danger' as const };
+				return { label: m.issue_card_wt_failed(), tone: 'danger' as const };
 			default:
 				return null;
 		}
@@ -294,7 +294,7 @@
 					text={hasWorktree ? `Open ${issue.branch_name ?? 'folder'}` : 'Assign folder'}
 				>
 					<Button
-						variant="ghost-overlay"
+						intent="ghost-overlay"
 						size="icon-sm"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
@@ -305,7 +305,7 @@
 				</WithTooltip>
 				<WithTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
 					<Button
-						variant="ghost-overlay"
+						intent="ghost-overlay"
 						size="icon-sm"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
@@ -316,7 +316,7 @@
 				</WithTooltip>
 				<WithTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
 					<Button
-						variant="ghost-overlay"
+						intent="ghost-overlay"
 						size="icon-sm"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
@@ -333,7 +333,7 @@
 						: 'Mute sounds for this issue'}
 				>
 					<Button
-						variant="ghost-overlay"
+						intent="ghost-overlay"
 						size="icon-sm"
 						style="opacity: {issue.is_sound_muted ? 0.35 : 0.6}"
 						onclick={handleToggleMute}
@@ -393,7 +393,7 @@
 				</div>
 				<div class="flex shrink-0 items-center gap-1">
 					{#if worktreeBadge}
-						<Badge variant={worktreeBadge.variant} size="compact">
+						<Badge tone={worktreeBadge.tone} size="compact">
 							{#if issue.worktree_state === 'pending'}
 								<span
 									class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"

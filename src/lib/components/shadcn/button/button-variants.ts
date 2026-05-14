@@ -6,7 +6,7 @@ import { asExhaustiveArray } from '$lib/utils/variants.js';
 export const buttonVariants = tv({
 	base: 'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent font-medium leading-none outline-none select-none transition-[background,border-color,color,transform,filter,box-shadow] duration-120 ease-[ease] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-45 [&_svg:not([class*="size-"])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
 	variants: {
-		variant: {
+		intent: {
 			primary:
 				'bg-primary text-primary-foreground shadow-sm hover:bg-[color-mix(in_oklch,var(--primary)_88%,white_12%)] dark:hover:bg-[color-mix(in_oklch,var(--primary)_88%,black_12%)]',
 			secondary:
@@ -29,15 +29,15 @@ export const buttonVariants = tv({
 		},
 	},
 	defaultVariants: {
-		variant: 'primary',
+		intent: 'primary',
 		size: 'md',
 	},
 });
 
-export type ButtonVariant = keyof typeof buttonVariants.variants.variant;
+export type ButtonIntent = keyof typeof buttonVariants.variants.intent;
 export type ButtonSize = keyof typeof buttonVariants.variants.size;
 
-export const BUTTON_VARIANTS = Object.keys(buttonVariants.variants.variant) as ButtonVariant[];
+export const BUTTON_INTENTS = Object.keys(buttonVariants.variants.intent) as ButtonIntent[];
 
 export const BUTTON_TEXT_SIZES = ['sm', 'md', 'lg'] as const satisfies ReadonlyArray<ButtonSize>;
 export const BUTTON_ICON_SIZES = ['icon', 'icon-sm'] as const satisfies ReadonlyArray<ButtonSize>;
@@ -50,6 +50,6 @@ export const BUTTON_SIZES = asExhaustiveArray<ButtonSize>()([
 
 export type ButtonProps = WithElementRef<HTMLButtonAttributes> &
 	WithElementRef<HTMLAnchorAttributes> & {
-		variant?: ButtonVariant;
+		intent?: ButtonIntent;
 		size?: ButtonSize;
 	};

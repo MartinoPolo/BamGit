@@ -102,14 +102,12 @@
 						<span class="truncate">{item.label}</span>
 						<span class="ml-auto flex shrink-0 items-center gap-1.5">
 							{#if item.shortcut}
-								<Kbd variant="mono">{item.shortcut}</Kbd>
+								<Kbd format="mono">{item.shortcut}</Kbd>
 							{/if}
 							{#if item.description}
 								{#if item.category === COMMAND_PALETTE_CATEGORIES.issues}
 									<Badge
-										variant={item.description === 'active'
-											? 'success'
-											: 'default'}
+										tone={item.description === 'active' ? 'success' : 'neutral'}
 									>
 										{item.description}
 									</Badge>
@@ -136,11 +134,11 @@
 			class="flex items-center gap-3 border-t border-border px-3 py-2 text-(length:--text-2xs) text-foreground-subtle"
 		>
 			<span class="flex items-center gap-1">
-				<Kbd variant="lucide"><ArrowUpIcon /><ArrowDownIcon /></Kbd>
+				<Kbd format="lucide"><ArrowUpIcon /><ArrowDownIcon /></Kbd>
 				{m.command_palette_navigate()}
 			</span>
 			<span class="flex items-center gap-1">
-				<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
+				<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
 				{m.command_palette_select()}
 			</span>
 			<span class="flex items-center gap-1">

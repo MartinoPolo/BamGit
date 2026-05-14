@@ -15,7 +15,7 @@
 	import RangeCalendarNextButton from './range-calendar-next-button.svelte';
 	import RangeCalendarPrevButton from './range-calendar-prev-button.svelte';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
-	import type { ButtonVariant } from '$lib/components/shadcn/button/index.js';
+	import type { ButtonIntent } from '$lib/components/shadcn/button/index.js';
 	import type { Snippet } from 'svelte';
 	import { isEqualMonth, type DateValue } from '@internationalized/date';
 
@@ -26,7 +26,7 @@
 		// fallow-ignore-next-line code-duplication
 		weekdayFormat = 'short',
 		class: className,
-		buttonVariant = 'ghost',
+		buttonIntent = 'ghost',
 		captionLayout = 'label',
 		locale = 'en-US',
 		months: monthsProp,
@@ -37,7 +37,7 @@
 		disableDaysOutsideMonth = false,
 		...restProps
 	}: WithoutChildrenOrChild<RangeCalendarPrimitive.RootProps> & {
-		buttonVariant?: ButtonVariant;
+		buttonIntent?: ButtonIntent;
 		captionLayout?: 'dropdown' | 'dropdown-months' | 'dropdown-years' | 'label';
 		months?: RangeCalendarPrimitive.MonthSelectProps['months'];
 		years?: RangeCalendarPrimitive.YearSelectProps['years'];
@@ -75,8 +75,8 @@
 	{#snippet children({ months, weekdays })}
 		<RangeCalendarMonths>
 			<RangeCalendarNav>
-				<RangeCalendarPrevButton variant={buttonVariant} />
-				<RangeCalendarNextButton variant={buttonVariant} />
+				<RangeCalendarPrevButton intent={buttonIntent} />
+				<RangeCalendarNextButton intent={buttonIntent} />
 			</RangeCalendarNav>
 			{#each months as month, monthIndex (month)}
 				<RangeCalendarMonth>

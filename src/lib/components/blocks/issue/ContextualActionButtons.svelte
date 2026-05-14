@@ -69,7 +69,7 @@
 		{@const primaryId = derivedActions.primary}
 		<WithTooltip text={getLabel(primaryId)}>
 			<Button
-				variant="contextual-primary"
+				intent="contextual-primary"
 				size="sm"
 				class="font-semibold"
 				onclick={(event: MouseEvent) => handleClick(event, primaryId)}
@@ -87,7 +87,7 @@
 		{@const secondaryId = derivedActions.secondary}
 		<WithTooltip text={getLabel(secondaryId)}>
 			<Button
-				variant="secondary"
+				intent="secondary"
 				size="sm"
 				onclick={(event: MouseEvent) => handleClick(event, secondaryId)}
 			>
@@ -107,7 +107,7 @@
 					<WithTooltip text="More actions">
 						<Button
 							{...props}
-							variant="secondary"
+							intent="secondary"
 							size="icon-sm"
 							onclick={(event: MouseEvent) => event.stopPropagation()}
 						>

@@ -44,11 +44,11 @@
 					class="m-0 mb-3 whitespace-pre-wrap font-mono text-[11.5px] leading-normal text-foreground-muted">{detail}</pre>
 			{/if}
 			<div class="flex gap-1.5">
-				<Button variant="primary" size="sm" class="h-(--size-control-md)" onclick={onAllow}>
-					Allow <Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+				<Button intent="primary" size="sm" class="h-(--size-control-md)" onclick={onAllow}>
+					Allow <Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 				<Button
-					variant="secondary"
+					intent="secondary"
 					size="sm"
 					class="h-(--size-control-md)"
 					onclick={onAllowAlways}
@@ -56,10 +56,10 @@
 					Allow Always
 					<KbdGroup>
 						<Kbd>Ctrl</Kbd>
-						<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
+						<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
 					</KbdGroup>
 				</Button>
-				<Button variant="danger" size="sm" class="h-(--size-control-md)" onclick={onDeny}>
+				<Button intent="danger" size="sm" class="h-(--size-control-md)" onclick={onDeny}>
 					Deny <Kbd>Esc</Kbd>
 				</Button>
 			</div>

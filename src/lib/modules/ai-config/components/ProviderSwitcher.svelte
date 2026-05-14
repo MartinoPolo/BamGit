@@ -29,7 +29,7 @@
 
 		{#if isInstalled}
 			<Button
-				variant={isActive ? 'secondary' : 'ghost'}
+				intent={isActive ? 'secondary' : 'ghost'}
 				size="sm"
 				aria-pressed={isActive}
 				onclick={() => aiConfig.setProvider(kind)}
@@ -40,7 +40,7 @@
 		{:else}
 			<WithTooltip text="Not installed">
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="sm"
 					disabled
 					aria-pressed={false}

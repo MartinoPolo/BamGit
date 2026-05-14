@@ -104,7 +104,7 @@
 			<Select id="err-sel" state="error" value="" {...args}>
 				<option value="">No provider configured</option>
 			</Select>
-			<HelpText status="error">Add a provider in Settings.</HelpText>
+			<HelpText state="error">Add a provider in Settings.</HelpText>
 		</div>
 	{/snippet}
 </Story>
@@ -207,7 +207,7 @@
 					<SelectCustom.CustomItem value="claude-sonnet" label="Claude · Sonnet 4.5" />
 				</SelectCustom.CustomContent>
 			</SelectCustom.CustomRoot>
-			<HelpText status="error">Add a provider in Settings.</HelpText>
+			<HelpText state="error">Add a provider in Settings.</HelpText>
 		</div>
 	{/snippet}
 </Story>
@@ -283,7 +283,7 @@
 						<option value="claude">Claude - Sonnet 4.5</option>
 					</Select>
 					{#if state === 'error'}
-						<HelpText status="error">Add a provider in Settings.</HelpText>
+						<HelpText state="error">Add a provider in Settings.</HelpText>
 					{/if}
 				</div>
 			{/each}
@@ -323,7 +323,7 @@
 				<Select state="error" value="">
 					<option value="">No provider configured</option>
 				</Select>
-				<HelpText status="error">Add a provider in Settings.</HelpText>
+				<HelpText state="error">Add a provider in Settings.</HelpText>
 			</div>
 		</div>
 	{/snippet}

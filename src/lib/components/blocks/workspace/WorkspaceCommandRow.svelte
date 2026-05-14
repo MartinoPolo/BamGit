@@ -78,7 +78,7 @@
 	</div>
 
 	<Button
-		variant="ghost"
+		intent="ghost"
 		size="icon-sm"
 		class="mt-1 shrink-0 text-muted-foreground hover:text-destructive"
 		onclick={() => onDelete(command.id)}

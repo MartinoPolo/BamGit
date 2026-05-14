@@ -55,13 +55,13 @@
 			</Dialog.Body>
 
 			<Dialog.Footer>
-				<Button variant="ghost" onclick={onClose}>
+				<Button intent="ghost" onclick={onClose}>
 					{m.btn_cancel()}
 					<Kbd>Esc</Kbd>
 				</Button>
-				<Button variant="primary-destructive" onclick={() => onConfirm(removeWorktree)}>
+				<Button intent="primary-destructive" onclick={() => onConfirm(removeWorktree)}>
 					{m.btn_confirm_delete()}
-					<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+					<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 			</Dialog.Footer>
 		{/if}

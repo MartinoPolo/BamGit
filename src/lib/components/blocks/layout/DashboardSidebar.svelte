@@ -95,7 +95,7 @@
 					{#snippet asChild(props)}
 						<Button
 							{...props}
-							variant="ghost"
+							intent="ghost"
 							size="icon-sm"
 							onclick={onToggleSidebar}
 							class="group relative hover:bg-surface-hover!"
@@ -124,7 +124,7 @@
 					side="right"
 				>
 					<Button
-						variant="ghost"
+						intent="ghost"
 						size="icon-sm"
 						onclick={onToggleSidebar}
 						aria-label="Collapse sidebar"

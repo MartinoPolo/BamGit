@@ -1,6 +1,6 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
-import { type VariantProps, tv } from 'tailwind-variants';
+import { tv } from 'tailwind-variants';
 
 export const toastVariants = tv({
 	base: 'flex items-center gap-3 rounded-lg border border-border bg-surface p-3 shadow-md',
@@ -39,5 +39,4 @@ export type ToastProps = {
 	icon?: Snippet;
 	action?: Snippet;
 	onDismiss?: () => void;
-} & Omit<HTMLAttributes<HTMLDivElement>, 'title'> &
-	VariantProps<typeof toastVariants>;
+} & Omit<HTMLAttributes<HTMLDivElement>, 'title'>;

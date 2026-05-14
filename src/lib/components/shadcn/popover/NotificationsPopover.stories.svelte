@@ -53,7 +53,7 @@
 				<Popover.Trigger>
 					{#snippet child({ props })}
 						<div class="relative inline-block">
-							<Button variant="secondary" size="icon" {...props}>
+							<Button intent="secondary" size="icon" {...props}>
 								<BellIcon class="size-3.5" />
 							</Button>
 							<span
@@ -67,7 +67,7 @@
 						class="flex items-center justify-between border-b border-border px-3 py-2.5"
 					>
 						<div class="text-(length:--text-md) font-semibold">Inbox · 3 unread</div>
-						<Button variant="ghost" size="sm">Mark all read</Button>
+						<Button intent="ghost" size="sm">Mark all read</Button>
 					</div>
 					<div class="max-h-80 overflow-y-auto">
 						{#each NOTIFICATIONS as notification (notification.title)}

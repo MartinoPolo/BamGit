@@ -1,15 +1,15 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { HELP_TEXT_STATUSES, HelpText } from './index.js';
+	import { HELP_TEXT_STATES, HelpText } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/HelpText',
 		component: HelpText,
 		tags: ['autodocs'],
 		argTypes: {
-			status: {
+			state: {
 				control: 'select',
-				options: [...HELP_TEXT_STATUSES],
+				options: [...HELP_TEXT_STATES],
 			},
 		},
 	});
@@ -19,7 +19,7 @@
 	import type { HelpTextProps } from './help-text-variants.js';
 </script>
 
-<Story name="Default" args={{ status: 'default' }}>
+<Story name="Default" args={{ state: 'default' }}>
 	{#snippet template(args: HelpTextProps)}
 		<div class="w-80">
 			<HelpText {...args}>Enter a value between 1 and 100.</HelpText>
@@ -30,14 +30,14 @@
 <Story name="All Variants">
 	{#snippet template(args: HelpTextProps)}
 		<div class="flex w-80 flex-col gap-2">
-			{#each HELP_TEXT_STATUSES as status (status)}
-				<HelpText {...args} {status}>Help text status: {status}.</HelpText>
+			{#each HELP_TEXT_STATES as state (state)}
+				<HelpText {...args} {state}>Help text state: {state}.</HelpText>
 			{/each}
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Error State" args={{ status: 'error' }}>
+<Story name="Error State" args={{ state: 'error' }}>
 	{#snippet template(args: HelpTextProps)}
 		<div class="w-80">
 			<HelpText {...args}>This field is required.</HelpText>
@@ -45,7 +45,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Success State" args={{ status: 'success' }}>
+<Story name="Success State" args={{ state: 'success' }}>
 	{#snippet template(args: HelpTextProps)}
 		<div class="w-80">
 			<HelpText {...args}>Your changes have been saved successfully.</HelpText>
@@ -53,7 +53,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Long Text" args={{ status: 'default' }}>
+<Story name="Long Text" args={{ state: 'default' }}>
 	{#snippet template(args: HelpTextProps)}
 		<div class="w-80">
 			<HelpText {...args}>

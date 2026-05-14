@@ -175,14 +175,14 @@
 		</Dialog.Body>
 
 		<Dialog.Footer class="shrink-0 justify-between">
-			<Button variant="ghost" size="sm" onclick={handleOpenInEditor}>
+			<Button intent="ghost" size="sm" onclick={handleOpenInEditor}>
 				<FolderOpenIcon class="size-3.5" />
 				Open in editor
 			</Button>
 
 			<div class="flex gap-2">
 				<Button
-					variant="ghost"
+					intent="ghost"
 					onclick={() => {
 						aiConfig.editingItemPath = null;
 					}}

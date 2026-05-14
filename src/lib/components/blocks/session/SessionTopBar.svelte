@@ -45,7 +45,7 @@
 <div class="flex h-10 shrink-0 items-center gap-2.5 border-b border-border bg-surface px-3.5">
 	<!-- Left: back button + title + state badge -->
 	{#if onBack}
-		<Button variant="ghost" size="icon-sm" onclick={onBack}>
+		<Button intent="ghost" size="icon-sm" onclick={onBack}>
 			<ArrowLeftIcon size={14} strokeWidth={2} />
 		</Button>
 	{/if}
@@ -63,10 +63,10 @@
 			<span class="font-mono text-[11px] text-foreground-muted">{branchName}</span>
 		{/if}
 		{#if issueNumber !== null}
-			<Badge variant="info">#{issueNumber} open</Badge>
+			<Badge tone="info">#{issueNumber} open</Badge>
 		{/if}
 		{#if prNumber !== null}
-			<Badge variant="moss">PR #{prNumber} draft</Badge>
+			<Badge tone="primary">PR #{prNumber} draft</Badge>
 		{/if}
 	</div>
 
@@ -74,14 +74,14 @@
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onOpenInCli}
 			<WithTooltip text="Open session in CLI">
-				<Button variant="secondary" size="sm" onclick={onOpenInCli}>
+				<Button intent="secondary" size="sm" onclick={onOpenInCli}>
 					<ExternalLinkIcon size={11} strokeWidth={1.8} />
 					<span class="text-[11px]">Open in CLI</span>
 				</Button>
 			</WithTooltip>
 		{/if}
 
-		<Button variant="ghost" size="icon-sm">
+		<Button intent="ghost" size="icon-sm">
 			<EllipsisVerticalIcon size={14} strokeWidth={2} />
 		</Button>
 

@@ -50,7 +50,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button variant="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" {...props}>
 									<XIcon class="size-3" />
 								</Button>
 							{/snippet}
@@ -96,13 +96,13 @@
 					<Dialog.Footer>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button variant="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
+								<Button intent="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
 							{/snippet}
 						</Dialog.Close>
-						<Button variant="primary">
+						<Button intent="primary">
 							<PlusIcon class="size-3.5" />
 							Create Issue
-							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</Dialog.Footer>
 				</Dialog.Content>
@@ -117,7 +117,7 @@
 			<Dialog.Root>
 				<Dialog.Trigger>
 					{#snippet child({ props })}
-						<Button variant="danger" {...props}>
+						<Button intent="danger" {...props}>
 							<TrashIcon class="size-3.5" />
 							Archive issue
 						</Button>
@@ -139,7 +139,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button variant="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" {...props}>
 									<XIcon class="size-3" />
 								</Button>
 							{/snippet}
@@ -182,13 +182,13 @@
 					<Dialog.Footer>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button variant="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
+								<Button intent="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
 							{/snippet}
 						</Dialog.Close>
-						<Button variant="primary-destructive">
+						<Button intent="primary-destructive">
 							<TrashIcon class="size-3.5" />
 							Archive
-							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</Dialog.Footer>
 				</Dialog.Content>

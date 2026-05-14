@@ -77,14 +77,14 @@
 					onkeydown={handleKeydown}
 				/>
 				<Button
-					variant="primary"
+					intent="primary"
 					size="sm"
 					class="h-(--size-control-md)"
 					onclick={handleSubmit}
 				>
-					Submit <Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+					Submit <Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button variant="ghost" size="sm" class="h-(--size-control-md)" onclick={onCancel}
+				<Button intent="ghost" size="sm" class="h-(--size-control-md)" onclick={onCancel}
 					>Cancel</Button
 				>
 			</div>

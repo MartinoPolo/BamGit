@@ -43,7 +43,7 @@
 						<TreesIcon class="size-3" />
 						#118 · Forest view overlays
 						<span class="ml-auto">
-							<Kbd variant="lucide"><CornerDownLeftIcon /></Kbd>
+							<Kbd format="lucide"><CornerDownLeftIcon /></Kbd>
 						</span>
 					</div>
 					<div

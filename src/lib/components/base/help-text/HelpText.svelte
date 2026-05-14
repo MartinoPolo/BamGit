@@ -4,7 +4,7 @@
 
 	let {
 		ref = $bindable(null),
-		status = 'default',
+		state = 'default',
 		class: className,
 		children,
 		...restProps
@@ -14,8 +14,8 @@
 <p
 	bind:this={ref}
 	data-slot="help-text"
-	data-status={status}
-	class={cn(helpTextVariants({ status }), className)}
+	data-state={state}
+	class={cn(helpTextVariants({ state }), className)}
 	{...restProps}
 >
 	{@render children?.()}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import { cardVariants, CARD_STATE_CLASSES, type CardProps } from './card-variants.js';
+	import { cardVariants, type CardProps } from './card-variants.js';
 
 	let {
 		class: className,
@@ -13,9 +13,6 @@
 		...restProps
 	}: CardProps = $props();
 
-	const stateClass = $derived(
-		state && state !== 'default' ? CARD_STATE_CLASSES[state] : undefined,
-	);
 	const dataState = $derived(state && state !== 'default' ? state : undefined);
 </script>
 
@@ -24,8 +21,7 @@
 	data-slot="card"
 	data-state={dataState}
 	class={cn(
-		cardVariants({ padding }),
-		stateClass,
+		cardVariants({ padding, state }),
 		accentBarColor != null && 'overflow-hidden',
 		gradientTint != null && 'gk-card-gradient-tint',
 		className,

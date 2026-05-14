@@ -36,14 +36,14 @@
 
 	const flag = $derived(getLanguageFlag(pack.language));
 
-	const statusVariant = $derived.by(() => {
+	const statusTone = $derived.by(() => {
 		if (!pack.is_complete) {
 			return 'warning' as const;
 		}
 		if (pack.is_enabled) {
 			return 'success' as const;
 		}
-		return 'default' as const;
+		return 'neutral' as const;
 	});
 
 	const statusLabel = $derived.by(() => {
@@ -88,11 +88,7 @@
 			{/if}
 		</div>
 		<div class="mt-0.5 flex items-center gap-2">
-			<Badge
-				variant={statusVariant}
-				size="compact"
-				dot={pack.is_enabled ? 'pulsing' : undefined}
-			>
+			<Badge tone={statusTone} size="compact" dot={pack.is_enabled ? 'pulsing' : undefined}>
 				{statusLabel}
 			</Badge>
 		</div>
@@ -109,7 +105,7 @@
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props })}
-						<Button {...props} variant="ghost" size="sm" class="size-8 p-0">
+						<Button {...props} intent="ghost" size="sm" class="size-8 p-0">
 							<EllipsisVerticalIcon class="size-4" />
 						</Button>
 					{/snippet}

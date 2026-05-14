@@ -403,12 +403,12 @@
 		{#if showFooter}
 			<Dialog.Footer class="flex items-center">
 				{#if showBackButton}
-					<Button variant="ghost" type="button" onclick={() => wizard.goBack()}>
+					<Button intent="ghost" type="button" onclick={() => wizard.goBack()}>
 						{m.wizard_back()}
 						{#if backKbdHint === 'escape'}
 							<Kbd>Esc</Kbd>
 						{:else}
-							<Kbd variant="lucide"><DeleteIcon /></Kbd>
+							<Kbd format="lucide"><DeleteIcon /></Kbd>
 						{/if}
 					</Button>
 				{/if}
@@ -416,24 +416,24 @@
 					{#if navigationHint === 'vertical'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
 							{m.wizard_navigate()}
-							<Kbd variant="lucide"><ArrowUpIcon /><ArrowDownIcon /></Kbd>
+							<Kbd format="lucide"><ArrowUpIcon /><ArrowDownIcon /></Kbd>
 						</span>
 					{:else if navigationHint === 'horizontal'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
 							{m.wizard_navigate()}
-							<Kbd variant="lucide"><ArrowLeftIcon /><ArrowRightIcon /></Kbd>
+							<Kbd format="lucide"><ArrowLeftIcon /><ArrowRightIcon /></Kbd>
 						</span>
 					{:else if navigationHint === 'grid'}
 						<span class="flex items-center gap-1.5 text-xs text-muted-foreground/60">
 							{m.wizard_navigate()}
-							<Kbd variant="lucide"
+							<Kbd format="lucide"
 								><ArrowUpIcon /><ArrowDownIcon /><ArrowLeftIcon /><ArrowRightIcon
 								/></Kbd
 							>
 						</span>
 					{/if}
 				</div>
-				<Button variant="ghost" type="button" onclick={() => wizard.closeWizard()}>
+				<Button intent="ghost" type="button" onclick={() => wizard.closeWizard()}>
 					{m.btn_cancel()}
 					{#if showCancelKbdHint}
 						<Kbd>Esc</Kbd>
@@ -442,13 +442,13 @@
 				{#if showNextButton}
 					<Button type="button" onclick={handleNextClick}>
 						{m.wizard_next()}
-						<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+						<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 					</Button>
 				{/if}
 				{#if isFinalStep}
 					<Button type="button" onclick={handleConfirmColor} disabled={isSubmitting}>
 						{m.wizard_confirm()}
-						<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+						<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 					</Button>
 				{/if}
 			</Dialog.Footer>

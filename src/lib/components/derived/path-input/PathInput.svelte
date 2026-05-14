@@ -29,7 +29,7 @@
 <div class="flex gap-1.5">
 	<Input {id} bind:value {placeholder} {disabled} oninput={() => onchange?.()} class="flex-1" />
 	<Button
-		variant="ghost"
+		intent="ghost"
 		size="icon-sm"
 		type="button"
 		{disabled}

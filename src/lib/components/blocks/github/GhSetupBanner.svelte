@@ -19,7 +19,7 @@
 		<AlertTriangle size={14} />
 		<span class="flex-1">Connect your GitHub account to sync issues, PRs, and branches.</span>
 		{#if onconnect}
-			<Button variant="secondary" size="sm" onclick={onconnect}>
+			<Button intent="secondary" size="sm" onclick={onconnect}>
 				<GithubIcon size={14} />
 				Connect to GitHub
 			</Button>

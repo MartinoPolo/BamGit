@@ -12,6 +12,6 @@
 	const config = $derived(SESSION_BADGE_CONFIG[state] ?? SESSION_BADGE_CONFIG.running);
 </script>
 
-<Badge variant={config.variant} dot={config.pulse ? 'pulsing' : 'static'}>
+<Badge tone={config.tone} dot={config.pulse ? 'pulsing' : 'static'}>
 	{config.label}
 </Badge>

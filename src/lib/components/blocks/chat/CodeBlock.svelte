@@ -37,12 +37,12 @@
 <div class="group/code relative my-2 overflow-hidden rounded-md border border-border bg-surface-2">
 	<div class="flex items-center justify-between border-b border-border px-3 py-1.5">
 		{#if language}
-			<Badge variant="mono">{language}</Badge>
+			<Badge format="mono">{language}</Badge>
 		{:else}
 			<span></span>
 		{/if}
 		<Button
-			variant="ghost"
+			intent="ghost"
 			size="icon-sm"
 			onclick={handleCopy}
 			aria-label={copied ? m.chat_copied() : m.chat_copy_code()}

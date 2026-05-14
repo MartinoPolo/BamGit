@@ -131,7 +131,7 @@
 			</p>
 		</div>
 		<Button
-			variant="ghost"
+			intent="ghost"
 			size="icon-sm"
 			aria-label="Refresh"
 			onclick={() => void aiConfig.discover()}
@@ -203,7 +203,7 @@
 
 				<!-- Error state -->
 			{:else if aiConfig.error !== null}
-				<Alert.Root variant="destructive">
+				<Alert.Root tone="destructive">
 					<Alert.Title>Discovery failed</Alert.Title>
 					<Alert.Description>{aiConfig.error}</Alert.Description>
 				</Alert.Root>

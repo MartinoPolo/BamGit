@@ -27,7 +27,7 @@
 			{model} · {toolCount} tools · {duration}
 		</span>
 		<div class="flex-1"></div>
-		<Button variant="ghost" size="sm" class="px-1.5 text-[10px]" onclick={onCollapse}>
+		<Button intent="ghost" size="sm" class="px-1.5 text-[10px]" onclick={onCollapse}>
 			Collapse
 		</Button>
 	</div>

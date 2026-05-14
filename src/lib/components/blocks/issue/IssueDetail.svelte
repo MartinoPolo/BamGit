@@ -157,14 +157,14 @@
 	<!-- Action buttons -->
 	<div class="flex flex-wrap gap-1.5 border-t border-border pt-3">
 		<WithTooltip text={m.issue_card_edit()}>
-			<Button variant="ghost" size="sm" onclick={() => onEdit(issue)}>
+			<Button intent="ghost" size="sm" onclick={() => onEdit(issue)}>
 				<Pencil size={14} />
 			</Button>
 		</WithTooltip>
 
 		{#if isStandalone && onRename}
 			<WithTooltip text={m.issue_card_rename()}>
-				<Button variant="ghost" size="sm" onclick={() => onRename(issue)}>
+				<Button intent="ghost" size="sm" onclick={() => onRename(issue)}>
 					<PenLine size={14} />
 				</Button>
 			</WithTooltip>
@@ -187,7 +187,7 @@
 					? m.issue_card_retry_worktree()
 					: m.issue_card_add_worktree()}
 			>
-				<Button variant="ghost" size="sm" onclick={() => onSetupWorktree(issue)}>
+				<Button intent="ghost" size="sm" onclick={() => onSetupWorktree(issue)}>
 					<GitBranchPlus size={14} />
 				</Button>
 			</WithTooltip>
@@ -196,7 +196,7 @@
 		{#if canRemoveWorktree && onRemoveWorktree}
 			<WithTooltip text={m.issue_card_remove_worktree()}>
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="sm"
 					onclick={() => onRemoveWorktree(issue)}
 					class="text-status-warning"
@@ -210,13 +210,13 @@
 
 		{#if isArchived}
 			<WithTooltip text={m.issue_card_unarchive()}>
-				<Button variant="ghost" size="sm" onclick={() => onUnarchive(issue.id)}>
+				<Button intent="ghost" size="sm" onclick={() => onUnarchive(issue.id)}>
 					<ArchiveRestore size={14} />
 				</Button>
 			</WithTooltip>
 		{:else}
 			<WithTooltip text={m.issue_card_archive()}>
-				<Button variant="ghost" size="sm" onclick={() => onArchive(issue)}>
+				<Button intent="ghost" size="sm" onclick={() => onArchive(issue)}>
 					<Archive size={14} />
 				</Button>
 			</WithTooltip>
@@ -224,7 +224,7 @@
 
 		<WithTooltip text={m.issue_card_delete()}>
 			<Button
-				variant="ghost"
+				intent="ghost"
 				size="sm"
 				onclick={() => onDelete(issue)}
 				class="text-destructive"

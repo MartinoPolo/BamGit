@@ -20,7 +20,7 @@
 			repository. A <strong class="text-foreground">portfolio dashboard</strong> groups multiple
 			repos together.
 		</p>
-		<Button variant="primary" onclick={onCreateDashboard}>
+		<Button intent="primary" onclick={onCreateDashboard}>
 			{m.onboarding_create()}
 		</Button>
 	</div>

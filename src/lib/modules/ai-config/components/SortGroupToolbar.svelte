@@ -78,7 +78,7 @@
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger>
 			{#snippet child({ props })}
-				<Button {...props} variant="ghost" size="sm" class="h-7 gap-1.5 px-2 text-xs">
+				<Button {...props} intent="ghost" size="sm" class="h-7 gap-1.5 px-2 text-xs">
 					<ArrowUpDownIcon class="size-3" />
 					Sort: {currentSortLabel}
 				</Button>
@@ -99,7 +99,7 @@
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger>
 			{#snippet child({ props })}
-				<Button {...props} variant="ghost" size="sm" class="h-7 gap-1.5 px-2 text-xs">
+				<Button {...props} intent="ghost" size="sm" class="h-7 gap-1.5 px-2 text-xs">
 					<LayersIcon class="size-3" />
 					Group: {currentGroupLabel}
 				</Button>

@@ -167,7 +167,7 @@
 				lastUpdatedAt={ctx.lastUpdatedAt.current}
 				onrefresh={() => ctx.loadData(windowCtx.boundDashboardId ?? undefined)}
 			/>
-			<Button variant="secondary" size="sm" onclick={handleExportCsv}>
+			<Button intent="secondary" size="sm" onclick={handleExportCsv}>
 				<DownloadIcon />
 				Export CSV
 			</Button>

@@ -205,5 +205,6 @@ export function isEditableElement(element: EventTarget | null): boolean {
  * Bindings stay text-based so UI callers can render modifier icons explicitly when needed.
  */
 export function formatBindingForDisplay(binding: string, _isMacOS?: boolean): string {
+	void _isMacOS;
 	return binding;
 }

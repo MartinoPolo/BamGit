@@ -72,7 +72,7 @@
 						</button>
 					</div>
 				{/each}
-				<Button variant="ghost" size="sm" class="shrink-0 px-2 text-[10px]">
+				<Button intent="ghost" size="sm" class="shrink-0 px-2 text-[10px]">
 					<PlusIcon size={10} strokeWidth={2} />
 					Add
 				</Button>
@@ -97,20 +97,20 @@
 		<!-- Bottom controls -->
 		<div class="flex items-center gap-1.5 border-t border-border px-3 py-1.5">
 			<!-- Left group -->
-			<Button variant="ghost" size="sm" class="text-[11px]">
+			<Button intent="ghost" size="sm" class="text-[11px]">
 				<PlusIcon size={11} strokeWidth={2} />
 				Attach
 			</Button>
-			<Button variant="ghost" size="sm" class="text-[11px]">Tools ▾</Button>
+			<Button intent="ghost" size="sm" class="text-[11px]">Tools ▾</Button>
 
 			<div class="flex-1"></div>
 
 			<!-- Right group -->
-			<Button variant="ghost" size="sm" class="font-mono text-[10.5px]">Local ▾</Button>
-			<Button variant="secondary" size="sm" class="max-w-65 truncate font-mono text-[10.5px]">
+			<Button intent="ghost" size="sm" class="font-mono text-[10.5px]">Local ▾</Button>
+			<Button intent="secondary" size="sm" class="max-w-65 truncate font-mono text-[10.5px]">
 				{providerConfig.name} · Opus 4.7 (1M) · High ▾
 			</Button>
-			<Button variant="secondary" size="sm" class="text-[10.5px]">Approve each ▾</Button>
+			<Button intent="secondary" size="sm" class="text-[10.5px]">Approve each ▾</Button>
 			<SendStopButton {isRunning} disabled={!canSend} {onSend} {onStop} />
 		</div>
 	</div>

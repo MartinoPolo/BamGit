@@ -49,14 +49,14 @@
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onSync}
 			<WithTooltip text={m.topbar_sync()}>
-				<Button variant="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
+				<Button intent="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
 					<RefreshCwIcon size={13} class={syncing ? 'animate-spin' : ''} />
 				</Button>
 			</WithTooltip>
 		{/if}
 
 		<WithTooltip text={m.topbar_notifications()}>
-			<Button variant="ghost" size="icon-sm" class="relative">
+			<Button intent="ghost" size="icon-sm" class="relative">
 				<BellIcon size={13} />
 				{#if hasNotifications}
 					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
@@ -66,7 +66,7 @@
 
 		{#if onQuickIdeas}
 			<WithTooltip text={m.raw_requirements_title()}>
-				<Button variant="ghost" size="icon-sm" onclick={onQuickIdeas}>
+				<Button intent="ghost" size="icon-sm" onclick={onQuickIdeas}>
 					<LightbulbIcon size={13} />
 				</Button>
 			</WithTooltip>
@@ -75,7 +75,7 @@
 		{#if onToggleForest}
 			<WithTooltip text={forestCollapsed ? m.topbar_show_forest() : m.topbar_hide_forest()}>
 				<Button
-					variant={forestCollapsed ? 'ghost' : 'secondary'}
+					intent={forestCollapsed ? 'ghost' : 'secondary'}
 					size="icon-sm"
 					onclick={onToggleForest}
 				>
@@ -86,7 +86,7 @@
 
 		{#if onCreateIssue}
 			<WithTooltip text={m.topbar_create_issue_title()}>
-				<Button variant="primary" size="sm" onclick={onCreateIssue}>
+				<Button intent="primary" size="sm" onclick={onCreateIssue}>
 					<PlusIcon size={12} />
 					<span>{m.topbar_create_issue()}</span>
 				</Button>

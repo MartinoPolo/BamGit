@@ -67,7 +67,7 @@
 		return source === 'user' ? 'User' : 'Project';
 	});
 
-	const sourceVariant = $derived.by(() => {
+	const sourceTone = $derived.by(() => {
 		const source = (item as { source?: string }).source;
 		if (source === 'user') {
 			return 'info' as const;
@@ -75,7 +75,7 @@
 		if (source === 'project') {
 			return 'success' as const;
 		}
-		return 'amber' as const;
+		return 'accent' as const;
 	});
 
 	const lineCount = $derived(getItemLineCount(item));
@@ -133,39 +133,39 @@
 		<span class="mr-auto text-sm font-semibold text-foreground">{title}</span>
 
 		<div class="flex flex-wrap items-center gap-1">
-			<Badge variant={sourceVariant} size="compact">{sourceLabel}</Badge>
+			<Badge tone={sourceTone} size="compact">{sourceLabel}</Badge>
 
 			{#if kind === 'skill' && skillItem !== null}
 				{#if skillItem.category}
-					<Badge variant="default" size="compact">{skillItem.category}</Badge>
+					<Badge tone="neutral" size="compact">{skillItem.category}</Badge>
 				{/if}
 			{:else if kind === 'agent'}
 				{@const agentItem = item as AgentConfig}
 				{#if agentItem.model}
-					<Badge variant="mono" size="compact">{agentItem.model}</Badge>
+					<Badge format="mono" size="compact">{agentItem.model}</Badge>
 				{/if}
 			{:else if kind === 'hook'}
 				{@const hookItem = item as HookConfig}
-				<Badge variant="default" size="compact">{hookItem.event_type}</Badge>
+				<Badge tone="neutral" size="compact">{hookItem.event_type}</Badge>
 				{#if hookItem.matcher}
-					<Badge variant="default" size="compact" class="max-w-30 truncate">
+					<Badge tone="neutral" size="compact" class="max-w-30 truncate">
 						{hookItem.matcher}
 					</Badge>
 				{/if}
 			{:else if kind === 'mcp'}
 				{@const mcpItem = item as McpServerConfig}
-				<Badge variant={mcpItem.enabled ? 'success' : 'danger'} size="compact">
+				<Badge tone={mcpItem.enabled ? 'success' : 'danger'} size="compact">
 					{mcpItem.enabled ? 'Enabled' : 'Disabled'}
 				</Badge>
-				<Badge variant="mono" size="compact">{mcpItem.transport_type}</Badge>
+				<Badge format="mono" size="compact">{mcpItem.transport_type}</Badge>
 			{:else if kind === 'memory'}
 				{@const memItem = item as MemoryConfig}
 				{#if memItem.memory_type}
-					<Badge variant="default" size="compact">{memItem.memory_type}</Badge>
+					<Badge tone="neutral" size="compact">{memItem.memory_type}</Badge>
 				{/if}
 			{:else if kind === 'instruction'}
 				{#if fileSizeLabel !== null}
-					<Badge variant="mono" size="compact">{fileSizeLabel}</Badge>
+					<Badge format="mono" size="compact">{fileSizeLabel}</Badge>
 				{/if}
 			{:else if kind === 'rule'}
 				{@const ruleItem = item as RuleConfig}
@@ -173,12 +173,12 @@
 					ruleItem.language ??
 					(ruleItem.filename ? deriveLanguage(ruleItem.filename) : null)}
 				{#if lang}
-					<Badge variant="default" size="compact">{lang}</Badge>
+					<Badge tone="neutral" size="compact">{lang}</Badge>
 				{/if}
 			{/if}
 
 			{#if isDeprecated}
-				<Badge variant="warning" size="compact">Deprecated</Badge>
+				<Badge tone="warning" size="compact">Deprecated</Badge>
 			{/if}
 
 			{#if skillItem !== null && skillItem.skill_override !== null && skillItem.skill_override !== undefined}
@@ -208,7 +208,7 @@
 		<div class="flex items-center gap-0.5">
 			{#if filePath !== null}
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="icon-sm"
 					aria-label="Open file"
 					onclick={handleOpenFile}
@@ -219,7 +219,7 @@
 			{/if}
 			{#if parentDir !== null}
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="icon-sm"
 					aria-label="Open folder"
 					onclick={handleOpenFolder}

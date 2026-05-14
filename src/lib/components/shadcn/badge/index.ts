@@ -2,11 +2,13 @@ import Root from './Badge.svelte';
 export { Root, Root as Badge };
 export {
 	badgeVariants,
-	BADGE_VARIANTS,
+	BADGE_TONES,
+	BADGE_FORMATS,
 	BADGE_SIZES,
 	BADGE_DOT_OPTIONS,
 	type BadgeProps,
-	type BadgeVariant,
+	type BadgeTone,
+	type BadgeFormat,
 	type BadgeSize,
 	type BadgeDot,
 } from './badge-variants.js';

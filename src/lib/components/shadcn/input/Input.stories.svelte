@@ -44,7 +44,7 @@
 		<div class="max-w-xs">
 			<Label for="success-demo">Branch name</Label>
 			<Input id="success-demo" state="success" value="feat/valid-name" {...args} />
-			<HelpText status="success">Branch is available.</HelpText>
+			<HelpText state="success">Branch is available.</HelpText>
 		</div>
 	{/snippet}
 </Story>
@@ -54,7 +54,7 @@
 		<div class="max-w-xs">
 			<Label for="error-demo">Branch name</Label>
 			<Input id="error-demo" state="error" value="feat/forest overlays" {...args} />
-			<HelpText status="error">Branch names cannot contain spaces.</HelpText>
+			<HelpText state="error">Branch names cannot contain spaces.</HelpText>
 		</div>
 	{/snippet}
 </Story>
@@ -95,9 +95,9 @@
 						value={state === 'loading' ? 'resolving...' : 'feat/forest-overlays'}
 					/>
 					{#if state === 'success'}
-						<HelpText status="success">Branch is available.</HelpText>
+						<HelpText state="success">Branch is available.</HelpText>
 					{:else if state === 'error'}
-						<HelpText status="error">Branch names cannot contain spaces.</HelpText>
+						<HelpText state="error">Branch names cannot contain spaces.</HelpText>
 					{/if}
 				</div>
 			{/each}
@@ -123,12 +123,12 @@
 			<div>
 				<Label>Success</Label>
 				<Input state="success" value="feat/valid-name" />
-				<HelpText status="success">Branch is available.</HelpText>
+				<HelpText state="success">Branch is available.</HelpText>
 			</div>
 			<div>
 				<Label>Error</Label>
 				<Input state="error" value="feat/forest overlays" />
-				<HelpText status="error">Branch names cannot contain spaces.</HelpText>
+				<HelpText state="error">Branch names cannot contain spaces.</HelpText>
 			</div>
 			<div>
 				<Label>Disabled</Label>

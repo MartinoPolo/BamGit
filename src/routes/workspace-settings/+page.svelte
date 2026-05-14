@@ -172,7 +172,7 @@
 					{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
 				</Button>
 			{:else if saveStatus === 'saved'}
-				<Badge variant="success">Saved</Badge>
+				<Badge tone="success">Saved</Badge>
 			{/if}
 		</div>
 
@@ -266,9 +266,9 @@
 					<div class="flex items-center gap-2">
 						<ServerIcon size={16} class="text-muted-foreground" />
 						<h3 class="text-sm font-medium">Server Commands</h3>
-						<Badge variant="mono">{serverCommands.length}</Badge>
+						<Badge format="mono">{serverCommands.length}</Badge>
 					</div>
-					<Button variant="ghost" size="sm" onclick={() => handleAddCommand('server')}>
+					<Button intent="ghost" size="sm" onclick={() => handleAddCommand('server')}>
 						<PlusIcon size={14} />
 						Add Server
 					</Button>
@@ -308,9 +308,9 @@
 					<div class="flex items-center gap-2">
 						<SquareCheckIcon size={16} class="text-muted-foreground" />
 						<h3 class="text-sm font-medium">Check Commands</h3>
-						<Badge variant="mono">{checkCommands.length}</Badge>
+						<Badge format="mono">{checkCommands.length}</Badge>
 					</div>
-					<Button variant="ghost" size="sm" onclick={() => handleAddCommand('check')}>
+					<Button intent="ghost" size="sm" onclick={() => handleAddCommand('check')}>
 						<PlusIcon size={14} />
 						Add Check
 					</Button>

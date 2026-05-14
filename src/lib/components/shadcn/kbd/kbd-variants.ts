@@ -6,7 +6,7 @@ import { tv } from 'tailwind-variants';
 export const kbdVariants = tv({
 	base: 'inline-flex h-4.5 min-w-4.5 items-center justify-center gap-px rounded-md border px-1.25 text-[10.5px] leading-none font-medium [&_svg:not([class*="size-"])]:size-3 [&_svg]:shrink-0',
 	variants: {
-		variant: {
+		format: {
 			default: 'font-sans',
 			lucide: 'font-sans',
 			mono: 'font-mono tabular-nums',
@@ -20,19 +20,19 @@ export const kbdVariants = tv({
 		},
 	},
 	defaultVariants: {
-		variant: 'default',
+		format: 'default',
 		tone: 'neutral',
 	},
 });
 
-export type KbdVariant = keyof typeof kbdVariants.variants.variant;
+export type KbdFormat = keyof typeof kbdVariants.variants.format;
 export type KbdTone = keyof typeof kbdVariants.variants.tone;
 
-export const KBD_VARIANTS = Object.keys(kbdVariants.variants.variant) as KbdVariant[];
+export const KBD_FORMATS = Object.keys(kbdVariants.variants.format) as KbdFormat[];
 export const KBD_TONES = Object.keys(kbdVariants.variants.tone) as KbdTone[];
 
 export type KbdProps = WithElementRef<HTMLAttributes<HTMLElement>, HTMLElement> & {
-	variant?: KbdVariant;
+	format?: KbdFormat;
 	tone?: KbdTone;
 	children?: Snippet;
 };

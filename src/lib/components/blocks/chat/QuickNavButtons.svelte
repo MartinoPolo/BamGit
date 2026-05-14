@@ -19,7 +19,7 @@
 	<div class="pointer-events-none sticky bottom-36 z-10 flex justify-center gap-2">
 		{#if showJumpToPrompt}
 			<Button
-				variant="secondary"
+				intent="secondary"
 				size="sm"
 				class="pointer-events-auto shadow-md text-[11px]"
 				onclick={onJumpToPrompt}
@@ -30,7 +30,7 @@
 		{/if}
 		{#if showJumpToResponse}
 			<Button
-				variant="secondary"
+				intent="secondary"
 				size="sm"
 				class="pointer-events-auto shadow-md text-[11px]"
 				onclick={onJumpToResponse}

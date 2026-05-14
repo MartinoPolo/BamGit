@@ -170,7 +170,7 @@
 			{/each}
 
 			<Button
-				variant="ghost"
+				intent="ghost"
 				size="sm"
 				class="h-6 gap-1 rounded-full px-2.5 text-xs"
 				onclick={() => {
@@ -215,13 +215,13 @@
 						bind:value={pendingPath}
 						class="flex-1"
 					/>
-					<Button variant="secondary" size="sm" onclick={handlePickFolder}>Browse</Button>
+					<Button intent="secondary" size="sm" onclick={handlePickFolder}>Browse</Button>
 				</div>
 			</div>
 		</Dialog.Body>
 		<Dialog.Footer>
 			<Button
-				variant="ghost"
+				intent="ghost"
 				onclick={() => {
 					addDialogOpen = false;
 				}}

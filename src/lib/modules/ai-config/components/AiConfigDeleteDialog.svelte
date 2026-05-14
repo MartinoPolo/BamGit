@@ -310,7 +310,7 @@
 
 			<Dialog.Footer>
 				<Button
-					variant="ghost"
+					intent="ghost"
 					onclick={() => {
 						aiConfig.deletingItemPath = null;
 					}}
@@ -319,11 +319,11 @@
 				</Button>
 
 				{#if canDelete}
-					<Button variant="danger" disabled={isDeleting} onclick={handleDelete}>
+					<Button intent="danger" disabled={isDeleting} onclick={handleDelete}>
 						{isDeleting ? 'Deleting…' : 'Delete'}
 					</Button>
 				{:else}
-					<Button variant="danger" disabled title={disabledReason ?? ''}>Delete</Button>
+					<Button intent="danger" disabled title={disabledReason ?? ''}>Delete</Button>
 				{/if}
 			</Dialog.Footer>
 		{/if}

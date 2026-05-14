@@ -23,7 +23,7 @@
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Open Menu</Button>
+					<Button intent="secondary">Open Menu</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>Profile</DropdownMenu.Item>
@@ -41,7 +41,7 @@
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Open Menu</Button>
+					<Button intent="secondary">Open Menu</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Group>
@@ -68,7 +68,7 @@
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Open Menu</Button>
+					<Button intent="secondary">Open Menu</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>
@@ -95,7 +95,7 @@
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Edit</Button>
+					<Button intent="secondary">Edit</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>
@@ -130,7 +130,7 @@
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Open Menu</Button>
+					<Button intent="secondary">Open Menu</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>Profile</DropdownMenu.Item>
@@ -157,7 +157,7 @@
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Open Menu</Button>
+					<Button intent="secondary">Open Menu</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content class="min-w-55" portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>
@@ -190,7 +190,7 @@
 			<!-- Dropdown 1: Icons + headers + separators -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Account</Button>
+					<Button intent="secondary">Account</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content class="min-w-52" portalProps={{ disabled: true }}>
 					<DropdownMenu.Group>
@@ -215,7 +215,7 @@
 			<!-- Dropdown 2: With disabled items -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Workspace</Button>
+					<Button intent="secondary">Workspace</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content class="min-w-55" portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>
@@ -242,7 +242,7 @@
 			<!-- Dropdown 3: Destructive item with keyboard shortcut -->
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button variant="secondary">Edit</Button>
+					<Button intent="secondary">Edit</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content class="min-w-48" portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>

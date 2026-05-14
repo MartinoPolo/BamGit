@@ -38,11 +38,11 @@
 			<span class="text-sm font-medium">GitHub</span>
 		</div>
 		{#if fullyDisconnected}
-			<Badge variant="danger" size="compact">Not connected</Badge>
+			<Badge tone="danger" size="compact">Not connected</Badge>
 		{:else if oauthConnected}
-			<Badge variant="success" size="compact">Connected</Badge>
+			<Badge tone="success" size="compact">Connected</Badge>
 		{:else}
-			<Badge variant="warning" size="compact">CLI only</Badge>
+			<Badge tone="warning" size="compact">CLI only</Badge>
 		{/if}
 	</div>
 
@@ -59,18 +59,18 @@
 							class="size-5 rounded-full border"
 						/>
 						<span class="font-medium">{authStatus.user.login}</span>
-						<Badge variant="moss" size="compact">OAuth</Badge>
+						<Badge tone="primary" size="compact">OAuth</Badge>
 					</div>
 				{:else}
 					<span class="text-muted-foreground">OAuth not connected</span>
 				{/if}
 			</div>
 			{#if oauthConnected && ondisconnect}
-				<Button variant="ghost" size="sm" class="h-6 text-xs" onclick={ondisconnect}>
+				<Button intent="ghost" size="sm" class="h-6 text-xs" onclick={ondisconnect}>
 					Disconnect
 				</Button>
 			{:else if !oauthConnected && onconnect}
-				<Button variant="secondary" size="sm" class="h-6 text-xs" onclick={onconnect}>
+				<Button intent="secondary" size="sm" class="h-6 text-xs" onclick={onconnect}>
 					Connect
 				</Button>
 			{/if}

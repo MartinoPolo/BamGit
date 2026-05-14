@@ -52,7 +52,7 @@
 		</div>
 		{#if sounds.length > 0}
 			<Button
-				variant="ghost"
+				intent="ghost"
 				size="sm"
 				class="h-7 px-2 text-xs text-destructive hover:bg-destructive/10"
 				onclick={() => (showClearDialog = true)}
@@ -120,9 +120,9 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer>
-			<Button variant="ghost" onclick={() => (showClearDialog = false)}>Cancel</Button>
+			<Button intent="ghost" onclick={() => (showClearDialog = false)}>Cancel</Button>
 			<Button
-				variant="danger"
+				intent="danger"
 				onclick={() => {
 					showClearDialog = false;
 					onclearall?.();

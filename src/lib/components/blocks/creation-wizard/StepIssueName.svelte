@@ -56,7 +56,7 @@
 		oninput={() => (showError = false)}
 	/>
 	{#if showError}
-		<HelpText status="error" class="mt-0">{m.wizard_name_required()}</HelpText>
+		<HelpText state="error" class="mt-0">{m.wizard_name_required()}</HelpText>
 	{/if}
 	{#if branchPreview}
 		<HelpText class="mt-0">{m.wizard_branch_preview({ branch: branchPreview })}</HelpText>

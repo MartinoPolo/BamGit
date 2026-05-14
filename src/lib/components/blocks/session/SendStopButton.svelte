@@ -14,11 +14,11 @@
 </script>
 
 {#if isRunning}
-	<Button variant="danger" size="icon-sm" onclick={onStop} class="rounded-1.75">
+	<Button intent="danger" size="icon-sm" onclick={onStop} class="rounded-1.75">
 		<SquareIcon size={11} strokeWidth={2.4} />
 	</Button>
 {:else}
-	<Button variant="primary" size="icon-sm" onclick={onSend} {disabled} class="rounded-1.75">
+	<Button intent="primary" size="icon-sm" onclick={onSend} {disabled} class="rounded-1.75">
 		<SendIcon size={13} strokeWidth={2} />
 	</Button>
 {/if}

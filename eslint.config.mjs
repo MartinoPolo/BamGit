@@ -18,6 +18,7 @@ export default [
 			'claude_design',
 			'node_modules',
 			'scripts',
+			'storybook-static',
 			'src-tauri',
 			'src/lib/paraglide',
 			'src/lib/types/generated',

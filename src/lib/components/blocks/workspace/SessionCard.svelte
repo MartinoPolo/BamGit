@@ -122,7 +122,7 @@
 
 		{#if isActive}
 			<Button
-				variant="danger"
+				intent="danger"
 				size="sm"
 				class="ml-auto"
 				onclick={(event: MouseEvent) => {

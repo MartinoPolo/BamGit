@@ -1,15 +1,15 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { ALERT_VARIANTS, Alert, AlertAction, AlertDescription, AlertTitle } from './index.js';
+	import { ALERT_TONES, Alert, AlertAction, AlertDescription, AlertTitle } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Alert',
 		component: Alert,
 		tags: ['autodocs'],
 		argTypes: {
-			variant: {
+			tone: {
 				control: 'select',
-				options: [...ALERT_VARIANTS],
+				options: [...ALERT_TONES],
 			},
 		},
 	});
@@ -39,7 +39,7 @@
 <Story name="Destructive">
 	{#snippet template(args)}
 		<div class="w-96">
-			<Alert variant="destructive" {...args}>
+			<Alert tone="destructive" {...args}>
 				<AlertTitle>Error</AlertTitle>
 				<AlertDescription>Your session has expired. Please log in again.</AlertDescription>
 			</Alert>
@@ -80,25 +80,25 @@
 					>A new version is available. Restart to apply the update.</AlertDescription
 				>
 				<AlertAction>
-					<Button variant="secondary" size="sm">Restart now</Button>
+					<Button intent="secondary" size="sm">Restart now</Button>
 				</AlertAction>
 			</Alert>
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="All Variants">
+<Story name="All Tones">
 	{#snippet template(args: AlertProps)}
 		<div class="flex max-w-lg flex-col gap-3">
-			{#each ALERT_VARIANTS as variant (variant)}
-				<Alert {...args} {variant}>
-					{#if variant === 'destructive'}
+			{#each ALERT_TONES as tone (tone)}
+				<Alert {...args} {tone}>
+					{#if tone === 'destructive'}
 						<TriangleAlertIcon />
 					{:else}
 						<InfoIcon />
 					{/if}
-					<AlertTitle>{variant}</AlertTitle>
-					<AlertDescription>Alert variant: {variant}.</AlertDescription>
+					<AlertTitle>{tone}</AlertTitle>
+					<AlertDescription>Alert tone: {tone}.</AlertDescription>
 				</Alert>
 			{/each}
 			<Alert>
@@ -108,7 +108,7 @@
 					>A new version is available. Restart to apply the update.</AlertDescription
 				>
 				<AlertAction>
-					<Button variant="secondary" size="sm">Restart now</Button>
+					<Button intent="secondary" size="sm">Restart now</Button>
 				</AlertAction>
 			</Alert>
 			<Alert>

@@ -60,13 +60,13 @@
 		</span>
 		<div class="flex items-center gap-1">
 			{#if note.processed}
-				<Badge variant="default" class="text-(length:--text-2xs)">
+				<Badge tone="neutral" class="text-(length:--text-2xs)">
 					{m.raw_requirements_processed()}
 				</Badge>
 			{/if}
 			{#if !isEditing}
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="icon-sm"
 					class="opacity-0 transition-opacity group-hover:opacity-100"
 					onclick={startEditing}
@@ -76,7 +76,7 @@
 				</Button>
 				{#if showToggleProcessed}
 					<Button
-						variant="ghost"
+						intent="ghost"
 						size="icon-sm"
 						class="opacity-0 transition-opacity group-hover:opacity-100"
 						onclick={() => void rawRequirementsCtx.toggleProcessed(index)}
@@ -99,11 +99,11 @@
 			onkeydown={handleEditKeydown}
 		/>
 		<div class="mt-2 flex justify-end gap-1">
-			<Button variant="ghost" size="sm" onclick={cancelEditing}>
+			<Button intent="ghost" size="sm" onclick={cancelEditing}>
 				<XIcon />
 				{m.raw_requirements_cancel_edit()}
 			</Button>
-			<Button variant="primary" size="sm" onclick={() => void saveEdit()}>
+			<Button intent="primary" size="sm" onclick={() => void saveEdit()}>
 				<CheckIcon />
 				{m.raw_requirements_save_edit()}
 			</Button>

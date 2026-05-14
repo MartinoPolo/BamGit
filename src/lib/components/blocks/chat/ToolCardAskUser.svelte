@@ -76,12 +76,12 @@
 			</RadioGroup.Root>
 		{/if}
 		<Button
-			variant="primary"
+			intent="primary"
 			size="sm"
 			class="h-(--size-control-md)"
 			onclick={() => onConfirm?.(selectedIndex)}
 		>
-			Confirm <Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+			Confirm <Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 		</Button>
 	</div>
 </Card.Card>

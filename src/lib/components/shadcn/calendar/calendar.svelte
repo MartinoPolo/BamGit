@@ -15,7 +15,7 @@
 	import CalendarNextButton from './calendar-next-button.svelte';
 	import CalendarPrevButton from './calendar-prev-button.svelte';
 	import { cn, type WithoutChildrenOrChild } from '$lib/utils.js';
-	import type { ButtonVariant } from '../button/index.js';
+	import type { ButtonIntent } from '../button/index.js';
 	import { isEqualMonth, type DateValue } from '@internationalized/date';
 	import type { Snippet } from 'svelte';
 
@@ -26,7 +26,7 @@
 		class: className,
 		// fallow-ignore-next-line code-duplication
 		weekdayFormat = 'short',
-		buttonVariant = 'ghost',
+		buttonIntent = 'ghost',
 		captionLayout = 'label',
 		locale = 'en-US',
 		months: monthsProp,
@@ -37,7 +37,7 @@
 		disableDaysOutsideMonth = false,
 		...restProps
 	}: WithoutChildrenOrChild<CalendarPrimitive.RootProps> & {
-		buttonVariant?: ButtonVariant;
+		buttonIntent?: ButtonIntent;
 		captionLayout?: 'dropdown' | 'dropdown-months' | 'dropdown-years' | 'label';
 		months?: CalendarPrimitive.MonthSelectProps['months'];
 		years?: CalendarPrimitive.YearSelectProps['years'];
@@ -79,8 +79,8 @@ get along, so we shut typescript up by casting `value` to `never`.
 	{#snippet children({ months, weekdays })}
 		<CalendarMonths>
 			<CalendarNav>
-				<CalendarPrevButton variant={buttonVariant} />
-				<CalendarNextButton variant={buttonVariant} />
+				<CalendarPrevButton intent={buttonIntent} />
+				<CalendarNextButton intent={buttonIntent} />
 			</CalendarNav>
 			{#each months as month, monthIndex (month)}
 				<CalendarMonth>

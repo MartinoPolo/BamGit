@@ -22,10 +22,10 @@
 	{:else if worktreeState === 'active'}
 		<CircleCheck size={32} class="text-status-success" />
 		<p class="text-sm text-status-success">{m.wizard_progress_active()}</p>
-		<Button variant="ghost" size="sm" onclick={onClose}>OK</Button>
+		<Button intent="ghost" size="sm" onclick={onClose}>OK</Button>
 	{:else if worktreeState === 'failed'}
 		<CircleX size={32} class="text-status-danger" />
 		<p class="text-sm text-status-danger">{m.wizard_progress_failed()}</p>
-		<Button variant="ghost" size="sm" onclick={onRetry}>{m.wizard_retry()}</Button>
+		<Button intent="ghost" size="sm" onclick={onRetry}>{m.wizard_retry()}</Button>
 	{/if}
 </div>

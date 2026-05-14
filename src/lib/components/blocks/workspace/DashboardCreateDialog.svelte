@@ -85,7 +85,7 @@
 				<div class="flex gap-2">
 					<Button
 						type="button"
-						variant={dashboardType === 'repo' ? 'primary' : 'secondary'}
+						intent={dashboardType === 'repo' ? 'primary' : 'secondary'}
 						size="sm"
 						class="flex-1"
 						onclick={() => (dashboardType = 'repo')}
@@ -94,7 +94,7 @@
 					</Button>
 					<Button
 						type="button"
-						variant={dashboardType === 'portfolio' ? 'primary' : 'secondary'}
+						intent={dashboardType === 'portfolio' ? 'primary' : 'secondary'}
 						size="sm"
 						class="flex-1"
 						onclick={() => (dashboardType = 'portfolio')}
@@ -208,7 +208,7 @@
 			</Dialog.Body>
 
 			<Dialog.Footer>
-				<Button variant="ghost" type="button" onclick={handleCancel}>
+				<Button intent="ghost" type="button" onclick={handleCancel}>
 					{m.btn_cancel()}
 				</Button>
 				<Button type="submit">

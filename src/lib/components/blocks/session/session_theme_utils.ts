@@ -1,18 +1,18 @@
 import type { SessionState } from '$lib/types/generated/SessionState.js';
 
 interface SessionBadgeConfig {
-	variant: 'success' | 'warning' | 'info' | 'moss' | 'danger' | 'default';
+	tone: 'success' | 'warning' | 'info' | 'primary' | 'danger' | 'neutral';
 	label: string;
 	pulse: boolean;
 }
 
 export const SESSION_BADGE_CONFIG: Record<SessionState, SessionBadgeConfig> = {
-	running: { variant: 'success', label: 'Running', pulse: true },
-	'needs-input': { variant: 'warning', label: 'Needs Input', pulse: true },
-	'needs-review': { variant: 'info', label: 'Needs Review', pulse: false },
-	paused: { variant: 'warning', label: 'Stopped', pulse: false },
-	finished: { variant: 'moss', label: 'Finished', pulse: false },
-	errored: { variant: 'danger', label: 'Errored', pulse: false },
+	running: { tone: 'success', label: 'Running', pulse: true },
+	'needs-input': { tone: 'warning', label: 'Needs Input', pulse: true },
+	'needs-review': { tone: 'info', label: 'Needs Review', pulse: false },
+	paused: { tone: 'warning', label: 'Stopped', pulse: false },
+	finished: { tone: 'primary', label: 'Finished', pulse: false },
+	errored: { tone: 'danger', label: 'Errored', pulse: false },
 };
 
 export function getContextColor(percent: number): string {

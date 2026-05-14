@@ -236,7 +236,7 @@
 							{#if config.sound_file}
 								<WithTooltip text="Play test sound">
 									<Button
-										variant="ghost"
+										intent="ghost"
 										size="icon-sm"
 										onclick={() => handleTestSound(config.event_type)}
 									>
@@ -290,7 +290,7 @@
 										by {pack.author}
 									</span>
 								{/if}
-								<Badge variant="mono">
+								<Badge format="mono">
 									{pack.event_count} sounds
 								</Badge>
 							</div>
@@ -299,7 +299,7 @@
 					{#if pack.name !== 'grove'}
 						<WithTooltip text="Remove pack">
 							<Button
-								variant="ghost"
+								intent="ghost"
 								size="icon-sm"
 								onclick={() => handleRemovePack(pack.name)}
 							>

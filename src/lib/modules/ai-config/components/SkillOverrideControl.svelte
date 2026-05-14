@@ -56,7 +56,7 @@
 {#if variant === 'chip'}
 	{#if isDisabled}
 		<WithTooltip text="Open a workspace to override skills">
-			<Badge variant="default" size="compact" class="cursor-not-allowed opacity-50">
+			<Badge tone="neutral" size="compact" class="cursor-not-allowed opacity-50">
 				{isNonDefault ? currentLabel : 'Override'}
 			</Badge>
 		</WithTooltip>
@@ -64,12 +64,7 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
-					<Badge
-						{...props}
-						variant="warning"
-						size="compact"
-						class="cursor-pointer gap-0.5"
-					>
+					<Badge {...props} tone="warning" size="compact" class="cursor-pointer gap-0.5">
 						{currentLabel}
 						<ChevronDownIcon class="size-2.5" />
 					</Badge>

@@ -77,7 +77,7 @@
 			</Dialog.Body>
 
 			<Dialog.Footer>
-				<Button variant="ghost" onclick={onClose}>
+				<Button intent="ghost" onclick={onClose}>
 					{m.btn_cancel()}
 				</Button>
 				<Button onclick={() => onConfirm(removeWorktree)}>

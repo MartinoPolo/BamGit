@@ -91,7 +91,7 @@
 						>
 							{#snippet asChild(props)}
 								<span {...props}>
-									<Button variant="secondary" size="sm" disabled>
+									<Button intent="secondary" size="sm" disabled>
 										<SparklesIcon />
 										{m.raw_requirements_process()}
 									</Button>
@@ -101,7 +101,7 @@
 					{/if}
 					{#if rawRequirementsCtx.notes.length >= FULL_PAGE_NOTE_THRESHOLD}
 						<Button
-							variant="ghost"
+							intent="ghost"
 							size="sm"
 							onclick={() => {
 								rawRequirementsCtx.close();
@@ -114,7 +114,7 @@
 					{/if}
 				</div>
 				<Button
-					variant="primary"
+					intent="primary"
 					size="sm"
 					disabled={newNoteContent.trim() === ''}
 					onclick={() => void submitNewNote()}

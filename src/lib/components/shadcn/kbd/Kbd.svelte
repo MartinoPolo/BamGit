@@ -4,7 +4,7 @@
 
 	let {
 		class: className,
-		variant = 'default',
+		format = 'default',
 		tone = 'neutral',
 		ref = $bindable(null),
 		children,
@@ -15,7 +15,7 @@
 <kbd
 	bind:this={ref}
 	data-slot="kbd"
-	class={cn(kbdVariants({ variant, tone }), className)}
+	class={cn(kbdVariants({ format, tone }), className)}
 	{...restProps}
 >
 	{@render children?.()}

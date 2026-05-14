@@ -249,7 +249,7 @@
 			<span class="whitespace-nowrap">{syncAgoText}</span>
 			<WithTooltip text="Refresh assigned issues">
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="icon-sm"
 					disabled={loading}
 					onclick={() => onRefresh?.()}
@@ -291,12 +291,12 @@
 		{/if}
 		<div class="flex-1"></div>
 		{#if selectedUnlinkedCount > 0}
-			<Button variant="primary" size="sm" class="h-6 text-xs" onclick={handleAddSelected}>
+			<Button intent="primary" size="sm" class="h-6 text-xs" onclick={handleAddSelected}>
 				<Plus size={12} />
 				Add Selected
 			</Button>
 			<Button
-				variant="secondary"
+				intent="secondary"
 				size="sm"
 				class="h-6 text-xs"
 				onclick={handleAddSelectedWithWorktree}
@@ -437,7 +437,7 @@
 							{#if onWizardOpen}
 								<WithTooltip text="Add to dashboard">
 									<Button
-										variant="ghost"
+										intent="ghost"
 										size="icon-sm"
 										onclick={(event) => {
 											event.stopPropagation();
@@ -451,7 +451,7 @@
 							{#if onQuickAddWithWorktree}
 								<WithTooltip text="Add with worktree">
 									<Button
-										variant="ghost"
+										intent="ghost"
 										size="icon-sm"
 										onclick={(event) => {
 											event.stopPropagation();
@@ -563,7 +563,7 @@
 		{#if hasMore && onLoadMore}
 			<div class="mt-2 text-center">
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="sm"
 					onclick={onLoadMore}
 					class="text-muted-foreground/60"

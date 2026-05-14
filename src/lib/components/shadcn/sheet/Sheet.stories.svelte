@@ -18,7 +18,7 @@
 			<Sheet.Root>
 				<Sheet.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>Open Sheet (Right)</Button>
+						<Button intent="secondary" {...props}>Open Sheet (Right)</Button>
 					{/snippet}
 				</Sheet.Trigger>
 				<Sheet.Content side="right" portalProps={{ disabled: true }}>
@@ -35,7 +35,7 @@
 					<Sheet.Footer>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="secondary" {...props}>Close</Button>
+								<Button intent="secondary" {...props}>Close</Button>
 							{/snippet}
 						</Sheet.Close>
 					</Sheet.Footer>
@@ -51,7 +51,7 @@
 			<Sheet.Root>
 				<Sheet.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>Open Sheet (Left)</Button>
+						<Button intent="secondary" {...props}>Open Sheet (Left)</Button>
 					{/snippet}
 				</Sheet.Trigger>
 				<Sheet.Content side="left" portalProps={{ disabled: true }}>
@@ -68,7 +68,7 @@
 					<Sheet.Footer>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="secondary" {...props}>Close</Button>
+								<Button intent="secondary" {...props}>Close</Button>
 							{/snippet}
 						</Sheet.Close>
 					</Sheet.Footer>
@@ -84,7 +84,7 @@
 			<Sheet.Root>
 				<Sheet.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>Open Sheet (Top)</Button>
+						<Button intent="secondary" {...props}>Open Sheet (Top)</Button>
 					{/snippet}
 				</Sheet.Trigger>
 				<Sheet.Content side="top" portalProps={{ disabled: true }}>
@@ -98,7 +98,7 @@
 					<Sheet.Footer>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="secondary" {...props}>Close</Button>
+								<Button intent="secondary" {...props}>Close</Button>
 							{/snippet}
 						</Sheet.Close>
 					</Sheet.Footer>
@@ -114,7 +114,7 @@
 			<Sheet.Root>
 				<Sheet.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>Open Sheet (Bottom)</Button>
+						<Button intent="secondary" {...props}>Open Sheet (Bottom)</Button>
 					{/snippet}
 				</Sheet.Trigger>
 				<Sheet.Content side="bottom" portalProps={{ disabled: true }}>
@@ -128,7 +128,7 @@
 					<Sheet.Footer>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="secondary" {...props}>Close</Button>
+								<Button intent="secondary" {...props}>Close</Button>
 							{/snippet}
 						</Sheet.Close>
 					</Sheet.Footer>
@@ -175,10 +175,10 @@
 					<Sheet.Footer>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="secondary" {...props}>Cancel</Button>
+								<Button intent="secondary" {...props}>Cancel</Button>
 							{/snippet}
 						</Sheet.Close>
-						<Button variant="primary">Save changes</Button>
+						<Button intent="primary">Save changes</Button>
 					</Sheet.Footer>
 				</Sheet.Content>
 			</Sheet.Root>
@@ -192,7 +192,7 @@
 			<Sheet.Root>
 				<Sheet.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>Open Terms</Button>
+						<Button intent="secondary" {...props}>Open Terms</Button>
 					{/snippet}
 				</Sheet.Trigger>
 				<Sheet.Content side="right" portalProps={{ disabled: true }}>
@@ -231,12 +231,12 @@
 					<Sheet.Footer>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="secondary" {...props}>Decline</Button>
+								<Button intent="secondary" {...props}>Decline</Button>
 							{/snippet}
 						</Sheet.Close>
 						<Sheet.Close>
 							{#snippet child({ props })}
-								<Button variant="primary" {...props}>Accept</Button>
+								<Button intent="primary" {...props}>Accept</Button>
 							{/snippet}
 						</Sheet.Close>
 					</Sheet.Footer>

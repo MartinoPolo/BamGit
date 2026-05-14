@@ -98,7 +98,7 @@
 										</span>
 									{/if}
 									<Button
-										variant="primary"
+										intent="primary"
 										size="sm"
 										onclick={confirmRebind}
 										disabled={collision !== null}
@@ -112,14 +112,14 @@
 										{m.shortcuts_press_key_combo()}
 									</span>
 								{/if}
-								<Button variant="ghost" size="sm" onclick={cancelRebind}>
+								<Button intent="ghost" size="sm" onclick={cancelRebind}>
 									{m.shortcuts_cancel()}
 								</Button>
 							</div>
 						{:else}
 							<WithTooltip text={m.shortcuts_click_to_rebind()}>
 								<Button
-									variant="ghost"
+									intent="ghost"
 									size="sm"
 									onclick={() => startRebind(shortcutBinding.actionId)}
 								>
@@ -129,7 +129,7 @@
 							{#if shortcutBinding.isCustom}
 								<WithTooltip text={m.shortcuts_reset_to_default()}>
 									<Button
-										variant="ghost"
+										intent="ghost"
 										size="sm"
 										onclick={() => resetToDefault(shortcutBinding.actionId)}
 									>

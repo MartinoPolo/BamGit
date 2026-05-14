@@ -81,12 +81,8 @@
 								</div>
 							</div>
 							<div class="flex items-center gap-1">
-								<Badge variant="merged" size="compact"
-									>{m.prune_badge_merged()}</Badge
-								>
-								<Badge variant="danger" size="compact"
-									>{m.prune_badge_closed()}</Badge
-								>
+								<Badge tone="merged" size="compact">{m.prune_badge_merged()}</Badge>
+								<Badge tone="danger" size="compact">{m.prune_badge_closed()}</Badge>
 							</div>
 						</label>
 					{/each}
@@ -95,12 +91,12 @@
 		</Dialog.Body>
 
 		<Dialog.Footer>
-			<Button variant="ghost" onclick={onClose} disabled={removing}>
+			<Button intent="ghost" onclick={onClose} disabled={removing}>
 				{m.btn_cancel()}
 				<Kbd>Esc</Kbd>
 			</Button>
 			<Button
-				variant="primary-destructive"
+				intent="primary-destructive"
 				onclick={handlePrune}
 				disabled={selectedIds.size === 0 || removing}
 			>
@@ -111,7 +107,7 @@
 						? m.prune_remove_count_plural({ count: selectedIds.size })
 						: m.prune_remove_count({ count: selectedIds.size })}
 				{/if}
-				<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+				<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

@@ -285,12 +285,12 @@
 		<Dialog.Header class="flex-row items-center gap-3 border-b border-border px-4 py-3">
 			<Dialog.Title class="text-lg">Bulk Import Characters</Dialog.Title>
 			{#if scanResult}
-				<Badge variant="info">
+				<Badge tone="info">
 					{characters.length} characters · {scanResult.total_sounds} sounds
 				</Badge>
 			{/if}
 			{#if step === 'review'}
-				<Badge variant={selectedCharacterList.length > 0 ? 'success' : 'warning'}>
+				<Badge tone={selectedCharacterList.length > 0 ? 'success' : 'warning'}>
 					{selectedCharacterList.length} selected
 				</Badge>
 			{/if}
@@ -414,7 +414,7 @@
 								<h3 class="text-sm font-semibold">
 									{currentCharacter.folder_name}
 								</h3>
-								<Badge variant="mono" size="compact">
+								<Badge format="mono" size="compact">
 									{currentCharacter.sounds.length} sounds
 								</Badge>
 								<LanguageSelect
@@ -425,7 +425,7 @@
 									}}
 								/>
 								<Button
-									variant="ghost"
+									intent="ghost"
 									size="sm"
 									class="ml-auto h-7"
 									onclick={handleReMap}
@@ -502,7 +502,7 @@
 		<Dialog.Footer class="border-t border-border px-4 py-3">
 			{#if step === 'scan'}
 				<Button
-					variant="ghost"
+					intent="ghost"
 					onclick={() => {
 						open = false;
 						onclose?.();
@@ -526,7 +526,7 @@
 					</div>
 					<div class="flex gap-2">
 						<Button
-							variant="ghost"
+							intent="ghost"
 							onclick={() => {
 								step = 'scan';
 							}}

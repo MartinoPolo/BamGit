@@ -323,20 +323,20 @@
 
 		<Dialog.Footer>
 			{#if phase === null}
-				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
+				<Button intent="ghost" onclick={handleClose}>Cancel</Button>
 			{:else if phase.kind === 'polling'}
-				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
+				<Button intent="ghost" onclick={handleClose}>Cancel</Button>
 				<Button onclick={handleOpenGitHub}>
 					<ExternalLink size={14} />
 					Open GitHub
 				</Button>
 			{:else if phase.kind === 'expired'}
-				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
+				<Button intent="ghost" onclick={handleClose}>Cancel</Button>
 				<Button onclick={handleGetNewCode}>Get New Code</Button>
 			{:else if phase.kind === 'success'}
 				<Button onclick={handleClose}>Done</Button>
 			{:else if phase.kind === 'error'}
-				<Button variant="ghost" onclick={handleClose}>Cancel</Button>
+				<Button intent="ghost" onclick={handleClose}>Cancel</Button>
 				<Button onclick={handleGetNewCode}>Try Again</Button>
 			{/if}
 		</Dialog.Footer>

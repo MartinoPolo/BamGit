@@ -11,7 +11,7 @@
 
 <div class="flex flex-col items-center gap-3 py-12 text-center">
 	<p class="text-muted-foreground">{m.empty_issues_title()}</p>
-	<Button variant="primary" onclick={onAddIssue}>
+	<Button intent="primary" onclick={onAddIssue}>
 		{m.empty_issues_add()}
 	</Button>
 	<p class="text-xs text-muted-foreground/60">

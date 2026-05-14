@@ -108,7 +108,7 @@
 				</Dialog.Body>
 
 				<Dialog.Footer>
-					<Button variant="ghost" type="button" onclick={onClose}>
+					<Button intent="ghost" type="button" onclick={onClose}>
 						{m.btn_cancel()}
 					</Button>
 					<Button type="submit">

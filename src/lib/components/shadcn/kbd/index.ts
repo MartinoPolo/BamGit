@@ -3,9 +3,9 @@ import Group from './KbdGroup.svelte';
 export { Root, Root as Kbd, Group, Group as KbdGroup };
 export {
 	KBD_TONES,
-	KBD_VARIANTS,
+	KBD_FORMATS,
 	kbdVariants,
 	type KbdProps,
 	type KbdTone,
-	type KbdVariant,
+	type KbdFormat,
 } from './kbd-variants.js';

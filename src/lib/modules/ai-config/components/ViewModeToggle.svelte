@@ -16,7 +16,7 @@
 
 <div class="flex items-center gap-0.5">
 	<Button
-		variant="ghost"
+		intent="ghost"
 		size="icon-sm"
 		aria-pressed={aiConfig.viewModeFor(tab) === 'card'}
 		aria-label="Card view"
@@ -26,7 +26,7 @@
 		<LayoutGridIcon />
 	</Button>
 	<Button
-		variant="ghost"
+		intent="ghost"
 		size="icon-sm"
 		aria-pressed={aiConfig.viewModeFor(tab) === 'list'}
 		aria-label="List view"

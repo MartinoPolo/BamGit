@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cardVariants, CARD_STATE_OPTIONS, CARD_STATE_CLASSES } from './card-variants.js';
+import { cardVariants, CARD_STATE_OPTIONS } from './card-variants.js';
 
 describe('cardVariants', () => {
 	it('generates base classes with relative, surface bg, border, radius-lg, and shadow-sm', () => {
@@ -51,64 +51,62 @@ describe('CARD_STATE_OPTIONS', () => {
 	});
 });
 
-describe('CARD_STATE_CLASSES', () => {
+describe('cardVariants state axis', () => {
 	it('maps hover state to border-strong and shadow-md', () => {
-		const classes = CARD_STATE_CLASSES.hover;
+		const classes = cardVariants({ state: 'hover' });
 		expect(classes).toContain('border-border-strong');
 		expect(classes).toContain('shadow-md');
 	});
 
 	it('maps selected state to primary border and ring shadow', () => {
-		const classes = CARD_STATE_CLASSES.selected;
+		const classes = cardVariants({ state: 'selected' });
 		expect(classes).toMatch(/border-primary/);
 		expect(classes).toMatch(/shadow/);
 	});
 
 	it('maps focus state to outline with ring color', () => {
-		const classes = CARD_STATE_CLASSES.focus;
+		const classes = cardVariants({ state: 'focus' });
 		expect(classes).toMatch(/outline/);
 		expect(classes).toMatch(/ring/);
 	});
 
 	it('maps dragging state to rotation and scale', () => {
-		const classes = CARD_STATE_CLASSES.dragging;
+		const classes = cardVariants({ state: 'dragging' });
 		expect(classes).toMatch(/rotate/);
 		expect(classes).toMatch(/scale/);
 		expect(classes).toContain('shadow-lg');
 	});
 
 	it('maps loading state to relative and overflow-hidden', () => {
-		const classes = CARD_STATE_CLASSES.loading;
+		const classes = cardVariants({ state: 'loading' });
 		expect(classes).toContain('relative');
 		expect(classes).toContain('overflow-hidden');
 	});
 
 	it('maps error state to danger border', () => {
-		const classes = CARD_STATE_CLASSES.error;
+		const classes = cardVariants({ state: 'error' });
 		expect(classes).toMatch(/status-danger/);
 	});
 
 	it('maps success state to success border-left', () => {
-		const classes = CARD_STATE_CLASSES.success;
+		const classes = cardVariants({ state: 'success' });
 		expect(classes).toMatch(/status-success/);
 	});
 
 	it('maps archived state to reduced opacity', () => {
-		const classes = CARD_STATE_CLASSES.archived;
+		const classes = cardVariants({ state: 'archived' });
 		expect(classes).toMatch(/opacity/);
 	});
 
 	it('maps disabled state to reduced opacity and pointer-events-none', () => {
-		const classes = CARD_STATE_CLASSES.disabled;
+		const classes = cardVariants({ state: 'disabled' });
 		expect(classes).toContain('pointer-events-none');
 		expect(classes).toMatch(/opacity/);
 	});
 
-	it('does not have a default key', () => {
-		expect('default' in CARD_STATE_CLASSES).toBe(false);
-	});
-
-	it('returns undefined for default state lookup', () => {
-		expect(CARD_STATE_CLASSES['default']).toBeUndefined();
+	it('keeps default state neutral', () => {
+		const classes = cardVariants({ state: 'default' });
+		expect(classes).not.toContain('border-border-strong');
+		expect(classes).not.toContain('status-danger');
 	});
 });

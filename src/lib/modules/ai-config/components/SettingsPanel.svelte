@@ -130,7 +130,7 @@
 		<span class="text-xs font-medium text-foreground-subtle">Scope</span>
 		<div class="inline-flex rounded-md border border-border bg-surface-2 p-0.5">
 			<Button
-				variant={scope === 'user' ? 'secondary' : 'ghost'}
+				intent={scope === 'user' ? 'secondary' : 'ghost'}
 				size="sm"
 				class="h-7 px-3 text-xs"
 				aria-pressed={scope === 'user'}
@@ -139,7 +139,7 @@
 				User
 			</Button>
 			<Button
-				variant={scope === 'project' ? 'secondary' : 'ghost'}
+				intent={scope === 'project' ? 'secondary' : 'ghost'}
 				size="sm"
 				class="h-7 px-3 text-xs"
 				aria-pressed={scope === 'project'}
@@ -171,7 +171,7 @@
 	{/if}
 
 	{#if error !== null}
-		<Alert.Root variant="destructive">
+		<Alert.Root tone="destructive">
 			<Alert.Title>Failed to load settings</Alert.Title>
 			<Alert.Description>{error}</Alert.Description>
 		</Alert.Root>
@@ -262,7 +262,7 @@
 							>
 								{#each def.control.options as option (option.value)}
 									<Button
-										variant={valueAsString(current) === option.value
+										intent={valueAsString(current) === option.value
 											? 'secondary'
 											: 'ghost'}
 										size="sm"

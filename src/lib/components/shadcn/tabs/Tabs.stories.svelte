@@ -75,7 +75,7 @@
 	{#snippet template()}
 		<Tabs>
 			<Tab active={badgeActive === 'Inbox'} onclick={() => (badgeActive = 'Inbox')}
-				>Inbox <Badge variant="moss" class="ml-1.5">3</Badge></Tab
+				>Inbox <Badge tone="primary" class="ml-1.5">3</Badge></Tab
 			>
 			<Tab active={badgeActive === 'Drafts'} onclick={() => (badgeActive = 'Drafts')}
 				>Drafts</Tab

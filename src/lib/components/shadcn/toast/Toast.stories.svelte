@@ -5,6 +5,7 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import AlertTriangleIcon from '@lucide/svelte/icons/triangle-alert';
 	import XIcon from '@lucide/svelte/icons/x';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Toast',
@@ -83,11 +84,7 @@
 			>
 				{#snippet icon()}<AlertTriangleIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
-					<button
-						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
-					>
-						Review
-					</button>
+					<Button intent="secondary" size="sm">Review</Button>
 				{/snippet}
 			</Toast>
 		</div>
@@ -104,11 +101,7 @@
 			>
 				{#snippet icon()}<XIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
-					<button
-						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
-					>
-						Retry
-					</button>
+					<Button intent="secondary" size="sm">Retry</Button>
 				{/snippet}
 			</Toast>
 		</div>
@@ -149,11 +142,7 @@
 			>
 				{#snippet icon()}<AlertTriangleIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
-					<button
-						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
-					>
-						Review
-					</button>
+					<Button intent="secondary" size="sm">Review</Button>
 				{/snippet}
 			</Toast>
 			<Toast
@@ -163,11 +152,7 @@
 			>
 				{#snippet icon()}<XIcon class="size-3.5" />{/snippet}
 				{#snippet action()}
-					<button
-						class="inline-flex h-(--size-control-sm) items-center rounded-sm border border-border bg-surface-2 px-2.25 text-(length:--text-sm) text-foreground hover:bg-surface-3"
-					>
-						Retry
-					</button>
+					<Button intent="secondary" size="sm">Retry</Button>
 				{/snippet}
 			</Toast>
 			<Toast tone="loading" title="Setting up worktree…" body="Creating worktree for #142">

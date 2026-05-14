@@ -217,7 +217,7 @@
 				</div>
 				<div class="flex shrink-0 gap-0.5">
 					<Button
-						variant="ghost"
+						intent="ghost"
 						size="icon"
 						class={cn('size-6.5', workspace.github_repo == null && 'opacity-[0.35]')}
 						onclick={(event: MouseEvent) => handleIconClick(event, onGithubClick)}
@@ -227,7 +227,7 @@
 						<GithubIcon size={14} strokeWidth={1.7} />
 					</Button>
 					<Button
-						variant="ghost"
+						intent="ghost"
 						size="icon"
 						class={cn('size-6.5', workspace.local_folder == null && 'opacity-[0.35]')}
 						onclick={(event: MouseEvent) => handleIconClick(event, onFolderClick)}

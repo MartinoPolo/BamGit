@@ -45,7 +45,7 @@
 
 	{#if onDismiss}
 		<Button
-			variant="ghost"
+			intent="ghost"
 			size="icon-sm"
 			class="size-6 text-foreground-subtle"
 			onclick={onDismiss}

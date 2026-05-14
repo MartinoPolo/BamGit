@@ -77,9 +77,9 @@
 		return source === 'user' ? 'User' : 'Project';
 	});
 
-	const sourceVariant = $derived.by(() => {
+	const sourceTone = $derived.by(() => {
 		if (item === null || kind === 'memory') {
-			return 'default' as const;
+			return 'neutral' as const;
 		}
 		const source = (item as Exclude<typeof item, MemoryConfig>).source;
 		if (source === 'user') {
@@ -88,7 +88,7 @@
 		if (source === 'project') {
 			return 'success' as const;
 		}
-		return 'amber' as const;
+		return 'accent' as const;
 	});
 
 	const content = $derived.by((): string | null => {
@@ -159,42 +159,41 @@
 					<Dialog.Title>{title}</Dialog.Title>
 					<div class="flex flex-wrap items-center gap-1">
 						{#if kind !== 'memory'}
-							<Badge variant={sourceVariant} size="compact">{sourceLabel}</Badge>
+							<Badge tone={sourceTone} size="compact">{sourceLabel}</Badge>
 						{/if}
 
 						{#if kind === 'skill'}
 							{@const skillItem = item as SkillConfig}
 							{#if skillItem.category}
-								<Badge variant="default" size="compact">{skillItem.category}</Badge>
+								<Badge tone="neutral" size="compact">{skillItem.category}</Badge>
 							{/if}
 							{#if skillItem.deprecated}
-								<Badge variant="warning" size="compact">Deprecated</Badge>
+								<Badge tone="warning" size="compact">Deprecated</Badge>
 							{/if}
 						{:else if kind === 'agent'}
 							{@const agentItem = item as AgentConfig}
 							{#if agentItem.model}
-								<Badge variant="mono" size="compact">{agentItem.model}</Badge>
+								<Badge format="mono" size="compact">{agentItem.model}</Badge>
 							{/if}
 							{#if agentItem.deprecated}
-								<Badge variant="warning" size="compact">Deprecated</Badge>
+								<Badge tone="warning" size="compact">Deprecated</Badge>
 							{/if}
 						{:else if kind === 'hook'}
 							{@const hookItem = item as HookConfig}
-							<Badge variant="default" size="compact">{hookItem.event_type}</Badge>
+							<Badge tone="neutral" size="compact">{hookItem.event_type}</Badge>
 							{#if hookItem.matcher}
-								<Badge variant="default" size="compact">{hookItem.matcher}</Badge>
+								<Badge tone="neutral" size="compact">{hookItem.matcher}</Badge>
 							{/if}
 						{:else if kind === 'mcp'}
 							{@const mcpItem = item as McpServerConfig}
-							<Badge variant={mcpItem.enabled ? 'success' : 'danger'} size="compact">
+							<Badge tone={mcpItem.enabled ? 'success' : 'danger'} size="compact">
 								{mcpItem.enabled ? 'Enabled' : 'Disabled'}
 							</Badge>
-							<Badge variant="mono" size="compact">{mcpItem.transport_type}</Badge>
+							<Badge format="mono" size="compact">{mcpItem.transport_type}</Badge>
 						{:else if kind === 'memory'}
 							{@const memItem = item as MemoryConfig}
 							{#if memItem.memory_type}
-								<Badge variant="default" size="compact">{memItem.memory_type}</Badge
-								>
+								<Badge tone="neutral" size="compact">{memItem.memory_type}</Badge>
 							{/if}
 						{:else if kind === 'rule'}
 							{@const ruleItem = item as RuleConfig}
@@ -202,7 +201,7 @@
 								ruleItem.language ??
 								(ruleItem.filename ? deriveLanguage(ruleItem.filename) : null)}
 							{#if lang}
-								<Badge variant="default" size="compact">{lang}</Badge>
+								<Badge tone="neutral" size="compact">{lang}</Badge>
 							{/if}
 						{/if}
 					</div>
@@ -263,13 +262,13 @@
 			<Dialog.Footer class="shrink-0 justify-between">
 				<div class="flex gap-1">
 					{#if filePath !== null}
-						<Button variant="ghost" size="sm" onclick={handleOpenFile}>
+						<Button intent="ghost" size="sm" onclick={handleOpenFile}>
 							<FileTextIcon class="size-3.5" />
 							Open file
 						</Button>
 					{/if}
 					{#if parentDir !== null}
-						<Button variant="ghost" size="sm" onclick={handleOpenFolder}>
+						<Button intent="ghost" size="sm" onclick={handleOpenFolder}>
 							<FolderOpenIcon class="size-3.5" />
 							Open folder
 						</Button>
@@ -278,15 +277,15 @@
 
 				<div class="flex gap-2">
 					{#if filePath !== null}
-						<Button variant="ghost" size="sm" onclick={handleOpenFile}>
+						<Button intent="ghost" size="sm" onclick={handleOpenFile}>
 							Open in Editor
 						</Button>
 					{/if}
 					{#if isEditable}
-						<Button variant="primary" size="sm" onclick={handleEdit}>Edit</Button>
+						<Button intent="primary" size="sm" onclick={handleEdit}>Edit</Button>
 					{/if}
 					{#if kind !== 'hook' && kind !== 'mcp' && kind !== 'instruction'}
-						<Button variant="danger" size="sm" onclick={handleDelete}>Delete</Button>
+						<Button intent="danger" size="sm" onclick={handleDelete}>Delete</Button>
 					{/if}
 				</div>
 			</Dialog.Footer>

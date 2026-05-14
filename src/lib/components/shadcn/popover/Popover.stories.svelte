@@ -29,7 +29,7 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<FilterIcon class="size-3.5" />
 							Filter
 						</Button>
@@ -78,13 +78,13 @@
 					<Popover.Divider />
 					<!-- Keyboard hints: Enter = Apply, Ctrl+R = Reset. Tab/Space on checkboxes handled by bits-ui. -->
 					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
-						<Button variant="ghost" size="sm" class="flex-1">
+						<Button intent="ghost" size="sm" class="flex-1">
 							<KbdGroup><Kbd>Ctrl</Kbd><Kbd>R</Kbd></KbdGroup>
 							Reset
 						</Button>
-						<Button variant="primary" size="sm" class="flex-1">
+						<Button intent="primary" size="sm" class="flex-1">
 							Apply
-							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</div>
 				</Popover.Content>
@@ -99,7 +99,7 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<LayersIcon class="size-3.5" />
 							Sort by
 						</Button>
@@ -184,7 +184,7 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<SparklesIcon class="size-3.5" />
 							Legend
 						</Button>
@@ -214,7 +214,7 @@
 			<Popover.Root open={true}>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<FilterIcon class="size-3.5" />
 							Filter
 						</Button>
@@ -242,13 +242,13 @@
 					</label>
 					<Popover.Divider />
 					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
-						<Button variant="ghost" size="sm" class="flex-1">
+						<Button intent="ghost" size="sm" class="flex-1">
 							<KbdGroup><Kbd>Ctrl</Kbd><Kbd>R</Kbd></KbdGroup>
 							Reset
 						</Button>
-						<Button variant="primary" size="sm" class="flex-1">
+						<Button intent="primary" size="sm" class="flex-1">
 							Apply
-							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</div>
 				</Popover.Content>
@@ -264,7 +264,7 @@
 			<Popover.Root open={true}>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<FilterIcon class="size-3.5" />
 							Filter
 						</Button>
@@ -312,13 +312,13 @@
 					</label>
 					<Popover.Divider />
 					<div class="flex gap-1.5 px-1 pb-1 pt-0.5">
-						<Button variant="ghost" size="sm" class="flex-1">
+						<Button intent="ghost" size="sm" class="flex-1">
 							<KbdGroup><Kbd>Ctrl</Kbd><Kbd>R</Kbd></KbdGroup>
 							Reset
 						</Button>
-						<Button variant="primary" size="sm" class="flex-1">
+						<Button intent="primary" size="sm" class="flex-1">
 							Apply
-							<Kbd variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+							<Kbd format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 						</Button>
 					</div>
 				</Popover.Content>
@@ -328,7 +328,7 @@
 			<Popover.Root open={true}>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<LayersIcon class="size-3.5" />
 							Sort by
 						</Button>
@@ -377,7 +377,7 @@
 			<Popover.Root open={true}>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" {...props}>
+						<Button intent="secondary" {...props}>
 							<SparklesIcon class="size-3.5" />
 							Legend
 						</Button>

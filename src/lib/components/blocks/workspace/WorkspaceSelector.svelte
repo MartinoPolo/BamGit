@@ -17,7 +17,7 @@
 	<SidebarCollapsedItem icon={FolderIcon} label={name} {onclick} iconClass="text-primary" />
 {:else}
 	<Button
-		variant="ghost"
+		intent="ghost"
 		class="w-full justify-start gap-2 bg-surface-2 hover:bg-surface-3"
 		{onclick}
 	>

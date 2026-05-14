@@ -82,7 +82,7 @@
 >
 	<div class="mb-2 flex items-center gap-2">
 		<span class="text-sm font-medium text-foreground">{label}</span>
-		<Badge variant="mono" size="compact">{eventType}</Badge>
+		<Badge format="mono" size="compact">{eventType}</Badge>
 		{#if sounds.length > 0}
 			<span class="ml-auto text-[10px] text-muted-foreground">
 				{sounds.length} sound{sounds.length !== 1 ? 's' : ''}

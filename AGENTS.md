@@ -46,6 +46,7 @@ For nested PowerShell scripts, use `powershell -NoProfile -ExecutionPolicy Bypas
 - For Svelte edits, run `svelte-autofixer` first. Fetch Svelte docs only for unfamiliar APIs or syntax, and request the smallest relevant sections.
 - Prefer targeted shell reads: `rg -l`, path-scoped `rg`, `git diff --stat`, and `git diff -- <files>`.
 - Use `scripts/run-quiet.ps1` for noisy checks. It records the full log under `.logs/`, prints pass/fail, and prints only the tail on failure.
+- If `scripts/run-quiet.ps1` aborts with PowerShell `NativeCommandError`, rerun the command directly to see the real tool output.
 - Inspect a full log only when the tail does not identify the failure.
 - Do not run full Storybook build unless changing Storybook build config, deployment output, or behavior that only appears in the production Storybook bundle.
 - For component work, prefer `pnpm check:fast`, targeted tests, Storybook dev-server viewing of affected stories, and browser screenshots over full builds.

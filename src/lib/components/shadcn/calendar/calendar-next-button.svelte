@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { Calendar as CalendarPrimitive } from 'bits-ui';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
-	import { buttonVariants, type ButtonVariant } from '$lib/components/shadcn/button/index.js';
+	import { buttonVariants, type ButtonIntent } from '$lib/components/shadcn/button/index.js';
 	import { cn } from '$lib/utils.js';
 
 	let {
 		ref = $bindable(null),
 		class: className,
 		children,
-		variant = 'ghost',
+		intent = 'ghost',
 		...restProps
 	}: CalendarPrimitive.NextButtonProps & {
-		variant?: ButtonVariant;
+		intent?: ButtonIntent;
 	} = $props();
 </script>
 
@@ -22,7 +22,7 @@
 <CalendarPrimitive.NextButton
 	bind:ref
 	class={cn(
-		buttonVariants({ variant }),
+		buttonVariants({ intent }),
 		'size-(--cell-size) bg-transparent p-0 select-none disabled:opacity-50 rtl:rotate-180',
 		className,
 	)}

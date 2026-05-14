@@ -52,7 +52,7 @@
 		/>
 		<div class="mt-2 flex justify-end">
 			<Button
-				variant="primary"
+				intent="primary"
 				size="sm"
 				disabled={newNoteContent.trim() === ''}
 				onclick={() => void submitNewNote()}

@@ -5,7 +5,7 @@
 	let {
 		ref = $bindable(null),
 		class: className,
-		variant = 'default',
+		tone = 'default',
 		children,
 		...restProps
 	}: AlertProps = $props();
@@ -15,7 +15,7 @@
 	bind:this={ref}
 	data-slot="alert"
 	role="alert"
-	class={cn(alertVariants({ variant }), className)}
+	class={cn(alertVariants({ tone }), className)}
 	{...restProps}
 >
 	{@render children?.()}

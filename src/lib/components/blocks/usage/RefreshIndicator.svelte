@@ -62,7 +62,7 @@
 {#if hasTooltip}
 	<WithTooltip text={tooltipText} side="bottom">
 		<Button
-			variant="secondary"
+			intent="secondary"
 			size="sm"
 			disabled={isLoading}
 			onclick={onrefresh}
@@ -84,7 +84,7 @@
 		</Button>
 	</WithTooltip>
 {:else}
-	<Button variant="secondary" size="sm" disabled={isLoading} onclick={onrefresh} class="relative">
+	<Button intent="secondary" size="sm" disabled={isLoading} onclick={onrefresh} class="relative">
 		<RefreshCwIcon
 			class={cn('size-3.5', isLoading && 'animate-spin', isMuted && 'text-muted-foreground')}
 		/>

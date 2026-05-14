@@ -71,7 +71,7 @@
 		</div>
 		<div class="flex items-center gap-2">
 			<Button
-				variant={showArchived ? 'primary' : 'secondary'}
+				intent={showArchived ? 'primary' : 'secondary'}
 				size="icon"
 				onclick={() => (showArchived = !showArchived)}
 				aria-label="Toggle archived workspaces"
@@ -82,7 +82,7 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button {...props} variant="secondary" size="icon">
+						<Button {...props} intent="secondary" size="icon">
 							<GithubIcon size={16} />
 						</Button>
 					{/snippet}

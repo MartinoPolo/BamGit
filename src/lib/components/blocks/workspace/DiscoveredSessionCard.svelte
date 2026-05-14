@@ -75,7 +75,7 @@
 		{/if}
 
 		<Button
-			variant="primary"
+			intent="primary"
 			size="sm"
 			class="ml-auto"
 			onclick={(event: MouseEvent) => {

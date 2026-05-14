@@ -25,7 +25,7 @@
 <div class="flex flex-wrap items-center gap-1 px-3 pb-1 pt-2">
 	{#each defaultChips as chip (chip.command)}
 		<Button
-			variant="secondary"
+			intent="secondary"
 			size="sm"
 			class="rounded-full px-2 text-[10.5px]"
 			onclick={() => onChipClick?.(chip.command)}
@@ -33,5 +33,5 @@
 			{chip.label}
 		</Button>
 	{/each}
-	<Button variant="ghost" size="sm" class="px-1.5 text-[10.5px]">More ▾</Button>
+	<Button intent="ghost" size="sm" class="px-1.5 text-[10.5px]">More ▾</Button>
 </div>

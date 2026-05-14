@@ -48,7 +48,7 @@
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
-			<Button variant="secondary" size="sm" {...props}>
+			<Button intent="secondary" size="sm" {...props}>
 				<PaletteIcon class="size-3.5" />
 			</Button>
 		{/snippet}

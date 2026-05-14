@@ -153,11 +153,11 @@
 				</Dialog.Body>
 
 				<Dialog.Footer class="justify-between">
-					<Button variant="danger" type="button" size="sm" onclick={handleDelete}>
+					<Button intent="danger" type="button" size="sm" onclick={handleDelete}>
 						{confirmDelete ? m.btn_confirm_delete() : m.btn_delete()}
 					</Button>
 					<div class="flex gap-2">
-						<Button variant="ghost" type="button" onclick={onClose}>
+						<Button intent="ghost" type="button" onclick={onClose}>
 							{m.btn_cancel()}
 						</Button>
 						<Button type="submit">

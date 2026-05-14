@@ -2,9 +2,9 @@ import Root from './HelpText.svelte';
 
 export { Root, Root as HelpText };
 export {
-	HELP_TEXT_STATUSES,
+	HELP_TEXT_STATES,
 	helpTextVariants,
 	type HelpTextProps,
-	type HelpTextStatus,
+	type HelpTextState,
 } from './help-text-variants.js';
 export type { HelpTextProps as Props } from './help-text-variants.js';

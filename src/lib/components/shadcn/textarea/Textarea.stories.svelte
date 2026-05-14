@@ -50,7 +50,7 @@
 		<div class="max-w-sm">
 			<Label for="error-ta">Description</Label>
 			<Textarea id="error-ta" state="error" rows={2} value="" {...args} />
-			<HelpText status="error">Description is required.</HelpText>
+			<HelpText state="error">Description is required.</HelpText>
 		</div>
 	{/snippet}
 </Story>
@@ -85,7 +85,7 @@
 							: 'Surface session failures and PR review state directly above each tree.'}
 					/>
 					{#if state === 'error'}
-						<HelpText status="error">Description is required.</HelpText>
+						<HelpText state="error">Description is required.</HelpText>
 					{/if}
 				</div>
 			{/each}
@@ -110,7 +110,7 @@
 			<div>
 				<Label>Error</Label>
 				<Textarea state="error" rows={2} />
-				<HelpText status="error">Description is required.</HelpText>
+				<HelpText state="error">Description is required.</HelpText>
 			</div>
 			<div>
 				<Label>Disabled</Label>

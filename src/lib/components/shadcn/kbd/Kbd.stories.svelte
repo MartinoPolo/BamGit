@@ -1,15 +1,15 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { KBD_TONES, KBD_VARIANTS, Kbd } from './index.js';
+	import { KBD_TONES, KBD_FORMATS, Kbd } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Kbd',
 		component: Kbd,
 		tags: ['autodocs'],
 		argTypes: {
-			variant: {
+			format: {
 				control: 'select',
-				options: [...KBD_VARIANTS],
+				options: [...KBD_FORMATS],
 			},
 			tone: {
 				control: 'select',
@@ -20,7 +20,7 @@
 </script>
 
 <script lang="ts">
-	import type { KbdProps, KbdTone, KbdVariant } from './kbd-variants.js';
+	import type { KbdProps, KbdTone, KbdFormat } from './kbd-variants.js';
 	import { KbdGroup } from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
@@ -35,20 +35,20 @@
 
 	const singleKeySamples: {
 		label: string;
-		variant: KbdVariant;
+		format: KbdFormat;
 		tone: KbdTone;
 		content: 'letter' | 'escape' | 'command' | 'enter' | 'delete' | 'arrows';
 	}[] = [
-		{ label: 'Default', variant: 'default', tone: 'neutral', content: 'letter' },
-		{ label: 'Lucide', variant: 'lucide', tone: 'neutral', content: 'command' },
-		{ label: 'Mono', variant: 'mono', tone: 'neutral', content: 'letter' },
-		{ label: 'Default accent', variant: 'default', tone: 'accent', content: 'escape' },
-		{ label: 'Lucide accent', variant: 'lucide', tone: 'accent', content: 'enter' },
-		{ label: 'Mono accent', variant: 'mono', tone: 'accent', content: 'letter' },
-		{ label: 'Default inverted', variant: 'default', tone: 'inverted', content: 'escape' },
-		{ label: 'Lucide inverted', variant: 'lucide', tone: 'inverted', content: 'delete' },
-		{ label: 'Mono inverted', variant: 'mono', tone: 'inverted', content: 'letter' },
-		{ label: 'Arrow keys', variant: 'lucide', tone: 'neutral', content: 'arrows' },
+		{ label: 'Default', format: 'default', tone: 'neutral', content: 'letter' },
+		{ label: 'Lucide', format: 'lucide', tone: 'neutral', content: 'command' },
+		{ label: 'Mono', format: 'mono', tone: 'neutral', content: 'letter' },
+		{ label: 'Default accent', format: 'default', tone: 'accent', content: 'escape' },
+		{ label: 'Lucide accent', format: 'lucide', tone: 'accent', content: 'enter' },
+		{ label: 'Mono accent', format: 'mono', tone: 'accent', content: 'letter' },
+		{ label: 'Default inverted', format: 'default', tone: 'inverted', content: 'escape' },
+		{ label: 'Lucide inverted', format: 'lucide', tone: 'inverted', content: 'delete' },
+		{ label: 'Mono inverted', format: 'mono', tone: 'inverted', content: 'letter' },
+		{ label: 'Arrow keys', format: 'lucide', tone: 'neutral', content: 'arrows' },
 	];
 </script>
 
@@ -81,7 +81,7 @@
 					]}
 				>
 					<span class="text-sm">{sample.label}</span>
-					<Kbd {...args} variant={sample.variant} tone={sample.tone}>
+					<Kbd {...args} format={sample.format} tone={sample.tone}>
 						{@render keyContent(sample.content)}
 					</Kbd>
 				</div>
@@ -98,7 +98,7 @@
 			>
 				<span class="text-sm text-foreground-muted">Open command palette</span>
 				<KbdGroup>
-					<Kbd {...args} variant="lucide"><CommandIcon /></Kbd>
+					<Kbd {...args} format="lucide"><CommandIcon /></Kbd>
 					<Kbd {...args}>K</Kbd>
 				</KbdGroup>
 			</div>
@@ -108,7 +108,7 @@
 				<span class="text-sm text-foreground-muted">Run selected action</span>
 				<KbdGroup>
 					<Kbd {...args}>Ctrl</Kbd>
-					<Kbd {...args} variant="lucide"><CornerDownLeftIcon /></Kbd>
+					<Kbd {...args} format="lucide"><CornerDownLeftIcon /></Kbd>
 				</KbdGroup>
 			</div>
 			<div
@@ -116,18 +116,18 @@
 			>
 				<span class="text-sm text-foreground-muted">Open project search</span>
 				<KbdGroup>
-					<Kbd {...args} variant="mono" tone="accent">Ctrl</Kbd>
-					<Kbd {...args} variant="mono" tone="accent">Shift</Kbd>
-					<Kbd {...args} variant="mono" tone="accent">P</Kbd>
+					<Kbd {...args} format="mono" tone="accent">Ctrl</Kbd>
+					<Kbd {...args} format="mono" tone="accent">Shift</Kbd>
+					<Kbd {...args} format="mono" tone="accent">P</Kbd>
 				</KbdGroup>
 			</div>
 			<div
 				class="flex items-center justify-between gap-4 rounded-md bg-primary px-3 py-2 text-primary-foreground"
 			>
 				<span class="text-sm">Primary button hint</span>
-				<Button variant="primary" class="pointer-events-none">
+				<Button intent="primary" class="pointer-events-none">
 					Create
-					<Kbd {...args} variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+					<Kbd {...args} format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
 			</div>
 		</div>
@@ -145,7 +145,7 @@
 					/>
 					<Input class="pl-8 pr-16" placeholder="Search workspaces" />
 					<KbdGroup class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
-						<Kbd {...args} variant="lucide"><CommandIcon /></Kbd>
+						<Kbd {...args} format="lucide"><CommandIcon /></Kbd>
 						<Kbd {...args}>K</Kbd>
 					</KbdGroup>
 				</div>
@@ -153,14 +153,14 @@
 
 			<div class="flex flex-col gap-4">
 				<p class="text-sm font-medium text-foreground">Button hint</p>
-				<Button variant="primary" class="w-fit">
+				<Button intent="primary" class="w-fit">
 					Open
-					<Kbd {...args} variant="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
+					<Kbd {...args} format="lucide" tone="inverted"><CornerDownLeftIcon /></Kbd>
 				</Button>
-				<Button variant="secondary" class="w-fit">
+				<Button intent="secondary" class="w-fit">
 					Search
 					<KbdGroup>
-						<Kbd {...args} variant="lucide"><CommandIcon /></Kbd>
+						<Kbd {...args} format="lucide"><CommandIcon /></Kbd>
 						<Kbd {...args}>K</Kbd>
 					</KbdGroup>
 				</Button>

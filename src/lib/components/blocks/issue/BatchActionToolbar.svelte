@@ -85,7 +85,7 @@
 					{#snippet asChild(props)}
 						<Button
 							{...props}
-							variant="ghost"
+							intent="ghost"
 							size="sm"
 							onclick={onBatchArchive}
 							disabled={!hasActiveIssues}
@@ -103,7 +103,7 @@
 					{#snippet asChild(props)}
 						<Button
 							{...props}
-							variant="ghost"
+							intent="ghost"
 							size="sm"
 							onclick={onBatchUnarchive}
 							disabled={!hasArchivedIssues}
@@ -120,7 +120,7 @@
 				{#snippet asChild(props)}
 					<Button
 						{...props}
-						variant="danger"
+						intent="danger"
 						size="sm"
 						onclick={onBatchDelete}
 						aria-label="Delete selected"
@@ -134,7 +134,7 @@
 			<Popover.Root bind:open={priorityPopoverOpen}>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button {...props} variant="ghost" size="sm" aria-label="Change priority">
+						<Button {...props} intent="ghost" size="sm" aria-label="Change priority">
 							Change Priority
 							<ChevronDownIcon />
 						</Button>
@@ -157,7 +157,7 @@
 					{#snippet asChild(props)}
 						<Button
 							{...props}
-							variant="ghost"
+							intent="ghost"
 							size="icon-sm"
 							onclick={onBatchPrune}
 							disabled={!hasActiveWorktrees}
@@ -169,12 +169,7 @@
 				</WithTooltip>
 			{/if}
 
-			<Button
-				variant="ghost"
-				size="icon-sm"
-				onclick={onDeselectAll}
-				aria-label="Deselect all"
-			>
+			<Button intent="ghost" size="icon-sm" onclick={onDeselectAll} aria-label="Deselect all">
 				<XIcon />
 			</Button>
 		</div>
@@ -185,7 +180,7 @@
 				{#snippet asChild(props)}
 					<Button
 						{...props}
-						variant="ghost"
+						intent="ghost"
 						size="icon-sm"
 						onclick={onBatchPrune}
 						aria-label="Clean up worktrees"

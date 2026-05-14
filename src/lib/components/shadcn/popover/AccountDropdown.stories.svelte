@@ -28,7 +28,7 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button variant="secondary" class="w-70 justify-between" {...props}>
+						<Button intent="secondary" class="w-70 justify-between" {...props}>
 							<span class="flex items-center gap-2">
 								<span
 									class="flex size-5.5 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground"
@@ -60,7 +60,7 @@
 							<UserIcon class="size-3.5" />
 							Profile
 							<KbdGroup class="ml-auto">
-								<Kbd variant="lucide"><CommandIcon /></Kbd>
+								<Kbd format="lucide"><CommandIcon /></Kbd>
 								<Kbd>P</Kbd>
 							</KbdGroup>
 						</Popover.Item>
@@ -68,7 +68,7 @@
 							<SettingsIcon class="size-3.5" />
 							Settings
 							<KbdGroup class="ml-auto">
-								<Kbd variant="lucide"><CommandIcon /></Kbd>
+								<Kbd format="lucide"><CommandIcon /></Kbd>
 								<Kbd>,</Kbd>
 							</KbdGroup>
 						</Popover.Item>
@@ -79,15 +79,15 @@
 						<Popover.Divider />
 						<Popover.Label>Theme</Popover.Label>
 						<div class="flex gap-1 px-2 pb-1.5">
-							<Button variant="secondary" size="sm" class="flex-1">
+							<Button intent="secondary" size="sm" class="flex-1">
 								<SunIcon class="size-3" />
 								Light
 							</Button>
-							<Button variant="primary" size="sm" class="flex-1">
+							<Button intent="primary" size="sm" class="flex-1">
 								<MoonIcon class="size-3" />
 								Dark
 							</Button>
-							<Button variant="secondary" size="sm" class="flex-1">Auto</Button>
+							<Button intent="secondary" size="sm" class="flex-1">Auto</Button>
 						</div>
 						<Popover.Divider />
 						<Popover.Item>

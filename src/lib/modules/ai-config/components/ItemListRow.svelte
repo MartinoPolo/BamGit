@@ -113,10 +113,10 @@
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if kind === 'hook'}
 			{@const hookItem = item as HookConfig}
-			<Badge variant="default" size="compact">{hookItem.event_type}</Badge>
+			<Badge tone="neutral" size="compact">{hookItem.event_type}</Badge>
 		{:else if kind === 'mcp'}
 			{@const mcpItem = item as McpServerConfig}
-			<Badge variant={mcpItem.enabled ? 'success' : 'danger'} size="compact">
+			<Badge tone={mcpItem.enabled ? 'success' : 'danger'} size="compact">
 				{mcpItem.enabled ? 'Enabled' : 'Disabled'}
 			</Badge>
 		{:else if kind === 'rule'}
@@ -124,17 +124,17 @@
 			{@const lang =
 				ruleItem.language ?? (ruleItem.filename ? deriveLanguage(ruleItem.filename) : null)}
 			{#if lang}
-				<Badge variant="default" size="compact">{lang}</Badge>
+				<Badge tone="neutral" size="compact">{lang}</Badge>
 			{/if}
 		{:else if kind === 'agent'}
 			{@const agentItem = item as AgentConfig}
 			{#if agentItem.model}
-				<Badge variant="mono" size="compact">{agentItem.model}</Badge>
+				<Badge format="mono" size="compact">{agentItem.model}</Badge>
 			{/if}
 		{/if}
 
 		{#if item.deprecated}
-			<Badge variant="warning" size="compact">Deprecated</Badge>
+			<Badge tone="warning" size="compact">Deprecated</Badge>
 		{/if}
 
 		{#if lineCount !== null}
@@ -159,7 +159,7 @@
 		<div class="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
 			{#if filePath !== null}
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="icon-sm"
 					aria-label="Open file"
 					onclick={handleOpenFile}
@@ -170,7 +170,7 @@
 			{/if}
 			{#if parentDir !== null}
 				<Button
-					variant="ghost"
+					intent="ghost"
 					size="icon-sm"
 					aria-label="Open folder"
 					onclick={handleOpenFolder}

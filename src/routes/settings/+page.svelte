@@ -216,7 +216,7 @@
 				</p>
 			</div>
 			<div class="flex gap-2">
-				<Button variant="secondary" size="sm" onclick={() => (bulkImportOpen = true)}>
+				<Button intent="secondary" size="sm" onclick={() => (bulkImportOpen = true)}>
 					<FolderOpenIcon class="size-4" />
 					Import Folder
 				</Button>
@@ -274,9 +274,9 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer>
-				<Button variant="ghost" onclick={() => (deletePackId = null)}>Cancel</Button>
+				<Button intent="ghost" onclick={() => (deletePackId = null)}>Cancel</Button>
 				<Button
-					variant="danger"
+					intent="danger"
 					onclick={async () => {
 						if (deletePackId !== null) {
 							await characterPacks.deletePack(deletePackId);
@@ -299,7 +299,7 @@
 		<div class="flex flex-wrap gap-3">
 			{#each ACCENT_COLORS as color (color)}
 				<Button
-					variant="secondary"
+					intent="secondary"
 					size="sm"
 					onclick={() => {
 						boardStore.theme.accent = color;
@@ -372,7 +372,7 @@
 								{m.btn_save()}
 							</Button>
 							<Button
-								variant="ghost"
+								intent="ghost"
 								size="sm"
 								onclick={() => {
 									editingPaletteId = null;
@@ -388,11 +388,11 @@
 					<div class="mb-2 flex items-center justify-between">
 						<span class="text-sm font-medium">{palette.name}</span>
 						<div class="flex gap-2">
-							<Button variant="ghost" size="sm" onclick={() => startEditing(palette)}>
+							<Button intent="ghost" size="sm" onclick={() => startEditing(palette)}>
 								{m.issue_card_edit()}
 							</Button>
 							<Button
-								variant="danger"
+								intent="danger"
 								size="sm"
 								onclick={() => handleDelete(palette.id)}
 							>
@@ -429,7 +429,7 @@
 							{m.palette_create()}
 						</Button>
 						<Button
-							variant="ghost"
+							intent="ghost"
 							size="sm"
 							onclick={() => {
 								creating = false;
@@ -443,7 +443,7 @@
 			</div>
 		{:else}
 			<Button
-				variant="secondary"
+				intent="secondary"
 				onclick={() => {
 					creating = true;
 					operationError = null;
@@ -475,17 +475,13 @@
 
 			<div class="flex flex-wrap gap-3">
 				<Button
-					variant="secondary"
+					intent="secondary"
 					disabled={seedStatus !== 'idle'}
 					onclick={handleSeedDemo}
 				>
 					{seedStatus === 'seeding' ? 'Seeding...' : 'Seed Demo Workspace'}
 				</Button>
-				<Button
-					variant="danger"
-					disabled={seedStatus !== 'idle'}
-					onclick={handleDeleteDemo}
-				>
+				<Button intent="danger" disabled={seedStatus !== 'idle'} onclick={handleDeleteDemo}>
 					{seedStatus === 'deleting' ? 'Deleting...' : 'Delete Demo Workspace'}
 				</Button>
 			</div>

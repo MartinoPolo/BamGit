@@ -18,7 +18,7 @@
 <Dialog.Root>
 	<Dialog.Trigger>
 		{#snippet child({ props })}
-			<Button variant="secondary" size="sm" {...props}>
+			<Button intent="secondary" size="sm" {...props}>
 				<TrophyIcon class="size-3.5" />
 				{unlockedCount}/{totalCount}
 			</Button>
@@ -42,7 +42,7 @@
 			</div>
 			<Dialog.Close>
 				{#snippet child({ props: closeProps })}
-					<Button variant="ghost" size="icon-sm" {...closeProps}>
+					<Button intent="ghost" size="icon-sm" {...closeProps}>
 						<XIcon class="size-3" />
 					</Button>
 				{/snippet}

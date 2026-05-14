@@ -280,7 +280,7 @@
 	<!-- Header -->
 	<header class="flex items-center gap-3 border-b border-border px-4 py-3">
 		<Button
-			variant="ghost"
+			intent="ghost"
 			size="sm"
 			class="size-8 p-0"
 			onclick={() => void goto(resolve('/settings'))}
@@ -293,13 +293,13 @@
 		</h1>
 
 		{#if criticalMissing.length > 0}
-			<Badge variant="danger" dot="pulsing">
+			<Badge tone="danger" dot="pulsing">
 				{criticalMissing.length} critical slot{criticalMissing.length !== 1 ? 's' : ''} empty
 			</Badge>
 		{/if}
 
 		<div class="ml-auto flex items-center gap-2">
-			<Button variant="ghost" onclick={() => void goto(resolve('/settings'))}>Cancel</Button>
+			<Button intent="ghost" onclick={() => void goto(resolve('/settings'))}>Cancel</Button>
 			{#if canSave}
 				<Button onclick={handleSave} disabled={saving}>
 					<SaveIcon class="size-4" />
