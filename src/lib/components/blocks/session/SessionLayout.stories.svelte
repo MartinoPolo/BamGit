@@ -71,56 +71,6 @@
 	{/snippet}
 </Story>
 
-<Story name="Sidebar — Expanded">
-	{#snippet template()}
-		<div class="flex h-150">
-			<div class="flex-1 bg-background p-4">
-				<span class="text-sm text-foreground-muted">Chat content area</span>
-			</div>
-			<SessionSidebar
-				session={runningSession}
-				contextPercent={54}
-				quota5hPercent={42}
-				quota7dPercent={18}
-				subAgentCount={5}
-			/>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Sidebar — Quota Warning">
-	{#snippet template()}
-		<div class="flex h-150">
-			<div class="flex-1 bg-background p-4">
-				<span class="text-sm text-foreground-muted">Chat content area</span>
-			</div>
-			<SessionSidebar
-				session={runningSession}
-				contextPercent={72}
-				quota5hPercent={88}
-				quota7dPercent={65}
-				subAgentCount={3}
-			/>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Sidebar — Errored Session">
-	{#snippet template()}
-		<div class="flex h-150">
-			<div class="flex-1 bg-background p-4">
-				<span class="text-sm text-foreground-muted">Chat content area</span>
-			</div>
-			<SessionSidebar
-				session={erroredSession}
-				contextPercent={95}
-				quota5hPercent={50}
-				quota7dPercent={10}
-			/>
-		</div>
-	{/snippet}
-</Story>
-
 <Story name="Full Layout">
 	{#snippet template()}
 		<div class="flex h-175 w-full flex-col">

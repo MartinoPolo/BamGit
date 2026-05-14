@@ -27,11 +27,17 @@
 		: 'var(--border)'}
 	role={onclick ? 'button' : undefined}
 	tabindex={onclick ? 0 : undefined}
-	{onclick}
+	onclick={onclick
+		? (event: MouseEvent) => {
+				event.stopPropagation();
+				onclick();
+			}
+		: undefined}
 	onkeydown={onclick
-		? (event) => {
+		? (event: KeyboardEvent) => {
 				if (event.key === 'Enter' || event.key === ' ') {
 					event.preventDefault();
+					event.stopPropagation();
 					onclick();
 				}
 			}
