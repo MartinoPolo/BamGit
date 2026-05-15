@@ -94,6 +94,34 @@ describe('selectionMatchesUrl', () => {
 	});
 });
 
+describe('parseSelectionFromUrl — edge cases', () => {
+	it('unknown tab value in URL falls back to null tab', () => {
+		const url = new URL('http://localhost/?issue=abc&tab=unknown-panel');
+		const result = parseSelectionFromUrl(url);
+		expect(result).toEqual({ issueId: 'abc', tab: null });
+	});
+
+	it('any string is accepted as issue ID (validation is UI-level)', () => {
+		const url = new URL('http://localhost/?issue=not-a-uuid&tab=issues');
+		const result = parseSelectionFromUrl(url);
+		expect(result.issueId).toBe('not-a-uuid');
+	});
+
+	it('both issue and tab present serialize/deserialize round-trip correctly', () => {
+		const original = { issueId: 'abc-123', tab: 'dependencies' as const };
+		const params = serializeSelectionToParams(original);
+		const url = new URL(`http://localhost/?${params.toString()}`);
+		const parsed = parseSelectionFromUrl(url);
+		expect(parsed).toEqual(original);
+	});
+
+	it('empty string issue is treated as present', () => {
+		const url = new URL('http://localhost/?issue=');
+		const result = parseSelectionFromUrl(url);
+		expect(result.issueId).toBe('');
+	});
+});
+
 describe('buildSelectionUrl', () => {
 	it('builds correct URL with params', () => {
 		const base = new URL('http://localhost/');

@@ -3,6 +3,9 @@ import {
 	findPaletteForDashboard,
 	selectActiveDashboardId,
 	resolveActiveDashboardId,
+	isThemeMode,
+	isAccentColor,
+	ACCENT_COLORS,
 } from './types.js';
 import type { ColorPalette } from '$lib/types/generated';
 
@@ -76,5 +79,41 @@ describe('resolveActiveDashboardId', () => {
 
 	it('returns null when dashboards is empty', () => {
 		expect(resolveActiveDashboardId([], 'dash-1')).toBeNull();
+	});
+});
+
+describe('isThemeMode', () => {
+	it('accepts valid theme modes', () => {
+		expect(isThemeMode('dark')).toBe(true);
+		expect(isThemeMode('light')).toBe(true);
+		expect(isThemeMode('system')).toBe(true);
+	});
+
+	it('rejects invalid values', () => {
+		expect(isThemeMode('auto')).toBe(false);
+		expect(isThemeMode('')).toBe(false);
+		expect(isThemeMode(null)).toBe(false);
+		expect(isThemeMode(undefined)).toBe(false);
+		expect(isThemeMode(42)).toBe(false);
+	});
+});
+
+describe('isAccentColor', () => {
+	it('accepts all defined accent colors', () => {
+		for (const color of ACCENT_COLORS) {
+			expect(isAccentColor(color)).toBe(true);
+		}
+	});
+
+	it('rejects invalid values', () => {
+		expect(isAccentColor('red')).toBe(false);
+		expect(isAccentColor('blue')).toBe(false);
+		expect(isAccentColor('')).toBe(false);
+		expect(isAccentColor(null)).toBe(false);
+		expect(isAccentColor(42)).toBe(false);
+	});
+
+	it('has exactly 12 accent colors', () => {
+		expect(ACCENT_COLORS).toHaveLength(12);
 	});
 });
