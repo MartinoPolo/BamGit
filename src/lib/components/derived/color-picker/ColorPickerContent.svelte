@@ -185,6 +185,7 @@
 			value={effectiveColor}
 			oninput={handleNativeInput}
 			class="absolute inset-0 cursor-pointer opacity-0"
+			aria-label="Custom color"
 		/>
 	</label>
 	<Input
@@ -193,5 +194,6 @@
 		onchange={handleHexInput}
 		class="min-w-0 flex-1"
 		placeholder="#000000"
+		aria-label="Hex color value"
 	/>
 </div>

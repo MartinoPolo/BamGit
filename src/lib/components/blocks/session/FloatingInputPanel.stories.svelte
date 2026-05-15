@@ -1,10 +1,70 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, fn, userEvent, within } from 'storybook/test';
 	import FloatingInputPanel from './FloatingInputPanel.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Session/FloatingInputPanel',
+		args: {
+			onSend: fn(),
+			onStop: fn(),
+		},
 	});
+
+	interface PlayContext {
+		canvasElement: HTMLElement;
+		args: Record<string, unknown>;
+	}
+
+	/** SendStopButton is always the last button in the panel's bottom controls. */
+	function getActionButton(canvas: ReturnType<typeof within>): HTMLElement {
+		const buttons = canvas.getAllByRole('button');
+		return buttons[buttons.length - 1];
+	}
+
+	const playTypeEnablesSend = async ({ canvasElement }: PlayContext) => {
+		const canvas = within(canvasElement);
+		const textarea = canvas.getByPlaceholderText('Message or /command…');
+		const sendButton = getActionButton(canvas);
+
+		// Initially disabled (empty textarea)
+		await expect(sendButton).toBeDisabled();
+
+		// Type text → send button enables
+		await userEvent.type(textarea, 'Hello world');
+		await expect(textarea).toHaveValue('Hello world');
+		await expect(sendButton).toBeEnabled();
+	};
+
+	const playClickSendFiresCallback = async ({ canvasElement, args }: PlayContext) => {
+		const canvas = within(canvasElement);
+		const textarea = canvas.getByPlaceholderText('Message or /command…');
+
+		// Type so the send button enables
+		await userEvent.type(textarea, 'Send this message');
+		const sendButton = getActionButton(canvas);
+		await expect(sendButton).toBeEnabled();
+
+		await userEvent.click(sendButton);
+		await expect(args.onSend).toHaveBeenCalledOnce();
+	};
+
+	const playClickStopFiresCallback = async ({ canvasElement, args }: PlayContext) => {
+		const canvas = within(canvasElement);
+		const stopButton = getActionButton(canvas);
+
+		await userEvent.click(stopButton);
+		await expect(args.onStop).toHaveBeenCalledOnce();
+	};
+
+	const playDisabledState = async ({ canvasElement }: PlayContext) => {
+		const canvas = within(canvasElement);
+		const textarea = canvas.getByPlaceholderText('Message or /command…');
+		const sendButton = getActionButton(canvas);
+
+		await expect(textarea).toBeDisabled();
+		await expect(sendButton).toBeDisabled();
+	};
 </script>
 
 <script lang="ts">
@@ -77,6 +137,57 @@
 	{#snippet template()}
 		<div class="w-full max-w-225 rounded-lg border border-border bg-surface p-0">
 			<SkillChipsRow />
+		</div>
+	{/snippet}
+</Story>
+
+<!-- Interaction tests -->
+
+<Story name="Type Enables Send" play={playTypeEnablesSend}>
+	{#snippet template(args: Record<string, unknown>)}
+		<div class="relative h-75 w-full bg-background">
+			<FloatingInputPanel
+				session={idleSession}
+				onSend={args.onSend as () => void}
+				onStop={args.onStop as () => void}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Click Send Fires Callback" play={playClickSendFiresCallback}>
+	{#snippet template(args: Record<string, unknown>)}
+		<div class="relative h-75 w-full bg-background">
+			<FloatingInputPanel
+				session={idleSession}
+				onSend={args.onSend as () => void}
+				onStop={args.onStop as () => void}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Click Stop Fires Callback" play={playClickStopFiresCallback}>
+	{#snippet template(args: Record<string, unknown>)}
+		<div class="relative h-75 w-full bg-background">
+			<FloatingInputPanel
+				session={runningSession}
+				onSend={args.onSend as () => void}
+				onStop={args.onStop as () => void}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Disabled State" play={playDisabledState}>
+	{#snippet template(args: Record<string, unknown>)}
+		<div class="relative h-75 w-full bg-background">
+			<FloatingInputPanel
+				session={idleSession}
+				disabled={true}
+				onSend={args.onSend as () => void}
+				onStop={args.onStop as () => void}
+			/>
 		</div>
 	{/snippet}
 </Story>

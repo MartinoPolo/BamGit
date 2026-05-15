@@ -32,6 +32,7 @@
 					<Input
 						{...args}
 						{state}
+						aria-label={state}
 						value={state === 'loading' ? 'resolving...' : 'feat/forest-overlays'}
 					/>
 					{#if state === 'success'}
@@ -48,7 +49,7 @@
 <Story name="Default" args={{ state: 'default' }}>
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
-			<Input placeholder="Branch name" {...args} />
+			<Input placeholder="Branch name" aria-label="Branch name" {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -56,7 +57,7 @@
 <Story name="Filled">
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
-			<Input value="feat/forest-overlays" {...args} />
+			<Input value="feat/forest-overlays" aria-label="Branch name" {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -84,7 +85,7 @@
 <Story name="Disabled">
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
-			<Input disabled value="feat/locked-branch" {...args} />
+			<Input disabled value="feat/locked-branch" aria-label="Disabled branch" {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -92,7 +93,7 @@
 <Story name="Read Only">
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
-			<Input readonly value="main" {...args} />
+			<Input readonly value="main" aria-label="Read-only branch" {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -100,7 +101,7 @@
 <Story name="Loading">
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
-			<Input state="loading" value="resolving..." {...args} />
+			<Input state="loading" value="resolving..." aria-label="Loading branch" {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -110,37 +111,37 @@
 		<div class="grid max-w-2xl grid-cols-3 gap-4">
 			<div>
 				<Label>Default</Label>
-				<Input placeholder="Branch name" {...args} />
+				<Input placeholder="Branch name" aria-label="Default" {...args} />
 			</div>
 			<div>
 				<Label>Filled</Label>
-				<Input value="feat/forest-overlays" />
+				<Input value="feat/forest-overlays" aria-label="Filled" />
 			</div>
 			<div>
 				<Label>Focus (interact)</Label>
-				<Input value="feat/forest-overlays" />
+				<Input value="feat/forest-overlays" aria-label="Focus" />
 			</div>
 			<div>
 				<Label>Success</Label>
-				<Input state="success" value="feat/valid-name" />
+				<Input state="success" value="feat/valid-name" aria-label="Success" />
 				<HelpText state="success">Branch is available.</HelpText>
 			</div>
 			<div>
 				<Label>Error</Label>
-				<Input state="error" value="feat/forest overlays" />
+				<Input state="error" value="feat/forest overlays" aria-label="Error" />
 				<HelpText state="error">Branch names cannot contain spaces.</HelpText>
 			</div>
 			<div>
 				<Label>Disabled</Label>
-				<Input disabled value="feat/locked-branch" />
+				<Input disabled value="feat/locked-branch" aria-label="Disabled" />
 			</div>
 			<div>
 				<Label>Read-only</Label>
-				<Input readonly value="main" />
+				<Input readonly value="main" aria-label="Read-only" />
 			</div>
 			<div>
 				<Label>Loading</Label>
-				<Input state="loading" value="resolving..." />
+				<Input state="loading" value="resolving..." aria-label="Loading" />
 			</div>
 		</div>
 	{/snippet}

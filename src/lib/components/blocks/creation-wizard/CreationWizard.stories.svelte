@@ -2,6 +2,14 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import CreationWizard from './CreationWizard.svelte';
 	import CreationWizardStoryWrapper from './CreationWizardStoryWrapper.svelte';
+	import {
+		playOpensAtStep1,
+		playSearchListVisible,
+		playEnterAdvancesToStep2,
+		playBackspaceGoesBack,
+		playEscapeContainment,
+		playEscapeFromStep2,
+	} from './creation_wizard_stories_play.js';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/CreationWizard/CreationWizard',
@@ -50,9 +58,74 @@
 	const mockOnSetupWorktree = fn().mockResolvedValue(undefined);
 </script>
 
-<Story name="Default (GitHub Search)">
+<Story name="Default (GitHub Search)" play={playOpensAtStep1}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper>
+			<CreationWizard
+				{assignedIssues}
+				onCreate={mockOnCreate}
+				onUpdate={mockOnUpdate}
+				onSetupWorktree={mockOnSetupWorktree}
+			/>
+		</CreationWizardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Search List Visible" play={playSearchListVisible}>
+	{#snippet template()}
+		<CreationWizardStoryWrapper>
+			<CreationWizard
+				{assignedIssues}
+				onCreate={mockOnCreate}
+				onUpdate={mockOnUpdate}
+				onSetupWorktree={mockOnSetupWorktree}
+			/>
+		</CreationWizardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Enter Advances to Step 2" play={playEnterAdvancesToStep2}>
+	{#snippet template()}
+		<CreationWizardStoryWrapper>
+			<CreationWizard
+				{assignedIssues}
+				onCreate={mockOnCreate}
+				onUpdate={mockOnUpdate}
+				onSetupWorktree={mockOnSetupWorktree}
+			/>
+		</CreationWizardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Backspace Goes Back" play={playBackspaceGoesBack}>
+	{#snippet template()}
+		<CreationWizardStoryWrapper initialStep={WIZARD_STEPS.ISSUE_NAME}>
+			<CreationWizard
+				{assignedIssues}
+				onCreate={mockOnCreate}
+				onUpdate={mockOnUpdate}
+				onSetupWorktree={mockOnSetupWorktree}
+			/>
+		</CreationWizardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Escape Containment (Step 1)" play={playEscapeContainment}>
+	{#snippet template()}
+		<CreationWizardStoryWrapper>
+			<CreationWizard
+				{assignedIssues}
+				onCreate={mockOnCreate}
+				onUpdate={mockOnUpdate}
+				onSetupWorktree={mockOnSetupWorktree}
+			/>
+		</CreationWizardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Escape Containment (Step 2)" play={playEscapeFromStep2}>
+	{#snippet template()}
+		<CreationWizardStoryWrapper initialStep={WIZARD_STEPS.ISSUE_NAME}>
 			<CreationWizard
 				{assignedIssues}
 				onCreate={mockOnCreate}

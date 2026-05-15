@@ -18,10 +18,29 @@ const preview: Preview = {
 			},
 		},
 		a11y: {
-			// 'todo' - show a11y violations in the test UI only
-			// 'error' - fail CI on a11y violations
-			// 'off' - skip a11y checks entirely
-			test: 'todo',
+			test: 'error',
+			config: {
+				rules: [
+					// Deferred: design-level decisions needed
+					{ id: 'color-contrast', enabled: false },
+					// Deferred: bits-ui Tooltip.Trigger wraps buttons as <button>
+					{ id: 'nested-interactive', enabled: false },
+					// Deferred: 895 icon-only buttons need aria-labels across all components
+					{ id: 'button-name', enabled: false },
+					// Deferred: bits-ui renders roles outside required ARIA containers in isolation
+					{ id: 'aria-required-parent', enabled: false },
+					{ id: 'aria-required-children', enabled: false },
+					// Deferred: Storybook decorator renders sidebar landmarks inside story
+					{ id: 'landmark-banner-is-top-level', enabled: false },
+					{ id: 'landmark-no-duplicate-banner', enabled: false },
+					{ id: 'landmark-unique', enabled: false },
+					// Deferred: bits-ui open overlays expose internal ARIA artifacts
+					{ id: 'aria-input-field-name', enabled: false },
+					{ id: 'aria-required-attr', enabled: false },
+					{ id: 'aria-allowed-attr', enabled: false },
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
 		},
 	},
 };

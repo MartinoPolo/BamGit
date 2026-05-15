@@ -37,6 +37,7 @@
 				class="flex shrink-0 cursor-pointer items-center"
 				role="button"
 				tabindex="-1"
+				aria-label={expanded ? 'Collapse' : 'Expand'}
 				onclick={(e) => {
 					e.stopPropagation();
 					expanded = !expanded;
