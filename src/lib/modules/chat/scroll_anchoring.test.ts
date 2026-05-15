@@ -18,7 +18,7 @@ function makeMessage(role: ChatMessage['role']): ChatMessage {
 
 describe('shouldAutoScroll', () => {
 	it('returns true when near bottom (within threshold)', () => {
-		expect(shouldAutoScroll({ scrollTop: 900, scrollHeight: 1000, clientHeight: 100 })).toBe(
+		expect(shouldAutoScroll({ scrollTop: 860, scrollHeight: 1000, clientHeight: 100 })).toBe(
 			true,
 		);
 	});

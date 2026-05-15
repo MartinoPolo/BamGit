@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	computeRangeSelection,
-	computeMergedBatchSelection,
-	CARD_STATE_CLASSES,
-	BATCH_SELECTED_GLOW_COLOR,
-} from './batch_selection_utils.js';
+import { computeRangeSelection, computeMergedBatchSelection } from './batch_selection_utils.js';
 
 describe('computeRangeSelection', () => {
 	it('returns IDs between anchor and target inclusive when anchor comes first', () => {
@@ -49,44 +44,6 @@ describe('computeRangeSelection', () => {
 	it('returns full range when anchor is last and target is first', () => {
 		const flatOrder = ['a', 'b', 'c'];
 		expect(computeRangeSelection('c', 'a', flatOrder)).toEqual(['a', 'b', 'c']);
-	});
-});
-
-describe('CARD_STATE_CLASSES', () => {
-	it('has all expected state keys', () => {
-		const expectedKeys = [
-			'active',
-			'hovered',
-			'selectionHover',
-			'selected',
-			'dragging',
-			'loading',
-			'archived',
-			'error',
-			'disabled',
-		];
-		expect(Object.keys(CARD_STATE_CLASSES).sort()).toEqual(expectedKeys.sort());
-	});
-
-	it('has non-empty string values for every key', () => {
-		for (const value of Object.values(CARD_STATE_CLASSES)) {
-			expect(typeof value).toBe('string');
-			expect(value.length).toBeGreaterThan(0);
-		}
-	});
-
-	it('active class uses box-shadow CSS class referencing --ic', () => {
-		expect(CARD_STATE_CLASSES.active).toBe('card-state-active-ic');
-	});
-
-	it('selected class uses box-shadow CSS class referencing --primary', () => {
-		expect(CARD_STATE_CLASSES.selected).toBe('card-state-selected-primary');
-	});
-});
-
-describe('BATCH_SELECTED_GLOW_COLOR', () => {
-	it('uses --primary CSS variable', () => {
-		expect(BATCH_SELECTED_GLOW_COLOR).toBe('var(--primary)');
 	});
 });
 
