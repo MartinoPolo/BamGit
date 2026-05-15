@@ -75,7 +75,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
 
         CREATE TABLE IF NOT EXISTS sessions (
             id TEXT PRIMARY KEY,
-            issue_id TEXT REFERENCES issues(id),
+            issue_id TEXT REFERENCES issues(id) ON DELETE SET NULL,
             provider TEXT NOT NULL DEFAULT 'claude-code',
             state TEXT NOT NULL DEFAULT 'running'
                 CHECK (state IN ('running', 'needs-input', 'needs-review', 'paused', 'finished', 'errored')),
@@ -123,7 +123,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         );
 
         CREATE TABLE IF NOT EXISTS git_status_cache (
-            issue_id TEXT PRIMARY KEY REFERENCES issues(id),
+            issue_id TEXT PRIMARY KEY REFERENCES issues(id) ON DELETE CASCADE,
             branch_status TEXT,
             pr_state TEXT CHECK (pr_state IN ('draft', 'open', 'review-requested', 'changes-requested', 'approved', 'ready-to-merge', 'merged', 'closed')),
             pr_number INTEGER,

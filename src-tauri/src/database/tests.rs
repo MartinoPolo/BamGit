@@ -24,6 +24,16 @@ mod tests {
             "keyboard_shortcuts",
             "window_workspace_bindings",
             "app_settings",
+            "session_metrics",
+            "turn_metrics",
+            "tool_usage",
+            "achievements",
+            "import_history",
+            "workspace_commands",
+            "model_pricing_cache",
+            "character_packs",
+            "character_event_sounds",
+            "sound_volume_overrides",
         ];
 
         for table_name in &expected_tables {
@@ -385,7 +395,7 @@ mod tests {
         let connection = setup_test_database();
         insert_test_dashboard(&connection, "d1", "repo");
 
-        for (index, priority) in ["low", "medium", "high", "top"].iter().enumerate() {
+        for (index, priority) in ["lowest", "low", "medium", "high", "top"].iter().enumerate() {
             let id = format!("i{index}");
             let result = connection.execute(
                 "INSERT INTO issues (id, dashboard_id, name, priority) VALUES (?1, 'd1', 'Test', ?2)",
@@ -1260,6 +1270,321 @@ mod tests {
         );
 
         assert!(result.is_err(), "execution_phase 'building' should be rejected");
+    }
+
+    // --- Idempotency tests ---
+
+    #[test]
+    fn create_tables_idempotent() {
+        let connection = Connection::open_in_memory().unwrap();
+        connection.execute_batch("PRAGMA foreign_keys = ON;").unwrap();
+        crate::database::schema::create_tables(&connection).unwrap();
+        crate::database::schema::create_tables(&connection).unwrap();
+    }
+
+    #[test]
+    fn seed_defaults_idempotent() {
+        let connection = setup_test_database();
+        crate::database::defaults::seed_defaults(&connection).unwrap();
+
+        let count_before: i64 = connection.query_row(
+            "SELECT COUNT(*) FROM notification_config", [], |r| r.get(0)
+        ).unwrap();
+
+        crate::database::defaults::seed_defaults(&connection).unwrap();
+
+        let count_after: i64 = connection.query_row(
+            "SELECT COUNT(*) FROM notification_config", [], |r| r.get(0)
+        ).unwrap();
+
+        assert_eq!(count_before, count_after, "seed_defaults should be idempotent");
+    }
+
+    // --- Metrics cascade tests ---
+
+    #[test]
+    fn delete_session_cascades_to_session_metrics() {
+        let connection = setup_test_database();
+        connection.execute("INSERT INTO sessions (id, state) VALUES ('s1', 'finished')", []).unwrap();
+        connection.execute(
+            "INSERT INTO session_metrics (session_id, provider, started_at) VALUES ('s1', 'claude-code', '2026-01-01')",
+            [],
+        ).unwrap();
+        connection.execute("DELETE FROM sessions WHERE id = 's1'", []).unwrap();
+        let count: i64 = connection.query_row(
+            "SELECT COUNT(*) FROM session_metrics WHERE session_id = 's1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(count, 0, "Deleting session should cascade to session_metrics");
+    }
+
+    #[test]
+    fn delete_session_cascades_to_turn_metrics() {
+        let connection = setup_test_database();
+        connection.execute("INSERT INTO sessions (id, state) VALUES ('s1', 'finished')", []).unwrap();
+        connection.execute(
+            "INSERT INTO turn_metrics (id, session_id, turn_index, timestamp) VALUES ('t1', 's1', 0, '2026-01-01')",
+            [],
+        ).unwrap();
+        connection.execute("DELETE FROM sessions WHERE id = 's1'", []).unwrap();
+        let count: i64 = connection.query_row(
+            "SELECT COUNT(*) FROM turn_metrics WHERE session_id = 's1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(count, 0, "Deleting session should cascade to turn_metrics");
+    }
+
+    #[test]
+    fn delete_session_cascades_to_tool_usage() {
+        let connection = setup_test_database();
+        connection.execute("INSERT INTO sessions (id, state) VALUES ('s1', 'finished')", []).unwrap();
+        connection.execute(
+            "INSERT INTO tool_usage (id, session_id, tool_name, timestamp) VALUES ('tu1', 's1', 'Read', '2026-01-01')",
+            [],
+        ).unwrap();
+        connection.execute("DELETE FROM sessions WHERE id = 's1'", []).unwrap();
+        let count: i64 = connection.query_row(
+            "SELECT COUNT(*) FROM tool_usage WHERE session_id = 's1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(count, 0, "Deleting session should cascade to tool_usage");
+    }
+
+    // --- workspace_commands constraint tests ---
+
+    #[test]
+    fn workspace_commands_category_accepts_valid_values() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        for (idx, category) in ["server", "check"].iter().enumerate() {
+            let id = format!("wc{idx}");
+            let result = connection.execute(
+                "INSERT INTO workspace_commands (id, dashboard_id, category, name, command) VALUES (?1, 'd1', ?2, 'test', 'echo')",
+                rusqlite::params![id, category],
+            );
+            assert!(result.is_ok(), "Category '{category}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn workspace_commands_category_rejects_invalid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        let result = connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command) VALUES ('wc1', 'd1', 'invalid', 'test', 'echo')",
+            [],
+        );
+        assert!(result.is_err(), "Invalid category should be rejected");
+    }
+
+    // --- model_pricing_cache constraint tests ---
+
+    #[test]
+    fn model_pricing_cache_source_accepts_valid_values() {
+        let connection = setup_test_database();
+        for (idx, source) in ["user", "litellm", "openrouter"].iter().enumerate() {
+            let id = format!("model-{idx}");
+            let result = connection.execute(
+                "INSERT INTO model_pricing_cache (model_id, input_cost_per_token, output_cost_per_token, source) VALUES (?1, 0.001, 0.002, ?2)",
+                rusqlite::params![id, source],
+            );
+            assert!(result.is_ok(), "Source '{source}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn model_pricing_cache_source_rejects_invalid() {
+        let connection = setup_test_database();
+        let result = connection.execute(
+            "INSERT INTO model_pricing_cache (model_id, input_cost_per_token, output_cost_per_token, source) VALUES ('m1', 0.001, 0.002, 'invalid')",
+            [],
+        );
+        assert!(result.is_err(), "Invalid source should be rejected");
+    }
+
+    // --- character_packs constraint tests ---
+
+    #[test]
+    fn character_packs_unique_name_constraint() {
+        let connection = setup_test_database();
+        connection.execute(
+            "INSERT INTO character_packs (id, name, display_name) VALUES ('cp1', 'grove', 'Grove')",
+            [],
+        ).unwrap();
+        let result = connection.execute(
+            "INSERT INTO character_packs (id, name, display_name) VALUES ('cp2', 'grove', 'Grove Duplicate')",
+            [],
+        );
+        assert!(result.is_err(), "Duplicate character pack name should be rejected");
+    }
+
+    #[test]
+    fn character_event_sounds_cascade_on_pack_delete() {
+        let connection = setup_test_database();
+        connection.execute(
+            "INSERT INTO character_packs (id, name, display_name) VALUES ('cp1', 'grove', 'Grove')",
+            [],
+        ).unwrap();
+        connection.execute(
+            "INSERT INTO character_event_sounds (id, character_pack_id, event_type, sound_file) VALUES ('ces1', 'cp1', 'session_start', 'start.wav')",
+            [],
+        ).unwrap();
+        connection.execute("DELETE FROM character_packs WHERE id = 'cp1'", []).unwrap();
+        let count: i64 = connection.query_row(
+            "SELECT COUNT(*) FROM character_event_sounds WHERE character_pack_id = 'cp1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(count, 0, "Deleting character pack should cascade to event sounds");
+    }
+
+    // --- Session FK tests ---
+
+    #[test]
+    fn session_allows_null_issue_id() {
+        let connection = setup_test_database();
+        let result = connection.execute(
+            "INSERT INTO sessions (id, state, issue_id) VALUES ('s1', 'running', NULL)",
+            [],
+        );
+        assert!(result.is_ok(), "Session with NULL issue_id should be accepted");
+    }
+
+    #[test]
+    fn session_rejects_invalid_issue_id() {
+        let connection = setup_test_database();
+        let result = connection.execute(
+            "INSERT INTO sessions (id, state, issue_id) VALUES ('s1', 'running', 'nonexistent')",
+            [],
+        );
+        assert!(result.is_err(), "Session with invalid issue_id should be rejected by FK constraint");
+    }
+
+    #[test]
+    fn delete_issue_nullifies_session_issue_id() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Issue with session");
+        connection
+            .execute(
+                "INSERT INTO sessions (id, state, issue_id) VALUES ('s1', 'running', 'i1')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+
+        let issue_id: Option<String> = connection
+            .query_row(
+                "SELECT issue_id FROM sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(issue_id, None, "Session issue_id should be NULL after issue deletion");
+    }
+
+    // --- Dashboard status constraint tests ---
+
+    #[test]
+    fn dashboard_status_defaults_to_active() {
+        let connection = setup_test_database();
+        connection.execute(
+            "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+            [],
+        ).unwrap();
+        let status: String = connection.query_row(
+            "SELECT status FROM dashboards WHERE id = 'd1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(status, "active");
+    }
+
+    #[test]
+    fn dashboard_status_accepts_all_valid_values() {
+        let connection = setup_test_database();
+        for (idx, status) in ["active", "archived", "deleted"].iter().enumerate() {
+            let id = format!("d{idx}");
+            let result = connection.execute(
+                "INSERT INTO dashboards (id, name, type, status) VALUES (?1, 'Test', 'repo', ?2)",
+                rusqlite::params![id, status],
+            );
+            assert!(result.is_ok(), "Dashboard status '{status}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn dashboard_status_rejects_invalid() {
+        let connection = setup_test_database();
+        let result = connection.execute(
+            "INSERT INTO dashboards (id, name, type, status) VALUES ('d1', 'Test', 'repo', 'suspended')",
+            [],
+        );
+        assert!(result.is_err(), "Invalid dashboard status should be rejected");
+    }
+
+    // --- git_status_cache FK tests ---
+
+    #[test]
+    fn delete_issue_cascades_git_status_cache() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Issue with cache");
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status) VALUES ('i1', 'active')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 0, "git_status_cache should cascade on issue delete");
+    }
+
+    #[test]
+    fn delete_issue_with_sessions_and_cache_succeeds() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        insert_test_issue(&connection, "i1", "d1", "Issue with deps");
+
+        connection
+            .execute(
+                "INSERT INTO sessions (id, state, issue_id) VALUES ('s1', 'finished', 'i1')",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute(
+                "INSERT INTO git_status_cache (issue_id, branch_status) VALUES ('i1', 'active')",
+                [],
+            )
+            .unwrap();
+
+        connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+
+        let session_issue: Option<String> = connection
+            .query_row("SELECT issue_id FROM sessions WHERE id = 's1'", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert_eq!(session_issue, None, "Session issue_id should be NULLed");
+
+        let cache_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(cache_count, 0, "git_status_cache should be cascade-deleted");
     }
 
 }

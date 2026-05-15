@@ -194,3 +194,102 @@ pub struct UsageDashboardData {
     pub tool_usage: Vec<ToolUsageBreakdown>,
     pub pricing_available: bool,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn all_returns_none_filter() {
+        assert!(MetricsPeriod::All.to_sql_date_filter().is_none());
+    }
+
+    #[test]
+    fn today_returns_date_filter() {
+        let filter = MetricsPeriod::Today.to_sql_date_filter().unwrap();
+        assert!(filter.contains("date('now')"));
+    }
+
+    #[test]
+    fn week_returns_7_day_filter() {
+        let filter = MetricsPeriod::Week.to_sql_date_filter().unwrap();
+        assert!(filter.contains("-7 days"));
+    }
+
+    #[test]
+    fn thirty_days_returns_30_day_filter() {
+        let filter = MetricsPeriod::ThirtyDays.to_sql_date_filter().unwrap();
+        assert!(filter.contains("-30 days"));
+    }
+
+    #[test]
+    fn month_returns_start_of_month_filter() {
+        let filter = MetricsPeriod::Month.to_sql_date_filter().unwrap();
+        assert!(filter.contains("start of month"));
+    }
+
+    #[test]
+    fn custom_valid_dates_returns_range_filter() {
+        let period = MetricsPeriod::Custom {
+            start: "2026-01-01".to_string(),
+            end: "2026-01-31".to_string(),
+        };
+        let filter = period.to_sql_date_filter().unwrap();
+        assert!(filter.contains("2026-01-01"));
+        assert!(filter.contains("2026-01-31"));
+    }
+
+    #[test]
+    fn custom_invalid_date_format_returns_none() {
+        let period = MetricsPeriod::Custom {
+            start: "not-a-date".to_string(),
+            end: "2026-01-31".to_string(),
+        };
+        assert!(period.to_sql_date_filter().is_none());
+    }
+
+    #[test]
+    fn custom_short_date_returns_none() {
+        let period = MetricsPeriod::Custom {
+            start: "2026-01".to_string(),
+            end: "2026-01-31".to_string(),
+        };
+        assert!(period.to_sql_date_filter().is_none());
+    }
+
+    #[test]
+    fn custom_date_with_letters_returns_none() {
+        let period = MetricsPeriod::Custom {
+            start: "2026-0a-01".to_string(),
+            end: "2026-01-31".to_string(),
+        };
+        assert!(period.to_sql_date_filter().is_none());
+    }
+
+    #[test]
+    fn previous_period_returns_none_for_all() {
+        assert!(MetricsPeriod::All.previous_period_filter().is_none());
+    }
+
+    #[test]
+    fn previous_period_returns_none_for_custom() {
+        let period = MetricsPeriod::Custom {
+            start: "2026-01-01".to_string(),
+            end: "2026-01-31".to_string(),
+        };
+        assert!(period.previous_period_filter().is_none());
+    }
+
+    #[test]
+    fn previous_period_returns_some_for_today() {
+        let (prev, _current) = MetricsPeriod::Today.previous_period_filter().unwrap();
+        assert!(prev.contains("-1 day"));
+    }
+
+    #[test]
+    fn previous_period_returns_some_for_week() {
+        let (prev, current) = MetricsPeriod::Week.previous_period_filter().unwrap();
+        assert!(prev.contains("-14 days"));
+        assert!(current.contains("-7 days"));
+    }
+}
