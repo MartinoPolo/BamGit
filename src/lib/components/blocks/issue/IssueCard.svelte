@@ -24,8 +24,8 @@
 	import Volume2Icon from '@lucide/svelte/icons/volume-2';
 	import VolumeXIcon from '@lucide/svelte/icons/volume-x';
 	import { invoke } from '$lib/tauri.js';
-	import { CARD_STATE_CLASSES } from './batch_selection_utils.js';
 	import { PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
+	import { deriveCardStateClass, deriveWorktreeBadge } from '$lib/modules/issue-card/index.js';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import TreeThumbnailImage from '$lib/components/blocks/forest/TreeThumbnailImage.svelte';
 
@@ -92,38 +92,22 @@
 
 	const hasPrdLabel = $derived(prdParent !== null && prdParent.number !== null);
 
-	const worktreeBadge = $derived.by(() => {
-		switch (issue.worktree_state) {
-			case 'pending':
-				return { label: m.issue_card_setting_up(), tone: 'warning' as const };
-			case 'active':
-				return { label: m.issue_card_worktree(), tone: 'success' as const };
-			case 'failed':
-				return { label: m.issue_card_wt_failed(), tone: 'danger' as const };
-			default:
-				return null;
-		}
-	});
+	const worktreeBadge = $derived(deriveWorktreeBadge(issue.worktree_state));
 
 	const priorityBadgeClass = $derived(
 		issue.priority !== null ? (PRIORITY_BADGE_CLASSES[issue.priority] ?? null) : null,
 	);
 
-	const cardStateClass = $derived.by(() => {
-		if (isArchived) {
-			return CARD_STATE_CLASSES.archived;
-		}
-		if (isBatchSelected) {
-			return CARD_STATE_CLASSES.selected;
-		}
-		if (isActive) {
-			return CARD_STATE_CLASSES.active;
-		}
-		if (isHovered) {
-			return isModifierHeld ? CARD_STATE_CLASSES.selectionHover : CARD_STATE_CLASSES.hovered;
-		}
-		return '';
-	});
+	const cardStateClass = $derived(
+		deriveCardStateClass({
+			isArchived,
+			isBatchSelected,
+			isActive,
+			isHovered,
+			isModifierHeld,
+			worktreeState: issue.worktree_state,
+		}),
+	);
 
 	const priorityChipClass = $derived(
 		isLightHeader ? 'bg-white/22 text-black/80' : 'bg-black/18 text-inherit',
