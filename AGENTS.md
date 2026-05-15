@@ -2,6 +2,10 @@
 
 App is in development — no backwards compatibility is required. When implementing changes, freely delete, replace, or restructure obsolete code and schemas without preservation shims.
 
+## Project Documentation
+
+Before implementation, read `.mpx/CONTEXT.md` (domain language, feature index, constraints) and `.mpx/DECISIONS.md` (settled architectural choices). If a requirement is missing from these files, search `.mpx/archive/` for detail — but verify against current code before trusting archived content.
+
 ## Svelte
 
 Before finalizing any .svelte or .svelte.ts file, run svelte-autofixer and iterate until no issues remain.
@@ -25,9 +29,6 @@ SQLite (rusqlite, bundled)
 Vitest, Playwright, Storybook
 
 ## Commands
-
-For nested PowerShell scripts, use `powershell -NoProfile -ExecutionPolicy Bypass` to avoid profile noise.
-For `shell_command` calls, set `login: false` if the user PowerShell profile causes startup noise or failures.
 
 `pnpm tauri dev` -- full dev (frontend + native window)
 `pnpm dev` -- frontend only
@@ -63,7 +64,6 @@ On startup: `schema::create_tables()` (IF NOT EXISTS) then `defaults::seed_defau
 - New table: add to `schema.rs`, add demo data to `seed_commands.rs` if needed
 - Modify existing table: edit `schema.rs` directly, run `pnpm db:reset`, update `seed_commands.rs` if affected
 - New app default: update `defaults.rs::seed_defaults()`
-- Before production: switch to versioned migrations (PRAGMA user_version)
 
 ## Browser Mock Mode
 
@@ -76,4 +76,3 @@ Always fix unrelated errors you encounter (merge artifacts, stale imports, broke
 ## Testing
 
 - TDD: write tests first, then implement.
-- 80% coverage threshold enforced.
