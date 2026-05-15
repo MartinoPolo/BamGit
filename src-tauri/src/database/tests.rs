@@ -1456,20 +1456,29 @@ mod tests {
     }
 
     #[test]
-    fn delete_issue_blocked_when_sessions_reference_it() {
-        // This test documents a real FK behavior: sessions.issue_id references issues(id)
-        // with NO ON DELETE clause (default: RESTRICT). Deleting an issue that has sessions
-        // pointing to it will fail.
+    fn delete_issue_nullifies_session_issue_id() {
         let connection = setup_test_database();
         insert_test_dashboard(&connection, "d1", "repo");
         insert_test_issue(&connection, "i1", "d1", "Issue with session");
-        connection.execute(
-            "INSERT INTO sessions (id, state, issue_id) VALUES ('s1', 'running', 'i1')",
-            [],
-        ).unwrap();
+        connection
+            .execute(
+                "INSERT INTO sessions (id, state, issue_id) VALUES ('s1', 'running', 'i1')",
+                [],
+            )
+            .unwrap();
 
-        let result = connection.execute("DELETE FROM issues WHERE id = 'i1'", []);
-        assert!(result.is_err(), "Deleting issue with active sessions should fail due to FK RESTRICT");
+        connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+
+        let issue_id: Option<String> = connection
+            .query_row(
+                "SELECT issue_id FROM sessions WHERE id = 's1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(issue_id, None, "Session issue_id should be NULL after issue deletion");
     }
 
     // --- Dashboard status constraint tests ---
@@ -1513,7 +1522,7 @@ mod tests {
     // --- git_status_cache FK tests ---
 
     #[test]
-    fn delete_issue_blocked_when_git_status_cache_references_it() {
+    fn delete_issue_cascades_git_status_cache() {
         let connection = setup_test_database();
         insert_test_dashboard(&connection, "d1", "repo");
         insert_test_issue(&connection, "i1", "d1", "Issue with cache");
@@ -1524,15 +1533,22 @@ mod tests {
             )
             .unwrap();
 
-        let result = connection.execute("DELETE FROM issues WHERE id = 'i1'", []);
-        assert!(
-            result.is_err(),
-            "Deleting issue with git_status_cache entry should fail due to FK RESTRICT"
-        );
+        connection
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
+            .unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(count, 0, "git_status_cache should cascade on issue delete");
     }
 
     #[test]
-    fn delete_issue_succeeds_after_clearing_non_cascading_fks() {
+    fn delete_issue_with_sessions_and_cache_succeeds() {
         let connection = setup_test_database();
         insert_test_dashboard(&connection, "d1", "repo");
         insert_test_issue(&connection, "i1", "d1", "Issue with deps");
@@ -1551,17 +1567,24 @@ mod tests {
             .unwrap();
 
         connection
-            .execute("DELETE FROM sessions WHERE issue_id = 'i1'", [])
-            .unwrap();
-        connection
-            .execute("DELETE FROM git_status_cache WHERE issue_id = 'i1'", [])
+            .execute("DELETE FROM issues WHERE id = 'i1'", [])
             .unwrap();
 
-        let result = connection.execute("DELETE FROM issues WHERE id = 'i1'", []);
-        assert!(
-            result.is_ok(),
-            "Deleting issue should succeed after clearing sessions and git_status_cache"
-        );
+        let session_issue: Option<String> = connection
+            .query_row("SELECT issue_id FROM sessions WHERE id = 's1'", [], |r| {
+                r.get(0)
+            })
+            .unwrap();
+        assert_eq!(session_issue, None, "Session issue_id should be NULLed");
+
+        let cache_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM git_status_cache WHERE issue_id = 'i1'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(cache_count, 0, "git_status_cache should be cascade-deleted");
     }
 
 }

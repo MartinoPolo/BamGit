@@ -110,7 +110,7 @@ fn delete_demo_data(connection: &mut Connection) -> Result<(), String> {
         .transaction()
         .map_err(|error| format!("Failed to start transaction: {error}"))?;
 
-    // Delete non-cascading children first (sessions and git_status_cache lack ON DELETE CASCADE)
+    // Sessions use ON DELETE SET NULL (not CASCADE) — delete explicitly to avoid orphans
     transaction
         .execute(
             "DELETE FROM sessions WHERE issue_id IN (SELECT id FROM issues WHERE dashboard_id = ?1)",
@@ -118,14 +118,7 @@ fn delete_demo_data(connection: &mut Connection) -> Result<(), String> {
         )
         .map_err(|error| format!("Failed to delete sessions: {error}"))?;
 
-    transaction
-        .execute(
-            "DELETE FROM git_status_cache WHERE issue_id IN (SELECT id FROM issues WHERE dashboard_id = ?1)",
-            params![DEMO_DASHBOARD_ID],
-        )
-        .map_err(|error| format!("Failed to delete git_status_cache: {error}"))?;
-
-    // Cascade handles issues, label_shape_mappings, actions
+    // git_status_cache and issues cascade from dashboard delete
     transaction
         .execute(
             "DELETE FROM dashboards WHERE id = ?1",
