@@ -3,7 +3,7 @@
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
 	import NoteCard from '$lib/components/blocks/workspace/NoteCard.svelte';
@@ -53,7 +53,10 @@
 </script>
 
 <Dialog.Root open={rawRequirementsCtx.open} onOpenChange={handleDialogOpenChange}>
-	<Dialog.Content class="max-w-175 h-[90vh] flex flex-col p-0">
+	<Dialog.Content
+		class="max-w-175 h-[90vh] flex flex-col p-0"
+		onEscapeKeydown={(e) => e.stopPropagation()}
+	>
 		<Dialog.Header>
 			<Dialog.Title>{m.raw_requirements_title()}</Dialog.Title>
 		</Dialog.Header>
@@ -84,7 +87,7 @@
 			<div class="mt-3 flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					{#if rawRequirementsCtx.hasNotes}
-						<WithTooltip
+						<SimpleTooltip
 							text={m.raw_requirements_process_coming_soon()}
 							side="top"
 							sideOffset={6}
@@ -97,7 +100,7 @@
 									</Button>
 								</span>
 							{/snippet}
-						</WithTooltip>
+						</SimpleTooltip>
 					{/if}
 					{#if rawRequirementsCtx.notes.length >= FULL_PAGE_NOTE_THRESHOLD}
 						<Button

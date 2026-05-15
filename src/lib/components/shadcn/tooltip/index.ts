@@ -3,7 +3,7 @@ import Trigger from './tooltip-trigger.svelte';
 import Content from './tooltip-content.svelte';
 import Provider from './tooltip-provider.svelte';
 import Portal from './tooltip-portal.svelte';
-import WithTooltip from './WithTooltip.svelte';
+import SimpleTooltip from './SimpleTooltip.svelte';
 
 export { tooltipContentVariants } from './tooltip-variants.js';
 
@@ -13,7 +13,7 @@ export {
 	Content,
 	Provider,
 	Portal,
-	WithTooltip,
+	SimpleTooltip,
 	//
 	Root as Tooltip,
 	Content as TooltipContent,

@@ -281,7 +281,10 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="max-w-5xl max-h-[85vh] flex flex-col p-0">
+	<Dialog.Content
+		class="max-w-5xl max-h-[85vh] flex flex-col p-0"
+		onEscapeKeydown={(e) => e.stopPropagation()}
+	>
 		<Dialog.Header class="flex-row items-center gap-3 border-b border-border px-4 py-3">
 			<Dialog.Title class="text-lg">Bulk Import Characters</Dialog.Title>
 			{#if scanResult}

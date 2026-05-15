@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import { openUrl } from '$lib/opener.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import type { PullRequestState } from '$lib/types/generated';
 	import {
 		VARIANT_CLASSES,
@@ -81,7 +81,7 @@
 
 {#if resolved !== null}
 	{@const Icon = resolved.icon}
-	<WithTooltip text={tooltip}>
+	<SimpleTooltip text={tooltip}>
 		{#snippet asChild(props)}
 			<button
 				{...props}
@@ -97,5 +97,5 @@
 				<span>#{number}</span>
 			</button>
 		{/snippet}
-	</WithTooltip>
+	</SimpleTooltip>
 {/if}

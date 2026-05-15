@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { VIEW_MODE, type ViewMode } from '$lib/modules/dependency-graph';
+	import { Select } from '$lib/components/shadcn/select/index.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import FocusIcon from '@lucide/svelte/icons/focus';
@@ -65,11 +66,11 @@
 	</div>
 
 	{#if viewMode === VIEW_MODE.singlePrd}
-		<select
-			class="prd-select"
+		<Select
 			value={selectedPrdId ?? ''}
 			onchange={handleSelectChange}
 			aria-label="Select PRD"
+			class="h-[30px] min-w-[180px] w-auto text-[12px]"
 		>
 			{#if prdOptions.length === 0}
 				<option value="">No PRDs available</option>
@@ -81,7 +82,7 @@
 					<option value={option.id}>{option.name}</option>
 				{/each}
 			{/if}
-		</select>
+		</Select>
 	{/if}
 </div>
 
@@ -131,16 +132,5 @@
 	.segmented-button.active {
 		background: var(--primary);
 		color: var(--primary-foreground);
-	}
-
-	.prd-select {
-		height: 30px;
-		padding: 0 8px;
-		border: 1px solid var(--border);
-		border-radius: calc(var(--radius) * 1);
-		background: var(--card);
-		color: var(--foreground);
-		font-size: 12px;
-		min-width: 180px;
 	}
 </style>

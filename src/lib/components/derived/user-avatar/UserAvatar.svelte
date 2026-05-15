@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		username: string;
@@ -14,7 +14,7 @@
 
 {#if collapsed}
 	<div class="flex w-full items-center justify-center py-3">
-		<WithTooltip text={m.user_tooltip({ username, count: String(activeCount) })} side="right">
+		<SimpleTooltip text={m.user_tooltip({ username, count: String(activeCount) })} side="right">
 			{#snippet asChild(props)}
 				<div
 					{...props}
@@ -28,7 +28,7 @@
 					{/if}
 				</div>
 			{/snippet}
-		</WithTooltip>
+		</SimpleTooltip>
 	</div>
 {:else}
 	<div class="flex w-full items-center gap-2 py-2.5">
