@@ -121,6 +121,63 @@ describe('applyDependencyFilter', () => {
 		});
 		expect(result.map((i) => i.id)).toEqual(['a']);
 	});
+
+	it('area filter is exact match, not substring', () => {
+		const issues = [
+			makeIssue({ id: 'a', labels: [{ name: 'area:ui', color: '#000' }] }),
+			makeIssue({ id: 'b', labels: [{ name: 'area:ui-testing', color: '#000' }] }),
+		];
+		const result = applyDependencyFilter(issues, {
+			...DEFAULT_DEPENDENCY_FILTER,
+			area: 'area:ui',
+		});
+		expect(result.map((i) => i.id)).toEqual(['a']);
+	});
+
+	it('showClosed=false with labelSearch still hides archived non-matching', () => {
+		const issues = [
+			makeIssue({
+				id: 'a',
+				status: 'archived',
+				labels: [{ name: 'AFK', color: '#000' }],
+			}),
+			makeIssue({
+				id: 'b',
+				status: 'active',
+				labels: [{ name: 'AFK', color: '#000' }],
+			}),
+		];
+		const result = applyDependencyFilter(issues, {
+			...DEFAULT_DEPENDENCY_FILTER,
+			showClosed: false,
+			labelSearch: 'AFK',
+		});
+		expect(result.map((i) => i.id)).toEqual(['b']);
+	});
+
+	it('empty labelSearch matches all labels', () => {
+		const issues = [
+			makeIssue({ id: 'a', labels: [{ name: 'bug', color: '#000' }] }),
+			makeIssue({ id: 'b', labels: [] }),
+		];
+		const result = applyDependencyFilter(issues, {
+			...DEFAULT_DEPENDENCY_FILTER,
+			labelSearch: '',
+		});
+		expect(result.map((i) => i.id)).toEqual(['a', 'b']);
+	});
+
+	it('labelSearch with whitespace is trimmed', () => {
+		const issues = [
+			makeIssue({ id: 'a', labels: [{ name: 'bug', color: '#000' }] }),
+			makeIssue({ id: 'b', labels: [{ name: 'feature', color: '#000' }] }),
+		];
+		const result = applyDependencyFilter(issues, {
+			...DEFAULT_DEPENDENCY_FILTER,
+			labelSearch: '  bug  ',
+		});
+		expect(result.map((i) => i.id)).toEqual(['a']);
+	});
 });
 
 describe('extractAreaLabels', () => {

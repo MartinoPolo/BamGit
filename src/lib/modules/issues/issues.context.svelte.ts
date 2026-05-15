@@ -16,8 +16,8 @@ import type {
 	SetupWorktreeRequest,
 	RemoveWorktreeRequest,
 } from './types.js';
-import { PRIORITY_ORDER, PRIORITY_ORDER_NONE } from './priority.js';
 import { serializeLabels, toIssue, validateWorktreeState } from './serialization.js';
+import { sortIssues } from './sort.js';
 
 // ─── Context ───────────────────────────────────────────────────────────────
 
@@ -45,24 +45,7 @@ function createIssuesContext() {
 	let currentDashboardId = $state<string | null>(null);
 	const worktreeProgress = new SvelteMap<string, string[]>();
 
-	const sortedIssues = $derived.by(() => {
-		const list = [...issues];
-		switch (sortMode) {
-			case 'priority':
-				return list.sort(
-					(a, b) =>
-						(a.priority !== null ? PRIORITY_ORDER[a.priority] : PRIORITY_ORDER_NONE) -
-						(b.priority !== null ? PRIORITY_ORDER[b.priority] : PRIORITY_ORDER_NONE),
-				);
-			case 'name':
-				return list.sort((a, b) => a.name.localeCompare(b.name));
-			case 'date':
-				return list.sort(
-					(a, b) =>
-						a.sort_order - b.sort_order || a.created_at.localeCompare(b.created_at),
-				);
-		}
-	});
+	const sortedIssues = $derived(sortIssues(issues, sortMode));
 
 	const activeIssues = $derived(sortedIssues.filter((issue) => issue.status === 'active'));
 	const archivedIssues = $derived(sortedIssues.filter((issue) => issue.status === 'archived'));

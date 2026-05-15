@@ -11,6 +11,11 @@ import type {
 	ProviderKind,
 } from '$lib/types/generated';
 import { computeSessionEventEffects, type NotificationAction } from './session_events.js';
+import {
+	filterActiveSessions,
+	filterFinishedSessions,
+	groupSessionsByIssueId,
+} from './session_filters.js';
 import { SvelteMap } from 'svelte/reactivity';
 
 // ─── Module-internal request types ──────────────────────────────────────────
@@ -97,26 +102,14 @@ function createSessionsContext(notifications: NotificationsApi) {
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
-	const activeSessions = $derived(
-		sessions.filter((session) => session.state !== 'finished' && session.state !== 'errored'),
-	);
+	const activeSessions = $derived(filterActiveSessions(sessions));
 
-	const finishedSessions = $derived(
-		sessions.filter((session) => session.state === 'finished' || session.state === 'errored'),
-	);
+	const finishedSessions = $derived(filterFinishedSessions(sessions));
 
 	const sessionsByIssueId = $derived.by(() => {
 		const map = new SvelteMap<string, Session[]>();
-		for (const session of sessions) {
-			if (session.issue_id === null) {
-				continue;
-			}
-			const existing = map.get(session.issue_id);
-			if (existing !== undefined) {
-				existing.push(session);
-			} else {
-				map.set(session.issue_id, [session]);
-			}
+		for (const [issueId, issueSessions] of groupSessionsByIssueId(sessions)) {
+			map.set(issueId, issueSessions);
 		}
 		return map;
 	});
