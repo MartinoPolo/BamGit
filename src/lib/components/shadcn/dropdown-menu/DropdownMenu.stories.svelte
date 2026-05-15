@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, waitFor } from 'storybook/test';
 	import * as DropdownMenu from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import UserIcon from '@lucide/svelte/icons/user';
@@ -16,9 +17,92 @@
 		component: DropdownMenu.Root,
 		tags: ['autodocs'],
 	});
+
+	/** Assert menu is closed (either removed from DOM or data-state="closed"). */
+	async function expectMenuClosed(canvasElement: HTMLElement) {
+		await waitFor(() => {
+			const menu = canvasElement.querySelector('[role="menu"]');
+			if (menu) {
+				expect((menu as HTMLElement).dataset.state).toBe('closed');
+			}
+		});
+	}
+
+	/** Find the DropdownMenu trigger button (skips ThemeDecorator buttons). */
+	function findDropdownTrigger(canvasElement: HTMLElement): HTMLElement {
+		const trigger = canvasElement.querySelector(
+			'[data-dropdown-menu-trigger] [data-slot="button"]',
+		) as HTMLElement | null;
+		if (trigger) {
+			return trigger;
+		}
+		// Fallback: find button inside dropdown-menu-trigger data-slot
+		const slotTrigger = canvasElement.querySelector(
+			'[data-slot="dropdown-menu-trigger"]',
+		) as HTMLElement | null;
+		if (slotTrigger) {
+			return slotTrigger;
+		}
+		throw new Error('DropdownMenu trigger button not found');
+	}
+
+	const playOpensOnClick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = findDropdownTrigger(canvasElement);
+
+		trigger.click();
+		await waitFor(() => expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy());
+	};
+
+	const playArrowDownFocusesItems = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = findDropdownTrigger(canvasElement);
+
+		// Use native click to bypass pointer-events:none on child-snippet triggers
+		trigger.click();
+		await waitFor(() => expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy());
+
+		const items = canvasElement.querySelectorAll('[role="menuitem"]');
+		await expect(items.length).toBeGreaterThanOrEqual(2);
+
+		// bits-ui highlights items via data-highlighted while keeping focus on the menu container
+		await userEvent.keyboard('{ArrowDown}');
+		await waitFor(() => expect(items[0]).toHaveAttribute('data-highlighted', ''));
+
+		await userEvent.keyboard('{ArrowDown}');
+		await waitFor(() => expect(items[1]).toHaveAttribute('data-highlighted', ''));
+	};
+
+	const playEnterSelectsItem = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = findDropdownTrigger(canvasElement);
+
+		trigger.click();
+		await waitFor(() => expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy());
+
+		await userEvent.keyboard('{ArrowDown}');
+
+		// bits-ui may keep focus on the menu content while highlighting items via data-highlighted
+		const firstItem = canvasElement.querySelectorAll('[role="menuitem"]')[0];
+		await waitFor(() => expect(firstItem).toHaveAttribute('data-highlighted', ''));
+
+		await userEvent.keyboard('{Enter}');
+
+		// Menu should close after selecting an item
+		await expectMenuClosed(canvasElement);
+	};
+
+	const playEscapeClosesMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = findDropdownTrigger(canvasElement);
+
+		// Use native click to bypass pointer-events:none on child-snippet triggers
+		trigger.click();
+		await waitFor(() => expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy());
+
+		await userEvent.keyboard('{Escape}');
+
+		await expectMenuClosed(canvasElement);
+	};
 </script>
 
-<Story name="Basic">
+<Story name="Basic" play={playOpensOnClick}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -36,12 +120,14 @@
 	{/snippet}
 </Story>
 
-<Story name="With Separators">
+<Story name="With Separators" play={playArrowDownFocusesItems}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button intent="secondary">Open Menu</Button>
+					{#snippet child({ props })}
+						<Button intent="secondary" {...props}>Open Menu</Button>
+					{/snippet}
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Group>
@@ -63,7 +149,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons">
+<Story name="With Icons" play={playEnterSelectsItem}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -90,12 +176,14 @@
 	{/snippet}
 </Story>
 
-<Story name="With Keyboard Shortcuts">
+<Story name="With Keyboard Shortcuts" play={playEscapeClosesMenu}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
-					<Button intent="secondary">Edit</Button>
+					{#snippet child({ props })}
+						<Button intent="secondary" {...props}>Edit</Button>
+					{/snippet}
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content portalProps={{ disabled: true }}>
 					<DropdownMenu.Item>

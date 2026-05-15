@@ -31,6 +31,7 @@
 					<Textarea
 						{...args}
 						{state}
+						aria-label={state}
 						rows={3}
 						value={state === 'error'
 							? ''
@@ -98,23 +99,34 @@
 		<div class="grid max-w-2xl grid-cols-2 gap-4">
 			<div>
 				<Label>Default</Label>
-				<Textarea rows={3} placeholder="Describe the change…" {...args} />
+				<Textarea
+					rows={3}
+					placeholder="Describe the change…"
+					aria-label="Default"
+					{...args}
+				/>
 			</div>
 			<div>
 				<Label>Focus (interact)</Label>
 				<Textarea
 					rows={3}
+					aria-label="Focus"
 					value="Surface session failures and PR review state directly above each tree."
 				/>
 			</div>
 			<div>
 				<Label>Error</Label>
-				<Textarea state="error" rows={2} />
+				<Textarea state="error" rows={2} aria-label="Error" />
 				<HelpText state="error">Description is required.</HelpText>
 			</div>
 			<div>
 				<Label>Disabled</Label>
-				<Textarea disabled rows={3} value="Locked while session running" />
+				<Textarea
+					disabled
+					rows={3}
+					aria-label="Disabled"
+					value="Locked while session running"
+				/>
 			</div>
 		</div>
 	{/snippet}

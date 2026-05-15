@@ -1,8 +1,8 @@
 # Phase 3 — Storybook `play()` Interaction Tests + Accessibility CI
 
-**Status**: Not started
+**Status**: Complete
 **Pre-requisite**: Phase 1 and Phase 2 complete (all stories exist)
-**Estimated sub-agents**: 18 component groups + 1 a11y enablement task
+**Estimated sub-agents**: 24 component groups + 1 a11y enablement task
 **Run after**: Phase 2
 **Run before**: Phase 4
 
@@ -53,7 +53,7 @@ Import from: `import { expect, userEvent, within, fn } from 'storybook/test';`
 
 ## Notes
 
-> **SearchField Escape key interactivity**: The full keyboard interactivity of SearchField (pressing Escape to close results, keyboard navigation through results) should be implemented as `play()` tests in Phase 3. This was deferred from Phase 1 because interactive state management (open/close results, keyboard nav) requires `play()` test infrastructure.
+> **SearchField note**: SearchField is a styled `<input>` wrapper with no built-in overlay or dropdown behavior. Keyboard interactivity (Escape to close results, arrow key navigation through results) lives in the **parent components** that compose SearchField with a results list — primarily CommandPalette (sub-agent 16) and CreationWizard's GitHub search step (sub-agent 15). Those components' play() tests cover SearchField's keyboard behavior in context.
 
 ---
 
@@ -91,7 +91,7 @@ After making this change:
 
 ---
 
-## Components for `play()` Tests (18 sub-agents)
+## Components for `play()` Tests (24 sub-agents)
 
 Spawn one sub-agent per component/group. Each sub-agent adds `play()` functions to the **existing story** for that component (created in Phase 1 or Phase 2, or already existing before Phase 1).
 
@@ -102,8 +102,8 @@ Spawn one sub-agent per component/group. Each sub-agent adds `play()` functions 
     - Primary story: click button → `onclick` callback is called once
     - Disabled story: click disabled button → callback is NOT called
     - Loading story (if variant exists): button in loading state ignores clicks
-- **Import**: `import { expect, userEvent, within } from '@storybook/test';`
-- **Note**: Callbacks in Storybook stories are typically `vi.fn()` mock functions added to story `args`. Add `onclick: fn()` in `argTypes` and verify call count.
+- **Import**: `import { expect, userEvent, within, fn } from 'storybook/test';`
+- **Note**: Use `fn()` from `storybook/test` for spy functions (NOT `vi.fn()`). Add `onclick: fn()` in `args` and verify call count.
 
 ### Sub-agent 2 — `Checkbox`
 
@@ -126,16 +126,17 @@ Spawn one sub-agent per component/group. Each sub-agent adds `play()` functions 
 ### Sub-agent 4 — `Tabs`
 
 - **Story**: `src/lib/components/shadcn/tabs/Tabs.stories.svelte`
+- **Component note**: Tabs is a **custom component** (`<div role="tablist">` + `<button role="tab">` with `aria-selected`), NOT bits-ui Tabs. Arrow key navigation is NOT built in — it must be implemented if desired.
 - **Play tests**:
     - Click Tab 2 → Tab 2 panel becomes visible, Tab 1 panel hidden
     - Click Tab 3 → Tab 3 active
-    - ArrowRight on focused tab → moves focus to next tab (keyboard nav)
-    - ArrowLeft on focused tab → moves focus to previous tab
-    - **⚠️ Arrow key propagation note**: bits-ui Tabs calls `e.preventDefault()` on arrow keys but does **not** call `e.stopPropagation()`. Arrow key events bubble by default. Write a test to verify arrow keys do not trigger page-level shortcut handlers. If the test fails, add an `onkeydown` handler on the Tabs root to stop propagation for navigation keys.
+    - Click disabled tab (if "With Disabled Tab" variant exists) → no state change
+    - Verify `aria-selected` is `true` on active tab and `false` on others
+    - **Keyboard accessibility**: Since Tabs is custom (no bits-ui), verify that Enter/Space on a focused tab activates it. Arrow key navigation between tabs is NOT expected unless explicitly implemented.
 
 ### Sub-agent 5 — `Dialog`
 
-- **Story**: `src/lib/components/shadcn/dialog/dialog.stories.svelte`
+- **Story**: `src/lib/components/shadcn/dialog/Dialog.stories.svelte`
 - **Play tests**:
     - Click trigger → dialog opens (role="dialog" visible)
     - Click close button → dialog closes
@@ -174,7 +175,7 @@ Spawn one sub-agent per component/group. Each sub-agent adds `play()` functions 
 
 ### Sub-agent 8 — `Popover`
 
-- **Story**: `src/lib/components/shadcn/popover/popover.stories.svelte`
+- **Story**: `src/lib/components/shadcn/popover/Popover.stories.svelte`
 - **Play tests**:
     - Click trigger → popover content visible
     - Click outside → popover closes
@@ -287,11 +288,95 @@ Spawn one sub-agent per component/group. Each sub-agent adds `play()` functions 
 ### Sub-agent 18 — `DependencyGraphView`
 
 - **Story**: `src/lib/components/blocks/dependency-graph/DependencyGraphView.stories.svelte` (created in Phase 2)
+- **Rendering**: Uses **SVG + foreignObject** for DOM nodes (NOT canvas). Nodes are rendered as Svelte components inside `<foreignObject>` elements within an SVG. Edges are SVG `<path>` elements with arrow markers.
 - **Play tests**:
-    - Graph renders with nodes visible
-    - Toggle filter "show closed" → archived nodes appear/disappear
-    - Click on a node → `onNodeClick` callback called with correct issue ID
-    - **Note**: Graph may use canvas/SVG. Use `canvas.getByRole('img')` or custom selectors as appropriate.
+    - Graph renders with nodes visible — query for foreignObject content or node text
+    - View mode switcher: click "PRDs" or "Single PRD" → graph re-renders with filtered nodes
+    - Filter bar: toggle filter checkboxes → nodes appear/disappear
+    - Click on a node → `handleNodeSelect` fires with correct issue ID
+    - Empty state: when no issues exist, empty state icon/message is shown
+    - **Note**: Use `canvas.getByText()` or `canvas.getByRole()` to find node content rendered inside foreignObject elements. Standard DOM queries work because foreignObject renders real HTML.
+
+### Sub-agent 19 — `ContextMenu`
+
+- **Story**: `src/lib/components/shadcn/context-menu/ContextMenu.stories.svelte`
+- **Component note**: Base overlay component built on bits-ui `ContextMenuPrimitive`. Used as wrapper around IssueCard, WorkspaceCard, and other cards throughout the app. Triggered by right-click (`contextmenu` event).
+- **Play tests**:
+    - Right-click trigger area → context menu appears (`role="menu"` visible)
+    - Click menu item → item action fires, menu closes
+    - ArrowDown → first item focused, ArrowDown again → second item focused
+    - Enter on focused item → item action fires, menu closes
+    - Escape → menu closes
+    - **⚠️ Event propagation test — Escape containment**:
+      Create a "ContextMenu in Dialog" story variant: open dialog → right-click inside to open context menu → press Escape → context menu closes, dialog REMAINS open. This validates bits-ui's escape-layer system for context menus.
+    - Disabled items: verify disabled items cannot be clicked or focused via keyboard
+
+### Sub-agent 20 — `RadioGroup`
+
+- **Story**: `src/lib/components/shadcn/radio-group/RadioGroup.stories.svelte`
+- **Component note**: Built on bits-ui `RadioGroupPrimitive`. Form control with keyboard accessibility.
+- **Play tests**:
+    - Click a radio option → that option becomes selected, callback fires
+    - Click a different option → selection moves, previous deselected
+    - ArrowDown on focused radio → next option focused and selected
+    - ArrowUp on focused radio → previous option focused and selected
+    - Space on focused radio → selects it (if not already selected)
+    - Disabled radio cannot be selected via click or keyboard
+    - Verify `aria-checked` attributes update correctly
+
+### Sub-agent 21 — `Calendar` & `RangeCalendar`
+
+- **Stories**:
+    - `src/lib/components/shadcn/calendar/Calendar.stories.svelte`
+    - `src/lib/components/shadcn/range-calendar/RangeCalendar.stories.svelte`
+- **Component note**: Built on bits-ui calendar primitives. Interactive date picker with navigation and constraints.
+- **Play tests (Calendar)**:
+    - Click a date → date selected, `onValueChange` callback fires
+    - Click next month button → month advances, dates update
+    - Click previous month button → month goes back
+    - Disabled dates: cannot be clicked or selected
+    - Min/max constraints: dates outside range are disabled
+    - Verify `aria-selected` on selected date cell
+- **Play tests (RangeCalendar)**:
+    - Click start date → start selected
+    - Click end date → range completed, callback fires with both dates
+    - Range highlight visible between start and end dates
+    - Click outside range after start selected → range resets or adjusts
+
+### Sub-agent 22 — `FloatingInputPanel`
+
+- **Story**: `src/lib/components/blocks/session/FloatingInputPanel.stories.svelte`
+- **Component note**: Complex session input panel with textarea, optional image carousel, skill chips, and send/stop button. Keyboard shortcuts: Shift+Enter for newline vs Enter for submit (behavior varies by mode).
+- **Play tests**:
+    - Type in textarea → text appears, send button enables (if it was disabled when empty)
+    - Click send button → `onSend` callback fires with textarea content
+    - Click stop button (during generation) → `onStop` callback fires
+    - Skill chip click → command prepended to textarea input
+    - Image carousel toggle → carousel section appears/disappears
+    - Verify textarea auto-focus behavior
+    - Disabled state: textarea and send button are disabled when `disabled` prop is true
+
+### Sub-agent 23 — `DateRangePicker`
+
+- **Story**: `src/lib/components/blocks/usage/DateRangePicker.stories.svelte`
+- **Component note**: Composition of Popover + RangeCalendar. Trigger button shows selected range; clicking opens popover with calendar.
+- **Play tests**:
+    - Click trigger → popover opens with RangeCalendar visible
+    - Select date range in calendar → trigger text updates with selected range
+    - Escape → popover closes, selection preserved
+    - Click outside → popover closes
+    - **⚠️ Event propagation test**: Escape closes DateRangePicker popover without affecting parent layer
+
+### Sub-agent 24 — `SessionCard`
+
+- **Story**: `src/lib/components/blocks/workspace/SessionCard.stories.svelte`
+- **Component note**: Card with nested terminate button that uses `stopPropagation()` (confirmed at line 129). Same propagation pattern as IssueCard/WorkspaceCard.
+- **Play tests**:
+    - Click card → `onClick` callback fires
+    - Click terminate button → `onTerminate` fires, card `onClick` NOT fired (propagation stopped)
+    - Verify different visual states: running, needs-input, errored
+    - Token count and session info display correctly
+    - Terminate button only visible when session is active
 
 ---
 
@@ -303,7 +388,7 @@ You are adding play() interaction tests to an existing Storybook story in Grovek
 1. Read the existing story file completely.
 2. Read the component source file completely.
 3. Identify which stories are best suited for interaction tests (default/primary story usually best).
-4. Import test utilities: import { expect, userEvent, within } from '@storybook/test';
+4. Import test utilities: import { expect, userEvent, within, fn } from 'storybook/test';
 5. Add play() functions following the patterns in CONVENTIONS.md §1.
 6. For EVERY floating overlay (dropdown, popover, dialog, select): add an Escape containment test.
 7. For EVERY nested interactive element inside a card/container: add a click propagation test.
@@ -352,7 +437,7 @@ Escape containment test pattern:
 
 ## Completion Criteria
 
-- `play()` functions added to all 18 component stories
+- `play()` functions added to all 24 component stories
 - a11y CI enabled (test: 'error') and all violations fixed or explicitly deferred with justification
 - All `play()` tests pass in `pnpm test -- --project=storybook`
 - `pnpm check:all` passes

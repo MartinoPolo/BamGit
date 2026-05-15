@@ -4,15 +4,25 @@
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 
+	import type { HTMLAttributes } from 'svelte/elements';
+
 	interface Props {
 		value: string;
 		id?: string;
 		placeholder?: string;
 		disabled?: boolean;
 		onchange?: () => void;
+		'aria-label'?: HTMLAttributes<HTMLInputElement>['aria-label'];
 	}
 
-	let { value = $bindable(''), id, placeholder, disabled = false, onchange }: Props = $props();
+	let {
+		value = $bindable(''),
+		id,
+		placeholder,
+		disabled = false,
+		onchange,
+		'aria-label': ariaLabel,
+	}: Props = $props();
 
 	async function handleBrowse() {
 		if (disabled) {
@@ -27,7 +37,15 @@
 </script>
 
 <div class="flex gap-1.5">
-	<Input {id} bind:value {placeholder} {disabled} oninput={() => onchange?.()} class="flex-1" />
+	<Input
+		{id}
+		bind:value
+		{placeholder}
+		{disabled}
+		aria-label={ariaLabel}
+		oninput={() => onchange?.()}
+		class="flex-1"
+	/>
 	<Button
 		intent="ghost"
 		size="icon-sm"

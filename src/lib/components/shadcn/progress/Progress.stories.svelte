@@ -16,7 +16,7 @@
 	{#snippet template(args)}
 		<div class="w-80 space-y-1">
 			<p class="text-muted-foreground text-sm">{args.value ?? 0}%</p>
-			<Progress {...args} />
+			<Progress aria-label="Progress" {...args} />
 		</div>
 	{/snippet}
 </Story>

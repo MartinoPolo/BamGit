@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, within } from 'storybook/test';
 	import { SELECT_STATES, Select } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { HelpText } from '$lib/components/base/help-text/index.js';
@@ -16,6 +17,78 @@
 			disabled: { control: 'boolean' },
 		},
 	});
+
+	/* ── Play functions for Custom (bits-ui) Select stories ──────────── */
+
+	/** Helper: find the custom select trigger button. */
+	function getSelectTrigger(canvasElement: HTMLElement): HTMLElement {
+		return canvasElement.querySelector('[data-slot="select-trigger"]') as HTMLElement;
+	}
+
+	const playOpenDropdown = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Closed initially
+		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+		// Click trigger → listbox visible
+		await userEvent.click(trigger);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+		const listbox = document.querySelector('[role="listbox"]');
+		await expect(listbox).toBeInTheDocument();
+	};
+
+	const playSelectOption = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Open dropdown
+		await userEvent.click(trigger);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+		// Click second option (Claude · Haiku 4.5)
+		const listbox = document.querySelector('[role="listbox"]')!;
+		const options = within(listbox as HTMLElement).getAllByRole('option');
+		await userEvent.click(options[1]);
+
+		// List closes, trigger shows selected value
+		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+		await expect(trigger).toHaveTextContent('Claude · Haiku 4.5');
+	};
+
+	const playEscapeClosesDropdown = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Open dropdown
+		await userEvent.click(trigger);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+		// Press Escape → list closes
+		await userEvent.keyboard('{Escape}');
+		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+		// Selection unchanged — still shows placeholder
+		await expect(trigger).toHaveTextContent('Choose provider…');
+	};
+
+	const playEscapeDoesNotPropagate = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Open dropdown
+		await userEvent.click(trigger);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+		// Press Escape — should only close the listbox
+		await userEvent.keyboard('{Escape}');
+		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+		// Trigger is still in the DOM (parent layer not dismissed)
+		await expect(trigger).toBeInTheDocument();
+	};
 </script>
 
 <script lang="ts">
@@ -76,7 +149,12 @@
 			{#each SELECT_STATES as state (state)}
 				<div>
 					<Label>{state}</Label>
-					<Select {...args} {state} value={state === 'error' ? '' : 'claude'}>
+					<Select
+						{...args}
+						{state}
+						value={state === 'error' ? '' : 'claude'}
+						aria-label="Provider ({state})"
+					>
 						<option value="">Choose provider...</option>
 						<option value="claude">Claude - Sonnet 4.5</option>
 					</Select>
@@ -182,7 +260,7 @@
 
 <!-- ─── Custom (bits-ui) Select Stories ──────────────────────────────────── -->
 
-<Story name="Custom · Default">
+<Story name="Custom · Default" play={playOpenDropdown}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -198,7 +276,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · With Value">
+<Story name="Custom · With Value" play={playSelectOption}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -245,7 +323,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · With Groups">
+<Story name="Custom · With Groups" play={playEscapeClosesDropdown}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -271,7 +349,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · Disabled Item">
+<Story name="Custom · Disabled Item" play={playEscapeDoesNotPropagate}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -296,31 +374,31 @@
 		<div class="grid max-w-2xl grid-cols-3 gap-4">
 			<div>
 				<Label>Default</Label>
-				<Select {...args}>
+				<Select {...args} aria-label="Default">
 					<option>Choose provider…</option>
 				</Select>
 			</div>
 			<div>
 				<Label>Value</Label>
-				<Select value="claude">
+				<Select value="claude" aria-label="Value">
 					<option value="claude">Claude · Sonnet 4.5</option>
 				</Select>
 			</div>
 			<div>
 				<Label>Focus (interact)</Label>
-				<Select value="claude">
+				<Select value="claude" aria-label="Focus">
 					<option value="claude">Claude · Sonnet 4.5</option>
 				</Select>
 			</div>
 			<div>
 				<Label>Disabled</Label>
-				<Select disabled value="claude">
+				<Select disabled value="claude" aria-label="Disabled">
 					<option value="claude">Claude · Sonnet 4.5</option>
 				</Select>
 			</div>
 			<div>
 				<Label>Error</Label>
-				<Select state="error" value="">
+				<Select state="error" value="" aria-label="Error">
 					<option value="">No provider configured</option>
 				</Select>
 				<HelpText state="error">Add a provider in Settings.</HelpText>

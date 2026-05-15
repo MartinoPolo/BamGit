@@ -219,6 +219,7 @@
 						<a
 							href={resolve('/settings')}
 							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+							aria-label={NAV_LABELS.settings()}
 						>
 							<SettingsIcon size={14} />
 						</a>

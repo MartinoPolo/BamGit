@@ -37,6 +37,7 @@
 				class={cn(sidebarCollapsedItemVariants({ active }))}
 				aria-disabled={disabled || undefined}
 				aria-current={active ? 'page' : undefined}
+				aria-label={label}
 			>
 				<Icon size={15} class={iconClass ?? (active ? 'text-primary' : '')} />
 				{#if badge !== null}
@@ -51,6 +52,7 @@
 				class={cn(sidebarCollapsedItemVariants({ active }))}
 				{disabled}
 				{onclick}
+				aria-label={label}
 			>
 				<Icon size={15} class={iconClass ?? (active ? 'text-primary' : '')} />
 				{#if badge !== null}

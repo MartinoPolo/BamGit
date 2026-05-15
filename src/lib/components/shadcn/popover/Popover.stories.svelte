@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import * as Popover from './index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
@@ -15,6 +16,85 @@
 		component: Popover.Root,
 		tags: ['autodocs'],
 	});
+
+	/** Helper: find popover content inside the canvas (portal disabled in stories). */
+	function getPopoverContent(canvas: HTMLElement): HTMLElement | null {
+		return canvas.querySelector('[data-slot="popover-content"]');
+	}
+
+	/** Helper: assert popover content is closed (either absent or data-state="closed"). */
+	async function expectPopoverClosed(canvas: HTMLElement) {
+		const content = getPopoverContent(canvas);
+		if (content) {
+			await waitFor(() => expect(content.dataset.state).toBe('closed'));
+			return;
+		}
+	}
+
+	/** Click trigger -> popover opens, Escape -> popover closes. */
+	const playOpenAndEscapeClose = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const trigger = canvas.getByRole('button', { name: /filter/i });
+
+		// Popover starts closed
+		await expectPopoverClosed(canvasElement);
+
+		// Click trigger -> opens
+		await userEvent.click(trigger);
+		const content = getPopoverContent(canvasElement);
+		await expect(content).not.toBeNull();
+		await expect(content).toHaveAttribute('data-state', 'open');
+
+		// Escape -> closes
+		await userEvent.keyboard('{Escape}');
+		await expectPopoverClosed(canvasElement);
+	};
+
+	/** Popover starts open, click outside -> popover closes. */
+	const playClickOutsideCloses = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		// "Open by Default" story starts with the popover already open
+		await expect(getPopoverContent(canvasElement)).not.toBeNull();
+
+		// Click outside the popover (on the canvas wrapper)
+		await userEvent.click(canvasElement);
+		await expectPopoverClosed(canvasElement);
+	};
+
+	/** Click a sort item -> data-state="active" updates, click another -> previous deactivates. */
+	const playSortItemSelection = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const trigger = canvas.getByRole('button', { name: /sort by/i });
+
+		// Open popover
+		await userEvent.click(trigger);
+		const content = getPopoverContent(canvasElement)!;
+
+		// "Updated · newest" is active by default
+		const items = [...content.querySelectorAll('[role="menuitem"]')] as HTMLElement[];
+		await expect(items[0]).toHaveAttribute('data-state', 'active'); // Updated · newest
+
+		// Click "Created · newest"
+		await userEvent.click(items[1]);
+		await expect(items[1]).toHaveAttribute('data-state', 'active');
+		await expect(items[0]).not.toHaveAttribute('data-state', 'active');
+	};
+
+	/** Escape closes popover and trigger remains accessible (containment test). */
+	const playEscapeContainment = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const trigger = canvas.getByRole('button', { name: /legend/i });
+
+		// Open popover
+		await userEvent.click(trigger);
+		await expect(getPopoverContent(canvasElement)).not.toBeNull();
+
+		// Press Escape — should close popover
+		await userEvent.keyboard('{Escape}');
+		await expectPopoverClosed(canvasElement);
+
+		// Trigger should remain in the DOM (parent layer not dismissed)
+		await expect(trigger).toBeVisible();
+	};
 </script>
 
 <script lang="ts">
@@ -23,7 +103,7 @@
 	let groupBy = $state('repository');
 </script>
 
-<Story name="Filter">
+<Story name="Filter" play={playOpenAndEscapeClose}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
@@ -93,7 +173,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Sort">
+<Story name="Sort" play={playSortItemSelection}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
@@ -178,7 +258,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Legend">
+<Story name="Legend" play={playEscapeContainment}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
@@ -208,7 +288,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Open by Default">
+<Story name="Open by Default" play={playClickOutsideCloses}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4 pb-72">
 			<Popover.Root open={true}>

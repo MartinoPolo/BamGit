@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, within } from 'storybook/test';
 	import { Checkbox } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 
@@ -13,19 +14,63 @@
 			disabled: { control: 'boolean' },
 		},
 	});
+
+	const playClickToCheck = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const checkbox = canvas.getByRole('checkbox');
+		await expect(checkbox).toHaveAttribute('aria-checked', 'false');
+		await userEvent.click(checkbox);
+		await expect(checkbox).toHaveAttribute('aria-checked', 'true');
+	};
+
+	const playClickToUncheck = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const checkbox = canvas.getByRole('checkbox');
+		await expect(checkbox).toHaveAttribute('aria-checked', 'true');
+		await userEvent.click(checkbox);
+		await expect(checkbox).toHaveAttribute('aria-checked', 'false');
+	};
+
+	const playDisabledNoChange = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const checkboxes = canvas.getAllByRole('checkbox');
+		const uncheckedDisabled = checkboxes[0];
+		const checkedDisabled = checkboxes[1];
+
+		await expect(uncheckedDisabled).toBeDisabled();
+		await expect(uncheckedDisabled).toHaveAttribute('aria-checked', 'false');
+		await userEvent.click(uncheckedDisabled);
+		await expect(uncheckedDisabled).toHaveAttribute('aria-checked', 'false');
+
+		await expect(checkedDisabled).toBeDisabled();
+		await expect(checkedDisabled).toHaveAttribute('aria-checked', 'true');
+		await userEvent.click(checkedDisabled);
+		await expect(checkedDisabled).toHaveAttribute('aria-checked', 'true');
+	};
+
+	const playKeyboardToggle = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const checkbox = canvas.getByRole('checkbox');
+		await expect(checkbox).toHaveAttribute('aria-checked', 'false');
+		await checkbox.focus();
+		await userEvent.keyboard(' ');
+		await expect(checkbox).toHaveAttribute('aria-checked', 'true');
+		await userEvent.keyboard(' ');
+		await expect(checkbox).toHaveAttribute('aria-checked', 'false');
+	};
 </script>
 
 <script lang="ts">
 	import type { CheckboxProps } from './checkbox-variants.js';
 </script>
 
-<Story name="Unchecked">
+<Story name="Unchecked" play={playClickToCheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox {...args} />
 	{/snippet}
 </Story>
 
-<Story name="Checked">
+<Story name="Checked" play={playClickToUncheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox checked {...args} />
 	{/snippet}
@@ -37,12 +82,18 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled">
+<Story name="Disabled" play={playDisabledNoChange}>
 	{#snippet template(args: CheckboxProps)}
 		<div class="flex items-center gap-4">
 			<Checkbox disabled {...args} />
 			<Checkbox disabled checked {...args} />
 		</div>
+	{/snippet}
+</Story>
+
+<Story name="Keyboard Toggle" play={playKeyboardToggle}>
+	{#snippet template(args: CheckboxProps)}
+		<Checkbox {...args} />
 	{/snippet}
 </Story>
 
