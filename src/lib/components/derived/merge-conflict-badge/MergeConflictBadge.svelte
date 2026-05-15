@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 </script>
 
-<WithTooltip text="Merge conflicts detected with base branch">
+<SimpleTooltip text="Merge conflicts detected with base branch">
 	{#snippet asChild(props)}
 		<span
 			{...props}
@@ -12,4 +12,4 @@
 			conflict
 		</span>
 	{/snippet}
-</WithTooltip>
+</SimpleTooltip>

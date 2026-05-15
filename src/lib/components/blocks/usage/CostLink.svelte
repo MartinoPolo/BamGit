@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
 	import { getCostMagnitude, formatCostDisplay, type CostMagnitude } from './cost_link_utils.js';
 	import type { MetricsPeriod, UsageScope } from '$lib/modules/usage/usage_types.js';
@@ -55,7 +55,7 @@
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- usageHref already resolved via resolve('/usage') -->
-<WithTooltip text="View usage details" side="top">
+<SimpleTooltip text="View usage details" side="top">
 	<a
 		href={usageHref}
 		class={cn('cost-link', `cost-link-${size}`, `cost-link-${magnitude}`, className)}
@@ -66,7 +66,7 @@
 	>
 		{displayValue}
 	</a>
-</WithTooltip>
+</SimpleTooltip>
 
 <!-- eslint-enable svelte/no-navigation-without-resolve -->
 

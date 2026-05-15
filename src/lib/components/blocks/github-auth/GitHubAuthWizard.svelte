@@ -219,7 +219,7 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpenChange}>
-	<Dialog.Content class="max-w-md">
+	<Dialog.Content class="max-w-md" onEscapeKeydown={(e) => e.stopPropagation()}>
 		<Dialog.Header>
 			<div class="flex items-center gap-2">
 				<GithubIcon size={20} />

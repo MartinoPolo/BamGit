@@ -15,7 +15,7 @@
 	import SessionStateChip from '$lib/components/derived/session-state-chip/SessionStateChip.svelte';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import VscodeIcon from '$lib/components/derived/icons/VscodeIcon.svelte';
@@ -273,7 +273,7 @@
 			{/if}
 
 			{#if priorityBadgeClass && prioritiesEnabled && issue.priority !== 'medium'}
-				<WithTooltip text="Change priority">
+				<SimpleTooltip text="Change priority">
 					<button
 						class="inline-flex h-4.5 cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
 						onclick={(event) => {
@@ -285,12 +285,12 @@
 					>
 						{issue.priority}
 					</button>
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 
 			<!-- Quick-action buttons -->
 			<div class="ml-0.5 flex items-center gap-0.5">
-				<WithTooltip
+				<SimpleTooltip
 					text={hasWorktree ? `Open ${issue.branch_name ?? 'folder'}` : 'Assign folder'}
 				>
 					<Button
@@ -303,8 +303,8 @@
 					>
 						<FolderIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
-				</WithTooltip>
-				<WithTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
+				</SimpleTooltip>
+				<SimpleTooltip text={hasWorktree ? 'Open Terminal' : 'Assign folder'}>
 					<Button
 						intent="ghost-overlay"
 						size="icon-sm"
@@ -315,8 +315,8 @@
 					>
 						<TerminalIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
-				</WithTooltip>
-				<WithTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
+				</SimpleTooltip>
+				<SimpleTooltip text={hasWorktree ? 'Open Editor' : 'Assign folder'}>
 					<Button
 						intent="ghost-overlay"
 						size="icon-sm"
@@ -327,10 +327,10 @@
 					>
 						<VscodeIcon data-icon="inline-end" />
 					</Button>
-				</WithTooltip>
+				</SimpleTooltip>
 
 				<!-- Character mute toggle -->
-				<WithTooltip
+				<SimpleTooltip
 					text={issue.is_sound_muted
 						? 'Unmute sounds for this issue'
 						: 'Mute sounds for this issue'}
@@ -348,7 +348,7 @@
 							<Volume2Icon strokeWidth={1.7} data-icon="inline-start" />
 						{/if}
 					</Button>
-				</WithTooltip>
+				</SimpleTooltip>
 			</div>
 		</div>
 	</div>
@@ -361,11 +361,11 @@
 			style="background: linear-gradient(180deg, color-mix(in oklch, {color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {color} 20%, var(--border));"
 		>
 			{#if notificationDotColor !== null && sessionState === null}
-				<WithTooltip text={m.issue_card_session_needs_attention()}>
+				<SimpleTooltip text={m.issue_card_session_needs_attention()}>
 					<span
 						class="absolute top-1.5 right-1.5 z-10 size-1.75 animate-pulse rounded-full {notificationDotColor}"
 					></span>
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 			{#if visualization}
 				<div
@@ -453,7 +453,7 @@
 						</Badge>
 					{/each}
 					{#if overflowCount > 0}
-						<WithTooltip
+						<SimpleTooltip
 							text={issue.labels
 								.slice(maxVisible)
 								.map((l) => l.name)
@@ -464,7 +464,7 @@
 							>
 								+{overflowCount}
 							</span>
-						</WithTooltip>
+						</SimpleTooltip>
 					{/if}
 				</div>
 			{/if}

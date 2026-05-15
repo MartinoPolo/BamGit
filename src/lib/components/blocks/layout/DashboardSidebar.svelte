@@ -17,7 +17,7 @@
 	import ThemeToggle from '$lib/components/derived/theme-toggle/ThemeToggle.svelte';
 	import LanguageSwitcher from '$lib/components/derived/language-switcher/LanguageSwitcher.svelte';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {
@@ -88,7 +88,7 @@
 			class:justify-center={collapsed}
 		>
 			{#if collapsed}
-				<WithTooltip
+				<SimpleTooltip
 					text={m.sidebar_expand({ shortcut: toggleSidebarBinding })}
 					side="right"
 				>
@@ -111,7 +111,7 @@
 							</span>
 						</Button>
 					{/snippet}
-				</WithTooltip>
+				</SimpleTooltip>
 			{:else}
 				<div class="flex items-center">
 					<div class="flex w-10 shrink-0 items-center justify-center">
@@ -119,7 +119,7 @@
 					</div>
 					<span class="text-sm font-semibold tracking-tight">{m.app_name()}</span>
 				</div>
-				<WithTooltip
+				<SimpleTooltip
 					text={m.sidebar_collapse({ shortcut: toggleSidebarBinding })}
 					side="right"
 				>
@@ -131,7 +131,7 @@
 					>
 						<PanelLeftIcon data-icon="inline-start" />
 					</Button>
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 		</div>
 
@@ -215,7 +215,7 @@
 						activeCount={activeSessionCount}
 						{collapsed}
 					/>
-					<WithTooltip text={NAV_LABELS.settings()} side="top">
+					<SimpleTooltip text={NAV_LABELS.settings()} side="top">
 						<a
 							href={resolve('/settings')}
 							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
@@ -223,7 +223,7 @@
 						>
 							<SettingsIcon size={14} />
 						</a>
-					</WithTooltip>
+					</SimpleTooltip>
 				</div>
 			{/if}
 		</div>

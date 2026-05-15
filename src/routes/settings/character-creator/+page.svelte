@@ -7,7 +7,7 @@
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import * as Accordion from '$lib/components/shadcn/accordion/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Progress } from '$lib/components/shadcn/progress/index.js';
 	import {
 		AvatarUpload,
@@ -306,7 +306,7 @@
 					{saving ? 'Saving...' : 'Save'}
 				</Button>
 			{:else}
-				<WithTooltip text={saveTooltip}>
+				<SimpleTooltip text={saveTooltip}>
 					{#snippet asChild(props)}
 						<div {...props}>
 							<Button disabled>
@@ -315,7 +315,7 @@
 							</Button>
 						</div>
 					{/snippet}
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 		</div>
 	</header>

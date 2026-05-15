@@ -360,7 +360,10 @@
 <Dialog.Root open={wizard.open} onOpenChange={handleOpenChange}>
 	<Dialog.Content
 		class="top-[15%] translate-y-0 max-w-lg"
-		onEscapeKeydown={(e) => e.preventDefault()}
+		onEscapeKeydown={(e) => {
+			e.preventDefault();
+			e.stopPropagation();
+		}}
 	>
 		<Dialog.Header class="flex items-center">
 			<Dialog.Title class="text-base font-semibold text-foreground">

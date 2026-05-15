@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		behindBaseCount: number;
@@ -26,7 +26,7 @@
 </script>
 
 {#if behindBaseCount > 0}
-	<WithTooltip text={tooltip}>
+	<SimpleTooltip text={tooltip}>
 		{#snippet asChild(props)}
 			<span
 				{...props}
@@ -36,5 +36,5 @@
 				{behindBaseCount}
 			</span>
 		{/snippet}
-	</WithTooltip>
+	</SimpleTooltip>
 {/if}

@@ -24,7 +24,7 @@
 			</Button>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content portalProps={{ disabled: true }}>
+	<Dialog.Content portalProps={{ disabled: true }} onEscapeKeydown={(e) => e.stopPropagation()}>
 		<Dialog.Title class="sr-only">Achievements</Dialog.Title>
 		<Dialog.Description class="sr-only">
 			{unlockedCount} of {totalCount} unlocked

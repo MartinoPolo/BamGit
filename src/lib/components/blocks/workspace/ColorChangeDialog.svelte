@@ -32,7 +32,7 @@
 </script>
 
 <Dialog.Root {open} onOpenChange={handleOpenChange}>
-	<Dialog.Content class="max-w-xs">
+	<Dialog.Content class="max-w-xs" onEscapeKeydown={(e) => e.stopPropagation()}>
 		{#if issue}
 			<Dialog.Header>
 				<Dialog.Title>{m.issue_card_change_color()}</Dialog.Title>
