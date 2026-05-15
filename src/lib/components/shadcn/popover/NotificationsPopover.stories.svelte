@@ -158,7 +158,7 @@
 			<Popover.Trigger>
 				{#snippet child({ props })}
 					<div class="relative inline-block">
-						<Button intent="secondary" size="icon" {...props}>
+						<Button intent="secondary" size="icon" aria-label="Demo" {...props}>
 							<BellIcon data-icon="inline-start" />
 						</Button>
 						<span class="absolute right-1 top-1 size-1.75 rounded-full bg-status-danger"

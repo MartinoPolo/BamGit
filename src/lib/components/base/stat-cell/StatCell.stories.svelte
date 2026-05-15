@@ -1,5 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+
+	import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 	import { STAT_CELL_TONES, StatCell } from './index.js';
 
 	const { Story } = defineMeta({
@@ -19,6 +21,20 @@
 			},
 		},
 	});
+
+	const playClickCallsOnclick = async ({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: { onclick?: unknown };
+	}) => {
+		const spy = args.onclick as ReturnType<typeof fn>;
+		const canvas = within(canvasElement);
+		const cell = canvas.getByRole('button', { name: /ISSUES/i });
+		await userEvent.click(cell);
+		await waitFor(() => expect(spy).toHaveBeenCalledOnce());
+	};
 </script>
 
 <script lang="ts">
@@ -125,6 +141,14 @@
 			<StatCell label="PRs" value={4} icon={GitPrIcon} />
 			<StatCell label="ATTN" value={2} tone="danger" pulse icon={AlertIcon} />
 			<StatCell label="HITL" value={1} tone="warning" pulse icon={UserIcon} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Click Calls Onclick" args={{ onclick: fn() }} play={playClickCallsOnclick}>
+	{#snippet template(args: StatCellProps)}
+		<div class="w-17.5">
+			<StatCell {...args} label="ISSUES" value={12} icon={ListChecksIcon} />
 		</div>
 	{/snippet}
 </Story>

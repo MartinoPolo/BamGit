@@ -114,6 +114,7 @@
 							{...props}
 							intent="secondary"
 							size="icon-sm"
+							aria-label="More actions"
 							onclick={(event: MouseEvent) => event.stopPropagation()}
 						>
 							<MoreHorizontalIcon data-icon="inline-end" />

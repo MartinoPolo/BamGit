@@ -59,9 +59,30 @@ Use Button as the template for variant-bearing components.
 - Tabs triggers stay inside `Tabs.List`.
 - Menu/select/command items stay inside their group component when the primitive provides one.
 - Form invalid state uses both `data-invalid` on the field container and `aria-invalid` on the control.
+- Icon-only buttons (`size="icon"` or `size="icon-sm"`) must have `aria-label`. Tooltip wrappers (`WithTooltip`) do not provide screen-reader labels.
+- Use `{#snippet child({ props })}` on `Tooltip.Trigger` to avoid nested `<button>` elements (nested-interactive a11y violation).
+
+## Event Propagation
+
+- Floating overlays (Dropdown, ContextMenu, Popover, Sheet, Select, Combobox) must stop keyboard and pointer events from propagating to parent layers.
+- Escape key must close only the topmost overlay — bits-ui escape-layer handles this by default.
+- Click events inside interactive zones (cards, toolbar buttons, quick-action icons) need `stopPropagation()` to prevent parent card/row click handlers from firing.
+- Custom `svelte:window` keyboard handlers must guard against firing when an overlay is open.
 
 ## Icons
 
-- Current standard: Lucide path imports.
-- Pending decision: adopt `data-icon="inline-start"` / `data-icon="inline-end"` only after a Storybook showcase verifies sizing and spacing.
-- Until adopted, do not require `data-icon`; rely on component CSS where already implemented.
+- Lucide path imports: `import XIcon from '@lucide/svelte/icons/x'`.
+- Use `data-icon="inline-start"` (prefix) or `data-icon="inline-end"` (suffix) on icons inside `Button`. Component CSS sizes icons automatically via these attributes.
+- No `size-*` classes on icons inside components — the component handles sizing.
+
+## Storybook Conventions
+
+- Story files: `ComponentName.stories.svelte` using `defineMeta` + `{#snippet template(args)}`.
+- Title taxonomy: `Base/` for shadcn/base, `Derived/` for derived, `Blocks/<Module>/` for blocks.
+- Always include `tags: ['autodocs']` in `defineMeta`.
+- Play test imports: `import { expect, fn, userEvent, waitFor, within } from 'storybook/test'` (NOT `@storybook/test`).
+- Use `fn()` for callback spies in `defineMeta.args`, never `vi.fn()`.
+- Play function args: use narrow types matching component callback props (`{ onclick?: unknown }`), not `Record<string, unknown>`.
+- bits-ui triggers with `pointer-events: none` (child-snippet pattern): use native `element.click()` instead of `userEvent.click()` in play tests.
+- Wrap post-state-change assertions in `waitFor()` — Svelte 5 `$state` updates are async.
+- bits-ui highlights items via `data-highlighted` attribute, not DOM focus — assert `toHaveAttribute('data-highlighted', '')` not `toHaveFocus()`.

@@ -49,14 +49,20 @@
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onSync}
 			<SimpleTooltip text={m.topbar_sync()}>
-				<Button intent="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
+				<Button
+					intent="ghost"
+					size="icon-sm"
+					aria-label="Sync"
+					disabled={syncing}
+					onclick={onSync}
+				>
 					<RefreshCwIcon class={syncing ? 'animate-spin' : ''} data-icon="inline-start" />
 				</Button>
 			</SimpleTooltip>
 		{/if}
 
 		<SimpleTooltip text={m.topbar_notifications()}>
-			<Button intent="ghost" size="icon-sm" class="relative">
+			<Button intent="ghost" size="icon-sm" aria-label="Notifications" class="relative">
 				<BellIcon data-icon="inline-start" />
 				{#if hasNotifications}
 					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
@@ -66,7 +72,12 @@
 
 		{#if onQuickIdeas}
 			<SimpleTooltip text={m.raw_requirements_title()}>
-				<Button intent="ghost" size="icon-sm" onclick={onQuickIdeas}>
+				<Button
+					intent="ghost"
+					size="icon-sm"
+					aria-label="Quick ideas"
+					onclick={onQuickIdeas}
+				>
 					<LightbulbIcon data-icon="inline-start" />
 				</Button>
 			</SimpleTooltip>
@@ -77,6 +88,7 @@
 				<Button
 					intent={forestCollapsed ? 'ghost' : 'secondary'}
 					size="icon-sm"
+					aria-label="Toggle forest"
 					onclick={onToggleForest}
 				>
 					<TreesIcon data-icon="inline-start" />

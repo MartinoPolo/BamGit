@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { expect, userEvent, within } from 'storybook/test';
+	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import { SELECT_STATES, Select } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { HelpText } from '$lib/components/base/help-text/index.js';
@@ -88,6 +88,64 @@
 
 		// Trigger is still in the DOM (parent layer not dismissed)
 		await expect(trigger).toBeInTheDocument();
+	};
+
+	const playDisabledIgnoresClick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Trigger is disabled — pointer-events: none means userEvent.click is blocked by CSS;
+		// use native .click() to confirm the element itself rejects the interaction.
+		await expect(trigger).toBeDisabled();
+		await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+		trigger.click();
+
+		// Dropdown must not open after clicking a disabled trigger
+		await waitFor(() => {
+			expect(trigger).toHaveAttribute('aria-expanded', 'false');
+		});
+		await expect(document.querySelector('[role="listbox"]')).not.toBeInTheDocument();
+	};
+
+	const playClickOutsideCloses = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Open dropdown
+		await userEvent.click(trigger);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+		await expect(document.querySelector('[role="listbox"]')).toBeInTheDocument();
+
+		// Click outside — use the story root element as the "outside" target
+		await userEvent.click(canvasElement);
+
+		await waitFor(() => {
+			expect(trigger).toHaveAttribute('aria-expanded', 'false');
+		});
+	};
+
+	const playKeyboardArrowDown = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const trigger = getSelectTrigger(canvasElement);
+
+		// Open dropdown via click
+		await userEvent.click(trigger);
+		await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+		const listbox = document.querySelector('[role="listbox"]')!;
+		await expect(listbox).toBeInTheDocument();
+
+		// Press ArrowDown — first option should receive focus / aria-selected highlight
+		await userEvent.keyboard('{ArrowDown}');
+
+		await waitFor(() => {
+			const options = within(listbox as HTMLElement).getAllByRole('option');
+			const highlighted = options.find(
+				(opt) =>
+					opt.getAttribute('data-highlighted') !== null ||
+					opt.getAttribute('aria-selected') === 'true' ||
+					document.activeElement === opt,
+			);
+			expect(highlighted).toBeDefined();
+		});
 	};
 </script>
 
@@ -309,7 +367,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · Disabled">
+<Story name="Custom · Disabled" play={playDisabledIgnoresClick}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -317,6 +375,52 @@
 				<SelectCustom.CustomTrigger>Claude · Sonnet 4.5</SelectCustom.CustomTrigger>
 				<SelectCustom.CustomContent portalProps={{ disabled: true }}>
 					<SelectCustom.CustomItem value="claude-sonnet" label="Claude · Sonnet 4.5" />
+				</SelectCustom.CustomContent>
+			</SelectCustom.CustomRoot>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Disabled select ignores click" play={playDisabledIgnoresClick}>
+	{#snippet template()}
+		<div class="max-w-xs">
+			<Label>Provider</Label>
+			<SelectCustom.CustomRoot type="single" value="claude-sonnet" disabled>
+				<SelectCustom.CustomTrigger>Claude · Sonnet 4.5</SelectCustom.CustomTrigger>
+				<SelectCustom.CustomContent portalProps={{ disabled: true }}>
+					<SelectCustom.CustomItem value="claude-sonnet" label="Claude · Sonnet 4.5" />
+				</SelectCustom.CustomContent>
+			</SelectCustom.CustomRoot>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Click outside closes dropdown" play={playClickOutsideCloses}>
+	{#snippet template()}
+		<div class="max-w-xs">
+			<Label>Provider</Label>
+			<SelectCustom.CustomRoot type="single" bind:value={selectedDefault}>
+				<SelectCustom.CustomTrigger>{selectedDefaultLabel}</SelectCustom.CustomTrigger>
+				<SelectCustom.CustomContent portalProps={{ disabled: true }}>
+					{#each providers as item (item.value)}
+						<SelectCustom.CustomItem value={item.value} label={item.label} />
+					{/each}
+				</SelectCustom.CustomContent>
+			</SelectCustom.CustomRoot>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Keyboard ArrowDown highlights option" play={playKeyboardArrowDown}>
+	{#snippet template()}
+		<div class="max-w-xs">
+			<Label>Provider</Label>
+			<SelectCustom.CustomRoot type="single" bind:value={selectedDefault}>
+				<SelectCustom.CustomTrigger>{selectedDefaultLabel}</SelectCustom.CustomTrigger>
+				<SelectCustom.CustomContent portalProps={{ disabled: true }}>
+					{#each providers as item (item.value)}
+						<SelectCustom.CustomItem value={item.value} label={item.label} />
+					{/each}
 				</SelectCustom.CustomContent>
 			</SelectCustom.CustomRoot>
 		</div>

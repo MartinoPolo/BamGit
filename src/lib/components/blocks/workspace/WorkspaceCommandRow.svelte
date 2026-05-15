@@ -80,6 +80,7 @@
 	<Button
 		intent="ghost"
 		size="icon-sm"
+		aria-label="Delete command"
 		class="mt-1 shrink-0 text-muted-foreground hover:text-destructive"
 		onclick={() => onDelete(command.id)}
 	>
