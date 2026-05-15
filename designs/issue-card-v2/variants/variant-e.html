@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Variant E: Atmospheric Haze — Issue Card v2</title>
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Issue Card v2 — Atmospheric Haze ─────────────────── */
+
+    .ic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+      gap: var(--space-8);
+      padding: var(--space-12);
+    }
+
+    /* ── Card shell ──────────────────────────────────────── */
+    .ic-card {
+      --ic-color: oklch(0.69 0.098 132); /* default: moss */
+      position: relative;
+      border-radius: var(--radius-lg);
+      border: none;
+      /* Atmospheric color wash: uniform tint + stronger top concentration */
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in oklch, var(--ic-color) 18%, transparent) 0%,
+          color-mix(in oklch, var(--ic-color) 10%, var(--surface)) 40%,
+          color-mix(in oklch, var(--ic-color) 8%, var(--surface)) 100%
+        );
+      /* Glow-based inset border */
+      box-shadow:
+        inset 0 0 0 1px color-mix(in oklch, var(--ic-color) 25%, var(--border)),
+        0 0 20px -4px color-mix(in oklch, var(--ic-color) 8%, transparent);
+      transition:
+        box-shadow var(--duration-4) var(--ease-standard),
+        background var(--duration-4) var(--ease-standard),
+        filter var(--duration-4) var(--ease-standard),
+        opacity var(--duration-4) var(--ease-standard);
+      overflow: hidden;
+    }
+
+    .ic-card:hover {
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in oklch, var(--ic-color) 24%, transparent) 0%,
+          color-mix(in oklch, var(--ic-color) 15%, var(--surface)) 40%,
+          color-mix(in oklch, var(--ic-color) 12%, var(--surface)) 100%
+        );
+      box-shadow:
+        inset 0 0 0 1px color-mix(in oklch, var(--ic-color) 40%, var(--border)),
+        0 0 28px -2px color-mix(in oklch, var(--ic-color) 14%, transparent),
+        0 0 6px 0px color-mix(in oklch, var(--ic-color) 10%, transparent);
+    }
+
+    /* ── Frozen showcase states: suppress live hover ──── */
+    .ic-card.is-frozen:hover {
+      background: unset;
+      box-shadow: unset;
+    }
+
+    /* Active state: green ring */
+    .ic-card.is-active {
+      box-shadow:
+        inset 0 0 0 3px #22c55e,
+        0 0 20px -4px color-mix(in oklch, var(--ic-color) 8%, transparent);
+    }
+    .ic-card.is-active.is-frozen:hover {
+      box-shadow:
+        inset 0 0 0 3px #22c55e,
+        0 0 20px -4px color-mix(in oklch, var(--ic-color) 8%, transparent);
+    }
+
+    /* Selected state: blue ring + blue atmosphere tint */
+    .ic-card.is-selected {
+      --ic-sel-blue: oklch(0.58 0.18 255);
+      box-shadow:
+        inset 0 0 0 3px #4a9eff,
+        0 0 24px -4px color-mix(in oklch, #4a9eff 12%, transparent);
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in oklch, #4a9eff 14%, transparent) 0%,
+          color-mix(in oklch, var(--ic-color) 8%, color-mix(in oklch, #4a9eff 6%, var(--surface))) 40%,
+          color-mix(in oklch, var(--ic-color) 6%, color-mix(in oklch, #4a9eff 4%, var(--surface))) 100%
+        );
+    }
+    .ic-card.is-selected.is-frozen:hover {
+      box-shadow:
+        inset 0 0 0 3px #4a9eff,
+        0 0 24px -4px color-mix(in oklch, #4a9eff 12%, transparent);
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in oklch, #4a9eff 14%, transparent) 0%,
+          color-mix(in oklch, var(--ic-color) 8%, color-mix(in oklch, #4a9eff 6%, var(--surface))) 40%,
+          color-mix(in oklch, var(--ic-color) 6%, color-mix(in oklch, #4a9eff 4%, var(--surface))) 100%
+        );
+    }
+
+    /* Archived: grayscale + opacity */
+    .ic-card.is-archived {
+      filter: grayscale(0.8);
+      opacity: 0.7;
+    }
+    .ic-card.is-archived.is-frozen:hover {
+      filter: grayscale(0.8);
+      opacity: 0.7;
+    }
+
+    /* Executing: breathing atmospheric pulse */
+    .ic-card.is-executing {
+      animation: ic-breathe 2.8s ease-in-out infinite;
+    }
+    @keyframes ic-breathe {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 0 1px color-mix(in oklch, var(--ic-color) 25%, var(--border)),
+          0 0 20px -4px color-mix(in oklch, var(--ic-color) 8%, transparent);
+        background:
+          linear-gradient(
+            180deg,
+            color-mix(in oklch, var(--ic-color) 18%, transparent) 0%,
+            color-mix(in oklch, var(--ic-color) 10%, var(--surface)) 40%,
+            color-mix(in oklch, var(--ic-color) 8%, var(--surface)) 100%
+          );
+      }
+      50% {
+        box-shadow:
+          inset 0 0 0 1px color-mix(in oklch, var(--ic-color) 45%, var(--border)),
+          0 0 32px -2px color-mix(in oklch, var(--ic-color) 18%, transparent),
+          0 0 8px 0px color-mix(in oklch, var(--ic-color) 12%, transparent);
+        background:
+          linear-gradient(
+            180deg,
+            color-mix(in oklch, var(--ic-color) 28%, transparent) 0%,
+            color-mix(in oklch, var(--ic-color) 18%, var(--surface)) 40%,
+            color-mix(in oklch, var(--ic-color) 14%, var(--surface)) 100%
+          );
+      }
+    }
+
+    /* Hover showcase (frozen) */
+    .ic-card.is-hover-showcase {
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in oklch, var(--ic-color) 24%, transparent) 0%,
+          color-mix(in oklch, var(--ic-color) 15%, var(--surface)) 40%,
+          color-mix(in oklch, var(--ic-color) 12%, var(--surface)) 100%
+        );
+      box-shadow:
+        inset 0 0 0 1px color-mix(in oklch, var(--ic-color) 40%, var(--border)),
+        0 0 28px -2px color-mix(in oklch, var(--ic-color) 14%, transparent),
+        0 0 6px 0px color-mix(in oklch, var(--ic-color) 10%, transparent);
+    }
+    .ic-card.is-hover-showcase.is-frozen:hover {
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in oklch, var(--ic-color) 24%, transparent) 0%,
+          color-mix(in oklch, var(--ic-color) 15%, var(--surface)) 40%,
+          color-mix(in oklch, var(--ic-color) 12%, var(--surface)) 100%
+        );
+      box-shadow:
+        inset 0 0 0 1px color-mix(in oklch, var(--ic-color) 40%, var(--border)),
+        0 0 28px -2px color-mix(in oklch, var(--ic-color) 14%, transparent),
+        0 0 6px 0px color-mix(in oklch, var(--ic-color) 10%, transparent);
+    }
+
+    /* ── Ghost card (non-adopted) ────────────────────── */
+    .ic-card.is-ghost {
+      --ic-color: var(--foreground-subtle);
+      background: var(--surface);
+      box-shadow:
+        inset 0 0 0 1px var(--border);
+      border: 1px dashed var(--border);
+    }
+    .ic-card.is-ghost:hover {
+      box-shadow:
+        inset 0 0 0 1px var(--border-strong);
+      border-color: var(--border-strong);
+      background: color-mix(in oklch, var(--surface-hover) 50%, var(--surface));
+    }
+
+    /* Ghost with split gradient (two-label coloring) */
+    .ic-card.is-ghost-labeled {
+      --ic-color-l: oklch(0.66 0.12 230);
+      --ic-color-r: oklch(0.72 0.135 15);
+      background:
+        linear-gradient(
+          90deg,
+          color-mix(in oklch, var(--ic-color-l) 6%, var(--surface)) 0%,
+          var(--surface) 50%,
+          color-mix(in oklch, var(--ic-color-r) 6%, var(--surface)) 100%
+        );
+      box-shadow:
+        inset 0 0 0 1px var(--border);
+      border: 1px dashed var(--border);
+    }
+    .ic-card.is-ghost-labeled:hover {
+      background:
+        linear-gradient(
+          90deg,
+          color-mix(in oklch, var(--ic-color-l) 10%, var(--surface)) 0%,
+          var(--surface) 50%,
+          color-mix(in oklch, var(--ic-color-r) 10%, var(--surface)) 100%
+        );
+      box-shadow:
+        inset 0 0 0 1px var(--border-strong);
+      border-color: var(--border-strong);
+    }
+
+    /* ── Header zone ─────────────────────────────────── */
+    .ic-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-6) var(--space-8) var(--space-3);
+      /* Semi-transparent scrim for text readability */
+      background: linear-gradient(
+        180deg,
+        color-mix(in oklch, var(--background) 45%, transparent) 0%,
+        transparent 100%
+      );
+      min-height: 40px;
+    }
+
+    .ic-header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+      flex: 1;
+    }
+
+    .ic-prd-ref {
+      font-family: var(--font-mono);
+      font-size: var(--text-2xs);
+      color: var(--foreground-subtle);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ic-issue-num {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--foreground);
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    .ic-issue-num:hover {
+      text-decoration: underline;
+    }
+
+    .ic-title {
+      font-size: var(--text-md);
+      font-weight: var(--weight-medium);
+      color: var(--foreground);
+      letter-spacing: var(--tracking-snug);
+      line-height: var(--leading-snug);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .ic-title:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--foreground-subtle);
+      text-underline-offset: 2px;
+    }
+
+    .ic-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    /* ── Chips & badges in header ────────────────────── */
+    .ic-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+      padding: 0 6px;
+      font-size: var(--text-2xs);
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      font-family: var(--font-sans);
+    }
+
+    .ic-chip-children {
+      background: color-mix(in oklch, var(--foreground) 8%, transparent);
+      color: var(--foreground-muted);
+      border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+    }
+
+    .ic-chip-session {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      font-weight: var(--weight-semibold);
+    }
+    .ic-chip-session.executing {
+      background: color-mix(in oklch, var(--session-running) 18%, transparent);
+      color: var(--session-running);
+      border: 1px solid color-mix(in oklch, var(--session-running) 30%, transparent);
+    }
+    .ic-chip-session.hitl {
+      background: color-mix(in oklch, var(--session-needs-input) 18%, transparent);
+      color: var(--session-needs-input);
+      border: 1px solid color-mix(in oklch, var(--session-needs-input) 30%, transparent);
+    }
+    .ic-chip-session.review {
+      background: color-mix(in oklch, var(--session-needs-review) 18%, transparent);
+      color: var(--session-needs-review);
+      border: 1px solid color-mix(in oklch, var(--session-needs-review) 30%, transparent);
+    }
+    .ic-chip-session.error {
+      background: color-mix(in oklch, var(--session-errored) 18%, transparent);
+      color: var(--session-errored);
+      border: 1px solid color-mix(in oklch, var(--session-errored) 30%, transparent);
+    }
+    .ic-chip-session.paused {
+      background: color-mix(in oklch, var(--session-paused) 18%, transparent);
+      color: var(--session-paused);
+      border: 1px solid color-mix(in oklch, var(--session-paused) 20%, transparent);
+    }
+    .ic-chip-session.done {
+      background: color-mix(in oklch, var(--session-finished) 18%, transparent);
+      color: var(--foreground-muted);
+      border: 1px solid color-mix(in oklch, var(--session-finished) 20%, transparent);
+    }
+
+    .ic-priority {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-xs);
+      font-size: 10px;
+      font-weight: var(--weight-bold);
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: transform var(--duration-2) var(--ease-standard);
+    }
+    .ic-priority:hover {
+      transform: scale(1.15);
+    }
+    .ic-priority.top {
+      background: color-mix(in oklch, var(--priority-top) 20%, transparent);
+      color: var(--priority-top);
+      border: 1px solid color-mix(in oklch, var(--priority-top) 35%, transparent);
+    }
+    .ic-priority.high {
+      background: color-mix(in oklch, var(--priority-high) 18%, transparent);
+      color: var(--priority-high);
+      border: 1px solid color-mix(in oklch, var(--priority-high) 30%, transparent);
+    }
+    .ic-priority.medium {
+      background: color-mix(in oklch, var(--priority-medium) 16%, transparent);
+      color: color-mix(in oklch, var(--priority-medium) 80%, var(--foreground));
+      border: 1px solid color-mix(in oklch, var(--priority-medium) 25%, transparent);
+    }
+    .ic-priority.low {
+      background: color-mix(in oklch, var(--priority-low) 14%, transparent);
+      color: var(--priority-low);
+      border: 1px solid color-mix(in oklch, var(--priority-low) 22%, transparent);
+    }
+
+    /* ── Quick action icons (header) ─────────────────── */
+    .ic-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .ic-qbtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: color-mix(in oklch, var(--foreground) 6%, transparent);
+      color: var(--foreground-muted);
+      cursor: pointer;
+      transition:
+        background var(--duration-2) var(--ease-standard),
+        color var(--duration-2) var(--ease-standard);
+    }
+    .ic-qbtn:hover {
+      background: color-mix(in oklch, var(--foreground) 12%, transparent);
+      color: var(--foreground);
+    }
+    .ic-qbtn:active {
+      transform: scale(0.92);
+    }
+    .ic-qbtn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .ic-qbtn:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 1px;
+    }
+
+    /* ── Body: two-column ────────────────────────────── */
+    .ic-body {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: var(--space-6);
+      padding: var(--space-3) var(--space-8) var(--space-6);
+      align-items: start;
+    }
+
+    /* Tree thumbnail */
+    .ic-thumb {
+      width: 100px;
+      height: 80px;
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(
+          160deg,
+          color-mix(in oklch, var(--ic-color) 22%, var(--surface-2)) 0%,
+          color-mix(in oklch, var(--ic-color) 10%, var(--surface-2)) 100%
+        );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: color-mix(in oklch, var(--ic-color) 60%, var(--foreground-muted));
+      overflow: hidden;
+      border: 1px solid color-mix(in oklch, var(--ic-color) 15%, var(--border));
+    }
+
+    .ic-thumb-placeholder {
+      width: 100px;
+      height: 80px;
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--foreground-subtle);
+      font-size: var(--text-2xs);
+    }
+
+    /* Right column */
+    .ic-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    /* Row 1: worktree + branch */
+    .ic-worktree-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .ic-path {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--foreground-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    .ic-path svg {
+      flex-shrink: 0;
+      color: var(--foreground-subtle);
+    }
+
+    .ic-branch {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--foreground);
+      font-weight: var(--weight-medium);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ic-branch svg {
+      flex-shrink: 0;
+      color: color-mix(in oklch, var(--ic-color) 70%, var(--foreground-muted));
+    }
+
+    .ic-inline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 18px;
+      padding: 0 5px;
+      font-size: 10px;
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .ic-inline-badge.synced {
+      background: color-mix(in oklch, var(--status-success) 12%, transparent);
+      color: var(--status-success);
+      border: 1px solid color-mix(in oklch, var(--status-success) 22%, transparent);
+    }
+    .ic-inline-badge.conflict {
+      background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+      color: var(--status-danger);
+      border: 1px solid color-mix(in oklch, var(--status-danger) 22%, transparent);
+    }
+    .ic-inline-badge.stale {
+      background: color-mix(in oklch, var(--status-warning) 12%, transparent);
+      color: color-mix(in oklch, var(--status-warning) 75%, var(--foreground));
+      border: 1px solid color-mix(in oklch, var(--status-warning) 22%, transparent);
+    }
+
+    .ic-no-worktree {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--foreground-subtle);
+      font-style: italic;
+    }
+
+    /* Row 2: GitHub badges */
+    .ic-gh-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: 20px;
+      flex-wrap: wrap;
+    }
+
+    .ic-gh-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 20px;
+      padding: 0 7px;
+      font-size: var(--text-2xs);
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      font-family: var(--font-sans);
+    }
+    .ic-gh-badge .gh-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ic-gh-badge.pr-open {
+      background: color-mix(in oklch, var(--gh-open) 14%, transparent);
+      color: var(--gh-open);
+      border: 1px solid color-mix(in oklch, var(--gh-open) 25%, transparent);
+    }
+    .ic-gh-badge.pr-open .gh-dot { background: var(--gh-open); }
+    .ic-gh-badge.pr-draft {
+      background: color-mix(in oklch, var(--gh-draft) 14%, transparent);
+      color: var(--foreground-muted);
+      border: 1px solid color-mix(in oklch, var(--gh-draft) 20%, transparent);
+    }
+    .ic-gh-badge.pr-draft .gh-dot { background: var(--gh-draft); }
+    .ic-gh-badge.pr-merged {
+      background: color-mix(in oklch, var(--gh-merged) 14%, transparent);
+      color: var(--gh-merged);
+      border: 1px solid color-mix(in oklch, var(--gh-merged) 25%, transparent);
+    }
+    .ic-gh-badge.pr-merged .gh-dot { background: var(--gh-merged); }
+    .ic-gh-badge.issue-open {
+      background: color-mix(in oklch, var(--gh-open) 12%, transparent);
+      color: var(--gh-open);
+      border: 1px solid color-mix(in oklch, var(--gh-open) 22%, transparent);
+    }
+    .ic-gh-badge.issue-open .gh-dot { background: var(--gh-open); }
+    .ic-gh-badge.issue-closed {
+      background: color-mix(in oklch, var(--gh-closed) 12%, transparent);
+      color: var(--gh-closed);
+      border: 1px solid color-mix(in oklch, var(--gh-closed) 22%, transparent);
+    }
+    .ic-gh-badge.issue-closed .gh-dot { background: var(--gh-closed); }
+
+    /* Row 3: GitHub labels */
+    .ic-labels-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .ic-label-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      padding: 0 7px;
+      font-size: 10px;
+      font-weight: var(--weight-medium);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      border: 1px solid;
+    }
+
+    .ic-label-overflow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 18px;
+      padding: 0 5px;
+      font-size: 10px;
+      color: var(--foreground-subtle);
+      border-radius: var(--radius-full);
+      background: color-mix(in oklch, var(--foreground) 6%, transparent);
+      cursor: pointer;
+    }
+    .ic-label-overflow:hover {
+      background: color-mix(in oklch, var(--foreground) 10%, transparent);
+      color: var(--foreground-muted);
+    }
+
+    /* ── Action buttons (bottom-right) ───────────────── */
+    .ic-actions {
+      position: absolute;
+      bottom: var(--space-4);
+      right: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .ic-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 26px;
+      padding: 0 10px;
+      font-size: var(--text-sm);
+      font-weight: var(--weight-medium);
+      font-family: var(--font-sans);
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition:
+        background var(--duration-2) var(--ease-standard),
+        transform var(--duration-1) var(--ease-standard),
+        box-shadow var(--duration-2) var(--ease-standard);
+      white-space: nowrap;
+    }
+    .ic-action-btn:active {
+      transform: scale(0.95);
+    }
+    .ic-action-btn:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+    .ic-action-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .ic-action-btn.primary {
+      background: oklch(0.55 0.12 145);
+      color: oklch(0.97 0.01 130);
+      box-shadow: 0 1px 3px color-mix(in oklch, oklch(0.55 0.12 145) 30%, transparent);
+    }
+    .ic-action-btn.primary:hover {
+      background: oklch(0.60 0.12 145);
+    }
+
+    .ic-action-btn.ghost {
+      background: transparent;
+      color: var(--foreground-muted);
+      border: 1px solid var(--border);
+    }
+    .ic-action-btn.ghost:hover {
+      background: var(--surface-2);
+      color: var(--foreground);
+      border-color: var(--border-strong);
+    }
+
+    .ic-overflow-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      transition:
+        background var(--duration-2) var(--ease-standard),
+        color var(--duration-2) var(--ease-standard);
+    }
+    .ic-overflow-btn:hover {
+      background: var(--surface-2);
+      color: var(--foreground);
+      border-color: var(--border-strong);
+    }
+    .ic-overflow-btn:active {
+      transform: scale(0.94);
+    }
+    .ic-overflow-btn:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+    .ic-overflow-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ── Adopt split button for ghost cards ──────────── */
+    .ic-adopt-split {
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .ic-adopt-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 26px;
+      padding: 0 10px;
+      font-size: var(--text-sm);
+      font-weight: var(--weight-medium);
+      font-family: var(--font-sans);
+      background: oklch(0.55 0.12 145);
+      color: oklch(0.97 0.01 130);
+      border: none;
+      cursor: pointer;
+      transition: background var(--duration-2) var(--ease-standard);
+      white-space: nowrap;
+    }
+    .ic-adopt-main:hover {
+      background: oklch(0.60 0.12 145);
+    }
+    .ic-adopt-main:active {
+      transform: scale(0.96);
+    }
+    .ic-adopt-main:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+    .ic-adopt-main:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .ic-adopt-drop {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: oklch(0.50 0.10 145);
+      color: oklch(0.97 0.01 130);
+      border: none;
+      border-left: 1px solid oklch(0.45 0.08 145);
+      cursor: pointer;
+      transition: background var(--duration-2) var(--ease-standard);
+    }
+    .ic-adopt-drop:hover {
+      background: oklch(0.55 0.10 145);
+    }
+    .ic-adopt-drop:active {
+      transform: scale(0.94);
+    }
+    .ic-adopt-drop:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+    .ic-adopt-drop:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ── State label overlays for showcase ────────────── */
+    .ic-state-label {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+      background: color-mix(in oklch, var(--background) 80%, transparent);
+      color: var(--foreground-subtle);
+      z-index: 2;
+    }
+
+    /* ── Accordion section ───────────────────────────── */
+    .ic-accordion {
+      margin: var(--space-16) var(--space-12) var(--space-12);
+    }
+
+    .ic-accordion-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--space-8);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ic-accordion-title {
+      font-size: var(--text-base);
+      font-weight: var(--weight-semibold);
+      color: var(--foreground);
+      letter-spacing: var(--tracking-snug);
+      line-height: var(--leading-snug);
+    }
+
+    .ic-accordion-count {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--foreground-subtle);
+    }
+
+    .ic-accordion-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-left: auto;
+    }
+
+    .ic-accordion-chevron {
+      color: var(--foreground-subtle);
+      transition: transform var(--duration-3) var(--ease-standard);
+    }
+    .ic-accordion-header:hover .ic-accordion-chevron {
+      color: var(--foreground-muted);
+    }
+
+    /* ── Tree SVG illustration ───────────────────────── */
+    .ic-tree-illus {
+      width: 48px;
+      height: 58px;
+    }
+
+    /* ── Page layout ─────────────────────────────────── */
+    .page-header {
+      padding: var(--space-12) var(--space-12) var(--space-4);
+    }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 960px) {
+      .ic-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-8);
+      }
+      .ic-accordion {
+        margin: var(--space-8);
+      }
+      .page-header {
+        padding: var(--space-8) var(--space-8) var(--space-4);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gk-root theme-dark">
+
+    <!-- Variant label -->
+    <div class="page-header">
+      <div class="gk-eyebrow" style="margin-bottom: var(--space-4);">VARIANT E: ATMOSPHERIC HAZE</div>
+      <h1 class="gk-h1" style="margin: 0 0 var(--space-2);">Issue Cards</h1>
+      <p class="gk-small" style="margin: 0;">Full-card atmospheric color wash with soft halo glow. No header/body separation.</p>
+    </div>
+
+    <!-- ═══ Adopted Grid ═══ -->
+    <div class="ic-grid">
+
+      <!-- ── Card 1: Moss / Default state ── -->
+      <article class="ic-card" style="--ic-color: oklch(0.69 0.098 132);">
+        <div class="ic-header">
+          <div class="ic-header-left">
+            <span class="ic-prd-ref">PRD#87 /</span>
+            <a href="#" class="ic-issue-num">#142</a>
+            <span class="ic-title">Implement session metrics aggregation pipeline</span>
+          </div>
+          <div class="ic-header-right">
+            <span class="ic-chip ic-chip-children">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              4
+            </span>
+            <span class="ic-chip ic-chip-session executing">Executing</span>
+            <span class="ic-priority high" title="High priority">H</span>
+            <div class="ic-quick-actions">
+              <button class="ic-qbtn" title="Open Folder" aria-label="Open Folder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Terminal" aria-label="Open Terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Editor" aria-label="Open Editor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Mute Notifications" aria-label="Mute Notifications">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-thumb">
+            <svg class="ic-tree-illus" viewBox="0 0 48 58" fill="none">
+              <rect x="21" y="38" width="6" height="16" rx="1" fill="oklch(0.5 0.075 55)"/>
+              <path d="M24 4L8 24h10v8H6l18 12 18-12H30v-8h10L24 4z" fill="oklch(0.55 0.12 145)" opacity="0.7"/>
+              <path d="M24 8L12 22h8v6h-8l12 10 12-10h-8v-6h8L24 8z" fill="oklch(0.62 0.14 140)" opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="ic-info">
+            <div class="ic-worktree-row">
+              <span class="ic-path">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 15h5v6h6v-6h5z"/></svg>
+                worktree/
+              </span>
+              <span class="ic-branch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                feature/session-metrics
+              </span>
+              <span class="ic-inline-badge synced">synced</span>
+            </div>
+            <div class="ic-gh-row">
+              <span class="ic-gh-badge pr-open"><span class="gh-dot"></span>PR #298 open</span>
+              <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+            </div>
+            <div class="ic-labels-row">
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.69 0.098 132) 14%, transparent); color: oklch(0.69 0.098 132); border-color: color-mix(in oklch, oklch(0.69 0.098 132) 28%, transparent);">enhancement</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.66 0.12 230) 14%, transparent); color: oklch(0.66 0.12 230); border-color: color-mix(in oklch, oklch(0.66 0.12 230) 28%, transparent);">backend</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.77 0.15 65) 14%, transparent); color: oklch(0.77 0.15 65); border-color: color-mix(in oklch, oklch(0.77 0.15 65) 28%, transparent);">priority</span>
+              <span class="ic-label-overflow" title="2 more labels">+2</span>
+            </div>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="ic-action-btn primary">Review PR</button>
+          <button class="ic-overflow-btn" aria-label="More actions">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- ── Card 2: Amber / Hover state (frozen showcase) ── -->
+      <article class="ic-card is-hover-showcase is-frozen" style="--ic-color: oklch(0.77 0.15 65);">
+        <span class="ic-state-label">hover</span>
+        <div class="ic-header">
+          <div class="ic-header-left">
+            <span class="ic-prd-ref">PRD#90 /</span>
+            <a href="#" class="ic-issue-num">#158</a>
+            <span class="ic-title">Add provider adapter for Claude session spawning</span>
+          </div>
+          <div class="ic-header-right">
+            <span class="ic-chip ic-chip-children">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              2
+            </span>
+            <span class="ic-chip ic-chip-session hitl">HITL</span>
+            <span class="ic-priority top" title="Top priority">!</span>
+            <div class="ic-quick-actions">
+              <button class="ic-qbtn" title="Open Folder" aria-label="Open Folder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Terminal" aria-label="Open Terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Editor" aria-label="Open Editor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Mute Notifications" aria-label="Mute Notifications">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-thumb">
+            <svg class="ic-tree-illus" viewBox="0 0 48 58" fill="none">
+              <rect x="21" y="40" width="6" height="14" rx="1" fill="oklch(0.5 0.075 55)"/>
+              <ellipse cx="24" cy="22" rx="16" ry="20" fill="oklch(0.62 0.14 75)" opacity="0.6"/>
+              <ellipse cx="24" cy="20" rx="12" ry="16" fill="oklch(0.68 0.15 70)" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="ic-info">
+            <div class="ic-worktree-row">
+              <span class="ic-path">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 15h5v6h6v-6h5z"/></svg>
+                worktree/
+              </span>
+              <span class="ic-branch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                feature/claude-adapter
+              </span>
+              <span class="ic-inline-badge stale">2 behind</span>
+            </div>
+            <div class="ic-gh-row">
+              <span class="ic-gh-badge pr-draft"><span class="gh-dot"></span>PR #305 draft</span>
+              <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+            </div>
+            <div class="ic-labels-row">
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.77 0.15 65) 14%, transparent); color: oklch(0.77 0.15 65); border-color: color-mix(in oklch, oklch(0.77 0.15 65) 28%, transparent);">feature</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.64 0.13 320) 14%, transparent); color: oklch(0.64 0.13 320); border-color: color-mix(in oklch, oklch(0.64 0.13 320) 28%, transparent);">session</span>
+            </div>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="ic-action-btn primary">Respond</button>
+          <button class="ic-overflow-btn" aria-label="More actions">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- ── Card 3: Azure / Active state (green ring) ── -->
+      <article class="ic-card is-active is-frozen" style="--ic-color: oklch(0.66 0.12 230);">
+        <span class="ic-state-label">active</span>
+        <div class="ic-header">
+          <div class="ic-header-left">
+            <span class="ic-prd-ref">PRD#87 /</span>
+            <a href="#" class="ic-issue-num">#176</a>
+            <span class="ic-title">Refactor workspace sync to use event-driven updates</span>
+          </div>
+          <div class="ic-header-right">
+            <span class="ic-chip ic-chip-session review">Review</span>
+            <span class="ic-priority medium" title="Medium priority">M</span>
+            <div class="ic-quick-actions">
+              <button class="ic-qbtn" title="Open Folder" aria-label="Open Folder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Terminal" aria-label="Open Terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Editor" aria-label="Open Editor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Mute Notifications" aria-label="Mute Notifications">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-thumb">
+            <svg class="ic-tree-illus" viewBox="0 0 48 58" fill="none">
+              <rect x="22" y="36" width="5" height="18" rx="1" fill="oklch(0.5 0.075 55)"/>
+              <polygon points="24,2 6,28 16,28 12,40 36,40 32,28 42,28" fill="oklch(0.52 0.12 235)" opacity="0.7"/>
+              <polygon points="24,8 12,26 18,26 15,36 33,36 30,26 36,26" fill="oklch(0.58 0.13 230)" opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="ic-info">
+            <div class="ic-worktree-row">
+              <span class="ic-path">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 15h5v6h6v-6h5z"/></svg>
+                worktree/
+              </span>
+              <span class="ic-branch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                refactor/event-sync
+              </span>
+              <span class="ic-inline-badge synced">synced</span>
+            </div>
+            <div class="ic-gh-row">
+              <span class="ic-gh-badge pr-open"><span class="gh-dot"></span>PR #312 open</span>
+              <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+            </div>
+            <div class="ic-labels-row">
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.66 0.12 230) 14%, transparent); color: oklch(0.66 0.12 230); border-color: color-mix(in oklch, oklch(0.66 0.12 230) 28%, transparent);">refactor</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.69 0.098 132) 14%, transparent); color: oklch(0.69 0.098 132); border-color: color-mix(in oklch, oklch(0.69 0.098 132) 28%, transparent);">core</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.72 0.135 15) 14%, transparent); color: oklch(0.72 0.135 15); border-color: color-mix(in oklch, oklch(0.72 0.135 15) 28%, transparent);">breaking</span>
+            </div>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="ic-action-btn primary">Approve</button>
+          <button class="ic-action-btn ghost">Diff</button>
+          <button class="ic-overflow-btn" aria-label="More actions">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- ── Card 4: Plum / Selected state (blue ring) ── -->
+      <article class="ic-card is-selected is-frozen" style="--ic-color: oklch(0.64 0.13 320);">
+        <span class="ic-state-label">selected</span>
+        <div class="ic-header">
+          <div class="ic-header-left">
+            <a href="#" class="ic-issue-num">#189</a>
+            <span class="ic-title">Build character emotion expression system</span>
+          </div>
+          <div class="ic-header-right">
+            <span class="ic-chip ic-chip-children">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              6
+            </span>
+            <span class="ic-chip ic-chip-session paused">Paused</span>
+            <span class="ic-priority low" title="Low priority">L</span>
+            <div class="ic-quick-actions">
+              <button class="ic-qbtn" title="Open Folder" aria-label="Open Folder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Terminal" aria-label="Open Terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Editor" aria-label="Open Editor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Mute Notifications" aria-label="Mute Notifications">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-thumb">
+            <svg class="ic-tree-illus" viewBox="0 0 48 58" fill="none">
+              <rect x="21" y="38" width="6" height="16" rx="1" fill="oklch(0.5 0.075 55)"/>
+              <circle cx="24" cy="22" r="18" fill="oklch(0.52 0.12 320)" opacity="0.5"/>
+              <circle cx="24" cy="20" r="13" fill="oklch(0.58 0.14 318)" opacity="0.65"/>
+              <circle cx="24" cy="18" r="8" fill="oklch(0.62 0.15 315)" opacity="0.75"/>
+            </svg>
+          </div>
+          <div class="ic-info">
+            <div class="ic-worktree-row">
+              <span class="ic-path">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 15h5v6h6v-6h5z"/></svg>
+                worktree/
+              </span>
+              <span class="ic-branch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                feature/character-emotions
+              </span>
+            </div>
+            <div class="ic-gh-row">
+              <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+            </div>
+            <div class="ic-labels-row">
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.64 0.13 320) 14%, transparent); color: oklch(0.64 0.13 320); border-color: color-mix(in oklch, oklch(0.64 0.13 320) 28%, transparent);">character</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.77 0.15 65) 14%, transparent); color: oklch(0.77 0.15 65); border-color: color-mix(in oklch, oklch(0.77 0.15 65) 28%, transparent);">animation</span>
+            </div>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="ic-action-btn primary">Resume</button>
+          <button class="ic-overflow-btn" aria-label="More actions">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- ── Card 5: Rose / Executing (breathing) state ── -->
+      <article class="ic-card is-executing" style="--ic-color: oklch(0.72 0.135 15);">
+        <span class="ic-state-label">executing</span>
+        <div class="ic-header">
+          <div class="ic-header-left">
+            <span class="ic-prd-ref">PRD#95 /</span>
+            <a href="#" class="ic-issue-num">#201</a>
+            <span class="ic-title">Wire notification sound engine to session events</span>
+          </div>
+          <div class="ic-header-right">
+            <span class="ic-chip ic-chip-session executing">Executing</span>
+            <span class="ic-priority high" title="High priority">H</span>
+            <div class="ic-quick-actions">
+              <button class="ic-qbtn" title="Open Folder" aria-label="Open Folder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Terminal" aria-label="Open Terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Open Editor" aria-label="Open Editor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </button>
+              <button class="ic-qbtn" title="Mute Notifications" aria-label="Mute Notifications">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-thumb">
+            <svg class="ic-tree-illus" viewBox="0 0 48 58" fill="none">
+              <rect x="22" y="40" width="5" height="14" rx="1" fill="oklch(0.5 0.075 55)"/>
+              <path d="M24 6C16 6 10 18 10 28c0 6 6 12 14 12s14-6 14-12c0-10-6-22-14-22z" fill="oklch(0.58 0.13 15)" opacity="0.6"/>
+              <path d="M24 12C18 12 14 20 14 28c0 4 4 8 10 8s10-4 10-8c0-8-4-16-10-16z" fill="oklch(0.65 0.14 18)" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="ic-info">
+            <div class="ic-worktree-row">
+              <span class="ic-path">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 15h5v6h6v-6h5z"/></svg>
+                worktree/
+              </span>
+              <span class="ic-branch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                feature/sound-engine-events
+              </span>
+            </div>
+            <div class="ic-gh-row">
+              <span class="ic-gh-badge pr-open"><span class="gh-dot"></span>PR #319 open</span>
+              <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+            </div>
+            <div class="ic-labels-row">
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.72 0.135 15) 14%, transparent); color: oklch(0.72 0.135 15); border-color: color-mix(in oklch, oklch(0.72 0.135 15) 28%, transparent);">audio</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.69 0.098 132) 14%, transparent); color: oklch(0.69 0.098 132); border-color: color-mix(in oklch, oklch(0.69 0.098 132) 28%, transparent);">notifications</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.7 0.095 195) 14%, transparent); color: oklch(0.7 0.095 195); border-color: color-mix(in oklch, oklch(0.7 0.095 195) 28%, transparent);">events</span>
+            </div>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="ic-action-btn primary">Watch</button>
+          <button class="ic-overflow-btn" aria-label="More actions">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- ── Card 6: Teal / Archived state ── -->
+      <article class="ic-card is-archived is-frozen" style="--ic-color: oklch(0.7 0.095 195);">
+        <span class="ic-state-label">archived</span>
+        <div class="ic-header">
+          <div class="ic-header-left">
+            <span class="ic-prd-ref">PRD#87 /</span>
+            <a href="#" class="ic-issue-num">#112</a>
+            <span class="ic-title">Migrate sidebar navigation to command palette integration</span>
+          </div>
+          <div class="ic-header-right">
+            <span class="ic-chip ic-chip-session done">Done</span>
+            <span class="ic-priority medium" title="Medium priority">M</span>
+            <div class="ic-quick-actions">
+              <button class="ic-qbtn" disabled title="Open Folder" aria-label="Open Folder">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </button>
+              <button class="ic-qbtn" disabled title="Open Terminal" aria-label="Open Terminal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </button>
+              <button class="ic-qbtn" disabled title="Open Editor" aria-label="Open Editor">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </button>
+              <button class="ic-qbtn" disabled title="Mute Notifications" aria-label="Mute Notifications">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="ic-body">
+          <div class="ic-thumb">
+            <svg class="ic-tree-illus" viewBox="0 0 48 58" fill="none">
+              <rect x="21" y="38" width="6" height="16" rx="1" fill="oklch(0.5 0.075 55)"/>
+              <path d="M24 4L10 22h8l-4 14h20l-4-14h8L24 4z" fill="oklch(0.56 0.09 195)" opacity="0.6"/>
+              <path d="M24 10L14 22h6l-3 10h14l-3-10h6L24 10z" fill="oklch(0.62 0.10 195)" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="ic-info">
+            <div class="ic-worktree-row">
+              <span class="ic-path">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L4 15h5v6h6v-6h5z"/></svg>
+                worktree/
+              </span>
+              <span class="ic-branch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                feature/sidebar-cmd-palette
+              </span>
+              <span class="ic-inline-badge synced">synced</span>
+            </div>
+            <div class="ic-gh-row">
+              <span class="ic-gh-badge pr-merged"><span class="gh-dot"></span>PR #278 merged</span>
+              <span class="ic-gh-badge issue-closed"><span class="gh-dot"></span>Issue closed</span>
+            </div>
+            <div class="ic-labels-row">
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.7 0.095 195) 14%, transparent); color: oklch(0.7 0.095 195); border-color: color-mix(in oklch, oklch(0.7 0.095 195) 28%, transparent);">navigation</span>
+              <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.66 0.12 230) 14%, transparent); color: oklch(0.66 0.12 230); border-color: color-mix(in oklch, oklch(0.66 0.12 230) 28%, transparent);">ux</span>
+            </div>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="ic-action-btn ghost">Restore</button>
+          <button class="ic-overflow-btn" aria-label="More actions">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- ═══ Accordion: Assigned (Ghost Cards) ═══ -->
+    <section class="ic-accordion">
+      <div class="ic-accordion-header">
+        <svg class="ic-accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        <span class="ic-accordion-title">Assigned</span>
+        <span class="ic-accordion-count">3 issues</span>
+        <div class="ic-accordion-actions">
+          <button class="ic-qbtn" title="Sort" aria-label="Sort">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+          </button>
+          <button class="ic-qbtn" title="Filter" aria-label="Filter">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ic-grid" style="padding: 0;">
+
+        <!-- Ghost Card 1: plain, no labels -->
+        <article class="ic-card is-ghost">
+          <div class="ic-header">
+            <div class="ic-header-left">
+              <a href="#" class="ic-issue-num">#215</a>
+              <span class="ic-title">Add keyboard shortcut overlay for onboarding</span>
+            </div>
+            <div class="ic-header-right">
+              <span class="ic-priority low" title="Low priority">L</span>
+            </div>
+          </div>
+          <div class="ic-body">
+            <div class="ic-thumb-placeholder">
+              <span>no tree</span>
+            </div>
+            <div class="ic-info">
+              <div class="ic-worktree-row">
+                <span class="ic-no-worktree">no worktree</span>
+              </div>
+              <div class="ic-gh-row">
+                <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+              </div>
+              <div class="ic-labels-row">
+                <span class="ic-label-pill" style="background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent); color: var(--foreground-subtle); border-color: color-mix(in oklch, var(--foreground-subtle) 18%, transparent);">onboarding</span>
+              </div>
+            </div>
+          </div>
+          <div class="ic-actions">
+            <div class="ic-adopt-split">
+              <button class="ic-adopt-main">Adopt with Worktree</button>
+              <button class="ic-adopt-drop" aria-label="More adopt options">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Ghost Card 2: split gradient from two labels -->
+        <article class="ic-card is-ghost is-ghost-labeled" style="--ic-color-l: oklch(0.66 0.12 230); --ic-color-r: oklch(0.72 0.135 15);">
+          <div class="ic-header">
+            <div class="ic-header-left">
+              <span class="ic-prd-ref">PRD#96 /</span>
+              <a href="#" class="ic-issue-num">#223</a>
+              <span class="ic-title">Design settings sidebar for workspace preferences</span>
+            </div>
+            <div class="ic-header-right">
+              <span class="ic-priority medium" title="Medium priority">M</span>
+            </div>
+          </div>
+          <div class="ic-body">
+            <div class="ic-thumb-placeholder">
+              <span>no tree</span>
+            </div>
+            <div class="ic-info">
+              <div class="ic-worktree-row">
+                <span class="ic-no-worktree">no worktree</span>
+              </div>
+              <div class="ic-gh-row">
+                <span class="ic-gh-badge issue-open"><span class="gh-dot"></span>Issue open</span>
+              </div>
+              <div class="ic-labels-row">
+                <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.66 0.12 230) 14%, transparent); color: oklch(0.66 0.12 230); border-color: color-mix(in oklch, oklch(0.66 0.12 230) 28%, transparent);">design</span>
+                <span class="ic-label-pill" style="background: color-mix(in oklch, oklch(0.72 0.135 15) 14%, transparent); color: oklch(0.72 0.135 15); border-color: color-mix(in oklch, oklch(0.72 0.135 15) 28%, transparent);">settings</span>
+                <span class="ic-label-pill" style="background: color-mix(in oklch, var(--foreground-subtle) 10%, transparent); color: var(--foreground-subtle); border-color: color-mix(in oklch, var(--foreground-subtle) 18%, transparent);">docs</span>
+              </div>
+            </div>
+          </div>
+          <div class="ic-actions">
+            <div class="ic-adopt-split">
+              <button class="ic-adopt-main">Adopt with Worktree</button>
+              <button class="ic-adopt-drop" aria-label="More adopt options">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
