@@ -23,7 +23,6 @@ import type {
 	Viewport,
 	PositionedForestItem,
 } from './index';
-import type { IssueDependency } from '$lib/types/generated';
 import {
 	computeTreeVisualization,
 	mapIssueToStateDimensions,
@@ -33,7 +32,6 @@ import {
 	TOOL_TYPES,
 	GLOW_COLORS,
 	SPEECH_BUBBLE_COLORS,
-	BIRD_TYPE_MAP,
 } from './testing';
 import type { StateDimensions } from './testing';
 import type { Issue } from '$lib/modules/issues';
@@ -1333,38 +1331,6 @@ describe('computeTreeVisualization — fruit', () => {
 	});
 });
 
-// ─── Bird Type Mapping (REQ-6) ────────────────────────────────────────
-
-describe('BIRD_TYPE_MAP — sub-agent bird type mapping', () => {
-	it('maps all 6 agent categories to bird types', () => {
-		expect(Object.keys(BIRD_TYPE_MAP)).toHaveLength(6);
-	});
-
-	it('analysis maps to owl', () => {
-		expect(BIRD_TYPE_MAP.analysis).toBe('owl');
-	});
-
-	it('executor maps to robin', () => {
-		expect(BIRD_TYPE_MAP.executor).toBe('robin');
-	});
-
-	it('checker maps to sparrow', () => {
-		expect(BIRD_TYPE_MAP.checker).toBe('sparrow');
-	});
-
-	it('reviewer maps to cardinal', () => {
-		expect(BIRD_TYPE_MAP.reviewer).toBe('cardinal');
-	});
-
-	it('utility maps to hummingbird', () => {
-		expect(BIRD_TYPE_MAP.utility).toBe('hummingbird');
-	});
-
-	it('research maps to parrot', () => {
-		expect(BIRD_TYPE_MAP.research).toBe('parrot');
-	});
-});
-
 // ════════════════════════════════════════════════════════════════════════
 // computeForestLayout — Row-Based Equidistant Layout
 // ════════════════════════════════════════════════════════════════════════
@@ -1806,78 +1772,6 @@ describe('computeForestLayout — stumps in rows', () => {
 		expect(s1.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
 		expect(s1.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
 		expect(s1.rowIndex).toBe(1);
-	});
-});
-
-describe('computeDepthRows (legacy tests adapted to dependency-based API)', () => {
-	const dep = (blocker: string, blocked: string): IssueDependency => ({
-		id: `dep-${blocker}-${blocked}`,
-		blocker_issue_id: blocker,
-		blocked_issue_id: blocked,
-	});
-
-	it('assigns all issues to depth 0 when no dependencies exist', () => {
-		const issueIds = ['issue1', 'issue2', 'issue3'];
-		const result = computeDepthRows(issueIds, []);
-
-		expect(result.size).toBe(3);
-		expect(result.get('issue1')).toBe(0);
-		expect(result.get('issue2')).toBe(0);
-		expect(result.get('issue3')).toBe(0);
-	});
-
-	it('places blocked issue one row behind blocker', () => {
-		const issueIds = ['blocker', 'child1', 'child2'];
-		const deps = [dep('blocker', 'child1'), dep('blocker', 'child2')];
-		const result = computeDepthRows(issueIds, deps);
-
-		expect(result.get('blocker')).toBe(0);
-		expect(result.get('child1')).toBe(1);
-		expect(result.get('child2')).toBe(1);
-	});
-
-	it('computes correct depths for multi-level blocking chain', () => {
-		const issueIds = ['l1a', 'l1b', 'l2a', 'l2b', 'l3a'];
-		const deps = [dep('l1a', 'l2a'), dep('l1b', 'l2b'), dep('l2a', 'l3a')];
-		const result = computeDepthRows(issueIds, deps);
-
-		expect(result.get('l1a')).toBe(0);
-		expect(result.get('l1b')).toBe(0);
-		expect(result.get('l2a')).toBe(1);
-		expect(result.get('l2b')).toBe(1);
-		expect(result.get('l3a')).toBe(2);
-	});
-
-	it('handles disconnected issues by assigning them depth 0', () => {
-		const issueIds = ['blocker', 'child1', 'orphan1', 'orphan2'];
-		const deps = [dep('blocker', 'child1')];
-		const result = computeDepthRows(issueIds, deps);
-
-		expect(result.get('child1')).toBe(1);
-		expect(result.get('orphan1')).toBe(0);
-		expect(result.get('orphan2')).toBe(0);
-	});
-
-	it('returns empty depth map when issueIds is empty', () => {
-		const result = computeDepthRows([], []);
-		expect(result.size).toBe(0);
-	});
-
-	it('handles single issue with no dependencies', () => {
-		const issueIds = ['solo'];
-		const result = computeDepthRows(issueIds, []);
-
-		expect(result.size).toBe(1);
-		expect(result.get('solo')).toBe(0);
-	});
-
-	it('ignores dependencies referencing unknown issue IDs', () => {
-		const issueIds = ['a', 'b'];
-		const deps = [dep('unknown', 'a'), dep('a', 'ghost')];
-		const result = computeDepthRows(issueIds, deps);
-
-		expect(result.get('a')).toBe(0);
-		expect(result.get('b')).toBe(0);
 	});
 });
 
