@@ -19,6 +19,7 @@ export const buttonVariants = tv({
 			danger: 'bg-transparent text-status-danger border-[color-mix(in_oklch,var(--status-danger)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--status-danger)_12%,transparent)]',
 			'contextual-primary': `bg-moss-700 text-white shadow-sm hover:bg-moss-600 dark:bg-moss-600 dark:hover:bg-moss-500 ${FILLED_BUTTON_KBD_CLASSES}`,
 			'primary-destructive': `bg-status-danger text-white shadow-sm hover:bg-[color-mix(in_oklch,var(--status-danger)_88%,white_12%)] dark:hover:bg-[color-mix(in_oklch,var(--status-danger)_88%,black_12%)] ${FILLED_BUTTON_KBD_CLASSES}`,
+			'issue-color': `bg-[var(--issue-btn-bg,var(--surface-2))] text-[var(--issue-btn-text,var(--foreground))] border-[var(--issue-btn-border,var(--border))] shadow-sm hover:brightness-110 ${FILLED_BUTTON_KBD_CLASSES}`,
 		},
 		size: {
 			sm: 'h-(--size-control-sm) px-2.25 text-(length:--text-sm) rounded-sm [&_[data-icon]]:size-3.5',

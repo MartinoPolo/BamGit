@@ -1,6 +1,13 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { BADGE_DOT_OPTIONS, BADGE_FORMATS, BADGE_SIZES, BADGE_TONES, Badge } from './index.js';
+	import {
+		BADGE_DOT_OPTIONS,
+		BADGE_FORMATS,
+		BADGE_SIZES,
+		BADGE_STYLES,
+		BADGE_TONES,
+		Badge,
+	} from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Badge',
@@ -18,6 +25,10 @@
 			size: {
 				control: 'select',
 				options: [...BADGE_SIZES],
+			},
+			badgeStyle: {
+				control: 'select',
+				options: [...BADGE_STYLES],
 			},
 			dot: {
 				control: 'select',
@@ -106,6 +117,23 @@
 			<Badge format="mono" {...args}>v2.1.0</Badge>
 			<Badge format="mono" {...args}>GET</Badge>
 			<Badge format="mono" {...args}>200</Badge>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Badge Styles (A/B/C)">
+	{#snippet template(args: BadgeProps)}
+		<div class="flex flex-col gap-4">
+			{#each BADGE_STYLES as style (style)}
+				<div class="flex flex-col gap-2">
+					<p class="text-sm font-medium text-foreground-muted">{style}</p>
+					<div class="flex flex-wrap gap-2">
+						{#each BADGE_TONES as tone (tone)}
+							<Badge {...args} {tone} badgeStyle={style}>{tone}</Badge>
+						{/each}
+					</div>
+				</div>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

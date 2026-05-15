@@ -5,6 +5,7 @@
 	let {
 		class: className,
 		tone = 'neutral',
+		badgeStyle = 'bordered-dark',
 		format = 'default',
 		size = 'default',
 		dot,
@@ -18,7 +19,7 @@
 <span
 	bind:this={ref}
 	data-slot="badge"
-	class={cn(badgeVariants({ tone, format, size }), className)}
+	class={cn(badgeVariants({ tone, badgeStyle, format, size }), className)}
 	{...restProps}
 >
 	{#if icon}
