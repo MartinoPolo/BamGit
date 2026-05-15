@@ -59,7 +59,6 @@ describe('CARD_STATE_CLASSES', () => {
 			'hovered',
 			'selectionHover',
 			'selected',
-			'dragging',
 			'loading',
 			'archived',
 			'error',
