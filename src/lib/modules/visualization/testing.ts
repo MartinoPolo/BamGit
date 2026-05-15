@@ -11,7 +11,6 @@ export {
 	TOOL_TYPES,
 	GLOW_COLORS,
 	SPEECH_BUBBLE_COLORS,
-	BIRD_TYPE_MAP,
 } from './constants.js';
 
 export { aggregateSessionState, mapIssueToStateDimensions } from './state_mapping.js';
