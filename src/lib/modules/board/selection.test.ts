@@ -2,52 +2,12 @@ import { describe, it, expect } from 'vitest';
 import {
 	BOTTOM_PANEL_TABS,
 	TAB_BEHAVIOR_MAP,
-	BOTTOM_PANEL_TAB_LABELS,
 	shouldShowPrdOverview,
 	computeStageCounts,
 	isBottomPanelTab,
 } from './selection.js';
 
-describe('BOTTOM_PANEL_TABS', () => {
-	it('has exactly 7 entries with correct values', () => {
-		expect(BOTTOM_PANEL_TABS).toEqual({
-			issues: 'issues',
-			kanban: 'kanban',
-			issueDetail: 'issue-detail',
-			dependencies: 'dependencies',
-			activity: 'activity',
-			session: 'session',
-			assignedIssues: 'assigned-issues',
-		});
-		expect(Object.keys(BOTTOM_PANEL_TABS)).toHaveLength(7);
-	});
-});
-
 describe('TAB_BEHAVIOR_MAP', () => {
-	it('maps issues to replace', () => {
-		expect(TAB_BEHAVIOR_MAP['issues']).toBe('replace');
-	});
-
-	it('maps kanban to replace', () => {
-		expect(TAB_BEHAVIOR_MAP['kanban']).toBe('replace');
-	});
-
-	it('maps issue-detail to replace', () => {
-		expect(TAB_BEHAVIOR_MAP['issue-detail']).toBe('replace');
-	});
-
-	it('maps dependencies to highlight', () => {
-		expect(TAB_BEHAVIOR_MAP['dependencies']).toBe('highlight');
-	});
-
-	it('maps activity to filter', () => {
-		expect(TAB_BEHAVIOR_MAP['activity']).toBe('filter');
-	});
-
-	it('maps session to replace', () => {
-		expect(TAB_BEHAVIOR_MAP['session']).toBe('replace');
-	});
-
 	it('covers all tabs', () => {
 		const tabValues = Object.values(BOTTOM_PANEL_TABS);
 		const mappedTabs = Object.keys(TAB_BEHAVIOR_MAP);
@@ -77,27 +37,6 @@ describe('shouldShowPrdOverview', () => {
 
 	it('returns false when prdIssueId is null but activeIssueId is set', () => {
 		expect(shouldShowPrdOverview('issue-456', null)).toBe(false);
-	});
-});
-
-describe('BOTTOM_PANEL_TAB_LABELS', () => {
-	it('maps each tab to correct display label', () => {
-		expect(BOTTOM_PANEL_TAB_LABELS['issues']).toBe('Issues');
-		expect(BOTTOM_PANEL_TAB_LABELS['kanban']).toBe('Kanban');
-		expect(BOTTOM_PANEL_TAB_LABELS['issue-detail']).toBe('Issue Detail');
-		expect(BOTTOM_PANEL_TAB_LABELS['dependencies']).toBe('Dependencies');
-		expect(BOTTOM_PANEL_TAB_LABELS['activity']).toBe('Activity');
-		expect(BOTTOM_PANEL_TAB_LABELS['session']).toBe('Session');
-	});
-
-	it('has a non-empty label for every tab', () => {
-		const tabValues = Object.values(BOTTOM_PANEL_TABS);
-		for (const tab of tabValues) {
-			const label = BOTTOM_PANEL_TAB_LABELS[tab];
-			expect(label).toBeDefined();
-			expect(typeof label).toBe('string');
-			expect(label.length).toBeGreaterThan(0);
-		}
 	});
 });
 

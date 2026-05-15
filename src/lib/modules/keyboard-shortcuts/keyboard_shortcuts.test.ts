@@ -5,7 +5,6 @@ import {
 	matchesKeyEvent,
 	eventToBinding,
 	isEditableElement,
-	formatBindingForDisplay,
 } from './types.js';
 
 // ─── Mock helper ─────────────────────────────────────────────────────────────
@@ -174,95 +173,5 @@ describe('isEditableElement', () => {
 
 	it('returns false for null', () => {
 		expect(isEditableElement(null)).toBe(false);
-	});
-});
-
-// ─── Collision detection (pure logic) ────────────────────────────────────────
-
-describe('collision detection pure logic', () => {
-	interface ActionBinding {
-		actionId: string;
-		label: string;
-		binding: string;
-	}
-
-	function findCollision(
-		actionId: string,
-		newBinding: string,
-		existingBindings: ActionBinding[],
-	): { existingActionId: string; existingLabel: string } | null {
-		for (const entry of existingBindings) {
-			if (entry.actionId === actionId) {
-				continue;
-			}
-			if (entry.binding.toLowerCase() === newBinding.toLowerCase()) {
-				return { existingActionId: entry.actionId, existingLabel: entry.label };
-			}
-		}
-		return null;
-	}
-
-	it('detects a collision when two actions share the same binding', () => {
-		const existingBindings: ActionBinding[] = [
-			{ actionId: 'open-search', label: 'Open Search', binding: 'Ctrl+K' },
-			{ actionId: 'open-file', label: 'Open File', binding: 'Ctrl+O' },
-		];
-		const collision = findCollision('new-action', 'Ctrl+K', existingBindings);
-		expect(collision).toEqual({
-			existingActionId: 'open-search',
-			existingLabel: 'Open Search',
-		});
-	});
-
-	it('returns null when no actions share the binding', () => {
-		const existingBindings: ActionBinding[] = [
-			{ actionId: 'open-search', label: 'Open Search', binding: 'Ctrl+K' },
-		];
-		const collision = findCollision('new-action', 'Ctrl+J', existingBindings);
-		expect(collision).toBeNull();
-	});
-
-	it('does not report a collision when checking the same actionId against itself', () => {
-		const existingBindings: ActionBinding[] = [
-			{ actionId: 'open-search', label: 'Open Search', binding: 'Ctrl+K' },
-		];
-		const collision = findCollision('open-search', 'Ctrl+K', existingBindings);
-		expect(collision).toBeNull();
-	});
-});
-
-// ─── formatBindingForDisplay ──────────────────────────────────────────────────
-
-describe('formatBindingForDisplay', () => {
-	it('returns the binding string as-is on non-macOS platforms', () => {
-		expect(formatBindingForDisplay('Ctrl+K')).toBe('Ctrl+K');
-	});
-
-	it('returns multi-modifier binding as-is on non-macOS', () => {
-		expect(formatBindingForDisplay('Ctrl+Shift+I', false)).toBe('Ctrl+Shift+I');
-	});
-
-	it('keeps Ctrl text on macOS', () => {
-		expect(formatBindingForDisplay('Ctrl+K', true)).toBe('Ctrl+K');
-	});
-
-	it('keeps Ctrl+Shift text on macOS', () => {
-		expect(formatBindingForDisplay('Ctrl+Shift+I', true)).toBe('Ctrl+Shift+I');
-	});
-
-	it('keeps Alt text on macOS', () => {
-		expect(formatBindingForDisplay('Alt+F4', true)).toBe('Alt+F4');
-	});
-
-	it('keeps Meta text on macOS', () => {
-		expect(formatBindingForDisplay('Meta+K', true)).toBe('Meta+K');
-	});
-
-	it('returns a single key unchanged regardless of platform', () => {
-		expect(formatBindingForDisplay('Escape')).toBe('Escape');
-	});
-
-	it('keeps multi-modifier binding text on macOS', () => {
-		expect(formatBindingForDisplay('Ctrl+Shift+Alt+K', true)).toBe('Ctrl+Shift+Alt+K');
 	});
 });

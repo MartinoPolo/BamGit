@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { OVERLAY_DEFAULTS, type OverlayConfig } from 'low-poly-2d-trees';
-import { TREE_CONTEXT_MENU_ACTIONS, resolveGlowOverlay } from './index';
-import type { TreeContextMenuAction, ResolveGlowOverlayParams } from './index';
+import { resolveGlowOverlay } from './index';
+import type { ResolveGlowOverlayParams } from './index';
 
 // ════════════════════════════════════════════════════════════════════════
 // Test Data
@@ -33,30 +33,6 @@ function createParams(overrides: Partial<ResolveGlowOverlayParams> = {}): Resolv
 		...overrides,
 	};
 }
-
-// ════════════════════════════════════════════════════════════════════════
-// TREE_CONTEXT_MENU_ACTIONS
-// ════════════════════════════════════════════════════════════════════════
-
-describe('TREE_CONTEXT_MENU_ACTIONS', () => {
-	it('has exactly 6 entries', () => {
-		expect(Object.keys(TREE_CONTEXT_MENU_ACTIONS)).toHaveLength(6);
-	});
-
-	it('contains all expected keys', () => {
-		expect(TREE_CONTEXT_MENU_ACTIONS.openGithub).toBe('open-github');
-		expect(TREE_CONTEXT_MENU_ACTIONS.openWorktree).toBe('open-worktree');
-		expect(TREE_CONTEXT_MENU_ACTIONS.startSession).toBe('start-session');
-		expect(TREE_CONTEXT_MENU_ACTIONS.archive).toBe('archive');
-		expect(TREE_CONTEXT_MENU_ACTIONS.changeColor).toBe('change-color');
-		expect(TREE_CONTEXT_MENU_ACTIONS.pruneWorktree).toBe('prune-worktree');
-	});
-
-	it('type can be assigned from constant values', () => {
-		const action: TreeContextMenuAction = TREE_CONTEXT_MENU_ACTIONS.openGithub;
-		expect(action).toBe('open-github');
-	});
-});
 
 // ════════════════════════════════════════════════════════════════════════
 // resolveGlowOverlay

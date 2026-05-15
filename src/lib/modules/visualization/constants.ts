@@ -66,15 +66,6 @@ export const SPEECH_BUBBLE_COLORS = {
 } as const;
 
 /** Sub-agent category to bird type mapping (REQ-6). Rendering deferred to library enhancement. */
-export const BIRD_TYPE_MAP = {
-	analysis: 'owl',
-	executor: 'robin',
-	checker: 'sparrow',
-	reviewer: 'cardinal',
-	utility: 'hummingbird',
-	research: 'parrot',
-} as const;
-
 /** Minimum pixel distance between any two positioned items. */
 export const MIN_SPACING_PX = 60;
 

@@ -11,18 +11,17 @@ describe('deriveCanopyColors — chromatic hex colors', () => {
 		expect(result).not.toBeNull();
 		expect(result!.canopyLightColor).toMatch(/^#[0-9a-f]{6}$/);
 		expect(result!.canopyDarkColor).toMatch(/^#[0-9a-f]{6}$/);
+		expect(result!.canopyLightColor).not.toBe(result!.canopyDarkColor);
 	});
 
 	it('adapts red hue toward green (adaptedHue = lerp(0, 120, 0.5) = 60)', () => {
+		// Red: h=0, adaptedHue = 0 + (120-0)*0.5 = 60
+		// Light: hslToHex(60, 60%, 60%) = #d6d65c (yellow-green, higher lightness)
+		// Dark:  hslToHex(60, 45%, 20%) = #4a4a1c (dark yellow-green, lower lightness)
 		const result = deriveCanopyColors('#ff0000');
-		// HSL(60, 60%, 60%) light, HSL(60, 45%, 20%) dark
-		// Expected light: hslToHex(60, 60, 60)
-		// Expected dark: hslToHex(60, 45, 20)
 		expect(result).not.toBeNull();
-		// Light: HSL(60, 60%, 60%) -> yellowish-green
-		// Dark: HSL(60, 45%, 20%) -> dark yellowish-green
-		expect(result!.canopyLightColor).not.toBe('#a8d84e'); // Not default
-		expect(result!.canopyDarkColor).not.toBe('#1a472a'); // Not default
+		expect(result!.canopyLightColor).toBe('#d6d65c');
+		expect(result!.canopyDarkColor).toBe('#4a4a1c');
 	});
 });
 
@@ -45,12 +44,13 @@ describe('deriveCanopyColors — achromatic colors', () => {
 
 describe('deriveCanopyColors — green input', () => {
 	it('returns canopy colors with green hue for pure green input', () => {
+		// Green: h=120, adaptedHue = 120 + (120-120)*0.5 = 120 (stays green)
+		// Light: hslToHex(120, 60%, 60%) = #5cd65c (medium green, higher lightness)
+		// Dark:  hslToHex(120, 45%, 20%) = #1c4a1c (dark green, lower lightness)
 		const result = deriveCanopyColors('#00ff00');
 		expect(result).not.toBeNull();
-		// adaptedHue = lerp(120, 120, 0.5) = 120 (stays green)
-		// Light: HSL(120, 60%, 60%) -> green
-		// Dark: HSL(120, 45%, 20%) -> dark green
-		expect(result!.canopyLightColor).toMatch(/^#[0-9a-f]{6}$/);
-		expect(result!.canopyDarkColor).toMatch(/^#[0-9a-f]{6}$/);
+		expect(result!.canopyLightColor).toBe('#5cd65c');
+		expect(result!.canopyDarkColor).toBe('#1c4a1c');
+		expect(result!.canopyLightColor).not.toBe(result!.canopyDarkColor);
 	});
 });
