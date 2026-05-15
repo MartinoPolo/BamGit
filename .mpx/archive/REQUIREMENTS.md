@@ -23,17 +23,24 @@ See `ARCHITECTURE.md` for full architecture, module map, and diagrams.
 
 ## Core Features
 
-### Workspace Dashboard (implemented)
+### Workspace Dashboard (implemented, issue cards v2 redesign grilled — ready for implementation)
 
 PRD #87 (design system), PRD #89 (issue management). Sub-issues: #97-#105, #131-#136.
 Design: `claude_design/Issue Card.html`, `claude_design/Grovekeeper Design.html`.
+**Redesign spec**: `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` — canonical implementation reference (grilled 2026-05-15).
 
 - Root page per workspace window. Forest View in top panel (collapsible), tabbed bottom panel
 - **Bottom panel tabs**: Issues | Kanban | Dependencies | Activity | Session | Assigned Issues
-- **Issue cards**: responsive grid, color header band, session state chip, status badges, tree thumbnail, quick-action buttons (folder/terminal/editor), context menu with all actions
-- **Badges**: branch status, PR state, GitHub issue state, sync status, merge conflict — all interactive and responsive
+- **Issue cards**: 3 switchable variants (Veil/Refined Horizon/Radiant) via CSS custom properties. Gradient-based color identity, issue state chip (18-state cascade across all dimensions), priority badge (9 positions), tree/character preview (100px square), quick-action buttons (ghost style). Both dark and light mode
+- **Issue state chip**: Replaces session-only chip. Cascade covers session, execution phase, worktree, PR, sync states. `deriveIssueStateChipLabel()` utility + pure display component. Single chip, highest priority wins
+- **Ghost cards**: Non-adopted GitHub-assigned issues in accordion. Dashed border, label-based coloring (single label tint or split left/right for two labels, alphabetical ordering, cap at 2). Adopt split-button (outlined, remembers last selection in DB)
+- **Done state**: Derived at render (closed + merged). Transparent bg, no border, content fully readable, action buttons preserved, `● DONE` chip. On hover: border + generic bg
+- **Card appearance settings**: 10 settings in dedicated "Issue Cards" section. User settings (global defaults) → workspace overrides. Includes variant, badge style, priority position, label tint, overlay glow, and variant-specific sliders
+- **New components**: SplitButton, IssueColorButton (new `issue-color` intent in button-variants.ts), IssueStateChip, Badge Style B/C
+- **View switcher**: Global toggle between card grid and compact row view (applies to both adopted and assigned sections)
+- **Badges**: branch status, PR state, GitHub issue state, sync status, merge conflict — all interactive and responsive. 3 badge styles (Solid/Borderless Dark/Bordered Dark), default: Style B
 - **Batch selection**: Ctrl+click, Shift+click (Windows Explorer pattern), right-click "Select", long press (mobile). Actions: Archive, Unarchive, Delete, Change Priority, Clean Worktrees
-- **Active vs Selected**: Active = single-click inspect (one at a time, bottom panel detail). Selected = batch (multiple, bulk ops). Visual hierarchy via `box-shadow` rings and issue-color glows
+- **Active vs Selected**: Active = single-click inspect (one at a time, bottom panel detail). Selected = batch (multiple, bulk ops). Subtle glows (not thick rings) — green for active, blue for selected
 - **Multi-panel layout**: 7 presets via paneforge. Smart defaults (session spawn opens second panel)
 - **Main toolbar**: Title/Subtitle | Sync | Notifications | Forest Toggle | Create Issue (split-button)
 - **Bottom panel toolbar**: Sort | Filter | Clean Up Worktrees. Batch mode: "N selected" + batch action buttons
