@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
 	computeForestLayout,
-	computeDepthRows,
 	MIN_SPACING_PX,
 	MAX_DEPTH_ROWS,
 	TREE_SPACING_FRACTION,
