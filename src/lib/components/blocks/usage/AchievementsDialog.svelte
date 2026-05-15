@@ -42,7 +42,7 @@
 			</div>
 			<Dialog.Close>
 				{#snippet child({ props: closeProps })}
-					<Button intent="ghost" size="icon-sm" {...closeProps}>
+					<Button intent="ghost" size="icon-sm" aria-label="Close" {...closeProps}>
 						<XIcon data-icon="inline-start" />
 					</Button>
 				{/snippet}

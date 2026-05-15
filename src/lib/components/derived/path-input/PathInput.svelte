@@ -50,6 +50,7 @@
 		intent="ghost"
 		size="icon-sm"
 		type="button"
+		aria-label="Browse"
 		{disabled}
 		onclick={handleBrowse}
 		class="shrink-0"

@@ -251,6 +251,7 @@
 				<Button
 					intent="ghost"
 					size="icon-sm"
+					aria-label="Refresh assigned issues"
 					disabled={loading}
 					onclick={() => onRefresh?.()}
 				>
@@ -439,6 +440,7 @@
 									<Button
 										intent="ghost"
 										size="icon-sm"
+										aria-label="Add to dashboard"
 										onclick={(event) => {
 											event.stopPropagation();
 											onWizardOpen(issue);
@@ -453,6 +455,7 @@
 									<Button
 										intent="ghost"
 										size="icon-sm"
+										aria-label="Add with worktree"
 										onclick={(event) => {
 											event.stopPropagation();
 											onQuickAddWithWorktree(issue);

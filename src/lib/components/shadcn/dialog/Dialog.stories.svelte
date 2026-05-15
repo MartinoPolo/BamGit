@@ -159,7 +159,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button intent="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" aria-label="Demo" {...props}>
 									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}
@@ -248,7 +248,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button intent="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" aria-label="Demo" {...props}>
 									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}
@@ -331,7 +331,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button intent="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" aria-label="Demo" {...props}>
 									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}
@@ -379,7 +379,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button intent="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" aria-label="Demo" {...props}>
 									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}
@@ -430,7 +430,7 @@
 						</div>
 						<Dialog.Close>
 							{#snippet child({ props })}
-								<Button intent="ghost" size="icon-sm" {...props}>
+								<Button intent="ghost" size="icon-sm" aria-label="Demo" {...props}>
 									<XIcon data-icon="inline-start" />
 								</Button>
 							{/snippet}

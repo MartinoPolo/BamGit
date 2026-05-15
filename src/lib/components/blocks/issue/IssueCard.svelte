@@ -296,6 +296,7 @@
 					<Button
 						intent="ghost-overlay"
 						size="icon-sm"
+						aria-label="Open folder"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-folder')}
 						oncontextmenu={handleQuickActionContextMenu}
@@ -307,6 +308,7 @@
 					<Button
 						intent="ghost-overlay"
 						size="icon-sm"
+						aria-label="Open terminal"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-terminal')}
 						oncontextmenu={handleQuickActionContextMenu}
@@ -318,6 +320,7 @@
 					<Button
 						intent="ghost-overlay"
 						size="icon-sm"
+						aria-label="Open editor"
 						style="opacity: {hasWorktree ? 0.6 : 0.35}"
 						onclick={(event: MouseEvent) => handleQuickAction(event, 'open-editor')}
 						oncontextmenu={handleQuickActionContextMenu}
@@ -335,6 +338,7 @@
 					<Button
 						intent="ghost-overlay"
 						size="icon-sm"
+						aria-label="Toggle mute"
 						style="opacity: {issue.is_sound_muted ? 0.35 : 0.6}"
 						onclick={handleToggleMute}
 					>

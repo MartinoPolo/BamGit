@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import SessionSidebar from './SessionSidebar.svelte';
 
 	const { Story } = defineMeta({
@@ -7,6 +8,55 @@
 		component: SessionSidebar,
 		tags: ['autodocs'],
 	});
+
+	async function playSidebarSectionsAreVisible({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}): Promise<void> {
+		const canvas = within(canvasElement);
+		await waitFor(() => {
+			expect(canvas.getByText('Provider')).toBeInTheDocument();
+			expect(canvas.getByText('Global Usage')).toBeInTheDocument();
+			expect(canvas.getByText('Session')).toBeInTheDocument();
+			expect(canvas.getByText('Sub-Agents')).toBeInTheDocument();
+		});
+	}
+
+	async function playCollapseAndExpandToggle({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}): Promise<void> {
+		const canvas = within(canvasElement);
+		const user = userEvent.setup();
+
+		// Sidebar starts expanded — Provider section is visible
+		await waitFor(() => {
+			expect(canvas.getByText('Provider')).toBeInTheDocument();
+		});
+
+		// Click the collapse toggle (button with aria-label "Collapse sidebar")
+		const collapseButton = canvas.getByRole('button', { name: /collapse sidebar/i });
+		await user.click(collapseButton);
+
+		// Sidebar is now collapsed — Provider text hidden
+		await waitFor(() => {
+			const provider = canvas.queryByText('Provider');
+			if (provider !== null) {
+				expect(provider).not.toBeVisible();
+			}
+		});
+
+		// Click expand toggle
+		const expandButton = canvas.getByRole('button', { name: /expand sidebar/i });
+		await user.click(expandButton);
+
+		// Provider section is visible again
+		await waitFor(() => {
+			expect(canvas.getByText('Provider')).toBeInTheDocument();
+		});
+	}
 </script>
 
 <script lang="ts">
@@ -122,6 +172,40 @@
 				contextPercent={38}
 				quota5hPercent={25}
 				quota7dPercent={8}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Sidebar Sections Are Visible" play={playSidebarSectionsAreVisible}>
+	{#snippet template()}
+		<div class="flex h-150">
+			<div class="flex-1 bg-background p-4">
+				<span class="text-sm text-foreground-muted">Chat area</span>
+			</div>
+			<SessionSidebar
+				session={runningSession}
+				contextPercent={54}
+				quota5hPercent={42}
+				quota7dPercent={18}
+				subAgentCount={0}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Collapse And Expand Toggle" play={playCollapseAndExpandToggle}>
+	{#snippet template()}
+		<div class="flex h-150">
+			<div class="flex-1 bg-background p-4">
+				<span class="text-sm text-foreground-muted">Chat area</span>
+			</div>
+			<SessionSidebar
+				session={runningSession}
+				contextPercent={54}
+				quota5hPercent={42}
+				quota7dPercent={18}
+				subAgentCount={0}
 			/>
 		</div>
 	{/snippet}

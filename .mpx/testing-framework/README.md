@@ -4,14 +4,16 @@ This folder contains stand-alone agent prompt documents for each phase of the Gr
 
 ## Execution Order
 
-| Phase | File                                                               | Description                                                                      | Est. Sub-Agents | Status       |
-| ----- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------- | --------------- | ------------ |
-| 1     | [phase-1-storybook-primitives.md](phase-1-storybook-primitives.md) | Storybook stories for shadcn/base/derived components missing stories             | 14              | ✅ Complete  |
-| 2     | [phase-2-storybook-blocks.md](phase-2-storybook-blocks.md)         | Storybook stories for block components (issue, workspace, session, layout, etc.) | 20              | ✅ Complete  |
-| 3     | [phase-3-storybook-play-tests.md](phase-3-storybook-play-tests.md) | Add `play()` interaction tests to existing + new stories; enable a11y CI         | 18              | ⏳ Blocked/2 |
-| 4     | [phase-4-vitest-logic.md](phase-4-vitest-logic.md)                 | Fill Vitest unit test gaps for business logic modules                            | 6               | ⏳ Parallel  |
-| 5     | [phase-5-rust-tests.md](phase-5-rust-tests.md)                     | Rust `#[cfg(test)]` tests for backend commands and logic                         | 6               | ⏳ Parallel  |
-| 6     | [phase-6-playwright-e2e.md](phase-6-playwright-e2e.md)             | Playwright E2E tests: navigation, URL state, keyboard, workflows                 | 4               | ⏳ Parallel  |
+| Phase | File                                                   | Description                                                      | Est. Sub-Agents | Status      |
+| ----- | ------------------------------------------------------ | ---------------------------------------------------------------- | --------------- | ----------- |
+| 1     | _(deleted — complete)_                                 | Storybook stories for shadcn/base/derived components             | 14              | ✅ Complete |
+| 2     | _(deleted — complete)_                                 | Storybook stories for block components                           | 20              | ✅ Complete |
+| 3     | _(deleted — complete)_                                 | play() interaction tests + a11y CI enforcement                   | 18              | ✅ Complete |
+| 4     | [phase-4-vitest-logic.md](phase-4-vitest-logic.md)     | Fill Vitest unit test gaps for business logic modules            | 6               | ⏳ Parallel |
+| 5     | [phase-5-rust-tests.md](phase-5-rust-tests.md)         | Rust `#[cfg(test)]` tests for backend commands and logic         | 6               | ⏳ Parallel |
+| 6     | [phase-6-playwright-e2e.md](phase-6-playwright-e2e.md) | Playwright E2E tests: navigation, URL state, keyboard, workflows | 4               | ⏳ Parallel |
+
+Phases 1-3 prompts were deleted after completion. Reusable patterns extracted to `.claude/rules/grovekeeper-shadcn-svelte.md`.
 
 ## Shared Conventions
 

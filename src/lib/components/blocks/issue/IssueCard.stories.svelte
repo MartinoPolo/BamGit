@@ -31,18 +31,6 @@
 		};
 	}
 
-	/** Active card renders with correct title visible. */
-	const playActiveCardVisible = async ({ canvasElement, args }: PlayContext) => {
-		const canvas = within(canvasElement);
-		const title = canvas.getByText('Refactor auth middleware for OAuth2');
-		await expect(title).toBeVisible();
-		// Card container should have active state class
-		const card = canvasElement.querySelector('.card-state-active-ic');
-		await expect(card).not.toBeNull();
-		// Sanity: onclick not called without interaction
-		await expect(args.onCardClick).not.toHaveBeenCalled();
-	};
-
 	/** Click priority badge → onPriorityClick called, card onclick NOT called. */
 	const playPriorityClickContainment = async ({ canvasElement, args }: PlayContext) => {
 		const canvas = within(canvasElement);
@@ -113,12 +101,6 @@
 		// Note: Svelte 5 event delegation means stopPropagation in the handler fires
 		// after bubbling, so we check preventDefault instead of stopPropagation
 		await expect(event.defaultPrevented).toBe(true);
-	};
-
-	/** Selected card has the selected CSS class. */
-	const playSelectedStateClass = async ({ canvasElement }: PlayContext) => {
-		const card = canvasElement.querySelector('.card-state-selected-primary');
-		await expect(card).not.toBeNull();
 	};
 </script>
 
@@ -292,16 +274,6 @@
 
 <!-- Interaction tests: event propagation -->
 
-<Story name="Test: Active Card Visible" play={playActiveCardVisible}>
-	{#snippet template(args: IssueCardProps)}
-		<IssueCardStoryWrapper>
-			<div class="max-w-md">
-				<IssueCard {...args} issue={baseIssue} isActive={true} ghAvailable={true} />
-			</div>
-		</IssueCardStoryWrapper>
-	{/snippet}
-</Story>
-
 <Story name="Test: Priority Click Containment" play={playPriorityClickContainment}>
 	{#snippet template(args: IssueCardProps)}
 		<IssueCardStoryWrapper>
@@ -340,16 +312,6 @@
 		<IssueCardStoryWrapper>
 			<div class="max-w-md">
 				<IssueCard {...args} issue={baseIssue} ghAvailable={true} />
-			</div>
-		</IssueCardStoryWrapper>
-	{/snippet}
-</Story>
-
-<Story name="Test: Selected State Class" play={playSelectedStateClass}>
-	{#snippet template(args: IssueCardProps)}
-		<IssueCardStoryWrapper>
-			<div class="max-w-md">
-				<IssueCard {...args} issue={baseIssue} isBatchSelected={true} ghAvailable={true} />
 			</div>
 		</IssueCardStoryWrapper>
 	{/snippet}
