@@ -238,6 +238,7 @@
 									<Button
 										intent="ghost"
 										size="icon-sm"
+										aria-label="Play test sound"
 										onclick={() => handleTestSound(config.event_type)}
 									>
 										&#9654;
@@ -301,6 +302,7 @@
 							<Button
 								intent="ghost"
 								size="icon-sm"
+								aria-label="Remove sound pack"
 								onclick={() => handleRemovePack(pack.name)}
 							>
 								<TrashIcon data-icon="inline-end" />

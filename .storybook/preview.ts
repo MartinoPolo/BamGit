@@ -21,20 +21,20 @@ const preview: Preview = {
 			test: 'error',
 			config: {
 				rules: [
-					// Deferred: design-level decisions needed
+					// foreground-subtle fixed; foreground-muted borderline in light — re-enable after review
 					{ id: 'color-contrast', enabled: false },
-					// Deferred: bits-ui Tooltip.Trigger wraps buttons as <button>
-					{ id: 'nested-interactive', enabled: false },
-					// Deferred: 895 icon-only buttons need aria-labels across all components
+					// bits-ui Checkbox/Switch/Combobox render as <button> without text — upstream
 					{ id: 'button-name', enabled: false },
-					// Deferred: bits-ui renders roles outside required ARIA containers in isolation
+					// bits-ui Tooltip.Trigger nests buttons (our stories fixed, bits-ui internals remain)
+					{ id: 'nested-interactive', enabled: false },
+					// bits-ui renders roles outside required ARIA containers in isolation
 					{ id: 'aria-required-parent', enabled: false },
 					{ id: 'aria-required-children', enabled: false },
-					// Deferred: Storybook decorator renders sidebar landmarks inside story
+					// Storybook decorator renders sidebar landmarks inside story
 					{ id: 'landmark-banner-is-top-level', enabled: false },
 					{ id: 'landmark-no-duplicate-banner', enabled: false },
 					{ id: 'landmark-unique', enabled: false },
-					// Deferred: bits-ui open overlays expose internal ARIA artifacts
+					// bits-ui open overlays expose internal ARIA artifacts
 					{ id: 'aria-input-field-name', enabled: false },
 					{ id: 'aria-required-attr', enabled: false },
 					{ id: 'aria-allowed-attr', enabled: false },

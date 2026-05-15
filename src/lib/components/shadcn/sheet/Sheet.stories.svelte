@@ -76,9 +76,10 @@
 		document.addEventListener('keydown', documentKeydownSpy);
 
 		try {
-			// Open sheet
-			await userEvent.click(canvas.getByRole('button', { name: /open sheet \(bottom\)/i }));
-			await expect(canvas.getByRole('dialog')).toBeVisible();
+			// Open sheet — use native click to bypass pointer-events check (bits-ui body scroll lock)
+			const trigger = canvas.getByRole('button', { name: /open sheet \(bottom\)/i });
+			trigger.click();
+			await waitFor(() => expect(canvas.getByRole('dialog')).toBeVisible());
 
 			// Reset spy to ignore events from the click
 			documentKeydownSpy.mockClear();

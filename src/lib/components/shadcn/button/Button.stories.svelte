@@ -175,10 +175,10 @@
 		<div class="flex gap-4">
 			<div class="rounded-lg bg-primary p-4">
 				<div class="flex items-center gap-2">
-					<Button intent="ghost-overlay" size="icon-sm" {...args}
+					<Button intent="ghost-overlay" size="icon-sm" aria-label="Demo" {...args}
 						><MailIcon data-icon="inline-start" /></Button
 					>
-					<Button intent="ghost-overlay" size="icon-sm" {...args}
+					<Button intent="ghost-overlay" size="icon-sm" aria-label="Demo" {...args}
 						><SettingsIcon data-icon="inline-start" /></Button
 					>
 					<Button intent="ghost-overlay" {...args}>Action</Button>
@@ -186,10 +186,10 @@
 			</div>
 			<div class="rounded-lg bg-surface-2 p-4">
 				<div class="flex items-center gap-2">
-					<Button intent="ghost-overlay" size="icon-sm" {...args}
+					<Button intent="ghost-overlay" size="icon-sm" aria-label="Demo" {...args}
 						><MailIcon data-icon="inline-start" /></Button
 					>
-					<Button intent="ghost-overlay" size="icon-sm" {...args}
+					<Button intent="ghost-overlay" size="icon-sm" aria-label="Demo" {...args}
 						><SettingsIcon data-icon="inline-start" /></Button
 					>
 					<Button intent="ghost-overlay" {...args}>Action</Button>
@@ -226,22 +226,22 @@
 <Story name="Icon Only">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
-			<Button intent="primary" size="icon" {...args}
+			<Button intent="primary" size="icon" aria-label="Demo" {...args}
 				><PlusIcon data-icon="inline-start" /></Button
 			>
-			<Button intent="secondary" size="icon" {...args}
+			<Button intent="secondary" size="icon" aria-label="Demo" {...args}
 				><SettingsIcon data-icon="inline-start" /></Button
 			>
-			<Button intent="ghost" size="icon" {...args}
+			<Button intent="ghost" size="icon" aria-label="Demo" {...args}
 				><MailIcon data-icon="inline-start" /></Button
 			>
-			<Button intent="danger" size="icon" {...args}
+			<Button intent="danger" size="icon" aria-label="Demo" {...args}
 				><TrashIcon data-icon="inline-start" /></Button
 			>
-			<Button intent="primary" size="icon-sm" {...args}
+			<Button intent="primary" size="icon-sm" aria-label="Demo" {...args}
 				><PlusIcon data-icon="inline-start" /></Button
 			>
-			<Button intent="ghost" size="icon-sm" {...args}
+			<Button intent="ghost" size="icon-sm" aria-label="Demo" {...args}
 				><SettingsIcon data-icon="inline-start" /></Button
 			>
 		</div>

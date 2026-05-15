@@ -18,11 +18,14 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-						>
-							Hover me
-						</button>
+						{#snippet child({ props })}
+							<button
+								{...props}
+								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
+							>
+								Hover me
+							</button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}
 						>Sync now</Tooltip.Content
@@ -39,11 +42,14 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-						>
-							Hover me
-						</button>
+						{#snippet child({ props })}
+							<button
+								{...props}
+								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
+							>
+								Hover me
+							</button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="bottom" portalProps={{ disabled: true }}>
 						Create issue
@@ -61,11 +67,15 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-						>
-							<SettingsIcon class="size-3.5" />
-						</button>
+						{#snippet child({ props })}
+							<button
+								{...props}
+								aria-label="Settings"
+								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
+							>
+								<SettingsIcon class="size-3.5" />
+							</button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="left" portalProps={{ disabled: true }}
 						>Filter issues</Tooltip.Content
@@ -82,11 +92,15 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-						>
-							<SettingsIcon class="size-3.5" />
-						</button>
+						{#snippet child({ props })}
+							<button
+								{...props}
+								aria-label="Settings"
+								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
+							>
+								<SettingsIcon class="size-3.5" />
+							</button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="right" portalProps={{ disabled: true }}
 						>Forest view</Tooltip.Content
@@ -103,11 +117,14 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-						>
-							Create issue
-						</button>
+						{#snippet child({ props })}
+							<button
+								{...props}
+								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
+							>
+								Create issue
+							</button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}>
 						Start a new agent session
@@ -125,11 +142,14 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<div
-							class="flex size-14 items-center justify-center rounded-lg border border-border bg-surface-2 text-2xl"
-						>
-							🌳
-						</div>
+						{#snippet child({ props })}
+							<div
+								{...props}
+								class="flex size-14 items-center justify-center rounded-lg border border-border bg-surface-2 text-2xl"
+							>
+								🌳
+							</div>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content
 						side="top"
@@ -153,11 +173,14 @@
 			<div class="flex items-center justify-center p-16">
 				<Tooltip.Root>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-						>
-							Hover me
-						</button>
+						{#snippet child({ props })}
+							<button
+								{...props}
+								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
+							>
+								Hover me
+							</button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content
 						side="top"
@@ -179,11 +202,15 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<button
+									{...props}
+									aria-label="Top placement"
+									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
+								>
+									<SettingsIcon class="size-3.5" />
+								</button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="top" portalProps={{ disabled: true }}
 							>Top · Sync now</Tooltip.Content
@@ -193,11 +220,15 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<button
+									{...props}
+									aria-label="Bottom placement"
+									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
+								>
+									<SettingsIcon class="size-3.5" />
+								</button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="bottom" portalProps={{ disabled: true }}
 							>Bottom · Create issue</Tooltip.Content
@@ -207,11 +238,15 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<button
+									{...props}
+									aria-label="Left placement"
+									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
+								>
+									<SettingsIcon class="size-3.5" />
+								</button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="left" portalProps={{ disabled: true }}
 							>Left · Filter issues</Tooltip.Content
@@ -221,11 +256,15 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<button
+									{...props}
+									aria-label="Right placement"
+									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
+								>
+									<SettingsIcon class="size-3.5" />
+								</button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="right" portalProps={{ disabled: true }}
 							>Right · Forest view</Tooltip.Content

@@ -1,16 +1,12 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, fn, userEvent, within } from 'storybook/test';
 	import ToolCardPermission from './ToolCardPermission.svelte';
+	import type { ChatMessage } from '$lib/modules/chat/index.js';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Chat/InteractionCards',
 	});
-</script>
-
-<script lang="ts">
-	import ToolCardElicitation from './ToolCardElicitation.svelte';
-	import ToolCardAskUser from './ToolCardAskUser.svelte';
-	import type { ChatMessage } from '$lib/modules/chat/index.js';
 
 	const permissionMessage: ChatMessage = {
 		id: 'perm-1',
@@ -25,6 +21,55 @@
 		interactionType: 'permission',
 		requestId: 'req_1',
 	};
+
+	interface PermissionPlayContext {
+		canvasElement: HTMLElement;
+		args: { onAllow?: unknown; onAllowAlways?: unknown; onDeny?: unknown };
+	}
+
+	/** Click Allow button → onAllow fires. */
+	const playAllowFires = async ({ canvasElement, args }: PermissionPlayContext) => {
+		const canvas = within(canvasElement);
+		const onAllowSpy = args.onAllow as ReturnType<typeof fn>;
+		onAllowSpy.mockClear();
+
+		const allowButton = canvas.getByRole('button', { name: /^allow$/i });
+		await userEvent.click(allowButton);
+
+		await expect(onAllowSpy).toHaveBeenCalledOnce();
+	};
+
+	/** Click Deny button → onDeny fires. */
+	const playDenyFires = async ({ canvasElement, args }: PermissionPlayContext) => {
+		const canvas = within(canvasElement);
+		const onDenySpy = args.onDeny as ReturnType<typeof fn>;
+		onDenySpy.mockClear();
+
+		const denyButton = canvas.getByRole('button', { name: /deny/i });
+		await userEvent.click(denyButton);
+
+		await expect(onDenySpy).toHaveBeenCalledOnce();
+	};
+
+	/** Click Allow Always button → onAllowAlways fires, onAllow does NOT fire. */
+	const playAllowAlwaysFires = async ({ canvasElement, args }: PermissionPlayContext) => {
+		const canvas = within(canvasElement);
+		const onAllowSpy = args.onAllow as ReturnType<typeof fn>;
+		const onAllowAlwaysSpy = args.onAllowAlways as ReturnType<typeof fn>;
+		onAllowSpy.mockClear();
+		onAllowAlwaysSpy.mockClear();
+
+		const allowAlwaysButton = canvas.getByRole('button', { name: /allow always/i });
+		await userEvent.click(allowAlwaysButton);
+
+		await expect(onAllowAlwaysSpy).toHaveBeenCalledOnce();
+		await expect(onAllowSpy).not.toHaveBeenCalled();
+	};
+</script>
+
+<script lang="ts">
+	import ToolCardElicitation from './ToolCardElicitation.svelte';
+	import ToolCardAskUser from './ToolCardAskUser.svelte';
 
 	const elicitationMessage: ChatMessage = {
 		id: 'elicit-1',
@@ -88,6 +133,69 @@
 			<ToolCardPermission message={permissionMessage} />
 			<ToolCardElicitation message={elicitationMessage} />
 			<ToolCardAskUser message={askUserMessage} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story
+	name="Test: Allow Fires Callback"
+	args={{ onAllow: fn(), onAllowAlways: fn(), onDeny: fn() }}
+	play={playAllowFires}
+>
+	{#snippet template(args: {
+		onAllow?: () => void;
+		onAllowAlways?: () => void;
+		onDeny?: () => void;
+	})}
+		<div class="mx-auto max-w-225 p-4">
+			<ToolCardPermission
+				message={permissionMessage}
+				onAllow={args.onAllow}
+				onAllowAlways={args.onAllowAlways}
+				onDeny={args.onDeny}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story
+	name="Test: Deny Fires Callback"
+	args={{ onAllow: fn(), onAllowAlways: fn(), onDeny: fn() }}
+	play={playDenyFires}
+>
+	{#snippet template(args: {
+		onAllow?: () => void;
+		onAllowAlways?: () => void;
+		onDeny?: () => void;
+	})}
+		<div class="mx-auto max-w-225 p-4">
+			<ToolCardPermission
+				message={permissionMessage}
+				onAllow={args.onAllow}
+				onAllowAlways={args.onAllowAlways}
+				onDeny={args.onDeny}
+			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story
+	name="Test: Allow Always Fires Callback"
+	args={{ onAllow: fn(), onAllowAlways: fn(), onDeny: fn() }}
+	play={playAllowAlwaysFires}
+>
+	{#snippet template(args: {
+		onAllow?: () => void;
+		onAllowAlways?: () => void;
+		onDeny?: () => void;
+	})}
+		<div class="mx-auto max-w-225 p-4">
+			<ToolCardPermission
+				message={permissionMessage}
+				onAllow={args.onAllow}
+				onAllowAlways={args.onAllowAlways}
+				onDeny={args.onDeny}
+			/>
 		</div>
 	{/snippet}
 </Story>

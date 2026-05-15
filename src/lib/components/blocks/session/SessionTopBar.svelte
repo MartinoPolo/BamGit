@@ -45,7 +45,7 @@
 <div class="flex h-10 shrink-0 items-center gap-2.5 border-b border-border bg-surface px-3.5">
 	<!-- Left: back button + title + state badge -->
 	{#if onBack}
-		<Button intent="ghost" size="icon-sm" onclick={onBack}>
+		<Button intent="ghost" size="icon-sm" aria-label="Go back" onclick={onBack}>
 			<ArrowLeftIcon strokeWidth={2} data-icon="inline-start" />
 		</Button>
 	{/if}
@@ -81,7 +81,7 @@
 			</WithTooltip>
 		{/if}
 
-		<Button intent="ghost" size="icon-sm">
+		<Button intent="ghost" size="icon-sm" aria-label="More options">
 			<EllipsisVerticalIcon strokeWidth={2} data-icon="inline-start" />
 		</Button>
 

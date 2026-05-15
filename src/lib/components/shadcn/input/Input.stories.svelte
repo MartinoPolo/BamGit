@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, within } from 'storybook/test';
 	import { INPUT_STATES, Input } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { HelpText } from '$lib/components/base/help-text/index.js';
@@ -17,6 +18,30 @@
 			readonly: { control: 'boolean' },
 		},
 	});
+
+	const playTypeUpdatesValue = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const input = canvas.getByRole('textbox');
+		await userEvent.clear(input);
+		await userEvent.type(input, 'hello world');
+		await expect(input).toHaveValue('hello world');
+	};
+
+	const playFocusOnClick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const input = canvas.getByRole('textbox');
+		await userEvent.click(input);
+		await expect(input).toHaveFocus();
+	};
+
+	const playDisabledRejectsTyping = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const input = canvas.getByRole('textbox');
+		await expect(input).toBeDisabled();
+		const valueBefore = (input as HTMLInputElement).value;
+		await userEvent.type(input, 'should not appear');
+		await expect(input).toHaveValue(valueBefore);
+	};
 </script>
 
 <script lang="ts">
@@ -102,6 +127,30 @@
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
 			<Input state="loading" value="resolving..." aria-label="Loading branch" {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Type Updates Value" play={playTypeUpdatesValue}>
+	{#snippet template(args: InputProps)}
+		<div class="max-w-xs">
+			<Input placeholder="Type here" aria-label="Branch name" {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Focus On Click" play={playFocusOnClick}>
+	{#snippet template(args: InputProps)}
+		<div class="max-w-xs">
+			<Input placeholder="Click to focus" aria-label="Branch name" {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Disabled Rejects Typing" play={playDisabledRejectsTyping}>
+	{#snippet template(args: InputProps)}
+		<div class="max-w-xs">
+			<Input disabled value="feat/locked-branch" aria-label="Disabled branch" {...args} />
 		</div>
 	{/snippet}
 </Story>

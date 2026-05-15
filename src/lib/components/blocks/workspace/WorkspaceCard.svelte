@@ -219,6 +219,7 @@
 					<Button
 						intent="ghost"
 						size="icon"
+						aria-label="Open GitHub repository"
 						class={cn('size-6.5', workspace.github_repo == null && 'opacity-[0.35]')}
 						onclick={(event: MouseEvent) => handleIconClick(event, onGithubClick)}
 						oncontextmenu={(event: MouseEvent) =>
@@ -229,6 +230,7 @@
 					<Button
 						intent="ghost"
 						size="icon"
+						aria-label="Open local folder"
 						class={cn('size-6.5', workspace.local_folder == null && 'opacity-[0.35]')}
 						onclick={(event: MouseEvent) => handleIconClick(event, onFolderClick)}
 						oncontextmenu={(event: MouseEvent) =>
