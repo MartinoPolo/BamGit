@@ -7,7 +7,7 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 
 	interface Props {
 		title: string;
@@ -48,49 +48,61 @@
 	<!-- Right: controls -->
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onSync}
-			<WithTooltip text={m.topbar_sync()}>
-				<Button intent="ghost" size="icon-sm" disabled={syncing} onclick={onSync}>
+			<SimpleTooltip text={m.topbar_sync()}>
+				<Button
+					intent="ghost"
+					size="icon-sm"
+					aria-label="Sync"
+					disabled={syncing}
+					onclick={onSync}
+				>
 					<RefreshCwIcon class={syncing ? 'animate-spin' : ''} data-icon="inline-start" />
 				</Button>
-			</WithTooltip>
+			</SimpleTooltip>
 		{/if}
 
-		<WithTooltip text={m.topbar_notifications()}>
-			<Button intent="ghost" size="icon-sm" class="relative">
+		<SimpleTooltip text={m.topbar_notifications()}>
+			<Button intent="ghost" size="icon-sm" aria-label="Notifications" class="relative">
 				<BellIcon data-icon="inline-start" />
 				{#if hasNotifications}
 					<span class="absolute top-1 right-1 size-1.5 rounded-full bg-accent"></span>
 				{/if}
 			</Button>
-		</WithTooltip>
+		</SimpleTooltip>
 
 		{#if onQuickIdeas}
-			<WithTooltip text={m.raw_requirements_title()}>
-				<Button intent="ghost" size="icon-sm" onclick={onQuickIdeas}>
+			<SimpleTooltip text={m.raw_requirements_title()}>
+				<Button
+					intent="ghost"
+					size="icon-sm"
+					aria-label="Quick ideas"
+					onclick={onQuickIdeas}
+				>
 					<LightbulbIcon data-icon="inline-start" />
 				</Button>
-			</WithTooltip>
+			</SimpleTooltip>
 		{/if}
 
 		{#if onToggleForest}
-			<WithTooltip text={forestCollapsed ? m.topbar_show_forest() : m.topbar_hide_forest()}>
+			<SimpleTooltip text={forestCollapsed ? m.topbar_show_forest() : m.topbar_hide_forest()}>
 				<Button
 					intent={forestCollapsed ? 'ghost' : 'secondary'}
 					size="icon-sm"
+					aria-label="Toggle forest"
 					onclick={onToggleForest}
 				>
 					<TreesIcon data-icon="inline-start" />
 				</Button>
-			</WithTooltip>
+			</SimpleTooltip>
 		{/if}
 
 		{#if onCreateIssue}
-			<WithTooltip text={m.topbar_create_issue_title()}>
+			<SimpleTooltip text={m.topbar_create_issue_title()}>
 				<Button intent="primary" size="sm" onclick={onCreateIssue}>
 					<PlusIcon data-icon="inline-start" />
 					<span>{m.topbar_create_issue()}</span>
 				</Button>
-			</WithTooltip>
+			</SimpleTooltip>
 		{/if}
 
 		{#if children}

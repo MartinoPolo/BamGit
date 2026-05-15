@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, waitFor } from 'storybook/test';
 	import IssueCardList from './IssueCardList.svelte';
 
 	const { Story } = defineMeta({
@@ -7,6 +8,65 @@
 		component: IssueCardList,
 		tags: ['autodocs'],
 	});
+
+	/** Verify multiple issue cards render — list-level rendering smoke test. */
+	const playRendersMultipleCards = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		// Wait for the responsive grid to appear and contain multiple card wrappers
+		await waitFor(() => {
+			const grid = canvasElement.querySelector(
+				'div[style*="grid-template-columns"]',
+			) as HTMLElement | null;
+			expect(grid).toBeInTheDocument();
+			expect((grid as HTMLElement).children.length).toBeGreaterThan(1);
+		});
+
+		// The outermost list container must still be visible
+		await expect(canvasElement.querySelector('div.outline-none')).toBeInTheDocument();
+	};
+
+	/** Verify clicking a card does not throw and the list remains stable. */
+	const playCardClickStable = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await waitFor(() => {
+			const grid = canvasElement.querySelector('div[style*="grid-template-columns"]');
+			expect(grid).toBeInTheDocument();
+			expect((grid as HTMLElement).children.length).toBeGreaterThan(0);
+		});
+
+		const grid = canvasElement.querySelector(
+			'div[style*="grid-template-columns"]',
+		) as HTMLElement;
+		const firstCardWrapper = grid.children[0] as HTMLElement;
+
+		// Click first card — should not throw; selection state is internal
+		firstCardWrapper.click();
+
+		// List must still be in the DOM after the click
+		await waitFor(() => {
+			expect(grid).toBeInTheDocument();
+		});
+	};
+
+	/** Clicking the grid background (not a card) should not propagate errors. */
+	const playGridBackgroundClick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await waitFor(() => {
+			const grid = canvasElement.querySelector('div[style*="grid-template-columns"]');
+			expect(grid).toBeInTheDocument();
+		});
+
+		const grid = canvasElement.querySelector(
+			'div[style*="grid-template-columns"]',
+		) as HTMLElement;
+
+		// Dispatch a click directly on the grid background element
+		grid.dispatchEvent(
+			new MouseEvent('click', { bubbles: true, target: grid } as MouseEventInit),
+		);
+
+		// The list must still be present — no unmounting due to the click
+		await waitFor(() => {
+			expect(grid).toBeInTheDocument();
+		});
+	};
 </script>
 
 <script lang="ts">
@@ -139,6 +199,57 @@
 				archivedIssues={[]}
 				showArchived={false}
 				isPortfolio={true}
+				getChildren={getChildrenStub}
+				getNotificationDotColor={getNotificationDotColorStub}
+				getVisualization={getVisualizationStub}
+				{...callbacks}
+			/>
+		</IssueCardListStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Test: List renders multiple cards" play={playRendersMultipleCards}>
+	{#snippet template()}
+		<IssueCardListStoryWrapper>
+			<IssueCardList
+				parentIssues={allIssues}
+				archivedIssues={[]}
+				showArchived={false}
+				isPortfolio={false}
+				getChildren={getChildrenStub}
+				getNotificationDotColor={getNotificationDotColorStub}
+				getVisualization={getVisualizationStub}
+				{...callbacks}
+			/>
+		</IssueCardListStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Test: Card click keeps list stable" play={playCardClickStable}>
+	{#snippet template()}
+		<IssueCardListStoryWrapper>
+			<IssueCardList
+				parentIssues={allIssues}
+				archivedIssues={[]}
+				showArchived={false}
+				isPortfolio={false}
+				getChildren={getChildrenStub}
+				getNotificationDotColor={getNotificationDotColorStub}
+				getVisualization={getVisualizationStub}
+				{...callbacks}
+			/>
+		</IssueCardListStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Test: Grid background click does not propagate" play={playGridBackgroundClick}>
+	{#snippet template()}
+		<IssueCardListStoryWrapper>
+			<IssueCardList
+				parentIssues={allIssues}
+				archivedIssues={[]}
+				showArchived={false}
+				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}

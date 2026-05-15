@@ -111,7 +111,7 @@
 </div>
 
 <Dialog.Root bind:open={showClearDialog}>
-	<Dialog.Content>
+	<Dialog.Content onEscapeKeydown={(e) => e.stopPropagation()}>
 		<Dialog.Header>
 			<Dialog.Title>Clear all sounds?</Dialog.Title>
 			<Dialog.Description>

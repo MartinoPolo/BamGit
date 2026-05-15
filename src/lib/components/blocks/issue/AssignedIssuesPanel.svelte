@@ -23,7 +23,7 @@
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { SearchField } from '$lib/components/base/search-field/index.js';
 	import { cn } from '$lib/utils.js';
@@ -247,16 +247,17 @@
 		/>
 		<div class="flex items-center gap-1.5 text-[11px] text-muted-foreground">
 			<span class="whitespace-nowrap">{syncAgoText}</span>
-			<WithTooltip text="Refresh assigned issues">
+			<SimpleTooltip text="Refresh assigned issues">
 				<Button
 					intent="ghost"
 					size="icon-sm"
+					aria-label="Refresh assigned issues"
 					disabled={loading}
 					onclick={() => onRefresh?.()}
 				>
 					<RefreshCw size={13} class={loading ? 'animate-spin' : ''} />
 				</Button>
-			</WithTooltip>
+			</SimpleTooltip>
 		</div>
 	</div>
 
@@ -435,10 +436,11 @@
 						</div>
 						<div class="flex items-center justify-end gap-0.5">
 							{#if onWizardOpen}
-								<WithTooltip text="Add to dashboard">
+								<SimpleTooltip text="Add to dashboard">
 									<Button
 										intent="ghost"
 										size="icon-sm"
+										aria-label="Add to dashboard"
 										onclick={(event) => {
 											event.stopPropagation();
 											onWizardOpen(issue);
@@ -446,13 +448,14 @@
 									>
 										<Plus size={12} />
 									</Button>
-								</WithTooltip>
+								</SimpleTooltip>
 							{/if}
 							{#if onQuickAddWithWorktree}
-								<WithTooltip text="Add with worktree">
+								<SimpleTooltip text="Add with worktree">
 									<Button
 										intent="ghost"
 										size="icon-sm"
+										aria-label="Add with worktree"
 										onclick={(event) => {
 											event.stopPropagation();
 											onQuickAddWithWorktree(issue);
@@ -460,7 +463,7 @@
 									>
 										<GitBranch size={12} />
 									</Button>
-								</WithTooltip>
+								</SimpleTooltip>
 							{/if}
 						</div>
 					</div>
@@ -547,11 +550,11 @@
 								{/each}
 							</div>
 							<div class="flex items-center justify-end">
-								<WithTooltip text="Already linked">
+								<SimpleTooltip text="Already linked">
 									<span class="text-muted-foreground">
 										<Check size={14} />
 									</span>
-								</WithTooltip>
+								</SimpleTooltip>
 							</div>
 						</div>
 					{/each}

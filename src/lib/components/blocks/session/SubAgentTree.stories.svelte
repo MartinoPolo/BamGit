@@ -1,10 +1,75 @@
 ﻿<script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 	import SubAgentTree from './SubAgentTree.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Blocks/Session/SubAgentTree',
 	});
+
+	async function playTreeNodesAreVisible({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}): Promise<void> {
+		const canvas = within(canvasElement);
+		await waitFor(() => {
+			expect(canvas.getByText('Main session')).toBeInTheDocument();
+			expect(canvas.getByText('Explore codebase structure')).toBeInTheDocument();
+			expect(canvas.getByText('Review error handling')).toBeInTheDocument();
+			expect(canvas.getByText('Implement provider trait')).toBeInTheDocument();
+		});
+	}
+
+	async function playExpandCollapse({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}): Promise<void> {
+		const canvas = within(canvasElement);
+		const user = userEvent.setup();
+
+		// Children are visible initially (expanded = true by default)
+		await waitFor(() => {
+			expect(canvas.getByText('Explore codebase structure')).toBeInTheDocument();
+		});
+
+		// Click the first chevron/expand toggle (root node, aria-label "Collapse")
+		const collapseToggles = canvas.getAllByRole('button', { name: 'Collapse' });
+		await user.click(collapseToggles[0]);
+
+		// Children should now be hidden
+		await waitFor(() => {
+			expect(canvas.queryByText('Explore codebase structure')).not.toBeInTheDocument();
+		});
+
+		// Click expand toggle again to re-expand
+		const expandToggle = canvas.getByRole('button', { name: 'Expand' });
+		await user.click(expandToggle);
+
+		// Children should be visible again
+		await waitFor(() => {
+			expect(canvas.getByText('Explore codebase structure')).toBeInTheDocument();
+		});
+	}
+
+	async function playOnSelectFires({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: { onSelect?: unknown };
+	}): Promise<void> {
+		const canvas = within(canvasElement);
+		const user = userEvent.setup();
+
+		const exploreNode = await canvas.findByText('Explore codebase structure');
+		await user.click(exploreNode);
+
+		await waitFor(() => {
+			expect(args.onSelect).toHaveBeenCalledWith('explore');
+		});
+	}
 </script>
 
 <script lang="ts">
@@ -188,6 +253,30 @@
 	{#snippet template()}
 		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={deepTree} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Tree Nodes Are Visible" play={playTreeNodesAreVisible}>
+	{#snippet template()}
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
+			<SubAgentTree agents={canonicalTree} activeAgentId="explore" />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Expand Collapse Children" play={playExpandCollapse}>
+	{#snippet template()}
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
+			<SubAgentTree agents={canonicalTree} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: OnSelect Fires on Node Click" args={{ onSelect: fn() }} play={playOnSelectFires}>
+	{#snippet template({ onSelect })}
+		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
+			<SubAgentTree agents={canonicalTree} {onSelect} />
 		</div>
 	{/snippet}
 </Story>

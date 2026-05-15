@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
 	import { sidebarCollapsedItemVariants } from './sidebar_collapsed_item_variants.js';
 
@@ -27,7 +27,7 @@
 	}: Props = $props();
 </script>
 
-<WithTooltip text={label} side="right">
+<SimpleTooltip text={label} side="right">
 	{#snippet asChild(props)}
 		{#if href}
 			<!-- eslint-disable svelte/no-navigation-without-resolve -- href is pre-resolved by parent -->
@@ -62,4 +62,4 @@
 			</button>
 		{/if}
 	{/snippet}
-</WithTooltip>
+</SimpleTooltip>

@@ -7,7 +7,7 @@
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import SessionStateBadge from './SessionStateBadge.svelte';
 
@@ -45,7 +45,7 @@
 <div class="flex h-10 shrink-0 items-center gap-2.5 border-b border-border bg-surface px-3.5">
 	<!-- Left: back button + title + state badge -->
 	{#if onBack}
-		<Button intent="ghost" size="icon-sm" onclick={onBack}>
+		<Button intent="ghost" size="icon-sm" aria-label="Go back" onclick={onBack}>
 			<ArrowLeftIcon strokeWidth={2} data-icon="inline-start" />
 		</Button>
 	{/if}
@@ -73,15 +73,15 @@
 	<!-- Right: actions + tabs -->
 	<div class="flex shrink-0 items-center gap-1.5">
 		{#if onOpenInCli}
-			<WithTooltip text="Open session in CLI">
+			<SimpleTooltip text="Open session in CLI">
 				<Button intent="secondary" size="sm" onclick={onOpenInCli}>
 					<ExternalLinkIcon strokeWidth={1.8} data-icon="inline-start" />
 					<span class="text-[11px]">Open in CLI</span>
 				</Button>
-			</WithTooltip>
+			</SimpleTooltip>
 		{/if}
 
-		<Button intent="ghost" size="icon-sm">
+		<Button intent="ghost" size="icon-sm" aria-label="More options">
 			<EllipsisVerticalIcon strokeWidth={2} data-icon="inline-start" />
 		</Button>
 

@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { fn } from 'storybook/test';
+	import { expect, fn, userEvent, within } from 'storybook/test';
 	import DiscoveredSessionCard from './DiscoveredSessionCard.svelte';
 	import type { DiscoveredSession } from '$lib/types/generated';
 	import type { DiscoveredSessionStatus } from '$lib/types/generated';
@@ -34,6 +34,33 @@
 	}
 
 	const onAdopt = fn();
+
+	interface AdoptPlayContext {
+		canvasElement: HTMLElement;
+		args: { onAdopt?: unknown };
+	}
+
+	/** Click Adopt button → onAdopt fires with the session object. */
+	const playAdoptFiresCallback = async ({ canvasElement, args }: AdoptPlayContext) => {
+		const canvas = within(canvasElement);
+		const onAdoptSpy = args.onAdopt as ReturnType<typeof fn>;
+		onAdoptSpy.mockClear();
+
+		const adoptButton = canvas.getByRole('button', { name: /adopt/i });
+		await userEvent.click(adoptButton);
+
+		await expect(onAdoptSpy).toHaveBeenCalledOnce();
+	};
+
+	/** Card displays project name, branch, prompt, and PID correctly. */
+	const playSessionInfoVisible = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+
+		await expect(canvas.getByText('my-project')).toBeVisible();
+		await expect(canvas.getByText('feat/auth-refresh')).toBeVisible();
+		await expect(canvas.getByText('Fix the authentication token refresh logic')).toBeVisible();
+		await expect(canvas.getByText(/12345/)).toBeVisible();
+	};
 </script>
 
 <Story name="Default" args={{ session: makeMockDiscoveredSession(), onAdopt }}>
@@ -130,6 +157,36 @@
 				})}
 				onAdopt={fn()}
 			/>
+		</div>
+	{/snippet}
+</Story>
+
+<Story
+	name="Test: Adopt Fires Callback"
+	args={{ session: makeMockDiscoveredSession(), onAdopt: fn() }}
+	play={playAdoptFiresCallback}
+>
+	{#snippet template(args: {
+		session: DiscoveredSession;
+		onAdopt?: (s: DiscoveredSession) => void;
+	})}
+		<div class="max-w-lg p-8">
+			<DiscoveredSessionCard session={args.session} onAdopt={args.onAdopt!} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story
+	name="Test: Session Info Visible"
+	args={{ session: makeMockDiscoveredSession(), onAdopt: fn() }}
+	play={playSessionInfoVisible}
+>
+	{#snippet template(args: {
+		session: DiscoveredSession;
+		onAdopt: (s: DiscoveredSession) => void;
+	})}
+		<div class="max-w-lg p-8">
+			<DiscoveredSessionCard session={args.session} onAdopt={args.onAdopt} />
 		</div>
 	{/snippet}
 </Story>

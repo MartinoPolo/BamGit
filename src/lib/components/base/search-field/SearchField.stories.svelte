@@ -1,5 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+
+	import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 	import { SearchField } from './index.js';
 
 	const { Story } = defineMeta({
@@ -7,6 +9,43 @@
 		component: SearchField,
 		tags: ['autodocs'],
 	});
+
+	const playTypingUpdatesValue = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const input = canvas.getByRole('searchbox');
+		await userEvent.click(input);
+		await userEvent.type(input, 'hello');
+		await waitFor(() => expect((input as HTMLInputElement).value).toBe('hello'));
+	};
+
+	const playClearFieldEmptiesValue = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		const input = canvas.getByRole('searchbox');
+		await userEvent.click(input);
+		await userEvent.type(input, 'hello');
+		await waitFor(() => expect((input as HTMLInputElement).value).toBe('hello'));
+		await userEvent.clear(input);
+		await waitFor(() => expect((input as HTMLInputElement).value).toBe(''));
+	};
+
+	const playOninputCallbackFires = async ({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: { oninput?: unknown };
+	}) => {
+		const spy = args.oninput as ReturnType<typeof fn>;
+		const canvas = within(canvasElement);
+		const input = canvas.getByRole('searchbox');
+		await userEvent.click(input);
+		await userEvent.type(input, 'abc');
+		await waitFor(() => expect(spy).toHaveBeenCalled());
+	};
 </script>
 
 <script lang="ts">
@@ -132,6 +171,30 @@
 					</div>
 				</SearchField>
 			</div>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Typing Updates Value" play={playTypingUpdatesValue}>
+	{#snippet template(args: SearchFieldProps)}
+		<div class="max-w-xs">
+			<SearchField placeholder="Search…" aria-label="Search" {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Clear Field Empties Value" play={playClearFieldEmptiesValue}>
+	{#snippet template(args: SearchFieldProps)}
+		<div class="max-w-xs">
+			<SearchField placeholder="Search…" aria-label="Search" {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Test: Oninput Callback Fires" args={{ oninput: fn() }} play={playOninputCallbackFires}>
+	{#snippet template(args: SearchFieldProps)}
+		<div class="max-w-xs">
+			<SearchField placeholder="Search…" aria-label="Search" {...args} />
 		</div>
 	{/snippet}
 </Story>

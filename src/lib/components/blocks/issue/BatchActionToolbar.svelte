@@ -3,7 +3,7 @@
 	import { PRIORITY_OPTIONS } from '$lib/components/blocks/issue/issue_card_utils.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
-	import { WithTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import ArchiveRestoreIcon from '@lucide/svelte/icons/archive-restore';
 	import Trash2Icon from '@lucide/svelte/icons/trash-2';
@@ -81,7 +81,7 @@
 		<!-- Batch action buttons -->
 		<div class="flex items-center gap-1.5">
 			{#if hasActiveIssues}
-				<WithTooltip text="Archive selected issues">
+				<SimpleTooltip text="Archive selected issues">
 					{#snippet asChild(props)}
 						<Button
 							{...props}
@@ -95,11 +95,11 @@
 							Archive
 						</Button>
 					{/snippet}
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 
 			{#if hasArchivedIssues}
-				<WithTooltip text="Unarchive selected issues">
+				<SimpleTooltip text="Unarchive selected issues">
 					{#snippet asChild(props)}
 						<Button
 							{...props}
@@ -113,10 +113,10 @@
 							Unarchive
 						</Button>
 					{/snippet}
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 
-			<WithTooltip text="Delete selected issues">
+			<SimpleTooltip text="Delete selected issues">
 				{#snippet asChild(props)}
 					<Button
 						{...props}
@@ -129,7 +129,7 @@
 						Delete
 					</Button>
 				{/snippet}
-			</WithTooltip>
+			</SimpleTooltip>
 
 			<Popover.Root bind:open={priorityPopoverOpen}>
 				<Popover.Trigger>
@@ -153,7 +153,7 @@
 			</Popover.Root>
 
 			{#if hasActiveWorktrees}
-				<WithTooltip text="Remove active worktrees for selected issues">
+				<SimpleTooltip text="Remove active worktrees for selected issues">
 					{#snippet asChild(props)}
 						<Button
 							{...props}
@@ -166,7 +166,7 @@
 							<ScissorsIcon data-icon="inline-start" />
 						</Button>
 					{/snippet}
-				</WithTooltip>
+				</SimpleTooltip>
 			{/if}
 
 			<Button intent="ghost" size="icon-sm" onclick={onDeselectAll} aria-label="Deselect all">
@@ -176,7 +176,7 @@
 	{:else}
 		<!-- Default state: Clean Up Worktrees button only -->
 		<div class="flex flex-1 items-center justify-end">
-			<WithTooltip text="Remove inactive and orphaned worktrees">
+			<SimpleTooltip text="Remove inactive and orphaned worktrees">
 				{#snippet asChild(props)}
 					<Button
 						{...props}
@@ -188,7 +188,7 @@
 						<ScissorsIcon data-icon="inline-start" />
 					</Button>
 				{/snippet}
-			</WithTooltip>
+			</SimpleTooltip>
 		</div>
 	{/if}
 </div>

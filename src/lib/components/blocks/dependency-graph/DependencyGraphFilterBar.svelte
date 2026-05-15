@@ -3,6 +3,7 @@
 		DEFAULT_DEPENDENCY_FILTER,
 		type DependencyFilter,
 	} from '$lib/modules/dependency-graph';
+	import { Select } from '$lib/components/shadcn/select/index.js';
 	import EyeIcon from '@lucide/svelte/icons/eye';
 	import EyeOffIcon from '@lucide/svelte/icons/eye-off';
 	import RotateCcwIcon from '@lucide/svelte/icons/rotate-ccw';
@@ -72,20 +73,20 @@
 	</button>
 
 	{#if areaOptions.length > 0}
-		<select
-			class="filter-select"
+		<Select
 			value={filter.area ?? ''}
 			onchange={(event) => {
-				const target = event.target as HTMLSelectElement;
+				const target = event.currentTarget as HTMLSelectElement;
 				update({ area: target.value === '' ? null : target.value });
 			}}
 			aria-label="Filter by area"
+			class="h-[26px] w-auto text-[11px]"
 		>
 			<option value="">All areas</option>
 			{#each areaOptions as area (area)}
 				<option value={area}>{area}</option>
 			{/each}
-		</select>
+		</Select>
 	{/if}
 
 	<input
@@ -144,16 +145,6 @@
 		background: var(--primary);
 		border-color: var(--primary);
 		color: var(--primary-foreground);
-	}
-
-	.filter-select {
-		height: 26px;
-		padding: 0 6px;
-		border: 1px solid var(--border);
-		border-radius: calc(var(--radius) * 1);
-		background: var(--card);
-		color: var(--foreground);
-		font-size: 11px;
 	}
 
 	.filter-search {

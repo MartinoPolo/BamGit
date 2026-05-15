@@ -9,6 +9,7 @@
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { ColorPicker } from '$lib/components/derived/color-picker/index.js';
 	import { buildUpdateIssueRequest } from './dialog_helpers.js';
+	import { PRIORITY_OPTIONS } from './issue_card_utils.js';
 
 	interface Props {
 		issue: Issue | null;
@@ -83,11 +84,9 @@
 						<Label for="edit-issue-priority">{m.issue_field_priority()}</Label>
 						<Select id="edit-issue-priority" bind:value={priority}>
 							<option value="">{m.priority_none()}</option>
-							<option value="lowest">{m.priority_lowest()}</option>
-							<option value="low">{m.priority_low()}</option>
-							<option value="medium">{m.priority_medium()}</option>
-							<option value="high">{m.priority_high()}</option>
-							<option value="top">{m.priority_top()}</option>
+							{#each PRIORITY_OPTIONS as option (option.value)}
+								<option value={option.value}>{option.label()}</option>
+							{/each}
 						</Select>
 					</div>
 
