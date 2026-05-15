@@ -196,7 +196,7 @@
 			<!-- Select -->
 			<div class="rounded-lg border border-border bg-surface p-4">
 				<h3 class="mb-3 text-sm font-semibold text-foreground">Select</h3>
-				<Select>
+				<Select aria-label="Select option">
 					<option value="">Choose an option…</option>
 					<option value="one">Option One</option>
 					<option value="two">Option Two</option>
