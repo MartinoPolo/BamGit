@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { fn } from 'storybook/test';
+	import { expect, fn, userEvent, within } from 'storybook/test';
 	import WorkspaceCard from './WorkspaceCard.svelte';
 	import { MOCK_OVERVIEW_DATA } from '$lib/tauri_mock_data.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
@@ -28,6 +28,178 @@
 	const onHitlClick = fn();
 	const onPrdClick = fn();
 	const onAfkClick = fn();
+
+	// --- play() interaction tests ---
+
+	const playRendersContent = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+
+		// Title visible
+		await expect(canvas.getByText('Grovekeeper')).toBeInTheDocument();
+
+		// Issue count visible (afk_ready_count = 3, shown as value)
+		await expect(canvas.getByText('ISSUES')).toBeInTheDocument();
+		await expect(canvas.getByText('3')).toBeInTheDocument();
+
+		// Session count visible in AFK meta
+		await expect(canvas.getByText(/3 sessions/)).toBeInTheDocument();
+
+		// Branch info visible
+		await expect(canvas.getByText(/dev · 5 worktrees/)).toBeInTheDocument();
+
+		// PRD row visible
+		await expect(canvas.getByText(/3 PRDs/)).toBeInTheDocument();
+	};
+
+	const playGithubButtonStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		onclick.mockClear();
+		onGithubClick.mockClear();
+
+		// GitHub and Folder buttons are <button data-slot="button"> with data-icon="inline-end" icons
+		const iconButtons = Array.from(
+			canvasElement.querySelectorAll<HTMLButtonElement>('button[data-slot="button"]'),
+		).filter((btn) => btn.querySelector('[data-icon="inline-end"]'));
+		// First is GitHub, second is Folder
+		const githubButton = iconButtons[0]!;
+		await userEvent.click(githubButton);
+
+		await expect(onGithubClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playFolderButtonStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		onclick.mockClear();
+		onFolderClick.mockClear();
+
+		// GitHub and Folder buttons are <button data-slot="button"> with data-icon="inline-end" icons
+		const iconButtons = Array.from(
+			canvasElement.querySelectorAll<HTMLButtonElement>('button[data-slot="button"]'),
+		).filter((btn) => btn.querySelector('[data-icon="inline-end"]'));
+		// First is GitHub, second is Folder
+		const folderButton = iconButtons[1]!;
+		await userEvent.click(folderButton);
+
+		await expect(onFolderClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playIssuesStatCellStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+		onIssuesClick.mockClear();
+
+		// StatCell with onclick renders role="button" — find the one labelled "ISSUES"
+		const issuesCell = canvas.getByText('ISSUES').closest('[role="button"]')!;
+		await userEvent.click(issuesCell);
+
+		await expect(onIssuesClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playPrsStatCellStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+		onPrsClick.mockClear();
+
+		const prsCell = canvas.getByText('PRs').closest('[role="button"]')!;
+		await userEvent.click(prsCell);
+
+		await expect(onPrsClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playAttnStatCellStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+		onAttnClick.mockClear();
+
+		const attnCell = canvas.getByText('ATTN').closest('[role="button"]')!;
+		await userEvent.click(attnCell);
+
+		await expect(onAttnClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playHitlStatCellStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+		onHitlClick.mockClear();
+
+		const hitlCell = canvas.getByText('HITL').closest('[role="button"]')!;
+		await userEvent.click(hitlCell);
+
+		await expect(onHitlClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playPrdRowStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+		onPrdClick.mockClear();
+
+		// PRD row is a <button> containing "PRDs" text
+		const prdButton = canvas.getByText(/3 PRDs/).closest('button')!;
+		await userEvent.click(prdButton);
+
+		await expect(onPrdClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playAfkRowStopsPropagation = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+		onAfkClick.mockClear();
+
+		// StatusRow with onclick renders role="button"
+		const afkRow = canvas.getByText('AFK loop running').closest('[role="button"]')!;
+		await userEvent.click(afkRow);
+
+		await expect(onAfkClick).toHaveBeenCalledOnce();
+		await expect(onclick).not.toHaveBeenCalled();
+	};
+
+	const playCardClickFiresOnclick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		onclick.mockClear();
+
+		// Click the card title area (not on any nested interactive element)
+		const title = canvas.getByText('Grovekeeper');
+		await userEvent.click(title);
+
+		await expect(onclick).toHaveBeenCalledOnce();
+	};
 </script>
 
 <Story name="Active Workspace (Default)">
@@ -165,5 +337,86 @@
 				{onAfkClick}
 			/>
 		</div>
+	{/snippet}
+</Story>
+
+<!-- Interaction tests -->
+
+{#snippet interactionCard()}
+	<div class="max-w-xs p-8">
+		<WorkspaceCard
+			workspace={makeWorkspace()}
+			{onclick}
+			{onGithubClick}
+			{onFolderClick}
+			{onGithubRightClick}
+			{onFolderRightClick}
+			{onIssuesClick}
+			{onPrsClick}
+			{onAttnClick}
+			{onHitlClick}
+			{onPrdClick}
+			{onAfkClick}
+		/>
+	</div>
+{/snippet}
+
+<Story name="Test: Renders Content" play={playRendersContent}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: Card Click Fires Onclick" play={playCardClickFiresOnclick}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: GitHub Button Stops Propagation" play={playGithubButtonStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: Folder Button Stops Propagation" play={playFolderButtonStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: Issues Cell Stops Propagation" play={playIssuesStatCellStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: PRs Cell Stops Propagation" play={playPrsStatCellStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: Attn Cell Stops Propagation" play={playAttnStatCellStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: HITL Cell Stops Propagation" play={playHitlStatCellStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: PRD Row Stops Propagation" play={playPrdRowStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
+	{/snippet}
+</Story>
+
+<Story name="Test: AFK Row Stops Propagation" play={playAfkRowStopsPropagation}>
+	{#snippet template()}
+		{@render interactionCard()}
 	{/snippet}
 </Story>

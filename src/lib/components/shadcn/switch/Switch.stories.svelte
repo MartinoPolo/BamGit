@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, within } from 'storybook/test';
 	import { Switch } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 
@@ -12,25 +13,60 @@
 			disabled: { control: 'boolean' },
 		},
 	});
+
+	const playClickTogglesOn = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const switchEl = canvas.getByRole('switch');
+		await expect(switchEl).toHaveAttribute('aria-checked', 'false');
+		await userEvent.click(switchEl);
+		await expect(switchEl).toHaveAttribute('aria-checked', 'true');
+	};
+
+	const playClickTogglesOff = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const switchEl = canvas.getByRole('switch');
+		await expect(switchEl).toHaveAttribute('aria-checked', 'true');
+		await userEvent.click(switchEl);
+		await expect(switchEl).toHaveAttribute('aria-checked', 'false');
+	};
+
+	const playDisabledIgnoresClick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const switchEl = canvas.getByRole('switch');
+		await expect(switchEl).toHaveAttribute('aria-checked', 'false');
+		await userEvent.click(switchEl);
+		await expect(switchEl).toHaveAttribute('aria-checked', 'false');
+	};
+
+	const playSpaceKeyToggles = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const switchEl = canvas.getByRole('switch');
+		await expect(switchEl).toHaveAttribute('aria-checked', 'false');
+		switchEl.focus();
+		await userEvent.keyboard(' ');
+		await expect(switchEl).toHaveAttribute('aria-checked', 'true');
+		await userEvent.keyboard(' ');
+		await expect(switchEl).toHaveAttribute('aria-checked', 'false');
+	};
 </script>
 
 <script lang="ts">
 	import type { SwitchProps } from './switch-variants.js';
 </script>
 
-<Story name="Off">
+<Story name="Off" play={playClickTogglesOn}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} />
 	{/snippet}
 </Story>
 
-<Story name="On">
+<Story name="On" play={playClickTogglesOff}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} checked />
 	{/snippet}
 </Story>
 
-<Story name="Disabled Off">
+<Story name="Disabled Off" play={playDisabledIgnoresClick}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} disabled />
 	{/snippet}
@@ -39,6 +75,12 @@
 <Story name="Disabled On">
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} disabled checked />
+	{/snippet}
+</Story>
+
+<Story name="Space Key Toggles" play={playSpaceKeyToggles}>
+	{#snippet template(args: SwitchProps)}
+		<Switch {...args} />
 	{/snippet}
 </Story>
 

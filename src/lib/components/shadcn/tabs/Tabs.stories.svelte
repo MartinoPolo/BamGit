@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, within } from 'storybook/test';
 	import { Tabs } from './index.js';
 
 	const { Story } = defineMeta({
@@ -7,6 +8,68 @@
 		component: Tabs,
 		tags: ['autodocs'],
 	});
+
+	const playTabSwitchToSecond = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const tabs = canvas.getAllByRole('tab');
+
+		// Initial state — first tab active
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+		await expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+		await expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+
+		// Click second tab
+		await userEvent.click(tabs[1]);
+		await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+		await expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+	};
+
+	const playTabSwitchToThird = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const tabs = canvas.getAllByRole('tab');
+
+		// Click third tab
+		await userEvent.click(tabs[2]);
+		await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+		await expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+	};
+
+	const playKeyboardActivation = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const tabs = canvas.getAllByRole('tab');
+
+		// Initial state
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+
+		// Focus second tab and press Enter
+		tabs[1].focus();
+		await userEvent.keyboard('{Enter}');
+		await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+
+		// Focus third tab and press Space
+		tabs[2].focus();
+		await userEvent.keyboard(' ');
+		await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+		await expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+	};
+
+	const playDisabledTabIgnored = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+		const tabs = canvas.getAllByRole('tab');
+
+		// First tab starts active
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+
+		// Click disabled tab (third tab in "With Disabled Tab" story)
+		await userEvent.click(tabs[2]);
+
+		// First tab should remain active — disabled tab should not activate
+		await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+		await expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+	};
 </script>
 
 <script lang="ts">
@@ -34,7 +97,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Default">
+<Story name="Default" play={playTabSwitchToSecond}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={defaultActive === 'Overview'} onclick={() => (defaultActive = 'Overview')}
@@ -50,7 +113,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons">
+<Story name="With Icons" play={playTabSwitchToThird}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={iconsActive === 'Profile'} onclick={() => (iconsActive = 'Profile')}
@@ -68,7 +131,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Disabled Tab">
+<Story name="With Disabled Tab" play={playDisabledTabIgnored}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={disabledActive === 'Active'} onclick={() => (disabledActive = 'Active')}
@@ -82,7 +145,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Badge">
+<Story name="With Badge" play={playKeyboardActivation}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={badgeActive === 'Inbox'} onclick={() => (badgeActive = 'Inbox')}

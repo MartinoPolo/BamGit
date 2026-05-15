@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import * as ContextMenu from './index.js';
 	import DeleteIcon from '@lucide/svelte/icons/delete';
 
@@ -8,6 +9,141 @@
 		component: ContextMenu.Root,
 		tags: ['autodocs'],
 	});
+
+	/* ------------------------------------------------------------------ */
+	/*  Helpers                                                           */
+	/* ------------------------------------------------------------------ */
+
+	/** Right-click the trigger area to open the context menu. */
+	async function rightClickTrigger(canvasElement: HTMLElement) {
+		const canvas = within(canvasElement);
+		const triggerArea = canvas.getByText('Right-click here');
+		await userEvent.pointer({ keys: '[MouseRight]', target: triggerArea });
+	}
+
+	/** Assert menu is closed (either removed from DOM or data-state="closed"). */
+	async function expectMenuClosed(canvasElement: HTMLElement) {
+		await waitFor(() => {
+			const menu = canvasElement.querySelector('[role="menu"]');
+			if (menu) {
+				expect((menu as HTMLElement).dataset.state).toBe('closed');
+			}
+		});
+	}
+
+	/* ------------------------------------------------------------------ */
+	/*  play() interaction tests                                          */
+	/* ------------------------------------------------------------------ */
+
+	const playOpensOnRightClick = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await rightClickTrigger(canvasElement);
+
+		const menu = canvasElement.querySelector('[role="menu"]');
+		await expect(menu).toBeTruthy();
+	};
+
+	const playClickItemClosesMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await rightClickTrigger(canvasElement);
+
+		const items = canvasElement.querySelectorAll('[role="menuitem"]');
+		await expect(items.length).toBeGreaterThanOrEqual(1);
+
+		await userEvent.click(items[0]);
+
+		// Menu should close after clicking an item
+		await expectMenuClosed(canvasElement);
+	};
+
+	const playArrowDownFocusesItems = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await rightClickTrigger(canvasElement);
+
+		const menu = canvasElement.querySelector('[role="menu"]');
+		await expect(menu).toBeTruthy();
+
+		const items = canvasElement.querySelectorAll('[role="menuitem"]');
+		await expect(items.length).toBeGreaterThanOrEqual(2);
+
+		await userEvent.keyboard('{ArrowDown}');
+		await expect(items[0]).toHaveFocus();
+
+		await userEvent.keyboard('{ArrowDown}');
+		await expect(items[1]).toHaveFocus();
+	};
+
+	const playRadioItemEnterSelects = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await rightClickTrigger(canvasElement);
+
+		const menu = canvasElement.querySelector('[role="menu"]');
+		await expect(menu).toBeTruthy();
+
+		// Radio items have role="menuitemradio"
+		const radioItems = canvasElement.querySelectorAll('[role="menuitemradio"]');
+		await expect(radioItems.length).toBeGreaterThanOrEqual(2);
+
+		await userEvent.keyboard('{ArrowDown}');
+		const firstRadio = radioItems[0];
+		await expect(firstRadio).toHaveFocus();
+
+		await userEvent.keyboard('{Enter}');
+
+		// Menu should close after Enter on a radio item
+		await expectMenuClosed(canvasElement);
+	};
+
+	const playEscapeClosesMenu = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		await rightClickTrigger(canvasElement);
+
+		const menu = canvasElement.querySelector('[role="menu"]');
+		await expect(menu).toBeTruthy();
+
+		await userEvent.keyboard('{Escape}');
+
+		await expectMenuClosed(canvasElement);
+	};
+
+	const playDisabledItemsNotClickable = async ({
+		canvasElement,
+	}: {
+		canvasElement: HTMLElement;
+	}) => {
+		await rightClickTrigger(canvasElement);
+
+		const menu = canvasElement.querySelector('[role="menu"]');
+		await expect(menu).toBeTruthy();
+
+		// Disabled items have data-disabled attribute
+		const disabledItems = canvasElement.querySelectorAll('[role="menuitem"][data-disabled]');
+		await expect(disabledItems.length).toBeGreaterThanOrEqual(1);
+
+		// Verify each disabled item has data-disabled (pointer-events:none prevents click)
+		for (const item of disabledItems) {
+			await expect(item).toHaveAttribute('data-disabled');
+		}
+
+		// Menu should still be open after checking disabled items
+		await expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy();
+	};
+
+	const playEscapeContainment = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+
+		// Open the dialog first
+		await userEvent.click(canvas.getByRole('button', { name: /open dialog/i }));
+		await expect(canvas.getByRole('dialog')).toBeVisible();
+
+		// Right-click inside the dialog to open context menu
+		const triggerArea = canvas.getByText('Right-click here');
+		await userEvent.pointer({ keys: '[MouseRight]', target: triggerArea });
+
+		const menu = canvasElement.querySelector('[role="menu"]');
+		await expect(menu).toBeTruthy();
+
+		// Press Escape — should close context menu but NOT the dialog
+		await userEvent.keyboard('{Escape}');
+
+		await expectMenuClosed(canvasElement);
+		await expect(canvas.getByRole('dialog')).toBeVisible();
+	};
 </script>
 
 <script lang="ts">
@@ -16,12 +152,14 @@
 	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import FolderIcon from '@lucide/svelte/icons/folder';
+	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 
 	let checkboxChecked = $state(false);
 	let radioValue = $state('middle');
 </script>
 
-<Story name="Basic Menu">
+<Story name="Basic Menu" play={playOpensOnRightClick}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -31,7 +169,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.Item>Back</ContextMenu.Item>
 				<ContextMenu.Item>Forward</ContextMenu.Item>
 				<ContextMenu.Item>Reload</ContextMenu.Item>
@@ -43,7 +181,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons">
+<Story name="With Icons" play={playClickItemClosesMenu}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -53,7 +191,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.Item>
 					<ScissorsIcon class="size-4" />
 					Cut
@@ -80,7 +218,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Submenus">
+<Story name="With Submenus" play={playArrowDownFocusesItems}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -90,7 +228,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.Item>New File</ContextMenu.Item>
 				<ContextMenu.Item>New Window</ContextMenu.Item>
 				<ContextMenu.Separator />
@@ -111,7 +249,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled Items">
+<Story name="Disabled Items" play={playDisabledItemsNotClickable}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -121,7 +259,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.Item>Undo</ContextMenu.Item>
 				<ContextMenu.Item>Redo</ContextMenu.Item>
 				<ContextMenu.Separator />
@@ -143,7 +281,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.CheckboxItem bind:checked={checkboxChecked}>
 					Show Minimap
 				</ContextMenu.CheckboxItem>
@@ -154,7 +292,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Radio Items">
+<Story name="Radio Items" play={playRadioItemEnterSelects}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -164,7 +302,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.Label>Panel Position</ContextMenu.Label>
 				<ContextMenu.Separator />
 				<ContextMenu.RadioGroup bind:value={radioValue}>
@@ -176,7 +314,7 @@
 		</ContextMenu.Root>
 	{/snippet}
 </Story>
-<Story name="With Icons And Submenus">
+<Story name="With Icons And Submenus" play={playEscapeClosesMenu}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -186,7 +324,7 @@
 					Right-click here
 				</div>
 			</ContextMenu.Trigger>
-			<ContextMenu.Content>
+			<ContextMenu.Content portalProps={{ disabled: true }}>
 				<ContextMenu.Item>
 					<ScissorsIcon class="size-4" />
 					Cut
@@ -228,7 +366,7 @@
 							With Icons + Destructive
 						</div>
 					</ContextMenu.Trigger>
-					<ContextMenu.Content>
+					<ContextMenu.Content portalProps={{ disabled: true }}>
 						<ContextMenu.Item>
 							<ScissorsIcon class="size-4" />
 							Cut
@@ -262,7 +400,7 @@
 							With Submenus + Icons
 						</div>
 					</ContextMenu.Trigger>
-					<ContextMenu.Content>
+					<ContextMenu.Content portalProps={{ disabled: true }}>
 						<ContextMenu.Item>New File</ContextMenu.Item>
 						<ContextMenu.Sub>
 							<ContextMenu.SubTrigger>
@@ -284,5 +422,40 @@
 				</ContextMenu.Root>
 			</div>
 		</div>
+	{/snippet}
+</Story>
+
+<Story name="Escape Containment (Dialog)" play={playEscapeContainment}>
+	{#snippet template()}
+		<Dialog.Root>
+			<Dialog.Trigger>
+				{#snippet child({ props })}
+					<Button {...props} intent="secondary">Open Dialog</Button>
+				{/snippet}
+			</Dialog.Trigger>
+			<Dialog.Content portalProps={{ disabled: true }}>
+				<Dialog.Header>
+					<Dialog.Title>Dialog with Context Menu</Dialog.Title>
+					<Dialog.Description>
+						Right-click the area below. Escape should close the context menu but not the
+						dialog.
+					</Dialog.Description>
+				</Dialog.Header>
+				<ContextMenu.Root>
+					<ContextMenu.Trigger>
+						<div
+							class="flex h-36 w-72 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
+						>
+							Right-click here
+						</div>
+					</ContextMenu.Trigger>
+					<ContextMenu.Content portalProps={{ disabled: true }}>
+						<ContextMenu.Item>Cut</ContextMenu.Item>
+						<ContextMenu.Item>Copy</ContextMenu.Item>
+						<ContextMenu.Item>Paste</ContextMenu.Item>
+					</ContextMenu.Content>
+				</ContextMenu.Root>
+			</Dialog.Content>
+		</Dialog.Root>
 	{/snippet}
 </Story>

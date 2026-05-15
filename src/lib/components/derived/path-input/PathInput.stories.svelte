@@ -23,7 +23,7 @@
 <Story name="Empty" args={{}}>
 	{#snippet template()}
 		<div class="w-80">
-			<PathInput bind:value={emptyValue} />
+			<PathInput bind:value={emptyValue} aria-label="Project path" />
 		</div>
 	{/snippet}
 </Story>
@@ -31,7 +31,7 @@
 <Story name="Prefilled Path" args={{}}>
 	{#snippet template()}
 		<div class="w-80">
-			<PathInput bind:value={prefilledValue} />
+			<PathInput bind:value={prefilledValue} aria-label="Project path" />
 		</div>
 	{/snippet}
 </Story>
@@ -39,7 +39,11 @@
 <Story name="With Custom Placeholder" args={{}}>
 	{#snippet template()}
 		<div class="w-80">
-			<PathInput bind:value={placeholderValue} placeholder="Select project root folder…" />
+			<PathInput
+				bind:value={placeholderValue}
+				placeholder="Select project root folder…"
+				aria-label="Project root folder"
+			/>
 		</div>
 	{/snippet}
 </Story>
@@ -47,7 +51,7 @@
 <Story name="Disabled" args={{}}>
 	{#snippet template()}
 		<div class="w-80">
-			<PathInput bind:value={disabledValue} disabled />
+			<PathInput bind:value={disabledValue} disabled aria-label="Project path" />
 		</div>
 	{/snippet}
 </Story>

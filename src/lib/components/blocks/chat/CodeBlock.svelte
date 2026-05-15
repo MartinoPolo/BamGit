@@ -55,7 +55,12 @@
 			{/if}
 		</Button>
 	</div>
-	<pre class="overflow-x-auto p-3"><code
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<pre
+		class="overflow-x-auto p-3"
+		tabindex="0"
+		role="region"
+		aria-label={language !== undefined && language !== '' ? `${language} code` : 'Code'}><code
 			class="font-mono text-[11.5px] leading-relaxed text-foreground-muted">{code}</code
 		></pre>
 </div>

@@ -20,7 +20,7 @@
 <Story name="Rest">
 	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
-			<SearchField placeholder="Search issues, branches…" {...args} />
+			<SearchField placeholder="Search issues, branches…" aria-label="Search" {...args} />
 		</div>
 	{/snippet}
 </Story>
@@ -28,7 +28,7 @@
 <Story name="Typing With Results">
 	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
-			<SearchField value="forest" {...args}>
+			<SearchField value="forest" aria-label="Search" {...args}>
 				<div
 					class="mt-1.5 max-h-80 overflow-auto rounded-md border border-border bg-surface p-1.5 shadow-lg"
 				>
@@ -72,7 +72,7 @@
 <Story name="No Results">
 	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
-			<SearchField value="qqzzqz" {...args}>
+			<SearchField value="qqzzqz" aria-label="Search" {...args}>
 				<div
 					class="mt-1.5 rounded-md border border-border bg-surface p-4.5 text-center shadow-lg"
 				>
@@ -88,11 +88,15 @@
 		<div class="grid max-w-2xl grid-cols-3 items-start gap-4">
 			<div>
 				<span class="mb-2 block text-xs text-foreground-subtle">Rest</span>
-				<SearchField placeholder="Search issues, branches…" {...args} />
+				<SearchField
+					placeholder="Search issues, branches…"
+					aria-label="Search rest"
+					{...args}
+				/>
 			</div>
 			<div>
 				<span class="mb-2 block text-xs text-foreground-subtle">Typing + results</span>
-				<SearchField value="forest">
+				<SearchField value="forest" aria-label="Search typing">
 					<div
 						class="mt-1.5 max-h-80 overflow-auto rounded-md border border-border bg-surface p-1.5 shadow-lg"
 					>
@@ -118,7 +122,7 @@
 			</div>
 			<div>
 				<span class="mb-2 block text-xs text-foreground-subtle">No results</span>
-				<SearchField value="qqzzqz">
+				<SearchField value="qqzzqz" aria-label="Search no results">
 					<div
 						class="mt-1.5 rounded-md border border-border bg-surface p-4.5 text-center shadow-lg"
 					>

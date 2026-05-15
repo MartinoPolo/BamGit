@@ -1,12 +1,17 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, fn, userEvent, within } from 'storybook/test';
 	import { BUTTON_INTENTS, BUTTON_SIZES, Button } from './index.js';
 
 	const { Story } = defineMeta({
 		title: 'Base/Button',
 		component: Button,
 		tags: ['autodocs'],
+		args: {
+			onclick: fn(),
+		},
 		argTypes: {
+			onclick: { action: 'clicked' },
 			intent: {
 				control: 'select',
 				options: [...BUTTON_INTENTS],
@@ -18,6 +23,35 @@
 			disabled: { control: 'boolean' },
 		},
 	});
+
+	const playClickCallsHandler = async ({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: { onclick?: unknown };
+	}) => {
+		const canvas = within(canvasElement);
+		const button = canvas.getByRole('button', { name: 'Primary' });
+		await userEvent.click(button);
+		await expect(args.onclick).toHaveBeenCalledOnce();
+	};
+
+	const playDisabledIgnoresClick = async ({
+		canvasElement,
+		args,
+	}: {
+		canvasElement: HTMLElement;
+		args: { onclick?: unknown };
+	}) => {
+		// Only check buttons with data-slot="button" (shadcn buttons), not ThemeDecorator buttons
+		const buttons = canvasElement.querySelectorAll<HTMLButtonElement>('[data-slot="button"]');
+		await expect(buttons.length).toBeGreaterThan(0);
+		for (const button of buttons) {
+			await expect(button).toBeDisabled();
+		}
+		await expect(args.onclick).not.toHaveBeenCalled();
+	};
 </script>
 
 <script lang="ts">
@@ -118,7 +152,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Primary" args={{ intent: 'primary' }}>
+<Story name="Primary" args={{ intent: 'primary' }} play={playClickCallsHandler}>
 	{#snippet template(args: ButtonProps)}
 		<Button {...args}>Primary</Button>
 	{/snippet}
@@ -177,7 +211,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled">
+<Story name="Disabled" play={playDisabledIgnoresClick}>
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
 			<Button intent="primary" disabled {...args}>Primary</Button>
