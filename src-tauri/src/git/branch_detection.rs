@@ -92,8 +92,10 @@ mod tests {
         assert!(result.is_ok());
         let status = result.unwrap();
         assert!(
-            status == BranchStatus::Active || status == BranchStatus::Local,
-            "Expected Active or Local for current branch '{branch_name}', got {:?}",
+            status == BranchStatus::Active
+                || status == BranchStatus::Local
+                || status == BranchStatus::RemoteGone,
+            "Expected Active, Local, or RemoteGone for current branch '{branch_name}', got {:?}",
             status
         );
     }

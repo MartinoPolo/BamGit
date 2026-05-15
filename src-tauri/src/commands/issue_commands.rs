@@ -289,11 +289,10 @@ pub fn toggle_issue_sound_mute(
 
 #[cfg(test)]
 mod tests {
-    #[allow(unused_imports)]
     use crate::database::test_helpers::setup_test_database;
     use rusqlite::Connection;
+    use super::validate_branch_name_chars;
 
-    #[allow(dead_code)]
     fn insert_dashboard(connection: &Connection, id: &str) {
         connection
             .execute(
@@ -303,7 +302,6 @@ mod tests {
             .unwrap();
     }
 
-    #[allow(dead_code)]
     fn insert_issue_with_github(
         connection: &Connection,
         id: &str,
@@ -318,4 +316,93 @@ mod tests {
             .unwrap();
     }
 
+    #[test]
+    fn validate_branch_name_accepts_simple_names() {
+        assert!(validate_branch_name_chars("feature-auth").is_ok());
+        assert!(validate_branch_name_chars("fix/login-bug").is_ok());
+        assert!(validate_branch_name_chars("release_v2.1").is_ok());
+        assert!(validate_branch_name_chars("main").is_ok());
+    }
+
+    #[test]
+    fn validate_branch_name_rejects_special_chars() {
+        assert!(validate_branch_name_chars("feature branch").is_err());
+        assert!(validate_branch_name_chars("fix@bug").is_err());
+        assert!(validate_branch_name_chars("test#123").is_err());
+        assert!(validate_branch_name_chars("name with spaces").is_err());
+    }
+
+    #[test]
+    fn validate_branch_name_empty_string_is_valid() {
+        assert!(validate_branch_name_chars("").is_ok());
+    }
+
+    #[test]
+    fn labels_json_round_trip_at_db_level() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+
+        let labels_json = r##"[{"name":"bug","color":"#ff0000"}]"##;
+        connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, labels) VALUES ('i1', 'd1', 'Labeled Issue', ?1)",
+            rusqlite::params![labels_json],
+        ).unwrap();
+
+        let fetched_labels: Option<String> = connection.query_row(
+            "SELECT labels FROM issues WHERE id = 'i1'", [], |row| row.get(0),
+        ).unwrap();
+
+        assert_eq!(fetched_labels.as_deref(), Some(labels_json));
+    }
+
+    #[test]
+    fn issue_github_number_stored_correctly() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+        insert_issue_with_github(&connection, "i1", "d1", Some(42));
+
+        let number: Option<i64> = connection.query_row(
+            "SELECT github_issue_number FROM issues WHERE id = 'i1'", [], |row| row.get(0),
+        ).unwrap();
+
+        assert_eq!(number, Some(42));
+    }
+
+    #[test]
+    fn issue_github_number_null_when_not_set() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+        insert_issue_with_github(&connection, "i1", "d1", None);
+
+        let number: Option<i64> = connection.query_row(
+            "SELECT github_issue_number FROM issues WHERE id = 'i1'", [], |row| row.get(0),
+        ).unwrap();
+
+        assert_eq!(number, None);
+    }
+
+    #[test]
+    fn partial_update_preserves_unmodified_fields() {
+        let connection = setup_test_database();
+        insert_dashboard(&connection, "d1");
+        connection.execute(
+            "INSERT INTO issues (id, dashboard_id, name, priority, color) VALUES ('i1', 'd1', 'Original', 'high', '#ff0000')",
+            [],
+        ).unwrap();
+
+        connection.execute(
+            "UPDATE issues SET name = 'Updated' WHERE id = 'i1'",
+            [],
+        ).unwrap();
+
+        let (name, priority, color): (String, Option<String>, Option<String>) = connection.query_row(
+            "SELECT name, priority, color FROM issues WHERE id = 'i1'", [], |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+            },
+        ).unwrap();
+
+        assert_eq!(name, "Updated");
+        assert_eq!(priority.as_deref(), Some("high"));
+        assert_eq!(color.as_deref(), Some("#ff0000"));
+    }
 }

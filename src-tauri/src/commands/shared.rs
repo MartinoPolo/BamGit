@@ -25,3 +25,61 @@ pub fn validate_hex_color(color: &str) -> Result<(), String> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn resolve_nullable_field_none_keeps_existing() {
+        let existing: Option<String> = Some("existing".to_string());
+        let result = resolve_nullable_field(None, existing);
+        assert_eq!(result.as_deref(), Some("existing"));
+    }
+
+    #[test]
+    fn resolve_nullable_field_some_none_clears() {
+        let existing: Option<String> = Some("existing".to_string());
+        let result = resolve_nullable_field(Some(None), existing);
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn resolve_nullable_field_some_some_sets_new() {
+        let existing: Option<String> = Some("existing".to_string());
+        let result = resolve_nullable_field(Some(Some("new".to_string())), existing);
+        assert_eq!(result.as_deref(), Some("new"));
+    }
+
+    #[test]
+    fn resolve_nullable_field_none_preserves_none() {
+        let existing: Option<String> = None;
+        let result: Option<String> = resolve_nullable_field(None, existing);
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn validate_hex_color_accepts_valid() {
+        assert!(validate_hex_color("#FF00AA").is_ok());
+        assert!(validate_hex_color("#000000").is_ok());
+        assert!(validate_hex_color("#ffffff").is_ok());
+        assert!(validate_hex_color("#a1B2c3").is_ok());
+    }
+
+    #[test]
+    fn validate_hex_color_rejects_missing_hash() {
+        assert!(validate_hex_color("FF00AA").is_err());
+    }
+
+    #[test]
+    fn validate_hex_color_rejects_wrong_length() {
+        assert!(validate_hex_color("#FFF").is_err());
+        assert!(validate_hex_color("#FF00AABB").is_err());
+    }
+
+    #[test]
+    fn validate_hex_color_rejects_invalid_chars() {
+        assert!(validate_hex_color("#GGHHII").is_err());
+        assert!(validate_hex_color("#12345Z").is_err());
+    }
+}
