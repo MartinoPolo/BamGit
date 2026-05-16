@@ -61,7 +61,10 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 
 		for (const key of keys) {
 			const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-			const wsKey = dashboardId ? `ws_${dashboardId}_${dbKey}` : null;
+			const wsKey =
+				dashboardId !== null && dashboardId !== undefined
+					? `ws_${dashboardId}_${dbKey}`
+					: null;
 
 			let resolvedValue: string | number = ISSUE_CARD_SETTING_DEFAULTS[key];
 
@@ -86,7 +89,10 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 
 	async function updateSetting(key: IssueCardSettingKey, value: string | number) {
 		const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-		const effectiveKey = dashboardId ? `ws_${dashboardId}_${dbKey}` : dbKey;
+		const effectiveKey =
+			dashboardId !== null && dashboardId !== undefined
+				? `ws_${dashboardId}_${dbKey}`
+				: dbKey;
 		await setAppSetting(effectiveKey, String(value));
 		(stateMap[key] as StateRaw<string | number>).current = value;
 
