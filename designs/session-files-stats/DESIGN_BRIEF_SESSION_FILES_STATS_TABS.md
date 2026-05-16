@@ -1,199 +1,409 @@
-# Session Files & Stats Tabs — Design Spec
+# Session Files & Stats Tabs — Design Brief
 
-Design spec for the **Files** and **Stats** tabs inside the session detail view. These two tabs live alongside the Chat tab in the session view header. Hand this to a designer for visual exploration.
-
-## Design Tokens
-
-Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono.
-
-## Container Context
-
-**Parent**: Session detail view — tab content area (alongside the "Chat" tab)
-**What parent provides**: Session top bar (title, state badge, git context), tab bar (Chat / Files / Stats), right sidebar (sub-agent tree, provider info)
-**What this component fills**: The content area below the session tab bar, full width (minus sidebar if open) × full height
-**Must NOT include**: Session top bar, tab bar, right sidebar — these belong to the session view layout
-
-**Mockup rendering**: Show the session view shell (top bar + tab bar with the relevant tab active) as read-only context at ~40% opacity. The designed component fills the content area below.
-
-## Purpose
-
-These two tabs provide visibility into session activity beyond the conversation:
-
-- **Files tab**: Code review surface — shows all files changed during the session with GitHub-style diffs, enabling users to review agent edits without leaving Grovekeeper
-- **Stats tab**: Session analytics — aggregates cost, token usage, tool calls, and efficiency metrics so users understand what the agent spent time and resources on
-
-Both tabs support the session detail view's goal of full transparency into AI agent behavior.
-
-## Tab Context
-
-Both tabs live inside the session view alongside the Chat tab. They are full-height within the session view's content area. The right sidebar (sub-agent tree) can be open or collapsed independently.
+Design brief for the **Files** and **Stats** content areas within the session detail view. These are tab-switched views alongside the Chat tab, activated via the `SessionTopBar` tab strip (`Chat | Files | Stats`). The right metadata sidebar persists across all tabs.
 
 ---
 
-## Files Tab
+## 1. Purpose
 
-### Purpose
+- **Files tab**: Code review surface — shows all files changed during the session with GitHub-style diffs, enabling review of agent edits without leaving Grovekeeper.
+- **Stats tab**: Session analytics — aggregates cost, token usage (input/output/cache), tool calls, turns, duration, model, and efficiency metrics so users understand what the agent spent time and resources on.
 
-Shows all files changed during the session, with GitHub-style diffs for each. Lets the user review the agent's edits without switching to a code editor. This is the primary code review surface inside Grovekeeper.
-
-### Required Elements
-
-#### File Summary Bar (top of tab)
-
-- Total count of changed files (e.g., "12 files changed")
-- Total additions and deletions (e.g., "+347 −89" in green/red)
-- Filter or sort controls (optional in variants — e.g., filter by file type)
-
-#### File Tree / File List
-
-- List or tree of all changed files
-- Per file: file path (right-to-left truncation for long paths), `+N −N` stats in green/red
-- Visual indicator for file status: modified / added / deleted / renamed
-- Click to jump to that file's diff
-
-#### Diff View
-
-- Unified diff per file (GitHub PR Files style)
-- Added lines: green highlight
-- Removed lines: red highlight
-- Unchanged context lines: muted
-- Line numbers on both sides
-- File header: full file path + `+N −N` stats
-- Toggle between unified and side-by-side diff (optional — show in variants)
-- "Expand all" / "Collapse all" diffs action
-- Long diffs (100+ lines): collapse with "Show N hidden lines" expander
-
-### States
-
-- Empty state: "No files changed yet" (session just started or read-only session)
-- Large diff (many files): file list should scroll independently of the diff view
-- Binary files: show "Binary file changed — cannot display diff"
-- Deleted file: show all lines as removed
+Both tabs support the session view's goal of full transparency into AI agent behavior. The right sidebar already shows summary metrics (cost, tokens, context, quotas). These tabs provide the detailed drill-down.
 
 ---
 
-## Stats Tab
+## 2. Surrounding Context
 
-### Purpose
+The session page layout (implemented in `SessionChatView.svelte`):
 
-Aggregated metrics for the session: how much it cost, how many tokens were used, which tools were called most, and how efficiently the context was used. Lets users understand what the agent spent time on.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ SessionTopBar (40px)                                            │
+│  [← Back] [title] [state badge] ... [Chat | Files | Stats]     │
+├──────────────────────────────────────────────┬──────────────────┤
+│                                              │ SessionSidebar   │
+│  Content area (flex-1)                       │ (272px expanded  │
+│  ─────────────────────                       │  or 44px collapsed)│
+│  max-width: 900px centered (Chat/Stats)      │                  │
+│  OR full available width (Files)             │ • Provider       │
+│                                              │ • Global Usage   │
+│                                              │   (5h/7d quotas) │
+│                                              │ • Session        │
+│                                              │   (context, cost,│
+│                                              │    tokens)       │
+│                                              │ • Sub-Agents     │
+│                                              │   (tree)         │
+├──────────────────────────────────────────────┤                  │
+│ FloatingInputPanel (absolute bottom)         │                  │
+└──────────────────────────────────────────────┴──────────────────┘
+```
 
-### Required Elements
+**Location**: Files/Stats are **tab content within the main area**, not inside the right sidebar. The right sidebar persists independently — it always shows provider, quotas, cost summary, and sub-agent tree regardless of active tab.
 
-#### Cost Section
+**Tab switching**: `SessionTopBar` already has `activeTab: 'chat' | 'files' | 'stats'` prop and `onTabChange` callback. The parent (`SessionChatView`) conditionally renders the appropriate content.
 
-- **Total cost** — prominent, USD (e.g., "$4.387")
-- **Cost by model** — breakdown if multiple models used during session (e.g., via model switching or sub-agents using different models)
-- Optional: local currency equivalent (small, secondary)
+**Floating input panel**: Remains visible on Files/Stats tabs (users may want to ask the agent about specific files/stats). Bottom padding (`pb-36`) must accommodate it.
 
-#### Token Section
+---
 
-- **Input tokens** — total
-- **Output tokens** — total
-- **Cache read tokens** — tokens served from prompt cache
-- **Cache write tokens** — tokens written to prompt cache
-- **Cache hit ratio** — percentage of input served from cache (e.g., "71% cache hit")
-- Context window utilization: filled / total tokens
+## 3. Requirements
 
-#### Session Activity
+### 3.1 Files Tab — Data Requirements
 
-- **Total turns** — number of user↔assistant exchanges
-- **Session duration** — total time from spawn to current/end (e.g., "1h 23m")
-- **Start time** — timestamp
-- **End time** — timestamp (or "Running" if active)
+**File list data** (per changed file):
+- `filePath` — full relative path from worktree root
+- `changeType` — `added` | `modified` | `deleted` | `renamed` | `binary`
+- `additions` — line count (green)
+- `deletions` — line count (red)
+- `oldPath` — for renamed files only
 
-#### Tool Usage
+**Diff data** (per file):
+- Unified diff hunks with context lines
+- Line numbers (old + new)
+- Added/removed/context line classification
 
-- Count of calls per tool type (Read, Bash, Edit, Grep, Agent, WebFetch, etc.)
+**Aggregate summary**:
+- Total files changed count
+- Total additions / total deletions
+- Breakdown by change type (N added, N modified, N deleted)
+
+**Data source**: Tool events from the session stream. `tool_end` events where `tool_name` is `Edit`, `Write`, `Read` (for tracking touched files), or `Bash` (for git operations). File changes are accumulated by parsing tool inputs/outputs. For completed sessions, a `git diff` summary from the Rust backend provides the definitive file list.
+
+### 3.2 Stats Tab — Data Requirements
+
+**Cost section**:
+- Total cost USD (e.g., `$4.387`) — from `session.cost_usd` + `usage_update` events
+- Cost by model — when session uses multiple models (sub-agents, model switching)
+- Cost breakdown: input tokens × price, output tokens × price, cache read × price, cache write × price
+
+**Token section** (from `session_metrics` table and `usage_update` events):
+- `input_tokens` — total
+- `output_tokens` — total
+- `cache_read_tokens` — tokens served from prompt cache
+- `cache_write_tokens` — tokens written to prompt cache
+- Cache hit ratio — `cache_read / (input + cache_read)` as percentage
+- Context window utilization — filled / total (from `usage_update.input_tokens` vs model context limit)
+
+**Session activity**:
+- `turn_count` — user↔assistant exchanges (from `usage_update.num_turns` or `turn_metrics` count)
+- `duration_seconds` — from `session_metrics.duration_seconds` or computed `ended_at - started_at`
+- `started_at` — timestamp
+- `ended_at` — timestamp or "Running" if active
+- `one_shot_turns` / `one_shot_rate` — turns that succeeded without retries
+- `edit_turns` — turns containing file edits
+- `retry_count` — total retries
+
+**Tool usage** (from `tool_usage` table):
+- Per tool: `tool_name`, `call_count`, `error_count`, `total_duration_seconds`
 - Sorted by most-used
-- Show as compact table rows with tool icon, tool name, call count
-- Optional: add duration or success rate per tool (show in at least one variant)
+- Success rate: `(call_count - error_count) / call_count`
 
-### States
+**Activity breakdown** (from `turn_metrics` table):
+- Per category (13 categories from activity classifier): `category`, `cost_usd`, `turn_count`, `one_shot_percent`
 
-- Mid-session (running): costs and token counts updating in real-time
-- Empty state: session spawned but no turns yet
-- Long session: many tool types, long list
+**Model info**:
+- Primary model name (from `session_init` event or `session_metrics.model`)
+- Provider name (from `session.provider`)
+
+### 3.3 Real-Time Updates
+
+- **Mid-session (running)**: Stats update on each `usage_update` event. File list grows as `tool_end` events for Edit/Write arrive. Token counts, cost, turn count animate/transition smoothly.
+- **Completed session**: All data is final. Show `ended_at` timestamp.
 
 ---
 
-## States
+## 4. Existing Components to Reuse
 
-Both tabs must handle these states:
+| Component | Location | Usage |
+|-----------|----------|-------|
+| **StatCell** | `base/stat-cell/` | Individual metric tiles (cost, tokens, turns, duration). Supports `tone`, `icon`, `pulse` props. |
+| **ProgressBar** | `blocks/session/ProgressBar.svelte` | Context window utilization, cache hit ratio bars |
+| **Badge** | `shadcn/badge/` | File status indicators (added/modified/deleted), tool name labels |
+| **Button** | `shadcn/button/` | `ghost × icon-sm` for expand/collapse, filter/sort controls |
+| **Tabs** | `shadcn/tabs/` | If sub-tabs needed within Stats (unlikely — single scrollable view preferred) |
+| **Separator** | `shadcn/separator/` | Between stat sections |
+| **SimpleTooltip** | `shadcn/tooltip/` | Hover details on truncated paths, cache ratio explanation |
+| **Skeleton** | `shadcn/skeleton/` | Loading placeholders while data fetches |
+| **CostChart** | `blocks/usage/CostChart.svelte` | Potential reuse for token-over-time mini chart |
+| **SessionStateBadge** | `blocks/session/SessionStateBadge.svelte` | State indicator if shown in stats |
+| **ProviderChip** | `blocks/session/ProviderChip.svelte` | Provider display in stats header |
+
+**CSS classes** from `tokens.css`:
+- `.cb-panel` + `.cb-panel-title` — bracket-style `[HEADING]` for dense data sections
+- `.cb-row` + `.cb-num` + `.cb-mute` — dense data rows with mono numbers
+- `.cb-bar` / `.cb-bar-cool` / `.cb-bar-moss` — gradient bars for tool usage, activity
+- `.gk-eyebrow` — 10.5px uppercase section labels
+- `.gk-small` — 12px body text for secondary info
+- `.font-mono` — monospace for all numbers, file paths, costs
+
+---
+
+## 5. Components to Design
+
+### Files Tab
+
+| Component | Description |
+|-----------|-------------|
+| **FileSummaryBar** | Top bar: "12 files changed" + `+347 −89` in green/red + optional filter/sort. Stays fixed at top of scroll area. |
+| **FileListItem** | Collapsed row: file path (right-truncated) + status badge (A/M/D/R) + `+N −N` stats. Click to expand diff. Chevron toggle. |
+| **InlineDiffView** | Unified diff rendered inline below FileListItem when expanded. Line numbers (old/new gutter), green/red line highlights, context lines muted. Monospace. |
+| **DiffHunkHeader** | `@@ -N,N +N,N @@` header with function/scope context. Muted background. |
+| **HiddenLinesExpander** | "Show N hidden lines" clickable bar between visible hunks. |
+| **BinaryFileIndicator** | "Binary file changed — cannot display diff" placeholder row. |
+
+### Stats Tab
+
+| Component | Description |
+|-----------|-------------|
+| **StatsHeader** | Session identity: model name + provider chip + duration + state. Compact single row. |
+| **CostBreakdownPanel** | Total cost (prominent `$X.XXX`), cost-by-model table (when multi-model), cost-by-token-type breakdown (input/output/cache). Uses `cb-panel` styling. |
+| **TokenSummaryPanel** | Input/output/cache-read/cache-write with bars showing relative proportions. Cache hit ratio as ProgressBar + percentage. |
+| **SessionActivityPanel** | Turns, duration, start/end times, one-shot rate, edit turns, retries. Grid of StatCells. |
+| **ToolUsageTable** | Rows: tool icon + name + call count + error count + avg duration + success rate. Inline horizontal bar fill for visual weight. Sorted by most-used. Uses `cb-row` styling. |
+| **ActivityBreakdownTable** | Per-category rows: category label + cost + turn count + one-shot %. Inline bar fill. Uses `cb-row` styling. |
+
+---
+
+## 6. Layout & Dimensions
+
+### Files Tab Layout
+
+```
+┌──────────────────────────────────────────────┐
+│ FileSummaryBar (sticky top)                  │
+│  "12 files changed  +347 −89"  [Sort ▾]     │
+├──────────────────────────────────────────────┤
+│ ─ scrollable file list + inline diffs ─      │
+│                                              │
+│ ▸ src/lib/components/Foo.svelte  M  +12 −3  │
+│ ▾ src/lib/utils/bar.ts           M  +45 −8  │
+│   ┌─────────────────────────────────────┐    │
+│   │ @@ -10,6 +10,8 @@ function bar()   │    │
+│   │  10 │  10 │  unchanged line        │    │
+│   │     │  11 │+ added line            │    │
+│   │  11 │     │- removed line          │    │
+│   │  12 │  12 │  unchanged line        │    │
+│   └─────────────────────────────────────┘    │
+│ ▸ src/new-file.ts                A  +28      │
+│ ▸ src/old-file.ts                D      −15  │
+│                                              │
+│                              (pb-36 for FAB) │
+└──────────────────────────────────────────────┘
+```
+
+- **Full available width** — diffs benefit from horizontal space. No 900px constraint.
+- File list and diffs share a single scroll container.
+- `FileSummaryBar` sticky at top of scroll area.
+- Diff view uses monospace font, 13px line height. Line number gutters: ~48px each (old + new).
+- Padding: `px-4` horizontal, consistent with chat view alignment.
+
+### Stats Tab Layout
+
+```
+┌──────────────────────────────────────────────┐
+│            max-width: 900px centered          │
+│                                              │
+│ [COST]                                       │
+│  $4.387 total                                │
+│  ┌──────────────────────────────────────┐    │
+│  │ claude-4-opus   $3.20   73%         │    │
+│  │ claude-4-sonnet $1.19   27%         │    │
+│  │ Input: 142K × $15/M = $2.13        │    │
+│  │ Output: 18K × $75/M = $1.35        │    │
+│  │ Cache read: 89K × $1.5/M = $0.13   │    │
+│  └──────────────────────────────────────┘    │
+│                                              │
+│ [TOKENS]                                     │
+│  Input: 142,380  Output: 18,042              │
+│  Cache read: 89,100  Cache write: 12,400     │
+│  Cache hit: ██████████░░░░ 71%               │
+│  Context:   ████████░░░░░░ 54%               │
+│                                              │
+│ [ACTIVITY]                                   │
+│  ┌────┬────┬──────┬────────┐                 │
+│  │ 47 │1h23│ 12:41│ Running│ turns/dur/start │
+│  │ 82%│ 31 │  3   │        │ 1-shot/edits/rt │
+│  └────┴────┴──────┴────────┘                 │
+│                                              │
+│ [TOOLS]                                      │
+│  Edit     ████████████░  31  98% ✓           │
+│  Read     ██████████░░░  28  100%✓           │
+│  Bash     ████████░░░░░  22  86% ✓           │
+│  Grep     ██████░░░░░░░  18  100%✓           │
+│  ...                                         │
+│                                              │
+│ [ACTIVITY BREAKDOWN]                         │
+│  Implementation  $2.10  22 turns  77%        │
+│  Testing         $0.89  12 turns  83%        │
+│  Debugging       $0.72   8 turns  62%        │
+│  ...                                         │
+│                              (pb-36 for FAB) │
+└──────────────────────────────────────────────┘
+```
+
+- **900px max-width centered** — matches Chat tab column width for visual consistency across tab switches.
+- Single scrollable column. No sub-tabs — all stats visible in one scroll.
+- Section headings use `cb-panel-title` bracket style `[HEADING]`.
+- Numbers use monospace font with `tabular-nums` for alignment.
+- Padding: `px-6 pt-4 pb-36` matching chat view.
+
+---
+
+## 7. States & Interactions
 
 ### Files Tab States
 
-- **Empty**: "No files changed yet" (session just started or read-only session)
-- **Loading**: Initial load or refreshing diffs
-- **Large diff**: Many files (100+), file list scrolls independently
-- **Binary file**: "Binary file changed — cannot display diff"
-- **Deleted file**: All lines shown as removed
-- **Sidebar open/closed**: Content area adjusts width accordingly
+| State | Visual | Trigger |
+|-------|--------|---------|
+| **Empty** | "No files changed yet" centered message with file-plus icon | Session just started or read-only session |
+| **Accumulating (live)** | File list grows as tool events arrive. New files animate in. Existing file stats update (additions/deletions change) | Session running, `tool_end` events for Edit/Write |
+| **Session complete** | Full file list, all diffs available. Summary bar shows final counts | Session state = finished |
+| **Loading diffs** | Skeleton placeholder in expanded diff area | User expands a file, diff data fetching |
+| **Large changeset (50+ files)** | Virtualized list. "Expand all" disabled with tooltip "Too many files — expand individually" | Many files changed |
+| **Binary file** | "Binary file changed — cannot display diff" in muted text | Binary file detected |
+| **Deleted file** | All lines shown as removed (red). Header badge: `D` | File removed |
+| **Renamed file** | Header shows `old/path → new/path`. Badge: `R` | Renamed/moved |
+| **Sidebar open/closed** | Content area adjusts width. Diff lines may wrap or scroll horizontally | User toggles sidebar |
+
+**Interactions**:
+- Click FileListItem chevron → expand/collapse inline diff
+- Click file path → copy to clipboard (with toast)
+- "Expand all" / "Collapse all" button in FileSummaryBar
+- Sort options: by path (default), by change size, by change type
+- Filter: by change type (added/modified/deleted)
+- Right-click file → "Open in Editor" (Tauri command), "Copy Path"
 
 ### Stats Tab States
 
-- **Mid-session (running)**: Costs and token counts update in real-time
-- **Empty**: Session spawned but no turns yet
-- **Completed session**: All metrics finalized, shows end timestamp
-- **Long session**: Many tool types, scrollable list
-- **Sidebar open/closed**: Content area adjusts width accordingly
+| State | Visual | Trigger |
+|-------|--------|---------|
+| **Mid-session (running)** | Cost and token numbers update on each `usage_update` event. Values transition/animate between updates. "Running" shown instead of end time. Activity panel shows live duration counter | Session state = running |
+| **Empty** | "Session spawned — no turns yet" centered message | Session has no turns |
+| **Completed** | All metrics finalized. End timestamp shown. Duration shows final value | Session state = finished/errored |
+| **No pricing** | Cost shows "N/A" with warning badge. Token counts still shown | `pricing_available = false` or unknown model |
+| **Loading** | Skeleton placeholders for all stat panels | Initial data fetch |
+| **Sidebar open/closed** | Content stays centered within available width | User toggles sidebar |
+
+**Interactions**:
+- Click total cost → navigates to `/usage` with session filter pre-applied (via `CostLink` pattern from PRD #93)
+- Hover on cache hit ratio → tooltip explaining what cache tokens are
+- Click tool name in tool usage → future: filter chat to show only that tool's calls
+- Copy button on cost value → clipboard
 
 ---
 
-## Reusable Components
+## 8. Design Constraints (Non-Negotiable)
 
-Use these existing Grovekeeper components:
-
-- **Button**: `.gk-btn-sm` for filter/sort actions, expand/collapse controls
-- **Badge**: `.gk-badge-success` (additions), `.gk-badge-danger` (deletions), `.gk-badge-info` (file status indicators)
-- **Typography**: `.gk-h2` for tab section headers (e.g., "Cost", "Token Usage"), `.gk-body` for file paths and stats, `.font-mono` for numbers and code paths
-- **Card**: `.gk-card` for stats section groupings (Cost, Tokens, Activity, Tool Usage)
-- **Divider**: `.gk-hr` between stats sections
-- **Text styles**: `.cb-num` for numeric values (cost, tokens), `.cb-mute` for secondary labels
-
----
-
-## Components to Adopt
-
-Consider these shadcn-svelte or Bits UI components if needed:
-
-- **Collapsible** from Bits UI — for expandable diff sections in Files tab
-- **Table** from shadcn-svelte — for tool usage breakdown in Stats tab
-- **Progress** from shadcn-svelte — for context window utilization bar
+- **Tab content area only** — must NOT render session top bar, tab strip, sidebar, or floating input panel. These belong to the session view layout.
+- **Font**: Geist (sans) for labels, Geist Mono for numbers, paths, and diff content.
+- **Forest Moss palette**: Green for additions, red for removals. Use `--status-success` / `--status-danger` tokens, not hardcoded colors.
+- **Button sizing**: `.gk-btn-sm` (26px) for all actions. No inline height overrides.
+- **Badge sizing**: `.gk-badge` (20px) for file status indicators.
+- **OKLCH color space**: All custom colors via CSS custom properties.
+- **Dark theme primary**: Light theme supported but secondary.
+- **No inline file editing or commenting** — out of scope for v1.
+- **No side-by-side diff** — unified only for v1. Side-by-side is a future enhancement.
+- **Responsive to sidebar state**: Content must look good at both ~full-width (sidebar collapsed, 44px) and ~reduced-width (sidebar expanded, 272px).
+- **Semantic tokens only** — never hardcode `bg-green-500`, always `text-status-success`.
+- **Bottom padding**: `pb-36` to accommodate floating input panel.
 
 ---
 
-## Layout Constraints
-
-- Full height within the session view content area
-- Both tabs should scroll as needed (independent scroll from the right sidebar)
-- Diff view can be very tall — virtual scrolling or efficient rendering implied
-- File tree and diff should feel cohesive (same padding, same fonts)
-- Stats tab numbers should use monospace font for alignment
-- **Content column width:** The Chat tab constrains its content to `max-width: 900px` centered. The Stats tab should follow the same 900px column for consistency. The Files tab may use full available width (diffs benefit from horizontal space), but the file summary bar and controls should still align to the 900px column when the sidebar is open — this keeps the header visually consistent across tab switches.
-- All buttons use `.gk-btn-sm` (26px), badges use `.gk-badge` (20px) — no inline height overrides. Matches the standardized sizing established in the session chat view update.
-
-## Visual References
-
-- GitHub PR Files view — primary reference for the Files tab diff display
-- Linear issue activity sidebar — inspiration for compact stats layout
-- Grovekeeper Forest Moss palette — green for additions, red for removals (override token colors)
-
-## UI Freedom
+## 9. Design Freedom
 
 Designers have creative latitude in:
 
-- **Files tab**: Layout between file list and diff viewer (split view, stacked, or full-width with inline navigation)
-- **Stats tab**: Visual treatment of metrics (cards vs table vs dashboard tiles)
-- **Diff rendering**: Syntax highlighting color choices (within Forest Moss palette bounds)
-- **Tool usage visualization**: Table, bar chart, or compact list with icons
+- **Files tab**: File list density (compact rows vs cards), expand/collapse animation style, diff line highlight intensity, how the summary bar looks
+- **Stats tab**: Section visual treatment — can use `cb-panel` bracket headings, `StatCell` grid, or plain `gk-card` sections. Mix is OK
+- **Cost visualization**: Prominent number vs breakdown-first vs pie chart
+- **Token visualization**: Bars vs stacked chart vs numeric grid
+- **Tool usage**: Table with inline bars, horizontal bar chart, or compact rows with `cb-bar`
+- **Activity breakdown**: Table, segmented bar, or treemap
 - **Empty states**: Illustration style and messaging tone
-- **Filter/sort controls**: Positioning and visual style (dropdowns, tabs, buttons)
-- **Diff expander UI**: Visual treatment for "Show N hidden lines" controls
+- **Diff syntax highlighting**: Color choices for keywords, strings, comments within Forest Moss bounds
+- **Section ordering in Stats**: Cost first (recommended) or activity first
+- **Diff line number style**: Gutter background, separator treatment
+- **Number animations**: Counter scroll, fade, or instant update during live sessions
 
-Must preserve: Forest Moss palette adherence, 26px button height (`.gk-btn-sm`), 900px content column for Stats tab, monospace fonts for numbers.
+Must preserve: Forest Moss palette, Geist/Geist Mono fonts, 26px button height, 900px Stats column, monospace for all numeric data.
 
-## Not Included in This Design
+---
 
-- Chat tab, tool cards, sub-agent tree, session metadata, skill controls → `SESSION_CHAT_VIEW.md`
-- File editing / inline comments on diffs (out of scope for v1)
+## 10. Inspiration
+
+- **GitHub PR Files tab** — primary reference for file list + expandable diffs
+- **Claude.ai usage dashboard** — clean stat presentation with prominent cost
+- **Linear issue activity panel** — compact stats layout
+- **CodeBurn data panels** — `cb-panel`/`cb-row`/`cb-bar` for dense developer-facing data
+- **Issue Card v2 info density** — the `IssueCardInfoRows` pattern of cramming useful data into small spaces
+- **Variant D (existing)** — single-column feed with expandable file cards + stacked metric cards. 900px centered, mobile-friendly
+- **Variant E (existing)** — dashboard-overview-first with 3x2 metric tile grid, donut chart for file types, accent-colored tiles. More visual, less dense
+
+---
+
+## 11. Data Flow
+
+### Files Tab Data Source
+
+```
+Session running:
+  SessionEvent (tool_start/tool_end where tool_name ∈ {Edit, Write})
+  → frontend accumulates FileChange[] in component state
+  → each tool_end for Edit provides: file_path, additions, deletions
+  → each tool_end for Write provides: file_path (treat as "added" if new)
+
+Session complete:
+  invoke('get_session_file_changes', { sessionId })
+  → Rust runs git diff against the session's worktree
+  → returns definitive FileChange[] with full diff hunks
+
+Expand file:
+  invoke('get_session_file_diff', { sessionId, filePath })
+  → returns unified diff string for that file
+```
+
+**Note**: `get_session_file_changes` and `get_session_file_diff` Tauri commands do not exist yet — they must be implemented. During active sessions, file changes are derived from tool events. After completion, the git-based approach is authoritative.
+
+### Stats Tab Data Source
+
+```
+Session running:
+  SessionEvent.usage_update → live cost, tokens, turns, duration
+  → frontend updates displayed values on each event
+
+Session complete (or on-demand):
+  invoke('get_session_metrics', { sessionId })
+  → returns session_metrics row (cost, tokens, turns, duration, etc.)
+
+  invoke('get_session_tool_usage', { sessionId })
+  → returns tool_usage rows grouped by tool_name
+
+  invoke('get_session_activity_breakdown', { sessionId })
+  → returns turn_metrics grouped by category
+```
+
+**Note**: `get_session_metrics`, `get_session_tool_usage`, `get_session_activity_breakdown` may need to be added as dedicated Tauri commands. Currently the usage dashboard queries are workspace-scoped, not session-scoped. The `session_metrics`, `turn_metrics`, and `tool_usage` tables already exist with all required columns.
+
+---
+
+## 12. Mockup Rendering Instructions
+
+**For mockup HTML files**: Show the full session view shell (top bar with tabs, sidebar in expanded state) as read-only context at ~40% opacity. The designed tab content fills the area below the top bar and to the left of the sidebar. Render two separate views: one with the Files tab active, one with the Stats tab active.
+
+**Token import**: Inline `tokens.css` from `designs/tokens.css`. Use `gk-root theme-dark` wrapper. Geist + Geist Mono via Google Fonts CDN.
+
+**Variant HTML files**: Place in `designs/session-files-stats/variants/variant-{letter}.html`.
+
+---
+
+## 13. Not Included in This Design
+
+- Chat tab content, tool cards, streaming text → `SessionChatView.svelte`
+- Sub-agent tree, provider info, quotas → `SessionSidebar.svelte`
+- Session top bar, tab strip → `SessionTopBar.svelte`
+- Floating input panel → `FloatingInputPanel.svelte`
+- File editing / inline comments on diffs (future v2)
+- Side-by-side diff toggle (future v2)
+- Session search / full-text search within files tab (future)
+- Diff view syntax highlighting beyond added/removed coloring (future v2 — could use Shiki)

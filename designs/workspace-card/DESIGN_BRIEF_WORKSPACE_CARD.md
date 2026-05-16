@@ -1,298 +1,362 @@
 # Workspace Card — Design Brief
 
-Quick-glance health overview of a workspace. Click opens/focuses that workspace's window.
-
-## Design Tokens
-
-Use the Grovekeeper Forest Moss palette from `designs/tokens.css`. Font: Geist / Geist Mono.
-
-## Container Context
-
-**Parent**: Standalone (Overview window — `src/routes/overview/+page.svelte`)
-**What parent provides**: Full viewport, header with app name/subtitle, toggle for archived workspaces, grid container
-**What this component fills**: Individual grid cell (320×196px minimum) in auto-fill responsive grid
-**Must NOT include**: Window chrome, page header, grid layout — these belong to the parent
-
-**Mockup rendering**: Show the card as standalone with minimal surrounding context. The Overview window displays multiple cards in a grid, but focus the mockup on a single card's design.
-
-## Purpose
-
-Quick-glance health overview of a workspace. Click opens/focuses that workspace's window. The card should feel like a living dashboard widget, not a static list item.
+Entry point to each workspace on the Overview page. Shows workspace health, active sessions, issue counts, GitHub repo info, and accent color. Click opens the workspace window.
 
 ---
 
-## Required Elements
+## 1. Purpose
 
-### Identity (Header)
+The workspace card is the primary health-at-a-glance widget for each workspace. It answers: "Does this workspace need my attention right now?" Users scan the card grid to triage across multiple workspaces, then click to enter one.
 
-- **Workspace name** — equals the repository name (e.g., "grovekeeper"). Bold, 15px, 600 weight
-- **Accent color** — prominently visible as card background gradient tint (8% opacity, 135deg), left accent bar (3px solid), and AFK LED glow. Each workspace has a distinct color from the 12-preset palette. Dominant visual differentiator between cards
-- **Custom thumbnail** — optional project icon/SVG uploaded by user. When unset: hatched placeholder square with 2-letter uppercase initials (mono font)
-- **Subtitle line** — mono, 10.5px, muted: `{branch_icon} {default_branch} · {N} worktrees`
-    - Branch = repo default branch (the main worktree's branch, e.g., "main", "develop")
-    - Worktrees = count of active git worktrees in this workspace
-
-### Quick Access Buttons (top-right corner)
-
-- **GitHub link** — custom stroke-based `GithubIcon.svelte` (Lucide/Feather style, matching the design's icon). Opens repo URL in browser
-- **Local folder** — Lucide `folder` (closed). Opens project path in file explorer
-- Both: 26×26px (`icon-sm`), `ghost` variant, `text-foreground-subtle` at rest, `text-foreground` + `bg-surface-2` on hover, strokeWidth 1.7
-- **Unassigned state**: opacity 0.35. Left-click AND right-click open workspace config wizard for that field
-- **Assigned state**: opacity 1.0 (via `text-foreground-subtle`). Left-click opens target. Right-click opens workspace config wizard
-
-### Health Indicators (stat grid — 4 cells, equal width)
-
-Order: **Issues → PRs → ATTN → HITL**
-
-Each cell: label row (icon + uppercase mono text, 9.5px) + value row (mono number, 16px, 600 weight).
-
-| Stat      | Label    | Icon (Lucide)      | Tone when >0      | Pulse dot |
-| --------- | -------- | ------------------ | ----------------- | --------- |
-| Issues    | `ISSUES` | `list-checks`      | neutral           | No        |
-| PRs       | `PRs`    | `git-pull-request` | neutral           | No        |
-| Attention | `ATTN`   | `triangle-alert`   | `danger` (red)    | Yes       |
-| HITL      | `HITL`   | `user`             | `warning` (amber) | Yes       |
-
-**Issues dual number**: displayed as `{afk_actionable}/{total_tracked}`. The AFK numerator = issues with AFK label, unblocked, regardless of session state. Total = non-PRD Grovekeeper issues in this workspace. Example: `3/10`. Tooltip: "3 actionable AFK issues out of 10 tracked"
-
-- AFK numerator styling: normal weight `--foreground`
-- Slash + denominator: lighter weight `--foreground-muted`
-- When AFK count = 0: "zero" tone (muted)
-
-**Tone variants** (StatCell component):
-
-- `neutral` — default: `surface-2` bg, `border`, normal colors
-- `zero` — when value = 0: muted number, lighter weight
-- `warning` — amber tint bg, amber border, amber number + label
-- `danger` — red tint bg, red border, red number + label
-
-**Click behavior**:
-
-- Issues → workspace dashboard, Issues tab (all tracked)
-- PRs → workspace dashboard, PRs view
-- ATTN → workspace dashboard, Issues tab filtered to attention-needed
-- HITL → workspace dashboard, Issues tab filtered to HITL issues
-
-### PRD Row (compact inline, below health grid)
-
-Layout: `{icon} {N} PRDs · {completed}/{total} done [{progress_bar}]`
-
-- Icon: a small icon (TBD — tree or clipboard-list) at 12px
-- "3 PRDs" = count of open PRDs in this workspace
-- Progress bar: thin horizontal bar showing aggregate sub-issue completion across all PRDs
-- `12/31 done` = total completed sub-issues / total sub-issues across all open PRDs
-- Click → navigates to PRD view in workspace dashboard
-- Styling: same container style as AFK row (surface-2 bg, border, rounded)
-
-### AFK Status Row
-
-Container: `surface-2` bg, `border`, `radius-sm`, 8px 10px padding.
-
-| Element              | AFK On                                         | AFK Off                                      |
-| -------------------- | ---------------------------------------------- | -------------------------------------------- |
-| LED dot              | 8px, `moss-400`, glowing + pulsing animation   | 8px, `foreground-subtle`, static             |
-| Label                | "AFK loop running" (500 weight, `foreground`)  | "AFK loop off" (`foreground-muted`)          |
-| Meta (right-aligned) | `{total} sessions ({afk_count} AFK)` or `idle` | `{total} sessions` or `last {relative_time}` |
-
-- Session count: total active sessions in workspace. AFK count = sessions spawned by AFK loop (not manually spawned)
-- When AFK on, 0 sessions: show `idle`
-- When AFK off, 0 sessions: show `last {time_since_last_afk_run}`
-- Container border gets moss tint when AFK is on
-- Click → navigates to AFK loop page in workspace dashboard
-- Start/stop AFK toggle: only available inside workspace dashboard, NOT on overview card
-
-### Footer (cost + activity)
-
-- Dashed top border separator
-- Left: `today $4.82` — period hardcoded to "today" (configurable period deferred to PRD #93 Metrics)
-- Right: `{clock_icon} {relative_timestamp}` — when any activity last happened in workspace
-- Mono 10.5px, `foreground-subtle`
+The card should feel like a living dashboard widget, not a static list item. Active workspaces breathe, urgent ones pulse red, dormant ones fade — visual priority is immediate.
 
 ---
 
-## States
+## 2. Surrounding Context
 
-List every state that must be designed:
+The workspace card appears on the **Overview page** — a full-width launcher with **NO sidebar** and **NO forest view**.
 
-- **Default**: Standard healthy workspace, AFK off, no alerts
-- **Active/Breathing**: Breathing glow animation (3.6s ease-in-out, inset box-shadow pulsing 0.7–1.0 opacity) when AFK loop running
-- **Hover**: Transform translateY(-2px), border accent blend, shadow-md + 1px accent ring + 28px accent glow
-- **Needs-attention**: Accent overridden to amber when HITL pending (hitl_count > 0)
-- **Urgent**: Accent overridden to red when PRs needing attention (attn_count > 0)
-- **Dormant**: opacity 0.72, saturate(0.7) when no activity >24h
-- **Empty**: Health grid replaced with dashed placeholder: "Newly planted — open to track issues" with sparkle icon when no Grovekeeper issues tracked
-- **Add Workspace Card state**: Dashed border, centered `+` circle with "Add workspace" label, hover effects
+**Overview page layout:**
+- Full viewport, no sidebar navigation
+- **Header row**: h1 "Grovekeeper" + subtitle (left), archive toggle + GitHub connection button (right)
+- **Controls** (PRD #257): Sort, Filter, and Settings buttons in header row (planned)
+- **Card grid**: `grid-template-columns: repeat(auto-fill, 340px)`, `gap: 16px`
+- Workspace cards fill the grid; `AddWorkspaceCard` (dashed border, `+` icon) is always last
+- **Context menu** (PRD #257 / issue #274): right-click workspace card opens `DashboardEditDialog` directly (no dropdown context menu)
 
-## Reusable Components
+**Parent component**: `src/routes/overview/+page.svelte`
+**What parent provides**: Grid layout, data fetching via `getOverviewData()`, click handlers for open/github/folder/config
+**What this component fills**: Individual grid cell in the auto-fill grid
+**Must NOT include**: Page header, grid layout, window chrome — those belong to the parent
 
-Specify which existing components to use:
+**Mockup rendering**: Show the FULL overview page with multiple workspace cards in a grid, the header above, controls, and NO sidebar. Show 4-6 cards demonstrating different variants (active, urgent, needs-attention, dormant, empty, default) plus the AddWorkspaceCard.
 
-- **Card**: Base `Card` component from `$lib/components/ui/card` with new props: `accentBarColor` (3px left border) and `gradientTint` (::before gradient overlay)
-- **Button**: Lucide icon buttons (26px, `icon-sm`, `ghost` variant) for GitHub/folder actions with opacity states
-- **Badge**: `.gk-badge` with tone variants for status indicators if needed
-- **StatCell**: New component (see below) for health grid metrics
-- **StatusRow**: New component (see below) for AFK status display
-- **GithubIcon**: New stroke-based icon matching Lucide style
-- **ColorPickerContent**: Inline 12-preset color picker (2×6 grid)
+---
 
-## Components to Adopt
+## 3. Requirements
 
-shadcn-svelte or Bits UI components to install if needed:
+### 3.1 Data to Show
 
-None currently required. All interactive elements use existing Button, Card, and custom components.
+All data sourced from `OverviewWorkspaceData` (ts-rs generated type):
 
-## Layout Constraints
+| Field | Source | Display |
+|-------|--------|---------|
+| Workspace name | `name` | Bold header, 15px |
+| Accent color | `accent_color` | Left bar + gradient tint + LED glow |
+| GitHub repo | `github_repo` | Icon button (GitHub) |
+| Local folder | `local_folder` | Icon button (Folder) |
+| Default branch | `default_branch` | Subtitle: `{branch} · {N} worktrees` |
+| Worktree count | `worktree_count` | Subtitle |
+| Issue counts | `afk_ready_count`, `open_issue_count` | Stat cell: `{afk}/{total}` dual number |
+| PR count | `open_pr_count` | Stat cell |
+| Attention PRs | `prs_needing_attention` | Stat cell (danger tone when >0) |
+| HITL count | `hitl_count` | Stat cell (warning tone when >0) |
+| PRD tracking | `prd_count`, `prd_completed_subs`, `prd_total_subs` | PRD row with progress bar |
+| AFK loop | `afk_loop_status` | StatusRow: LED + label + session meta |
+| Sessions | `active_session_count` | StatusRow meta |
+| Cost | `total_cost_usd` | Footer: `today $X.XX` via CostLink |
+| Last activity | `last_activity` | Footer: relative timestamp |
+| Status | `status` (DashboardStatus) | Archived filter |
 
-- **Card size**: 320px width (grid column minimum), 196px min-height
-- **Grid layout**: `auto-fill` responsive grid with 340px columns (parent provides)
-- **Padding**: 14px 14px 12px
-- **Spacing**: 4px base grid, consistent internal spacing using `--space-*` tokens
-- **Responsive**: Cards maintain fixed width; grid wraps to available space
-- **Z-index isolation**: Cards use `isolation: isolate` for stacking context
+### 3.2 Context Menu Actions (PRD #257, Issue #274)
 
-## Visual References
+Right-click opens `DashboardEditDialog` directly (no dropdown context menu). Planned additional actions: Open Folder, Open GitHub, Rename, Archive, Delete, Settings. Gear icon in card header alongside folder/GitHub buttons (PRD #257).
 
-- **GitHub Desktop** — workspace switcher list (side panel) for quick project overview
-- **Linear** — issue grid cards with status indicators and glanceable metrics
-- **Raycast** — extension cards with icon, description, stats row
-- **VS Code** — start page "Recent" section with repo cards, folder path, icons
-- **Dashboard widgets** — macOS widget cards, Notion database cards (compact metric display with icon + number pattern)
+### 3.3 Click Behaviors
 
-Feel consistent with: Grovekeeper's existing `.cb-panel` data panels (control board style), issue cards in workspace dashboard, session status indicators.
+| Target | Action |
+|--------|--------|
+| Card body | Open workspace window via `openWorkspaceWindow(dashboardId)` |
+| GitHub icon | Open `https://github.com/{repo}` in browser; unassigned = config wizard |
+| Folder icon | Open local folder in file explorer; unassigned = config wizard |
+| Right-click GitHub/Folder | Open config wizard |
+| Issues stat | Navigate to workspace Issues tab (all tracked) |
+| PRs stat | Navigate to workspace PRs view |
+| ATTN stat | Navigate to workspace Issues tab, filtered to attention-needed |
+| HITL stat | Navigate to workspace Issues tab, filtered to HITL |
+| PRD row | Navigate to PRD view in workspace dashboard |
+| AFK row | Navigate to AFK loop page in workspace dashboard |
 
-## UI Freedom
+---
+
+## 4. Existing Components to Reuse
+
+| Component | Location | Usage |
+|-----------|----------|-------|
+| **Card** | `$lib/components/shadcn/card/` | Base card with `accentBarColor` (3px left border) + `gradientTint` (::before gradient) |
+| **StatCell** | `$lib/components/base/stat-cell/` | 4-cell health grid. Props: `label`, `value`, `suffix`, `tone`, `icon`, `pulse`, `onclick` |
+| **StatusRow** | `$lib/components/base/status-row/` | AFK status. Props: `active`, `label`, `meta`, `onclick`, `activeColor` |
+| **Button** | `$lib/components/shadcn/button/` | Ghost variant, icon-sm size for GitHub/Folder actions |
+| **Badge** | `$lib/components/shadcn/badge/` | Tones: success, warning, danger, info, moss, amber |
+| **Tooltip** | `$lib/components/shadcn/tooltip/` | Stat cell tooltips (e.g., "3 actionable AFK issues out of 10 tracked") |
+| **ContextMenu** | `$lib/components/shadcn/context-menu/` | Right-click workspace actions (issue #274) |
+| **Progress** | `$lib/components/shadcn/progress/` | Available but PRD row uses a custom inline progress bar |
+| **CostLink** | `$lib/components/blocks/usage/CostLink.svelte` | Footer cost display |
+| **GithubIcon** | `$lib/components/derived/icons/GithubIcon.svelte` | Stroke-based SVG matching Lucide style |
+| **Typography** | Design system classes | `.gk-h3` (14px), `.gk-body` (13px), `.gk-small` (12px), `.gk-tiny` (11px), `.gk-eyebrow` (10.5px uppercase), `.font-mono` |
+
+**Lucide icons in use**: `list-checks`, `git-pull-request`, `triangle-alert`, `user`, `folder`, `git-branch`, `clipboard-list`, `clock`, `sparkles`, `plus`
+
+---
+
+## 5. Components to Design
+
+### 5.1 WorkspaceCard Layout
+
+The overall card structure (already implemented in `WorkspaceCard.svelte`):
+
+```
+button (full card click target)
+  Card (accentBarColor + gradientTint)
+    [Breathing glow overlay — active variant only]
+    Header: thumbnail + name/subtitle (left) + icon buttons (right)
+    Content:
+      [Empty state OR health grid + PRD row + AFK row]
+    Footer: cost + last activity
+```
+
+### 5.2 Gear/Settings Icon Button (PRD #257 — not yet implemented)
+
+New icon button alongside GitHub/Folder in header. Same styling: ghost, icon-sm, 26px, strokeWidth 1.7. Left-click opens `DashboardEditDialog`.
+
+### 5.3 Overview Toolbar Controls (PRD #257 / Issue #276 — not yet implemented)
+
+Sort, Filter, and Settings buttons in the overview header row. Sort options: Name, Activity, Issue count, Cost. Filter options: All, Active, Needs Attention, Dormant.
+
+---
+
+## 6. Layout & Dimensions
+
+| Property | Value |
+|----------|-------|
+| Card width | 340px (grid column) |
+| Card min-height | `min-h-49` (AddWorkspaceCard reference); auto-height in practice |
+| Grid | `repeat(auto-fill, 340px)`, `gap-4` (16px), `auto-rows-[1fr]` |
+| Card padding | 14px horizontal, 14px top, 12px bottom (`px-3.5 pt-3.5 pb-3`) |
+| Internal spacing | 4px base grid, `gap-1.5` for stat grid, `mb-2` / `mb-1.5` between sections |
+| Border radius | `rounded-lg` (Card default) |
+| Accent bar | 3px wide, left side, card's accent color (via Card `accentBarColor`) |
+| Thumbnail | 32px square, rounded-md, border, surface-2 bg, mono initials |
+| Header icon buttons | 26px (`size-6.5`), ghost variant |
+| Stat grid | 4 equal columns (`grid-cols-4`), `gap-1.5` |
+| PRD row | Full width, `px-2.5 py-1.5`, surface-2 bg, border, rounded-sm |
+| Footer | Dashed top border separator, `mt-2.5 pt-2` |
+| Z-index | `isolate` on card for stacking context |
+| Responsive | Cards maintain 340px width; grid wraps to available columns (1-4+) |
+
+---
+
+## 7. States & Interactions
+
+### 7.1 Card Variant Priority (highest wins)
+
+Derived by `deriveWorkspaceCardVariant()` in `workspace_card_variants.ts`:
+
+| # | Variant | Condition | Visual Treatment |
+|---|---------|-----------|-----------------|
+| 1 | `urgent` | `prsNeedingAttention > 0` | Accent overridden to red `oklch(0.620 0.205 25)`, ATTN stat pulsing |
+| 2 | `needs-attention` | `hitlCount > 0` | Accent overridden to amber `oklch(0.770 0.155 75)`, HITL stat pulsing |
+| 3 | `active` | `afkLoopStatus === 'running'` | Breathing glow animation (inset box-shadow, accent color at 22% opacity) |
+| 4 | `dormant` | No activity >24h | `opacity-[0.72] saturate-[0.7]` |
+| 5 | `empty` | `openIssueCount === 0` | Health grid replaced with dashed placeholder: sparkles icon + "Newly created - open to track issues" |
+| 6 | `default` | None of above | Standard healthy workspace |
+
+### 7.2 Hover State (Orthogonal — Applies on Top of Any Variant)
+
+- Transform: `translate-y-0.5` (negative, card lifts)
+- Border: accent-blended via `gk-ws-hover-glow` class
+- Shadow: elevated shadow + accent ring + accent glow
+- Applied via CSS `:hover` / `group-hover` on the Card
+
+### 7.3 StatCell States
+
+| Tone | Trigger | Visual |
+|------|---------|--------|
+| `neutral` | Default, value > 0 | Surface-2 bg, standard border |
+| `zero` | Value = 0 (auto-detected) | Muted number, lighter weight |
+| `warning` | HITL > 0 | Amber tint bg, amber border, amber text |
+| `danger` | ATTN > 0 | Red tint bg, red border, red text |
+| + `pulse` | `pulse=true` and value > 0 | Animated dot next to value |
+
+### 7.4 StatusRow States (AFK Row)
+
+| State | LED | Label | Meta |
+|-------|-----|-------|------|
+| AFK on, sessions active | 8px moss-400, glowing + pulsing | "AFK loop running" (bold) | `{total} sessions ({afk} AFK)` |
+| AFK on, idle | 8px moss-400, glowing + pulsing | "AFK loop running" (bold) | `idle` |
+| AFK off, recent activity | 8px foreground-subtle, static | "AFK loop off" (muted) | `last {relative_time}` |
+| AFK off, manual sessions | 8px foreground-subtle, static | "AFK loop off" (muted) | `{total} sessions` |
+| AFK off, no activity | 8px foreground-subtle, static | "AFK loop off" (muted) | (none) |
+
+### 7.5 Icon Button States
+
+| State | GitHub / Folder |
+|-------|----------------|
+| Assigned, resting | `text-foreground-subtle`, opacity 1.0 |
+| Assigned, hover | `text-foreground` + `bg-surface-2` |
+| Unassigned, resting | `opacity-[0.35]` |
+| Unassigned, hover | `opacity-[0.35]` + `bg-surface-2` |
+
+Left-click: assigned = open target; unassigned = config wizard.
+Right-click: always = config wizard.
+
+### 7.6 PRD Row States
+
+| State | Visual |
+|-------|--------|
+| Visible | `prd_count > 0`: icon + "N PRDs" + progress bar + "X/Y done" |
+| Hidden | `prd_count === 0`: empty spacer (`h-7.5`) preserving card height |
+| Hover | `border-border-strong` highlight |
+
+### 7.7 AddWorkspaceCard
+
+- Dashed border (1.5px), no accent bar, no gradient
+- Content: centered `+` circle (36px, surface-2 bg) + "Add workspace" label (13px, 500 weight)
+- Hover: border -> moss-400, text -> moss-300, subtle moss bg tint, lift
+
+---
+
+## 8. Design Constraints (Non-Negotiable)
+
+- 12-preset accent color palette is the identity system — must be prominent
+- 3px left accent bar as primary accent surface
+- Health grid order: **Issues -> PRs -> ATTN -> HITL** (decision priority from grilling)
+- Dual number format for Issues stat: `{afk_actionable}/{total_tracked}`
+- Active/breathing animation must be present when AFK loop is running
+- 340px card width, must work in `auto-fill` grid
+- No AFK start/stop toggle on overview card (only in workspace dashboard)
+- Icon buttons always visible (not hover-revealed) — touch/mobile support
+- StrokeWidth 1.7 on icon buttons
+- "Newly created" (not "Newly planted") in empty state
+- Must use existing Card component with `accentBarColor` + `gradientTint` props
+- Cost period hardcoded to "today" (configurable period deferred to PRD #93 Metrics)
+- Footer config: global, applies to all workspace cards (PRD #257)
+
+---
+
+## 9. Design Freedom
 
 Designer has creative latitude in:
 
-- **Accent gradient direction and blend mode** — current spec uses 180deg linear, 8% tint, 0–60% stop. Experiment with radial, conic, or different angle/opacity if it reads better
-- **Hover animation easing** — spring physics, cubic-bezier, or CSS transition timing
-- **LED dot glow parameters** — blur radius, spread, animation timing (current: 3.6s ease-in-out)
-- **Stat cell icon style** — any Lucide icon that feels appropriate for each metric (current suggestions: list-checks, git-pull-request, triangle-alert, user)
-- **Add Workspace card placeholder style** — dashed border + centered icon is suggested, but alternative empty state treatments welcome
-- **Dormant state visual treatment** — opacity + saturation is current spec; alternative: grayscale filter, reduced contrast, faded border
+- **Accent gradient direction and blend mode** — current: 180deg linear, 8% tint, 0-60% stop. Radial, conic, or different angle/opacity welcome
+- **Hover animation easing** — spring, cubic-bezier, or CSS transition timing
+- **LED dot glow parameters** — blur radius, spread, animation timing
+- **Card shadow depth** — resting vs hover elevation contrast
+- **Stat cell hover feedback** — background color, border treatment
+- **Thumbnail treatment** — placeholder styling, aspect ratio, corner rounding, future custom icons
+- **Empty state messaging** — copy and iconography for zero-issue workspaces
+- **PRD progress bar styling** — fill animation, corner radius, height
+- **Dormant state visual treatment** — current: opacity + saturation. Alternatives: grayscale, faded border, reduced contrast
+- **Add Workspace card placeholder** — dashed border + centered icon is current; alternative empty state treatments welcome
+- **Breathing glow animation timing** — current spec: 3.6s ease-in-out; tune for subtlety
 
 Designer MUST preserve:
 
 - 12-preset accent color palette (identity system)
-- Health grid order: Issues → PRs → ATTN → HITL (decision priority)
+- Health grid order: Issues -> PRs -> ATTN -> HITL
 - 3px left accent bar (primary accent surface)
 - Active/breathing animation presence (AFK loop running indicator)
-- Dual number format for Issues stat (afk_actionable/total_tracked)
-
-## Not Included
-
-[Explicit scope exclusions]
-
-- Configurable cost period (PRD #93 Metrics)
-- Full PRD view/page (new PRD: PRD Management & Visualization)
-- Forest thumbnail on card
-- Inline issue list
-- AFK loop start/stop toggle on overview card
+- Dual number format for Issues stat (`afk_actionable/total_tracked`)
 
 ---
 
-## Visual Design
+## 10. Inspiration
 
-### Card Structure
+- **Issue Card v2** (`designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md`) — color treatment: gradient-based identity (not flat fills), hover glow + card lift, subtle box-shadow glows over thick borders. Follow similar visual language for workspace accent color prominence
+- **Linear** — issue grid cards with status indicators and glanceable metrics
+- **GitHub Desktop** — workspace switcher list for quick project overview
+- **Raycast** — extension cards with icon, description, stats row
+- **VS Code** — start page "Recent" section with repo cards, folder path, icons
+- **Dashboard widgets** — macOS widget cards, Notion database cards (compact metric display)
 
-- Width: 320px (grid column minimum)
-- Min-height: 196px
-- Padding: 14px 14px 12px
-- Background: `linear-gradient(180deg, accent_tint 0%, transparent 60%), var(--surface)`
-    - `accent_tint` = `color-mix(in oklch, {accent} 8%, transparent)`
-- Border: 1px solid `var(--border)`, radius: `var(--radius-lg)`
-- Shadow: `var(--shadow-sm)`
-- Left accent bar: 3px, `{accent_color}`, 85% opacity (CSS `::before`)
-- Cursor: pointer
-- Isolation: isolate (for stacking context)
-
-### Card Component Integration
-
-WorkspaceCard derives from the base `Card` component with two new Card props:
-
-- `accentBarColor?: string` — renders 3px left border in the given color
-- `gradientTint?: string` — renders a `::before` pseudo-element gradient overlay
-
-WorkspaceCard handles its own state variants (active/breathing, needs-attention, urgent, dormant, empty) — these are NOT Card-level states.
-
-### Hover State
-
-- Transform: `translateY(-2px)`
-- Border: `color-mix(in oklch, accent 50%, var(--border))`
-- Shadow: `shadow-md` + 1px accent ring (22% opacity) + 28px accent glow (50% opacity, -10px spread)
-
-### Add Workspace Card
-
-- Dashed border (1.5px), no accent bar, no gradient
-- Content: centered `+` circle (36px, `surface-2` bg) + "Add workspace" label (13px, 500 weight)
-- No subtitle text
-- Hover: border → `moss-400`, text → `moss-300`, subtle moss bg tint, translateY(-2px)
+Feel consistent with: Grovekeeper's existing `.cb-panel` data panels (control board style), issue cards in workspace dashboard, session status indicators, the 12-color accent system used in worktree tabs and session labels.
 
 ---
 
-## Accent Color System (12 presets)
+## Accent Color System (12 Presets)
 
-Workspace accent chosen via `ColorPickerContent` (inline, no dropdown) with 12 presets in a 2×6 grid.
+Workspace accent chosen via `ColorPickerContent` (inline, no dropdown) with 12 presets in a 2x6 grid.
 
-| Name    | OKLCH                    | Hue  | Token                              |
-| ------- | ------------------------ | ---- | ---------------------------------- |
-| moss    | `oklch(0.580 0.096 134)` | 134° | `--moss-500` (existing)            |
-| amber   | `oklch(0.690 0.165 55)`  | 55°  | `--amber-500` (existing)           |
-| bark    | `oklch(0.500 0.075 55)`  | 55°  | `--bark-500` (existing)            |
-| azure   | `oklch(0.570 0.130 235)` | 235° | `--azure-500` (fix to match token) |
-| plum    | `oklch(0.560 0.150 320)` | 320° | NEW `--plum-500`                   |
-| teal    | `oklch(0.620 0.110 195)` | 195° | NEW `--teal-500`                   |
-| rose    | `oklch(0.640 0.155 15)`  | 15°  | NEW `--rose-500`                   |
-| coral   | `oklch(0.620 0.155 30)`  | 30°  | NEW `--coral-500`                  |
-| gold    | `oklch(0.650 0.135 90)`  | 90°  | NEW `--gold-500`                   |
-| sage    | `oklch(0.600 0.085 160)` | 160° | NEW `--sage-500`                   |
-| indigo  | `oklch(0.540 0.140 275)` | 275° | NEW `--indigo-500`                 |
-| fuchsia | `oklch(0.580 0.155 350)` | 350° | NEW `--fuchsia-500`                |
+| Name | OKLCH | Hue | Token |
+|------|-------|-----|-------|
+| moss | `oklch(0.580 0.096 134)` | 134 | `--moss-500` (existing) |
+| amber | `oklch(0.690 0.165 55)` | 55 | `--amber-500` (existing) |
+| bark | `oklch(0.500 0.075 55)` | 55 | `--bark-500` (existing) |
+| azure | `oklch(0.570 0.130 235)` | 235 | `--azure-500` (existing) |
+| plum | `oklch(0.560 0.150 320)` | 320 | `--plum-500` |
+| teal | `oklch(0.620 0.110 195)` | 195 | `--teal-500` |
+| rose | `oklch(0.640 0.155 15)` | 15 | `--rose-500` |
+| coral | `oklch(0.620 0.155 30)` | 30 | `--coral-500` |
+| gold | `oklch(0.650 0.135 90)` | 90 | `--gold-500` |
+| sage | `oklch(0.600 0.085 160)` | 160 | `--sage-500` |
+| indigo | `oklch(0.540 0.140 275)` | 275 | `--indigo-500` |
+| fuchsia | `oklch(0.580 0.155 350)` | 350 | `--fuchsia-500` |
 
-Each new color needs a 5-step scale (300–700) following the existing OKLCH pattern. Grid layout:
-
+Grid layout:
 ```
 Row 1: moss    amber   gold    coral   rose    fuchsia
 Row 2: sage    teal    azure   indigo  plum    bark
 ```
 
----
-
-## New Components Required
-
-### StatCell (`src/lib/components/ui/stat-cell/`)
-
-Mini metric display for dashboard cards.
-
-**Props**: `label: string`, `value: number | string`, `tone?: 'neutral' | 'zero' | 'warning' | 'danger'`, `icon?: Component`, `pulse?: boolean`, `onclick?: () => void`
-
-**States**: neutral (default bg), zero (muted everything), warning (amber tint), danger (red tint). Pulse dot animates when `pulse=true` and value > 0.
-
-**Storybook**: all tones, zero vs non-zero, with/without pulse, with/without icon, clickable vs static.
-
-### StatusRow (`src/lib/components/ui/status-row/`)
-
-Horizontal status indicator with LED, label, and right-aligned metadata.
-
-**Props**: `active: boolean`, `label: string`, `meta?: string`, `onclick?: () => void`, `activeColor?: string` (default moss)
-
-**States**: active (glowing LED, tinted border, bold label), inactive (muted LED, muted label).
-
-**Storybook**: active/inactive, with/without meta text, different active colors.
-
-### GithubIcon (`src/lib/components/icons/`)
-
-Stroke-based SVG matching Lucide/Feather style (same path as in `claude_design/icons.jsx`). Props: `size`, `strokeWidth`, `class`. Matches Lucide component API so it blends with other icons.
-
-### VscodeIcon (rewrite)
-
-Replace current stroke-based approximation with proper Simple Icons fill-based SVG (`fill="currentColor"`, no stroke). Props: `size`, `class`. No `strokeWidth` (fill icon).
+Each color has a 5-step scale (300-700) following the existing OKLCH pattern.
 
 ---
 
-## Grid Layout
+## Existing Implementation
 
-- `grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))`
-- Gap: 16px
-- Responsive: 1–4 columns depending on window width
-- Add Workspace card always last
+### Source Files
+
+| File | Description |
+|------|-------------|
+| `src/lib/components/blocks/workspace/WorkspaceCard.svelte` | Main component (~360 lines) |
+| `src/lib/components/blocks/workspace/workspace_card_variants.ts` | Variant derivation + accent color override |
+| `src/lib/components/blocks/workspace/workspace_card_variants.test.ts` | Unit tests for variant logic |
+| `src/lib/components/blocks/workspace/WorkspaceCard.stories.svelte` | Storybook stories |
+| `src/lib/components/blocks/workspace/AddWorkspaceCard.svelte` | Add workspace CTA card |
+| `src/lib/components/base/stat-cell/` | StatCell component (4 tones, pulse, suffix) |
+| `src/lib/components/base/status-row/` | StatusRow component (LED, label, meta) |
+| `src/routes/overview/+page.svelte` | Overview page consuming WorkspaceCard |
+| `src/lib/types/generated/OverviewWorkspaceData.ts` | ts-rs generated data type |
+
+### Implementation Status
+
+Fully implemented: card structure, variant derivation, stat grid, PRD row, AFK StatusRow, footer, accent colors, empty state, dormant state, breathing glow, icon buttons, CostLink integration.
+
+Not yet implemented (from PRD #257):
+- Gear/settings icon button in card header
+- Right-click context menu (issue #274)
+- Sort/filter/settings toolbar on overview page (issue #276)
+- Configurable footer content (issue #276)
+
+---
+
+## Not Included (Explicit Scope Exclusions)
+
+- Configurable cost period — deferred to PRD #93 Metrics
+- Full PRD view/page — separate PRD #219: PRD Management & Visualization
+- Forest thumbnail on card (no forest view in overview)
+- Inline issue list (card shows aggregates only)
+- AFK loop start/stop toggle on overview card
+- Drag and drop reordering — grid order via sort controls
+- Workspace creation flow — handled by AddWorkspaceCard + DashboardCreateDialog
+- Session management controls — handled in workspace detail view
+- Git branch switcher — branch display is read-only
+- Cost breakdown tooltip — cost label shows simple total
+- Card editing UI (rename, delete, archive) — handled by context menu / DashboardEditDialog
+- Workspace card structural redesign or new visual variants (PRD #257 scope note)
+
+---
+
+## Related Issues & PRDs
+
+| Issue | Status | Description |
+|-------|--------|-------------|
+| #257 | OPEN | PRD: Overview & Workspace Card Polish (sort, filter, gear icon, context menu, footer config) |
+| #274 | OPEN | Add right-click context menu to workspace cards |
+| #276 | OPEN | Add sorting, filtering, and configurable footer to Overview page |
+| #96 | OPEN | PRD: Platform & Settings (parent PRD, overview dashboard section) |
+| #212 | CLOSED | Workspace card redesign -- full visual implementation |
+| #213 | CLOSED | Card component enhancements -- accentBarColor + gradientTint |
+| #214 | CLOSED | New components -- StatCell + StatusRow with Storybook |
+| #217 | CLOSED | Workspace accent color system -- 12-color palette + token scales |
+| #218 | CLOSED | Add workspace wizard update -- remove hint, add accent picker |

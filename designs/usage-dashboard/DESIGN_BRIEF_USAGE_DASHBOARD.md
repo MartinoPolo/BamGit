@@ -1,192 +1,375 @@
-# Usage Dashboard v2 — Design Spec
+# Usage Dashboard — Design Brief
 
-Redesign of the `/usage` analytics dashboard with LayerChart-based visualizations, configurable color themes, workspace scoping, and enhanced interactivity. The dashboard is the primary metrics surface — workspace-scoped by default with a global toggle. Hand this to a designer for visual exploration.
+Full-page analytics dashboard for tracking AI usage costs, token consumption, session statistics, and spending trends. Accessible via the "Usage" nav item (BarChart3Icon) in the sidebar. This is the primary metrics surface — workspace-scoped by default with a global toggle. Heatmap calendar chosen as primary visualization (Variant E decision). Hand this to a designer for visual exploration.
 
-## Design Tokens
+---
 
-Use the Grovekeeper Forest Moss palette from `tokens.css`. Font: Geist / Geist Mono. Chart colors: `--chart-1` through `--chart-5` CSS variables (to be defined per color theme).
+## 1. Purpose
 
-## Container Context
+Cost tracking, usage analytics, and spending awareness across sessions and providers. Users check this to:
 
-**Parent**: None — standalone page (`/usage` route)
-**This component is standalone** — it owns its full page chrome including header, filters, and content area.
+- Understand spending trends and identify expensive sessions
+- Track cost by provider, model, issue, and time period
+- Evaluate one-shot success rates and cache efficiency
+- Spot temporal patterns (weekday/weekend, sprint bursts, quiet periods)
+- Detect optimization opportunities (feeds into Optimize view, #250)
+- Compare model effectiveness (feeds into Compare view, #251)
 
-## Purpose
+PRD #93 (Metrics & Statistics). Related issues: #247 (backend wiring, closed), #248 (visual overhaul, closed), #249 (nav/URL/CostLink, closed). Open: #250 (optimize view), #251 (compare view), #309 (ColorThemePicker improvements).
 
-Primary metrics and analytics surface for tracking AI usage costs, session patterns, and tool efficiency. Users check this to understand spending trends, identify expensive sessions, evaluate one-shot success rates, and spot optimization opportunities.
+---
 
-## Required Elements
+## 2. Surrounding Context
 
-### Page Header
+**Parent**: None — standalone page (`/usage` route, SvelteKit SPA)
+**Layout**:
+- **Left**: Dashboard sidebar (240px, FINAL) — "Usage" nav item ACTIVE (highlighted with BarChart3Icon)
+- **Top**: Page header with title + action buttons (within content area, not TopBar)
+- **Content**: Full-width scrollable content area
+- **NO forest/bottom panel split** — this is a separate analytics page, not the workspace dashboard
 
-- **Title**: "Usage Analytics" (text-2xl, font-bold)
-- **Right-side button group** (all `icon-sm` size, `secondary` variant):
-    - Color theme shortcut (palette icon) — opens Popover with 3 theme options
-    - Trophy button — `{unlockedCount}/{total}` — opens Achievements Dialog
-    - RefreshIndicator component (see separate brief)
-    - Export CSV button (download icon)
+When accessed from the Overview window, scope defaults to "All workspaces" (global).
 
-### Filter Bar
+---
 
-- **Period tabs**: today | 7d | 30d | Month | All | Custom
-    - Active tab: `bg-background text-foreground shadow-sm`
-    - Inactive: `text-muted-foreground hover:text-foreground`
-    - "Custom" tab opens Popover with RangeCalendar (2-month, `@internationalized/date`)
-- **Scope toggle**: "This workspace" | "All workspaces" (ToggleGroup or Select)
-- **Group by dropdown**: None | Model | Provider | Category (Select component)
+## 3. Requirements
 
-### KPI Cards (4 cards)
+### Data Requirements
 
-Each card uses `Card.Card` with internal padding. Content:
+| Metric | Source | Notes |
+|--------|--------|-------|
+| Total cost (USD) | `UsageStats.total_cost_usd` | Delta vs previous period |
+| Session count | `UsageStats.session_count` | Delta vs previous period |
+| One-shot rate | `UsageStats.one_shot_rate` | Industry avg ~62% benchmark |
+| Cache hit ratio | `UsageStats.cache_hit_ratio` | Estimated monthly savings |
+| Cost over time | `TimeBucketCost[]` | Adaptive granularity: hourly/daily/weekly/monthly |
+| Grouped costs | `GroupedCostEntry[]` | By model, provider, or category |
+| Activity breakdown | `ActivityBreakdown[]` | 13 categories with cost, turns, one-shot % |
+| Top sessions | `TopSession[]` | Top 5 by cost with issue linkage |
+| Tool usage | `ToolUsageBreakdown[]` | Top 10 tools by call count |
+| Achievements | `Achievement[]` | 10 milestone-based, progress bars |
+| Pricing status | `pricing_available: boolean` | Warning when pricing unavailable |
 
-- Label: `text-sm text-muted-foreground`
-- Value: `text-2xl font-bold` (Geist Mono for numbers)
-- Subtitle: `text-xs` with delta indicator or context info
+### Functional Requirements
 
-| Card          | Value   | Delta/Context                                       |
-| ------------- | ------- | --------------------------------------------------- |
-| Total cost    | `$X.XX` | `+/-N% vs prev period` (green if down, amber if up) |
-| Sessions      | `N`     | `+/-N vs prev period`                               |
-| One-shot rate | `N%`    | `industry avg ~62%`                                 |
-| Cache hit     | `N%`    | `saving ~$X.XX/mo`                                  |
+- **Time range selection**: today, 7d, 30d, month, all, custom (RangeCalendar)
+- **Scope toggle**: "This workspace" / "All workspaces"
+- **Group by**: None / Model / Provider / Category
+- **3 color themes**: Monochrome (primary opacity 30-100%), Traffic Light (green/amber/red), Gradient (blue/yellow/red). Persisted via `Persisted` class in localStorage
+- **CSV export**: Respects active period filter
+- **URL state sync**: All filters (period, scope, groupBy, custom date range) encoded in URL. Back/forward navigation works. Deep-linking supported
+- **Refresh**: Event-driven (metrics-updated Tauri event), manual button, freshness timers (30s fresh → idle, 120s → stale)
+- **Multi-currency**: Store USD, convert at display time via Frankfurter API. Currency preference in user settings
+- **CostLink navigation**: Any cost value across the app can navigate here with filters pre-applied
 
-### Cost Chart (LayerChart)
+---
 
-- **Chart type**: Bar chart (`BarChart` from layerchart)
-- **Adaptive granularity**: hourly bars (today), daily (7d/30d/month), weekly/monthly (all-time)
-- **Y-axis**: 3-4 gridlines with dollar amounts (`$0`, `$2`, `$4`, `$6`)
-- **X-axis**: Date/time labels at start and end, tick marks at gridlines
-- **Bar coloring**: Per selected theme:
-    - Monochrome: `bg-primary` with `opacity` 30%-100% based on relative cost
-    - Traffic Light: green (<33% max) / amber (33-66%) / red (>66%)
-    - Gradient: 3-stop positional (blue-cyan -> yellow-orange -> red-orange)
-- **Hover**: ChartTooltip component (see below) via `{#snippet tooltip()}` on LayerChart
-- **When grouped** (by Model/Provider): stacked or grouped bars using `--chart-1` through `--chart-5`
-- **Container**: `Card.Card` with title "Cost per day" (adapts label: "Cost per hour", "Cost per week")
-- **Height**: 128-160px chart area
+## 4. Existing Components to Reuse
 
-### ChartTooltip Component
+### Usage-Specific (Already Built)
 
-Rich hover tooltip anchored to chart elements. Uses `Tooltip.Root` + `Tooltip.Trigger` + `Tooltip.Content` primitives.
+| Component | File | Description |
+|-----------|------|-------------|
+| **CostChart** | `src/lib/components/blocks/usage/CostChart.svelte` | LayerChart bar chart with 3 color themes, grouped/stacked modes, adaptive time labels |
+| **CostLink** | `src/lib/components/blocks/usage/CostLink.svelte` | Clickable cost value with magnitude coloring (low/medium/high), navigates to /usage with filters |
+| **RefreshIndicator** | `src/lib/components/blocks/usage/RefreshIndicator.svelte` | 5-state refresh button (idle/loading/fresh/stale/new-data-available) |
+| **ColorThemePicker** | `src/lib/components/blocks/usage/ColorThemePicker.svelte` | Popover with 3 theme radio options + swatch previews |
+| **AchievementsDialog** | `src/lib/components/blocks/usage/AchievementsDialog.svelte` | Dialog with 2-column achievement grid, progress bars |
+| **DateRangePicker** | `src/lib/components/blocks/usage/DateRangePicker.svelte` | Popover + 2-month RangeCalendar |
+| **GroupByDropdown** | `src/lib/components/blocks/usage/GroupByDropdown.svelte` | Select: None/Model/Provider/Category |
+| **ScopeToggle** | `src/lib/components/blocks/usage/ScopeToggle.svelte` | Select: This workspace / All workspaces |
+| **cost_link_utils** | `src/lib/components/blocks/usage/cost_link_utils.ts` | `formatCostDisplay()`, `getCostMagnitude()` |
+| **csv_export** | `src/lib/components/blocks/usage/csv_export.ts` | `exportUsageCsv()` |
 
-Content layout:
+### Usage Context
+
+| Module | File | Description |
+|--------|------|-------------|
+| **UsageContext** | `src/lib/modules/usage/usage.context.svelte.ts` | Full page state: period, scope, groupBy, colorTheme (Persisted), dashboardData, achievements, refreshState, load/notify functions |
+| **usage_types** | `src/lib/modules/usage/usage_types.ts` | `MetricsPeriod`, `GroupByOption`, `UsageScope`, `ChartColorTheme`, `RefreshState`, `PERIODS`, type guards |
+| **url_state_sync** | `src/lib/modules/usage/url_state_sync.svelte.ts` | URL ↔ state two-way sync |
+
+### Base Components
+
+| Component | Use |
+|-----------|-----|
+| **Card** | All content sections |
+| **Button** | `secondary` for header actions, `ghost` for compact controls |
+| **Tabs** | Period selector tabs |
+| **Badge** | Delta indicators, status badges |
+| **Dialog** | Achievements display |
+| **Popover** | Color theme picker, custom date range |
+| **Select** | Scope toggle, group-by dropdown |
+| **SimpleTooltip** | Header button tooltips |
+| **Tooltip.Root/Trigger/Content** | Rich chart tooltips |
+| **Separator** | Section dividers |
+| **Skeleton** | Loading placeholders |
+| **Progress** | Achievement progress bars |
+| **Chart.Container / Chart.Tooltip** | LayerChart wrapper + tooltip formatting |
+| **RangeCalendar** | Custom date range picker |
+
+### Design System Classes
+
+| Class | Use |
+|-------|-----|
+| `cb-panel` + `cb-panel-title` | Dense data sections with bracket-style `[HEADING]` |
+| `cb-row` + `cb-num` + `cb-mute` | Dense data rows (activity breakdown, tool calls) |
+| `cb-bar` / `cb-bar-cool` / `cb-bar-moss` | Gradient bars in breakdown tables |
+| `cb-tabs` + `cb-tab` | Tabbed sub-sections |
+| `gk-h2` / `gk-h3` / `gk-eyebrow` | Section headings and labels |
+| `gk-badge-*` | Status indicators (success/warning/danger/info) |
+| `font-mono` / `tabular-nums` | All numeric values |
+
+---
+
+## 5. Components to Design
+
+### 5.1 Heatmap Calendar (Primary Visualization — Variant E Decision)
+
+GitHub-contribution-style calendar grid replacing the traditional bar chart as the primary cost visualization. Each day is a colored cell where intensity maps to spend.
+
+**Requirements**:
+- 7-level intensity scale from empty surface through deep moss greens
+- Two modes: **Colorful** (moss → yellow → red scale matching CostLink magnitude colors) and **Monocolor** (moss-only intensity scale). Adapts correctly to both dark and light mode
+- Color scale: low = moss green, medium = golden yellow (distinct, not ambiguous), high = red (clearly danger). Match existing design tokens where possible
+- Click any cell to reveal a **drill-down detail panel** below showing that day's sessions + category cost breakdown
+- Week-total row: dashed-border row below calendar showing per-week cost totals
+- Adaptive to selected period: full year (all), 6 months, 30 days, current month
+
+### 5.2 Weekly Pattern Sidebar Panel
+
+Mini 7-bar chart showing average daily spend by weekday (Mon-Sun). Surfaces recurring patterns unique to the heatmap approach.
+
+### 5.3 Usage Summary Cards (KPI Strip)
+
+4 cards in a horizontal row at the top of the page. Already implemented but may need visual refinement.
+
+| Card | Value | Delta/Context |
+|------|-------|---------------|
+| Total cost | `$X.XX` | `+/-N% vs prev period` (green if down, amber if up) |
+| Sessions | `N` | `+/-N vs prev period` |
+| One-shot rate | `N%` | `industry avg ~62%` |
+| Cache hit | `N%` | `saving ~$X.XX/mo` |
+
+Each card: `Card.Card` with internal padding. Label `text-sm text-muted-foreground`, value `text-2xl font-bold` (Geist Mono), subtitle `text-xs` with delta indicator.
+
+### 5.4 Activity Breakdown Table
+
+Already implemented. Grid layout: `grid-cols-[120px_1fr_64px_44px_44px]`. Per-category: name, proportional bar, cost, turn count, one-shot % with dot indicator (green >=75%, amber >=60%, red <60%, muted dash = 0%). Bars should use the selected color theme.
+
+### 5.5 Top Sessions List
+
+Already implemented. Top 5 sessions by cost. Per session: issue number (muted), issue name (truncate), cost (tabular-nums, right-aligned). No issue = "Ad-hoc session". Clickable (navigates to session detail, future).
+
+### 5.6 Tool Calls Chart
+
+Already implemented. Horizontal bar chart within Card. Grid: `grid-cols-[80px_1fr_48px]` — tool name, bar, count. Top 10 tools, bars use `bg-primary/70`.
+
+### 5.7 Time Range Picker
+
+Already implemented. Tab bar with: today | 7d | 30d | Month | All | Custom. "Custom" opens Popover with 2-month RangeCalendar. Active tab highlighted.
+
+### 5.8 Day Detail Panel (New — Heatmap Drill-Down)
+
+Shown below the heatmap when a day cell is clicked. Split panel:
+- **Left**: Session list for that day (issue number, issue name, cost, turns, model)
+- **Right**: Category cost breakdown mini-bars
+
+Persistent view (not tooltip) — stays open until another day is clicked or dismissed.
+
+---
+
+## 6. Layout & Dimensions
 
 ```
-Date/time label          (font-semibold, 11px)
-$X.XX · N sessions       (10.5px, leading-relaxed)
-Top: Category (N%)       (10.5px, text-muted-foreground)
+┌──────────────────────────────────────────────────────────────┐
+│  Page Header: "Usage Analytics" + [Palette] [Trophy] [↻] [CSV]│
+├──────────────────────────────────────────────────────────────┤
+│  Filter Bar: [Today|7d|30d|Month|All|Custom] [Scope▾] [Group▾]│
+├──────────────────────────────────────────────────────────────┤
+│  KPI Cards (4x): [ Total Cost ] [ Sessions ] [ 1-Shot ] [ Cache ]│
+├──────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────┐ ┌──────────────────┐│
+│  │  Heatmap Calendar (~70%)            │ │  Weekly Pattern   ││
+│  │  + Click-to-drill detail panel      │ │  Sidebar (320px)  ││
+│  │                                     │ │                   ││
+│  └─────────────────────────────────────┘ └──────────────────┘│
+├──────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────┐ ┌─────────────────────────┐│
+│  │  Activity Breakdown (1.4fr)  │ │  Top Sessions + Tool    ││
+│  │                              │ │  Calls (1fr)            ││
+│  └──────────────────────────────┘ └─────────────────────────┘│
+└──────────────────────────────────────────────────────────────┘
 ```
-
-- Width: `w-[200px]`, `whitespace-normal`, `p-2.5`
-- Appears on hover over chart bars, disappears on mouse leave
-- Side: `top` with `sideOffset={8}`
-
-### Activity Breakdown
-
-- Grid layout: `grid-cols-[120px_1fr_64px_44px_44px]`
-- Header row with column labels (Category, bar, Cost, Turns, 1-shot)
-- Per-category row: name, proportional bar (within Card), cost, turn count, one-shot % with dot indicator
-- One-shot dot colors: green (>=75%), amber (>=60%), red (<60%), muted dash (0%)
-- Bars use the selected color theme (same as chart bars)
-
-### Top Sessions
-
-- List of top 5 sessions by cost
-- Per session: issue number (muted), issue name (truncate), cost (tabular-nums, right-aligned)
-- No issue → "Ad-hoc session"
-- Clickable: navigates to session detail (future)
-
-### Tool Calls
-
-- Horizontal bar chart (within Card)
-- Grid: `grid-cols-[80px_1fr_48px]` — tool name, bar, count
-- Top 10 tools, ordered by count descending
-- Bars use `bg-primary/70`
-
-### Color Theme Picker (Popover)
-
-Triggered by palette icon button in header. Popover content:
-
-- 3 radio options with visual preview swatch per theme
-- "Monochrome" — green opacity scale preview
-- "Traffic Light" — red/amber/green dot preview
-- "Gradient" — small gradient bar preview
-- Divider + "Applies to: [This workspace / All workspaces]" toggle
-
-### Achievements Dialog
-
-- Triggered by Trophy button
-- Dialog with title "Achievements" and subtitle "{N} of {total} unlocked"
-- 2-column grid of achievement cards
-- Each card: icon area (TrophyIcon, primary when unlocked, muted when locked), name, description, progress bar
-- Unlocked: `border-primary/30 bg-primary/5`, locked: `opacity-50`
-
-## States
-
-List every state that must be designed:
-
-- **Default loaded state**: 30d period, workspace scope, data populated
-- **"Today" period**: hourly bars in cost chart
-- **"Custom" period**: date range popover open with RangeCalendar
-- **Grouped by Model**: stacked/grouped bars with legend in cost chart
-- **Global scope**: all workspaces selected
-- **Empty state**: no data for selected period (show illustration + message)
-- **Loading state**: skeleton loaders for KPI cards, chart area, and tables
-- **Color theme variants**: Monochrome, Traffic Light, Gradient applied to same data
-- **Hover states**: chart bars showing ChartTooltip, button hover states
-- **Popover open states**: Color theme picker popover, custom date range popover
-- **Dialog open state**: Achievements Dialog displayed
-- **Export in progress**: CSV export button showing loading indicator
-- **RefreshIndicator states**: All 5 states from RefreshIndicator component
-
-## Reusable Components
-
-- `Button`: `icon-sm` for header actions, `secondary` variant
-- `Card.Card`: all content sections
-- `SimpleTooltip`: header button tooltips
-- `Tooltip.Root/Trigger/Content`: ChartTooltip (rich content)
-- `Dialog`: achievements display
-- `Popover`: color theme picker, custom date range
-- `Select`: scope toggle, group-by dropdown
-- `Badge`: delta indicators on KPI cards
-- `cn()`: conditional class merging for theme-based bar colors
-
-## Components to Adopt
-
-- `Calendar` + `RangeCalendar` from shadcn-svelte registry (bits-ui primitives)
-- `Chart.Container` + `Chart.Tooltip` from shadcn-svelte chart component
-- `layerchart` BarChart, LineChart, Highlight primitives
-- `@internationalized/date` for date value types
-
-## Layout Constraints
 
 - Full page width with `p-8` padding, `gap-6` between sections
 - KPI cards: `grid-cols-4 gap-4` (responsive: collapse to 2-col on narrow)
-- Chart area: minimum 128px height, maximum 200px
+- Heatmap + sidebar: `grid-cols-[1fr_320px] gap-4`
 - Activity + right column: `grid-cols-[1.4fr_1fr] gap-4`
 - All number values use `tabular-nums` for alignment
+- Minimum heatmap cell size: 14px (square)
+- Day detail panel: full width of heatmap area, max 200px height
 
-## Visual References
+---
 
-- Current implementation: `src/routes/usage/+page.svelte`
-- CodeBurn TUI dashboard: `C:/_MP_github_cloned/codeburn/src/dashboard.tsx` (layout, color gradient, panels)
-- Workspace card stat cells: `src/lib/components/ui/stat-cell/` (similar number formatting)
-- shadcn-svelte chart examples: `C:/_MP_github_cloned/shadcn-svelte/docs/src/lib/registry/blocks/`
+## 7. States & Interactions
 
-## UI Freedom
+### Page States
 
-- Chart aspect ratio and container sizing
-- KPI card internal layout (horizontal vs stacked labels)
-- Filter bar positioning and grouping
-- Whether breakdown tables use alternating row backgrounds
-- Transition animations between period switches
-- How the "Group by" mode visually transforms the chart (stacked vs grouped vs separate)
-- Empty state illustration/messaging
+| State | Visual | Trigger |
+|-------|--------|---------|
+| **Default loaded** | 30d period, workspace scope, data populated | Initial load |
+| **Loading** | Skeleton loaders for KPI cards, heatmap area, tables | Data fetch in progress |
+| **Empty** | Illustration + "No usage data for this period" message | No data for selected filters |
+| **Error** | Stale indicator + retry prompt | Backend fetch failed |
 
-## Not Included
+### Filter States
 
-- Optimize View (separate brief: OPTIMIZE_VIEW.md)
-- Compare View (separate brief: COMPARE_VIEW.md)
-- Widget drag-and-drop customization (deferred to v2)
-- Real-time streaming cost updates during active sessions
-- Budget/plan tracking overlay
+| State | Visual | Trigger |
+|-------|--------|---------|
+| **"Today" period** | Heatmap shows single day expanded (or falls back to hourly bar chart) | Period = today |
+| **"Custom" period** | Date range popover open with RangeCalendar | Click "Custom" tab |
+| **Grouped by Model** | Stacked/grouped bars with legend (in bar chart view) | GroupBy = model |
+| **Global scope** | All workspaces selected, scope badge highlighted | Scope toggle change |
+
+### Heatmap States
+
+| State | Visual | Trigger |
+|-------|--------|---------|
+| **Cell hover** | Tooltip with date, cost, session count | Mouse enter on cell |
+| **Cell selected** | Highlighted border, detail panel shown below | Click on cell |
+| **No data cell** | Empty surface color | Zero cost for that day |
+| **Max spend cell** | Brightest intensity color | Highest cost day |
+
+### Component States
+
+| State | Visual | Trigger |
+|-------|--------|---------|
+| **Color theme variants** | Monochrome / Traffic Light / Gradient applied | Theme picker change |
+| **Popover open** | Color theme picker or custom date range | Button click |
+| **Dialog open** | Achievements Dialog displayed | Trophy button click |
+| **Export in progress** | CSV button shows loading indicator | Export button click |
+| **RefreshIndicator** | 5 states: idle, loading (spin), fresh (<30s), stale (>2min), new-data-available (dot badge) | Timer / metrics-updated event |
+| **Pricing unavailable** | Warning badge on cost values | `pricing_available = false` |
+
+---
+
+## 8. Design Constraints (Non-Negotiable)
+
+- **Information density priority** — this is a data-heavy analytics page; maximize useful data per screen area
+- **Must use semantic tokens** — all colors via CSS custom properties (`bg-primary`, `text-foreground`, etc.). No hardcoded colors
+- **Dark theme primary** — light theme supported but dark is the design starting point
+- **Geist / Geist Mono fonts** — sans for labels, mono for all numeric values
+- **OKLCH color space** — all custom colors defined in OKLCH
+- **Heatmap color scale**: low = moss green, medium = golden yellow, high = red. Colors must be clearly distinguishable from each other. Match CostLink magnitude colors (hue 142 low, hue 82 medium, hue 8 high)
+- **4px base grid** — all spacing aligned to 4px increments
+- `tabular-nums` on ALL numeric values for column alignment
+- **No native `title` tooltips** — use ChartTooltip or SimpleTooltip
+- **No backdrop blur** on overlays (decision: performance on weaker hardware)
+- **Keyboard accessible** — every action reachable via keyboard. Tab through filters, Enter to select
+- **Touch/mobile planned** — clickable targets must meet minimum touch size (32px)
+- URL state sync for all filters — bookmarkable, shareable
+- CostLink (finalized design) used for all clickable cost values. Magnitude-coded: low (moss, <$1), medium (golden yellow, $1-$20), high (red, >$20)
+- Existing components are source of truth: CostChart, RefreshIndicator, ColorThemePicker, etc. already built and working. Design around them, don't redesign them
+
+---
+
+## 9. Design Freedom
+
+- **Heatmap cell styling**: rounded vs sharp corners, gap between cells, cell size
+- **Heatmap color interpolation**: discrete steps vs continuous gradient within each mode
+- **Detail panel animation**: slide-down, fade-in, or instant
+- **KPI card internal layout**: horizontal vs stacked labels, icon treatment
+- **Section card styling**: flat vs elevated, border treatment
+- **Whether breakdown tables use alternating row backgrounds**
+- **Transition animations between period switches** (fade, slide, morph)
+- **How the "Group by" mode visually transforms the heatmap** (overlay legend, separate heatmaps, stacked cells)
+- **Empty state illustration/messaging**
+- **Weekly pattern sidebar**: bar chart style, orientation, annotations
+- **Whether to show both heatmap AND bar chart** (e.g., heatmap primary + small bar chart in sidebar) or heatmap-only
+- **Day detail panel dismiss behavior**: click-away, X button, click-same-cell-again
+- **Section ordering below heatmap** (activity breakdown position relative to top sessions / tool calls)
+- **cb-panel vs Card styling** for data sections (CodeBurn TUI density vs shadcn Card polish)
+
+---
+
+## 10. Not Included (Separate Briefs / Future)
+
+| Feature | Status | Reference |
+|---------|--------|-----------|
+| Optimize View | Separate brief | #250, `designs/OPTIMIZE_VIEW.md` |
+| Compare View | Separate brief | #251, `designs/COMPARE_VIEW.md` |
+| Widget drag-and-drop customization | Deferred to v2 | — |
+| Real-time streaming cost updates during active sessions | Future | — |
+| Budget/plan tracking overlay | Future | — |
+| Advanced prompt analytics / A/B testing | Out of scope V1 | — |
+
+---
+
+## 11. Inspiration
+
+- **CodeBurn TUI dashboard**: `C:/_MP_github_cloned/codeburn/src/dashboard.tsx` — layout, color gradient, cb-panel density
+- **GitHub contribution heatmap**: Calendar grid pattern, intensity coloring, click-to-drill
+- **Grafana dashboards**: Analytics panel arrangement, time range pickers, drill-down patterns
+- **Issue Card v2 Final Decisions**: `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` — gold standard for brief quality, state enumeration, component architecture
+
+---
+
+## 12. Visual References (Current Implementation)
+
+| What | File |
+|------|------|
+| Usage page | `src/routes/usage/+page.svelte` |
+| Usage context | `src/lib/modules/usage/usage.context.svelte.ts` |
+| CostChart | `src/lib/components/blocks/usage/CostChart.svelte` |
+| CostLink | `src/lib/components/blocks/usage/CostLink.svelte` |
+| RefreshIndicator | `src/lib/components/blocks/usage/RefreshIndicator.svelte` |
+| ColorThemePicker | `src/lib/components/blocks/usage/ColorThemePicker.svelte` |
+| AchievementsDialog | `src/lib/components/blocks/usage/AchievementsDialog.svelte` |
+| DateRangePicker | `src/lib/components/blocks/usage/DateRangePicker.svelte` |
+| GroupByDropdown | `src/lib/components/blocks/usage/GroupByDropdown.svelte` |
+| ScopeToggle | `src/lib/components/blocks/usage/ScopeToggle.svelte` |
+| CostLink design decisions | `designs/cost-link/DECISION.md` + `SUMMARY.md` |
+| Variant D (activity feed) | `designs/usage-dashboard/variants/VARIANT-D.md` |
+| Variant E (heatmap, chosen) | `designs/usage-dashboard/variants/VARIANT-E.md` |
+| Design tokens | `designs/tokens.css` |
+| Workspace card stat cells | `src/lib/components/ui/stat-cell/` |
+| shadcn-svelte chart examples | `C:/_MP_github_cloned/shadcn-svelte/docs/src/lib/registry/blocks/` |
+
+---
+
+## 13. Data Shapes (Rust → TypeScript via ts-rs)
+
+```typescript
+type UsageDashboardData = {
+  stats: UsageStats;
+  time_bucket_costs: TimeBucketCost[];
+  grouped_costs: GroupedCostEntry[];
+  activity_breakdown: ActivityBreakdown[];
+  top_sessions: TopSession[];
+  tool_usage: ToolUsageBreakdown[];
+  pricing_available: boolean;
+};
+
+type UsageStats = {
+  total_cost_usd: number;
+  session_count: number;
+  one_shot_rate: number;
+  cache_hit_ratio: number;
+  cost_delta_percent: number | null;
+  session_count_delta: number | null;
+};
+
+type TimeBucketCost = { date: string; cost_usd: number; session_count: number };
+type GroupedCostEntry = { date: string; group: string; cost_usd: number; session_count: number };
+type ActivityBreakdown = { category: ActivityCategory; cost_usd: number; turn_count: number; one_shot_percent: number };
+type TopSession = { session_id: string; issue_name: string | null; issue_number: number | null; cost_usd: number; turn_count: number; tool_call_count: number; started_at: string };
+type ToolUsageBreakdown = { tool_name: string; call_count: number };
+type Achievement = { kind: AchievementKind; display_name: string; description: string; threshold: number; progress: number; unlocked_at: string | null };
+```
+
+---
+
+## 14. Base Components
+
+StatCell, StatusRow, Card, Badge, Button (ghost | secondary), Tabs, Progress, Chart.Container, Chart.Tooltip, DropdownMenu, Select, Tooltip, Separator, Skeleton, Popover, Dialog, RangeCalendar, cb-panel / cb-row / cb-bar / cb-tabs, gk-h2 / gk-h3 / gk-eyebrow, CostChart, CostLink, RefreshIndicator, ColorThemePicker, AchievementsDialog, DateRangePicker, GroupByDropdown, ScopeToggle
