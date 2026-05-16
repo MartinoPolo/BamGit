@@ -1,7 +1,7 @@
 import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
 import type { IssueCardAppearanceSettings, IssueCardVariant } from './issue_card_settings.js';
 
-export interface VariantCssInput {
+interface VariantCssInput {
 	readonly variant: IssueCardVariant;
 	readonly settings: IssueCardAppearanceSettings;
 	readonly issueColor: string;

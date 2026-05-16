@@ -134,7 +134,7 @@ export const VARIANT_SPECIFIC_SETTINGS = {
 
 // ── Setting resolution (used by settings context) ───────────────────
 
-export interface SettingResolutionResult {
+interface SettingResolutionResult {
 	readonly value: string | number;
 	readonly isOverridden: boolean;
 }

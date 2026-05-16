@@ -230,5 +230,3 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 		isOverridden,
 	};
 }
-
-export type { IssueCardSettingsContext };
