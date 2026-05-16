@@ -32,14 +32,19 @@
 
 	function handleDialogOpenChange(isOpen: boolean) {
 		paletteCtx.open = isOpen;
-		if (isOpen) {
-			requestAnimationFrame(focusCommandInput);
-		}
+	}
+
+	function handleOpenAutoFocus(event: Event) {
+		event.preventDefault();
+		focusCommandInput();
 	}
 </script>
 
 <Dialog.Root open={paletteCtx.open} onOpenChange={handleDialogOpenChange}>
-	<Dialog.Content class="top-[20%] translate-y-0 max-w-135 overflow-hidden p-0">
+	<Dialog.Content
+		class="top-[20%] translate-y-0 max-w-135 overflow-hidden p-0"
+		onOpenAutoFocus={handleOpenAutoFocus}
+	>
 		<Dialog.Title class="sr-only">{m.command_palette_title()}</Dialog.Title>
 
 		<Command.Root loop>
