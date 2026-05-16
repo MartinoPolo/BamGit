@@ -3,6 +3,7 @@
 	"entry": [
 		"src/lib/components/shadcn/*/index.ts",
 		"src/lib/components/base/*/index.ts",
+		"src/lib/components/derived/*/index.ts",
 		"src/lib/components/blocks/character/index.ts",
 		"src/lib/modules/*/index.ts",
 		"src/lib/i18n/index.ts",
@@ -10,7 +11,18 @@
 		"src/lib/reactivity/*.svelte.ts",
 		"designs/*"
 	],
-	"ignorePatterns": ["src/lib/types/generated/**", "claude_design/**", "designs/**"],
+	"ignorePatterns": [
+		"src/lib/types/generated/**",
+		"claude_design/**",
+		"designs/**",
+		"scripts/**"
+	],
+	"ignoreExports": [
+		{
+			"file": "src/lib/components/**/index.ts",
+			"exports": ["*"]
+		}
+	],
 	"ignoreDependencies": [
 		"@typescript-eslint/parser",
 		"vitest-browser-svelte",

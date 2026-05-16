@@ -1,1 +1,1 @@
-pnpm check:fallow && pnpm typecheck && pnpm exec eslint --cache . && pnpm test run --project client --project server
+node scripts/pre-push-parallel.js
