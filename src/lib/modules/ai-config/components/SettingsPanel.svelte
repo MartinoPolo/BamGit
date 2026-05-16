@@ -4,7 +4,7 @@
 	import { useAiConfig } from '../ai_config.context.svelte.js';
 	import { SETTINGS_BY_PROVIDER, type SettingDefinition } from './settings_definitions.js';
 	import * as Alert from '$lib/components/shadcn/alert/index.js';
-	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Switch } from '$lib/components/shadcn/switch/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
@@ -128,26 +128,20 @@
 <div class="flex flex-col gap-4">
 	<div class="flex items-center gap-2">
 		<span class="text-xs font-medium text-foreground-subtle">Scope</span>
-		<div class="inline-flex rounded-md border border-border bg-surface-2 p-0.5">
-			<Button
-				intent={scope === 'user' ? 'secondary' : 'ghost'}
-				size="sm"
-				class="h-7 px-3 text-xs"
-				aria-pressed={scope === 'user'}
-				onclick={() => (scope = 'user')}
-			>
-				User
-			</Button>
-			<Button
-				intent={scope === 'project' ? 'secondary' : 'ghost'}
-				size="sm"
-				class="h-7 px-3 text-xs"
-				aria-pressed={scope === 'project'}
-				onclick={() => (scope = 'project')}
-			>
-				Project
-			</Button>
-		</div>
+		<ToggleGroup.Root
+			type="single"
+			value={scope}
+			onValueChange={(value: string) => {
+				if (value) {
+					scope = value as SettingsScope;
+				}
+			}}
+			size="sm"
+			class="rounded-md border border-border bg-surface-2 p-0.5"
+		>
+			<ToggleGroup.Item value="user" class="h-7 px-3 text-xs">User</ToggleGroup.Item>
+			<ToggleGroup.Item value="project" class="h-7 px-3 text-xs">Project</ToggleGroup.Item>
+		</ToggleGroup.Root>
 	</div>
 
 	<Alert.Root>
@@ -257,23 +251,23 @@
 								{/each}
 							</Select>
 						{:else if def.control.type === 'segmented'}
-							<div
-								class="inline-flex rounded-md border border-border bg-surface-2 p-0.5"
+							<ToggleGroup.Root
+								type="single"
+								value={valueAsString(current)}
+								onValueChange={(value: string) => {
+									if (value) {
+										void save(def.key, value);
+									}
+								}}
+								size="sm"
+								class="rounded-md border border-border bg-surface-2 p-0.5"
 							>
 								{#each def.control.options as option (option.value)}
-									<Button
-										intent={valueAsString(current) === option.value
-											? 'secondary'
-											: 'ghost'}
-										size="sm"
-										class="h-7 px-2 text-xs"
-										aria-pressed={valueAsString(current) === option.value}
-										onclick={() => save(def.key, option.value)}
-									>
+									<ToggleGroup.Item value={option.value} class="h-7 px-2 text-xs">
 										{option.label}
-									</Button>
+									</ToggleGroup.Item>
 								{/each}
-							</div>
+							</ToggleGroup.Root>
 						{/if}
 					</div>
 				</div>

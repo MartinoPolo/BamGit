@@ -4,8 +4,10 @@
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import PaperclipIcon from '@lucide/svelte/icons/paperclip';
 	import XIcon from '@lucide/svelte/icons/x';
+	import * as Collapsible from '$lib/components/shadcn/collapsible/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Textarea } from '$lib/components/shadcn/textarea/index.js';
+	import { cn } from '$lib/utils.js';
 	import SkillChipsRow from './SkillChipsRow.svelte';
 	import SendStopButton from './SendStopButton.svelte';
 	import { getProviderConfig } from './session_theme_utils.js';
@@ -42,41 +44,54 @@
 
 <div class="pointer-events-none absolute bottom-4 left-1/2 z-15 w-full max-w-225 -translate-x-1/2">
 	<div class="pointer-events-auto rounded-3.5 border border-border bg-surface shadow-lg">
-		<!-- Image carousel (collapsed strip) -->
-		{#if !showImages && imageCount > 0}
-			<button
-				class="flex w-full cursor-pointer items-center gap-1 border-b border-border px-3 py-1"
-				onclick={() => (showImages = true)}
-			>
-				<PaperclipIcon size={11} strokeWidth={1.8} class="text-foreground-subtle" />
-				<span class="text-[11px] text-foreground-subtle">{imageCount} images</span>
-				<ChevronDownIcon size={10} strokeWidth={2} class="text-foreground-subtle" />
-			</button>
-		{/if}
-
-		<!-- Image carousel (expanded) -->
-		{#if showImages && imageCount > 0}
-			<div class="flex items-center gap-1.5 overflow-x-auto border-b border-border px-3 py-2">
-				{#each Array.from({ length: imageCount }, (_, idx) => idx) as i (i)}
+		<!-- Image carousel -->
+		{#if imageCount > 0}
+			<Collapsible.Root bind:open={showImages}>
+				<Collapsible.Trigger
+					class={cn(
+						'flex w-full cursor-pointer items-center gap-1 px-3 py-1',
+						!showImages && 'border-b border-border',
+					)}
+				>
+					<PaperclipIcon size={11} strokeWidth={1.8} class="text-foreground-subtle" />
+					<span class="text-[11px] text-foreground-subtle">{imageCount} images</span>
+					<ChevronDownIcon
+						size={10}
+						strokeWidth={2}
+						class={cn(
+							'text-foreground-subtle transition-transform',
+							showImages && 'rotate-180',
+						)}
+					/>
+				</Collapsible.Trigger>
+				<Collapsible.Content>
 					<div
-						class="relative flex size-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-surface-3"
+						class="flex items-center gap-1.5 overflow-x-auto border-b border-border px-3 py-2"
 					>
-						<span class="font-mono text-[10px] font-semibold text-foreground-muted">
-							#{i + 1}
-						</span>
-						<button
-							class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-0.75 border-none bg-black/40 p-0 text-white"
-							onclick={() => imageCount--}
-						>
-							<XIcon size={8} strokeWidth={2.5} />
-						</button>
+						{#each Array.from({ length: imageCount }, (_, idx) => idx) as i (i)}
+							<div
+								class="relative flex size-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-surface-3"
+							>
+								<span
+									class="font-mono text-[10px] font-semibold text-foreground-muted"
+								>
+									#{i + 1}
+								</span>
+								<button
+									class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-0.75 border-none bg-black/40 p-0 text-white"
+									onclick={() => imageCount--}
+								>
+									<XIcon size={8} strokeWidth={2.5} />
+								</button>
+							</div>
+						{/each}
+						<Button intent="ghost" size="sm" class="shrink-0 px-2 text-[10px]">
+							<PlusIcon strokeWidth={2} data-icon="inline-start" />
+							Add
+						</Button>
 					</div>
-				{/each}
-				<Button intent="ghost" size="sm" class="shrink-0 px-2 text-[10px]">
-					<PlusIcon strokeWidth={2} data-icon="inline-start" />
-					Add
-				</Button>
-			</div>
+				</Collapsible.Content>
+			</Collapsible.Root>
 		{/if}
 
 		<!-- Skill chips -->

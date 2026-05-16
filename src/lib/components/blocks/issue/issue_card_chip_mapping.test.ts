@@ -3,6 +3,7 @@ import {
 	createIssueCardContext,
 	type IssueCardContextProps,
 } from '$lib/modules/issue-card/issue_card.context.svelte.js';
+import { ISSUE_CARD_SETTING_DEFAULTS } from '$lib/modules/issue-card/issue_card_settings.js';
 import type { Issue } from '$lib/modules/issues/index.js';
 import type { GitStatusCache } from '$lib/types/generated';
 
@@ -46,6 +47,8 @@ function makeProps(overrides: Partial<IssueCardContextProps> = {}): IssueCardCon
 		prioritiesEnabled: true,
 		sessionState: null,
 		visualization: undefined,
+		appearanceSettings: { ...ISSUE_CARD_SETTING_DEFAULTS },
+		theme: 'dark',
 		isActive: false,
 		isHovered: false,
 		isBatchSelected: false,
