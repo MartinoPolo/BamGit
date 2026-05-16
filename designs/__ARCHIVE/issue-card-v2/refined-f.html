@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Issue Card v2 — Variant F Veil — All States</title>
+	<link rel="stylesheet" href="../tokens.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		/* ============================================================
+		   REFINED — Variant F (Veil) — All States
+		   Issue color creates a seamless vertical gradient from top to
+		   bottom. No hard header/body boundary. One unified gradient.
+		   Header text auto-determined via contrast.
+		   ============================================================ */
+
+		*, *::before, *::after { box-sizing: border-box; }
+		body { margin: 0; padding: 0; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+
+		/* ── Page layout ──────────────────────────────────────── */
+		.page-half { padding: 32px 28px 40px; }
+		.page-half + .page-half { border-top: 2px solid rgba(128,128,128,0.15); }
+		.page-half-eyebrow { font-size: 10.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 4px; }
+		.page-half-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 2px; }
+		.page-half-sub { font-size: 12px; margin-top: 4px; }
+		.section-label { font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 0 10px 0; margin: 24px 0 12px 0; border-bottom: 1px solid; }
+		.section-label:first-of-type { margin-top: 0; }
+
+		/* ── Card Grid ──────────────────────────────────────────── */
+		.ic-grid { display: grid; grid-template-columns: repeat(2, minmax(420px, 1fr)); gap: 10px; }
+
+		/* ── State label ─────────────────────────────────────────── */
+		.ic-state-label { position: absolute; top: -22px; left: 0; font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none; z-index: 20; }
+		.ic-card-wrapper { position: relative; padding-top: 26px; }
+
+		/* ============================================================
+		   ISSUE CARD — VARIANT F (VEIL)
+		   Seamless top-down gradient. --ic-gradient-reach controls
+		   how far color extends. --ic-color-sat controls vividness.
+		   ============================================================ */
+		.ic-card {
+			--ic-color: oklch(0.69 0.098 132);
+			--ic-header-text: var(--foreground);
+			--ic-gradient-reach: 70%;
+			--ic-color-sat: 150%;
+
+			position: relative;
+			border-radius: var(--radius-lg);
+			border: 1px solid color-mix(in oklch, var(--ic-color) 18%, var(--border));
+			overflow: hidden;
+			background: linear-gradient(180deg,
+				color-mix(in oklch, var(--ic-color) calc(var(--ic-color-sat) * 0.77), #1e1e1e) 0%,
+				color-mix(in oklch, var(--ic-color) calc(var(--ic-color-sat) * 0.43), #1e1e1e) calc(var(--ic-gradient-reach) * 0.4),
+				color-mix(in oklch, var(--ic-color) calc(var(--ic-color-sat) * 0.15), #1e1e1e) calc(var(--ic-gradient-reach) * 0.75),
+				var(--surface) var(--ic-gradient-reach)
+			);
+			box-shadow: var(--shadow-sm), 0 0 16px -4px color-mix(in oklch, var(--ic-color) 12%, transparent);
+			transition: border-color 160ms ease, box-shadow 160ms ease, transform 150ms ease, background 220ms ease;
+		}
+
+		/* ── HOVER ──────────────────────────────────────────────── */
+		.ic-card.is-hover {
+			transform: translateY(-2px);
+			box-shadow: 0 0 12px 2px color-mix(in oklch, var(--ic-color) 30%, transparent), 0 4px 12px rgba(0,0,0,0.3);
+		}
+
+		/* ── ACTIVE — issue-color glow (NOT green) ─────────────── */
+		.ic-card.is-active {
+			box-shadow: 0 0 14px 3px color-mix(in oklch, var(--ic-color) 32%, transparent), 0 0 6px 0 color-mix(in oklch, var(--ic-color) 18%, transparent), var(--shadow-md);
+			border-color: color-mix(in oklch, var(--ic-color) 45%, var(--border));
+		}
+
+		/* ── SELECTED — blue glow ──────────────────────────────── */
+		.ic-card.is-selected {
+			box-shadow: 0 0 14px 3px color-mix(in oklch, oklch(0.62 0.18 250) 28%, transparent), 0 0 6px 0 color-mix(in oklch, oklch(0.62 0.18 250) 14%, transparent), var(--shadow-md);
+			border-color: color-mix(in oklch, oklch(0.62 0.18 250) 45%, var(--border));
+		}
+
+		/* ── ERROR — red pulse ──────────────────────────────────── */
+		.ic-card.is-error { animation: ic-error-pulse 1.6s ease-in-out infinite; }
+		@keyframes ic-error-pulse {
+			0%, 100% { box-shadow: 0 0 10px 1px color-mix(in oklch, oklch(0.62 0.205 25) 16%, transparent), var(--shadow-md); }
+			50% { box-shadow: 0 0 28px 5px color-mix(in oklch, oklch(0.62 0.205 25) 35%, transparent), 0 0 8px 0 color-mix(in oklch, oklch(0.62 0.205 25) 22%, transparent), var(--shadow-md); }
+		}
+
+		/* ── NEEDS INPUT — amber pulse ─────────────────────────── */
+		.ic-card.is-hitl { animation: ic-hitl-pulse 2s ease-in-out infinite; }
+		@keyframes ic-hitl-pulse {
+			0%, 100% { box-shadow: 0 0 10px 1px color-mix(in oklch, oklch(0.77 0.155 75) 14%, transparent), var(--shadow-md); }
+			50% { box-shadow: 0 0 28px 5px color-mix(in oklch, oklch(0.77 0.155 75) 30%, transparent), 0 0 8px 0 color-mix(in oklch, oklch(0.77 0.155 75) 16%, transparent), var(--shadow-md); }
+		}
+
+		/* ── DONE — transparent, no veil ───────────────────────── */
+		.ic-card.is-done { background: transparent; border-color: transparent; box-shadow: none; }
+		.ic-card.is-done .ic-action-primary { background: var(--surface-3); color: var(--foreground-muted); border-color: var(--border); }
+
+		/* ── DONE + HOVER ──────────────────────────────────────── */
+		.ic-card.is-done-hover { background: color-mix(in oklch, var(--surface) 40%, transparent); border-color: var(--border); box-shadow: none; transform: translateY(-2px); }
+		.ic-card.is-done-hover .ic-action-primary { background: var(--surface-3); color: var(--foreground-muted); border-color: var(--border); }
+
+		/* ── WORKTREE SETUP — muted, no veil ───────────────────── */
+		.ic-card.is-worktree-setup { background: var(--surface); border-color: var(--border); box-shadow: none; }
+		.ic-card.is-worktree-setup .ic-thumb { opacity: 0.3; }
+
+		/* ── GHOST — dashed border, no veil ────────────────────── */
+		.ic-card.ic-ghost {
+			--ic-color: var(--foreground-subtle);
+			background: var(--surface);
+			border: 2px dashed var(--border-strong);
+			box-shadow: none;
+		}
+		.ic-card.ic-ghost-tint {
+			background: linear-gradient(180deg, color-mix(in oklch, var(--ic-ghost-tint-a, #f97316) 20%, #1e1e1e) 0%, var(--surface) 40%);
+		}
+		.ic-card.ic-ghost-split {
+			background: linear-gradient(135deg, color-mix(in oklch, var(--ic-ghost-tint-a, #f97316) 18%, #1e1e1e) 0%, var(--surface) 40%, color-mix(in oklch, var(--ic-ghost-tint-b, #3b82f6) 18%, #1e1e1e) 100%);
+		}
+
+		/* ── Header ─────────────────────────────────────────────── */
+		.ic-header { position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; padding: 10px 12px; min-height: 42px; }
+		.ic-header-left { display: flex; align-items: center; gap: 5px; min-width: 0; flex: 1; }
+		.ic-prd-ref { font-family: var(--font-mono); font-size: 11px; color: var(--ic-header-text); opacity: 0.7; white-space: nowrap; flex-shrink: 0; cursor: pointer; text-decoration: none; }
+		.ic-prd-ref:hover { text-decoration: underline; opacity: 0.9; }
+		.ic-prd-slash { font-family: var(--font-mono); font-size: 11px; color: var(--ic-header-text); opacity: 0.5; white-space: nowrap; flex-shrink: 0; }
+		.ic-title { font-size: 13px; font-weight: 600; color: var(--ic-header-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; letter-spacing: -0.01em; }
+		.ic-header-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+		/* ── Chip — rectangular, monospace, dot ─────────────────── */
+		.ic-chip { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; border-radius: 3px; white-space: nowrap; letter-spacing: 0.03em; }
+		.ic-chip-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+		.ic-chip-executing { background: color-mix(in oklch, var(--session-running) 16%, var(--surface)); color: oklch(0.72 0.19 145); }
+		.ic-chip-executing .ic-chip-dot { background: oklch(0.72 0.19 145); }
+		.ic-chip-error { background: color-mix(in oklch, var(--session-errored) 16%, var(--surface)); color: oklch(0.72 0.14 25); }
+		.ic-chip-error .ic-chip-dot { background: oklch(0.72 0.14 25); }
+		.ic-chip-hitl { background: color-mix(in oklch, var(--session-needs-input) 16%, var(--surface)); color: oklch(0.82 0.13 75); }
+		.ic-chip-hitl .ic-chip-dot { background: oklch(0.82 0.13 75); }
+		.ic-chip-review { background: color-mix(in oklch, var(--session-needs-review) 16%, var(--surface)); color: oklch(0.72 0.12 230); }
+		.ic-chip-review .ic-chip-dot { background: oklch(0.72 0.12 230); }
+		.ic-chip-paused { background: color-mix(in oklch, var(--foreground-subtle) 12%, var(--surface)); color: var(--foreground-muted); }
+		.ic-chip-paused .ic-chip-dot { background: var(--foreground-subtle); }
+		.ic-chip-done { background: color-mix(in oklch, var(--foreground-subtle) 12%, var(--surface)); color: var(--foreground-muted); }
+		.ic-chip-done .ic-chip-dot { background: var(--foreground-muted); }
+		.ic-chip-worktree { background: color-mix(in oklch, oklch(0.77 0.155 75) 14%, var(--surface)); color: oklch(0.82 0.13 75); }
+		.ic-chip-worktree .ic-chip-dot { background: oklch(0.82 0.13 75); }
+
+		/* ── Priority ──────────────────────────────────────────── */
+		.ic-priority { display: inline-flex; align-items: center; justify-content: center; height: 20px; padding: 0 6px; border-radius: 3px; font-size: 9px; font-weight: 700; font-family: var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; border: 1px solid transparent; }
+		.ic-priority-high { background: color-mix(in oklch, var(--priority-high) 16%, var(--surface)); color: oklch(0.82 0.14 75); }
+		.ic-priority-top { background: color-mix(in oklch, var(--priority-top) 16%, var(--surface)); color: oklch(0.72 0.14 25); }
+		.ic-priority-low { background: color-mix(in oklch, var(--priority-low) 14%, var(--surface)); color: var(--priority-low); }
+
+		/* ── Quick-action buttons ──────────────────────────────── */
+		.ic-qa-btn { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; border: none; background: transparent; color: var(--ic-header-text); opacity: 0.6; cursor: pointer; font-size: 12px; transition: background 100ms, opacity 100ms; }
+		.ic-qa-btn:hover { background: color-mix(in oklch, var(--foreground) 14%, transparent); opacity: 1; }
+
+		/* ── Body ───────────────────────────────────────────────── */
+		.ic-body { position: relative; z-index: 1; display: grid; grid-template-columns: 100px 1fr; gap: 0; padding: 4px 12px 12px; min-height: 110px; }
+
+		/* ── Preview (square) ──────────────────────────────────── */
+		.ic-thumb { width: 100px; height: 100px; border-radius: var(--radius-md); background: linear-gradient(135deg, color-mix(in oklch, var(--ic-color) 22%, var(--surface-2)), color-mix(in oklch, var(--ic-color) 8%, var(--surface-2))); border: 1px solid color-mix(in oklch, var(--ic-color) 14%, var(--border)); display: flex; align-items: center; justify-content: center; }
+		.ic-thumb svg { width: 48px; height: 48px; opacity: 0.4; color: var(--ic-color); }
+
+		/* ── Info rows ──────────────────────────────────────────── */
+		.ic-info { padding: 4px 0 0 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+		.ic-info-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--foreground-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.ic-info-icon { font-size: 11px; flex-shrink: 0; opacity: 0.6; }
+		.ic-info-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.ic-info-mono { font-family: var(--font-mono); font-size: 10.5px; }
+		.ic-gh-badge { display: inline-flex; align-items: center; gap: 4px; height: 18px; padding: 0 7px; border-radius: 999px; font-size: 10px; font-weight: 500; white-space: nowrap; }
+		.ic-labels-row { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
+		.ic-label-pill { display: inline-flex; align-items: center; height: 17px; padding: 0 7px; border-radius: 999px; font-size: 10.5px; font-weight: 500; white-space: nowrap; }
+		.ic-cmd-row { display: flex; align-items: center; gap: 8px; }
+		.ic-cmd-badge { display: inline-flex; align-items: center; gap: 4px; height: 18px; padding: 0 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 500; white-space: nowrap; }
+		.ic-cmd-pass { background: color-mix(in oklch, oklch(0.66 0.135 145) 14%, var(--surface)); color: oklch(0.72 0.19 145); }
+		.ic-cmd-fail { background: color-mix(in oklch, oklch(0.62 0.205 25) 14%, var(--surface)); color: oklch(0.72 0.14 25); }
+		.ic-cmd-running { background: color-mix(in oklch, oklch(0.66 0.105 220) 14%, var(--surface)); color: oklch(0.72 0.12 230); }
+		.ic-cmd-server { background: color-mix(in oklch, oklch(0.66 0.135 145) 12%, var(--surface)); color: oklch(0.72 0.19 145); }
+		@keyframes ic-spin { to { transform: rotate(360deg); } }
+		.ic-spinner { display: inline-block; width: 10px; height: 10px; border: 1.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: ic-spin 0.7s linear infinite; }
+
+		/* ── Action buttons ─────────────────────────────────────── */
+		.ic-actions { position: absolute; bottom: 10px; right: 12px; display: flex; align-items: center; gap: 4px; }
+		.ic-action-primary { display: inline-flex; align-items: center; justify-content: center; height: 26px; padding: 0 10px; border-radius: 6px; font-size: 12px; font-weight: 500; border: 1px solid transparent; cursor: pointer; background: var(--ic-color); color: oklch(0.15 0.02 145); white-space: nowrap; }
+		.ic-action-outlined { display: inline-flex; align-items: center; justify-content: center; height: 26px; padding: 0 10px; border-radius: 6px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--foreground-muted); cursor: pointer; white-space: nowrap; }
+		.ic-action-overflow { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; font-size: 14px; border: 1px solid var(--border); background: transparent; color: var(--foreground-muted); cursor: pointer; }
+
+		/* ── Adopt split-button ─────────────────────────────────── */
+		.ic-adopt-group { display: inline-flex; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; }
+		.ic-adopt-main { background: transparent; color: var(--foreground); border: none; border-right: 1px solid var(--border); padding: 0 10px; height: 26px; font-family: var(--font-sans); font-size: 12px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; }
+		.ic-adopt-drop { background: transparent; color: var(--foreground-muted); border: none; width: 24px; height: 26px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+
+		/* ── Light mode ────────────────────────────────────────── */
+		[data-theme="light"] .ic-card {
+			background: linear-gradient(180deg,
+				color-mix(in oklch, var(--ic-color) calc(var(--ic-color-sat) * 0.8), white) 0%,
+				color-mix(in oklch, var(--ic-color) calc(var(--ic-color-sat) * 0.4), white) calc(var(--ic-gradient-reach) * 0.4),
+				color-mix(in oklch, var(--ic-color) calc(var(--ic-color-sat) * 0.12), white) calc(var(--ic-gradient-reach) * 0.75),
+				var(--surface) var(--ic-gradient-reach)
+			);
+		}
+		[data-theme="light"] .ic-card .ic-prd-ref,
+		[data-theme="light"] .ic-card .ic-prd-slash,
+		[data-theme="light"] .ic-card .ic-title { color: var(--foreground); }
+		[data-theme="light"] .ic-card .ic-qa-btn { color: var(--foreground-muted); opacity: 0.7; }
+		[data-theme="light"] .ic-chip-executing { color: oklch(0.45 0.15 145); }
+		[data-theme="light"] .ic-chip-executing .ic-chip-dot { background: oklch(0.45 0.15 145); }
+		[data-theme="light"] .ic-chip-error { color: oklch(0.5 0.2 25); }
+		[data-theme="light"] .ic-chip-error .ic-chip-dot { background: oklch(0.5 0.2 25); }
+		[data-theme="light"] .ic-chip-hitl { color: oklch(0.55 0.15 75); }
+		[data-theme="light"] .ic-chip-hitl .ic-chip-dot { background: oklch(0.55 0.15 75); }
+		[data-theme="light"] .ic-card.ic-ghost-tint { background: linear-gradient(180deg, color-mix(in oklch, var(--ic-ghost-tint-a, #f97316) 18%, white) 0%, var(--surface) 40%); }
+		[data-theme="light"] .ic-card.ic-ghost-split { background: linear-gradient(135deg, color-mix(in oklch, var(--ic-ghost-tint-a, #f97316) 16%, white) 0%, var(--surface) 40%, color-mix(in oklch, var(--ic-ghost-tint-b, #3b82f6) 16%, white) 100%); }
+	</style>
+</head>
+<body>
+<div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DARK MODE
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page-half gk-root theme-dark" data-theme="dark" style="background: var(--background); color: var(--foreground);">
+	<div class="page-half-header">
+		<div class="page-half-eyebrow" style="color: var(--foreground-subtle);">REFINED — Variant F (Veil) — All States</div>
+		<div class="page-half-title" style="color: var(--foreground);">Dark Mode</div>
+		<div class="page-half-sub" style="color: var(--foreground-muted);">Seamless top-down gradient • no header boundary • color veil dissolves into surface</div>
+	</div>
+
+	<div class="section-label" style="color: var(--foreground-subtle); border-color: var(--border);">Adopted Issues</div>
+	<div class="ic-grid">
+
+		<!-- 1. DEFAULT — Moss -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">1 · Default</span>
+			<div class="ic-card" style="--ic-color: oklch(0.69 0.098 132); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#87</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Implement gradient token system</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-executing"><span class="ic-chip-dot"></span>EXECUTING</span>
+						<span class="ic-priority ic-priority-high">HIGH</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><path d="M24 6c2 4 8 10 8 18 0 6-3 10-8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">gradient-tokens/</span><span style="margin: 0 2px; color: var(--foreground-subtle);">⎇</span><span class="ic-info-text" style="color: var(--foreground-subtle);">gradient-tokens</span><span style="margin-left: auto;"><span class="ic-cmd-badge ic-cmd-pass" style="height: 16px; font-size: 9px;">● synced</span></span></div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.66 0.135 145) 12%, transparent); color: oklch(0.66 0.135 145);">● Issue Open</span><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.66 0.135 145) 12%, transparent); color: oklch(0.66 0.135 145);">● PR #318 Open</span></div>
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #22c55e 14%, transparent); color: #22c55e;">enhancement</span><span class="ic-label-pill" style="background: color-mix(in oklch, #3b82f6 14%, transparent); color: #3b82f6;">frontend</span></div>
+						<div class="ic-cmd-row"><span class="ic-cmd-badge ic-cmd-pass">●✓ check:all</span><span class="ic-cmd-badge ic-cmd-server">● :1420</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary">Review</button><button class="ic-action-outlined">Pause</button><button class="ic-action-overflow">⋯</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 2. HOVER — Amber -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">2 · Hover</span>
+			<div class="ic-card is-hover" style="--ic-color: oklch(0.77 0.15 65); --ic-header-text: oklch(0.15 0.02 60);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#87</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Fix session reconnection timeout</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-paused"><span class="ic-chip-dot"></span>PAUSED</span>
+						<span class="ic-priority ic-priority-low">LOW</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><path d="M24 6c2 4 8 10 8 18 0 6-3 10-8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">session-reconnect/</span><span style="margin: 0 2px; color: var(--foreground-subtle);">⎇</span><span class="ic-info-text" style="color: var(--foreground-subtle);">session-reconnect</span></div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.66 0.135 145) 12%, transparent); color: oklch(0.66 0.135 145);">● Issue Open</span></div>
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #ef4444 14%, transparent); color: #ef4444;">bug</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.77 0.15 65); color: oklch(0.15 0.02 60);">SyncBase</button><button class="ic-action-outlined">Run</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 3. ACTIVE — Azure -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">3 · Active</span>
+			<div class="ic-card is-active" style="--ic-color: oklch(0.66 0.12 230); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#90</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Provider adapter — session lifecycle</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-review"><span class="ic-chip-dot"></span>REVIEW</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">session-adapter/</span><span style="margin: 0 2px; color: var(--foreground-subtle);">⎇</span><span class="ic-info-text" style="color: var(--foreground-subtle);">session-adapter</span></div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.58 0.14 310) 12%, transparent); color: oklch(0.58 0.14 310);">● PR #331 Draft</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.66 0.12 230); color: white;">Review</button><button class="ic-action-outlined">CheckAndFix</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 4. SELECTED — Rose -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">4 · Selected (batch)</span>
+			<div class="ic-card is-selected" style="--ic-color: oklch(0.72 0.135 15); --ic-header-text: oklch(0.15 0.02 15);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#95</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Notification sound engine</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-priority ic-priority-top">TOP</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">sound-engine/</span><span style="margin: 0 2px; color: var(--foreground-subtle);">⎇</span><span class="ic-info-text" style="color: var(--foreground-subtle);">sound-engine</span></div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.66 0.135 145) 12%, transparent); color: oklch(0.66 0.135 145);">● Issue Open</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.72 0.135 15); color: oklch(0.15 0.02 15);">Run</button><button class="ic-action-outlined">SetupWorktree</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 5. ERROR — Plum -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">5 · Error overlay</span>
+			<div class="ic-card is-error" style="--ic-color: oklch(0.64 0.13 320); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#90</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Tool card approval flow</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-error"><span class="ic-chip-dot"></span>ERROR</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">tool-approval/</span></div>
+						<div class="ic-cmd-row"><span class="ic-cmd-badge ic-cmd-fail">●✗ check:all</span><span class="ic-cmd-badge ic-cmd-fail">●✗ test</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.64 0.13 320); color: white;">ViewSession</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 6. NEEDS INPUT — Teal -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">6 · Needs Input</span>
+			<div class="ic-card is-hitl" style="--ic-color: oklch(0.7 0.095 195); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#96</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Terminal emulator integration</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-hitl"><span class="ic-chip-dot"></span>NEEDS INPUT</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">terminal-emu/</span><span style="margin: 0 2px; color: var(--foreground-subtle);">⎇</span><span class="ic-info-text" style="color: var(--foreground-subtle);">terminal-emu</span></div>
+						<div class="ic-cmd-row"><span class="ic-cmd-badge ic-cmd-running"><span class="ic-spinner"></span> test</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.7 0.095 195); color: oklch(0.15 0.02 195);">ViewSession</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 7. DONE -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">7 · Done</span>
+			<div class="ic-card is-done" style="--ic-color: oklch(0.69 0.098 132);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#" style="color: var(--foreground-muted);">#87</a><span class="ic-prd-slash" style="color: var(--foreground-subtle);">/</span>
+						<span class="ic-title" style="color: var(--foreground);">Add color utility helpers</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-done"><span class="ic-chip-dot"></span>DONE</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="opacity: 0.5; background: var(--surface-2);"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">color-utils/</span></div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.58 0.14 310) 12%, transparent); color: oklch(0.58 0.14 310);">● Closed</span><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.58 0.14 310) 12%, transparent); color: oklch(0.58 0.14 310);">● PR Merged</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: var(--surface-3); color: var(--foreground-muted); border: 1px solid var(--border);">Archive</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 8. WORKTREE SETUP -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">8 · Worktree Setup</span>
+			<div class="ic-card is-worktree-setup" style="--ic-color: oklch(0.73 0.115 90);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#" style="color: var(--foreground-muted);">#96</a><span class="ic-prd-slash" style="color: var(--foreground-subtle);">/</span>
+						<span class="ic-title" style="color: var(--foreground);">Editor config scaffolding</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-worktree"><span class="ic-chip-dot"></span>WORKTREE SETUP</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="opacity: 0.3;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono" style="color: var(--foreground-subtle); font-style: italic;">Setting up worktree…</div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-outlined" style="opacity: 0.5;">Run</button></div>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /.ic-grid adopted dark -->
+
+	<div class="section-label" style="color: var(--foreground-subtle); border-color: var(--border); margin-top: 32px;">Ghost Cards</div>
+	<div class="ic-grid">
+
+		<!-- 9. GHOST no labels -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">9 · Ghost (no labels)</span>
+			<div class="ic-card ic-ghost">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<span class="ic-title" style="color: var(--foreground-muted);">Add workspace archival command</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="background: var(--surface-2); opacity: 0.4;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.2;"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row" style="color: var(--foreground-subtle);">Not yet adopted</div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.66 0.135 145) 10%, transparent); color: oklch(0.66 0.135 145);">● Issue #210 Open</span></div>
+					</div>
+					<div class="ic-actions"><div class="ic-adopt-group"><button class="ic-adopt-main">Adopt + Worktree</button><button class="ic-adopt-drop">▾</button></div></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 10. GHOST single label tint -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">10 · Ghost (label tint)</span>
+			<div class="ic-card ic-ghost ic-ghost-tint" style="--ic-ghost-tint-a: #f97316;">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<span class="ic-title" style="color: var(--foreground-muted);">Issue card redesign — final mockups</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="background: var(--surface-2); opacity: 0.4;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.2;"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row" style="color: var(--foreground-subtle);">Not yet adopted</div>
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #f97316 18%, transparent); color: #f97316;">design needed</span></div>
+					</div>
+					<div class="ic-actions"><div class="ic-adopt-group"><button class="ic-adopt-main">Adopt + Worktree</button><button class="ic-adopt-drop">▾</button></div></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 11. GHOST two-label split -->
+		<div class="ic-card-wrapper" style="grid-column: 1 / -1;">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">11 · Ghost (two-label split)</span>
+			<div class="ic-card ic-ghost ic-ghost-split" style="--ic-ghost-tint-a: #f97316; --ic-ghost-tint-b: #3b82f6;">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<span class="ic-title" style="color: var(--foreground-muted);">Config panel — editor + terminal settings</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="background: var(--surface-2); opacity: 0.4;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.2;"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row" style="color: var(--foreground-subtle);">Not yet adopted</div>
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #f97316 18%, transparent); color: #f97316;">design needed</span><span class="ic-label-pill" style="background: color-mix(in oklch, #3b82f6 18%, transparent); color: #3b82f6;">import</span></div>
+					</div>
+					<div class="ic-actions"><div class="ic-adopt-group"><button class="ic-adopt-main">Adopt + Worktree</button><button class="ic-adopt-drop">▾</button></div></div>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /.ic-grid ghost dark -->
+</div><!-- /.page-half dark -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LIGHT MODE
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page-half gk-root theme-light" data-theme="light" style="background: var(--background); color: var(--foreground);">
+	<div class="page-half-header">
+		<div class="page-half-eyebrow" style="color: var(--foreground-subtle);">REFINED — Variant F (Veil) — All States</div>
+		<div class="page-half-title" style="color: var(--foreground);">Light Mode</div>
+		<div class="page-half-sub" style="color: var(--foreground-muted);">Full saturation veil • white body surface • color bleeds into light</div>
+	</div>
+
+	<div class="section-label" style="color: var(--foreground-subtle); border-color: var(--border);">Adopted Issues</div>
+	<div class="ic-grid">
+
+		<!-- 1. DEFAULT (light) -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">1 · Default</span>
+			<div class="ic-card" style="--ic-color: oklch(0.69 0.098 132); --ic-header-text: oklch(0.2 0.02 145);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#87</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Implement gradient token system</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-executing"><span class="ic-chip-dot"></span>EXECUTING</span>
+						<span class="ic-priority ic-priority-high">HIGH</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><path d="M24 6c2 4 8 10 8 18 0 6-3 10-8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">gradient-tokens/</span><span style="margin: 0 2px; color: var(--foreground-subtle);">⎇</span><span class="ic-info-text" style="color: var(--foreground-subtle);">gradient-tokens</span></div>
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.5 0.15 145) 10%, transparent); color: oklch(0.5 0.15 145);">● Issue Open</span><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.5 0.15 145) 10%, transparent); color: oklch(0.5 0.15 145);">● PR #318 Open</span></div>
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #16a34a 12%, transparent); color: #16a34a;">enhancement</span><span class="ic-label-pill" style="background: color-mix(in oklch, #2563eb 12%, transparent); color: #2563eb;">frontend</span></div>
+						<div class="ic-cmd-row"><span class="ic-cmd-badge ic-cmd-pass">●✓ check:all</span><span class="ic-cmd-badge ic-cmd-server">● :1420</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary">Review</button><button class="ic-action-outlined">Pause</button><button class="ic-action-overflow">⋯</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 2. HOVER (light) — Amber -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">2 · Hover</span>
+			<div class="ic-card is-hover" style="--ic-color: oklch(0.77 0.15 65); --ic-header-text: oklch(0.15 0.02 60);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#87</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Fix session reconnection timeout</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-paused"><span class="ic-chip-dot"></span>PAUSED</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">session-reconnect/</span></div>
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #dc2626 12%, transparent); color: #dc2626;">bug</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.77 0.15 65); color: oklch(0.15 0.02 60);">SyncBase</button><button class="ic-action-outlined">Run</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 3. ACTIVE (light) — Azure -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">3 · Active</span>
+			<div class="ic-card is-active" style="--ic-color: oklch(0.57 0.13 235); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#90</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Provider adapter — session lifecycle</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-review"><span class="ic-chip-dot"></span>REVIEW</span>
+						<button class="ic-qa-btn">📁</button><button class="ic-qa-btn">▶</button><button class="ic-qa-btn">&lt;/&gt;</button><button class="ic-qa-btn">⋯</button>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">session-adapter/</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.57 0.13 235); color: white;">Review</button><button class="ic-action-outlined">CheckAndFix</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 4. ERROR (light) — Plum -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">4 · Error overlay</span>
+			<div class="ic-card is-error" style="--ic-color: oklch(0.64 0.13 320); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#90</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Tool card approval flow</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-error"><span class="ic-chip-dot"></span>ERROR</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-cmd-row"><span class="ic-cmd-badge ic-cmd-fail">●✗ check:all</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.64 0.13 320); color: white;">ViewSession</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 5. DONE (light) -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">5 · Done</span>
+			<div class="ic-card is-done" style="--ic-color: oklch(0.69 0.098 132);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#" style="color: var(--foreground-muted);">#87</a><span class="ic-prd-slash" style="color: var(--foreground-subtle);">/</span>
+						<span class="ic-title" style="color: var(--foreground);">Add color utility helpers</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-done"><span class="ic-chip-dot"></span>DONE</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="opacity: 0.5; background: var(--surface-2);"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row"><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.48 0.13 320) 10%, transparent); color: oklch(0.48 0.13 320);">● Closed</span><span class="ic-gh-badge" style="background: color-mix(in oklch, oklch(0.48 0.13 320) 10%, transparent); color: oklch(0.48 0.13 320);">● PR Merged</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: var(--surface-3); color: var(--foreground-muted); border: 1px solid var(--border);">Archive</button></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 6. NEEDS INPUT (light) — Teal -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">6 · Needs Input</span>
+			<div class="ic-card is-hitl" style="--ic-color: oklch(0.62 0.11 195); --ic-header-text: var(--foreground);">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<a class="ic-prd-ref" href="#">#96</a><span class="ic-prd-slash">/</span>
+						<span class="ic-title">Terminal emulator integration</span>
+					</div>
+					<div class="ic-header-right">
+						<span class="ic-chip ic-chip-hitl"><span class="ic-chip-dot"></span>NEEDS INPUT</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row ic-info-mono"><span class="ic-info-icon">📁</span><span class="ic-info-text">terminal-emu/</span></div>
+					</div>
+					<div class="ic-actions"><button class="ic-action-primary" style="background: oklch(0.62 0.11 195); color: white;">ViewSession</button></div>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /.ic-grid adopted light -->
+
+	<div class="section-label" style="color: var(--foreground-subtle); border-color: var(--border); margin-top: 32px;">Ghost Cards</div>
+	<div class="ic-grid">
+
+		<!-- 7. GHOST no labels (light) -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">7 · Ghost (no labels)</span>
+			<div class="ic-card ic-ghost">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<span class="ic-title" style="color: var(--foreground-muted);">Add workspace archival command</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="background: var(--surface-2); opacity: 0.4;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.2;"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-info-row" style="color: var(--foreground-subtle);">Not yet adopted</div>
+					</div>
+					<div class="ic-actions"><div class="ic-adopt-group"><button class="ic-adopt-main">Adopt + Worktree</button><button class="ic-adopt-drop">▾</button></div></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 8. GHOST single label (light) -->
+		<div class="ic-card-wrapper">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">8 · Ghost (label tint)</span>
+			<div class="ic-card ic-ghost ic-ghost-tint" style="--ic-ghost-tint-a: #f97316;">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<span class="ic-title" style="color: var(--foreground-muted);">Issue card redesign — final mockups</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="background: var(--surface-2); opacity: 0.4;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.2;"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #f97316 18%, transparent); color: #ea580c;">design needed</span></div>
+					</div>
+					<div class="ic-actions"><div class="ic-adopt-group"><button class="ic-adopt-main">Adopt + Worktree</button><button class="ic-adopt-drop">▾</button></div></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 9. GHOST two-label (light) -->
+		<div class="ic-card-wrapper" style="grid-column: 1 / -1;">
+			<span class="ic-state-label" style="color: var(--foreground-subtle);">9 · Ghost (two-label split)</span>
+			<div class="ic-card ic-ghost ic-ghost-split" style="--ic-ghost-tint-a: #f97316; --ic-ghost-tint-b: #3b82f6;">
+				<div class="ic-header">
+					<div class="ic-header-left">
+						<span class="ic-title" style="color: var(--foreground-muted);">Config panel — editor + terminal settings</span>
+					</div>
+				</div>
+				<div class="ic-body">
+					<div class="ic-thumb" style="background: var(--surface-2); opacity: 0.4;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity: 0.2;"><path d="M24 6c-2 4-8 10-8 18 0 6 3 10 8 18"/><line x1="24" y1="24" x2="24" y2="42"/></svg></div>
+					<div class="ic-info">
+						<div class="ic-labels-row"><span class="ic-label-pill" style="background: color-mix(in oklch, #f97316 18%, transparent); color: #ea580c;">design needed</span><span class="ic-label-pill" style="background: color-mix(in oklch, #3b82f6 18%, transparent); color: #2563eb;">import</span></div>
+					</div>
+					<div class="ic-actions"><div class="ic-adopt-group"><button class="ic-adopt-main">Adopt + Worktree</button><button class="ic-adopt-drop">▾</button></div></div>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /.ic-grid ghost light -->
+</div><!-- /.page-half light -->
+
+</div>
+</body>
+</html>
