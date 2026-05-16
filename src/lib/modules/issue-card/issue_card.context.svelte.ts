@@ -66,10 +66,10 @@ function mapCacheToSyncStatus(cache: GitStatusCache | null): ForestSyncStatus {
 	if (!cache) {
 		return { type: 'up-to-date' };
 	}
-	if (cache.merge_conflict) {
+	if (cache.merge_conflict === true) {
 		return { type: 'merge-conflict' };
 	}
-	if (cache.behind_base_count && cache.behind_base_count > 0) {
+	if (cache.behind_base_count != null && cache.behind_base_count > 0) {
 		return { type: 'behind-base', count: cache.behind_base_count };
 	}
 	return { type: 'up-to-date' };
