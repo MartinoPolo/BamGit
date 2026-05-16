@@ -5,7 +5,7 @@ import { getAppSetting, setAppSetting } from '$lib/modules/window/window_command
 import {
 	ISSUE_CARD_SETTING_DEFAULTS,
 	ISSUE_CARD_SETTING_KEYS,
-	parseSettingValue,
+	resolveSettingValue,
 	type IssueCardAppearanceSettings,
 	type IssueCardSettingKey,
 	type IssueCardVariant,
@@ -61,27 +61,24 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 
 		for (const key of keys) {
 			const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-			const wsKey =
+			const wsDbKey =
 				dashboardId !== null && dashboardId !== undefined
 					? `ws_${dashboardId}_${dbKey}`
 					: null;
 
-			let resolvedValue: string | number = ISSUE_CARD_SETTING_DEFAULTS[key];
-
 			const userSetting = await getAppSetting(dbKey);
-			if (userSetting !== null && userSetting !== undefined) {
-				resolvedValue = parseSettingValue(key, userSetting.value);
-			}
+			const wsSetting = wsDbKey !== null ? await getAppSetting(wsDbKey) : null;
 
-			if (wsKey !== null) {
-				const wsSetting = await getAppSetting(wsKey);
-				if (wsSetting !== null && wsSetting !== undefined) {
-					resolvedValue = parseSettingValue(key, wsSetting.value);
-					newOverrides.add(key);
-				}
-			}
+			const result = resolveSettingValue(
+				key,
+				userSetting?.value ?? null,
+				wsSetting?.value ?? null,
+			);
 
-			(stateMap[key] as StateRaw<string | number>).current = resolvedValue;
+			(stateMap[key] as StateRaw<string | number>).current = result.value;
+			if (result.isOverridden) {
+				newOverrides.add(key);
+			}
 		}
 
 		overriddenKeys.current = newOverrides;
@@ -113,11 +110,8 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 		await setAppSetting(wsKey, '');
 
 		const userSetting = await getAppSetting(dbKey);
-		const resolvedValue =
-			userSetting !== null && userSetting !== undefined
-				? parseSettingValue(key, userSetting.value)
-				: ISSUE_CARD_SETTING_DEFAULTS[key];
-		(stateMap[key] as StateRaw<string | number>).current = resolvedValue;
+		const result = resolveSettingValue(key, userSetting?.value ?? null, null);
+		(stateMap[key] as StateRaw<string | number>).current = result.value;
 
 		const current = overriddenKeys.current;
 		const updated = new SvelteSet(current);

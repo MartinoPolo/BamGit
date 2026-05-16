@@ -6,6 +6,7 @@ import {
 	ISSUE_CARD_SETTING_RANGES,
 	clampSettingValue,
 	parseSettingValue,
+	resolveSettingValue,
 	VARIANT_SPECIFIC_SETTINGS,
 	BUTTON_COLOR_OPTIONS,
 	PRIORITY_POSITION_OPTIONS,
@@ -216,6 +217,50 @@ describe('issue_card_settings', () => {
 	describe('BADGE_STYLE_OPTIONS', () => {
 		it('contains solid, borderless-dark, bordered-dark', () => {
 			expect(BADGE_STYLE_OPTIONS).toEqual(['solid', 'borderless-dark', 'bordered-dark']);
+		});
+	});
+
+	describe('resolveSettingValue', () => {
+		it('returns default when both user and workspace are null', () => {
+			const result = resolveSettingValue('variant', null, null);
+			expect(result.value).toBe('refined-horizon');
+			expect(result.isOverridden).toBe(false);
+		});
+
+		it('returns user value when workspace is null', () => {
+			const result = resolveSettingValue('variant', 'veil', null);
+			expect(result.value).toBe('veil');
+			expect(result.isOverridden).toBe(false);
+		});
+
+		it('returns workspace value overriding user value', () => {
+			const result = resolveSettingValue('variant', 'veil', 'radiant');
+			expect(result.value).toBe('radiant');
+			expect(result.isOverridden).toBe(true);
+		});
+
+		it('parses numeric settings from user value', () => {
+			const result = resolveSettingValue('gradientReach', '80', null);
+			expect(result.value).toBe(80);
+			expect(result.isOverridden).toBe(false);
+		});
+
+		it('clamps out-of-range numeric workspace value', () => {
+			const result = resolveSettingValue('gradientReach', '50', '999');
+			expect(result.value).toBe(100);
+			expect(result.isOverridden).toBe(true);
+		});
+
+		it('falls back to default for invalid numeric value', () => {
+			const result = resolveSettingValue('labelTint', 'not-a-number', null);
+			expect(result.value).toBe(20);
+			expect(result.isOverridden).toBe(false);
+		});
+
+		it('workspace null with valid user numeric value', () => {
+			const result = resolveSettingValue('overlayGlow', '180', null);
+			expect(result.value).toBe(180);
+			expect(result.isOverridden).toBe(false);
 		});
 	});
 });

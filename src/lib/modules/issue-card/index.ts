@@ -27,6 +27,7 @@ export {
 	BADGE_STYLE_OPTIONS,
 	clampSettingValue,
 	parseSettingValue,
+	resolveSettingValue,
 	type IssueCardVariant,
 	type IssueCardAppearanceSettings,
 	type IssueCardSettingKey,

@@ -131,3 +131,30 @@ export const VARIANT_SPECIFIC_SETTINGS = {
 	'refined-horizon': ['headerSaturation'],
 	radiant: ['radialIntensity'],
 } as const satisfies Record<IssueCardVariant, readonly IssueCardSettingKey[]>;
+
+// ── Setting resolution (used by settings context) ───────────────────
+
+export interface SettingResolutionResult {
+	readonly value: string | number;
+	readonly isOverridden: boolean;
+}
+
+export function resolveSettingValue(
+	key: IssueCardSettingKey,
+	userRawValue: string | null,
+	workspaceRawValue: string | null,
+): SettingResolutionResult {
+	let value: string | number = ISSUE_CARD_SETTING_DEFAULTS[key];
+	let isOverridden = false;
+
+	if (userRawValue !== null) {
+		value = parseSettingValue(key, userRawValue);
+	}
+
+	if (workspaceRawValue !== null) {
+		value = parseSettingValue(key, workspaceRawValue);
+		isOverridden = true;
+	}
+
+	return { value, isOverridden };
+}
