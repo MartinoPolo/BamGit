@@ -1,23 +1,6 @@
 import { CATEGORY_DISPLAY_ORDER } from './types.js';
 import type { CommandPaletteCategory, CommandPaletteItem } from './types.js';
 
-export function filterItems(
-	items: readonly CommandPaletteItem[],
-	query: string,
-): CommandPaletteItem[] {
-	const trimmedQuery = query.trim().toLowerCase();
-
-	if (trimmedQuery === '') {
-		return [...items];
-	}
-
-	return items.filter((item) => {
-		const labelMatch = item.label.toLowerCase().includes(trimmedQuery);
-		const descriptionMatch = item.description?.toLowerCase().includes(trimmedQuery) ?? false;
-		return labelMatch || descriptionMatch;
-	});
-}
-
 export function groupByCategory(
 	items: readonly CommandPaletteItem[],
 ): Map<CommandPaletteCategory, CommandPaletteItem[]> {
@@ -42,16 +25,4 @@ export function groupByCategory(
 	}
 
 	return orderedResult;
-}
-
-export function flattenGrouped(
-	grouped: Map<CommandPaletteCategory, CommandPaletteItem[]>,
-): CommandPaletteItem[] {
-	const result: CommandPaletteItem[] = [];
-
-	for (const items of grouped.values()) {
-		result.push(...items);
-	}
-
-	return result;
 }
