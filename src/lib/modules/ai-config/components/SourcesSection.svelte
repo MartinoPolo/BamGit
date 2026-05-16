@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Collapsible from '$lib/components/shadcn/collapsible/index.js';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
@@ -112,25 +113,31 @@
 	}
 </script>
 
-<div class="flex flex-col gap-2">
-	<!-- Toggle row -->
-	<Button
-		intent="ghost"
-		size="sm"
-		class="text-foreground-muted hover:text-foreground"
-		onclick={() => {
-			aiConfig.sourcesExpanded = !aiConfig.sourcesExpanded;
-		}}
-	>
-		<ChevronRightIcon
-			data-icon="inline-start"
-			class={cn('transition-transform', aiConfig.sourcesExpanded && 'rotate-90')}
-		/>
-		Sources ({sourcesCount})
-	</Button>
+<Collapsible.Root
+	class="flex flex-col gap-2"
+	open={aiConfig.sourcesExpanded}
+	onOpenChange={(value) => {
+		aiConfig.sourcesExpanded = value;
+	}}
+>
+	<Collapsible.Trigger>
+		{#snippet child({ props })}
+			<Button
+				{...props}
+				intent="ghost"
+				size="sm"
+				class="text-foreground-muted hover:text-foreground"
+			>
+				<ChevronRightIcon
+					data-icon="inline-start"
+					class={cn('transition-transform', aiConfig.sourcesExpanded && 'rotate-90')}
+				/>
+				Sources ({sourcesCount})
+			</Button>
+		{/snippet}
+	</Collapsible.Trigger>
 
-	<!-- Expanded pill row -->
-	{#if aiConfig.sourcesExpanded}
+	<Collapsible.Content>
 		<div class="flex flex-wrap items-center gap-1.5">
 			{#each providerSources as source (source.path)}
 				{@const count = itemCountForSource(source.path)}
@@ -183,8 +190,8 @@
 				Add source
 			</Button>
 		</div>
-	{/if}
-</div>
+	</Collapsible.Content>
+</Collapsible.Root>
 
 <!-- Add source dialog -->
 <Dialog.Root bind:open={addDialogOpen}>
