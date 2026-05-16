@@ -57,9 +57,18 @@
 		}
 		wizard.skipGithubSearch();
 	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			event.stopPropagation();
+			confirm();
+		}
+	}
 </script>
 
-<div class="flex flex-col gap-3">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="flex flex-col gap-3" onkeydown={handleKeydown}>
 	<Command.Root shouldFilter={false} bind:value={commandValue} class="bg-transparent">
 		<div class="relative">
 			<Command.Input

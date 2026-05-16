@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { tick } from 'svelte';
 	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
@@ -24,7 +25,7 @@
 	function handleDialogOpenChange(isOpen: boolean) {
 		paletteCtx.open = isOpen;
 		if (isOpen) {
-			requestAnimationFrame(() => {
+			void tick().then(() => {
 				const input = document.querySelector<HTMLInputElement>('[data-command-input]');
 				input?.focus();
 			});
