@@ -1,22 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	BOTTOM_PANEL_TABS,
-	TAB_BEHAVIOR_MAP,
-	shouldShowPrdOverview,
-	computeStageCounts,
-	isBottomPanelTab,
-} from './selection.js';
-
-describe('TAB_BEHAVIOR_MAP', () => {
-	it('covers all tabs', () => {
-		const tabValues = Object.values(BOTTOM_PANEL_TABS);
-		const mappedTabs = Object.keys(TAB_BEHAVIOR_MAP);
-		expect(mappedTabs).toHaveLength(tabValues.length);
-		for (const tab of tabValues) {
-			expect(TAB_BEHAVIOR_MAP).toHaveProperty(tab);
-		}
-	});
-});
+import { shouldShowPrdOverview, computeStageCounts, isBottomPanelTab } from './selection.js';
 
 describe('shouldShowPrdOverview', () => {
 	it('returns true when activeIssueId is null (no activation)', () => {

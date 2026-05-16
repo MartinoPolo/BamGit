@@ -1,4 +1,4 @@
-export const MAX_VISIBLE_LABELS = 3;
+const MAX_VISIBLE_LABELS = 3;
 
 export function computeLabelOverflow(labelCount: number): {
 	visibleCount: number;

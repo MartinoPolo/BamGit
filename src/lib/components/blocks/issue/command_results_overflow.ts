@@ -1,4 +1,4 @@
-export const MAX_VISIBLE_COMMAND_RESULTS = 3;
+const MAX_VISIBLE_COMMAND_RESULTS = 3;
 
 export function computeCommandResultsOverflow(resultCount: number): {
 	visibleCount: number;
