@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { CalendarDate, type DateValue } from '@internationalized/date';
-	import { cn } from '$lib/utils.js';
-	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
 	import { RangeCalendar } from '$lib/components/shadcn/range-calendar/index.js';
 	import type { DateRange } from 'bits-ui';
@@ -42,18 +41,7 @@
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
-			<Button
-				intent="ghost"
-				size="sm"
-				class={cn(
-					active
-						? 'bg-background text-foreground shadow-sm'
-						: 'text-muted-foreground hover:text-foreground',
-				)}
-				{...props}
-			>
-				Custom
-			</Button>
+			<Tabs.Tab {active} {...props}>Custom</Tabs.Tab>
 		{/snippet}
 	</Popover.Trigger>
 	<Popover.Content class="w-auto p-0" portalProps={{ disabled: true }}>

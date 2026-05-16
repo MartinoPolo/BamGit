@@ -23,12 +23,20 @@
 		TRUNK_DEAD_SPACE_PERCENT,
 	} from 'low-poly-2d-trees';
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
+	import * as m from '$lib/paraglide/messages.js';
 	import SproutIcon from '@lucide/svelte/icons/sprout';
+	import GlobeIcon from '@lucide/svelte/icons/globe';
+	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
+	import PlayIcon from '@lucide/svelte/icons/play';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import PaletteIcon from '@lucide/svelte/icons/palette';
+	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as ContextMenu from '$lib/components/shadcn/context-menu/index.js';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
-	import ForestContextMenu from './ForestContextMenu.svelte';
 	import { TREE_CONTEXT_MENU_ACTIONS } from '$lib/modules/visualization';
 	import type { TreeContextMenuAction } from '$lib/modules/visualization';
+	import { isContextMenuActionEnabled } from './forest_context_menu_utils.js';
 	import { useSelection } from '$lib/modules/board';
 	import { BATCH_SELECTED_GLOW_COLOR } from '$lib/components/blocks/issue/batch_selection_utils.js';
 	import { SPECIAL_LABELS } from '$lib/modules/visualization';
@@ -87,7 +95,46 @@
 
 	const interaction = useSelection();
 
-	let contextMenu = $state<{ x: number; y: number; issueId: string } | null>(null);
+	let contextMenuIssueId = $state<string | null>(null);
+
+	interface ContextMenuItem {
+		readonly action: TreeContextMenuAction;
+		readonly label: () => string;
+		readonly icon: typeof GlobeIcon;
+	}
+
+	const contextMenuItems: readonly ContextMenuItem[] = [
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.openGithub,
+			label: () => m.forest_menu_open_github(),
+			icon: GlobeIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.openWorktree,
+			label: () => m.forest_menu_open_worktree(),
+			icon: GitBranchIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.startSession,
+			label: () => m.forest_menu_start_session(),
+			icon: PlayIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.archive,
+			label: () => m.forest_menu_archive(),
+			icon: ArchiveIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.changeColor,
+			label: () => m.forest_menu_change_color(),
+			icon: PaletteIcon,
+		},
+		{
+			action: TREE_CONTEXT_MENU_ACTIONS.pruneWorktree,
+			label: () => m.forest_menu_prune_worktree(),
+			icon: ScissorsIcon,
+		},
+	];
 
 	interface IssueEntry {
 		readonly issue: Issue;
@@ -310,7 +357,7 @@
 
 	function handleContextMenu(event: MouseEvent, entry: IssueEntry) {
 		event.preventDefault();
-		contextMenu = { x: event.clientX, y: event.clientY, issueId: entry.issue.id };
+		contextMenuIssueId = entry.issue.id;
 	}
 
 	// fallow-ignore-next-line complexity
@@ -343,24 +390,19 @@
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
-			if (contextMenu !== null) {
-				contextMenu = null;
-			} else {
-				interaction.deactivate();
-				if (document.activeElement instanceof HTMLElement) {
-					document.activeElement.blur();
-				}
+			interaction.deactivate();
+			if (document.activeElement instanceof HTMLElement) {
+				document.activeElement.blur();
 			}
 		}
 	}
 
 	// fallow-ignore-next-line complexity
 	function handleContextMenuAction(action: TreeContextMenuAction) {
-		const menu = contextMenu;
-		if (menu === null) {
+		if (contextMenuIssueId === null) {
 			return;
 		}
-		const entry = entryById.get(menu.issueId);
+		const entry = entryById.get(contextMenuIssueId);
 		if (entry === undefined) {
 			return;
 		}
@@ -390,107 +432,134 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-	class="relative w-full flex-1 overflow-hidden rounded-md outline-none"
-	bind:clientWidth={rawViewportWidth}
-	bind:clientHeight={rawViewportHeight}
-	style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
-	style:min-height="0"
-	style:isolation="isolate"
-	style:contain="content"
-	onkeydown={handleKeydown}
-	tabindex="0"
+<ContextMenu.Root
+	onOpenChange={(isOpen) => {
+		if (!isOpen) {
+			contextMenuIssueId = null;
+		}
+	}}
 >
-	{#if issues.length === 0}
-		<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
-			<div class="w-24 h-24 opacity-60">
-				<LowPolyTree config={emptyStateTreeConfig} />
-			</div>
-			<p class="text-sm text-foreground/70 font-medium">Your forest is empty</p>
-			{#if onAddIssue}
-				<Button intent="primary" onclick={onAddIssue}>
-					<SproutIcon data-icon="inline-start" />
-					Create your first issue
-				</Button>
-			{/if}
-		</div>
-	{:else}
-		{#each layoutResult.items as positioned (positioned.id)}
-			{@const entry = entryById.get(positioned.id)}
-			{#if entry}
-				{@const size = getNaturalSize(entry)}
-				{@const overlayConfig = getResolvedOverlayConfig(entry)}
-				{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
-				<ForestTreeTooltip issueTitle={entry.issue.name} issueStatus={entry.issue.status}>
-					{#snippet children(triggerProps)}
-						<button
-							{...triggerProps}
-							type="button"
-							class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
-							style:left="{positioned.x}px"
-							style:top="{positioned.y}px"
-							style:width="{size.width}px"
-							style:height="{size.height}px"
-							style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
-								100}%)) scale({positioned.scale})"
-							style:opacity={positioned.opacity}
-							style:z-index={positioned.zIndex}
-							style:pointer-events="none"
-							style:will-change="transform"
-							onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
-							onmouseleave={() => interaction.unhover()}
-							onclick={(event) => handleTreeClick(entry, event)}
-							oncontextmenu={(e) => handleContextMenu(e, entry)}
-							aria-label="Tree for issue {entry.issue.name}"
+	<ContextMenu.Trigger class="flex flex-1 overflow-hidden rounded-md">
+		<div
+			class="relative w-full flex-1 outline-none"
+			bind:clientWidth={rawViewportWidth}
+			bind:clientHeight={rawViewportHeight}
+			style:background="linear-gradient(to bottom, var(--sky-top), var(--sky-bot))"
+			style:min-height="0"
+			style:isolation="isolate"
+			style:contain="content"
+			onkeydown={handleKeydown}
+			tabindex="0"
+		>
+			{#if issues.length === 0}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					class="absolute inset-0 flex flex-col items-center justify-center gap-4"
+					oncontextmenu={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+					}}
+				>
+					<div class="w-24 h-24 opacity-60">
+						<LowPolyTree config={emptyStateTreeConfig} />
+					</div>
+					<p class="text-sm text-foreground/70 font-medium">Your forest is empty</p>
+					{#if onAddIssue}
+						<Button intent="primary" onclick={onAddIssue}>
+							<SproutIcon data-icon="inline-start" />
+							Create your first issue
+						</Button>
+					{/if}
+				</div>
+			{:else}
+				{#each layoutResult.items as positioned (positioned.id)}
+					{@const entry = entryById.get(positioned.id)}
+					{#if entry}
+						{@const size = getNaturalSize(entry)}
+						{@const overlayConfig = getResolvedOverlayConfig(entry)}
+						{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
+						<ForestTreeTooltip
+							issueTitle={entry.issue.name}
+							issueStatus={entry.issue.status}
 						>
-							{#if entry.visualization.kind === 'oak'}
-								<LowPolyTree
-									config={getOakConfig(entry)}
-									{overlayConfig}
-									groundElements={groundProps.groundElements}
-									groundElementCount={groundProps.groundElementCount}
-								/>
-							{:else if entry.visualization.kind === 'tree'}
-								<LowPolyTree
-									config={entry.visualization.config}
-									toolVisibility={entry.visualization.toolVisibility}
-									{overlayConfig}
-									animateCanopySway={entry.visualization.animateCanopySway}
-									animateGrowth={entry.visualization.animateGrowth}
-									animateTools={entry.visualization.animateTools}
-									groundElements={groundProps.groundElements}
-									groundElementCount={groundProps.groundElementCount}
-								/>
-							{:else if entry.visualization.kind === 'potted-plant'}
-								<PottedPlant
-									stage={entry.visualization.stage}
-									seed={entry.visualization.seed}
-									{overlayConfig}
-								/>
-							{/if}
-						</button>
-					{/snippet}
-				</ForestTreeTooltip>
+							{#snippet children(triggerProps)}
+								<button
+									{...triggerProps}
+									type="button"
+									class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
+									style:left="{positioned.x}px"
+									style:top="{positioned.y}px"
+									style:width="{size.width}px"
+									style:height="{size.height}px"
+									style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
+										100}%)) scale({positioned.scale})"
+									style:opacity={positioned.opacity}
+									style:z-index={positioned.zIndex}
+									style:pointer-events="none"
+									style:will-change="transform"
+									onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
+									onmouseleave={() => interaction.unhover()}
+									onclick={(event) => handleTreeClick(entry, event)}
+									oncontextmenu={(e) => handleContextMenu(e, entry)}
+									aria-label="Tree for issue {entry.issue.name}"
+								>
+									{#if entry.visualization.kind === 'oak'}
+										<LowPolyTree
+											config={getOakConfig(entry)}
+											{overlayConfig}
+											groundElements={groundProps.groundElements}
+											groundElementCount={groundProps.groundElementCount}
+										/>
+									{:else if entry.visualization.kind === 'tree'}
+										<LowPolyTree
+											config={entry.visualization.config}
+											toolVisibility={entry.visualization.toolVisibility}
+											{overlayConfig}
+											animateCanopySway={entry.visualization
+												.animateCanopySway}
+											animateGrowth={entry.visualization.animateGrowth}
+											animateTools={entry.visualization.animateTools}
+											groundElements={groundProps.groundElements}
+											groundElementCount={groundProps.groundElementCount}
+										/>
+									{:else if entry.visualization.kind === 'potted-plant'}
+										<PottedPlant
+											stage={entry.visualization.stage}
+											seed={entry.visualization.seed}
+											{overlayConfig}
+										/>
+									{/if}
+								</button>
+							{/snippet}
+						</ForestTreeTooltip>
+					{/if}
+				{/each}
 			{/if}
+			<button
+				type="button"
+				class="absolute inset-x-0 bottom-0 cursor-default border-0 p-0"
+				style:height="{groundStripHeight}px"
+				style="background: linear-gradient(to top, var(--ground-dark), var(--ground-color))"
+				style:z-index="1"
+				onclick={handleGroundClick}
+				oncontextmenu={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+				}}
+				tabindex="-1"
+				aria-label="Forest ground — click to deselect"
+			></button>
+		</div>
+	</ContextMenu.Trigger>
+	<ContextMenu.Content>
+		{#each contextMenuItems as item (item.action)}
+			<ContextMenu.Item
+				disabled={!isContextMenuActionEnabled(item.action)}
+				onclick={() => handleContextMenuAction(item.action)}
+			>
+				<item.icon class="size-4" />
+				{item.label()}
+			</ContextMenu.Item>
 		{/each}
-	{/if}
-	<button
-		type="button"
-		class="absolute inset-x-0 bottom-0 cursor-default border-0 p-0"
-		style:height="{groundStripHeight}px"
-		style:background="linear-gradient(to top, var(--ground-dark), var(--ground-color))"
-		style:z-index="1"
-		onclick={handleGroundClick}
-		tabindex="-1"
-		aria-label="Forest ground — click to deselect"
-	></button>
-
-	{#if contextMenu}
-		<ForestContextMenu
-			x={contextMenu.x}
-			y={contextMenu.y}
-			onaction={handleContextMenuAction}
-			ondismiss={() => (contextMenu = null)}
-		/>
-	{/if}
-</div>
+	</ContextMenu.Content>
+</ContextMenu.Root>
