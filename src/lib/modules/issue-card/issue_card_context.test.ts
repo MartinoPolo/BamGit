@@ -3,6 +3,7 @@ import { createIssueCardContext, type IssueCardContextProps } from './issue_card
 import { CARD_STATE_CLASSES } from '$lib/components/blocks/issue/batch_selection_utils.js';
 import type { Issue } from '$lib/modules/issues/index.js';
 import type { GitStatusCache } from '$lib/types/generated';
+import { ISSUE_CARD_SETTING_DEFAULTS } from './issue_card_settings.js';
 
 function makeIssue(overrides: Partial<Issue> = {}): Issue {
 	return {
@@ -44,6 +45,8 @@ function makeProps(overrides: Partial<IssueCardContextProps> = {}): IssueCardCon
 		prioritiesEnabled: true,
 		sessionState: null,
 		visualization: undefined,
+		appearanceSettings: { ...ISSUE_CARD_SETTING_DEFAULTS },
+		theme: 'dark',
 		isActive: false,
 		isHovered: false,
 		isBatchSelected: false,

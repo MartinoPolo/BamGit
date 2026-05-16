@@ -7,7 +7,12 @@
 		type ActionId,
 		type ContextualActionInput,
 	} from '$lib/modules/contextual-actions';
-	import { setIssueCardContext, type SessionStateProp } from '$lib/modules/issue-card/index.js';
+	import {
+		setIssueCardContext,
+		type SessionStateProp,
+		ISSUE_CARD_SETTING_DEFAULTS,
+		type IssueCardAppearanceSettings,
+	} from '$lib/modules/issue-card/index.js';
 	import IssueCardHeader from './IssueCardHeader.svelte';
 	import IssueCardPreview from './IssueCardPreview.svelte';
 	import WorktreeRow from './WorktreeRow.svelte';
@@ -30,6 +35,8 @@
 		prioritiesEnabled?: boolean;
 		sessionState?: SessionStateProp;
 		visualization?: TreeVisualization | undefined;
+		appearanceSettings?: IssueCardAppearanceSettings;
+		theme?: 'dark' | 'light';
 		isActive?: boolean;
 		isHovered?: boolean;
 		isBatchSelected?: boolean;
@@ -52,6 +59,8 @@
 		prioritiesEnabled = true,
 		sessionState = null,
 		visualization,
+		appearanceSettings = { ...ISSUE_CARD_SETTING_DEFAULTS },
+		theme = 'dark',
 		isActive = false,
 		isHovered = false,
 		isBatchSelected = false,
@@ -74,6 +83,8 @@
 		prioritiesEnabled,
 		sessionState,
 		visualization,
+		appearanceSettings,
+		theme,
 		isActive,
 		isHovered,
 		isBatchSelected,
@@ -113,18 +124,26 @@
 			onCardClick(event);
 		}
 	}
+
+	const variantStyleString = $derived.by(() => {
+		const props = ctx.variantCssProperties;
+		return Object.entries(props)
+			.map(([key, value]) => `${key}: ${value}`)
+			.join('; ');
+	});
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="group relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm outline-none transition-shadow duration-150 focus:outline-none focus-visible:outline-none {ctx.cardStateClass} {ctx.isArchived ||
+	class="group relative overflow-hidden rounded-lg border border-border shadow-sm outline-none transition-shadow duration-150 focus:outline-none focus-visible:outline-none {ctx.cardStateClass} {ctx.isArchived ||
 	ctx.isActive ||
 	ctx.isHovered ||
 	ctx.isBatchSelected
 		? ''
 		: 'card-ic-interactive'}"
-	style:--ic={ctx.color}
+	data-variant={ctx.variant}
+	style={variantStyleString}
 	onclick={handleCardClick}
 	onmouseenter={onMouseEnter}
 	onmouseleave={onMouseLeave}

@@ -9,6 +9,8 @@ import { deriveWorktreeBadge } from './derive_worktree_badge.js';
 import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
 import type { AggregateSessionState } from '$lib/modules/visualization/types.js';
 import type { ForestPullRequestState, ForestSyncStatus } from '$lib/modules/visualization/types.js';
+import { computeVariantCssProperties } from './issue_card_variant_css.js';
+import type { IssueCardAppearanceSettings, IssueCardVariant } from './issue_card_settings.js';
 
 const DEFAULT_ISSUE_COLOR = '#525252';
 
@@ -28,6 +30,8 @@ export interface IssueCardContextProps {
 	prioritiesEnabled: boolean;
 	sessionState: SessionStateProp;
 	visualization: TreeVisualization | undefined;
+	appearanceSettings: IssueCardAppearanceSettings;
+	theme: 'dark' | 'light';
 	isActive: boolean;
 	isHovered: boolean;
 	isBatchSelected: boolean;
@@ -168,6 +172,21 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		},
 		get notificationDotColor(): string | null {
 			return getProps().notificationDotColor;
+		},
+		get variant(): IssueCardVariant {
+			return getProps().appearanceSettings.variant;
+		},
+		get appearanceSettings(): IssueCardAppearanceSettings {
+			return getProps().appearanceSettings;
+		},
+		get variantCssProperties(): Record<string, string> {
+			const props = getProps();
+			return computeVariantCssProperties({
+				variant: props.appearanceSettings.variant,
+				settings: props.appearanceSettings,
+				issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
+				theme: props.theme,
+			});
 		},
 
 		// Callbacks

@@ -251,7 +251,25 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	// ─── Window reads ─────────────────────────────────────────────────────────
 	get_window_bindings: () => MOCK_WINDOW_BINDINGS,
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
-	get_app_setting: () => null,
+	get_app_setting: (args: Record<string, unknown>) => {
+		const key = args.key as string;
+		const mockIssueCardSettings: Record<string, string> = {
+			issue_card_variant: 'refined-horizon',
+			issue_card_button_color: 'issue-color',
+			issue_card_priority_position: 'header-right',
+			issue_card_badge_style: 'borderless-dark',
+			issue_card_label_tint: '20',
+			issue_card_overlay_glow: '150',
+			issue_card_gradient_reach: '60',
+			issue_card_color_saturation: '150',
+			issue_card_header_saturation: '85',
+			issue_card_radial_intensity: '75',
+		};
+		if (key in mockIssueCardSettings) {
+			return { key, value: mockIssueCardSettings[key] };
+		}
+		return null;
+	},
 
 	// ─── Metrics reads ───────────────────────────────────────────────────────
 	get_usage_dashboard: () => MOCK_USAGE_DASHBOARD,
