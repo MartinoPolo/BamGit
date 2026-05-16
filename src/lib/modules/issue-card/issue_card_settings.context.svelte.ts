@@ -55,6 +55,7 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 		radialIntensity,
 	} as const;
 
+	// fallow-ignore-next-line complexity
 	async function loadSettings() {
 		const keys = Object.keys(ISSUE_CARD_SETTING_KEYS) as IssueCardSettingKey[];
 		const newOverrides = new SvelteSet<IssueCardSettingKey>();
