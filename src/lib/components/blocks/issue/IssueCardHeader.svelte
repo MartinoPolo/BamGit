@@ -15,8 +15,8 @@
 </script>
 
 <div
-	class="flex min-h-8 items-center justify-between gap-2.5 px-3 py-1.5"
-	style="background-color: {ctx.color}; color: {ctx.headerTextColor}; filter: saturate(var(--header-saturate, 1));"
+	class="issue-card-header flex min-h-8 items-center justify-between gap-2.5 px-3 py-1.5"
+	style="color: var(--ic-header-text, {ctx.headerTextColor}); filter: saturate(var(--header-saturate, 1));"
 >
 	<div class="flex min-w-0 flex-1 items-baseline gap-1.5">
 		<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">

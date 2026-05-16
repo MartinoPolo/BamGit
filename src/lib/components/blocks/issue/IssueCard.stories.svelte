@@ -56,10 +56,7 @@
 	 * We scope to the header band to avoid matching contextual action overflow buttons.
 	 */
 	function getQuickActionButtons(canvasElement: HTMLElement): HTMLButtonElement[] {
-		// The quick-action container has class "ml-0.5"
-		const headerBand = canvasElement.querySelector(
-			'[style*="background-color"]',
-		) as HTMLElement | null;
+		const headerBand = canvasElement.querySelector('.issue-card-header') as HTMLElement | null;
 		if (!headerBand) {
 			return [];
 		}
@@ -108,6 +105,10 @@
 	import type { Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import { MOCK_ISSUES } from '$lib/tauri_mock_data.js';
+	import {
+		ISSUE_CARD_SETTING_DEFAULTS,
+		type IssueCardAppearanceSettings,
+	} from '$lib/modules/issue-card/index.js';
 	import IssueCardStoryWrapper from './IssueCardStoryWrapper.svelte';
 
 	function parseMockIssue(raw: (typeof MOCK_ISSUES)[number]): Issue {
@@ -129,6 +130,21 @@
 	const archivedIssue: Issue = {
 		...parseMockIssue(MOCK_ISSUES[5]),
 		status: 'archived',
+	};
+
+	const veilSettings: IssueCardAppearanceSettings = {
+		...ISSUE_CARD_SETTING_DEFAULTS,
+		variant: 'veil',
+	};
+
+	const horizonSettings: IssueCardAppearanceSettings = {
+		...ISSUE_CARD_SETTING_DEFAULTS,
+		variant: 'refined-horizon',
+	};
+
+	const radiantSettings: IssueCardAppearanceSettings = {
+		...ISSUE_CARD_SETTING_DEFAULTS,
+		variant: 'radiant',
 	};
 
 	const withPrCache: GitStatusCache = {
@@ -311,6 +327,143 @@
 		<IssueCardStoryWrapper>
 			<div class="max-w-md">
 				<IssueCard {...args} issue={baseIssue} ghAvailable={true} />
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<!-- Variant stories -->
+
+<Story name="Variant: Veil (Dark)">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md">
+				<IssueCard
+					{...args}
+					issue={baseIssue}
+					ghAvailable={true}
+					appearanceSettings={veilSettings}
+					theme="dark"
+				/>
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Variant: Veil (Light)">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md" data-theme="light">
+				<IssueCard
+					{...args}
+					issue={baseIssue}
+					ghAvailable={true}
+					appearanceSettings={veilSettings}
+					theme="light"
+				/>
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Variant: Refined Horizon (Dark)">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md">
+				<IssueCard
+					{...args}
+					issue={baseIssue}
+					ghAvailable={true}
+					appearanceSettings={horizonSettings}
+					theme="dark"
+				/>
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Variant: Refined Horizon (Light)">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md" data-theme="light">
+				<IssueCard
+					{...args}
+					issue={baseIssue}
+					ghAvailable={true}
+					appearanceSettings={horizonSettings}
+					theme="light"
+				/>
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Variant: Radiant (Dark)">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md">
+				<IssueCard
+					{...args}
+					issue={baseIssue}
+					ghAvailable={true}
+					appearanceSettings={radiantSettings}
+					theme="dark"
+				/>
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Variant: Radiant (Light)">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md" data-theme="light">
+				<IssueCard
+					{...args}
+					issue={baseIssue}
+					ghAvailable={true}
+					appearanceSettings={radiantSettings}
+					theme="light"
+				/>
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Variant Comparison">
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="grid grid-cols-3 gap-4">
+				<div>
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Veil</h3>
+					<IssueCard
+						{...args}
+						issue={baseIssue}
+						ghAvailable={true}
+						appearanceSettings={veilSettings}
+						theme="dark"
+					/>
+				</div>
+				<div>
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Refined Horizon</h3>
+					<IssueCard
+						{...args}
+						issue={baseIssue}
+						ghAvailable={true}
+						appearanceSettings={horizonSettings}
+						theme="dark"
+					/>
+				</div>
+				<div>
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Radiant</h3>
+					<IssueCard
+						{...args}
+						issue={baseIssue}
+						ghAvailable={true}
+						appearanceSettings={radiantSettings}
+						theme="dark"
+					/>
+				</div>
 			</div>
 		</IssueCardStoryWrapper>
 	{/snippet}
