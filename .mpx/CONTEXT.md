@@ -72,24 +72,25 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 
 ## Core Features
 
-| Feature                | Status                     | PRD       | Design                                 |
-| ---------------------- | -------------------------- | --------- | -------------------------------------- |
-| Workspace Dashboard    | implemented                | #87, #89  | `designs/issue-card-v2/`               |
-| Overview Dashboard     | implemented                | #96       | `claude_design/Workspace Card.html`    |
-| Issue Creation         | implemented                | #89       | `claude_design/Creation Wizard.html`   |
-| Session Management     | partial (UI done)          | #90       | `claude_design/Session Chat View.html` |
-| Session Chat UI        | partial (components built) | #90       | `claude_design/Session Chat View.html` |
-| Forest Visualization   | partial (rendering done)   | #88       | `.mpx/STATE_MAPPING.md`                |
-| Git/GitHub Integration | implemented                | #91       | —                                      |
-| Notification System    | implemented                | #95       | —                                      |
-| Character Pack System  | implemented                | #95       | —                                      |
-| Metrics & Statistics   | implemented                | #93       | —                                      |
-| AI Configuration       | implemented                | #94       | —                                      |
-| AFK/HITL Workflow      | not started                | #92       | —                                      |
-| Workspace Settings     | implemented                | #96, #255 | —                                      |
-| PRD Management         | planned                    | #219      | —                                      |
-| Keyboard Shortcuts     | implemented                | #87       | —                                      |
-| Internationalization   | implemented (en + cs)      | #87       | —                                      |
+| Feature                | Status                     | PRD       | Design                                                |
+| ---------------------- | -------------------------- | --------- | ----------------------------------------------------- |
+| Workspace Dashboard    | implemented                | #87, #89  | `designs/issue-card-v2/`                              |
+| Issue Card v2 Redesign | ready for implementation   | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
+| Overview Dashboard     | implemented                | #96       | `claude_design/Workspace Card.html`                   |
+| Issue Creation         | implemented                | #89       | `claude_design/Creation Wizard.html`                  |
+| Session Management     | partial (UI done)          | #90       | `claude_design/Session Chat View.html`                |
+| Session Chat UI        | partial (components built) | #90       | `claude_design/Session Chat View.html`                |
+| Forest Visualization   | partial (rendering done)   | #88       | `.mpx/STATE_MAPPING.md`                               |
+| Git/GitHub Integration | implemented                | #91       | —                                                     |
+| Notification System    | implemented                | #95       | —                                                     |
+| Character Pack System  | implemented                | #95       | —                                                     |
+| Metrics & Statistics   | implemented                | #93       | —                                                     |
+| AI Configuration       | implemented                | #94       | —                                                     |
+| AFK/HITL Workflow      | not started                | #92       | —                                                     |
+| Workspace Settings     | implemented                | #96, #255 | —                                                     |
+| PRD Management         | planned                    | #219      | —                                                     |
+| Keyboard Shortcuts     | implemented                | #87       | —                                                     |
+| Internationalization   | implemented (en + cs)      | #87       | —                                                     |
 
 ## Key Constraints
 

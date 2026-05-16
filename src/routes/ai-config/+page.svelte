@@ -165,19 +165,19 @@
 			{@const count = aiConfig.tabCounts[tab]}
 			{@const isActive = activeTab === tab}
 			{@const isDimmed = tab !== 'settings' && count === 0 && aiConfig.searchQuery !== ''}
-			<button
-				type="button"
+			<Button
+				intent="ghost"
+				size="sm"
 				onclick={() => (aiConfig.activeTab = tab)}
 				class={cn(
-					'flex shrink-0 items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-					isActive
-						? 'bg-surface-2 text-foreground'
-						: 'text-foreground-muted hover:bg-surface-2/60 hover:text-foreground',
+					isActive && 'bg-surface-2 text-foreground',
+					!isActive &&
+						'text-foreground-muted hover:bg-surface-2/60 hover:text-foreground',
 					isDimmed && 'text-foreground-subtle opacity-60',
 				)}
 			>
 				{TAB_LABELS[tab]}{tab !== 'settings' ? ` (${count})` : ''}
-			</button>
+			</Button>
 		{/each}
 	</div>
 

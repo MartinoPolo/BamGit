@@ -3,6 +3,7 @@
 		DEFAULT_DEPENDENCY_FILTER,
 		type DependencyFilter,
 	} from '$lib/modules/dependency-graph';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import EyeIcon from '@lucide/svelte/icons/eye';
 	import EyeOffIcon from '@lucide/svelte/icons/eye-off';
@@ -34,43 +35,43 @@
 </script>
 
 <div class="filter-bar">
-	<button
-		type="button"
-		class="filter-toggle"
-		class:active={filter.showClosed}
+	<Button
+		intent={filter.showClosed ? 'primary' : 'secondary'}
+		size="sm"
+		class="h-6.5 text-[11px] font-semibold"
 		onclick={() => update({ showClosed: !filter.showClosed })}
 		aria-pressed={filter.showClosed}
 		title={filter.showClosed ? 'Hide closed issues' : 'Show closed issues'}
 	>
 		{#if filter.showClosed}
-			<EyeIcon size={12} />
+			<EyeIcon data-icon="inline-start" />
 		{:else}
-			<EyeOffIcon size={12} />
+			<EyeOffIcon data-icon="inline-start" />
 		{/if}
-		<span>Closed</span>
-	</button>
+		Closed
+	</Button>
 
-	<button
-		type="button"
-		class="filter-toggle"
-		class:active={filter.afkOnly}
+	<Button
+		intent={filter.afkOnly ? 'primary' : 'secondary'}
+		size="sm"
+		class="h-6.5 text-[11px] font-semibold"
 		onclick={() => update({ afkOnly: !filter.afkOnly, hitlOnly: false })}
 		aria-pressed={filter.afkOnly}
 		title="Show only AFK"
 	>
 		AFK
-	</button>
+	</Button>
 
-	<button
-		type="button"
-		class="filter-toggle"
-		class:active={filter.hitlOnly}
+	<Button
+		intent={filter.hitlOnly ? 'primary' : 'secondary'}
+		size="sm"
+		class="h-6.5 text-[11px] font-semibold"
 		onclick={() => update({ hitlOnly: !filter.hitlOnly, afkOnly: false })}
 		aria-pressed={filter.hitlOnly}
 		title="Show only HITL"
 	>
 		HITL
-	</button>
+	</Button>
 
 	{#if areaOptions.length > 0}
 		<Select
@@ -99,15 +100,16 @@
 	/>
 
 	{#if !isDefault}
-		<button
-			type="button"
-			class="filter-reset"
+		<Button
+			intent="secondary"
+			size="icon-sm"
+			class="size-6.5"
 			onclick={reset}
 			title="Reset filters"
 			aria-label="Reset filters"
 		>
-			<RotateCcwIcon size={12} />
-		</button>
+			<RotateCcwIcon />
+		</Button>
 	{/if}
 </div>
 
@@ -120,33 +122,6 @@
 		padding: 4px 0;
 	}
 
-	.filter-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		padding: 4px 10px;
-		height: 26px;
-		border: 1px solid var(--border);
-		border-radius: calc(var(--radius) * 1);
-		background: var(--card);
-		color: var(--muted-foreground);
-		font-size: 11px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 150ms ease;
-	}
-
-	.filter-toggle:hover {
-		background: var(--accent);
-		color: var(--accent-foreground);
-	}
-
-	.filter-toggle.active {
-		background: var(--primary);
-		border-color: var(--primary);
-		color: var(--primary-foreground);
-	}
-
 	.filter-search {
 		height: 26px;
 		min-width: 140px;
@@ -156,23 +131,5 @@
 		background: var(--card);
 		color: var(--foreground);
 		font-size: 11px;
-	}
-
-	.filter-reset {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 26px;
-		height: 26px;
-		border: 1px solid var(--border);
-		border-radius: calc(var(--radius) * 1);
-		background: var(--card);
-		color: var(--muted-foreground);
-		cursor: pointer;
-	}
-
-	.filter-reset:hover {
-		background: var(--accent);
-		color: var(--accent-foreground);
 	}
 </style>

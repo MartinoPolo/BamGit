@@ -1,6 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import * as Tooltip from './index.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
 	import { formatBindingForDisplay } from '$lib/modules/keyboard-shortcuts/index.js';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
@@ -19,12 +20,7 @@
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<button
-								{...props}
-								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-							>
-								Hover me
-							</button>
+							<Button {...props} intent="secondary" size="sm">Hover me</Button>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}
@@ -40,11 +36,9 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-16">
 			<Tooltip.SimpleTooltip text="Sync now">
-				<button
-					class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-				>
-					Hover me
-				</button>
+				{#snippet asChild(props)}
+					<Button {...props} intent="secondary" size="sm">Hover me</Button>
+				{/snippet}
 			</Tooltip.SimpleTooltip>
 		</div>
 	{/snippet}
@@ -57,12 +51,7 @@
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<button
-								{...props}
-								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-							>
-								Hover me
-							</button>
+							<Button {...props} intent="secondary" size="sm">Hover me</Button>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="bottom" portalProps={{ disabled: true }}>
@@ -82,13 +71,14 @@
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<button
+							<Button
 								{...props}
+								intent="secondary"
+								size="icon-sm"
 								aria-label="Settings"
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
 							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+								<SettingsIcon />
+							</Button>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="left" portalProps={{ disabled: true }}
@@ -107,13 +97,14 @@
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<button
+							<Button
 								{...props}
+								intent="secondary"
+								size="icon-sm"
 								aria-label="Settings"
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
 							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+								<SettingsIcon />
+							</Button>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="right" portalProps={{ disabled: true }}
@@ -132,12 +123,7 @@
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<button
-								{...props}
-								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-							>
-								Create issue
-							</button>
+							<Button {...props} intent="secondary" size="sm">Create issue</Button>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}>
@@ -185,11 +171,9 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-16">
 			<Tooltip.SimpleTooltip text="Instant — no delay" delayDuration={0}>
-				<button
-					class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-				>
-					Hover me (instant)
-				</button>
+				{#snippet asChild(props)}
+					<Button {...props} intent="secondary" size="sm">Hover me (instant)</Button>
+				{/snippet}
 			</Tooltip.SimpleTooltip>
 		</div>
 	{/snippet}
@@ -199,11 +183,9 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-16">
 			<Tooltip.SimpleTooltip text="300ms delay" delayDuration={300}>
-				<button
-					class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-				>
-					Hover me (300ms)
-				</button>
+				{#snippet asChild(props)}
+					<Button {...props} intent="secondary" size="sm">Hover me (300ms)</Button>
+				{/snippet}
 			</Tooltip.SimpleTooltip>
 		</div>
 	{/snippet}
@@ -213,11 +195,9 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-16">
 			<Tooltip.SimpleTooltip text="700ms delay — deliberate hover" delayDuration={700}>
-				<button
-					class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-				>
-					Hover me (700ms)
-				</button>
+				{#snippet asChild(props)}
+					<Button {...props} intent="secondary" size="sm">Hover me (700ms)</Button>
+				{/snippet}
 			</Tooltip.SimpleTooltip>
 		</div>
 	{/snippet}
@@ -230,11 +210,16 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root open={true}>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									intent="secondary"
+									size="icon-sm"
+									aria-label="Top"
+								>
+									<SettingsIcon />
+								</Button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="top" portalProps={{ disabled: true }}>
 							Top
@@ -244,11 +229,16 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root open={true}>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									intent="secondary"
+									size="icon-sm"
+									aria-label="Bottom"
+								>
+									<SettingsIcon />
+								</Button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="bottom" portalProps={{ disabled: true }}>
 							Bottom
@@ -258,11 +248,16 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root open={true}>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									intent="secondary"
+									size="icon-sm"
+									aria-label="Left"
+								>
+									<SettingsIcon />
+								</Button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="left" portalProps={{ disabled: true }}>
 							Left
@@ -272,11 +267,16 @@
 				<div class="flex items-center justify-center">
 					<Tooltip.Root open={true}>
 						<Tooltip.Trigger>
-							<button
-								class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
-							>
-								<SettingsIcon class="size-3.5" />
-							</button>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									intent="secondary"
+									size="icon-sm"
+									aria-label="Right"
+								>
+									<SettingsIcon />
+								</Button>
+							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="right" portalProps={{ disabled: true }}>
 							Right
@@ -295,12 +295,7 @@
 				<Tooltip.Root open={true}>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<button
-								{...props}
-								class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-							>
-								Hover me
-							</button>
+							<Button {...props} intent="secondary" size="sm">Hover me</Button>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}>
@@ -309,11 +304,9 @@
 				</Tooltip.Root>
 				<Tooltip.Root open={true}>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-						>
-							Create issue
-						</button>
+						{#snippet child({ props })}
+							<Button {...props} intent="secondary" size="sm">Create issue</Button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="top" portalProps={{ disabled: true }}>
 						Create issue
@@ -322,11 +315,9 @@
 				</Tooltip.Root>
 				<Tooltip.Root open={true}>
 					<Tooltip.Trigger>
-						<button
-							class="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm text-foreground"
-						>
-							Forest view
-						</button>
+						{#snippet child({ props })}
+							<Button {...props} intent="secondary" size="sm">Forest view</Button>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content side="bottom" portalProps={{ disabled: true }}>
 						Switch to forest view
@@ -364,13 +355,14 @@
 					<Tooltip.Root>
 						<Tooltip.Trigger>
 							{#snippet child({ props })}
-								<button
+								<Button
 									{...props}
+									intent="secondary"
+									size="icon-sm"
 									aria-label="Top placement"
-									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
 								>
-									<SettingsIcon class="size-3.5" />
-								</button>
+									<SettingsIcon />
+								</Button>
 							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="top" portalProps={{ disabled: true }}
@@ -382,13 +374,14 @@
 					<Tooltip.Root>
 						<Tooltip.Trigger>
 							{#snippet child({ props })}
-								<button
+								<Button
 									{...props}
+									intent="secondary"
+									size="icon-sm"
 									aria-label="Bottom placement"
-									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
 								>
-									<SettingsIcon class="size-3.5" />
-								</button>
+									<SettingsIcon />
+								</Button>
 							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="bottom" portalProps={{ disabled: true }}
@@ -400,13 +393,14 @@
 					<Tooltip.Root>
 						<Tooltip.Trigger>
 							{#snippet child({ props })}
-								<button
+								<Button
 									{...props}
+									intent="secondary"
+									size="icon-sm"
 									aria-label="Left placement"
-									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
 								>
-									<SettingsIcon class="size-3.5" />
-								</button>
+									<SettingsIcon />
+								</Button>
 							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="left" portalProps={{ disabled: true }}
@@ -418,13 +412,14 @@
 					<Tooltip.Root>
 						<Tooltip.Trigger>
 							{#snippet child({ props })}
-								<button
+								<Button
 									{...props}
+									intent="secondary"
+									size="icon-sm"
 									aria-label="Right placement"
-									class="inline-flex size-8 items-center justify-center rounded-md border border-border bg-surface-2 text-foreground"
 								>
-									<SettingsIcon class="size-3.5" />
-								</button>
+									<SettingsIcon />
+								</Button>
 							{/snippet}
 						</Tooltip.Trigger>
 						<Tooltip.Content side="right" portalProps={{ disabled: true }}

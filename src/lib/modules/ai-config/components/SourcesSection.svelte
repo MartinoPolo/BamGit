@@ -114,18 +114,20 @@
 
 <div class="flex flex-col gap-2">
 	<!-- Toggle row -->
-	<button
-		type="button"
-		class="flex items-center gap-1.5 text-sm font-medium text-foreground-muted hover:text-foreground"
+	<Button
+		intent="ghost"
+		size="sm"
+		class="text-foreground-muted hover:text-foreground"
 		onclick={() => {
 			aiConfig.sourcesExpanded = !aiConfig.sourcesExpanded;
 		}}
 	>
 		<ChevronRightIcon
-			class={cn('size-3.5 transition-transform', aiConfig.sourcesExpanded && 'rotate-90')}
+			data-icon="inline-start"
+			class={cn('transition-transform', aiConfig.sourcesExpanded && 'rotate-90')}
 		/>
 		Sources ({sourcesCount})
-	</button>
+	</Button>
 
 	<!-- Expanded pill row -->
 	{#if aiConfig.sourcesExpanded}
