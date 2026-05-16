@@ -1,13 +1,10 @@
-const WORKSPACE_CARD_VARIANTS = [
-	'urgent',
-	'needs-attention',
-	'active',
-	'dormant',
-	'empty',
-	'default',
-] as const;
-
-export type WorkspaceCardVariant = (typeof WORKSPACE_CARD_VARIANTS)[number];
+export type WorkspaceCardVariant =
+	| 'urgent'
+	| 'needs-attention'
+	| 'active'
+	| 'dormant'
+	| 'empty'
+	| 'default';
 
 export const AFK_LOOP_RUNNING = 'running' as const;
 
