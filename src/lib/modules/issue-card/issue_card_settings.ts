@@ -90,7 +90,7 @@ export const ISSUE_CARD_SETTING_RANGES: Record<string, SettingRange> = {
 
 export function clampSettingValue(key: string, value: number): number {
 	const range = ISSUE_CARD_SETTING_RANGES[key];
-	if (!range) {
+	if (range === undefined) {
 		return value;
 	}
 	return Math.min(Math.max(value, range.min), range.max);

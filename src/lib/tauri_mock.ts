@@ -253,7 +253,7 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
 	get_app_setting: (args: Record<string, unknown>) => {
 		const key = args.key as string;
-		const MOCK_ISSUE_CARD_SETTINGS: Record<string, string> = {
+		const mockIssueCardSettings: Record<string, string> = {
 			issue_card_variant: 'refined-horizon',
 			issue_card_button_color: 'issue-color',
 			issue_card_priority_position: 'header-right',
@@ -265,8 +265,8 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 			issue_card_header_saturation: '85',
 			issue_card_radial_intensity: '75',
 		};
-		if (key in MOCK_ISSUE_CARD_SETTINGS) {
-			return { key, value: MOCK_ISSUE_CARD_SETTINGS[key] };
+		if (key in mockIssueCardSettings) {
+			return { key, value: mockIssueCardSettings[key] };
 		}
 		return null;
 	},
