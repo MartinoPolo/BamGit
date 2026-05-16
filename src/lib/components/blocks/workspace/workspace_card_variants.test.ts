@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
 	deriveWorkspaceCardVariant,
 	getVariantAccentColor,
-	WORKSPACE_CARD_VARIANTS,
 	type WorkspaceCardVariantInput,
 } from './workspace_card_variants.js';
 
@@ -16,22 +15,6 @@ function makeInput(overrides: Partial<WorkspaceCardVariantInput> = {}): Workspac
 		...overrides,
 	};
 }
-
-describe('WORKSPACE_CARD_VARIANTS', () => {
-	it('contains all 6 variant values', () => {
-		expect(WORKSPACE_CARD_VARIANTS).toEqual(
-			expect.arrayContaining([
-				'urgent',
-				'needs-attention',
-				'active',
-				'dormant',
-				'empty',
-				'default',
-			]),
-		);
-		expect(WORKSPACE_CARD_VARIANTS).toHaveLength(6);
-	});
-});
 
 describe('deriveWorkspaceCardVariant', () => {
 	it('returns "default" when no special conditions', () => {

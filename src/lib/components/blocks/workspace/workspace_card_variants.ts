@@ -1,4 +1,4 @@
-export const WORKSPACE_CARD_VARIANTS = [
+const WORKSPACE_CARD_VARIANTS = [
 	'urgent',
 	'needs-attention',
 	'active',

@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	computeCommandResultsOverflow,
-	MAX_VISIBLE_COMMAND_RESULTS,
-} from './command_results_overflow.js';
+import { computeCommandResultsOverflow } from './command_results_overflow.js';
 
 describe('computeCommandResultsOverflow', () => {
 	it('returns zero visible and zero overflow for 0 results', () => {
@@ -24,9 +21,5 @@ describe('computeCommandResultsOverflow', () => {
 	it('returns max visible and correct overflow for large counts', () => {
 		expect(computeCommandResultsOverflow(5)).toEqual({ visibleCount: 3, overflowCount: 2 });
 		expect(computeCommandResultsOverflow(8)).toEqual({ visibleCount: 3, overflowCount: 5 });
-	});
-
-	it('exports MAX_VISIBLE_COMMAND_RESULTS as 3', () => {
-		expect(MAX_VISIBLE_COMMAND_RESULTS).toBe(3);
 	});
 });
