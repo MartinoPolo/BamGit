@@ -82,11 +82,18 @@
 	const playArrowDownHighlights = async () => {
 		await waitForDialog();
 
-		const options = getResultOptions();
-		await expect(options.length).toBeGreaterThan(1);
+		// Wait for search input to be focused (rAF-deferred) — keyboard events
+		// dispatch on activeElement so focus must be inside Dialog.Content for
+		// the keydown handler to fire.
+		const searchInput = getSearchInput()!;
+		await waitFor(() => expect(searchInput).toHaveFocus());
 
-		// First item starts selected
-		await expect(options[0]).toHaveAttribute('aria-selected', 'true');
+		// Wait for options to render and first item to be selected (async Svelte state)
+		await waitFor(() => {
+			const options = getResultOptions();
+			expect(options.length).toBeGreaterThan(1);
+			expect(options[0]).toHaveAttribute('aria-selected', 'true');
+		});
 
 		// ArrowDown → second item highlighted (waitFor: Svelte reactive update is async)
 		await userEvent.keyboard('{ArrowDown}');
