@@ -143,7 +143,7 @@
 		? ''
 		: 'card-ic-interactive'}"
 	data-variant={ctx.variant}
-	style="{variantStyleString}; --ic: {ctx.color}"
+	style={variantStyleString}
 	onclick={handleCardClick}
 	onmouseenter={onMouseEnter}
 	onmouseleave={onMouseLeave}
