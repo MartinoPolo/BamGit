@@ -434,7 +434,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <ContextMenu.Root
 	onOpenChange={(isOpen) => {
-		if (!isOpen) {
+		if (isOpen === false) {
 			contextMenuIssueId = null;
 		}
 	}}
