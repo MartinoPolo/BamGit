@@ -195,7 +195,6 @@
 					issue={baseIssue}
 					cache={withPrCache}
 					ghAvailable={true}
-					childCount={3}
 					prdParent={{
 						number: 95,
 						url: 'https://github.com/MartinoPolo/Grovekeeper/issues/95',

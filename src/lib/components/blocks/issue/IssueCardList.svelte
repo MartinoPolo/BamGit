@@ -209,13 +209,6 @@
 		}
 	}
 
-	function getChildCount(issueId: string): number {
-		if (!isPortfolio) {
-			return 0;
-		}
-		return getChildren(issueId).length;
-	}
-
 	// fallow-ignore-next-line complexity
 	function getDerivedActions(issue: Issue) {
 		const cache = cacheMap.get(issue.id);
@@ -294,7 +287,6 @@
 						cache={cacheMap.get(issue.id)}
 						{ghAvailable}
 						notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
-						childCount={getChildCount(issue.id)}
 						prdParent={getPrdParent(issue)}
 						{prioritiesEnabled}
 						visualization={getVisualization?.(issue.id)}
