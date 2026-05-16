@@ -21,6 +21,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { openUrl } from '$lib/opener.js';
 	import { Persisted, jsonSerde } from '$lib/reactivity/persisted.svelte.js';
+	import * as Collapsible from '$lib/components/shadcn/collapsible/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
@@ -347,10 +348,15 @@
 		</div>
 
 		<!-- Unlinked Section -->
-		<div class="mt-1">
-			<button
+		<Collapsible.Root
+			class="mt-1"
+			open={!unlinkedCollapsed.current}
+			onOpenChange={(value: boolean) => {
+				unlinkedCollapsed.current = !value;
+			}}
+		>
+			<Collapsible.Trigger
 				class="flex w-full items-center gap-1 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground"
-				onclick={() => (unlinkedCollapsed.current = !unlinkedCollapsed.current)}
 			>
 				{#if unlinkedCollapsed.current}
 					<ChevronRight size={12} />
@@ -358,9 +364,9 @@
 					<ChevronDown size={12} />
 				{/if}
 				Unlinked ({filteredUnlinked.length})
-			</button>
+			</Collapsible.Trigger>
 
-			{#if !unlinkedCollapsed.current}
+			<Collapsible.Content>
 				{#each filteredUnlinked as issue (issue.number)}
 					<div
 						class={cn(
@@ -468,15 +474,20 @@
 						</div>
 					</div>
 				{/each}
-			{/if}
-		</div>
+			</Collapsible.Content>
+		</Collapsible.Root>
 
 		<!-- Linked Section -->
 		{#if filteredLinked.length > 0}
-			<div class="mt-2">
-				<button
+			<Collapsible.Root
+				class="mt-2"
+				open={!linkedCollapsed.current}
+				onOpenChange={(value: boolean) => {
+					linkedCollapsed.current = !value;
+				}}
+			>
+				<Collapsible.Trigger
 					class="flex w-full items-center gap-1 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground"
-					onclick={() => (linkedCollapsed.current = !linkedCollapsed.current)}
 				>
 					{#if linkedCollapsed.current}
 						<ChevronRight size={12} />
@@ -484,9 +495,9 @@
 						<ChevronDown size={12} />
 					{/if}
 					Linked ({filteredLinked.length})
-				</button>
+				</Collapsible.Trigger>
 
-				{#if !linkedCollapsed.current}
+				<Collapsible.Content>
 					{#each filteredLinked as issue (issue.number)}
 						<div
 							class="assigned-table-grid items-center border-b border-border/40 text-xs opacity-45"
@@ -558,8 +569,8 @@
 							</div>
 						</div>
 					{/each}
-				{/if}
-			</div>
+				</Collapsible.Content>
+			</Collapsible.Root>
 		{/if}
 
 		<!-- Load More -->

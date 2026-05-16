@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as Collapsible from '$lib/components/shadcn/collapsible/index.js';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
@@ -156,14 +157,6 @@
 			selectedCharacters.add(folderPath);
 		} else {
 			selectedCharacters.delete(folderPath);
-		}
-	}
-
-	function handleToggleFaction(faction: string) {
-		if (expandedFactions.has(faction)) {
-			expandedFactions.delete(faction);
-		} else {
-			expandedFactions.add(faction);
 		}
 	}
 
@@ -334,26 +327,39 @@
 						</div>
 
 						{#each factions as [faction, factionCharacters] (faction)}
-							<div class="mb-1">
-								<Button
-									intent="ghost"
-									size="sm"
-									class="w-full justify-start text-muted-foreground"
-									onclick={() => handleToggleFaction(faction)}
-									aria-expanded={expandedFactions.has(faction)}
-								>
-									{#if expandedFactions.has(faction)}
-										<ChevronDownIcon data-icon="inline-start" />
-									{:else}
-										<ChevronRightIcon data-icon="inline-start" />
-									{/if}
-									{faction}
-									<span class="ml-auto text-[10px]"
-										>{factionCharacters.length}</span
-									>
-								</Button>
+							<Collapsible.Root
+								class="mb-1"
+								open={expandedFactions.has(faction)}
+								onOpenChange={(value: boolean) => {
+									if (value) {
+										expandedFactions.add(faction);
+									} else {
+										expandedFactions.delete(faction);
+									}
+								}}
+							>
+								<Collapsible.Trigger>
+									{#snippet child({ props })}
+										<Button
+											{...props}
+											intent="ghost"
+											size="sm"
+											class="w-full justify-start text-muted-foreground"
+										>
+											{#if expandedFactions.has(faction)}
+												<ChevronDownIcon data-icon="inline-start" />
+											{:else}
+												<ChevronRightIcon data-icon="inline-start" />
+											{/if}
+											{faction}
+											<span class="ml-auto text-[10px]"
+												>{factionCharacters.length}</span
+											>
+										</Button>
+									{/snippet}
+								</Collapsible.Trigger>
 
-								{#if expandedFactions.has(faction)}
+								<Collapsible.Content>
 									<div class="ml-4">
 										{#each factionCharacters as char (char.folder_path)}
 											{@const quality = getCharacterQuality(char)}
@@ -406,8 +412,8 @@
 											</button>
 										{/each}
 									</div>
-								{/if}
-							</div>
+								</Collapsible.Content>
+							</Collapsible.Root>
 						{/each}
 					</div>
 
