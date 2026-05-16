@@ -37,7 +37,7 @@
 	/** Click trigger -> popover opens with calendar visible. */
 	const playOpenPopover = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
-		const trigger = canvas.getByRole('button', { name: /custom/i });
+		const trigger = canvas.getByRole('tab', { name: /custom/i });
 
 		// Popover starts closed
 		await expectPopoverClosed(canvasElement);
@@ -62,7 +62,7 @@
 		args: { onselect?: unknown };
 	}) => {
 		const canvas = within(canvasElement);
-		const trigger = canvas.getByRole('button', { name: /custom/i });
+		const trigger = canvas.getByRole('tab', { name: /custom/i });
 
 		// Open popover
 		await userEvent.click(trigger);
@@ -90,7 +90,7 @@
 	/** Escape closes the popover. */
 	const playEscapeCloses = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
-		const trigger = canvas.getByRole('button', { name: /custom/i });
+		const trigger = canvas.getByRole('tab', { name: /custom/i });
 
 		// Open
 		await userEvent.click(trigger);
@@ -104,7 +104,7 @@
 	/** Click outside closes the popover. */
 	const playClickOutsideCloses = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
-		const trigger = canvas.getByRole('button', { name: /custom/i });
+		const trigger = canvas.getByRole('tab', { name: /custom/i });
 
 		// Open
 		await userEvent.click(trigger);
@@ -118,7 +118,7 @@
 	/** Escape from DateRangePicker popover does NOT propagate to parent layer. */
 	const playEscapeContainment = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const canvas = within(canvasElement);
-		const trigger = canvas.getByRole('button', { name: /custom/i });
+		const trigger = canvas.getByRole('tab', { name: /custom/i });
 
 		// Open popover
 		await userEvent.click(trigger);

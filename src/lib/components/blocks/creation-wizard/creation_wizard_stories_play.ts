@@ -45,10 +45,15 @@ export const playBackspaceGoesBack = async () => {
 	await expect(dialog).toBeVisible();
 	await expect(dialogCanvas.getByText('Issue Name')).toBeVisible();
 
-	const input = dialogCanvas.getByPlaceholderText('Issue name');
-	await userEvent.click(dialog);
-	await waitFor(() => expect(document.activeElement).not.toBe(input));
-	await userEvent.keyboard('{Backspace}');
+	// The wizard's Backspace handler (on svelte:window) navigates back only when no
+	// text input is focused. bits-ui focus-traps the dialog asynchronously, so we must
+	// blur the input and dispatch the Backspace event synchronously in the same
+	// microtask — preventing the focus trap from restoring focus before the handler runs.
+	const input = dialogCanvas.getByPlaceholderText('Issue name') as HTMLInputElement;
+	input.blur();
+	window.dispatchEvent(
+		new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true }),
+	);
 	await waitFor(() => expect(dialogCanvas.getByText('Search GitHub Issues')).toBeVisible());
 };
 

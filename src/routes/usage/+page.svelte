@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import * as Card from '$lib/components/shadcn/card/index.js';
 	import { cn } from '$lib/utils.js';
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
@@ -176,26 +177,20 @@
 
 	<!-- Filter bar: period tabs + group-by -->
 	<div class="flex items-center gap-3">
-		<div class="flex gap-1 rounded-lg bg-muted p-1">
+		<Tabs.Root class="gap-1 rounded-lg bg-muted p-1">
 			{#each PERIODS as period (period.value)}
-				<Button
-					intent="ghost"
-					size="sm"
-					class={cn(
-						ctx.activePeriod.current === period.value
-							? 'bg-background text-foreground shadow-sm'
-							: 'text-muted-foreground hover:text-foreground',
-					)}
+				<Tabs.Tab
+					active={ctx.activePeriod.current === period.value}
 					onclick={() => handlePeriodChange(period.value)}
 				>
 					{period.label}
-				</Button>
+				</Tabs.Tab>
 			{/each}
 			<DateRangePicker
 				onselect={handleCustomRange}
 				active={ctx.activePeriod.current === 'custom'}
 			/>
-		</div>
+		</Tabs.Root>
 		<ScopeToggle value={ctx.scope.current} onchange={handleScopeChange} />
 		<GroupByDropdown value={ctx.groupBy.current} onchange={handleGroupByChange} />
 	</div>

@@ -127,7 +127,7 @@ test.describe('Usage URL state', () => {
 		await page.waitForLoadState('networkidle');
 
 		// Default period is 'thirty-days' (30d). Switching to a different one pushes state.
-		const weekButton = page.getByRole('button', { name: '7d' });
+		const weekButton = page.getByRole('tab', { name: '7d' });
 		await expect(weekButton).toBeVisible();
 		await weekButton.click();
 		await expect(page).toHaveURL(/period=week/);
@@ -137,10 +137,10 @@ test.describe('Usage URL state', () => {
 		await page.goto('/usage?period=week');
 		await page.waitForLoadState('networkidle');
 
-		// The active button gets 'bg-background' class (visual highlight)
-		const weekButton = page.getByRole('button', { name: '7d' });
+		// The active tab gets 'bg-surface' class (visual highlight)
+		const weekButton = page.getByRole('tab', { name: '7d' });
 		await expect(weekButton).toBeVisible();
-		await expect(weekButton).toHaveClass(/bg-background/);
+		await expect(weekButton).toHaveAttribute('aria-selected', 'true');
 	});
 
 	test('browser back reverts usage period', async ({ page }) => {
@@ -148,7 +148,7 @@ test.describe('Usage URL state', () => {
 		await page.waitForLoadState('networkidle');
 
 		// Switch from default (30d) to 7d — this triggers a URL push
-		const weekButton = page.getByRole('button', { name: '7d' });
+		const weekButton = page.getByRole('tab', { name: '7d' });
 		await expect(weekButton).toBeVisible();
 		await weekButton.click();
 		await expect(page).toHaveURL(/period=week/);

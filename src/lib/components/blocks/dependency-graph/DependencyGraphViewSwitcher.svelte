@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { VIEW_MODE, type ViewMode } from '$lib/modules/dependency-graph';
-	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import LayersIcon from '@lucide/svelte/icons/layers';
@@ -29,42 +29,30 @@
 </script>
 
 <div class="view-switcher">
-	<div class="segmented" role="tablist" aria-label="Dependency graph view">
-		<Button
-			intent={viewMode === VIEW_MODE.global ? 'primary' : 'ghost'}
-			size="sm"
-			class="rounded-none border-r border-border text-xs last:border-r-0"
-			role="tab"
-			aria-selected={viewMode === VIEW_MODE.global}
+	<Tabs.Root aria-label="Dependency graph view">
+		<Tabs.Tab
+			active={viewMode === VIEW_MODE.global}
 			onclick={() => onViewModeChange(VIEW_MODE.global)}
 		>
 			<GlobeIcon data-icon="inline-start" />
 			Global
-		</Button>
-		<Button
-			intent={viewMode === VIEW_MODE.prds ? 'primary' : 'ghost'}
-			size="sm"
-			class="rounded-none border-r border-border text-xs last:border-r-0"
-			role="tab"
-			aria-selected={viewMode === VIEW_MODE.prds}
+		</Tabs.Tab>
+		<Tabs.Tab
+			active={viewMode === VIEW_MODE.prds}
 			onclick={() => onViewModeChange(VIEW_MODE.prds)}
 		>
 			<LayersIcon data-icon="inline-start" />
 			PRDs
-		</Button>
-		<Button
-			intent={viewMode === VIEW_MODE.singlePrd ? 'primary' : 'ghost'}
-			size="sm"
-			class="rounded-none border-r border-border text-xs last:border-r-0"
-			role="tab"
-			aria-selected={viewMode === VIEW_MODE.singlePrd}
+		</Tabs.Tab>
+		<Tabs.Tab
+			active={viewMode === VIEW_MODE.singlePrd}
 			onclick={() => onViewModeChange(VIEW_MODE.singlePrd)}
 			disabled={prdOptions.length === 0}
 		>
 			<FocusIcon data-icon="inline-start" />
 			Single PRD
-		</Button>
-	</div>
+		</Tabs.Tab>
+	</Tabs.Root>
 
 	{#if viewMode === VIEW_MODE.singlePrd}
 		<Select
@@ -92,13 +80,5 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-	}
-
-	.segmented {
-		display: inline-flex;
-		border: 1px solid var(--border);
-		border-radius: calc(var(--radius) * 1);
-		overflow: hidden;
-		background: var(--card);
 	}
 </style>
