@@ -8,8 +8,8 @@
 </script>
 
 <div
-	class="relative flex size-25 shrink-0 items-end justify-center overflow-hidden rounded-1.75 border"
-	style="background: linear-gradient(180deg, color-mix(in oklch, {ctx.color} var(--tree-bg-mix), var(--surface-2, hsl(0 0% 12%))) 0%, color-mix(in oklch, {ctx.color} 5%, var(--surface-3, hsl(0 0% 10%))) 100%); border-color: color-mix(in oklch, {ctx.color} 20%, var(--border));"
+	class="issue-card-preview relative flex size-25 shrink-0 items-end justify-center overflow-hidden rounded-1.75 border"
+	style="border-color: color-mix(in oklch, var(--ic-color, {ctx.color}) 20%, var(--border));"
 >
 	{#if ctx.notificationDotColor !== null && ctx.sessionState === null}
 		<SimpleTooltip text={m.issue_card_session_needs_attention()}>

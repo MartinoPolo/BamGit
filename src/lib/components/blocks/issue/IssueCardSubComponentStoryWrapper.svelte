@@ -7,6 +7,7 @@
 	import {
 		setIssueCardContext,
 		type IssueCardContextProps,
+		ISSUE_CARD_SETTING_DEFAULTS,
 	} from '$lib/modules/issue-card/index.js';
 	import { MOCK_DASHBOARDS } from '$lib/tauri_mock_data.js';
 
@@ -80,6 +81,8 @@
 		prioritiesEnabled: true,
 		sessionState: null,
 		visualization: undefined,
+		appearanceSettings: { ...ISSUE_CARD_SETTING_DEFAULTS },
+		theme: 'dark',
 		isActive: false,
 		isHovered: false,
 		isBatchSelected: false,
