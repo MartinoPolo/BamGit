@@ -13,23 +13,12 @@
 	/*  Helpers                                                            */
 	/* ------------------------------------------------------------------ */
 
-	function getCommandRoot(canvas: HTMLElement) {
-		return canvas.querySelector('[data-slot="command"]') as HTMLElement | null;
-	}
-
 	function getCommandInput(canvas: HTMLElement) {
 		return canvas.querySelector('[data-command-input]') as HTMLInputElement | null;
 	}
 
 	function getCommandItems(canvas: HTMLElement) {
 		return [...canvas.querySelectorAll('[data-command-item]')] as HTMLElement[];
-	}
-
-	function getVisibleCommandItems(canvas: HTMLElement) {
-		return getCommandItems(canvas).filter((item) => {
-			const parent = item.closest('[data-command-group]');
-			return parent ? getComputedStyle(parent).display !== 'none' : true;
-		});
 	}
 
 	function getCommandEmpty(canvas: HTMLElement) {
