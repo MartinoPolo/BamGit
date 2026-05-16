@@ -268,6 +268,56 @@ Example of "one-repo-many-issues" dashboard type. All issues belong to a single 
 
 ---
 
+## Spec-Driven Workflow Engine & AI Agent Orchestration
+
+### C:\_MP_github_cloned\spec-kit
+
+**License: Open Source** | **Stack: Python 3.11+, Typer CLI, YAML workflows, Jinja2 expressions** | **LOC: ~large (227KB main module + extensions)** | **Direct code reuse: LOW (Python CLI, not Rust/Svelte) — HIGH pattern reuse for workflow engine design**
+
+Toolkit for Spec-Driven Development. Inverts traditional dev: specifications are executable source of truth that drive AI-assisted code generation. Includes a **YAML-based workflow engine** with 10 step types, state persistence, resumability, and multi-agent integration (30+ AI coding tools). **Primary reference for interactive workflow builder, step sequencing, and agentic execution pipelines.**
+
+**Key patterns to study:**
+
+- **Workflow engine architecture** (`src/specify_cli/workflows/`): YAML workflow definitions with sequential execution, state persistence after each step, and resume from exact interruption point. `RunState` persisted to disk enables pause/resume across sessions.
+- **10 step types** (`src/specify_cli/workflows/steps/`): `command` (invoke AI agent), `shell` (run script), `gate` (human approval), `prompt` (arbitrary AI prompt), `if`/`switch` (conditional), `while`/`do-while` (loops), `fan-out`/`fan-in` (parallel dispatch + aggregation). Each implements `StepBase` with `execute()` + `validate()`.
+- **Expression engine** (`workflows/expressions.py`): Jinja2-like `{{ }}` syntax for dynamic values. Access `inputs.*`, `steps.<id>.output.*`, `item` (fan-out), `fan_in` (aggregation). Filters: `default`, `join`, `contains`, `map`.
+- **Gate steps for HITL** (`workflows/steps/gate/`): Interactive pause points with options (approve/reject). On reject → abort. Persists state before pausing, resumes after human input. Maps directly to Grovekeeper's approval workflow.
+- **Step registry** (`workflows/__init__.py`): Explicit registration of step types into `STEP_REGISTRY` dict. New types just subclass `StepBase` + register. Clean extensibility model.
+- **Workflow catalog system** (`workflows/catalog.py`): Hierarchical resolution (env var → project config → user config → built-in). Remote catalog fetching with 1hr cache. `specify workflow add <id>` installs from catalog.
+- **Multi-agent integration** (`src/specify_cli/integrations/`): 30+ agent adapters. Each integration writes commands in agent-native format (Claude skills, Copilot prompts, Gemini TOML, etc.). Base classes: `MarkdownIntegration`, `SkillsIntegration`, `TomlIntegration`, `YamlIntegration`.
+- **Extension hook system** (`extensions.py`): Before/after hooks on every command. Git extension auto-creates branches, commits at workflow transitions. 14+ hook points covering full lifecycle.
+- **Input schema with validation** (`workflows/engine.py`): Typed inputs (string/number/boolean/enum), required/optional with defaults, coercion at resolution time. Maps to workflow builder form fields.
+- **Workflow YAML format** (`workflows/speckit/workflow.yml`): Clean declarative format — `schema_version`, `workflow` metadata, `requires` (version + integration constraints), `inputs` (typed params), `steps` (sequential with IDs).
+
+**Grovekeeper adaptation — Interactive Workflow Builder:**
+
+The workflow engine is the most directly relevant pattern for Grovekeeper's planned interactive workflow feature:
+
+1. **Step type taxonomy** → Grovekeeper's workflow cards: `command` = agent skill execution, `shell` = deterministic script, `gate` = HITL checkpoint, `if`/`switch` = conditional routing based on CI results or review outcome.
+2. **YAML workflow definitions** → Grovekeeper persists workflow templates in SQLite. User-created via drag-and-drop canvas, stored as structured data (not YAML files).
+3. **`RunState` persistence** → Map to Grovekeeper's session events. Each workflow execution tracks `current_step_index` + accumulated results. Enables resume after app restart.
+4. **Gate steps** → Toggle between "auto-approve" (AFK mode) and "require approval" (HITL mode) per step. The spec-kit pattern of options (approve/reject/abort) maps to Grovekeeper's approval UI.
+5. **Fan-out/fan-in** → Run same workflow across multiple issues in parallel. Each issue gets its own execution track.
+6. **Expression interpolation** → Steps can reference outputs of prior steps (e.g., "if checks failed, route to fix step"). Enables conditional workflow paths.
+7. **Extension hooks** → Pre/post hooks on each step (e.g., auto-commit before review, auto-push after checks pass).
+8. **Workflow catalog** → Users share workflow templates. Community presets for common patterns (full review, quick fix, TDD cycle).
+
+**Key differences from Grovekeeper's needs:**
+
+- Spec-kit is CLI-only, text-driven. Grovekeeper needs a visual canvas with drag-and-drop.
+- Spec-kit workflows are static YAML. Grovekeeper workflows are interactive, togglable per-execution.
+- Spec-kit targets specification generation. Grovekeeper targets execution orchestration (worktree → code → review → ship).
+- Spec-kit's "command" step calls AI once. Grovekeeper's skill steps are full multi-turn sessions.
+
+**What NOT to copy:**
+
+- Python implementation (wrong stack)
+- YAML-as-primary-format (Grovekeeper stores in SQLite, exposes via visual UI)
+- Spec-driven philosophy (Grovekeeper is execution-driven, not spec-driven)
+- Extension marketplace (premature for single-user desktop app)
+
+---
+
 ## License Compatibility
 
 | Repository               | License             | Can Copy Code | Can Adapt Patterns | Notes                                             |
@@ -287,24 +337,26 @@ Example of "one-repo-many-issues" dashboard type. All issues belong to a single 
 | obsidian-tasks-dashboard | Private             | N/A (own)     | N/A (own)          | Predecessor project, same author                  |
 | mpx-claude-code          | Private             | N/A (own)     | N/A (own)          | Own tooling, invoked via GUI                      |
 | Multica                  | Modified Apache 2.0 | CAUTION       | YES                | No hosted-service redistribution; internal use OK |
+| spec-kit                 | Open Source         | YES           | YES                | Workflow engine, step types, YAML orchestration   |
 
 ## Tech Stack Overlap
 
-| Repository      | Tauri 2       | Rust       | Svelte     | TypeScript | SQLite        | Shared Libs              |
-| --------------- | ------------- | ---------- | ---------- | ---------- | ------------- | ------------------------ |
-| **Grovekeeper** | YES           | YES        | YES (5)    | YES        | YES           | —                        |
-| vibe-kanban     | YES           | YES (Axum) | no (React) | YES        | YES (SQLx)    | Tauri 2, SQLite, libgit2 |
-| OpenCovibe      | YES           | YES        | YES (5)    | YES        | no            | Tauri 2, Svelte 5        |
-| c9watch         | YES           | YES        | YES (5)    | YES        | no            | Tauri 2, SvelteKit       |
-| CodeBurn        | no            | no         | no         | YES        | no            | TypeScript patterns      |
-| t3code          | no (Electron) | no         | no (React) | YES        | YES           | TypeScript contracts     |
-| cline           | no (VS Code)  | no         | no (React) | YES        | no            | Provider abstraction     |
-| cline-kanban    | no            | no         | no (React) | YES        | no            | State machine, worktrees |
-| hooks-obs.      | no            | no         | no (Vue)   | YES        | YES           | SQLite, WebSocket        |
-| pixel-agents    | no (VS Code)  | no         | no (React) | YES        | no            | Canvas, hooks            |
-| Multica         | no (Electron) | no (Go)    | no (React) | YES        | no (Postgres) | shadcn patterns          |
-| peon-ping       | no            | no         | no         | no (Bash)  | no            | CESP standard            |
+| Repository      | Tauri 2       | Rust        | Svelte     | TypeScript | SQLite        | Shared Libs              |
+| --------------- | ------------- | ----------- | ---------- | ---------- | ------------- | ------------------------ |
+| **Grovekeeper** | YES           | YES         | YES (5)    | YES        | YES           | —                        |
+| vibe-kanban     | YES           | YES (Axum)  | no (React) | YES        | YES (SQLx)    | Tauri 2, SQLite, libgit2 |
+| OpenCovibe      | YES           | YES         | YES (5)    | YES        | no            | Tauri 2, Svelte 5        |
+| c9watch         | YES           | YES         | YES (5)    | YES        | no            | Tauri 2, SvelteKit       |
+| CodeBurn        | no            | no          | no         | YES        | no            | TypeScript patterns      |
+| t3code          | no (Electron) | no          | no (React) | YES        | YES           | TypeScript contracts     |
+| cline           | no (VS Code)  | no          | no (React) | YES        | no            | Provider abstraction     |
+| cline-kanban    | no            | no          | no (React) | YES        | no            | State machine, worktrees |
+| hooks-obs.      | no            | no          | no (Vue)   | YES        | YES           | SQLite, WebSocket        |
+| pixel-agents    | no (VS Code)  | no          | no (React) | YES        | no            | Canvas, hooks            |
+| Multica         | no (Electron) | no (Go)     | no (React) | YES        | no (Postgres) | shadcn patterns          |
+| peon-ping       | no            | no          | no         | no (Bash)  | no            | CESP standard            |
+| spec-kit        | no            | no (Python) | no         | no         | no            | Workflow engine design   |
 
 **Best code-level match:** vibe-kanban (Tauri 2 + Rust crates), OpenCovibe (Tauri 2 + Svelte 5)
 **Best feature-level match:** CodeBurn (evaluation dashboard)
-**Best pattern-level match:** t3code (provider abstraction), cline (multi-provider API), Multica (autopilot system)
+**Best pattern-level match:** t3code (provider abstraction), cline (multi-provider API), Multica (autopilot system), spec-kit (workflow engine)
