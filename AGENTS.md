@@ -43,8 +43,6 @@ Vitest, Playwright, Storybook
 
 - For Svelte edits, run `svelte-autofixer` first. Fetch Svelte docs only for unfamiliar APIs or syntax, and request the smallest relevant sections.
 - Prefer targeted shell reads: `rg -l`, path-scoped `rg`, `git diff --stat`, and `git diff -- <files>`.
-- Use `scripts/run-quiet.ps1` for noisy checks. It records the full log under `.logs/`, prints pass/fail, and prints only the tail on failure.
-- Invoke `scripts/run-quiet.ps1` with executable then args, e.g. `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run-quiet.ps1 pnpm check:all`.
 - Inspect a full log only when the tail does not identify the failure.
 - Do not run full Storybook build unless changing Storybook build config, deployment output, or behavior that only appears in the production Storybook bundle.
 - Use sub-agents for broad or third-party exploration when explicitly requested or already required by these instructions. Ask them for concise findings and file paths, not full command output.
