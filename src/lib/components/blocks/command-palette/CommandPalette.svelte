@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { tick } from 'svelte';
 	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
@@ -22,13 +21,19 @@
 		[COMMAND_PALETTE_CATEGORIES.issues]: () => m.command_palette_issues(),
 	};
 
+	function focusCommandInput() {
+		const input = document.querySelector<HTMLInputElement>('[data-command-input]');
+		if (input) {
+			input.focus();
+		} else {
+			requestAnimationFrame(focusCommandInput);
+		}
+	}
+
 	function handleDialogOpenChange(isOpen: boolean) {
 		paletteCtx.open = isOpen;
 		if (isOpen) {
-			void tick().then(() => {
-				const input = document.querySelector<HTMLInputElement>('[data-command-input]');
-				input?.focus();
-			});
+			requestAnimationFrame(focusCommandInput);
 		}
 	}
 </script>
