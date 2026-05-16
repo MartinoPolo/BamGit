@@ -4,6 +4,7 @@
 		type DependencyFilter,
 	} from '$lib/modules/dependency-graph';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Toggle } from '$lib/components/shadcn/toggle/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import EyeIcon from '@lucide/svelte/icons/eye';
 	import EyeOffIcon from '@lucide/svelte/icons/eye-off';
@@ -35,12 +36,12 @@
 </script>
 
 <div class="filter-bar">
-	<Button
-		intent={filter.showClosed ? 'primary' : 'secondary'}
+	<Toggle
+		intent="outline"
 		size="sm"
 		class="h-6.5 text-[11px] font-semibold"
-		onclick={() => update({ showClosed: !filter.showClosed })}
-		aria-pressed={filter.showClosed}
+		pressed={filter.showClosed}
+		onPressedChange={(pressed) => update({ showClosed: pressed })}
 		title={filter.showClosed ? 'Hide closed issues' : 'Show closed issues'}
 	>
 		{#if filter.showClosed}
@@ -49,29 +50,29 @@
 			<EyeOffIcon data-icon="inline-start" />
 		{/if}
 		Closed
-	</Button>
+	</Toggle>
 
-	<Button
-		intent={filter.afkOnly ? 'primary' : 'secondary'}
+	<Toggle
+		intent="outline"
 		size="sm"
 		class="h-6.5 text-[11px] font-semibold"
-		onclick={() => update({ afkOnly: !filter.afkOnly, hitlOnly: false })}
-		aria-pressed={filter.afkOnly}
+		pressed={filter.afkOnly}
+		onPressedChange={(pressed) => update({ afkOnly: pressed, hitlOnly: false })}
 		title="Show only AFK"
 	>
 		AFK
-	</Button>
+	</Toggle>
 
-	<Button
-		intent={filter.hitlOnly ? 'primary' : 'secondary'}
+	<Toggle
+		intent="outline"
 		size="sm"
 		class="h-6.5 text-[11px] font-semibold"
-		onclick={() => update({ hitlOnly: !filter.hitlOnly, afkOnly: false })}
-		aria-pressed={filter.hitlOnly}
+		pressed={filter.hitlOnly}
+		onPressedChange={(pressed) => update({ hitlOnly: pressed, afkOnly: false })}
 		title="Show only HITL"
 	>
 		HITL
-	</Button>
+	</Toggle>
 
 	{#if areaOptions.length > 0}
 		<Select

@@ -4,6 +4,7 @@
 	import type { Dashboard } from '$lib/types/generated';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
@@ -82,26 +83,25 @@
 
 			<Dialog.Body class="flex flex-col gap-4">
 				<!-- Type selector -->
-				<div class="flex gap-2">
-					<Button
-						type="button"
-						intent={dashboardType === 'repo' ? 'primary' : 'secondary'}
-						size="sm"
-						class="flex-1"
-						onclick={() => (dashboardType = 'repo')}
-					>
+				<ToggleGroup.Root
+					type="single"
+					value={dashboardType}
+					onValueChange={(value: string) => {
+						if (value) {
+							dashboardType = value as 'repo' | 'portfolio';
+						}
+					}}
+					intent="outline"
+					size="sm"
+					class="flex gap-2"
+				>
+					<ToggleGroup.Item value="repo" class="flex-1">
 						◆ {m.dashboard_type_repo()}
-					</Button>
-					<Button
-						type="button"
-						intent={dashboardType === 'portfolio' ? 'primary' : 'secondary'}
-						size="sm"
-						class="flex-1"
-						onclick={() => (dashboardType = 'portfolio')}
-					>
+					</ToggleGroup.Item>
+					<ToggleGroup.Item value="portfolio" class="flex-1">
 						◇ {m.dashboard_type_portfolio()}
-					</Button>
-				</div>
+					</ToggleGroup.Item>
+				</ToggleGroup.Root>
 
 				<!-- Name -->
 				<div class="flex flex-col gap-1.5">

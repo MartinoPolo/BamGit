@@ -11,6 +11,7 @@
 	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { Toggle } from '$lib/components/shadcn/toggle/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
@@ -70,15 +71,15 @@
 			<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
 		</div>
 		<div class="flex items-center gap-2">
-			<Button
-				intent={showArchived ? 'primary' : 'secondary'}
+			<Toggle
+				intent="outline"
 				size="icon"
-				onclick={() => (showArchived = !showArchived)}
+				pressed={showArchived}
+				onPressedChange={(pressed) => (showArchived = pressed)}
 				aria-label="Toggle archived workspaces"
-				aria-pressed={showArchived}
 			>
-				<ArchiveIcon data-icon="inline-end" />
-			</Button>
+				<ArchiveIcon />
+			</Toggle>
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
