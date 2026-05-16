@@ -8,7 +8,6 @@
 	import TreesIcon from '@lucide/svelte/icons/trees';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
-
 	interface Props {
 		title: string;
 		subtitle?: string;
