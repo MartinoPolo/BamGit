@@ -1,0 +1,1770 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Blocking Visualization — Variant C: Radiant Graph — Glowing Node Emanation</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			/* ─── Theme overrides ─── */
+			.theme-dark {
+				color-scheme: dark;
+				--background: oklch(0.155 0.018 150);
+				--surface: oklch(0.19 0.02 150);
+				--surface-2: oklch(0.225 0.022 150);
+				--surface-hover: oklch(0.265 0.024 150);
+				--surface-3: oklch(0.265 0.024 150);
+				--foreground: oklch(0.965 0.01 130);
+				--foreground-muted: oklch(0.73 0.018 135);
+				--foreground-subtle: oklch(0.56 0.02 140);
+				--border: oklch(0.295 0.022 148);
+				--border-strong: oklch(0.38 0.028 145);
+				--primary: var(--moss-400);
+				--primary-fg: oklch(0.135 0.02 150);
+				--primary-soft: oklch(0.305 0.045 145);
+				--accent: var(--moss-400);
+				--ring: var(--moss-400);
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+			}
+
+			.page-wrapper {
+				padding: 32px 32px 48px;
+				min-height: 100vh;
+				max-width: 1320px;
+				margin: 0 auto;
+			}
+
+			.variant-label {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin: 0 0 8px 0;
+			}
+
+			.page-title {
+				font-size: var(--text-2xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-tight);
+				line-height: var(--leading-tight);
+				margin: 0 0 6px 0;
+			}
+
+			.page-subtitle {
+				font-size: var(--text-md);
+				color: var(--foreground-muted);
+				margin: 0 0 24px 0;
+			}
+
+			.section-note {
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wide);
+				margin: 36px 0 12px 0;
+				padding-bottom: 6px;
+				border-bottom: 1px dashed var(--border);
+			}
+			.section-note::before {
+				content: '// ';
+				opacity: 0.5;
+			}
+
+			/* ─── Parent chrome ─── */
+			.surface-frame {
+				position: relative;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				background: var(--background);
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.parent-chrome {
+				opacity: 0.3;
+				pointer-events: none;
+				user-select: none;
+			}
+
+			.route-header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 8px 16px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+			}
+			.route-header .crumb-dot { color: var(--foreground-subtle); }
+			.route-header .crumb-strong {
+				color: var(--foreground);
+				font-weight: var(--weight-medium);
+			}
+			.route-header .route-spacer { flex: 1; }
+			.route-header .route-action {
+				width: 22px;
+				height: 22px;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+			}
+
+			.page-tabs {
+				display: flex;
+				gap: 4px;
+				padding: 6px 14px 0;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+			}
+			.page-tab {
+				padding: 8px 14px 10px;
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+				border-bottom: 2px solid transparent;
+				margin-bottom: -1px;
+			}
+			.page-tab.is-active {
+				color: var(--foreground);
+				border-bottom-color: var(--moss-400);
+			}
+
+			.shell {
+				display: flex;
+				min-height: 0;
+				flex: 1;
+			}
+			.shell-sidebar {
+				width: 56px;
+				border-right: 1px solid var(--border);
+				background: var(--surface);
+				padding: 10px 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				flex-shrink: 0;
+			}
+			.shell-sidebar .nav-item {
+				width: 40px;
+				height: 32px;
+				border-radius: var(--radius-sm);
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+			}
+			.shell-sidebar .nav-item.is-active {
+				background: var(--primary-soft);
+				border-color: color-mix(in oklch, var(--moss-400) 40%, var(--border));
+			}
+
+			.shell-main {
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+			}
+
+			/* ─── Canvas ─── */
+			.canvas {
+				position: relative;
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+			}
+
+			.canvas-toolbar {
+				height: 40px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 0 12px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+
+			.tb-divider {
+				width: 1px;
+				height: 18px;
+				background: var(--border);
+				flex-shrink: 0;
+			}
+			.tb-spacer { flex: 1; }
+
+			/* Segmented control */
+			.tg {
+				display: inline-flex;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 2px;
+				gap: 2px;
+			}
+			.tg-btn {
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+				background: transparent;
+				border: 0;
+				padding: 4px 10px;
+				border-radius: var(--radius-xs);
+				cursor: pointer;
+				line-height: 1.2;
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+			}
+			.tg-btn:hover { color: var(--foreground); }
+			.tg-btn.is-active {
+				background: var(--surface-hover);
+				color: var(--foreground);
+				box-shadow: inset 0 0 0 1px var(--border-strong);
+			}
+			.tg-btn:active { transform: scale(0.97); }
+			.tg-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+			/* Switch */
+			.sw {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				cursor: pointer;
+			}
+			.sw .sw-track {
+				width: 28px;
+				height: 16px;
+				border-radius: 999px;
+				background: var(--surface-2);
+				border: 1px solid var(--border);
+				position: relative;
+				transition: background var(--duration-2) ease;
+			}
+			.sw .sw-thumb {
+				position: absolute;
+				top: 1px;
+				left: 1px;
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+				background: var(--foreground-subtle);
+				transition: transform var(--duration-3) var(--ease-out), background var(--duration-2) ease;
+			}
+			.sw.is-on .sw-track {
+				background: color-mix(in oklch, var(--moss-400) 35%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--moss-400) 50%, var(--border));
+			}
+			.sw.is-on .sw-thumb {
+				transform: translateX(12px);
+				background: var(--moss-300);
+			}
+
+			/* Filter chip */
+			.chip {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				font-weight: var(--weight-medium);
+				color: var(--foreground-muted);
+				background: transparent;
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 3px 8px;
+				cursor: pointer;
+				line-height: 1.2;
+				transition: background var(--duration-2) ease, color var(--duration-2) ease, border-color var(--duration-2) ease;
+			}
+			.chip:hover {
+				color: var(--foreground);
+				border-color: var(--border-strong);
+				background: var(--surface-2);
+			}
+			.chip:active { transform: scale(0.97); }
+			.chip.is-active {
+				background: color-mix(in oklch, var(--moss-400) 18%, var(--surface-2));
+				border-color: color-mix(in oklch, var(--moss-400) 45%, var(--border));
+				color: var(--foreground);
+			}
+			.chip-group {
+				display: inline-flex;
+				gap: 4px;
+			}
+
+			/* Icon button */
+			.icon-btn {
+				width: 26px;
+				height: 26px;
+				border-radius: var(--radius-sm);
+				border: 1px solid transparent;
+				background: transparent;
+				color: var(--foreground-muted);
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				transition: background var(--duration-2) ease, color var(--duration-2) ease, border-color var(--duration-2) ease;
+			}
+			.icon-btn:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border);
+			}
+			.icon-btn:active { transform: scale(0.94); }
+			.icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+			.icon-btn svg { width: 14px; height: 14px; stroke-width: 1.7; }
+
+			/* ─── RADIANT CANVAS — darker bg + dot grid ─── */
+			.canvas-viewport {
+				position: relative;
+				flex: 1;
+				min-height: 0;
+				background:
+					radial-gradient(
+						circle at 1px 1px,
+						color-mix(in oklch, var(--foreground-subtle) 10%, transparent) 0.6px,
+						transparent 0.8px
+					);
+				background-size: 20px 20px;
+				background-color: oklch(0.135 0.015 150);
+				overflow: visible;
+			}
+
+			/* SVG edge layer */
+			.edge-layer {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+			}
+
+			/* ─── PRD Node (Radiant) ─── */
+			.prd-node {
+				position: absolute;
+				width: 220px;
+				height: 88px;
+				border-radius: var(--radius-md);
+				padding: 9px 10px 8px;
+				cursor: pointer;
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+				z-index: 2;
+				overflow: visible;
+				transition:
+					transform var(--duration-3) var(--ease-out),
+					box-shadow var(--duration-4) var(--ease-standard);
+				/* Semi-transparent dark body so glow bleeds through */
+				background: color-mix(in oklch, oklch(0.19 0.02 150) 92%, transparent);
+				border: 1px solid var(--border);
+			}
+
+			/* Per-node accent via CSS custom property --node-accent */
+			.prd-node {
+				--radial-intensity: 0.55;
+				--glow-radius: 80px;
+			}
+
+			/* Radial glow background via pseudo-element (extends beyond node boundary) */
+			.prd-node::before {
+				content: '';
+				position: absolute;
+				inset: calc(var(--glow-radius) * -1);
+				border-radius: 50%;
+				background: radial-gradient(
+					ellipse at center,
+					color-mix(in oklch, var(--node-accent) calc(35% * var(--radial-intensity)), transparent) 0%,
+					color-mix(in oklch, var(--node-accent) calc(22% * var(--radial-intensity)), transparent) 25%,
+					color-mix(in oklch, var(--node-accent) calc(10% * var(--radial-intensity)), transparent) 50%,
+					color-mix(in oklch, var(--node-accent) calc(4% * var(--radial-intensity)), transparent) 75%,
+					transparent 100%
+				);
+				z-index: -1;
+				pointer-events: none;
+			}
+
+			/* Accent-tinted border */
+			.prd-node {
+				border-color: color-mix(in oklch, var(--node-accent) 28%, var(--border));
+				box-shadow:
+					0 0 24px color-mix(in oklch, var(--node-accent) calc(18% * var(--radial-intensity)), transparent),
+					inset 0 1px 0 color-mix(in oklch, var(--node-accent) 8%, transparent);
+			}
+
+			/* Hover: radial intensity rises, border brightens */
+			.prd-node:hover {
+				--radial-intensity: 0.75;
+				--glow-radius: 100px;
+				border-color: color-mix(in oklch, var(--node-accent) 45%, var(--border-strong));
+				transform: translateY(-1px);
+				box-shadow:
+					0 0 32px color-mix(in oklch, var(--node-accent) 28%, transparent),
+					inset 0 1px 0 color-mix(in oklch, var(--node-accent) 12%, transparent);
+			}
+			.prd-node:active { transform: scale(0.99); }
+
+			.prd-head {
+				display: flex;
+				align-items: baseline;
+				gap: 6px;
+				line-height: 1;
+			}
+			.prd-id {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-medium);
+			}
+			.prd-pct {
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.prd-title {
+				font-size: 13px;
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				line-height: 1.2;
+				letter-spacing: -0.005em;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			/* Style B badges: dark bg + colored text, no border */
+			.prd-badges {
+				display: flex;
+				gap: 4px;
+				flex-wrap: wrap;
+				min-height: 16px;
+			}
+			.badge-b {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wide);
+				text-transform: uppercase;
+				padding: 1px 5px;
+				border-radius: var(--radius-xs);
+				border: none;
+				line-height: 1.4;
+				white-space: nowrap;
+			}
+			.badge-b-afk {
+				background: color-mix(in oklch, var(--status-info) 16%, oklch(0.15 0.01 230));
+				color: var(--status-info);
+			}
+			.badge-b-hitl {
+				background: color-mix(in oklch, var(--status-warning) 16%, oklch(0.15 0.01 75));
+				color: color-mix(in oklch, var(--status-warning) 80%, var(--foreground));
+			}
+			.badge-b-design {
+				background: color-mix(in oklch, oklch(0.74 0.16 50) 16%, oklch(0.15 0.01 50));
+				color: oklch(0.78 0.15 55);
+			}
+			.badge-b-unresolved {
+				background: color-mix(in oklch, var(--status-danger) 16%, oklch(0.15 0.01 25));
+				color: var(--status-danger);
+			}
+
+			.prd-foot {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-top: auto;
+			}
+			.prd-count {
+				font-family: var(--font-mono);
+				font-size: 10.5px;
+				color: var(--foreground-muted);
+				font-variant-numeric: tabular-nums;
+				white-space: nowrap;
+			}
+			.prd-bar {
+				flex: 1;
+				height: 4px;
+				background: color-mix(in oklch, var(--border) 40%, oklch(0.135 0.015 150));
+				border-radius: 2px;
+				overflow: hidden;
+			}
+			.prd-bar-fill {
+				height: 100%;
+				background: linear-gradient(90deg, var(--moss-400) 0%, var(--moss-600) 100%);
+				border-radius: 2px;
+			}
+
+			/* ─── Ready node: brighter emanation, breathing ─── */
+			@keyframes radiant-breathe {
+				0%, 100% {
+					box-shadow:
+						0 0 28px color-mix(in oklch, var(--node-accent) 32%, transparent),
+						0 0 56px color-mix(in oklch, var(--node-accent) 14%, transparent),
+						inset 0 1px 0 color-mix(in oklch, var(--node-accent) 12%, transparent);
+				}
+				50% {
+					box-shadow:
+						0 0 36px color-mix(in oklch, var(--node-accent) 42%, transparent),
+						0 0 72px color-mix(in oklch, var(--node-accent) 20%, transparent),
+						inset 0 1px 0 color-mix(in oklch, var(--node-accent) 16%, transparent);
+				}
+			}
+
+			.prd-node.is-ready {
+				--radial-intensity: 0.85;
+				--glow-radius: 110px;
+				border-color: color-mix(in oklch, var(--node-accent) 55%, var(--border-strong));
+				animation: radiant-breathe 3.6s ease-in-out infinite;
+			}
+
+			.prd-node .ready-overlay {
+				position: absolute;
+				top: -7px;
+				right: -7px;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: oklch(0.135 0.015 150);
+				color: var(--moss-300);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 3;
+				box-shadow: 0 0 8px color-mix(in oklch, var(--moss-400) 50%, transparent);
+			}
+			.prd-node .ready-overlay svg {
+				width: 18px;
+				height: 18px;
+				stroke-width: 2;
+			}
+
+			/* Selected node: accent-color ring */
+			.prd-node.is-selected {
+				border-color: color-mix(in oklch, var(--node-accent) 70%, var(--border-strong));
+				box-shadow:
+					0 0 0 2px color-mix(in oklch, var(--node-accent) 45%, transparent),
+					0 0 40px color-mix(in oklch, var(--node-accent) 35%, transparent),
+					inset 0 1px 0 color-mix(in oklch, var(--node-accent) 14%, transparent);
+			}
+			/* Override animation for selected+ready */
+			.prd-node.is-selected.is-ready {
+				animation: none;
+			}
+
+			/* ─── Selection popover ─── */
+			.sel-popover {
+				position: absolute;
+				background: color-mix(in oklch, var(--surface) 96%, transparent);
+				border: 1px solid var(--border-strong);
+				border-radius: var(--radius-md);
+				box-shadow:
+					var(--shadow-lg),
+					0 0 32px color-mix(in oklch, var(--node-accent, var(--moss-400)) 18%, transparent);
+				padding: 10px 12px;
+				min-width: 220px;
+				z-index: 9;
+				backdrop-filter: blur(8px);
+			}
+			.sel-popover::before {
+				content: '';
+				position: absolute;
+				width: 8px;
+				height: 8px;
+				background: var(--surface);
+				border-left: 1px solid var(--border-strong);
+				border-bottom: 1px solid var(--border-strong);
+				transform: rotate(45deg);
+				top: 18px;
+				left: -5px;
+			}
+			.sel-pop-id {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-subtle);
+				margin-bottom: 2px;
+			}
+			.sel-pop-title {
+				font-size: 13px;
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				margin: 0 0 8px;
+				line-height: 1.25;
+			}
+			.sel-pop-badges {
+				display: flex;
+				gap: 4px;
+				flex-wrap: wrap;
+				margin-bottom: 10px;
+			}
+			.sel-pop-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 8px;
+			}
+			.sel-pop-progress-bar {
+				flex: 1;
+				height: 4px;
+				background: color-mix(in oklch, var(--border) 50%, var(--surface-2));
+				border-radius: 2px;
+				overflow: hidden;
+			}
+			.sel-pop-progress-bar .fill {
+				height: 100%;
+				border-radius: 2px;
+				background: linear-gradient(90deg, var(--moss-400), var(--moss-600));
+			}
+			.sel-pop-actions {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			.btn-sm {
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				background: var(--moss-400);
+				color: var(--primary-fg);
+				border: 0;
+				border-radius: var(--radius-sm);
+				padding: 4px 10px;
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				transition: background var(--duration-2) ease, transform var(--duration-2) ease;
+			}
+			.btn-sm:hover { background: var(--moss-300); }
+			.btn-sm:active { transform: scale(0.97); }
+			.btn-sm:disabled { opacity: 0.45; cursor: not-allowed; }
+			.btn-ghost-sm {
+				background: transparent;
+				color: var(--foreground-muted);
+				border: 1px solid var(--border);
+				font-family: var(--font-sans);
+				font-size: var(--text-sm);
+				font-weight: var(--weight-medium);
+				border-radius: var(--radius-sm);
+				padding: 3px 9px;
+				cursor: pointer;
+				transition: background var(--duration-2) ease, color var(--duration-2) ease, border-color var(--duration-2) ease;
+			}
+			.btn-ghost-sm:hover {
+				background: var(--surface-2);
+				color: var(--foreground);
+				border-color: var(--border-strong);
+			}
+			.btn-ghost-sm:active { transform: scale(0.97); }
+
+			/* ─── Zoom controls ─── */
+			.zoom-controls {
+				position: absolute;
+				bottom: 14px;
+				right: 14px;
+				display: inline-flex;
+				gap: 2px;
+				background: color-mix(in oklch, var(--surface) 92%, transparent);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 2px;
+				box-shadow: var(--shadow-md);
+				z-index: 8;
+				backdrop-filter: blur(6px);
+			}
+			.zoom-controls .zoom-readout {
+				font-family: var(--font-mono);
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				padding: 0 6px;
+				display: inline-flex;
+				align-items: center;
+				min-width: 38px;
+				justify-content: center;
+			}
+			.zoom-controls .icon-btn { width: 22px; height: 22px; }
+			.zoom-controls .icon-btn svg { width: 12px; height: 12px; }
+
+			/* ─── Legend ─── */
+			.legend {
+				position: absolute;
+				bottom: 10px;
+				left: 10px;
+				width: 180px;
+				background: color-mix(in oklch, var(--surface) 90%, transparent);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				padding: 10px 11px;
+				box-shadow: var(--shadow-md);
+				z-index: 7;
+				display: flex;
+				flex-direction: column;
+				gap: 7px;
+				backdrop-filter: blur(6px);
+			}
+			.legend-title {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+				font-weight: var(--weight-semibold);
+			}
+			.legend-section {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.legend-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: var(--text-xs);
+				color: var(--foreground-muted);
+				line-height: 1.2;
+			}
+			.legend-swatch {
+				width: 14px;
+				height: 14px;
+				border-radius: 50%;
+				flex-shrink: 0;
+				position: relative;
+			}
+			.legend-swatch.sw-ready {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--moss-400) 50%, transparent) 0%,
+					color-mix(in oklch, var(--moss-400) 20%, transparent) 60%,
+					transparent 100%
+				);
+				box-shadow: 0 0 8px color-mix(in oklch, var(--moss-400) 45%, transparent);
+			}
+			.legend-swatch.sw-blocked {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--foreground-subtle) 30%, transparent) 0%,
+					color-mix(in oklch, var(--foreground-subtle) 10%, transparent) 60%,
+					transparent 100%
+				);
+			}
+			.legend-edge {
+				width: 14px;
+				height: 0;
+				flex-shrink: 0;
+			}
+			.legend-edge-solid {
+				border-top: 1.2px solid var(--border-strong);
+			}
+			.legend-edge-dashed {
+				border-top: 1.2px dashed var(--foreground-subtle);
+			}
+			.legend-divider {
+				height: 1px;
+				background: var(--border);
+				border: 0;
+				margin: 0;
+			}
+
+			/* ─── Inset (Mode A preview) ─── */
+			.inset-wrapper {
+				position: absolute;
+				top: 14px;
+				right: 14px;
+				width: 280px;
+				z-index: 12;
+			}
+			.inset-eyebrow {
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: var(--weight-semibold);
+				color: var(--foreground-subtle);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				margin: 0 0 6px 2px;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.inset-eyebrow::before {
+				content: '';
+				width: 14px;
+				height: 1px;
+				background: var(--foreground-subtle);
+			}
+
+			.inset {
+				width: 280px;
+				height: 200px;
+				border: 1px solid var(--border-strong);
+				border-radius: var(--radius-md);
+				background: oklch(0.135 0.015 150);
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				box-shadow:
+					var(--shadow-lg),
+					0 0 40px color-mix(in oklch, var(--moss-400) 8%, transparent);
+			}
+
+			.inset-tabbar {
+				display: flex;
+				gap: 0;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+				opacity: 0.3;
+				flex-shrink: 0;
+				padding: 0 4px;
+			}
+			.inset-tab {
+				font-size: 10px;
+				font-family: var(--font-sans);
+				color: var(--foreground-muted);
+				padding: 5px 7px;
+				border-bottom: 2px solid transparent;
+			}
+			.inset-tab.is-active {
+				color: var(--foreground);
+				border-bottom-color: var(--moss-400);
+			}
+
+			.inset-toolbar {
+				height: 28px;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				padding: 0 6px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface);
+				flex-shrink: 0;
+			}
+			.inset-toolbar .tg { padding: 1px; }
+			.inset-toolbar .tg-btn { font-size: 9.5px; padding: 2px 6px; }
+			.inset-toolbar .icon-btn { width: 18px; height: 18px; }
+			.inset-toolbar .icon-btn svg { width: 11px; height: 11px; }
+
+			.inset-canvas {
+				position: relative;
+				flex: 1;
+				min-height: 0;
+				background:
+					radial-gradient(
+						circle at 1px 1px,
+						color-mix(in oklch, var(--foreground-subtle) 8%, transparent) 0.5px,
+						transparent 0.7px
+					);
+				background-size: 12px 12px;
+				background-color: oklch(0.135 0.015 150);
+				overflow: visible;
+			}
+
+			/* Issue node (for inset) */
+			.issue-node {
+				position: absolute;
+				width: 100px;
+				height: 42px;
+				background: color-mix(in oklch, oklch(0.19 0.02 150) 90%, transparent);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				padding: 5px 6px 5px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				font-size: 9px;
+				cursor: pointer;
+				z-index: 2;
+				overflow: visible;
+			}
+			.issue-node::before {
+				content: '';
+				position: absolute;
+				top: 5px;
+				bottom: 5px;
+				left: 0;
+				width: 3px;
+				border-radius: 0 2px 2px 0;
+			}
+			.issue-node::after {
+				content: '';
+				position: absolute;
+				inset: -20px;
+				border-radius: 50%;
+				pointer-events: none;
+				z-index: -1;
+			}
+			/* Issue node accent colors via classes */
+			.issue-node.acc-azure::before { background: oklch(0.66 0.12 230); }
+			.issue-node.acc-azure::after {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, oklch(0.66 0.12 230) 14%, transparent) 0%,
+					transparent 70%
+				);
+			}
+			.issue-node.acc-azure { border-color: color-mix(in oklch, oklch(0.66 0.12 230) 22%, var(--border)); }
+
+			.issue-node.acc-amber::before { background: oklch(0.77 0.15 65); }
+			.issue-node.acc-amber::after {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, oklch(0.77 0.15 65) 14%, transparent) 0%,
+					transparent 70%
+				);
+			}
+			.issue-node.acc-amber { border-color: color-mix(in oklch, oklch(0.77 0.15 65) 22%, var(--border)); }
+
+			.issue-node.acc-coral::before { background: oklch(0.7 0.135 30); }
+			.issue-node.acc-coral::after {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, oklch(0.7 0.135 30) 14%, transparent) 0%,
+					transparent 70%
+				);
+			}
+			.issue-node.acc-coral { border-color: color-mix(in oklch, oklch(0.7 0.135 30) 22%, var(--border)); }
+
+			.issue-node.acc-moss::before { background: var(--moss-400); }
+			.issue-node.acc-moss::after {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--moss-400) 22%, transparent) 0%,
+					transparent 70%
+				);
+			}
+			.issue-node.acc-moss { border-color: color-mix(in oklch, var(--moss-400) 30%, var(--border)); }
+
+			.issue-node .iss-id {
+				font-family: var(--font-mono);
+				font-size: 9px;
+				color: var(--foreground-subtle);
+				line-height: 1;
+			}
+			.issue-node .iss-title {
+				font-size: 9.5px;
+				font-weight: var(--weight-medium);
+				color: var(--foreground);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				line-height: 1.15;
+			}
+			.issue-node.is-ready {
+				border-color: color-mix(in oklch, var(--moss-400) 50%, var(--border));
+				box-shadow: 0 0 12px color-mix(in oklch, var(--moss-400) 30%, transparent);
+			}
+			.issue-node.is-ready::after {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--moss-400) 32%, transparent) 0%,
+					color-mix(in oklch, var(--moss-400) 10%, transparent) 50%,
+					transparent 80%
+				);
+			}
+
+			/* ─── States grid ─── */
+			.states-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+				gap: 14px;
+			}
+			.state-card {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				min-height: 200px;
+			}
+			.state-card-head {
+				padding: 8px 12px;
+				border-bottom: 1px solid var(--border);
+				background: var(--surface-2);
+				font-family: var(--font-mono);
+				font-size: 9.5px;
+				font-weight: var(--weight-semibold);
+				letter-spacing: var(--tracking-wider);
+				text-transform: uppercase;
+				color: var(--foreground-subtle);
+			}
+			.state-card-body {
+				flex: 1;
+				min-height: 160px;
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 14px;
+				background:
+					radial-gradient(
+						circle at 1px 1px,
+						color-mix(in oklch, var(--foreground-subtle) 8%, transparent) 0.5px,
+						transparent 0.7px
+					);
+				background-size: 14px 14px;
+				background-color: oklch(0.135 0.015 150);
+			}
+
+			.empty-content {
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				max-width: 90%;
+			}
+			.empty-icon {
+				width: 28px;
+				height: 28px;
+				border: 1px solid var(--border-strong);
+				border-radius: var(--radius-md);
+				color: var(--foreground-subtle);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.empty-icon svg { width: 16px; height: 16px; }
+			.empty-msg {
+				font-size: var(--text-sm);
+				color: var(--foreground-muted);
+				line-height: 1.35;
+			}
+			.empty-sub {
+				font-family: var(--font-mono);
+				font-size: 10px;
+				color: var(--foreground-subtle);
+			}
+
+			/* Skeleton */
+			.skel-row {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				justify-content: center;
+				width: 100%;
+			}
+			.skel-rect {
+				width: 90px;
+				height: 38px;
+				border-radius: var(--radius-sm);
+				background: linear-gradient(
+					90deg,
+					oklch(0.17 0.015 150) 0%,
+					oklch(0.21 0.018 150) 50%,
+					oklch(0.17 0.015 150) 100%
+				);
+				background-size: 200% 100%;
+				animation: skel-shimmer 1.6s linear infinite;
+				border: 1px solid var(--border);
+			}
+			@keyframes skel-shimmer {
+				0% { background-position: 100% 0; }
+				100% { background-position: -100% 0; }
+			}
+
+			/* Mini-graph for states */
+			.mini-graph {
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+			.mini-node {
+				position: absolute;
+				width: 68px;
+				height: 30px;
+				background: color-mix(in oklch, oklch(0.19 0.02 150) 92%, transparent);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: var(--font-mono);
+				font-size: 9px;
+				color: var(--foreground-muted);
+				z-index: 2;
+				overflow: visible;
+			}
+			/* Mini-node radial glow */
+			.mini-node::before {
+				content: '';
+				position: absolute;
+				inset: -18px;
+				border-radius: 50%;
+				pointer-events: none;
+				z-index: -1;
+			}
+			.mini-node.is-ready {
+				border-color: color-mix(in oklch, var(--moss-400) 50%, var(--border));
+				color: var(--foreground);
+			}
+			.mini-node.is-ready::before {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--moss-400) 28%, transparent) 0%,
+					color-mix(in oklch, var(--moss-400) 8%, transparent) 60%,
+					transparent 100%
+				);
+			}
+			.mini-node.is-dim {
+				opacity: 0.22;
+			}
+			.mini-node.is-dim::before {
+				opacity: 0.15;
+			}
+			.mini-node.is-focus {
+				color: var(--foreground);
+			}
+			.mini-node.is-focus::before {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--amber-400) 35%, transparent) 0%,
+					color-mix(in oklch, var(--amber-400) 12%, transparent) 60%,
+					transparent 100%
+				);
+			}
+			.mini-node.is-focus {
+				border-color: color-mix(in oklch, var(--amber-400) 50%, var(--border));
+				box-shadow: 0 0 16px color-mix(in oklch, var(--amber-400) 25%, transparent);
+			}
+			/* Glow-intensified ready in states */
+			.mini-node.is-ready-bright {
+				border-color: color-mix(in oklch, var(--moss-400) 60%, var(--border));
+				box-shadow: 0 0 20px color-mix(in oklch, var(--moss-400) 40%, transparent);
+			}
+			.mini-node.is-ready-bright::before {
+				background: radial-gradient(
+					circle at center,
+					color-mix(in oklch, var(--moss-400) 45%, transparent) 0%,
+					color-mix(in oklch, var(--moss-400) 18%, transparent) 50%,
+					transparent 100%
+				);
+			}
+
+			/* ─── Responsive ─── */
+			@media (max-width: 768px) {
+				.page-wrapper {
+					padding: 16px 12px 32px;
+				}
+				.surface-frame {
+					height: auto !important;
+				}
+				.canvas-toolbar {
+					flex-wrap: wrap;
+					height: auto;
+					padding: 8px 10px;
+					gap: 6px;
+				}
+				.chip-group {
+					flex-wrap: wrap;
+				}
+				.states-grid {
+					grid-template-columns: 1fr;
+				}
+				.inset-wrapper {
+					display: none;
+				}
+			}
+
+			@media (min-width: 769px) and (max-width: 1100px) {
+				.states-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark">
+			<div class="page-wrapper">
+				<p class="gk-eyebrow" style="margin: 0 0 8px 0;">VARIANT C: RADIANT GRAPH &mdash; GLOWING NODE EMANATION</p>
+				<h1 class="page-title">Blocking Visualization</h1>
+				<p class="page-subtitle">
+					Luminous dependency graph &middot; nodes emanate their accent color as radial light sources
+				</p>
+
+				<!-- ─── PRIMARY: Mode B standalone page ─── -->
+				<p class="section-note">Mode B — standalone page (radiant PRD-level DAG)</p>
+
+				<div class="surface-frame" style="height: 660px;">
+					<!-- Parent chrome at low opacity -->
+					<div class="parent-chrome">
+						<div class="route-header">
+							<span class="font-mono">Workspace</span>
+							<span class="crumb-dot">&middot;</span>
+							<span class="crumb-strong font-mono">grovekeeper</span>
+							<span class="route-spacer"></span>
+							<span class="route-action"></span>
+							<span class="route-action"></span>
+						</div>
+						<div class="page-tabs">
+							<div class="page-tab">Overview</div>
+							<div class="page-tab is-active">Dependencies</div>
+							<div class="page-tab">Timeline</div>
+						</div>
+					</div>
+
+					<div class="shell">
+						<div class="parent-chrome shell-sidebar">
+							<div class="nav-item"></div>
+							<div class="nav-item is-active"></div>
+							<div class="nav-item"></div>
+							<div class="nav-item"></div>
+							<div class="nav-item"></div>
+						</div>
+
+						<div class="shell-main">
+							<div class="canvas">
+								<!-- Toolbar -->
+								<div class="canvas-toolbar">
+									<div class="tg" role="group" aria-label="View switch">
+										<button class="tg-btn is-active" aria-pressed="true">PRDs</button>
+										<button class="tg-btn" aria-pressed="false">Issues</button>
+									</div>
+									<div class="tb-divider"></div>
+
+									<label class="sw" style="opacity: 1;">
+										<span class="sw-track">
+											<span class="sw-thumb"></span>
+										</span>
+										<span>Highlight ready</span>
+									</label>
+
+									<div class="tb-divider"></div>
+
+									<div class="chip-group" role="group" aria-label="Filter labels">
+										<button class="chip is-active">AFK</button>
+										<button class="chip is-active">HITL</button>
+										<button class="chip">design-needed</button>
+										<button class="chip">unresolved</button>
+									</div>
+
+									<div class="tb-spacer"></div>
+
+									<button class="icon-btn" title="Re-run layout" aria-label="Layout">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+											<rect x="16" y="16" width="6" height="6" rx="1" />
+											<rect x="2" y="16" width="6" height="6" rx="1" />
+											<rect x="9" y="2" width="6" height="6" rx="1" />
+											<path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+											<path d="M12 12V8" />
+										</svg>
+									</button>
+								</div>
+
+								<!-- Viewport -->
+								<div class="canvas-viewport" style="height: 540px;">
+									<!-- Edge layer: orthogonal routing with 8px rounded corners -->
+									<svg class="edge-layer" viewBox="0 0 1000 560" preserveAspectRatio="none">
+										<defs>
+											<marker
+												id="arrow"
+												viewBox="0 0 10 10"
+												refX="9"
+												refY="5"
+												markerWidth="5"
+												markerHeight="5"
+												orient="auto-start-reverse"
+											>
+												<path d="M 0 0 L 10 5 L 0 10 z" fill="oklch(0.38 0.028 145)" />
+											</marker>
+											<marker
+												id="arrow-resolved"
+												viewBox="0 0 10 10"
+												refX="9"
+												refY="5"
+												markerWidth="5"
+												markerHeight="5"
+												orient="auto-start-reverse"
+											>
+												<path d="M 0 0 L 10 5 L 0 10 z" fill="oklch(0.42 0.02 140)" />
+											</marker>
+											<!-- Glow filter for edges connecting to ready nodes -->
+											<filter id="edge-glow" x="-20%" y="-20%" width="140%" height="140%">
+												<feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+												<feMerge>
+													<feMergeNode in="blur" />
+													<feMergeNode in="SourceGraphic" />
+												</feMerge>
+											</filter>
+										</defs>
+
+										<!-- #88 right(270,68) -> #257 left(400,68): horizontal with slight jog -->
+										<path
+											d="M 270 68 L 327 68 Q 335 68 335 68 L 400 68"
+											stroke="oklch(0.38 0.028 145)"
+											stroke-width="1.2"
+											fill="none"
+											marker-end="url(#arrow)"
+											opacity="0.7"
+										/>
+										<!-- #88 right(270,68) -> #92 left(400,234): orthogonal down-right -->
+										<path
+											d="M 270 68 L 327 68 Q 335 68 335 76 L 335 226 Q 335 234 343 234 L 400 234"
+											stroke="oklch(0.38 0.028 145)"
+											stroke-width="1.2"
+											fill="none"
+											marker-end="url(#arrow)"
+											opacity="0.7"
+										/>
+										<!-- #89 right(270,214) -> #92 left(400,234): orthogonal right -->
+										<path
+											d="M 270 214 L 327 214 Q 335 214 335 222 L 335 226 Q 335 234 343 234 L 400 234"
+											stroke="oklch(0.38 0.028 145)"
+											stroke-width="1.2"
+											fill="none"
+											marker-end="url(#arrow)"
+											opacity="0.7"
+										/>
+										<!-- #89 right(270,214) -> #93 left(740,204): long horizontal orthogonal -->
+										<path
+											d="M 270 214 L 327 214 Q 335 214 335 206 L 335 204 Q 335 204 343 204 L 740 204"
+											stroke="oklch(0.38 0.028 145)"
+											stroke-width="1.2"
+											fill="none"
+											marker-end="url(#arrow)"
+											opacity="0.7"
+										/>
+										<!-- #95 right(270,374) -> #93 left(740,204): dashed resolved, orthogonal up-right -->
+										<path
+											d="M 270 374 L 327 374 Q 335 374 335 366 L 335 212 Q 335 204 343 204 L 740 204"
+											stroke="oklch(0.42 0.02 140)"
+											stroke-width="1.2"
+											stroke-dasharray="5 4"
+											fill="none"
+											marker-end="url(#arrow-resolved)"
+											opacity="0.45"
+										/>
+										<!-- #257 right(620,68) -> #93 left(740,204): glowing edge, orthogonal down-right -->
+										<path
+											d="M 620 68 L 672 68 Q 680 68 680 76 L 680 196 Q 680 204 688 204 L 740 204"
+											stroke="oklch(0.69 0.098 132)"
+											stroke-width="1.2"
+											fill="none"
+											marker-end="url(#arrow)"
+											filter="url(#edge-glow)"
+											opacity="0.8"
+										/>
+									</svg>
+
+									<!-- PRD #88 Forest View — moss accent (column 1, row 1) -->
+									<div class="prd-node" style="left: 50px; top: 24px; --node-accent: oklch(0.69 0.098 132);">
+										<div class="prd-head">
+											<span class="prd-id">PRD #88</span>
+											<span class="prd-pct">62%</span>
+										</div>
+										<div class="prd-title">Forest View — workspace overview canvas</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-afk">AFK</span>
+											<span class="badge-b badge-b-design">design-needed</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">8/13 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 62%;"></div></div>
+										</div>
+									</div>
+
+									<!-- PRD #89 Issue Mgmt — amber accent (column 1, row 2) -->
+									<div class="prd-node" style="left: 50px; top: 170px; --node-accent: oklch(0.77 0.15 65);">
+										<div class="prd-head">
+											<span class="prd-id">PRD #89</span>
+											<span class="prd-pct">41%</span>
+										</div>
+										<div class="prd-title">Issue Management &amp; Triage</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-hitl">HITL</span>
+											<span class="badge-b badge-b-unresolved">unresolved</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">9/22 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 41%;"></div></div>
+										</div>
+									</div>
+
+									<!-- PRD #95 Notifications — azure accent (column 1, row 3) -->
+									<div class="prd-node" style="left: 50px; top: 330px; --node-accent: oklch(0.66 0.12 230);">
+										<div class="prd-head">
+											<span class="prd-id">PRD #95</span>
+											<span class="prd-pct">88%</span>
+										</div>
+										<div class="prd-title">Notifications &amp; Sound Engine</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-afk">AFK</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">14/16 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 88%;"></div></div>
+										</div>
+									</div>
+
+									<!-- PRD #90 Sessions — coral accent (floater, column 2 bottom) -->
+									<div class="prd-node" style="left: 340px; top: 420px; --node-accent: oklch(0.7 0.135 30);">
+										<div class="prd-head">
+											<span class="prd-id">PRD #90</span>
+											<span class="prd-pct">54%</span>
+										</div>
+										<div class="prd-title">Sessions — multi-provider orchestrator</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-hitl">HITL</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">8/15 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 54%;"></div></div>
+										</div>
+									</div>
+
+									<!-- PRD #257 Overview Polish — moss READY + SELECTED (column 2, top) -->
+									<div class="prd-node is-ready is-selected" style="left: 400px; top: 24px; --node-accent: oklch(0.69 0.098 132);">
+										<div class="ready-overlay" title="Ready">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+												<circle cx="12" cy="12" r="10" />
+												<polyline points="9 12 12 15 17 10" />
+											</svg>
+										</div>
+										<div class="prd-head">
+											<span class="prd-id">PRD #257</span>
+											<span class="prd-pct">25%</span>
+										</div>
+										<div class="prd-title">Overview Polish — KPI cards &amp; filters</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-afk">AFK</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">4/16 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 25%;"></div></div>
+										</div>
+									</div>
+
+									<!-- Selection popover for #257 -->
+									<div class="sel-popover" style="left: 636px; top: 24px; --node-accent: oklch(0.69 0.098 132);">
+										<div class="sel-pop-id">PRD #257</div>
+										<p class="sel-pop-title">Overview Polish &mdash; KPI cards &amp; filters</p>
+										<div class="sel-pop-badges">
+											<span class="badge-b badge-b-afk">AFK</span>
+											<span class="gk-badge gk-badge-success" style="height: 18px; font-size: 10px; padding: 0 6px;">
+												<span class="gk-badge-dot"></span>
+												READY
+											</span>
+										</div>
+										<div class="sel-pop-row">
+											<span class="prd-count">4/16 done</span>
+											<div class="sel-pop-progress-bar"><div class="fill" style="width: 25%;"></div></div>
+										</div>
+										<div style="font-size: 11px; color: var(--foreground-muted); margin-bottom: 10px; line-height: 1.35;">
+											All upstream dependencies resolved.<br>
+											<span style="color: var(--foreground-subtle);">Blocked by: none &middot; Blocks: #93</span>
+										</div>
+										<div class="sel-pop-actions">
+											<button class="btn-sm">Open PRD</button>
+											<button class="btn-ghost-sm">View issues</button>
+										</div>
+									</div>
+
+									<!-- PRD #92 AFK/HITL — plum accent (column 2, mid) -->
+									<div class="prd-node" style="left: 400px; top: 190px; --node-accent: oklch(0.65 0.14 310);">
+										<div class="prd-head">
+											<span class="prd-id">PRD #92</span>
+											<span class="prd-pct">33%</span>
+										</div>
+										<div class="prd-title">AFK Loop &amp; HITL Approvals</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-hitl">HITL</span>
+											<span class="badge-b badge-b-design">design-needed</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">5/15 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 33%;"></div></div>
+										</div>
+									</div>
+
+									<!-- PRD #93 Metrics — teal READY (column 3) -->
+									<div class="prd-node is-ready" style="left: 740px; top: 160px; --node-accent: oklch(0.68 0.12 180);">
+										<div class="ready-overlay" title="Ready">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+												<circle cx="12" cy="12" r="10" />
+												<polyline points="9 12 12 15 17 10" />
+											</svg>
+										</div>
+										<div class="prd-head">
+											<span class="prd-id">PRD #93</span>
+											<span class="prd-pct">12%</span>
+										</div>
+										<div class="prd-title">Metrics — cost, throughput, drilldowns</div>
+										<div class="prd-badges">
+											<span class="badge-b badge-b-afk">AFK</span>
+										</div>
+										<div class="prd-foot">
+											<span class="prd-count">2/17 done</span>
+											<div class="prd-bar"><div class="prd-bar-fill" style="width: 12%;"></div></div>
+										</div>
+									</div>
+
+									<!-- Mode A inset (top-right) -->
+									<div class="inset-wrapper">
+										<div class="inset-eyebrow">Mode A &mdash; bottom panel tab</div>
+										<div class="inset">
+											<div class="inset-tabbar">
+												<div class="inset-tab">Terminal</div>
+												<div class="inset-tab">Problems</div>
+												<div class="inset-tab is-active">Dependencies</div>
+											</div>
+											<div class="inset-toolbar">
+												<div class="tg" role="group">
+													<button class="tg-btn" aria-pressed="false">PRDs</button>
+													<button class="tg-btn is-active" aria-pressed="true">Issues</button>
+												</div>
+												<div class="tb-spacer"></div>
+												<button class="icon-btn" aria-label="Layout">
+													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+														<rect x="16" y="16" width="6" height="6" rx="1" />
+														<rect x="2" y="16" width="6" height="6" rx="1" />
+														<rect x="9" y="2" width="6" height="6" rx="1" />
+														<path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+														<path d="M12 12V8" />
+													</svg>
+												</button>
+											</div>
+											<div class="inset-canvas">
+												<!-- Inset edge layer -->
+												<svg class="edge-layer" viewBox="0 0 280 130" preserveAspectRatio="none">
+													<!-- #421 -> #432 -->
+													<path
+														d="M 120 30 L 148 30 Q 156 30 156 38 L 156 70 Q 156 78 164 78 L 172 78"
+														stroke="oklch(0.38 0.028 145)"
+														stroke-width="1"
+														fill="none"
+														opacity="0.5"
+													/>
+													<!-- #424 -> #439 -->
+													<path
+														d="M 120 78 L 148 78 Q 156 78 156 86 L 156 110 Q 156 118 164 118 L 172 118"
+														stroke="oklch(0.69 0.098 132)"
+														stroke-width="1"
+														fill="none"
+														filter="url(#edge-glow)"
+														opacity="0.6"
+													/>
+												</svg>
+
+												<div class="issue-node acc-azure" style="left: 16px; top: 12px;">
+													<span class="iss-id">#421</span>
+													<span class="iss-title">Filter chip persist</span>
+												</div>
+												<div class="issue-node acc-amber" style="left: 16px; top: 60px;">
+													<span class="iss-id">#424</span>
+													<span class="iss-title">Layout re-run</span>
+												</div>
+												<div class="issue-node acc-coral" style="left: 168px; top: 56px;">
+													<span class="iss-id">#432</span>
+													<span class="iss-title">Edge routing v2</span>
+												</div>
+												<div class="issue-node acc-moss is-ready" style="left: 168px; top: 98px;">
+													<span class="iss-id">#439</span>
+													<span class="iss-title">Ready overlay</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Legend -->
+									<div class="legend">
+										<div class="legend-title">Legend</div>
+										<div class="legend-section">
+											<div class="legend-row">
+												<span class="legend-swatch sw-ready"></span>
+												<span>Ready &mdash; emanating glow</span>
+											</div>
+											<div class="legend-row">
+												<span class="legend-swatch sw-blocked"></span>
+												<span>Blocked &mdash; subdued glow</span>
+											</div>
+										</div>
+										<hr class="legend-divider" />
+										<div class="legend-section">
+											<div class="legend-row">
+												<span class="legend-edge legend-edge-solid"></span>
+												<span>Depends on</span>
+											</div>
+											<div class="legend-row">
+												<span class="legend-edge legend-edge-dashed"></span>
+												<span>Resolved (historical)</span>
+											</div>
+										</div>
+										<hr class="legend-divider" />
+										<div class="legend-section">
+											<div class="legend-row">
+												<span class="badge-b badge-b-afk" style="font-size: 8px; padding: 0 4px;">AFK</span>
+												<span>Autonomous work</span>
+											</div>
+											<div class="legend-row">
+												<span class="badge-b badge-b-hitl" style="font-size: 8px; padding: 0 4px;">HITL</span>
+												<span>Needs human input</span>
+											</div>
+										</div>
+									</div>
+
+									<!-- Zoom controls -->
+									<div class="zoom-controls">
+										<button class="icon-btn" aria-label="Zoom out">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14" /></svg>
+										</button>
+										<span class="zoom-readout">100%</span>
+										<button class="icon-btn" aria-label="Zoom in">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" /></svg>
+										</button>
+										<button class="icon-btn" aria-label="Fit to view">
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+												<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+											</svg>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ─── STATES ─── -->
+				<p class="section-note">Component states</p>
+
+				<div class="states-grid">
+					<!-- State 1: Empty — no PRDs -->
+					<div class="state-card">
+						<div class="state-card-head">empty &mdash; no PRDs</div>
+						<div class="state-card-body">
+							<div class="empty-content">
+								<div class="empty-icon">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+										<circle cx="12" cy="12" r="10" />
+										<path d="M12 8v4M12 16h.01" />
+									</svg>
+								</div>
+								<div class="empty-msg">No PRDs in this workspace</div>
+								<div class="empty-sub">Create a PRD to start tracking dependencies</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- State 2: Empty — no dependencies -->
+					<div class="state-card">
+						<div class="state-card-head">empty &mdash; no dependencies</div>
+						<div class="state-card-body">
+							<div class="empty-content">
+								<div class="empty-icon">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+										<path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4" />
+									</svg>
+								</div>
+								<div class="empty-msg">No blocking relationships defined</div>
+								<div class="empty-sub">All 7 PRDs are independent</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- State 3: Loading skeleton -->
+					<div class="state-card">
+						<div class="state-card-head">loading</div>
+						<div class="state-card-body">
+							<div class="skel-row">
+								<div class="skel-rect" style="width: 82px; height: 40px;"></div>
+								<div class="skel-rect" style="width: 82px; height: 40px; animation-delay: 0.2s;"></div>
+								<div class="skel-rect" style="width: 82px; height: 40px; animation-delay: 0.4s;"></div>
+							</div>
+						</div>
+					</div>
+
+					<!-- State 4: Hover — subgraph focus -->
+					<div class="state-card">
+						<div class="state-card-head">hover &mdash; subgraph focus (node glow intensifies)</div>
+						<div class="state-card-body">
+							<div class="mini-graph">
+								<svg class="edge-layer" viewBox="0 0 260 170" preserveAspectRatio="none">
+									<!-- A -> B -->
+									<path
+										d="M 84 50 L 112 50 Q 120 50 120 58 L 120 80 Q 120 88 128 88 L 136 88"
+										stroke="oklch(0.38 0.028 145)"
+										stroke-width="1"
+										fill="none"
+										opacity="0.6"
+									/>
+									<!-- A -> C (dim) -->
+									<path
+										d="M 84 50 L 112 50 Q 120 50 120 58 L 120 128 Q 120 136 128 136 L 136 136"
+										stroke="oklch(0.38 0.028 145)"
+										stroke-width="1"
+										fill="none"
+										opacity="0.2"
+									/>
+									<!-- B -> D (dim) -->
+									<path
+										d="M 202 88 L 220 88 Q 228 88 228 80 L 228 50 Q 228 42 236 42 L 244 42"
+										stroke="oklch(0.38 0.028 145)"
+										stroke-width="1"
+										fill="none"
+										opacity="0.2"
+									/>
+								</svg>
+
+								<!-- Hovered node: glow intensified -->
+								<div class="mini-node is-focus" style="left: 16px; top: 35px;">#88</div>
+								<!-- Connected: brightened -->
+								<div class="mini-node" style="left: 134px; top: 73px; border-color: color-mix(in oklch, oklch(0.65 0.14 310) 30%, var(--border));">#92</div>
+								<!-- Disconnected: dimmed -->
+								<div class="mini-node is-dim" style="left: 134px; top: 121px;">#90</div>
+								<div class="mini-node is-dim" style="left: 200px; top: 27px;">#93</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- State 5: Highlight ready only -->
+					<div class="state-card">
+						<div class="state-card-head">highlight ready &mdash; non-ready glows fade</div>
+						<div class="state-card-body">
+							<div class="mini-graph">
+								<svg class="edge-layer" viewBox="0 0 260 170" preserveAspectRatio="none">
+									<path
+										d="M 84 50 L 130 50"
+										stroke="oklch(0.38 0.028 145)"
+										stroke-width="1"
+										fill="none"
+										opacity="0.15"
+									/>
+									<path
+										d="M 84 120 L 130 120"
+										stroke="oklch(0.69 0.098 132)"
+										stroke-width="1"
+										fill="none"
+										filter="url(#edge-glow)"
+										opacity="0.6"
+									/>
+								</svg>
+
+								<!-- Non-ready: very dim -->
+								<div class="mini-node is-dim" style="left: 16px; top: 35px;">#88</div>
+								<div class="mini-node is-dim" style="left: 128px; top: 35px;">#92</div>
+								<!-- Ready: intensified -->
+								<div class="mini-node is-ready-bright" style="left: 16px; top: 105px;">#257</div>
+								<div class="mini-node is-ready-bright" style="left: 128px; top: 105px;">#93</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
