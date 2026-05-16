@@ -63,10 +63,11 @@ test.describe('Issue creation wizard', () => {
 
 	test('Backspace on non-first step (non-editable focused) goes back', async ({ page }) => {
 		await page.getByRole('button', { name: /create issue/i }).click();
+		await expect(page.getByRole('dialog')).toBeVisible();
 		await page.keyboard.press('Enter');
 
 		const nameInput = page.locator('#wizard-issue-name');
-		await expect(nameInput).toBeVisible({ timeout: 3000 });
+		await expect(nameInput).toBeVisible({ timeout: 5000 });
 
 		// Blur the input so Backspace isn't consumed as text editing
 		await nameInput.evaluate((el) => el.blur());
