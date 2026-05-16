@@ -9,8 +9,10 @@
 	import { initUsageUrlStateSync } from '$lib/modules/usage/url_state_sync.svelte.js';
 	import { useWindow } from '$lib/modules/window/window.context.svelte.js';
 	import {
+		CHART_COLOR_THEME_OPTIONS,
 		PERIODS,
 		USAGE_SCOPES,
+		isChartColorTheme,
 		isMetricsPeriod,
 		isUsageScope,
 		isGroupByOption,
@@ -23,7 +25,7 @@
 
 	import CostChart from '$lib/components/blocks/usage/CostChart.svelte';
 	import RefreshIndicator from '$lib/components/blocks/usage/RefreshIndicator.svelte';
-	import ColorThemePicker from '$lib/components/blocks/usage/ColorThemePicker.svelte';
+	import { ColorThemePicker } from '$lib/components/derived/color-theme-picker/index.js';
 	import GroupByDropdown from '$lib/components/blocks/usage/GroupByDropdown.svelte';
 	import ScopeToggle from '$lib/components/blocks/usage/ScopeToggle.svelte';
 	import AchievementsDialog from '$lib/components/blocks/usage/AchievementsDialog.svelte';
@@ -155,8 +157,14 @@
 		<h1 class="text-2xl font-bold text-foreground">Usage Analytics</h1>
 		<div class="flex items-center gap-2">
 			<ColorThemePicker
+				options={CHART_COLOR_THEME_OPTIONS}
 				value={ctx.colorTheme.current}
-				onchange={(theme) => (ctx.colorTheme.current = theme)}
+				onchange={(theme) => {
+					if (isChartColorTheme(theme)) {
+						ctx.colorTheme.current = theme;
+					}
+				}}
+				portalDisabled={true}
 			/>
 			<AchievementsDialog
 				achievements={ctx.achievements.current}

@@ -6,6 +6,24 @@ export const CHART_COLOR_THEMES = {
 
 export type ChartColorTheme = (typeof CHART_COLOR_THEMES)[keyof typeof CHART_COLOR_THEMES];
 
+export const CHART_COLOR_THEME_OPTIONS = [
+	{
+		value: CHART_COLOR_THEMES.monochrome,
+		label: 'Monochrome',
+		swatchColors: ['bg-chart-1', 'bg-chart-1/60', 'bg-chart-1/30'],
+	},
+	{
+		value: CHART_COLOR_THEMES.trafficLight,
+		label: 'Traffic Light',
+		swatchColors: ['bg-green-500', 'bg-amber-400', 'bg-red-500'],
+	},
+	{
+		value: CHART_COLOR_THEMES.gradient,
+		label: 'Gradient',
+		swatchColors: ['bg-blue-500', 'bg-yellow-400', 'bg-red-500'],
+	},
+] as const;
+
 export function isChartColorTheme(value: unknown): value is ChartColorTheme {
 	return (
 		typeof value === 'string' &&
