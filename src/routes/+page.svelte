@@ -46,8 +46,8 @@
 	const notificationStore = useNotifications();
 	const sessionStore = useSessions();
 	const selection = useSelection();
-	const rawRequirementsCtx = useRawRequirements();
 	const wizardStore = useCreationWizard();
+	const rawRequirementsCtx = useRawRequirements();
 	const toastsCtx = useToasts();
 
 	function getNotificationDotColor(issueId: string): string | null {
