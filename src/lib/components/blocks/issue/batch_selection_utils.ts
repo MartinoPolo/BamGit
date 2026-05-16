@@ -26,7 +26,6 @@ export const CARD_STATE_CLASSES = {
 	hovered: 'card-state-hovered-ic',
 	selectionHover: 'card-state-selection-hover',
 	selected: 'card-state-selected-primary',
-	dragging: 'rotate-[-1.5deg] scale-[1.02] shadow-lg opacity-92',
 	loading: 'pointer-events-none',
 	archived: 'opacity-70 grayscale-[0.8]',
 	error: 'border-l-0.75 border-l-destructive',

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import UploadIcon from '@lucide/svelte/icons/upload';
 
@@ -52,12 +53,8 @@
 		<span class="text-sm">Drop audio files here</span>
 	</div>
 	<span class="text-xs text-muted-foreground">or</span>
-	<button
-		type="button"
-		class="flex items-center gap-1.5 rounded-md bg-surface-2 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-		onclick={onfolderselect}
-	>
-		<FolderOpenIcon class="size-3.5" />
+	<Button intent="secondary" size="sm" onclick={onfolderselect}>
+		<FolderOpenIcon data-icon="inline-start" />
 		Import from folder
-	</button>
+	</Button>
 </div>

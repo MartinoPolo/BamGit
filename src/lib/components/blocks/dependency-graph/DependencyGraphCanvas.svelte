@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 
 	interface Props {
 		contentWidth: number;
@@ -193,33 +194,36 @@
 	</svg>
 
 	<div class="dep-canvas-controls">
-		<button
-			type="button"
+		<Button
+			intent="secondary"
+			size="icon-sm"
+			class="size-7"
 			onclick={zoomIn}
 			aria-label="Zoom in"
 			title="Zoom in"
-			class="dep-canvas-control"
 		>
 			+
-		</button>
-		<button
-			type="button"
+		</Button>
+		<Button
+			intent="secondary"
+			size="icon-sm"
+			class="size-7"
 			onclick={zoomOut}
 			aria-label="Zoom out"
 			title="Zoom out"
-			class="dep-canvas-control"
 		>
 			−
-		</button>
-		<button
-			type="button"
+		</Button>
+		<Button
+			intent="secondary"
+			size="icon-sm"
+			class="size-7"
 			onclick={resetView}
 			aria-label="Reset view"
 			title="Reset view"
-			class="dep-canvas-control"
 		>
 			⤧
-		</button>
+		</Button>
 	</div>
 
 	<div class="dep-canvas-zoom-readout">{Math.round(scale * 100)}%</div>
@@ -253,26 +257,6 @@
 		flex-direction: column;
 		gap: 4px;
 		z-index: 1;
-	}
-
-	.dep-canvas-control {
-		width: 28px;
-		height: 28px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid var(--border);
-		border-radius: calc(var(--radius) * 0.75);
-		background: var(--card);
-		color: var(--foreground);
-		cursor: pointer;
-		font-size: 14px;
-		line-height: 1;
-		transition: background 150ms ease;
-	}
-
-	.dep-canvas-control:hover {
-		background: var(--accent);
 	}
 
 	.dep-canvas-zoom-readout {

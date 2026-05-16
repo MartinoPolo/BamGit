@@ -335,22 +335,23 @@
 
 						{#each factions as [faction, factionCharacters] (faction)}
 							<div class="mb-1">
-								<button
-									type="button"
-									class="flex w-full items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-surface-2"
+								<Button
+									intent="ghost"
+									size="sm"
+									class="w-full justify-start text-muted-foreground"
 									onclick={() => handleToggleFaction(faction)}
 									aria-expanded={expandedFactions.has(faction)}
 								>
 									{#if expandedFactions.has(faction)}
-										<ChevronDownIcon class="size-3" />
+										<ChevronDownIcon data-icon="inline-start" />
 									{:else}
-										<ChevronRightIcon class="size-3" />
+										<ChevronRightIcon data-icon="inline-start" />
 									{/if}
 									{faction}
 									<span class="ml-auto text-[10px]"
 										>{factionCharacters.length}</span
 									>
-								</button>
+								</Button>
 
 								{#if expandedFactions.has(faction)}
 									<div class="ml-4">

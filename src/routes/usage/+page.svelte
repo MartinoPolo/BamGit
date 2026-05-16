@@ -178,9 +178,10 @@
 	<div class="flex items-center gap-3">
 		<div class="flex gap-1 rounded-lg bg-muted p-1">
 			{#each PERIODS as period (period.value)}
-				<button
+				<Button
+					intent="ghost"
+					size="sm"
 					class={cn(
-						'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
 						ctx.activePeriod.current === period.value
 							? 'bg-background text-foreground shadow-sm'
 							: 'text-muted-foreground hover:text-foreground',
@@ -188,7 +189,7 @@
 					onclick={() => handlePeriodChange(period.value)}
 				>
 					{period.label}
-				</button>
+				</Button>
 			{/each}
 			<DateRangePicker
 				onselect={handleCustomRange}

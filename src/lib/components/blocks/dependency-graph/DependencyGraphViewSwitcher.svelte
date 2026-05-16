@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { VIEW_MODE, type ViewMode } from '$lib/modules/dependency-graph';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import LayersIcon from '@lucide/svelte/icons/layers';
@@ -29,40 +30,40 @@
 
 <div class="view-switcher">
 	<div class="segmented" role="tablist" aria-label="Dependency graph view">
-		<button
-			type="button"
+		<Button
+			intent={viewMode === VIEW_MODE.global ? 'primary' : 'ghost'}
+			size="sm"
+			class="rounded-none border-r border-border text-xs last:border-r-0"
 			role="tab"
 			aria-selected={viewMode === VIEW_MODE.global}
-			class="segmented-button"
-			class:active={viewMode === VIEW_MODE.global}
 			onclick={() => onViewModeChange(VIEW_MODE.global)}
 		>
-			<GlobeIcon size={14} />
-			<span>Global</span>
-		</button>
-		<button
-			type="button"
+			<GlobeIcon data-icon="inline-start" />
+			Global
+		</Button>
+		<Button
+			intent={viewMode === VIEW_MODE.prds ? 'primary' : 'ghost'}
+			size="sm"
+			class="rounded-none border-r border-border text-xs last:border-r-0"
 			role="tab"
 			aria-selected={viewMode === VIEW_MODE.prds}
-			class="segmented-button"
-			class:active={viewMode === VIEW_MODE.prds}
 			onclick={() => onViewModeChange(VIEW_MODE.prds)}
 		>
-			<LayersIcon size={14} />
-			<span>PRDs</span>
-		</button>
-		<button
-			type="button"
+			<LayersIcon data-icon="inline-start" />
+			PRDs
+		</Button>
+		<Button
+			intent={viewMode === VIEW_MODE.singlePrd ? 'primary' : 'ghost'}
+			size="sm"
+			class="rounded-none border-r border-border text-xs last:border-r-0"
 			role="tab"
 			aria-selected={viewMode === VIEW_MODE.singlePrd}
-			class="segmented-button"
-			class:active={viewMode === VIEW_MODE.singlePrd}
 			onclick={() => onViewModeChange(VIEW_MODE.singlePrd)}
 			disabled={prdOptions.length === 0}
 		>
-			<FocusIcon size={14} />
-			<span>Single PRD</span>
-		</button>
+			<FocusIcon data-icon="inline-start" />
+			Single PRD
+		</Button>
 	</div>
 
 	{#if viewMode === VIEW_MODE.singlePrd}
@@ -99,38 +100,5 @@
 		border-radius: calc(var(--radius) * 1);
 		overflow: hidden;
 		background: var(--card);
-	}
-
-	.segmented-button {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 6px 10px;
-		border: none;
-		border-right: 1px solid var(--border);
-		background: transparent;
-		color: var(--muted-foreground);
-		font-size: 12px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: background 150ms ease;
-	}
-
-	.segmented-button:last-child {
-		border-right: none;
-	}
-
-	.segmented-button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.segmented-button:hover:not(:disabled) {
-		background: var(--accent);
-	}
-
-	.segmented-button.active {
-		background: var(--primary);
-		color: var(--primary-foreground);
 	}
 </style>
