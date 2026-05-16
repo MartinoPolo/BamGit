@@ -120,6 +120,8 @@
 	function handleEnter(event: KeyboardEvent) {
 		switch (wizard.currentStep) {
 			case WIZARD_STEPS.GITHUB_SEARCH:
+				event.preventDefault();
+				githubSearchRef?.confirm();
 				break;
 			case WIZARD_STEPS.ISSUE_NAME:
 				event.preventDefault();

@@ -15,8 +15,6 @@
 
 	const paletteCtx = useCommandPalette();
 
-	let searchInputRef = $state<HTMLInputElement | null>(null);
-
 	const CATEGORY_LABELS: Record<CommandPaletteCategory, () => string> = {
 		[COMMAND_PALETTE_CATEGORIES.actions]: () => m.command_palette_actions(),
 		[COMMAND_PALETTE_CATEGORIES.navigation]: () => m.command_palette_navigation(),
@@ -27,7 +25,8 @@
 		paletteCtx.open = isOpen;
 		if (isOpen) {
 			requestAnimationFrame(() => {
-				searchInputRef?.focus();
+				const input = document.querySelector<HTMLInputElement>('[data-command-input]');
+				input?.focus();
 			});
 		}
 	}
@@ -39,10 +38,7 @@
 
 		<Command.Root loop>
 			<div class="border-b border-border">
-				<Command.Input
-					bind:ref={searchInputRef}
-					placeholder={m.command_palette_placeholder()}
-				/>
+				<Command.Input placeholder={m.command_palette_placeholder()} />
 			</div>
 
 			<Command.List class="max-h-80 p-1.5">
