@@ -174,7 +174,7 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 			name: 'peon',
 			display_name: 'Peon',
 			language: 'en',
-			avatar_path: 'peon/avatar.webp',
+			avatar_path: null,
 			is_bundled: true,
 			is_enabled: true,
 			is_complete: true,

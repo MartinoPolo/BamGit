@@ -73,6 +73,7 @@
 			id: 'command-palette',
 			label: 'Command Palette',
 			defaultBinding: 'Ctrl+K',
+			allowFromEditable: true,
 			callback: () => commandPaletteCtx.toggle(),
 		});
 		shortcutsCtx.registerShortcut({

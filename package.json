@@ -20,7 +20,7 @@
 		"lint:css": "stylelint \"src/**/*.{css,svelte}\"",
 		"format": "prettier --write .",
 		"test": "vitest",
-		"test:e2e": "playwright test --pass-with-no-tests",
+		"test:e2e": "playwright test",
 		"postinstall": "node scripts/fix-worktree-links.js",
 		"prepare": "husky",
 		"db:reset": "node scripts/reset-database.js",
