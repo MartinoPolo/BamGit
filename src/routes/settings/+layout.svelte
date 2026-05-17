@@ -37,6 +37,12 @@
 		void settingsCtx.loadSettings(scope === 'workspace' ? dashboardId : null);
 	});
 
+	interface CategoryChild {
+		key: string;
+		path: string;
+		label: string;
+	}
+
 	interface CategoryItem {
 		key: string;
 		path: string;
@@ -45,6 +51,7 @@
 		userOnly: boolean;
 		workspaceOnly: boolean;
 		fullWidth?: boolean;
+		children?: CategoryChild[];
 	}
 
 	const allCategories: CategoryItem[] = [
@@ -95,6 +102,19 @@
 			label: 'Notifications',
 			userOnly: false,
 			workspaceOnly: false,
+			children: [
+				{ key: 'events', path: resolve('/settings/notifications/events'), label: 'Events' },
+				{
+					key: 'packs',
+					path: resolve('/settings/notifications/packs'),
+					label: 'Sound Packs',
+				},
+				{
+					key: 'characters',
+					path: resolve('/settings/notifications/characters'),
+					label: 'Characters',
+				},
+			],
 		},
 		{
 			key: 'ai-config',
@@ -152,11 +172,8 @@
 	}
 
 	function handleBack() {
-		if (window.history.length > 1) {
-			window.history.back();
-		} else {
-			void goto(resolve('/'));
-		}
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- navigating to stored URL from settings context
+		void goto(settingsCtx.returnUrl);
 	}
 
 	function handleEscape(event: KeyboardEvent) {
@@ -173,10 +190,12 @@
 		const currentRoute = page.url.pathname;
 		if (value === 'workspace' && boardStore.activeDashboard !== null) {
 			// eslint-disable-next-line svelte/no-navigation-without-resolve -- dynamically constructed query params
-			void goto(`${currentRoute}?scope=ws&id=${boardStore.activeDashboard.id}`);
+			void goto(`${currentRoute}?scope=ws&id=${boardStore.activeDashboard.id}`, {
+				replaceState: true,
+			});
 		} else {
 			// eslint-disable-next-line svelte/no-navigation-without-resolve -- navigating to current route without query params
-			void goto(currentRoute);
+			void goto(currentRoute, { replaceState: true });
 		}
 	}
 
@@ -189,6 +208,8 @@
 			? `Back to ${workspaceName}`
 			: 'Back to app',
 	);
+
+	const workspaceAccentColor = $derived(boardStore.activeDashboard?.accent_color ?? null);
 </script>
 
 <svelte:window onkeydown={handleEscape} />
@@ -218,14 +239,6 @@
 			</div>
 		{/if}
 
-		{#if scope === 'workspace' && workspaceName}
-			<div
-				class="mx-3 mb-3 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-medium text-primary"
-			>
-				{workspaceName}
-			</div>
-		{/if}
-
 		<nav class="flex flex-col gap-0.5 px-2">
 			{#each visibleCategories as category (category.key)}
 				<SidebarNavItem
@@ -233,7 +246,31 @@
 					label={category.label}
 					href={categoryHref(category.path)}
 					active={isActive(category.path)}
+					onclick={(event) => {
+						event.preventDefault();
+						const target = category.children
+							? categoryHref(category.children[0].path)
+							: categoryHref(category.path);
+						// eslint-disable-next-line svelte/no-navigation-without-resolve -- dynamically constructed route from categoryHref
+						void goto(target, { replaceState: true });
+					}}
 				/>
+				{#if category.children && isActive(category.path)}
+					{#each category.children as child (child.key)}
+						<SidebarNavItem
+							icon={category.icon}
+							label={child.label}
+							href={categoryHref(child.path)}
+							active={isActive(child.path)}
+							nested
+							onclick={(event) => {
+								event.preventDefault();
+								// eslint-disable-next-line svelte/no-navigation-without-resolve -- dynamically constructed route from categoryHref
+								void goto(categoryHref(child.path), { replaceState: true });
+							}}
+						/>
+					{/each}
+				{/if}
 			{/each}
 		</nav>
 
@@ -241,6 +278,16 @@
 	</aside>
 
 	<main class={cn('flex-1', isFullWidthCategory ? 'overflow-hidden' : 'overflow-auto')}>
+		{#if scope === 'workspace' && workspaceName}
+			<div
+				class="border-b px-8 py-2 text-xs font-medium"
+				style:border-color={workspaceAccentColor ?? 'var(--primary)'}
+				style:background-color="{workspaceAccentColor ?? 'var(--primary)'}10"
+				style:color={workspaceAccentColor ?? 'var(--primary)'}
+			>
+				{workspaceName}
+			</div>
+		{/if}
 		{#if isFullWidthCategory}
 			{@render children()}
 		{:else}

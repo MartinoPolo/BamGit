@@ -47,6 +47,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'github_device_flow_start',
 	'github_device_flow_poll',
 	'test_notification_sound',
+	'open_file',
 	'save_file',
 	'write_ai_config_file',
 	'delete_ai_config_file',

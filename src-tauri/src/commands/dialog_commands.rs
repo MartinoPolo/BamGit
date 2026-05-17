@@ -2,6 +2,31 @@ use tauri::AppHandle;
 use tauri_plugin_dialog::DialogExt;
 
 #[tauri::command]
+pub async fn open_file(
+    app: AppHandle,
+    filter_name: String,
+    filter_extensions: Vec<String>,
+) -> Result<Option<String>, String> {
+    let path = tauri::async_runtime::spawn_blocking(move || {
+        let ext_refs: Vec<&str> = filter_extensions.iter().map(|s| s.as_str()).collect();
+        app.dialog()
+            .file()
+            .add_filter(&filter_name, &ext_refs)
+            .blocking_pick_file()
+    })
+    .await
+    .map_err(|error| error.to_string())?;
+
+    if let Some(file_path) = path {
+        let path_str = file_path.to_string();
+        let content = std::fs::read_to_string(&path_str).map_err(|error| error.to_string())?;
+        Ok(Some(content))
+    } else {
+        Ok(None)
+    }
+}
+
+#[tauri::command]
 pub async fn pick_folder(app: AppHandle) -> Result<Option<String>, String> {
     let folder = tauri::async_runtime::spawn_blocking(move || {
         app.dialog().file().blocking_pick_folder()

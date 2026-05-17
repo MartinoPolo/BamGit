@@ -26,6 +26,8 @@
 		collapsed: boolean;
 		onToggleSidebar: () => void;
 		onEditWorkspace?: () => void;
+		onOpenSettings?: () => void;
+		onOpenWorkspaceSettings?: () => void;
 	}
 
 	let {
@@ -36,6 +38,8 @@
 		collapsed,
 		onToggleSidebar,
 		onEditWorkspace,
+		onOpenSettings,
+		onOpenWorkspaceSettings,
 	}: Props = $props();
 
 	const NAV_LABELS = {
@@ -139,7 +143,12 @@
 					{m.nav_workspace()}
 				</div>
 			{/if}
-			<WorkspaceSelector name={workspaceName} {collapsed} onclick={onEditWorkspace} />
+			<WorkspaceSelector
+				name={workspaceName}
+				{collapsed}
+				onEdit={onEditWorkspace}
+				onOpenSettings={onOpenWorkspaceSettings}
+			/>
 		</div>
 
 		<!-- Navigation -->
@@ -196,6 +205,12 @@
 					href={resolve('/settings/general')}
 					active={isActive(resolve('/settings/general'))}
 					{collapsed}
+					onclick={(event) => {
+						if (onOpenSettings) {
+							event.preventDefault();
+							onOpenSettings();
+						}
+					}}
 				/>
 			{:else}
 				<div class="flex items-center justify-between">
@@ -206,13 +221,14 @@
 						{collapsed}
 					/>
 					<SimpleTooltip text={NAV_LABELS.settings()} side="top">
-						<a
-							href={resolve('/settings/general')}
+						<button
+							type="button"
 							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
 							aria-label={NAV_LABELS.settings()}
+							onclick={onOpenSettings}
 						>
 							<SettingsIcon size={14} />
-						</a>
+						</button>
 					</SimpleTooltip>
 				</div>
 			{/if}

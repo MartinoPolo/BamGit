@@ -11,6 +11,7 @@
 		collapsed?: boolean;
 		badge?: number | null;
 		nested?: boolean;
+		onclick?: (event: MouseEvent) => void;
 	}
 
 	let {
@@ -22,6 +23,7 @@
 		collapsed = false,
 		badge = null,
 		nested = false,
+		onclick,
 	}: Props = $props();
 </script>
 
@@ -36,6 +38,7 @@
 		class:is-nested={nested}
 		aria-disabled={disabled || undefined}
 		aria-current={active ? 'page' : undefined}
+		{onclick}
 	>
 		<Icon size={14} class={active ? 'text-primary' : ''} />
 		<span class="sb-item-label">{label}</span>
