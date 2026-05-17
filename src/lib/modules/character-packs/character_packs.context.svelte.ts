@@ -259,6 +259,7 @@ function createCharacterPacksContext() {
 
 		async updatePack(request: {
 			id: string;
+			name?: string;
 			display_name?: string;
 			language?: string | null;
 		}): Promise<CharacterPack> {
