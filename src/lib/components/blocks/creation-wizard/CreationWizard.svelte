@@ -93,10 +93,6 @@
 
 		switch (wizard.currentStep) {
 			case WIZARD_STEPS.GITHUB_SEARCH:
-				if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-					event.preventDefault();
-					githubSearchRef?.handleArrow(event.key === 'ArrowDown' ? 1 : -1);
-				}
 				break;
 			case WIZARD_STEPS.WORKTREE_CHOICE:
 				if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {

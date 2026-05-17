@@ -310,7 +310,6 @@
 	"command_palette_navigate": "navigate",
 	"command_palette_select": "select",
 	"command_palette_close": "close",
-	"command_palette_results": "{count} results",
 	"command_palette_no_results": "No results found",
 
 	"shortcuts_title": "Keyboard Shortcuts",

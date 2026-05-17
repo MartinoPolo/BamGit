@@ -64,9 +64,13 @@ test.describe('Global keyboard shortcuts', () => {
 		await page.keyboard.press('Control+k');
 		await expect(page.getByRole('dialog')).toBeVisible();
 
-		await page.keyboard.type('settings');
-		await page.keyboard.press('ArrowDown');
-		await page.keyboard.press('Enter');
+		const commandInput = page.locator('[data-command-input]');
+		await expect(commandInput).toBeVisible();
+		await commandInput.fill('settings');
+
+		const settingsItem = page.getByRole('option', { name: /settings/i });
+		await expect(settingsItem).toBeVisible();
+		await settingsItem.click();
 
 		await expect(page).toHaveURL(/settings/);
 	});

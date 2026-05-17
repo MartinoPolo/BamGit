@@ -1,4 +1,4 @@
-export { filterItems, groupByCategory, flattenGrouped } from './search.js';
+export { groupByCategory } from './search.js';
 export {
 	COMMAND_PALETTE_CATEGORIES,
 	CATEGORY_DISPLAY_ORDER,

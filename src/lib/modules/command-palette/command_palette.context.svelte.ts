@@ -1,5 +1,4 @@
 import { createContext } from 'svelte';
-import { SvelteMap } from 'svelte/reactivity';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
@@ -7,7 +6,7 @@ import { useBoard } from '$lib/modules/board/index.js';
 import { useActions } from '$lib/modules/actions/index.js';
 import { useIssues } from '$lib/modules/issues/index.js';
 import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts/index.js';
-import { filterItems, groupByCategory, flattenGrouped } from './search.js';
+import { groupByCategory } from './search.js';
 import { COMMAND_PALETTE_CATEGORIES } from './types.js';
 import type { CommandPaletteCategory, CommandPaletteItem } from './types.js';
 import type { ThemeMode } from '$lib/modules/board/index.js';
@@ -36,8 +35,6 @@ function createCommandPaletteContext() {
 	const shortcutsCtx = useKeyboardShortcuts();
 
 	const open = new StateRaw(false);
-	const query = new StateRaw('');
-	const selectedIndex = new StateRaw(0);
 
 	// ── Built-in navigation items ──────────────────────────────────────────
 
@@ -117,63 +114,20 @@ function createCommandPaletteContext() {
 	);
 
 	const allItems = $derived([...utilityItems, ...actionItems, ...navigationItems, ...issueItems]);
-	const filteredItems = $derived(filterItems(allItems, query.current));
-	const groupedResults = $derived(groupByCategory(filteredItems));
-	const flatResults = $derived(flattenGrouped(groupedResults));
-	const resultCount = $derived(flatResults.length);
-
-	const flatIndexByItemId = $derived.by(() => {
-		const map = new SvelteMap<string, number>();
-		for (let index = 0; index < flatResults.length; index++) {
-			map.set(flatResults[index].id, index);
-		}
-		return map;
-	});
+	const groupedResults = $derived(groupByCategory(allItems));
 
 	// ── Methods ────────────────────────────────────────────────────────────
-
-	function resetState() {
-		query.current = '';
-		selectedIndex.current = 0;
-	}
 
 	function toggle() {
 		if (open.current) {
 			close();
 		} else {
 			open.current = true;
-			resetState();
 		}
 	}
 
 	function close() {
 		open.current = false;
-		resetState();
-	}
-
-	function selectNext() {
-		if (resultCount === 0) {
-			return;
-		}
-		selectedIndex.current = (selectedIndex.current + 1) % resultCount;
-	}
-
-	function selectPrevious() {
-		if (resultCount === 0) {
-			return;
-		}
-		selectedIndex.current = (selectedIndex.current - 1 + resultCount) % resultCount;
-	}
-
-	function executeSelected() {
-		if (resultCount === 0) {
-			return;
-		}
-		const item = flatResults[selectedIndex.current];
-		if (item !== undefined) {
-			item.onSelect();
-			close();
-		}
 	}
 
 	function executeItem(item: CommandPaletteItem) {
@@ -187,41 +141,13 @@ function createCommandPaletteContext() {
 		},
 		set open(value: boolean) {
 			open.current = value;
-			if (!value) {
-				resetState();
-			}
-		},
-		get query() {
-			return query.current;
-		},
-		set query(value: string) {
-			query.current = value;
-			selectedIndex.current = 0;
-		},
-		get selectedIndex() {
-			return selectedIndex.current;
-		},
-		set selectedIndex(value: number) {
-			selectedIndex.current = value;
 		},
 		get groupedResults(): Map<CommandPaletteCategory, CommandPaletteItem[]> {
 			return groupedResults;
 		},
-		get flatResults(): CommandPaletteItem[] {
-			return flatResults;
-		},
-		get resultCount() {
-			return resultCount;
-		},
-		get flatIndexByItemId(): Map<string, number> {
-			return flatIndexByItemId;
-		},
 
 		toggle,
 		close,
-		selectNext,
-		selectPrevious,
-		executeSelected,
 		executeItem,
 	};
 }

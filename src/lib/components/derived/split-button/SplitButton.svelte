@@ -16,7 +16,7 @@
 		onselect,
 	}: SplitButtonProps = $props();
 
-	let selectedValue = $state(defaultValue);
+	let selectedValue = $state('');
 
 	let selectedLabel = $derived(
 		options.find((option) => option.value === selectedValue)?.label ?? selectedValue,
@@ -35,6 +35,7 @@
 	}
 
 	onMount(() => {
+		selectedValue = defaultValue;
 		if (settingsKey !== undefined && settingsKey !== '') {
 			void getAppSetting(settingsKey).then((setting) => {
 				if (setting !== null && setting.value !== '') {

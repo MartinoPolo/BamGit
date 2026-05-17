@@ -13,12 +13,17 @@ function getVisibleDialog(): HTMLElement {
 	return dialog;
 }
 
+function getCommandInput(dialog: HTMLElement): HTMLInputElement | null {
+	return dialog.querySelector('[data-command-input]') as HTMLInputElement | null;
+}
+
 export const playOpensAtStep1 = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 	const dialog = getVisibleDialog();
 	const dialogCanvas = within(dialog);
 	await expect(dialog).toBeVisible();
 	await expect(dialogCanvas.getByText('Search GitHub Issues')).toBeVisible();
-	await expect(dialogCanvas.getByRole('searchbox')).toBeVisible();
+	const input = getCommandInput(dialog);
+	await expect(input).toBeInTheDocument();
 	await expect(canvasElement.children.length).toBeGreaterThan(0);
 };
 
@@ -34,8 +39,18 @@ export const playEnterAdvancesToStep2 = async () => {
 	const dialog = getVisibleDialog();
 	const dialogCanvas = within(dialog);
 	await expect(dialog).toBeVisible();
+
+	const input = getCommandInput(dialog);
+	await waitFor(() => expect(input).toHaveFocus());
+
+	await waitFor(() => {
+		const items = dialog.querySelectorAll('[data-command-item]');
+		expect(items.length).toBeGreaterThan(0);
+		expect(items[0]).toHaveAttribute('data-selected');
+	});
+
 	await userEvent.keyboard('{Enter}');
-	await expect(dialogCanvas.getByText('Issue Name')).toBeVisible();
+	await waitFor(() => expect(dialogCanvas.getByText('Issue Name')).toBeVisible());
 	await expect(dialogCanvas.getByPlaceholderText('Issue name')).toBeVisible();
 };
 
@@ -45,10 +60,6 @@ export const playBackspaceGoesBack = async () => {
 	await expect(dialog).toBeVisible();
 	await expect(dialogCanvas.getByText('Issue Name')).toBeVisible();
 
-	// The wizard's Backspace handler (on svelte:window) navigates back only when no
-	// text input is focused. bits-ui focus-traps the dialog asynchronously, so we must
-	// blur the input and dispatch the Backspace event synchronously in the same
-	// microtask — preventing the focus trap from restoring focus before the handler runs.
 	const input = dialogCanvas.getByPlaceholderText('Issue name') as HTMLInputElement;
 	input.blur();
 	window.dispatchEvent(
