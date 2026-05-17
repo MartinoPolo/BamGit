@@ -1,19 +1,19 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { useBoard } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
+	import { useSettings } from '$lib/modules/settings';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
 	import { invoke } from '$lib/tauri.js';
 
-	const boardStore = useBoard();
+	const settingsCtx = useSettings();
 	const versionControl = useVersionControl();
 
 	let authWizardOpen = $state(false);
-	let editUsername = $state(boardStore.username);
-	let editInitials = $state(boardStore.userInitials);
+	let editUsername = $state(settingsCtx.get('username'));
+	let editInitials = $state(settingsCtx.get('userInitials'));
 </script>
 
 <div class="space-y-8">
@@ -30,9 +30,7 @@
 				<Input
 					id="username-input"
 					bind:value={editUsername}
-					onchange={() => {
-						boardStore.username = editUsername;
-					}}
+					onchange={() => void settingsCtx.set('username', editUsername)}
 				/>
 			</div>
 			<div class="w-24 space-y-1">
@@ -40,9 +38,7 @@
 				<Input
 					id="initials-input"
 					bind:value={editInitials}
-					onchange={() => {
-						boardStore.userInitials = editInitials;
-					}}
+					onchange={() => void settingsCtx.set('userInitials', editInitials)}
 					maxlength={3}
 				/>
 			</div>

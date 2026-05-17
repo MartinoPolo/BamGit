@@ -1,9 +1,5 @@
 import { invoke } from '$lib/tauri.js';
-import type {
-	AppSetting,
-	OverviewWorkspaceData,
-	WindowWorkspaceBinding,
-} from '$lib/types/generated';
+import type { OverviewWorkspaceData, WindowWorkspaceBinding } from '$lib/types/generated';
 
 export function openWorkspaceWindow(dashboardId: string): Promise<void> {
 	return invoke('open_workspace_window', { dashboardId });
@@ -37,12 +33,4 @@ export function getOverviewData(
 	includeArchived: boolean = false,
 ): Promise<OverviewWorkspaceData[]> {
 	return invoke('get_overview_data', { includeArchived });
-}
-
-export function getAppSetting(key: string): Promise<AppSetting | null> {
-	return invoke('get_app_setting', { key });
-}
-
-export function setAppSetting(key: string, value: string): Promise<void> {
-	return invoke('set_app_setting', { key, value });
 }

@@ -1,5 +1,6 @@
 import { createContext } from 'svelte';
-import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+import { browser } from '$app/environment';
+import { MediaQuery, SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import {
 	SETTING_KEYS,
@@ -8,7 +9,11 @@ import {
 	type SettingKey,
 	type SettingScope,
 } from './types.js';
-import { resolveSettingCascade, mirrorToLocalStorage } from './settings_resolution.js';
+import {
+	resolveSettingCascade,
+	mirrorToLocalStorage,
+	readFoucMirror,
+} from './settings_resolution.js';
 import {
 	getAllUserSettings,
 	setUserSetting,
@@ -16,6 +21,7 @@ import {
 	setWorkspaceSetting,
 	deleteWorkspaceSetting,
 } from './settings_commands.js';
+import { isThemeMode, isAccentColor } from '$lib/modules/board/types.js';
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -39,8 +45,28 @@ function createSettingsContext() {
 	const activeDashboardId = new StateRaw<string | null>(null);
 
 	for (const key of Object.keys(SETTING_DEFAULTS) as SettingKey[]) {
-		values.set(key, SETTING_DEFAULTS[key]);
+		const foucValue = browser ? readFoucMirror(key) : null;
+		values.set(key, foucValue ?? SETTING_DEFAULTS[key]);
 	}
+
+	// ── Theme DOM application ─────────────────────────────────────────────
+	const prefersDark = browser ? new MediaQuery('(prefers-color-scheme: dark)') : null;
+
+	const isDark = $derived.by(() => {
+		const mode = values.get('themeMode') ?? SETTING_DEFAULTS.themeMode;
+		if (mode === 'system') {
+			return prefersDark?.current ?? true;
+		}
+		return mode === 'dark';
+	});
+
+	$effect.pre(() => {
+		document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+		document.documentElement.dataset.accent =
+			values.get('accentColor') ?? SETTING_DEFAULTS.accentColor;
+	});
+
+	// ── API ────────────────────────────────────────────────────────────────
 
 	function get(key: SettingKey): string {
 		return values.get(key) ?? SETTING_DEFAULTS[key];
@@ -135,6 +161,16 @@ function createSettingsContext() {
 		activeDashboardId.current = dashboardId ?? null;
 	}
 
+	function getThemeMode(): string {
+		const raw = values.get('themeMode') ?? SETTING_DEFAULTS.themeMode;
+		return isThemeMode(raw) ? raw : SETTING_DEFAULTS.themeMode;
+	}
+
+	function getAccentColor(): string {
+		const raw = values.get('accentColor') ?? SETTING_DEFAULTS.accentColor;
+		return isAccentColor(raw) ? raw : SETTING_DEFAULTS.accentColor;
+	}
+
 	return {
 		get,
 		set,
@@ -142,6 +178,11 @@ function createSettingsContext() {
 		resetOverride,
 		loadSettings,
 		setScope,
+		getThemeMode,
+		getAccentColor,
+		get isDark() {
+			return isDark;
+		},
 		get activeScope() {
 			return activeScope.current;
 		},

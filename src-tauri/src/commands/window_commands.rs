@@ -2,7 +2,6 @@ use rusqlite::Row;
 use tauri::{AppHandle, Manager, State};
 
 use crate::database::connection::DatabaseState;
-use crate::models::app_setting::AppSetting;
 use crate::models::overview::OverviewWorkspaceData;
 use crate::models::window_binding::WindowWorkspaceBinding;
 use crate::window_manager::{self, APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
@@ -286,43 +285,3 @@ pub fn get_overview_data(
     Ok(data)
 }
 
-#[tauri::command]
-pub fn get_app_setting(
-    state: State<DatabaseState>,
-    key: String,
-) -> Result<Option<AppSetting>, String> {
-    let connection = state.read()?;
-
-    let result = connection
-        .query_row(
-            "SELECT key, value FROM user_settings WHERE key = ?1",
-            [&key],
-            |row| {
-                Ok(AppSetting {
-                    key: row.get(0)?,
-                    value: row.get(1)?,
-                })
-            },
-        )
-        .ok();
-
-    Ok(result)
-}
-
-#[tauri::command]
-pub fn set_app_setting(
-    state: State<DatabaseState>,
-    key: String,
-    value: String,
-) -> Result<(), String> {
-    let connection = state.write()?;
-
-    connection
-        .execute(
-            "INSERT OR REPLACE INTO user_settings (key, value) VALUES (?1, ?2)",
-            rusqlite::params![key, value],
-        )
-        .map_err(|error| format!("Failed to set app setting: {error}"))?;
-
-    Ok(())
-}
