@@ -92,33 +92,42 @@ function createSettingsContext() {
 	}
 
 	async function loadSettings(dashboardId?: string | null): Promise<void> {
+		const normalizedDashboardId = dashboardId ?? null;
 		const userSettings = await getAllUserSettings();
-
-		const userMap = new SvelteMap<string, string>();
-		for (const setting of userSettings) {
-			userMap.set(setting.key, setting.value);
-		}
-
-		const wsMap = new SvelteMap<string, string>();
-		if (dashboardId !== undefined && dashboardId !== null) {
-			const wsSettings = await getAllWorkspaceSettings(dashboardId);
-			for (const setting of wsSettings) {
-				wsMap.set(setting.key, setting.value);
-			}
-			overriddenKeys.set(dashboardId, new SvelteSet(wsSettings.map((s) => s.key)));
-		}
+		const userMap = toKeyValueMap(userSettings);
+		const wsMap = await loadWorkspaceMap(normalizedDashboardId);
 
 		for (const settingKey of Object.keys(SETTING_KEYS) as SettingKey[]) {
 			const dbKey = SETTING_KEYS[settingKey];
-			const hasDashboard = dashboardId !== undefined && dashboardId !== null;
 			const resolved = resolveSettingCascade(
 				settingKey,
 				userMap.get(dbKey) ?? null,
-				hasDashboard ? (wsMap.get(dbKey) ?? null) : null,
+				wsMap.get(dbKey) ?? null,
 			);
 			values.set(settingKey, resolved.value);
 			mirrorToLocalStorage(settingKey, resolved.value);
 		}
+	}
+
+	function toKeyValueMap(
+		settings: Array<{ key: string; value: string }>,
+	): SvelteMap<string, string> {
+		const map = new SvelteMap<string, string>();
+		for (const setting of settings) {
+			map.set(setting.key, setting.value);
+		}
+		return map;
+	}
+
+	async function loadWorkspaceMap(
+		dashboardId: string | null,
+	): Promise<SvelteMap<string, string>> {
+		if (dashboardId === null) {
+			return new SvelteMap();
+		}
+		const wsSettings = await getAllWorkspaceSettings(dashboardId);
+		overriddenKeys.set(dashboardId, new SvelteSet(wsSettings.map((s) => s.key)));
+		return toKeyValueMap(wsSettings);
 	}
 
 	function setScope(scope: SettingScope, dashboardId?: string | null): void {
