@@ -23,18 +23,19 @@ export interface IssueStateChipResult {
 
 export interface IssueStateChipInput {
 	readonly aggregateSessionState: AggregateSessionState;
-	readonly executionPhase: ExecutionPhase;
+	readonly executionPhase?: ExecutionPhase;
 	readonly syncStatus: ForestSyncStatus;
 	readonly worktreeState: WorktreeState;
 	readonly pullRequestState: ForestPullRequestState;
 	readonly githubIssueState: 'open' | 'closed';
-	readonly activeCheckCommandCount: number;
-	readonly activeTestCommandCount: number;
-	readonly prCiStatus: 'running' | 'passed' | 'failed' | null;
+	readonly activeCheckCommandCount?: number;
+	readonly activeTestCommandCount?: number;
+	readonly prCiStatus?: 'running' | 'passed' | 'failed' | null;
 }
 
 export interface CardStateClassInput {
 	readonly isArchived: boolean;
+	readonly isDone: boolean;
 	readonly isBatchSelected: boolean;
 	readonly isActive: boolean;
 	readonly isHovered: boolean;

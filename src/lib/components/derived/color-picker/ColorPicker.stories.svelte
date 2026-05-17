@@ -113,11 +113,11 @@
 		await userEvent.clear(hexInput);
 		await userEvent.type(hexInput, '#00ff00');
 
-		// Tab away to trigger the onchange event
-		await userEvent.tab();
+		// Press Enter to confirm the hex value (doesn't move focus out of popover)
+		await userEvent.keyboard('{Enter}');
 
 		// onSelect should have been called with the typed hex
-		await expect(args.onSelect).toHaveBeenCalledWith('#00ff00');
+		await waitFor(() => expect(args.onSelect).toHaveBeenCalledWith('#00ff00'));
 
 		// Popover should still be open (hex input does not close it)
 		await expect(getPopoverContent(canvasElement)).not.toBeNull();

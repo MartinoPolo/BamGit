@@ -1,18 +1,16 @@
 <script lang="ts">
 	import { useIssueCard } from '$lib/modules/issue-card/index.js';
 	import IssueStateChip from '$lib/components/derived/issue-state-chip/IssueStateChip.svelte';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
-	import { PRIORITY_BADGE_CLASSES } from './issue_card_utils.js';
+	import { PriorityBadge } from '$lib/components/derived/priority-badge/index.js';
+	import type { DisplayPriority } from '$lib/components/derived/priority-badge/priority_badge_types.js';
 	import QuickActionButtons from './QuickActionButtons.svelte';
 
 	const ctx = useIssueCard();
 
-	const priorityBadgeClass = $derived(
-		ctx.issue.priority !== null ? (PRIORITY_BADGE_CLASSES[ctx.issue.priority] ?? null) : null,
-	);
-
-	const priorityChipClass = $derived(
-		ctx.isLightHeader ? 'bg-white/22 text-black/80' : 'bg-black/18 text-inherit',
+	const displayPriority = $derived(
+		ctx.issue.priority !== null && ctx.issue.priority !== 'medium'
+			? (ctx.issue.priority as DisplayPriority)
+			: null,
 	);
 </script>
 
@@ -21,20 +19,16 @@
 		<IssueStateChip label={ctx.chipState.label} colorVariable={ctx.chipState.colorVariable} />
 	{/if}
 
-	{#if priorityBadgeClass && ctx.prioritiesEnabled && ctx.issue.priority !== 'medium'}
-		<SimpleTooltip text="Change priority">
-			<button
-				class="inline-flex h-4.5 cursor-pointer items-center gap-1 rounded border-none bg-transparent px-1.5 font-mono text-[9px] font-bold uppercase leading-none tracking-wide {priorityChipClass}"
-				onclick={(event: MouseEvent) => {
-					event.stopPropagation();
-					if (ctx.onPriorityClick) {
-						ctx.onPriorityClick();
-					}
-				}}
-			>
-				{ctx.issue.priority}
-			</button>
-		</SimpleTooltip>
+	{#if displayPriority !== null && ctx.prioritiesEnabled}
+		<PriorityBadge
+			priority={displayPriority}
+			position={ctx.appearanceSettings.priorityPosition}
+			badgeStyle={ctx.appearanceSettings.badgeStyle}
+			onclick={(event) => {
+				event.stopPropagation();
+				ctx.onPriorityClick?.();
+			}}
+		/>
 	{/if}
 
 	<QuickActionButtons />

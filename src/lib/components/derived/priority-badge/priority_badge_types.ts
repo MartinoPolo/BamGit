@@ -1,20 +1,9 @@
 import type { BadgeStyle } from '$lib/components/shadcn/badge/index.js';
 import type { IssuePriority } from '$lib/modules/issues/types.js';
-
-export const PRIORITY_POSITIONS = [
-	'header-right',
-	'preview-bottom-half',
-	'preview-top-half',
-	'preview-bottom-inside',
-	'preview-top-inside',
-	'preview-tl',
-	'preview-tr',
-	'preview-bl',
-	'preview-br',
-] as const;
+import type { PriorityPositionOption } from '$lib/modules/issue-card/index.js';
 
 /** @public */
-export type PriorityPosition = (typeof PRIORITY_POSITIONS)[number];
+export type PriorityPosition = PriorityPositionOption;
 
 /** @public */
 export type DisplayPriority = Exclude<IssuePriority, 'medium'>;
@@ -40,5 +29,5 @@ export interface PriorityBadgeProps {
 	priority: DisplayPriority;
 	position?: PriorityPosition;
 	badgeStyle?: BadgeStyle;
-	onclick?: () => void;
+	onclick?: (event: MouseEvent) => void;
 }

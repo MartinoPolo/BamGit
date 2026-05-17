@@ -13,6 +13,7 @@
 		ISSUE_CARD_SETTING_DEFAULTS,
 		type IssueCardAppearanceSettings,
 	} from '$lib/modules/issue-card/index.js';
+	import { getHoveredPrdNumber } from './prd_hover_store.svelte.js';
 	import IssueCardHeader from './IssueCardHeader.svelte';
 	import IssueCardPreview from './IssueCardPreview.svelte';
 	import WorktreeRow from './WorktreeRow.svelte';
@@ -131,6 +132,10 @@
 			.map(([key, value]) => `${key}: ${value}`)
 			.join('; ');
 	});
+
+	const isPrdHighlighted = $derived(
+		getHoveredPrdNumber() !== null && ctx.prdParent?.number === getHoveredPrdNumber(),
+	);
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -141,7 +146,7 @@
 	ctx.isHovered ||
 	ctx.isBatchSelected
 		? ''
-		: 'card-ic-interactive'}"
+		: 'card-ic-interactive'} {isPrdHighlighted ? 'ring-2 ring-offset-2 ring-primary/25' : ''}"
 	data-variant={ctx.variant}
 	style={variantStyleString}
 	onclick={handleCardClick}
@@ -178,7 +183,7 @@
 	:global(.card-ic-interactive):hover,
 	:global(.card-state-hovered-ic) {
 		box-shadow:
-			inset 0 0 0 2px color-mix(in oklch, var(--ic) 40%, transparent),
+			inset 0 0 0 2px color-mix(in oklch, var(--ic-color) 40%, transparent),
 			var(--shadow-md);
 	}
 
@@ -192,7 +197,7 @@
 		position: absolute;
 		inset: 0;
 		border-radius: inherit;
-		border: 2px solid color-mix(in oklch, var(--ic) 45%, transparent);
+		border: 2px solid color-mix(in oklch, var(--ic-color) 45%, transparent);
 		pointer-events: none;
 		z-index: 10;
 	}
@@ -200,8 +205,8 @@
 	:global(.card-state-active-ic) {
 		box-shadow:
 			0 0 0 3px var(--surface),
-			0 0 0 5px color-mix(in oklch, var(--ic) 50%, transparent),
-			0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
+			0 0 0 5px color-mix(in oklch, var(--ic-color) 50%, transparent),
+			0 0 18px color-mix(in oklch, var(--ic-color) 25%, transparent);
 		background: color-mix(in oklch, oklch(0.55 0.08 55) 10%, var(--surface));
 	}
 
@@ -210,13 +215,13 @@
 		position: absolute;
 		inset: 0;
 		border-radius: inherit;
-		border: 3px solid color-mix(in oklch, var(--ic) 65%, transparent);
+		border: 3px solid color-mix(in oklch, var(--ic-color) 65%, transparent);
 		pointer-events: none;
 		z-index: 10;
 	}
 
 	:global(.card-state-selected-primary) {
-		box-shadow: 0 0 18px color-mix(in oklch, var(--ic) 25%, transparent);
+		box-shadow: 0 0 18px color-mix(in oklch, var(--ic-color) 25%, transparent);
 		background: color-mix(in srgb, var(--selection) 18%, var(--surface));
 	}
 
@@ -225,7 +230,7 @@
 		position: absolute;
 		inset: 0;
 		border-radius: inherit;
-		border: 3px solid color-mix(in oklch, var(--ic) 65%, transparent);
+		border: 3px solid color-mix(in oklch, var(--ic-color) 65%, transparent);
 		pointer-events: none;
 		z-index: 10;
 	}

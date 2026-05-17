@@ -1,6 +1,7 @@
 import { createContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
+import { Derived } from '$lib/reactivity/derived.svelte.js';
 import { getAppSetting, setAppSetting } from '$lib/modules/window/window_commands.js';
 import {
 	ISSUE_CARD_SETTING_DEFAULTS,
@@ -40,7 +41,8 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 	const headerSaturation = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.headerSaturation);
 	const radialIntensity = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.radialIntensity);
 
-	const overriddenKeys = new StateRaw<SvelteSet<IssueCardSettingKey>>(new SvelteSet());
+	// Fix 1: plain SvelteSet — already reactive, no StateRaw wrapper needed
+	const overriddenKeys = new SvelteSet<IssueCardSettingKey>();
 
 	const stateMap = {
 		buttonColor,
@@ -55,50 +57,52 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 		radialIntensity,
 	} as const;
 
+	// Fix 5: wsKey helper — eliminates repeated dashboardId null checks + template literals
+	const buildWsKey = (dbKey: string): string | null =>
+		dashboardId !== null && dashboardId !== undefined ? `ws_${dashboardId}_${dbKey}` : null;
+
+	// Fix 2: parallel loading with Promise.all
 	// fallow-ignore-next-line complexity
 	async function loadSettings() {
-		const keys = Object.keys(ISSUE_CARD_SETTING_KEYS) as IssueCardSettingKey[];
-		const newOverrides = new SvelteSet<IssueCardSettingKey>();
-
-		for (const key of keys) {
-			const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-			const wsDbKey =
-				dashboardId !== null && dashboardId !== undefined
-					? `ws_${dashboardId}_${dbKey}`
-					: null;
-
-			const userSetting = await getAppSetting(dbKey);
-			const wsSetting = wsDbKey !== null ? await getAppSetting(wsDbKey) : null;
-
-			const result = resolveSettingValue(
-				key,
-				userSetting?.value ?? null,
-				wsSetting?.value ?? null,
+		try {
+			const keys = Object.keys(ISSUE_CARD_SETTING_KEYS) as IssueCardSettingKey[];
+			const results = await Promise.all(
+				keys.map(async (key) => {
+					const dbKey = ISSUE_CARD_SETTING_KEYS[key];
+					const wsDbKey = buildWsKey(dbKey);
+					const [userSetting, wsSetting] = await Promise.all([
+						getAppSetting(dbKey),
+						wsDbKey !== null ? getAppSetting(wsDbKey) : Promise.resolve(null),
+					]);
+					return { key, userSetting, wsSetting };
+				}),
 			);
 
-			(stateMap[key] as StateRaw<string | number>).current = result.value;
-			if (result.isOverridden) {
-				newOverrides.add(key);
+			overriddenKeys.clear();
+			for (const { key, userSetting, wsSetting } of results) {
+				const result = resolveSettingValue(
+					key,
+					userSetting?.value ?? null,
+					wsSetting?.value ?? null,
+				);
+				(stateMap[key] as StateRaw<string | number>).current = result.value;
+				if (result.isOverridden) {
+					overriddenKeys.add(key);
+				}
 			}
+		} catch (error) {
+			console.warn('[IssueCardSettings] Failed to load settings:', error);
 		}
-
-		overriddenKeys.current = newOverrides;
 	}
 
 	async function updateSetting(key: IssueCardSettingKey, value: string | number) {
 		const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-		const effectiveKey =
-			dashboardId !== null && dashboardId !== undefined
-				? `ws_${dashboardId}_${dbKey}`
-				: dbKey;
+		const effectiveKey = buildWsKey(dbKey) ?? dbKey;
 		await setAppSetting(effectiveKey, String(value));
 		(stateMap[key] as StateRaw<string | number>).current = value;
 
 		if (dashboardId !== null && dashboardId !== undefined) {
-			const current = overriddenKeys.current;
-			const updated = new SvelteSet(current);
-			updated.add(key);
-			overriddenKeys.current = updated;
+			overriddenKeys.add(key);
 		}
 	}
 
@@ -107,41 +111,43 @@ function createIssueCardSettingsContext(dashboardId?: string) {
 			return;
 		}
 		const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-		const wsKey = `ws_${dashboardId}_${dbKey}`;
-		await setAppSetting(wsKey, '');
+		const wsDbKey = buildWsKey(dbKey);
+		if (wsDbKey !== null) {
+			await setAppSetting(wsDbKey, '');
+		}
 
 		const userSetting = await getAppSetting(dbKey);
 		const result = resolveSettingValue(key, userSetting?.value ?? null, null);
 		(stateMap[key] as StateRaw<string | number>).current = result.value;
 
-		const current = overriddenKeys.current;
-		const updated = new SvelteSet(current);
-		updated.delete(key);
-		overriddenKeys.current = updated;
+		overriddenKeys.delete(key);
 	}
 
 	function isOverridden(key: IssueCardSettingKey): boolean {
-		return overriddenKeys.current.has(key);
+		return overriddenKeys.has(key);
 	}
+
+	// Fix 6: Derived for stable settings object reference
+	const settingsObj = new Derived<IssueCardAppearanceSettings>(() => ({
+		buttonColor: buttonColor.current,
+		priorityPosition: priorityPosition.current,
+		badgeStyle: badgeStyle.current,
+		labelTint: labelTint.current,
+		overlayGlow: overlayGlow.current,
+		variant: variant.current,
+		gradientReach: gradientReach.current,
+		colorSaturation: colorSaturation.current,
+		headerSaturation: headerSaturation.current,
+		radialIntensity: radialIntensity.current,
+	}));
 
 	return {
 		get settings(): IssueCardAppearanceSettings {
-			return {
-				buttonColor: buttonColor.current,
-				priorityPosition: priorityPosition.current,
-				badgeStyle: badgeStyle.current,
-				labelTint: labelTint.current,
-				overlayGlow: overlayGlow.current,
-				variant: variant.current,
-				gradientReach: gradientReach.current,
-				colorSaturation: colorSaturation.current,
-				headerSaturation: headerSaturation.current,
-				radialIntensity: radialIntensity.current,
-			};
+			return settingsObj.current;
 		},
 
 		get overriddenKeys() {
-			return overriddenKeys.current;
+			return overriddenKeys;
 		},
 
 		set buttonColor(value: ButtonColorOption) {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { useIssueCard } from '$lib/modules/issue-card/index.js';
+	import { setHoveredPrdNumber } from './prd_hover_store.svelte.js';
 	import IssueCardHeaderActions from './IssueCardHeaderActions.svelte';
 
 	const ctx = useIssueCard();
@@ -11,6 +12,16 @@
 		if (ctx.onTitleClick) {
 			ctx.onTitleClick(event);
 		}
+	}
+
+	function handlePrdMouseEnter() {
+		if (ctx.prdParent?.number !== null && ctx.prdParent?.number !== undefined) {
+			setHoveredPrdNumber(ctx.prdParent.number);
+		}
+	}
+
+	function handlePrdMouseLeave() {
+		setHoveredPrdNumber(null);
 	}
 </script>
 
@@ -28,12 +39,17 @@
 					rel="noopener noreferrer"
 					class="hover:opacity-100"
 					style="color: inherit;"
-					onclick={(event) => event.stopPropagation()}>{ctx.prdParent.number}</a
+					onclick={(event) => event.stopPropagation()}
+					onmouseenter={handlePrdMouseEnter}
+					onmouseleave={handlePrdMouseLeave}>{ctx.prdParent.number}</a
 				>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				<span class="opacity-50">/</span>
 			{:else if hasPrdLabel && ctx.prdParent}
-				{ctx.prdParent.number}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<span onmouseenter={handlePrdMouseEnter} onmouseleave={handlePrdMouseLeave}>
+					{ctx.prdParent.number}
+				</span>
 				<span class="opacity-50">/</span>
 			{/if}
 			{#if ctx.issue.github_issue_url}

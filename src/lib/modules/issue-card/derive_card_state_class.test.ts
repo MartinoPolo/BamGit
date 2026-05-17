@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { deriveCardStateClass } from './derive_card_state_class.js';
-import { CARD_STATE_CLASSES } from '$lib/components/blocks/issue/batch_selection_utils.js';
+import { deriveCardStateClass, CARD_STATE_CLASSES } from './derive_card_state_class.js';
 import type { CardStateClassInput } from './types.js';
 
 function makeInput(overrides: Partial<CardStateClassInput> = {}): CardStateClassInput {
 	return {
 		isArchived: false,
+		isDone: false,
 		isBatchSelected: false,
 		isActive: false,
 		isHovered: false,
@@ -59,5 +59,25 @@ describe('deriveCardStateClass', () => {
 	it('priority: active > hovered (both true -> active)', () => {
 		const result = deriveCardStateClass(makeInput({ isActive: true, isHovered: true }));
 		expect(result).toBe(CARD_STATE_CLASSES.active);
+	});
+
+	it('done -> done class', () => {
+		const result = deriveCardStateClass(makeInput({ isDone: true }));
+		expect(result).toBe(CARD_STATE_CLASSES.done);
+	});
+
+	it('worktree pending -> worktreeSetup class', () => {
+		const result = deriveCardStateClass(makeInput({ worktreeState: 'pending' }));
+		expect(result).toBe(CARD_STATE_CLASSES.worktreeSetup);
+	});
+
+	it('priority: archived > done (both true -> archived)', () => {
+		const result = deriveCardStateClass(makeInput({ isArchived: true, isDone: true }));
+		expect(result).toBe(CARD_STATE_CLASSES.archived);
+	});
+
+	it('priority: done > worktreeSetup (both true -> done)', () => {
+		const result = deriveCardStateClass(makeInput({ isDone: true, worktreeState: 'pending' }));
+		expect(result).toBe(CARD_STATE_CLASSES.done);
 	});
 });

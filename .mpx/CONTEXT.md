@@ -12,6 +12,8 @@ Desktop AI agent orchestration platform for developers running parallel Claude C
 **Session** — One AI agent CLI execution tied to an issue. Has transcript, cost, turns, state. Multiple per issue.
 **Provider** — AI agent CLI backend (Claude Code, Cursor, Codex, OpenCode). Each session runs on one provider.
 **Issue Environment** — Per-issue bundle: worktree folder, editor instance, terminal session.
+**IssueCardContext** — Svelte createContext pattern sharing issue, color, settings, and derived state across 8 card sub-components. Lives in `src/lib/modules/issue-card/`
+**IssueStateChip** — Component rendering the 22-state priority cascade chip. Replaces former SessionStateChip.
 
 _Avoid_: "task" for Issue, "project" for Workspace, "run" for Session.
 
@@ -40,8 +42,13 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 **Deep Module** — Ousterhout pattern: small interface, large implementation. Each module exposes `use{Feature}()` factory.
 **Design Token** — OKLCH CSS custom property in `app.css` under `@theme inline`. Semantic tokens swap via `[data-theme]`.
 **Accent Color** — Theme applied via `data-accent` on `<html>`. 12 presets. Overrides `--primary`, `--accent`, `--ring`.
-**State Mapping** — Priority-ordered rule table for tree stage, accessories, overlays, glow, animations. See `.mpx/STATE_MAPPING.md`.
+**Appearance Settings** — 10 per-card user preferences (variant, badge style, label tint, etc.) stored in `app_settings` with `issue_card_` prefix; workspace overrides use `ws_{dashboard_id}_issue_card_` prefix.
+**State Mapping** — Priority-ordered rule table for tree stage, accessories, overlays, glow, animations. See`.mpx/STATE_MAPPING.md`.
+**State Chip Cascade** — 22-rule priority-ordered derivation in `derive_issue_state_chip.ts` mapping 8 state dimensions to a single {label, color} display chip.
 
+**Card Variant** — CSS-only visual mode (Veil, Horizon, Radiant) applied via `data-variant` attribute + `--card-*` custom properties. No JS branching.
+**CommandResultsRow** — Sub-component displaying command result badges (check/test/server) on issue card Row 4.
+**PRD Hover Store** — Module-level store (`prd_hover_store.svelte.ts`) enabling cross-card highlight when hovering a PRD number badge.
 **CESP** — Common Event Sound Protocol. Manifest format from peon-ping for notification sound packs.
 **Character Pack** — Per-issue character with avatar + sound assignments for 15 notification events.
 **Execution Phase** — Current step in an active session: analyzing, tdd, reviewing, testing, fixing, shipping.
@@ -75,7 +82,7 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 | Feature                | Status                     | PRD       | Design                                                |
 | ---------------------- | -------------------------- | --------- | ----------------------------------------------------- |
 | Workspace Dashboard    | implemented                | #87, #89  | `designs/issue-card-v2/`                              |
-| Issue Card v2 Redesign | ready for implementation   | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
+| Issue Card v2 Redesign | implemented                | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
 | Overview Dashboard     | implemented                | #96       | `claude_design/Workspace Card.html`                   |
 | Issue Creation         | implemented                | #89       | `claude_design/Creation Wizard.html`                  |
 | Session Management     | partial (UI done)          | #90       | `claude_design/Session Chat View.html`                |

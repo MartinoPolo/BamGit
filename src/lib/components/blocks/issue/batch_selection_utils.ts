@@ -1,3 +1,7 @@
+import { CARD_STATE_CLASSES } from '$lib/modules/issue-card/index.js';
+
+export { CARD_STATE_CLASSES };
+
 /**
  * Compute the range of issue IDs between anchor and target in a flat visual order.
  * Always returns IDs in forward (array) order regardless of anchor/target positions.
@@ -20,17 +24,6 @@ export function computeRangeSelection(
 
 	return flatOrder.slice(startIndex, endIndex + 1);
 }
-
-export const CARD_STATE_CLASSES = {
-	active: 'card-state-active-ic',
-	hovered: 'card-state-hovered-ic',
-	selectionHover: 'card-state-selection-hover',
-	selected: 'card-state-selected-primary',
-	loading: 'pointer-events-none',
-	archived: 'opacity-70 grayscale-[0.8]',
-	error: 'border-l-0.75 border-l-destructive',
-	disabled: 'opacity-42 pointer-events-none',
-} as const;
 
 export const BATCH_SELECTED_GLOW_COLOR = 'var(--primary)';
 

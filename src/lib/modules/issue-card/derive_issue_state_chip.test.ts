@@ -389,4 +389,43 @@ describe('deriveIssueStateChipLabel', () => {
 			expect(result?.colorVariable).not.toBe(CHIP_COLORS.success);
 		});
 	});
+
+	describe('optional fields — undefined skips those rules', () => {
+		it('skips execution phase rules when executionPhase is undefined (running -> EXECUTING)', () => {
+			const result = deriveIssueStateChipLabel(
+				makeInput({ aggregateSessionState: 'running', executionPhase: undefined }),
+			);
+			expect(result).toEqual({ label: 'EXECUTING', colorVariable: CHIP_COLORS.success });
+		});
+
+		it('skips command count rules when activeCheckCommandCount is undefined', () => {
+			const result = deriveIssueStateChipLabel(
+				makeInput({ activeCheckCommandCount: undefined }),
+			);
+			expect(result).toBeNull();
+		});
+
+		it('skips command count rules when activeTestCommandCount is undefined', () => {
+			const result = deriveIssueStateChipLabel(
+				makeInput({ activeTestCommandCount: undefined }),
+			);
+			expect(result).toBeNull();
+		});
+
+		it('skips CI status rule when prCiStatus is undefined', () => {
+			const result = deriveIssueStateChipLabel(makeInput({ prCiStatus: undefined }));
+			expect(result).toBeNull();
+		});
+
+		it('omitting all optional fields still resolves non-optional rules (merge-conflict)', () => {
+			const result = deriveIssueStateChipLabel({
+				aggregateSessionState: 'no-session',
+				syncStatus: { type: 'merge-conflict' },
+				worktreeState: 'active',
+				pullRequestState: 'no-pr',
+				githubIssueState: 'open',
+			});
+			expect(result).toEqual({ label: 'MERGE CONFLICT', colorVariable: CHIP_COLORS.error });
+		});
+	});
 });

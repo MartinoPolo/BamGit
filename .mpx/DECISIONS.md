@@ -301,3 +301,31 @@ Decided: 2026-05-10
 What: If a feature (like skill disable toggle) can't actually work with the provider, don't show a cosmetic-only UI for it. Skip entirely.
 Why: User explicitly rejects cosmetic-only features that create false expectations.
 Rejected: Display-only toggles as "coming soon" placeholders.
+
+### IssueCard decomposed via Svelte createContext (not prop drilling)
+
+Decided: 2026-05-16
+What: IssueCard is a thin orchestrator (~130 lines) that creates an IssueCardContext via createContext(). Eight sub-components (IssueCardHeader, GitHubStatusRow, WorktreeRow, CommandResultsRow, etc.) consume the context directly — no prop chains.
+Why: 526-line monolith was unmaintainable. Context avoids deeply nested prop drilling while keeping sub-components independently testable via IssueCardSubComponentStoryWrapper.
+Rejected: Prop drilling (verbose, brittle), single-component monolith (untestable).
+
+### Card variants are CSS-only via data-variant attribute
+
+Decided: 2026-05-16
+What: Three card visual modes (Veil, Horizon, Radiant) are switched by setting data-variant on the card root element. Each variant is defined as a CSS block overriding --card-\* custom properties. No JavaScript branching in component logic for variant differences.
+Why: Runtime CSS is instant (no re-render), variants remain fully composable with state classes, and adding a new variant requires only a CSS block.
+Rejected: Conditional Svelte markup per variant (bloats component), separate component per variant (duplication).
+
+### Issue card appearance: two-tier settings cascade (user + workspace)
+
+Decided: 2026-05-16
+What: 10 appearance settings (variant, badge style, label tint, etc.) stored in app*settings table. User-level keys use `issue_card*`prefix. Workspace overrides use`ws*{dashboard_id}\_issue_card*` prefix and take priority.
+Why: Allows per-dashboard visual tuning without a separate settings table. Matches existing app_settings pattern used by other features.
+Rejected: Separate appearance table (schema migration cost), single global setting (no per-workspace override).
+
+### Issue card: hide priority badge for "medium" priority
+
+Decided: 2026-05-17
+What: IssueCardHeaderActions suppresses the priority badge when the issue priority is "medium". Only non-default priorities (low, high, critical, urgent) show a badge.
+Why: Medium is the default priority. Showing it on every card adds visual noise without information value — the absence of a badge communicates "medium" implicitly.
+Rejected: Always show badge (clutter), configurable threshold (over-engineering for a UX heuristic).

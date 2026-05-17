@@ -10,7 +10,6 @@ interface VariantCssInput {
 
 function computeSharedProperties(issueColor: string, overlayGlow: number): Record<string, string> {
 	return {
-		'--ic': issueColor,
 		'--ic-color': issueColor,
 		'--ic-header-text': getContrastTextColor(issueColor),
 		'--ic-overlay-glow': String(overlayGlow / 100),

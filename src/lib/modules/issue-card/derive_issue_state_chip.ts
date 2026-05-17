@@ -24,22 +24,22 @@ export function deriveIssueStateChipLabel(input: IssueStateChipInput): IssueStat
 
 	// Rules 5-10: Running session with execution phase
 	if (input.aggregateSessionState === 'running') {
-		if (input.executionPhase === 'analyzing') {
+		if (input.executionPhase !== undefined && input.executionPhase === 'analyzing') {
 			return { label: 'ANALYZING', colorVariable: CHIP_COLORS.success };
 		}
-		if (input.executionPhase === 'tdd') {
+		if (input.executionPhase !== undefined && input.executionPhase === 'tdd') {
 			return { label: 'BUILDING', colorVariable: CHIP_COLORS.success };
 		}
-		if (input.executionPhase === 'reviewing') {
+		if (input.executionPhase !== undefined && input.executionPhase === 'reviewing') {
 			return { label: 'REVIEWING', colorVariable: CHIP_COLORS.info };
 		}
-		if (input.executionPhase === 'verifying') {
+		if (input.executionPhase !== undefined && input.executionPhase === 'verifying') {
 			return { label: 'VERIFYING', colorVariable: CHIP_COLORS.success };
 		}
-		if (input.executionPhase === 'committing') {
+		if (input.executionPhase !== undefined && input.executionPhase === 'committing') {
 			return { label: 'SHIPPING', colorVariable: CHIP_COLORS.success };
 		}
-		// Rule 10: running + none
+		// Rule 10: running + none (or executionPhase omitted)
 		return { label: 'EXECUTING', colorVariable: CHIP_COLORS.success };
 	}
 
@@ -54,12 +54,12 @@ export function deriveIssueStateChipLabel(input: IssueStateChipInput): IssueStat
 	}
 
 	// Rule 13: Running checks
-	if (input.activeCheckCommandCount > 0) {
+	if (input.activeCheckCommandCount !== undefined && input.activeCheckCommandCount > 0) {
 		return { label: 'RUNNING CHECKS', colorVariable: CHIP_COLORS.info };
 	}
 
 	// Rule 14: Running tests
-	if (input.activeTestCommandCount > 0) {
+	if (input.activeTestCommandCount !== undefined && input.activeTestCommandCount > 0) {
 		return { label: 'RUNNING TESTS', colorVariable: CHIP_COLORS.info };
 	}
 
@@ -74,7 +74,7 @@ export function deriveIssueStateChipLabel(input: IssueStateChipInput): IssueStat
 	}
 
 	// Rule 17: CI running
-	if (input.prCiStatus === 'running') {
+	if (input.prCiStatus !== undefined && input.prCiStatus === 'running') {
 		return { label: 'CI RUNNING', colorVariable: CHIP_COLORS.info };
 	}
 

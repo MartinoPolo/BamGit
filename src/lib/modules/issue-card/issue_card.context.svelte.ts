@@ -86,6 +86,7 @@ function mapCacheToPrState(cache: GitStatusCache | null): ForestPullRequestState
 	return cache.pr_state as ForestPullRequestState;
 }
 
+/** @internal - exported only for testing */
 export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 	return {
 		// Passthrough inputs
@@ -149,6 +150,7 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			const props = getProps();
 			return deriveCardStateClass({
 				isArchived: props.issue.status === 'archived',
+				isDone: false,
 				isBatchSelected: props.isBatchSelected,
 				isActive: props.isActive,
 				isHovered: props.isHovered,
@@ -160,14 +162,12 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			const props = getProps();
 			return deriveIssueStateChipLabel({
 				aggregateSessionState: mapSessionStateToAggregate(props.sessionState),
-				executionPhase: 'none',
 				syncStatus: mapCacheToSyncStatus(props.cache),
 				worktreeState: props.issue.worktree_state,
 				pullRequestState: mapCacheToPrState(props.cache),
 				githubIssueState: (props.cache?.github_issue_state as 'open' | 'closed') ?? 'open',
-				activeCheckCommandCount: 0,
-				activeTestCommandCount: 0,
-				prCiStatus: null,
+				// executionPhase, activeCheckCommandCount, activeTestCommandCount, prCiStatus
+				// omitted — will be wired when workspace commands backend (PRD #255) is available
 			});
 		},
 		get notificationDotColor(): string | null {

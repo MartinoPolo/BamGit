@@ -24,4 +24,5 @@
 			disabled={!ctx.ghAvailable}
 		/>
 	{/if}
+	<!-- CI badge: wire when prCiStatus is added to IssueCardContextProps (PRD #255) -->
 </div>

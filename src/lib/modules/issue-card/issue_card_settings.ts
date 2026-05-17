@@ -77,22 +77,24 @@ const NUMERIC_SETTING_KEYS = new Set<IssueCardSettingKey>([
 	'radialIntensity',
 ]);
 
-export const ISSUE_CARD_SETTING_RANGES: Record<string, SettingRange> = {
+export const ISSUE_CARD_SETTING_RANGES = {
 	labelTint: { min: 5, max: 30 },
 	overlayGlow: { min: 100, max: 200 },
 	gradientReach: { min: 30, max: 100 },
 	colorSaturation: { min: 30, max: 200 },
 	headerSaturation: { min: 30, max: 100 },
 	radialIntensity: { min: 30, max: 100 },
-} as const;
+} as const satisfies Partial<Record<IssueCardSettingKey, SettingRange>>;
 
 // ── Clamp ────────────────────────────────────────────────────────────
 
+export type RangeKey = keyof typeof ISSUE_CARD_SETTING_RANGES;
+
 export function clampSettingValue(key: string, value: number): number {
-	const range = ISSUE_CARD_SETTING_RANGES[key];
-	if (range === undefined) {
+	if (!(key in ISSUE_CARD_SETTING_RANGES)) {
 		return value;
 	}
+	const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey];
 	return Math.min(Math.max(value, range.min), range.max);
 }
 
@@ -105,6 +107,27 @@ export function parseSettingValue(key: IssueCardSettingKey, rawValue: string): s
 			return ISSUE_CARD_SETTING_DEFAULTS[key];
 		}
 		return clampSettingValue(key, parsed);
+	}
+
+	if (key === 'buttonColor') {
+		return (BUTTON_COLOR_OPTIONS as readonly string[]).includes(rawValue)
+			? rawValue
+			: ISSUE_CARD_SETTING_DEFAULTS[key];
+	}
+	if (key === 'badgeStyle') {
+		return (BADGE_STYLE_OPTIONS as readonly string[]).includes(rawValue)
+			? rawValue
+			: ISSUE_CARD_SETTING_DEFAULTS[key];
+	}
+	if (key === 'variant') {
+		return (Object.values(ISSUE_CARD_VARIANTS) as readonly string[]).includes(rawValue)
+			? rawValue
+			: ISSUE_CARD_SETTING_DEFAULTS[key];
+	}
+	if (key === 'priorityPosition') {
+		return (PRIORITY_POSITION_OPTIONS as readonly string[]).includes(rawValue)
+			? rawValue
+			: ISSUE_CARD_SETTING_DEFAULTS[key];
 	}
 	return rawValue;
 }
@@ -151,7 +174,7 @@ export function resolveSettingValue(
 		value = parseSettingValue(key, userRawValue);
 	}
 
-	if (workspaceRawValue !== null) {
+	if (workspaceRawValue !== null && workspaceRawValue !== '') {
 		value = parseSettingValue(key, workspaceRawValue);
 		isOverridden = true;
 	}

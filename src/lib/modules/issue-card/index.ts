@@ -1,6 +1,4 @@
-export { deriveIssueStateChipLabel } from './derive_issue_state_chip.js';
-export { deriveCardStateClass } from './derive_card_state_class.js';
-export { deriveWorktreeBadge } from './derive_worktree_badge.js';
+export { CARD_STATE_CLASSES } from './derive_card_state_class.js';
 export {
 	useIssueCard,
 	setIssueCardContext,
@@ -34,6 +32,7 @@ export {
 	type ButtonColorOption,
 	type PriorityPositionOption,
 	type BadgeStyleOption,
+	type RangeKey,
 } from './issue_card_settings.js';
 export { computeVariantCssProperties } from './issue_card_variant_css.js';
 export {
