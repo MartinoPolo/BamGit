@@ -146,12 +146,15 @@ function applyStateOverrides(
 			break;
 
 		case 'active':
+			card.outline = `3px solid ${issueColor}`;
+			card['outline-offset'] = '-3px';
 			card['box-shadow'] =
-				`0 0 12px 2px color-mix(in oklch, ${issueColor} 18%, transparent), 0 0 4px 0 color-mix(in oklch, ${issueColor} 10%, transparent), var(--shadow-md)`;
+				`0 0 0 8px color-mix(in oklch, ${issueColor} 40%, transparent), 0 0 24px 4px color-mix(in oklch, ${issueColor} 25%, transparent), 0 4px 12px 0 color-mix(in oklch, ${issueColor} 16%, transparent), var(--shadow-lg)`;
 			if (isHovered) {
 				card['box-shadow'] =
-					`0 0 24px 4px color-mix(in oklch, ${issueColor} 22%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 16%, transparent), var(--shadow-lg)`;
-				card.transform = 'translateY(-3px)';
+					`0 0 0 8px color-mix(in oklch, ${issueColor} 50%, transparent), 0 0 28px 6px color-mix(in oklch, ${issueColor} 30%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 20%, transparent), var(--shadow-lg)`;
+				card['box-shadow-offset'] = '50px';
+				card.transform = 'translateY(-2px)';
 				header = applyHoverHeaderBrighten(base.header);
 			}
 			break;

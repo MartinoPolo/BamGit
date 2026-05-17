@@ -115,10 +115,12 @@
 	onmouseenter={() => selection.hoverIssue(issue.id)}
 	onmouseleave={() => selection.unhover()}
 >
-	{#if ctx.cardState === 'selected' || ctx.cardState === 'selectionHover'}
+	{#if ctx.cardState === 'selected' || ctx.cardState === 'selectionHover' || ctx.cardState === 'active'}
 		<div
 			class="pointer-events-none absolute inset-0 z-1 rounded-lg"
-			style="background: color-mix(in oklch, {ctx.color} 8%, transparent);"
+			style="background: color-mix(in oklch, {ctx.color} {ctx.cardState === 'active'
+				? '10'
+				: '8'}%, transparent);"
 		></div>
 	{/if}
 
