@@ -17,6 +17,7 @@
 	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { useBoard } from '$lib/modules/board';
+	import { cn } from '$lib/utils.js';
 	import type { Component } from 'svelte';
 
 	let { children } = $props();
@@ -35,6 +36,7 @@
 		label: string;
 		userOnly: boolean;
 		workspaceOnly: boolean;
+		fullWidth?: boolean;
 	}
 
 	const allCategories: CategoryItem[] = [
@@ -93,6 +95,7 @@
 			label: 'AI Configuration',
 			userOnly: false,
 			workspaceOnly: false,
+			fullWidth: true,
 		},
 		{
 			key: 'shortcuts',
@@ -169,6 +172,10 @@
 		}
 	}
 
+	const isFullWidthCategory = $derived(
+		visibleCategories.find((cat) => isActive(cat.path))?.fullWidth ?? false,
+	);
+
 	const backLabel = $derived(
 		scope === 'workspace' && workspaceName.length > 0
 			? `Back to ${workspaceName}`
@@ -225,9 +232,13 @@
 		<div class="flex-1"></div>
 	</aside>
 
-	<main class="flex-1 overflow-auto">
-		<div class="mx-auto max-w-3xl p-8">
+	<main class={cn('flex-1', isFullWidthCategory ? 'overflow-hidden' : 'overflow-auto')}>
+		{#if isFullWidthCategory}
 			{@render children()}
-		</div>
+		{:else}
+			<div class="mx-auto max-w-3xl p-8">
+				{@render children()}
+			</div>
+		{/if}
 	</main>
 </div>
