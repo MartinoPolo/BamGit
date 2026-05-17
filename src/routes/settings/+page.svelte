@@ -3,7 +3,7 @@
 	import NotificationSettingsPanel from '$lib/components/blocks/settings/NotificationSettingsPanel.svelte';
 	import ShortcutSettingsPanel from '$lib/components/blocks/settings/ShortcutSettingsPanel.svelte';
 	import IssueCardAppearancePanel from '$lib/components/blocks/settings/IssueCardAppearancePanel.svelte';
-	import { setIssueCardSettingsContext } from '$lib/modules/issue-card/index.js';
+	import { useIssueCardSettings } from '$lib/components/blocks/issue-card/index.js';
 	import { useBoard, ACCENT_COLORS, type CreateColorPaletteRequest } from '$lib/modules/board';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { Button } from '$lib/components/shadcn/button/index.js';
@@ -25,7 +25,7 @@
 	const boardStore = useBoard();
 	const versionControl = useVersionControl();
 	const characterPacks = useCharacterPacks();
-	setIssueCardSettingsContext();
+	useIssueCardSettings();
 
 	let authWizardOpen = $state(false);
 	let bulkImportOpen = $state(false);

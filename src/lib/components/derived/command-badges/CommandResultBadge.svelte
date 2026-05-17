@@ -2,7 +2,7 @@
 	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
 	import CircleXIcon from '@lucide/svelte/icons/circle-x';
 	import { cn } from '$lib/utils.js';
-	import { resolveBadgeStyleClasses } from '$lib/components/shadcn/badge/badge_style_utils.js';
+	import { resolveBadgeStyleClass } from '$lib/components/shadcn/badge/badge_style_utils.js';
 	import type { CommandResultBadgeProps } from './command_result_badge_types.js';
 
 	let {
@@ -33,13 +33,13 @@
 			: 'h-5 px-1.5 py-1 rounded-full';
 		const staleClass = isStale ? 'opacity-40' : '';
 
-		return cn(base, sizing, staleClass, resolveBadgeStyleClasses('--cmd-color', badgeStyle));
+		return cn(base, sizing, staleClass, resolveBadgeStyleClass(badgeStyle));
 	});
 </script>
 
 <span
 	class={badgeClasses}
-	style:--cmd-color={cmdColorValue}
+	style:--badge-color={cmdColorValue}
 	role="status"
 	aria-label="{commandName}: {state}"
 >

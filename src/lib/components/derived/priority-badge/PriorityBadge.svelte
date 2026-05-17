@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils.js';
-	import { resolveBadgeStyleClasses } from '$lib/components/shadcn/badge/badge_style_utils.js';
+	import { resolveBadgeStyleClass } from '$lib/components/shadcn/badge/badge_style_utils.js';
 	import {
 		PRIORITY_LABELS,
 		PRIORITY_COLOR_VARIABLES,
@@ -20,16 +20,18 @@
 	let badgeClasses = $derived.by(() => {
 		const base =
 			'inline-flex items-center font-mono text-[10px] uppercase tracking-wider leading-none px-1.5 py-1 rounded-sm select-none';
-		const interactive = onclick ? 'cursor-pointer hover:brightness-125' : '';
+		const interactive = onclick
+			? 'cursor-pointer hover:brightness-85 dark:hover:brightness-125'
+			: '';
 
-		return cn(base, interactive, resolveBadgeStyleClasses('--priority-color', badgeStyle));
+		return cn(base, interactive, resolveBadgeStyleClass(badgeStyle));
 	});
 </script>
 
 <button
 	type="button"
 	class={badgeClasses}
-	style:--priority-color={priorityColorValue}
+	style:--badge-color={priorityColorValue}
 	data-position={position}
 	disabled={!onclick}
 	{onclick}

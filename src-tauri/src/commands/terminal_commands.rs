@@ -64,6 +64,38 @@ fn spawn_linux_terminal(folder_path: &str) -> Result<(), String> {
     }
 }
 
+/// Opens a folder in the OS file explorer.
+#[tauri::command]
+pub fn open_folder_in_explorer(folder_path: String) -> Result<(), String> {
+    if cfg!(target_os = "windows") {
+        Command::new("explorer")
+            .arg(&folder_path)
+            .spawn()
+            .map_err(|error| format!("Could not open Explorer: {error}"))?;
+    } else if cfg!(target_os = "macos") {
+        Command::new("open")
+            .arg(&folder_path)
+            .spawn()
+            .map_err(|error| format!("Could not open Finder: {error}"))?;
+    } else {
+        Command::new("xdg-open")
+            .arg(&folder_path)
+            .spawn()
+            .map_err(|error| format!("Could not open file manager: {error}"))?;
+    }
+    Ok(())
+}
+
+/// Opens a folder in VS Code.
+#[tauri::command]
+pub fn open_in_editor(folder_path: String) -> Result<(), String> {
+    Command::new("code")
+        .arg(&folder_path)
+        .spawn()
+        .map_err(|error| format!("Could not open VS Code: {error}"))?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

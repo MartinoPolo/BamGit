@@ -1,6 +1,6 @@
 import type { BadgeStyle } from '$lib/components/shadcn/badge/index.js';
 import type { IssuePriority } from '$lib/modules/issues/types.js';
-import type { PriorityPositionOption } from '$lib/modules/issue-card/index.js';
+import type { PriorityPositionOption } from '$lib/components/blocks/issue-card/index.js';
 
 /** @public */
 export type PriorityPosition = PriorityPositionOption;

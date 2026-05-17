@@ -329,3 +329,31 @@ Decided: 2026-05-17
 What: IssueCardHeaderActions suppresses the priority badge when the issue priority is "medium". Only non-default priorities (low, high, critical, urgent) show a badge.
 Why: Medium is the default priority. Showing it on every card adds visual noise without information value — the absence of a badge communicates "medium" implicitly.
 Rejected: Always show badge (clutter), configurable threshold (over-engineering for a UX heuristic).
+
+### IssueCard self-contained folder: blocks/issue-card/
+
+Decided: 2026-05-17
+What: All IssueCard-specific files (sub-components, context, settings, variant CSS, utilities, stories) collapse into `components/blocks/issue-card/`. The `modules/issue-card/` directory is eliminated. General issue files (IssueDetail, AssignedIssuesPanel, dialogs) stay in `blocks/issue/`.
+Why: Module/component boundary was leaky — context imported from blocks, blocks imported from modules. Single folder makes the component self-contained and discoverable.
+Rejected: Keep split across modules + blocks (leaky boundary), flat blocks/issue/ with everything mixed (no separation of concerns).
+
+### WorkspaceCard extracted to blocks/workspace-card/
+
+Decided: 2026-05-17
+What: WorkspaceCard.svelte + workspace_card_variants.ts + stories extracted to `components/blocks/workspace-card/`. No context decomposition needed (9 props, no sub-components).
+Why: Same principle as IssueCard — card components get their own folder. Workspace folder keeps dialogs, selectors, and other workspace-level components.
+Rejected: Leave in blocks/workspace/ mixed with 15+ unrelated files (poor discoverability).
+
+### IssueCard consumes selection context directly (prop reduction)
+
+Decided: 2026-05-17
+What: IssueCard reads selection state (isActive, isHovered, isBatchSelected, isModifierHeld) and wires interaction callbacks (onCardClick, onTitleClick, onMouseEnter, onMouseLeave) by consuming the selection context directly, instead of receiving them as 8 separate props from IssueCardList.
+Why: Selection state and interaction callbacks are tightly coupled — always derived from the same useSelection() context. Direct consumption drops 8 props, leaving ~14 genuine data dependencies as explicit props.
+Rejected: Keep all 22 props explicit (verbose, most are selection plumbing), group into prop objects (adds indirection without reducing coupling).
+
+### IssueCardList renamed to IssueCardGrid
+
+Decided: 2026-05-17
+What: IssueCardList.svelte renamed to IssueCardGrid.svelte. Stays mostly as-is — layout + interaction coordinator is appropriate for a block component.
+Why: "Grid" more accurately describes the component's role (CSS grid layout, not a list). Consistent with the component's actual rendering.
+Rejected: Further decomposition (already clean), keep "List" name (misleading — it renders a grid).

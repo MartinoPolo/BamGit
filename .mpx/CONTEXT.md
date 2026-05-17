@@ -12,7 +12,7 @@ Desktop AI agent orchestration platform for developers running parallel Claude C
 **Session** — One AI agent CLI execution tied to an issue. Has transcript, cost, turns, state. Multiple per issue.
 **Provider** — AI agent CLI backend (Claude Code, Cursor, Codex, OpenCode). Each session runs on one provider.
 **Issue Environment** — Per-issue bundle: worktree folder, editor instance, terminal session.
-**IssueCardContext** — Svelte createContext pattern sharing issue, color, settings, and derived state across 8 card sub-components. Lives in `src/lib/modules/issue-card/`
+**IssueCardContext** — Svelte createContext pattern sharing issue, color, settings, and derived state across 8 card sub-components. Lives in `src/lib/components/blocks/issue-card/`
 **IssueStateChip** — Component rendering the 22-state priority cascade chip. Replaces former SessionStateChip.
 
 _Avoid_: "task" for Issue, "project" for Workspace, "run" for Session.

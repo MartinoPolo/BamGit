@@ -21,11 +21,15 @@ pub struct GitStatusCache {
     #[ts(type = "number | null")]
     pub ahead_remote_count: Option<i64>,
     pub fetched_at: Option<String>,
+    /// CI check status for the PR: "passed", "failed", "running", or null
+    #[serde(default)]
+    pub pr_ci_status: Option<String>,
 }
 
 pub const GIT_STATUS_CACHE_SELECT_COLUMNS: &str =
     "issue_id, branch_status, pr_state, pr_number, pr_url, github_issue_state, \
-     behind_base_count, merge_conflict, has_local_changes, ahead_remote_count, fetched_at";
+     behind_base_count, merge_conflict, has_local_changes, ahead_remote_count, fetched_at, \
+     pr_ci_status";
 
 pub fn row_to_git_status_cache(row: &Row) -> Result<GitStatusCache, rusqlite::Error> {
     Ok(GitStatusCache {
@@ -40,5 +44,6 @@ pub fn row_to_git_status_cache(row: &Row) -> Result<GitStatusCache, rusqlite::Er
         has_local_changes: row.get(8)?,
         ahead_remote_count: row.get(9)?,
         fetched_at: row.get(10)?,
+        pr_ci_status: row.get(11)?,
     })
 }

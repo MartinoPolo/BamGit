@@ -14,8 +14,8 @@
 		type IssueCardVariant,
 		type IssueCardSettingKey,
 		type RangeKey,
-	} from '$lib/modules/issue-card/index.js';
-	import { useIssueCardSettings } from '$lib/modules/issue-card/index.js';
+	} from '$lib/components/blocks/issue-card/index.js';
+	import { useIssueCardSettings } from '$lib/components/blocks/issue-card/index.js';
 
 	const settingsCtx = useIssueCardSettings();
 

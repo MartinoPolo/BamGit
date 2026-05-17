@@ -105,7 +105,7 @@ export const MOCK_ISSUES: Issue[] = [
 		base_branch: 'dev',
 		worktree_folder: 'C:/_MP_projects/worktrees/42-refactor-auth-middleware',
 		worktree_state: 'active',
-		parent_issue_id: null,
+		parent_issue_id: PRD_NOTIFICATIONS,
 		editor_folder: null,
 		dev_server_command: null,
 		dev_server_port: null,
@@ -131,7 +131,7 @@ export const MOCK_ISSUES: Issue[] = [
 		base_branch: 'dev',
 		worktree_folder: 'C:/_MP_projects/worktrees/55-dark-mode-toggle',
 		worktree_state: 'active',
-		parent_issue_id: null,
+		parent_issue_id: PRD_SESSIONS,
 		editor_folder: null,
 		dev_server_command: 'pnpm dev',
 		dev_server_port: 1420,
@@ -183,7 +183,7 @@ export const MOCK_ISSUES: Issue[] = [
 		base_branch: 'dev',
 		worktree_folder: 'C:/_MP_projects/worktrees/71-ci-timeout-fix',
 		worktree_state: 'active',
-		parent_issue_id: null,
+		parent_issue_id: PRD_NOTIFICATIONS,
 		editor_folder: null,
 		dev_server_command: null,
 		dev_server_port: null,
@@ -991,6 +991,7 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		has_local_changes: true,
 		ahead_remote_count: 3,
 		fetched_at: '2026-05-03T09:00:00Z',
+		pr_ci_status: 'passed',
 	},
 	{
 		issue_id: ISSUE_DARK_MODE,
@@ -1004,6 +1005,7 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		has_local_changes: false,
 		ahead_remote_count: 0,
 		fetched_at: '2026-05-03T08:30:00Z',
+		pr_ci_status: 'running',
 	},
 	{
 		issue_id: ISSUE_CI_PIPELINE,
@@ -1017,6 +1019,7 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		has_local_changes: false,
 		ahead_remote_count: 0,
 		fetched_at: '2026-05-03T08:00:00Z',
+		pr_ci_status: 'passed',
 	},
 	{
 		issue_id: ISSUE_PR_MERGED,
@@ -1030,6 +1033,7 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		has_local_changes: false,
 		ahead_remote_count: 0,
 		fetched_at: '2026-05-03T12:00:00Z',
+		pr_ci_status: 'passed',
 	},
 	{
 		issue_id: ISSUE_CONFLICT,
@@ -1043,6 +1047,7 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		has_local_changes: true,
 		ahead_remote_count: 5,
 		fetched_at: '2026-05-03T13:00:00Z',
+		pr_ci_status: 'failed',
 	},
 ];
 

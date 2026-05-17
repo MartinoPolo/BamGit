@@ -133,7 +133,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             merge_conflict INTEGER,
             has_local_changes INTEGER,
             ahead_remote_count INTEGER,
-            fetched_at TEXT
+            fetched_at TEXT,
+            pr_ci_status TEXT CHECK (pr_ci_status IN ('passed', 'failed', 'running') OR pr_ci_status IS NULL)
         );
 
         CREATE TABLE IF NOT EXISTS keyboard_shortcuts (
