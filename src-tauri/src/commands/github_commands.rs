@@ -261,6 +261,7 @@ pub async fn fetch_issue_state(
         has_local_changes: None,
         ahead_remote_count: None,
         fetched_at: None,
+        pr_ci_status: None,
     };
 
     // Acquire write lock only for DB write (not held across .await)
@@ -333,6 +334,7 @@ pub async fn fetch_pr_for_branch(
         has_local_changes: None,
         ahead_remote_count: None,
         fetched_at: None,
+        pr_ci_status: None,
     };
 
     {
@@ -903,6 +905,7 @@ pub async fn sync_all_github_state(
             has_local_changes: None,
             ahead_remote_count: None,
             fetched_at: None,
+            pr_ci_status: None,
         });
     }
 
@@ -995,6 +998,7 @@ mod tests {
             has_local_changes: None,
             ahead_remote_count: None,
             fetched_at: None,
+            pr_ci_status: None,
         };
 
         upsert_cache(&connection, &cache).unwrap();
@@ -1024,6 +1028,7 @@ mod tests {
             has_local_changes: None,
             ahead_remote_count: None,
             fetched_at: None,
+            pr_ci_status: None,
         };
         upsert_cache(&connection, &initial).unwrap();
 
@@ -1040,6 +1045,7 @@ mod tests {
             has_local_changes: None,
             ahead_remote_count: None,
             fetched_at: None,
+            pr_ci_status: None,
         };
         upsert_cache(&connection, &update).unwrap();
 
@@ -1081,6 +1087,7 @@ mod tests {
                 has_local_changes: None,
                 ahead_remote_count: None,
                 fetched_at: None,
+                pr_ci_status: None,
             };
             upsert_cache(&connection, &cache).unwrap();
         }
