@@ -233,7 +233,7 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	}),
 	update_character_pack: ({ request }: Record<string, unknown>) => ({
 		id: (request as Record<string, unknown>).id,
-		name: 'updated',
+		name: (request as Record<string, unknown>).name ?? 'updated',
 		display_name: (request as Record<string, unknown>).display_name ?? 'Updated',
 		language: (request as Record<string, unknown>).language ?? null,
 		avatar_path: null,

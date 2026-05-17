@@ -217,13 +217,12 @@
 
 		saving = true;
 		try {
-			if (isEditMode) {
-				await characterPacks.updatePack({
-					id: packId,
-					display_name: resolveDisplayName(),
-					language,
-				});
-			}
+			await characterPacks.updatePack({
+				id: packId,
+				name: characterName.trim(),
+				display_name: resolveDisplayName(),
+				language,
+			});
 
 			await characterPacks.saveSounds(packId, buildAssignmentsFromMap());
 			await goto(backRoute);
@@ -281,7 +280,7 @@
 	<!-- Header -->
 	<header class="flex items-center gap-3 border-b border-border px-4 py-3">
 		<Button intent="ghost" size="sm" class="size-8 p-0" onclick={() => void goto(backRoute)}>
-			<ArrowLeftIcon data-icon="inline-end" />
+			<ArrowLeftIcon data-icon="inline-start" />
 		</Button>
 
 		<h1 class="text-lg font-semibold">
