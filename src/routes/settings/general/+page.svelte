@@ -42,6 +42,20 @@
 		}
 	}
 
+	function parseSettingsJson(content: string): Record<string, string> | null {
+		const data: unknown = JSON.parse(content);
+		if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+			return null;
+		}
+		const entries: Record<string, string> = {};
+		for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+			if (typeof value === 'string') {
+				entries[key] = value;
+			}
+		}
+		return entries;
+	}
+
 	async function handleImport() {
 		try {
 			const content: string | null = await invoke('open_file', {
@@ -51,20 +65,19 @@
 			if (content === null) {
 				return;
 			}
-			const data = JSON.parse(content) as Record<string, unknown>;
-			if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+			const entries = parseSettingsJson(content);
+			if (entries === null) {
 				toasts.show({ tone: 'danger', title: 'Invalid settings file' });
 				return;
 			}
-			let count = 0;
-			for (const [key, value] of Object.entries(data)) {
-				if (typeof value === 'string') {
-					await setUserSetting(key, value);
-					count++;
-				}
+			for (const [key, value] of Object.entries(entries)) {
+				await setUserSetting(key, value);
 			}
 			await settings.loadSettings();
-			toasts.show({ tone: 'success', title: `Imported ${count} settings` });
+			toasts.show({
+				tone: 'success',
+				title: `Imported ${Object.keys(entries).length} settings`,
+			});
 		} catch (error) {
 			toasts.show({ tone: 'danger', title: 'Import failed', body: String(error) });
 		}
