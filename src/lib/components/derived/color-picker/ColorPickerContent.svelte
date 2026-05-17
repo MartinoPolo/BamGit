@@ -20,7 +20,7 @@
 	}: ColorPickerContentProps = $props();
 
 	let focusedIndex = $state(0);
-	let swatchElements: HTMLButtonElement[] = [];
+	let swatchElements: HTMLButtonElement[] = $state([]);
 
 	let effectiveColor = $derived(selectedColor || colors[0] || '#000000');
 

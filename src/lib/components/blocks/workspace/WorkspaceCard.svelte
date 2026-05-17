@@ -177,7 +177,7 @@
 		{gradientTint}
 		class={cn(
 			'group relative isolate h-full cursor-pointer transition-all duration-200',
-			'hover:translate-y-0.5 gk-ws-hover-glow',
+			'hover:-translate-y-0.5 gk-ws-hover-glow',
 			isDormant && 'opacity-[0.72] saturate-[0.7]',
 		)}
 	>
