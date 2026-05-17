@@ -19,6 +19,7 @@ pub mod portfolio_commands;
 pub mod process_commands;
 pub mod raw_requirements_commands;
 pub mod seed_commands;
+pub mod settings_commands;
 pub mod session_commands;
 pub mod shared;
 pub mod terminal_commands;

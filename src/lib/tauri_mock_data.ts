@@ -1662,3 +1662,26 @@ export const MOCK_IMPORT_SUMMARY = {
 	total_sessions: 247,
 	total_skipped: 3,
 };
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+export const MOCK_USER_SETTINGS: Record<string, string> = {
+	theme_mode: 'system',
+	accent_color: 'moss',
+	username: 'User',
+	user_initials: 'U',
+	startup_behavior: 'overview',
+	chart_color_theme: 'monochrome',
+	language: 'en',
+	notification_volume: '0.7',
+	issue_card_variant: 'refined-horizon',
+	issue_card_button_color: 'issue-color',
+	issue_card_priority_position: 'header-right',
+	issue_card_badge_style: 'borderless-dark',
+	issue_card_label_tint: '20',
+	issue_card_overlay_glow: '150',
+	issue_card_gradient_reach: '60',
+	issue_card_color_saturation: '150',
+	issue_card_header_saturation: '85',
+	issue_card_radial_intensity: '75',
+};
