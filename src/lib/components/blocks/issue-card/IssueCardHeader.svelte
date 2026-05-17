@@ -27,9 +27,12 @@
 
 <div
 	class={ctx.slotClasses.header}
-	style="{ctx.headerStyleString}; color: var(--ic-header-text, {ctx.headerTextColor}); filter: brightness(var(--header-brightness, 1)) saturate(var(--header-saturate, 1)); transition: filter 150ms ease;"
+	style="{ctx.headerStyleString}; color: var(--ic-header-text, {ctx.headerTextColor});"
 >
-	<div class="flex min-w-0 flex-1 items-baseline gap-1.5">
+	<div
+		class="flex min-w-0 flex-1 items-baseline gap-1.5"
+		style="filter: brightness(var(--header-brightness, 1)) saturate(var(--header-saturate, 1)); transition: filter 150ms ease;"
+	>
 		<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">
 			{#if hasPrdLabel && ctx.prdParent?.url}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->

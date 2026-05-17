@@ -24,13 +24,12 @@ function makeSettings(
 function computeForVariant(
 	variant: IssueCardAppearanceSettings['variant'],
 	overrides: Partial<IssueCardAppearanceSettings> = {},
-	options: { issueColor?: string; theme?: 'dark' | 'light'; state?: IssueCardState } = {},
+	options: { issueColor?: string; state?: IssueCardState } = {},
 ) {
 	return computeVariantSlotStyles({
 		variant,
 		settings: makeSettings({ variant, ...overrides }),
 		issueColor: options.issueColor ?? '#ff5500',
-		theme: options.theme ?? 'dark',
 		state: options.state ?? 'interactive',
 		isHovered: false,
 	});
@@ -50,14 +49,9 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card.background).toContain('150%');
 		});
 
-		it('uses #1e1e1e as mix target for dark theme', () => {
-			const result = computeForVariant('veil', {}, { theme: 'dark' });
-			expect(result.card.background).toContain('#1e1e1e');
-		});
-
-		it('uses #ffffff as mix target for light theme', () => {
-			const result = computeForVariant('veil', {}, { theme: 'light' });
-			expect(result.card.background).toContain('#ffffff');
+		it('uses var(--background) as mix target', () => {
+			const result = computeForVariant('veil');
+			expect(result.card.background).toContain('var(--background)');
 		});
 
 		it('header has transparent background', () => {
@@ -122,10 +116,10 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card['--ic-header-text']).toBe('var(--foreground)');
 		});
 
-		it('preview uses gradient with issue color tint', () => {
+		it('preview uses gradient with theme-aware surface variables', () => {
 			const result = computeForVariant('radiant');
 			expect(result.preview.background).toContain('linear-gradient');
-			expect(result.preview.background).toContain('#1a1a1a');
+			expect(result.preview.background).toContain('var(--surface-2)');
 		});
 	});
 
@@ -152,7 +146,6 @@ describe('computeVariantSlotStyles', () => {
 				variant: 'refined-horizon',
 				settings: makeSettings(),
 				issueColor: '#ff5500',
-				theme: 'dark',
 				state: 'hovered',
 				isHovered: true,
 			});
@@ -173,10 +166,10 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card.filter).toBe('grayscale(0.8)');
 		});
 
-		it('selected state uses blue glow', () => {
+		it('selected state uses issue-color outline and glow', () => {
 			const result = computeForVariant('refined-horizon', {}, { state: 'selected' });
-			expect(result.card['box-shadow']).toContain('#4a9eff');
-			expect(result.card.background).toContain('#4a9eff');
+			expect(result.card.outline).toContain('#ff5500');
+			expect(result.card['box-shadow']).toContain('#ff5500');
 		});
 	});
 

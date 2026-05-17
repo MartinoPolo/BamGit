@@ -50,8 +50,8 @@
 			return '';
 		}
 		const color = ctx.color;
-		const tonedBg = `color-mix(in oklch, ${color} 85%, #1a1a1a)`;
-		return `--issue-btn-bg: ${tonedBg}; --issue-btn-text: #ffffff; --issue-btn-border: color-mix(in oklch, ${color} 60%, transparent);`;
+		const tonedBg = `color-mix(in oklch, ${color} 85%, var(--background))`;
+		return `--issue-btn-bg: ${tonedBg}; --issue-btn-text: var(--background); --issue-btn-border: color-mix(in oklch, ${color} 60%, transparent);`;
 	});
 
 	const ICON_MAP: Record<string, ActionIconComponent> = {

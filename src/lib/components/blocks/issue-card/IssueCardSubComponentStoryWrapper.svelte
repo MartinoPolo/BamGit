@@ -83,7 +83,6 @@
 		sessionState: null,
 		visualization: undefined,
 		appearanceSettings: { ...ISSUE_CARD_SETTING_DEFAULTS },
-		theme: 'dark',
 		isActive: false,
 		isHovered: false,
 		isBatchSelected: false,

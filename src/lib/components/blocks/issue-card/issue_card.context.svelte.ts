@@ -40,7 +40,6 @@ export interface IssueCardContextProps {
 	sessionState: SessionStateProp;
 	visualization: TreeVisualization | undefined;
 	appearanceSettings: IssueCardAppearanceSettings;
-	theme: 'dark' | 'light';
 	isActive: boolean;
 	isHovered: boolean;
 	isBatchSelected: boolean;
@@ -194,7 +193,6 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 				variant: props.appearanceSettings.variant,
 				settings: props.appearanceSettings,
 				issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
-				theme: props.theme,
 				state: this.cardState,
 				isHovered: props.isHovered,
 			});

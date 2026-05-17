@@ -38,7 +38,6 @@
 		sessionState?: SessionStateProp;
 		visualization?: TreeVisualization | undefined;
 		appearanceSettings?: IssueCardAppearanceSettings;
-		theme?: 'dark' | 'light';
 		onExecuteAction?: (actionId: string, issueId: string) => void;
 		onPriorityClick?: () => void;
 		onQuickActionAssignFolder?: (issueId: string) => void;
@@ -54,7 +53,6 @@
 		sessionState = null,
 		visualization,
 		appearanceSettings = { ...ISSUE_CARD_SETTING_DEFAULTS },
-		theme = 'dark',
 		onExecuteAction,
 		onPriorityClick,
 		onQuickActionAssignFolder,
@@ -72,7 +70,6 @@
 		sessionState,
 		visualization,
 		appearanceSettings,
-		theme,
 		isActive: selection.activeIssueId === issue.id,
 		isHovered: selection.hoveredIssueId === issue.id,
 		isBatchSelected: selection.batchSelectedIssueIds.has(issue.id),
@@ -118,6 +115,13 @@
 	onmouseenter={() => selection.hoverIssue(issue.id)}
 	onmouseleave={() => selection.unhover()}
 >
+	{#if ctx.cardState === 'selected' || ctx.cardState === 'selectionHover'}
+		<div
+			class="pointer-events-none absolute inset-0 z-1 rounded-lg"
+			style="background: color-mix(in oklch, {ctx.color} 8%, transparent);"
+		></div>
+	{/if}
+
 	<IssueCardHeader />
 
 	<!-- Body: tree thumbnail | info -->

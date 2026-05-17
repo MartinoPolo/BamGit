@@ -14,7 +14,6 @@ export interface VariantStylesInput {
 	readonly variant: IssueCardVariant;
 	readonly settings: IssueCardAppearanceSettings;
 	readonly issueColor: string;
-	readonly theme: 'dark' | 'light';
 	readonly state: IssueCardState;
 	readonly isHovered: boolean;
 }
@@ -32,9 +31,8 @@ export function styleMapToString(styles: Readonly<Record<string, string>>): stri
 function computeVeilStyles(
 	issueColor: string,
 	settings: IssueCardAppearanceSettings,
-	theme: 'dark' | 'light',
 ): VariantSlotStyles {
-	const mixTarget = theme === 'dark' ? '#1e1e1e' : '#ffffff';
+	const mixTarget = 'var(--background)';
 	const sat = settings.colorSaturation;
 	const reach = settings.gradientReach;
 
@@ -96,7 +94,7 @@ function computeRadiantStyles(
 			background: `linear-gradient(90deg, color-mix(in oklch, var(--surface) 35%, transparent) 0%, color-mix(in oklch, var(--surface) 65%, transparent) 40%, color-mix(in oklch, var(--surface) 80%, transparent) 100%)`,
 		},
 		preview: {
-			background: `linear-gradient(135deg, color-mix(in oklch, ${issueColor} 5%, #1a1a1a) 0%, #1a1a1a 100%)`,
+			background: `linear-gradient(135deg, color-mix(in oklch, ${issueColor} 5%, var(--surface-2)) 0%, var(--surface-3) 100%)`,
 		},
 	};
 }
@@ -139,10 +137,11 @@ function applyStateOverrides(
 			break;
 
 		case 'selectionHover':
+			card.outline = `3px solid ${issueColor}`;
+			card['outline-offset'] = '-3px';
 			card['box-shadow'] =
-				`0 0 20px 2px color-mix(in oklch, #4a9eff 16%, transparent), 0 6px 16px 0 color-mix(in oklch, #4a9eff 12%, transparent), var(--shadow-lg)`;
+				`0 0 24px 4px color-mix(in oklch, ${issueColor} 28%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 18%, transparent), var(--shadow-lg)`;
 			card.transform = 'translateY(-3px)';
-			card.background = 'color-mix(in oklch, #4a9eff 5%, var(--surface))';
 			header = applyHoverHeaderBrighten(base.header);
 			break;
 
@@ -158,10 +157,13 @@ function applyStateOverrides(
 			break;
 
 		case 'selected':
+			card.outline = `3px solid ${issueColor}`;
+			card['outline-offset'] = '-3px';
 			card['box-shadow'] =
-				`0 0 24px 4px color-mix(in oklch, #4a9eff 22%, transparent), 0 6px 16px 0 color-mix(in oklch, #4a9eff 16%, transparent), var(--shadow-lg)`;
-			card.background = 'color-mix(in oklch, #4a9eff 5%, var(--surface))';
+				`0 0 20px 2px color-mix(in oklch, ${issueColor} 22%, transparent), 0 4px 12px 0 color-mix(in oklch, ${issueColor} 14%, transparent), var(--shadow-lg)`;
 			if (isHovered) {
+				card['box-shadow'] =
+					`0 0 24px 4px color-mix(in oklch, ${issueColor} 28%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 18%, transparent), var(--shadow-lg)`;
 				card.transform = 'translateY(-2px)';
 				header = applyHoverHeaderBrighten(base.header);
 			}
@@ -191,7 +193,7 @@ function applyStateOverrides(
 // ── Main export ───────────────────────────────────────────────
 
 export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlotStyles {
-	const { variant, issueColor, settings, theme, state, isHovered } = input;
+	const { variant, issueColor, settings, state, isHovered } = input;
 
 	const sharedCardProps: Record<string, string> = {
 		'--ic-color': issueColor,
@@ -203,7 +205,7 @@ export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlot
 	let base: VariantSlotStyles;
 	switch (variant) {
 		case 'veil':
-			base = computeVeilStyles(issueColor, settings, theme);
+			base = computeVeilStyles(issueColor, settings);
 			break;
 		case 'refined-horizon':
 			base = computeHorizonStyles(issueColor, settings);

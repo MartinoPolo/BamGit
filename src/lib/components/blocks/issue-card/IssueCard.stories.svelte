@@ -311,7 +311,6 @@
 					issue={baseIssue}
 					ghAvailable={true}
 					appearanceSettings={veilSettings}
-					theme="dark"
 				/>
 			</div>
 		</IssueCardStoryWrapper>
@@ -327,7 +326,6 @@
 					issue={baseIssue}
 					ghAvailable={true}
 					appearanceSettings={veilSettings}
-					theme="light"
 				/>
 			</div>
 		</IssueCardStoryWrapper>
@@ -343,7 +341,6 @@
 					issue={baseIssue}
 					ghAvailable={true}
 					appearanceSettings={horizonSettings}
-					theme="dark"
 				/>
 			</div>
 		</IssueCardStoryWrapper>
@@ -359,7 +356,6 @@
 					issue={baseIssue}
 					ghAvailable={true}
 					appearanceSettings={horizonSettings}
-					theme="light"
 				/>
 			</div>
 		</IssueCardStoryWrapper>
@@ -375,7 +371,6 @@
 					issue={baseIssue}
 					ghAvailable={true}
 					appearanceSettings={radiantSettings}
-					theme="dark"
 				/>
 			</div>
 		</IssueCardStoryWrapper>
@@ -391,7 +386,6 @@
 					issue={baseIssue}
 					ghAvailable={true}
 					appearanceSettings={radiantSettings}
-					theme="light"
 				/>
 			</div>
 		</IssueCardStoryWrapper>
@@ -409,7 +403,6 @@
 						issue={baseIssue}
 						ghAvailable={true}
 						appearanceSettings={veilSettings}
-						theme="dark"
 					/>
 				</div>
 				<div>
@@ -419,7 +412,6 @@
 						issue={baseIssue}
 						ghAvailable={true}
 						appearanceSettings={horizonSettings}
-						theme="dark"
 					/>
 				</div>
 				<div>
@@ -429,7 +421,6 @@
 						issue={baseIssue}
 						ghAvailable={true}
 						appearanceSettings={radiantSettings}
-						theme="dark"
 					/>
 				</div>
 			</div>
