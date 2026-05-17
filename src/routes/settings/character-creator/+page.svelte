@@ -225,7 +225,7 @@
 			}
 
 			await characterPacks.saveSounds(packId, buildAssignmentsFromMap());
-			await goto(resolve('/settings'));
+			await goto(resolve('/settings/general'));
 		} catch (err) {
 			console.error('Failed to save character pack:', err);
 		} finally {
@@ -283,7 +283,7 @@
 			intent="ghost"
 			size="sm"
 			class="size-8 p-0"
-			onclick={() => void goto(resolve('/settings'))}
+			onclick={() => void goto(resolve('/settings/general'))}
 		>
 			<ArrowLeftIcon data-icon="inline-end" />
 		</Button>
@@ -299,7 +299,9 @@
 		{/if}
 
 		<div class="ml-auto flex items-center gap-2">
-			<Button intent="ghost" onclick={() => void goto(resolve('/settings'))}>Cancel</Button>
+			<Button intent="ghost" onclick={() => void goto(resolve('/settings/general'))}
+				>Cancel</Button
+			>
 			{#if canSave}
 				<Button onclick={handleSave} disabled={saving}>
 					<SaveIcon data-icon="inline-start" />

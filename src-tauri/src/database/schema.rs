@@ -150,9 +150,17 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             window_height INTEGER
         );
 
-        CREATE TABLE IF NOT EXISTS app_settings (
+        CREATE TABLE IF NOT EXISTS user_settings (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS workspace_settings (
+            id TEXT PRIMARY KEY,
+            dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
+            key TEXT NOT NULL,
+            value TEXT NOT NULL,
+            UNIQUE(dashboard_id, key)
         );
 
         CREATE TABLE IF NOT EXISTS issue_dependencies (

@@ -129,7 +129,7 @@ pub fn get_notification_volume(state: State<DatabaseState>) -> Result<f64, Strin
     let connection = state.read()?;
     let volume: String = connection
         .query_row(
-            "SELECT value FROM app_settings WHERE key = 'notification_volume'",
+            "SELECT value FROM user_settings WHERE key = 'notification_volume'",
             [],
             |row| row.get(0),
         )
@@ -145,7 +145,7 @@ pub fn set_notification_volume(state: State<DatabaseState>, volume: f64) -> Resu
     let connection = state.write()?;
     connection
         .execute(
-            "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('notification_volume', ?1)",
+            "INSERT OR REPLACE INTO user_settings (key, value) VALUES ('notification_volume', ?1)",
             rusqlite::params![clamped.to_string()],
         )
         .map_err(|error| format!("Failed to set volume: {error}"))?;

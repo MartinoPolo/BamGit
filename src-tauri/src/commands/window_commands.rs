@@ -295,7 +295,7 @@ pub fn get_app_setting(
 
     let result = connection
         .query_row(
-            "SELECT key, value FROM app_settings WHERE key = ?1",
+            "SELECT key, value FROM user_settings WHERE key = ?1",
             [&key],
             |row| {
                 Ok(AppSetting {
@@ -319,7 +319,7 @@ pub fn set_app_setting(
 
     connection
         .execute(
-            "INSERT OR REPLACE INTO app_settings (key, value) VALUES (?1, ?2)",
+            "INSERT OR REPLACE INTO user_settings (key, value) VALUES (?1, ?2)",
             rusqlite::params![key, value],
         )
         .map_err(|error| format!("Failed to set app setting: {error}"))?;

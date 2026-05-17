@@ -9,7 +9,7 @@ use super::{DEFAULT_NOTIFICATION_VOLUME, DEFAULT_SOUND_VOLUME_OVERRIDE};
 pub fn load_global_volume(connection: &Connection) -> f64 {
     connection
         .query_row(
-            "SELECT value FROM app_settings WHERE key = 'notification_volume'",
+            "SELECT value FROM user_settings WHERE key = 'notification_volume'",
             [],
             |row| row.get::<_, String>(0),
         )

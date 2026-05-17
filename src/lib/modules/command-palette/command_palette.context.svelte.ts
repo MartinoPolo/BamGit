@@ -56,7 +56,7 @@ function createCommandPaletteContext() {
 			category: COMMAND_PALETTE_CATEGORIES.navigation,
 			label: 'Go to Settings',
 			shortcut: shortcutsCtx.getBindingForDisplay('open-settings'),
-			onSelect: () => void goto(resolve('/settings')),
+			onSelect: () => void goto(resolve('/settings/general')),
 		},
 	];
 
