@@ -9,7 +9,6 @@ export type { ActivityCategory } from './ActivityCategory';
 export type { AgentConfig } from './AgentConfig';
 export type { AiConfigDiscoveryResult } from './AiConfigDiscoveryResult';
 export type { ApprovalDecision } from './ApprovalDecision';
-export type { AppSetting } from './AppSetting';
 export type { JsonValue } from './serde_json/JsonValue';
 export type { AssignedIssue } from './AssignedIssue';
 export type { AssignedIssueLabel } from './AssignedIssueLabel';

@@ -39,6 +39,8 @@
 	const windowCtx = setWindowContext();
 	const settingsCtx = setSettingsContext();
 	const boardStore = setBoardContext();
+	const username = $derived(settingsCtx.get('username'));
+	const userInitials = $derived(settingsCtx.get('userInitials'));
 	const selectionCtx = setSelectionContext();
 	initUrlStateSync(selectionCtx);
 	const notificationsCtx = setNotificationsContext();
@@ -160,8 +162,8 @@
 		>
 			<DashboardSidebar
 				{workspaceName}
-				username={boardStore.username}
-				userInitials={boardStore.userInitials}
+				{username}
+				{userInitials}
 				{activeSessionCount}
 				collapsed={boardStore.sidebarCollapsed}
 				onToggleSidebar={() => boardStore.toggleSidebar()}

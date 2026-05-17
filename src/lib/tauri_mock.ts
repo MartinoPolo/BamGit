@@ -252,13 +252,6 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	// ─── Window reads ─────────────────────────────────────────────────────────
 	get_window_bindings: () => MOCK_WINDOW_BINDINGS,
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
-	get_app_setting: (args: Record<string, unknown>) => {
-		const key = args.key as string;
-		if (key in MOCK_USER_SETTINGS) {
-			return { key, value: MOCK_USER_SETTINGS[key] };
-		}
-		return null;
-	},
 	get_user_setting: (args: Record<string, unknown>) => {
 		const key = args.key as string;
 		if (key in MOCK_USER_SETTINGS) {
@@ -969,7 +962,6 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	open_workspace_window: () => null,
 	close_workspace_window: () => null,
 	save_window_geometry: () => null,
-	set_app_setting: () => null,
 	open_terminal: () => null,
 	update_peacock_color: () => null,
 	run_workspace_command: () => null,

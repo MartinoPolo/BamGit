@@ -3,6 +3,7 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { useBoard } from '$lib/modules/board/index.js';
+import { useSettings } from '$lib/modules/settings/index.js';
 import { useActions } from '$lib/modules/actions/index.js';
 import { useIssues } from '$lib/modules/issues/index.js';
 import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts/index.js';
@@ -30,6 +31,7 @@ function createCommandPaletteContext() {
 	const themeCycleOrder: ThemeMode[] = ['light', 'dark', 'system'];
 
 	const boardStore = useBoard();
+	const settingsCtx = useSettings();
 	const actionsCtx = useActions();
 	const issuesCtx = useIssues();
 	const shortcutsCtx = useKeyboardShortcuts();
@@ -68,12 +70,14 @@ function createCommandPaletteContext() {
 			category: COMMAND_PALETTE_CATEGORIES.actions,
 			label: 'Toggle Theme',
 			get description() {
-				return `Current: ${boardStore.theme.mode}`;
+				return `Current: ${settingsCtx.getThemeMode()}`;
 			},
 			onSelect: () => {
-				const currentIndex = themeCycleOrder.indexOf(boardStore.theme.mode);
+				const currentIndex = themeCycleOrder.indexOf(
+					settingsCtx.getThemeMode() as ThemeMode,
+				);
 				const nextIndex = (currentIndex + 1) % themeCycleOrder.length;
-				boardStore.theme.mode = themeCycleOrder[nextIndex];
+				void settingsCtx.set('themeMode', themeCycleOrder[nextIndex]);
 			},
 		},
 		{

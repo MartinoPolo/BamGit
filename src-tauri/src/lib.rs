@@ -231,8 +231,6 @@ pub fn run() {
             window_commands::get_window_bindings,
             window_commands::save_window_geometry,
             window_commands::get_overview_data,
-            window_commands::get_app_setting,
-            window_commands::set_app_setting,
             dependency_commands::get_issue_dependencies,
             raw_requirements_commands::read_raw_requirements,
             raw_requirements_commands::write_raw_requirements,

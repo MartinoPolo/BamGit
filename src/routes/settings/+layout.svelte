@@ -17,17 +17,25 @@
 	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { useBoard } from '$lib/modules/board';
+	import { useSettings } from '$lib/modules/settings';
 	import { cn } from '$lib/utils.js';
 	import type { Component } from 'svelte';
 
 	let { children } = $props();
 
 	const boardStore = useBoard();
+	const settingsCtx = useSettings();
 
 	const scope = $derived(page.url.searchParams.get('scope') === 'ws' ? 'workspace' : 'user');
 	const scopeDashboardId = $derived(page.url.searchParams.get('id'));
 	const hasWorkspace = $derived(boardStore.activeDashboard !== null);
 	const workspaceName = $derived(boardStore.activeDashboard?.name ?? '');
+
+	$effect(() => {
+		const dashboardId = scopeDashboardId ?? boardStore.activeDashboardId;
+		settingsCtx.setScope(scope, scope === 'workspace' ? dashboardId : null);
+		void settingsCtx.loadSettings(scope === 'workspace' ? dashboardId : null);
+	});
 
 	interface CategoryItem {
 		key: string;

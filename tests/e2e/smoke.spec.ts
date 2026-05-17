@@ -5,7 +5,7 @@ test.describe('Smoke — all routes load', () => {
 		'/',
 		'/sessions',
 		'/settings',
-		'/workspace-settings',
+		'/settings/workspace',
 		'/usage',
 		'/settings/ai-config',
 	];
