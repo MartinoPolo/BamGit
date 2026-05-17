@@ -12,29 +12,24 @@
 
 	let { status }: Props = $props();
 
-	const CONFIG: Record<CiStatus, { label: string; colorClass: string }> = {
-		passed: {
-			label: 'CI passed',
-			colorClass: 'text-status-success border-status-success/30 bg-status-success/10',
-		},
-		failed: {
-			label: 'CI failed',
-			colorClass: 'text-status-danger border-status-danger/30 bg-status-danger/10',
-		},
-		running: {
-			label: 'CI running',
-			colorClass: 'text-status-info border-status-info/30 bg-status-info/10',
-		},
-	};
+	const tooltipText = $derived(
+		status === 'passed' ? 'CI passed' : status === 'failed' ? 'CI failed' : 'CI running',
+	);
 
-	const resolved = $derived(CONFIG[status]);
+	const colorClass = $derived(
+		status === 'passed'
+			? 'text-status-success'
+			: status === 'failed'
+				? 'text-status-danger'
+				: 'text-status-info',
+	);
 </script>
 
-<SimpleTooltip text={resolved.label}>
+<SimpleTooltip text={tooltipText}>
 	{#snippet asChild(props)}
 		<span
 			{...props}
-			class="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium {resolved.colorClass}"
+			class="inline-flex items-center gap-1 text-[10px] font-medium {colorClass}"
 		>
 			{#if status === 'passed'}
 				<CircleCheckIcon size={12} />
@@ -42,8 +37,8 @@
 				<CircleXIcon size={12} />
 			{:else}
 				<LoaderCircleIcon size={12} class="animate-spin" />
+				<span class="whitespace-nowrap">running</span>
 			{/if}
-			CI
 		</span>
 	{/snippet}
 </SimpleTooltip>

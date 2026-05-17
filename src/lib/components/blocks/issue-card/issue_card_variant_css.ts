@@ -103,6 +103,15 @@ function computeRadiantStyles(
 
 // ── State overrides ───────────────────────────────────────────
 
+function applyHoverHeaderBrighten(
+	baseHeader: Readonly<Record<string, string>>,
+): Record<string, string> {
+	const header: Record<string, string> = { ...baseHeader };
+	header['--header-brightness'] = '1.12';
+	header['--header-saturate'] = '1.12';
+	return header;
+}
+
 function applyStateOverrides(
 	base: VariantSlotStyles,
 	state: IssueCardState,
@@ -110,6 +119,7 @@ function applyStateOverrides(
 	issueColor: string,
 ): VariantSlotStyles {
 	const card: Record<string, string> = { ...base.card };
+	let header: Readonly<Record<string, string>> = base.header;
 
 	switch (state) {
 		case 'interactive':
@@ -117,6 +127,7 @@ function applyStateOverrides(
 				card['box-shadow'] =
 					`0 0 20px 2px color-mix(in oklch, ${issueColor} 14%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 12%, transparent), var(--shadow-lg)`;
 				card.transform = 'translateY(-3px)';
+				header = applyHoverHeaderBrighten(base.header);
 			}
 			break;
 
@@ -124,6 +135,7 @@ function applyStateOverrides(
 			card['box-shadow'] =
 				`0 0 20px 2px color-mix(in oklch, ${issueColor} 14%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 12%, transparent), var(--shadow-lg)`;
 			card.transform = 'translateY(-3px)';
+			header = applyHoverHeaderBrighten(base.header);
 			break;
 
 		case 'selectionHover':
@@ -131,6 +143,7 @@ function applyStateOverrides(
 				`0 0 20px 2px color-mix(in oklch, #4a9eff 16%, transparent), 0 6px 16px 0 color-mix(in oklch, #4a9eff 12%, transparent), var(--shadow-lg)`;
 			card.transform = 'translateY(-3px)';
 			card.background = 'color-mix(in oklch, #4a9eff 5%, var(--surface))';
+			header = applyHoverHeaderBrighten(base.header);
 			break;
 
 		case 'active':
@@ -140,17 +153,17 @@ function applyStateOverrides(
 				card['box-shadow'] =
 					`0 0 24px 4px color-mix(in oklch, ${issueColor} 22%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 16%, transparent), var(--shadow-lg)`;
 				card.transform = 'translateY(-3px)';
+				header = applyHoverHeaderBrighten(base.header);
 			}
 			break;
 
 		case 'selected':
 			card['box-shadow'] =
-				`0 0 12px 2px color-mix(in oklch, #4a9eff 18%, transparent), 0 0 4px 0 color-mix(in oklch, #4a9eff 10%, transparent), var(--shadow-md)`;
+				`0 0 24px 4px color-mix(in oklch, #4a9eff 22%, transparent), 0 6px 16px 0 color-mix(in oklch, #4a9eff 16%, transparent), var(--shadow-lg)`;
 			card.background = 'color-mix(in oklch, #4a9eff 5%, var(--surface))';
 			if (isHovered) {
-				card['box-shadow'] =
-					`0 0 24px 4px color-mix(in oklch, #4a9eff 22%, transparent), 0 6px 16px 0 color-mix(in oklch, #4a9eff 16%, transparent), var(--shadow-lg)`;
-				card.transform = 'translateY(-3px)';
+				card.transform = 'translateY(-2px)';
+				header = applyHoverHeaderBrighten(base.header);
 			}
 			break;
 
@@ -172,7 +185,7 @@ function applyStateOverrides(
 			break;
 	}
 
-	return { card, header: base.header, preview: base.preview };
+	return { card, header, preview: base.preview };
 }
 
 // ── Main export ───────────────────────────────────────────────

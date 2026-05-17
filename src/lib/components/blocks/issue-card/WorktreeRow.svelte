@@ -3,7 +3,7 @@
 	import SyncBadge from '$lib/components/derived/sync-badge/SyncBadge.svelte';
 	import MergeConflictBadge from '$lib/components/derived/merge-conflict-badge/MergeConflictBadge.svelte';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
-	import FolderGit2Icon from '@lucide/svelte/icons/folder-git-2';
+	import TreePineIcon from '@lucide/svelte/icons/tree-pine';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 
 	const ctx = useIssueCard();
@@ -30,7 +30,7 @@
 <div class="flex min-w-0 flex-wrap items-center gap-1.5">
 	<div class="flex min-w-0 flex-1 items-center gap-1 font-mono text-[11px] text-muted-foreground">
 		{#if ctx.hasWorktree && worktreeFolderName}
-			<FolderGit2Icon size={10} class="shrink-0" />
+			<TreePineIcon size={10} class="shrink-0" />
 			<span class="min-w-0 truncate text-foreground/60">{worktreeFolderName}/</span>
 			<GitBranchIcon size={10} class="shrink-0 ml-0.5" />
 			<span class="min-w-0 truncate text-foreground/60">{strippedBranchName}</span>
