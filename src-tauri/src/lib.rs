@@ -43,6 +43,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_mcp_bridge::init())
         .setup(|app| {
             // Register single-instance plugin in setup so we have access to app handle
             #[cfg(desktop)]

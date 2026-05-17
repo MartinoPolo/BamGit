@@ -74,3 +74,9 @@ Always fix unrelated errors you encounter (merge artifacts, stale imports, broke
 ## Testing
 
 - TDD: write tests first, then implement.
+
+## Visual Testing (Tauri MCP)
+
+For frontend visual verification, spawn a `mp-tauri-tester` sub-agent with numbered test requirements and expected outcomes. The agent connects to the running app via Tauri MCP bridge, applies all known workarounds, and returns a structured pass/fail report with screenshot evidence.
+
+Prerequisite: `pnpm tauri dev` must be running.

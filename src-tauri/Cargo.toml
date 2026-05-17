@@ -48,6 +48,7 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 keyring = { version = "3", features = ["sync-secret-service", "windows-native"] }
 which = "6"
 toml = "0.8"
+tauri-plugin-mcp-bridge = "0.11"
 
 [target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\"))".dependencies]
 tauri-plugin-single-instance = "2"
