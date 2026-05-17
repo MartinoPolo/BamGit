@@ -150,12 +150,12 @@ What: Full sidebar navigation with all sections (placeholder tabs for undefined 
 Why: User does not tolerate settings requiring significant scrolling.
 Rejected: Horizontal tab bar (doesn't scale), single scrollable page.
 
-### AI Config: 4th sidebar nav item, centered Dialog for details
+### AI Config: absorbed into settings as category (was: 4th sidebar nav item)
 
-Decided: 2026-05-10
-What: Separate `/ai-config` route with Sparkles icon. Item details in centered Dialog (max-w-2xl, h-[80vh]), not Sheet.
-Why: AI Config is conceptually separate from Settings. Dialog is more focused than Sheet and doesn't push content.
-Rejected: Nesting under Settings (too buried), Sheet side panel (pushes content, inconsistent).
+Decided: 2026-05-10. **Reversed: 2026-05-17 per PRD #320.**
+What: AI Config moved from standalone `/ai-config` route to `/settings/ai-config` category. Item details still use centered Dialog. Settings layout renders AI config full-width (no `max-w-3xl` constraint).
+Why: PRD #320 unifies all configuration under `/settings/*`. AI Config as a separate nav item fragmented the settings experience.
+Rejected (original): Nesting under Settings (too buried). Reversed because the settings shell now has proper sidebar navigation making it easy to find.
 
 ### ColorPicker: swatch trigger + popover dropdown, 24-preset palette
 
