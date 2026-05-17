@@ -157,6 +157,13 @@ What: Settings is a full SvelteKit route (`/settings/*`) replacing the entire pa
 Why: Consolidates all settings into one coherent system. Two-layer cascade (user → workspace) formalizes the ad-hoc pattern from issue card settings. Full-page approach gives room for dense categories.
 Rejected: Overlay mode (no deep-linking), side panel (constrained width), separate workspace settings page (duplicates UI).
 
+### Settings: replaceState for category navigation, stored returnUrl for back
+
+Decided: 2026-05-17
+What: Settings replaces the existing DashboardSidebar (root layout hides it on `/settings/*` routes). Category navigation within settings uses `goto(path, { replaceState: true })` so only the initial entry creates a browser history entry. Back button and Escape use a stored `returnUrl` (set on settings entry) instead of `history.back()`. Browser back also returns to pre-settings page.
+Why: Prevents double sidebar, history pollution, and broken back navigation. State-based overlay was rejected because it adds complexity (mount/unmount cycles, dual DOM), and the meaningful page state (active dashboard, selection) lives in context/URL params and survives navigation.
+Rejected: State-based overlay (complex mount/unmount, settings components lose state too), history.back() (walks through category history), hybrid state+URL (two systems to sync).
+
 ### Settings: 9 categories with two subcategory patterns
 
 ### Settings: entry points
