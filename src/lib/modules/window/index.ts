@@ -6,6 +6,4 @@ export {
 	getWindowBindings,
 	saveWindowGeometry,
 	getOverviewData,
-	getAppSetting,
-	setAppSetting,
 } from './window_commands.js';

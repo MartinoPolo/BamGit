@@ -1,12 +1,8 @@
 import { createContext } from 'svelte';
-import { SvelteSet } from 'svelte/reactivity';
-import { StateRaw } from '$lib/reactivity/state.svelte.js';
-import { Derived } from '$lib/reactivity/derived.svelte.js';
-import { getAppSetting, setAppSetting } from '$lib/modules/window/window_commands.js';
+import { useSettings } from '$lib/modules/settings/index.js';
+import type { SettingKey } from '$lib/modules/settings/index.js';
 import {
-	ISSUE_CARD_SETTING_DEFAULTS,
-	ISSUE_CARD_SETTING_KEYS,
-	resolveSettingValue,
+	parseSettingValue,
 	type IssueCardAppearanceSettings,
 	type IssueCardSettingKey,
 	type IssueCardVariant,
@@ -21,216 +17,154 @@ const [useIssueCardSettings, setIssueCardSettingsInternal] =
 	createContext<IssueCardSettingsContext>();
 export { useIssueCardSettings };
 
-export function setIssueCardSettingsContext(dashboardId?: string) {
-	const ctx = createIssueCardSettingsContext(dashboardId);
+export function setIssueCardSettingsContext() {
+	const ctx = createIssueCardSettingsContext();
 	setIssueCardSettingsInternal(ctx);
 	return ctx;
 }
 
-function createIssueCardSettingsContext(dashboardId?: string) {
-	const buttonColor = new StateRaw<ButtonColorOption>(ISSUE_CARD_SETTING_DEFAULTS.buttonColor);
-	const priorityPosition = new StateRaw<PriorityPositionOption>(
-		ISSUE_CARD_SETTING_DEFAULTS.priorityPosition,
-	);
-	const badgeStyle = new StateRaw<BadgeStyleOption>(ISSUE_CARD_SETTING_DEFAULTS.badgeStyle);
-	const labelTint = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.labelTint);
-	const overlayGlow = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.overlayGlow);
-	const variant = new StateRaw<IssueCardVariant>(ISSUE_CARD_SETTING_DEFAULTS.variant);
-	const gradientReach = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.gradientReach);
-	const colorSaturation = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.colorSaturation);
-	const headerSaturation = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.headerSaturation);
-	const radialIntensity = new StateRaw<number>(ISSUE_CARD_SETTING_DEFAULTS.radialIntensity);
+const ISSUE_CARD_KEY_TO_SETTING_KEY: Record<IssueCardSettingKey, SettingKey> = {
+	buttonColor: 'issueCardButtonColor',
+	priorityPosition: 'issueCardPriorityPosition',
+	badgeStyle: 'issueCardBadgeStyle',
+	labelTint: 'issueCardLabelTint',
+	overlayGlow: 'issueCardOverlayGlow',
+	variant: 'issueCardVariant',
+	gradientReach: 'issueCardGradientReach',
+	colorSaturation: 'issueCardColorSaturation',
+	headerSaturation: 'issueCardHeaderSaturation',
+	radialIntensity: 'issueCardRadialIntensity',
+};
 
-	// Fix 1: plain SvelteSet — already reactive, no StateRaw wrapper needed
-	const overriddenKeys = new SvelteSet<IssueCardSettingKey>();
+function createIssueCardSettingsContext() {
+	const settingsCtx = useSettings();
 
-	const stateMap = {
-		buttonColor,
-		priorityPosition,
-		badgeStyle,
-		labelTint,
-		overlayGlow,
-		variant,
-		gradientReach,
-		colorSaturation,
-		headerSaturation,
-		radialIntensity,
-	} as const;
-
-	// Fix 5: wsKey helper — eliminates repeated dashboardId null checks + template literals
-	const buildWsKey = (dbKey: string): string | null =>
-		dashboardId !== null && dashboardId !== undefined ? `ws_${dashboardId}_${dbKey}` : null;
-
-	// Fix 2: parallel loading with Promise.all
-	// fallow-ignore-next-line complexity
-	async function loadSettings() {
-		try {
-			const keys = Object.keys(ISSUE_CARD_SETTING_KEYS) as IssueCardSettingKey[];
-			const results = await Promise.all(
-				keys.map(async (key) => {
-					const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-					const wsDbKey = buildWsKey(dbKey);
-					const [userSetting, wsSetting] = await Promise.all([
-						getAppSetting(dbKey),
-						wsDbKey !== null ? getAppSetting(wsDbKey) : Promise.resolve(null),
-					]);
-					return { key, userSetting, wsSetting };
-				}),
-			);
-
-			overriddenKeys.clear();
-			for (const { key, userSetting, wsSetting } of results) {
-				const result = resolveSettingValue(
-					key,
-					userSetting?.value ?? null,
-					wsSetting?.value ?? null,
-				);
-				(stateMap[key] as StateRaw<string | number>).current = result.value;
-				if (result.isOverridden) {
-					overriddenKeys.add(key);
-				}
-			}
-		} catch (error) {
-			console.warn('[IssueCardSettings] Failed to load settings:', error);
-		}
-	}
-
-	async function updateSetting(key: IssueCardSettingKey, value: string | number) {
-		const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-		const effectiveKey = buildWsKey(dbKey) ?? dbKey;
-		await setAppSetting(effectiveKey, String(value));
-		(stateMap[key] as StateRaw<string | number>).current = value;
-
-		if (dashboardId !== null && dashboardId !== undefined) {
-			overriddenKeys.add(key);
-		}
-	}
-
-	async function resetOverride(key: IssueCardSettingKey) {
-		if (dashboardId === null || dashboardId === undefined) {
-			return;
-		}
-		const dbKey = ISSUE_CARD_SETTING_KEYS[key];
-		const wsDbKey = buildWsKey(dbKey);
-		if (wsDbKey !== null) {
-			await setAppSetting(wsDbKey, '');
-		}
-
-		const userSetting = await getAppSetting(dbKey);
-		const result = resolveSettingValue(key, userSetting?.value ?? null, null);
-		(stateMap[key] as StateRaw<string | number>).current = result.value;
-
-		overriddenKeys.delete(key);
+	function getRaw(key: IssueCardSettingKey): string | number {
+		const settingKey = ISSUE_CARD_KEY_TO_SETTING_KEY[key];
+		const raw = settingsCtx.get(settingKey);
+		return parseSettingValue(key, raw);
 	}
 
 	function isOverridden(key: IssueCardSettingKey): boolean {
-		return overriddenKeys.has(key);
+		const settingKey = ISSUE_CARD_KEY_TO_SETTING_KEY[key];
+		return settingsCtx.isOverridden(settingKey);
 	}
 
-	// Fix 6: Derived for stable settings object reference
-	const settingsObj = new Derived<IssueCardAppearanceSettings>(() => ({
-		buttonColor: buttonColor.current,
-		priorityPosition: priorityPosition.current,
-		badgeStyle: badgeStyle.current,
-		labelTint: labelTint.current,
-		overlayGlow: overlayGlow.current,
-		variant: variant.current,
-		gradientReach: gradientReach.current,
-		colorSaturation: colorSaturation.current,
-		headerSaturation: headerSaturation.current,
-		radialIntensity: radialIntensity.current,
-	}));
+	async function updateSetting(key: IssueCardSettingKey, value: string | number) {
+		const settingKey = ISSUE_CARD_KEY_TO_SETTING_KEY[key];
+		await settingsCtx.set(settingKey, String(value));
+	}
+
+	async function resetOverride(key: IssueCardSettingKey) {
+		const settingKey = ISSUE_CARD_KEY_TO_SETTING_KEY[key];
+		await settingsCtx.resetOverride(settingKey);
+	}
 
 	return {
 		get settings(): IssueCardAppearanceSettings {
-			return settingsObj.current;
+			return {
+				buttonColor: getRaw('buttonColor') as ButtonColorOption,
+				priorityPosition: getRaw('priorityPosition') as PriorityPositionOption,
+				badgeStyle: getRaw('badgeStyle') as BadgeStyleOption,
+				labelTint: getRaw('labelTint') as number,
+				overlayGlow: getRaw('overlayGlow') as number,
+				variant: getRaw('variant') as IssueCardVariant,
+				gradientReach: getRaw('gradientReach') as number,
+				colorSaturation: getRaw('colorSaturation') as number,
+				headerSaturation: getRaw('headerSaturation') as number,
+				radialIntensity: getRaw('radialIntensity') as number,
+			};
 		},
 
 		get overriddenKeys() {
-			return overriddenKeys;
+			const keys = Object.keys(ISSUE_CARD_KEY_TO_SETTING_KEY) as IssueCardSettingKey[];
+			return new Set(keys.filter((key) => isOverridden(key)));
 		},
 
 		set buttonColor(value: ButtonColorOption) {
-			buttonColor.current = value;
+			void updateSetting('buttonColor', value);
 		},
 
 		get buttonColor() {
-			return buttonColor.current;
+			return getRaw('buttonColor') as ButtonColorOption;
 		},
 
 		set priorityPosition(value: PriorityPositionOption) {
-			priorityPosition.current = value;
+			void updateSetting('priorityPosition', value);
 		},
 
 		get priorityPosition() {
-			return priorityPosition.current;
+			return getRaw('priorityPosition') as PriorityPositionOption;
 		},
 
 		set badgeStyle(value: BadgeStyleOption) {
-			badgeStyle.current = value;
+			void updateSetting('badgeStyle', value);
 		},
 
 		get badgeStyle() {
-			return badgeStyle.current;
+			return getRaw('badgeStyle') as BadgeStyleOption;
 		},
 
 		set labelTint(value: number) {
-			labelTint.current = value;
+			void updateSetting('labelTint', value);
 		},
 
 		get labelTint() {
-			return labelTint.current;
+			return getRaw('labelTint') as number;
 		},
 
 		set overlayGlow(value: number) {
-			overlayGlow.current = value;
+			void updateSetting('overlayGlow', value);
 		},
 
 		get overlayGlow() {
-			return overlayGlow.current;
+			return getRaw('overlayGlow') as number;
 		},
 
 		set variant(value: IssueCardVariant) {
-			variant.current = value;
+			void updateSetting('variant', value);
 		},
 
 		get variant() {
-			return variant.current;
+			return getRaw('variant') as IssueCardVariant;
 		},
 
 		set gradientReach(value: number) {
-			gradientReach.current = value;
+			void updateSetting('gradientReach', value);
 		},
 
 		get gradientReach() {
-			return gradientReach.current;
+			return getRaw('gradientReach') as number;
 		},
 
 		set colorSaturation(value: number) {
-			colorSaturation.current = value;
+			void updateSetting('colorSaturation', value);
 		},
 
 		get colorSaturation() {
-			return colorSaturation.current;
+			return getRaw('colorSaturation') as number;
 		},
 
 		set headerSaturation(value: number) {
-			headerSaturation.current = value;
+			void updateSetting('headerSaturation', value);
 		},
 
 		get headerSaturation() {
-			return headerSaturation.current;
+			return getRaw('headerSaturation') as number;
 		},
 
 		set radialIntensity(value: number) {
-			radialIntensity.current = value;
+			void updateSetting('radialIntensity', value);
 		},
 
 		get radialIntensity() {
-			return radialIntensity.current;
+			return getRaw('radialIntensity') as number;
 		},
 
-		loadSettings,
+		loadSettings() {
+			// No-op: settings are loaded by the unified settings engine
+			return Promise.resolve();
+		},
 		updateSetting,
 		resetOverride,
 		isOverridden,

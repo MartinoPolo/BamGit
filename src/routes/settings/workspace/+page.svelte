@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
 	import type { WorkspaceCommand, CommandCategory } from '$lib/types/generated';
 	import { useBoard } from '$lib/modules/board';
 	import { invoke } from '$lib/tauri.js';
@@ -16,6 +16,8 @@
 	import ServerIcon from '@lucide/svelte/icons/server';
 	import SquareCheckIcon from '@lucide/svelte/icons/square-check';
 	import SaveIcon from '@lucide/svelte/icons/save';
+	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import Trash2Icon from '@lucide/svelte/icons/trash-2';
 
 	const boardStore = useBoard();
 
@@ -35,6 +37,9 @@
 	let saveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
 	let saveError = $state<string | null>(null);
 	let dirty = $state(false);
+
+	let confirmDeleteName = $state('');
+	let showDeleteConfirm = $state(false);
 
 	const serverCommands = $derived(commands.filter((c) => c.category === 'server'));
 	const checkCommands = $derived(commands.filter((c) => c.category === 'check'));
@@ -151,19 +156,38 @@
 			saveError = String(err);
 		}
 	}
+
+	async function handleArchive() {
+		if (dashboard === null) {
+			return;
+		}
+		await boardStore.archiveDashboard(dashboard.id);
+	}
+
+	async function handleDelete() {
+		if (dashboard === null || confirmDeleteName.trim() !== dashboard.name) {
+			return;
+		}
+		await boardStore.deleteDashboard(dashboard.id, confirmDeleteName.trim());
+		showDeleteConfirm = false;
+		confirmDeleteName = '';
+	}
 </script>
 
-<div class="mx-auto max-w-2xl space-y-8 p-6">
-	{#if dashboard === null}
-		<div class="flex h-64 items-center justify-center text-muted-foreground">
-			No workspace selected
-		</div>
-	{:else}
+{#if dashboard === null}
+	<div class="space-y-4">
+		<h2 class="text-lg font-medium">Workspace</h2>
+		<p class="text-sm text-muted-foreground">
+			No workspace selected. Workspace settings are available when a workspace is active.
+		</p>
+	</div>
+{:else}
+	<div class="space-y-8">
 		<div class="flex items-center justify-between">
 			<div>
-				<h1 class="text-xl font-semibold">Workspace Settings</h1>
+				<h2 class="text-lg font-medium">{dashboard.name}</h2>
 				<p class="text-sm text-muted-foreground">
-					Configure {dashboard.name}
+					Workspace configuration, commands, and actions.
 				</p>
 			</div>
 			{#if dirty}
@@ -184,7 +208,7 @@
 
 		<!-- General Section -->
 		<section class="space-y-4">
-			<h2 class="text-lg font-medium">General</h2>
+			<h3 class="text-base font-medium">General</h3>
 			<Separator />
 
 			<div class="space-y-4">
@@ -237,7 +261,7 @@
 		<!-- Worktrees Section (repo only) -->
 		{#if isRepo}
 			<section class="space-y-4">
-				<h2 class="text-lg font-medium">Worktrees</h2>
+				<h3 class="text-base font-medium">Worktrees</h3>
 				<Separator />
 
 				<div class="space-y-1.5">
@@ -257,7 +281,7 @@
 
 		<!-- Commands Section -->
 		<section class="space-y-4">
-			<h2 class="text-lg font-medium">Commands</h2>
+			<h3 class="text-base font-medium">Commands</h3>
 			<Separator />
 
 			<!-- Server Commands -->
@@ -265,7 +289,7 @@
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<ServerIcon size={16} class="text-muted-foreground" />
-						<h3 class="text-sm font-medium">Server Commands</h3>
+						<span class="text-sm font-medium">Server Commands</span>
 						<Badge format="mono">{serverCommands.length}</Badge>
 					</div>
 					<Button intent="ghost" size="sm" onclick={() => handleAddCommand('server')}>
@@ -274,8 +298,7 @@
 					</Button>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					Long-running processes with optional port detection. Can be launched from issue
-					cards.
+					Long-running processes with optional port detection.
 				</p>
 
 				{#if commandsLoading}
@@ -307,7 +330,7 @@
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<SquareCheckIcon size={16} class="text-muted-foreground" />
-						<h3 class="text-sm font-medium">Check Commands</h3>
+						<span class="text-sm font-medium">Check Commands</span>
 						<Badge format="mono">{checkCommands.length}</Badge>
 					</div>
 					<Button intent="ghost" size="sm" onclick={() => handleAddCommand('check')}>
@@ -316,8 +339,7 @@
 					</Button>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					Short-lived commands that report pass/fail. Results shown as badges on issue
-					cards.
+					Short-lived commands that report pass/fail.
 				</p>
 
 				{#if commandsLoading}
@@ -342,5 +364,70 @@
 				{/if}
 			</div>
 		</section>
-	{/if}
-</div>
+
+		<!-- Danger Zone -->
+		<section class="space-y-4">
+			<h3 class="text-base font-medium text-destructive">Danger Zone</h3>
+			<Separator />
+
+			<div class="space-y-3 rounded-md border border-destructive/30 p-4">
+				<div class="flex items-center justify-between">
+					<div>
+						<p class="text-sm font-medium">Archive workspace</p>
+						<p class="text-xs text-muted-foreground">
+							Hide this workspace from the sidebar. Can be unarchived later.
+						</p>
+					</div>
+					<Button intent="secondary" size="sm" onclick={handleArchive}>
+						<ArchiveIcon data-icon="inline-start" />
+						Archive
+					</Button>
+				</div>
+
+				<Separator />
+
+				<div class="flex items-center justify-between">
+					<div>
+						<p class="text-sm font-medium">Delete workspace</p>
+						<p class="text-xs text-muted-foreground">
+							Permanently remove this workspace and all its data.
+						</p>
+					</div>
+					<Button
+						intent="danger"
+						size="sm"
+						onclick={() => (showDeleteConfirm = !showDeleteConfirm)}
+					>
+						<Trash2Icon data-icon="inline-start" />
+						Delete
+					</Button>
+				</div>
+
+				{#if showDeleteConfirm}
+					<div
+						class="space-y-2 rounded border border-destructive/20 bg-destructive/5 p-3"
+					>
+						<p class="text-xs text-muted-foreground">
+							Type <strong>{dashboard.name}</strong> to confirm deletion:
+						</p>
+						<div class="flex gap-2">
+							<Input
+								bind:value={confirmDeleteName}
+								placeholder={dashboard.name}
+								class="flex-1"
+							/>
+							<Button
+								intent="danger"
+								size="sm"
+								disabled={confirmDeleteName.trim() !== dashboard.name}
+								onclick={handleDelete}
+							>
+								Confirm Delete
+							</Button>
+						</div>
+					</div>
+				{/if}
+			</div>
+		</section>
+	</div>
+{/if}

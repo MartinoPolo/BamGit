@@ -20,6 +20,7 @@ import {
 	MOCK_USAGE_DASHBOARD,
 	MOCK_WINDOW_BINDINGS,
 	MOCK_WORKSPACE_COMMANDS,
+	MOCK_USER_SETTINGS,
 } from './tauri_mock_data.js';
 
 type MockHandler = (args: Record<string, unknown>) => unknown;
@@ -237,7 +238,7 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	}),
 	update_character_pack: ({ request }: Record<string, unknown>) => ({
 		id: (request as Record<string, unknown>).id,
-		name: 'updated',
+		name: (request as Record<string, unknown>).name ?? 'updated',
 		display_name: (request as Record<string, unknown>).display_name ?? 'Updated',
 		language: (request as Record<string, unknown>).language ?? null,
 		avatar_path: null,
@@ -256,24 +257,25 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	// ─── Window reads ─────────────────────────────────────────────────────────
 	get_window_bindings: () => MOCK_WINDOW_BINDINGS,
 	get_overview_data: () => MOCK_OVERVIEW_DATA,
-	get_app_setting: (args: Record<string, unknown>) => {
+	get_user_setting: (args: Record<string, unknown>) => {
 		const key = args.key as string;
-		const mockIssueCardSettings: Record<string, string> = {
-			issue_card_variant: 'refined-horizon',
-			issue_card_button_color: 'issue-color',
-			issue_card_priority_position: 'header-right',
-			issue_card_badge_style: 'borderless-dark',
-			issue_card_label_tint: '20',
-			issue_card_overlay_glow: '150',
-			issue_card_gradient_reach: '60',
-			issue_card_color_saturation: '150',
-			issue_card_header_saturation: '85',
-			issue_card_radial_intensity: '75',
-		};
-		if (key in mockIssueCardSettings) {
-			return { key, value: mockIssueCardSettings[key] };
+		if (key in MOCK_USER_SETTINGS) {
+			return { key, value: MOCK_USER_SETTINGS[key] };
 		}
 		return null;
+	},
+	set_user_setting: () => null,
+	delete_user_setting: () => null,
+	get_all_user_settings: () =>
+		Object.entries(MOCK_USER_SETTINGS).map(([key, value]) => ({ key, value })),
+	get_workspace_setting: () => null,
+	set_workspace_setting: () => null,
+	delete_workspace_setting: () => null,
+	get_all_workspace_settings: () => [],
+	get_workspace_overridden_keys: () => [],
+	get_resolved_setting: (args: Record<string, unknown>) => {
+		const key = args.key as string;
+		return MOCK_USER_SETTINGS[key] ?? null;
 	},
 
 	// ─── Metrics reads ───────────────────────────────────────────────────────
@@ -965,7 +967,6 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	open_workspace_window: () => null,
 	close_workspace_window: () => null,
 	save_window_geometry: () => null,
-	set_app_setting: () => null,
 	open_terminal: () => null,
 	open_folder_in_explorer: () => null,
 	open_in_editor: () => null,

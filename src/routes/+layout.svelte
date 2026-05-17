@@ -27,6 +27,7 @@
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
 	import { setCharacterPacksContext } from '$lib/modules/character-packs';
 	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
+	import { setSettingsContext } from '$lib/modules/settings';
 	import { setIssueCardSettingsContext } from '$lib/components/blocks/issue-card/index.js';
 	import { setToastsContext, registerMockToastBridge } from '$lib/modules/toasts';
 	import CommandPalette from '$lib/components/blocks/command-palette/CommandPalette.svelte';
@@ -37,7 +38,10 @@
 	let { children } = $props();
 
 	const windowCtx = setWindowContext();
+	const settingsCtx = setSettingsContext();
 	const boardStore = setBoardContext();
+	const username = $derived(settingsCtx.get('username'));
+	const userInitials = $derived(settingsCtx.get('userInitials'));
 	const selectionCtx = setSelectionContext();
 	initUrlStateSync(selectionCtx);
 	const notificationsCtx = setNotificationsContext();
@@ -63,11 +67,10 @@
 		void preloadCode(resolve('/'));
 		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
-		void preloadCode(resolve('/settings'));
-		void preloadCode(resolve('/workspace-settings'));
+		void preloadCode(resolve('/settings/general'));
 		void preloadCode(resolve('/usage'));
 		void preloadCode(resolve('/quick-ideas'));
-		void preloadCode(resolve('/ai-config'));
+		void settingsCtx.loadSettings();
 		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
@@ -89,7 +92,7 @@
 			id: 'open-settings',
 			label: 'Open Settings',
 			defaultBinding: 'Ctrl+,',
-			callback: () => void goto(resolve('/settings')),
+			callback: () => void goto(resolve('/settings/general')),
 		});
 		shortcutsCtx.registerShortcut({
 			id: 'quick-ideas',
@@ -162,8 +165,8 @@
 		>
 			<DashboardSidebar
 				{workspaceName}
-				username={boardStore.username}
-				userInitials={boardStore.userInitials}
+				{username}
+				{userInitials}
 				{activeSessionCount}
 				collapsed={boardStore.sidebarCollapsed}
 				onToggleSidebar={() => boardStore.toggleSidebar()}

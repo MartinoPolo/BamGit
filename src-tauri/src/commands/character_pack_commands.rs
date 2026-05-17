@@ -131,6 +131,13 @@ pub fn update_character_pack(
             return Err("Cannot edit bundled character packs".to_owned());
         }
 
+        if let Some(name) = &request.name {
+            conn.execute(
+                "UPDATE character_packs SET name = ?1 WHERE id = ?2",
+                rusqlite::params![name, request.id],
+            )
+            .map_err(|e| e.to_string())?;
+        }
         if let Some(display_name) = &request.display_name {
             conn.execute(
                 "UPDATE character_packs SET display_name = ?1 WHERE id = ?2",

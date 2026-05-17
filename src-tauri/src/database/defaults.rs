@@ -57,11 +57,26 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
         })?;
 
     connection.execute_batch(
-        "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('startup_behavior', 'overview');
-         INSERT OR IGNORE INTO app_settings (key, value) VALUES ('chart_color_theme', 'monochrome');",
+        "INSERT OR IGNORE INTO user_settings (key, value) VALUES ('startup_behavior', 'overview');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('chart_color_theme', 'monochrome');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('theme_mode', 'system');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('accent_color', 'moss');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('username', 'User');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('user_initials', 'U');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('language', 'en');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_variant', 'refined-horizon');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_button_color', 'issue-color');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_priority_position', 'header-right');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_badge_style', 'borderless-dark');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_label_tint', '20');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_overlay_glow', '150');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_gradient_reach', '60');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_color_saturation', '150');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_header_saturation', '85');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_radial_intensity', '75');",
     )?;
     connection.execute(
-        "INSERT OR IGNORE INTO app_settings (key, value) VALUES ('notification_volume', ?1)",
+        "INSERT OR IGNORE INTO user_settings (key, value) VALUES ('notification_volume', ?1)",
         rusqlite::params![crate::notification::DEFAULT_NOTIFICATION_VOLUME.to_string()],
     )?;
 
@@ -104,4 +119,70 @@ fn seed_grovekeeper_workspace(connection: &Connection) -> Result<(), rusqlite::E
     seed_label_shape_mappings_for_dashboard(connection, GROVEKEEPER_DASHBOARD_ID)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::database::test_helpers::setup_test_database;
+    use super::seed_defaults;
+
+    const EXPECTED_SETTING_KEYS: &[&str] = &[
+        "startup_behavior",
+        "chart_color_theme",
+        "theme_mode",
+        "accent_color",
+        "username",
+        "user_initials",
+        "language",
+        "notification_volume",
+        "issue_card_variant",
+        "issue_card_button_color",
+        "issue_card_priority_position",
+        "issue_card_badge_style",
+        "issue_card_label_tint",
+        "issue_card_overlay_glow",
+        "issue_card_gradient_reach",
+        "issue_card_color_saturation",
+        "issue_card_header_saturation",
+        "issue_card_radial_intensity",
+    ];
+
+    #[test]
+    fn seed_defaults_inserts_all_setting_keys() {
+        let connection = setup_test_database();
+        seed_defaults(&connection).unwrap();
+
+        let mut statement = connection
+            .prepare("SELECT key FROM user_settings ORDER BY key")
+            .unwrap();
+        let seeded_keys: Vec<String> = statement
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        for expected_key in EXPECTED_SETTING_KEYS {
+            assert!(
+                seeded_keys.contains(&expected_key.to_string()),
+                "Missing seed default for key: {expected_key}"
+            );
+        }
+    }
+
+    #[test]
+    fn seed_defaults_is_idempotent() {
+        let connection = setup_test_database();
+        seed_defaults(&connection).unwrap();
+        seed_defaults(&connection).unwrap();
+
+        let count: i64 = connection
+            .query_row(
+                "SELECT COUNT(DISTINCT key) FROM user_settings",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert!(count >= EXPECTED_SETTING_KEYS.len() as i64);
+    }
 }

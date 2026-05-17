@@ -143,19 +143,62 @@ What: Chat on left, metadata + sub-agents in 272px right sidebar (44px collapsed
 Why: App-level left nav already occupies left side. 900px matches every production tool (Claude.ai, ChatGPT, Cursor).
 Rejected: Left sidebar (conflicts with workspace nav), wider/narrower columns, full-width input bar.
 
-### Settings: full sidebar with sections
+### AI Config: absorbed into settings as category (was: 4th sidebar nav item)
 
-Decided: 2026-05-08
-What: Full sidebar navigation with all sections (placeholder tabs for undefined ones). No significant scrolling — split into sections if content exceeds ~2x visible height.
-Why: User does not tolerate settings requiring significant scrolling.
-Rejected: Horizontal tab bar (doesn't scale), single scrollable page.
+Decided: 2026-05-10. **Reversed: 2026-05-17 per PRD #320.**
+What: AI Config moved from standalone `/ai-config` route to `/settings/ai-config` category. Item details still use centered Dialog. Settings layout renders AI config full-width (no `max-w-3xl` constraint).
+Why: PRD #320 unifies all configuration under `/settings/*`. AI Config as a separate nav item fragmented the settings experience.
+Rejected (original): Nesting under Settings (too buried). Reversed because the settings shell now has proper sidebar navigation making it easy to find.
 
-### AI Config: 4th sidebar nav item, centered Dialog for details
+### Settings: two-layer system with full-page route shell
 
-Decided: 2026-05-10
-What: Separate `/ai-config` route with Sparkles icon. Item details in centered Dialog (max-w-2xl, h-[80vh]), not Sheet.
-Why: AI Config is conceptually separate from Settings. Dialog is more focused than Sheet and doesn't push content.
-Rejected: Nesting under Settings (too buried), Sheet side panel (pushes content, inconsistent).
+Decided: 2026-05-17 (supersedes 2026-05-08 "full sidebar with sections")
+What: Settings is a full SvelteKit route (`/settings/*`) replacing the entire page. Sidebar switches to category navigation with "← Back to app" at top. Escape exits settings immediately. Two scopes via segmented control in sidebar header: User (global defaults) and Workspace (per-workspace overrides). Workspace scope shows filtered categories (only overridable ones) plus a dedicated Workspace category. Codex-inspired UX.
+Why: Consolidates all settings into one coherent system. Two-layer cascade (user → workspace) formalizes the ad-hoc pattern from issue card settings. Full-page approach gives room for dense categories.
+Rejected: Overlay mode (no deep-linking), side panel (constrained width), separate workspace settings page (duplicates UI).
+
+### Settings: replaceState for category navigation, stored returnUrl for back
+
+Decided: 2026-05-17
+What: Settings replaces the existing DashboardSidebar (root layout hides it on `/settings/*` routes). Category navigation within settings uses `goto(path, { replaceState: true })` so only the initial entry creates a browser history entry. Back button and Escape use a stored `returnUrl` (set on settings entry) instead of `history.back()`. Browser back also returns to pre-settings page.
+Why: Prevents double sidebar, history pollution, and broken back navigation. State-based overlay was rejected because it adds complexity (mount/unmount cycles, dual DOM), and the meaningful page state (active dashboard, selection) lives in context/URL params and survives navigation.
+Rejected: State-based overlay (complex mount/unmount, settings components lose state too), history.back() (walks through category history), hybrid state+URL (two systems to sync).
+
+### Settings: 9 categories with two subcategory patterns
+
+### Settings: entry points
+
+Decided: 2026-05-17
+Why: Balances granularity with navigability. Two subcategory patterns serve different needs: nested sidebar for related-but-distinct sections (Notifications), horizontal tabs for provider-scoped content (AI Config).
+What: General, Account, Appearance, Issue Cards, Notifications (nested sidebar items: Events/Packs/Characters), AI Configuration (horizontal tabs with provider selector above), Keyboard Shortcuts, Language, Developer Tools (dev builds only). Workspace-overridable: Appearance, Issue Cards, Notifications, AI Config. User-only: Account, General, Shortcuts, Language, Dev Tools.
+
+Rejected: 6 categories (too consolidated), 10+ categories (too granular), tabs for all categories (unnecessary).
+
+### Settings: AI Config absorbed into settings
+
+Decided: 2026-05-17 (supersedes 2026-05-10 "4th sidebar nav item")
+What: AI Config moves from standalone `/ai-config` route to `/settings/ai-config` as a settings category. Provider selector + horizontal tabs (Skills, Agents, Hooks, MCP, Memories, Instructions, Rules, Settings) preserved. Item detail views stay as centered Dialogs. Sidebar nav reduced to Dashboard, Sessions, Usage.
+Why: User wants all configuration in one place. AI Config's complexity is handled by horizontal tabs within the settings category.
+Rejected: Keeping as separate nav item (scattered configuration), splitting into multiple settings categories (fragments the AI experience).
+
+### Settings: SQLite-only persistence with localStorage mirror
+
+Decided: 2026-05-17
+What: All settings stored in SQLite: `user_settings(key PK, value)` + `workspace_settings(dashboard_id, key, value, PK(dashboard_id, key))`. Resolution: workspace → user → hardcoded default. Theme and accent also written to localStorage as mirror for instant application before Tauri bridge loads (FOUC prevention).
+Why: Single source of truth simplifies cascade resolution, backup, and export. localStorage mirror solves the startup flash problem without complexity.
+Rejected: localStorage-only (no workspace override), hybrid persistence (two sources of truth), accept FOUC (noticeable flash).
+
+### Settings: override indicators and scope switching
+
+Decided: 2026-05-17
+Why: Clear visual feedback for what's overridden. Segmented control is always visible and switchable.
+What: Workspace settings show colored dot + "Reset to default" button next to overridden values. Scope switcher is a segmented control in sidebar header (`[User] [Workspace: Name]`). Hidden when no workspace active (Overview page). Gear icon from workspace header auto-selects workspace scope. Back button reads "← Back to WorkspaceName" in workspace scope.
+Rejected: Side-by-side values (too wide), background highlight (too noisy), disabled segment (confusing).
+
+Rejected: Settings as sidebar nav item (removed), language switcher in account section (rarely used).
+Why: Multiple contextual entry points. Quick edit modal preserved for fast workspace property changes.
+What: User settings: account section gear button (bottom-left sidebar) + Ctrl+, + Overview page gear icon. Workspace settings: gear icon next to pencil in workspace header. Quick workspace edit: pencil icon opens DashboardEditDialog modal (stays). Overview page also gets compact theme toggle. Account section keeps theme toggle, removes language switcher.
+Decided: 2026-05-17
 
 ### ColorPicker: swatch trigger + popover dropdown, 24-preset palette
 

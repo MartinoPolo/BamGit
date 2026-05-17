@@ -13,7 +13,7 @@ export type {
 	ThemeMode,
 	AccentColor,
 } from './types.js';
-export { ACCENT_COLORS } from './types.js';
+export { ACCENT_COLORS, isThemeMode, isAccentColor } from './types.js';
 
 export { setSelectionContext, useSelection } from './selection.context.svelte.js';
 export { initUrlStateSync } from './url_state_sync.svelte.js';

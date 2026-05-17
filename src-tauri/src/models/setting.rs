@@ -3,7 +3,16 @@ use ts_rs::TS;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
-pub struct AppSetting {
+pub struct UserSetting {
+    pub key: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct WorkspaceSetting {
+    pub id: String,
+    pub dashboard_id: String,
     pub key: String,
     pub value: String,
 }

@@ -29,6 +29,7 @@
 
 	const characterPacks = useCharacterPacks();
 
+	const backRoute = resolve('/settings/notifications');
 	const editPackId = $derived(page.url.searchParams.get('packId'));
 	const isEditMode = $derived(editPackId !== null);
 
@@ -216,16 +217,15 @@
 
 		saving = true;
 		try {
-			if (isEditMode) {
-				await characterPacks.updatePack({
-					id: packId,
-					display_name: resolveDisplayName(),
-					language,
-				});
-			}
+			await characterPacks.updatePack({
+				id: packId,
+				name: characterName.trim(),
+				display_name: resolveDisplayName(),
+				language,
+			});
 
 			await characterPacks.saveSounds(packId, buildAssignmentsFromMap());
-			await goto(resolve('/settings'));
+			await goto(backRoute);
 		} catch (err) {
 			console.error('Failed to save character pack:', err);
 		} finally {
@@ -279,13 +279,8 @@
 <div class="flex h-full flex-col">
 	<!-- Header -->
 	<header class="flex items-center gap-3 border-b border-border px-4 py-3">
-		<Button
-			intent="ghost"
-			size="sm"
-			class="size-8 p-0"
-			onclick={() => void goto(resolve('/settings'))}
-		>
-			<ArrowLeftIcon data-icon="inline-end" />
+		<Button intent="ghost" size="sm" class="size-8 p-0" onclick={() => void goto(backRoute)}>
+			<ArrowLeftIcon data-icon="inline-start" />
 		</Button>
 
 		<h1 class="text-lg font-semibold">
@@ -299,7 +294,7 @@
 		{/if}
 
 		<div class="ml-auto flex items-center gap-2">
-			<Button intent="ghost" onclick={() => void goto(resolve('/settings'))}>Cancel</Button>
+			<Button intent="ghost" onclick={() => void goto(backRoute)}>Cancel</Button>
 			{#if canSave}
 				<Button onclick={handleSave} disabled={saving}>
 					<SaveIcon data-icon="inline-start" />

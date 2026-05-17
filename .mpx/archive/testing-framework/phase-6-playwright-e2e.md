@@ -82,7 +82,14 @@ test.describe('Sidebar Navigation', () => {
 
 ```ts
 test.describe('Smoke — all routes load', () => {
-	const routes = ['/', '/sessions', '/settings', '/workspace-settings', '/usage', '/ai-config'];
+	const routes = [
+		'/',
+		'/sessions',
+		'/settings',
+		'/workspace-settings',
+		'/usage',
+		'/settings/ai-config',
+	];
 
 	for (const route of routes) {
 		test(`${route} loads without errors`, async ({ page }) => {

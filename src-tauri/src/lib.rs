@@ -16,7 +16,7 @@ use commands::{
     git_status_commands, github_auth_commands, github_commands, issue_commands,
     keyboard_shortcut_commands, label_shape_mapping_commands, metrics_commands,
     notification_commands, portfolio_commands, process_commands, raw_requirements_commands,
-    seed_commands, session_commands, terminal_commands, window_commands,
+    seed_commands, session_commands, settings_commands, terminal_commands, window_commands,
     workspace_command_commands, worktree_commands,
 };
 use std::sync::Arc;
@@ -25,7 +25,7 @@ use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
 use git::github_client::GitHubClient;
 use metrics::pricing::PricingEngine;
-use models::app_setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
+use models::setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
 use notification::playback_queue;
 use notification::service::NotificationService;
 use process::manager::ProcessManager;
@@ -98,7 +98,7 @@ pub fn run() {
                 let connection = database_state.read().unwrap_or_else(|e| panic!("{e}"));
                 connection
                     .query_row(
-                        "SELECT value FROM app_settings WHERE key = ?1",
+                        "SELECT value FROM user_settings WHERE key = ?1",
                         [STARTUP_BEHAVIOR_KEY],
                         |row| row.get::<_, String>(0),
                     )
@@ -233,8 +233,6 @@ pub fn run() {
             window_commands::get_window_bindings,
             window_commands::save_window_geometry,
             window_commands::get_overview_data,
-            window_commands::get_app_setting,
-            window_commands::set_app_setting,
             dependency_commands::get_issue_dependencies,
             raw_requirements_commands::read_raw_requirements,
             raw_requirements_commands::write_raw_requirements,
@@ -274,6 +272,16 @@ pub fn run() {
             workspace_command_commands::update_workspace_command,
             workspace_command_commands::delete_workspace_command,
             workspace_command_commands::reorder_workspace_commands,
+            settings_commands::get_user_setting,
+            settings_commands::set_user_setting,
+            settings_commands::delete_user_setting,
+            settings_commands::get_all_user_settings,
+            settings_commands::get_workspace_setting,
+            settings_commands::set_workspace_setting,
+            settings_commands::delete_workspace_setting,
+            settings_commands::get_all_workspace_settings,
+            settings_commands::get_workspace_overridden_keys,
+            settings_commands::get_resolved_setting,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

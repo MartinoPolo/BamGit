@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
-	import { getAppSetting, setAppSetting } from '$lib/modules/window/window_commands.js';
+	import { getUserSetting, setUserSetting } from '$lib/modules/settings/settings_commands.js';
 	import type { SplitButtonProps } from './split_button_types.js';
 
 	let {
@@ -31,14 +31,14 @@
 		selectedValue = value;
 		onselect(value);
 		if (settingsKey !== undefined && settingsKey !== '') {
-			void setAppSetting(settingsKey, value);
+			void setUserSetting(settingsKey, value);
 		}
 	}
 
 	onMount(() => {
 		selectedValue = defaultValue;
 		if (settingsKey !== undefined && settingsKey !== '') {
-			void getAppSetting(settingsKey).then((setting) => {
+			void getUserSetting(settingsKey).then((setting) => {
 				if (setting !== null && setting.value !== '') {
 					const matchesOption = options.some((option) => option.value === setting.value);
 					if (matchesOption) {

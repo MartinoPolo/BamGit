@@ -1,8 +1,5 @@
 import { createContext } from 'svelte';
-import { browser } from '$app/environment';
-import { MediaQuery } from 'svelte/reactivity';
 import { invoke } from '$lib/tauri.js';
-import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
 import type {
 	Dashboard,
 	ColorPalette,
@@ -15,12 +12,8 @@ import type {
 	CreateColorPaletteRequest,
 	UpdateColorPaletteRequest,
 	AddRepoToPortfolioRequest,
-	ThemeMode,
-	AccentColor,
 } from './types.js';
 import {
-	isThemeMode,
-	isAccentColor,
 	findPaletteForDashboard,
 	selectActiveDashboardId,
 	resolveActiveDashboardId,
@@ -69,45 +62,6 @@ function createBoardContext() {
 	let palettes = $state<ColorPalette[]>([]);
 	let palettesLoading = $state(false);
 	let palettesError = $state<string | null>(null);
-
-	// ── Theme state ────────────────────────────────────────────────────────
-	const themeMode = new Persisted<ThemeMode>({
-		key: 'grovekeeper_theme_mode',
-		serde: stringSerde(isThemeMode),
-		defaultValue: 'system',
-	});
-
-	const accentColor = new Persisted<AccentColor>({
-		key: 'grovekeeper_accent_color',
-		serde: stringSerde(isAccentColor),
-		defaultValue: 'moss',
-	});
-
-	const username = new Persisted<string>({
-		key: 'grovekeeper_username',
-		serde: stringSerde((v): v is string => typeof v === 'string' && v.length > 0),
-		defaultValue: 'User',
-	});
-
-	const userInitials = new Persisted<string>({
-		key: 'grovekeeper_user_initials',
-		serde: stringSerde((v): v is string => typeof v === 'string' && v.length > 0),
-		defaultValue: 'U',
-	});
-
-	const prefersDark = browser ? new MediaQuery('(prefers-color-scheme: dark)') : null;
-
-	const isDark = $derived.by(() => {
-		if (themeMode.current === 'system') {
-			return prefersDark?.current ?? true;
-		}
-		return themeMode.current === 'dark';
-	});
-
-	$effect.pre(() => {
-		document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-		document.documentElement.dataset.accent = accentColor.current;
-	});
 
 	// ── Public interface ───────────────────────────────────────────────────
 	return {
@@ -298,44 +252,6 @@ function createBoardContext() {
 				color,
 				priorityOrder,
 			});
-		},
-
-		// Theme
-		get theme() {
-			return {
-				get mode() {
-					return themeMode.current;
-				},
-				set mode(value: ThemeMode) {
-					themeMode.current = value;
-				},
-				get isDark() {
-					return isDark;
-				},
-				get prefersDark() {
-					return prefersDark?.current ?? true;
-				},
-				get accent() {
-					return accentColor.current;
-				},
-				set accent(value: AccentColor) {
-					accentColor.current = value;
-				},
-			};
-		},
-
-		// User profile
-		get username() {
-			return username.current;
-		},
-		set username(value: string) {
-			username.current = value;
-		},
-		get userInitials() {
-			return userInitials.current;
-		},
-		set userInitials(value: string) {
-			userInitials.current = value;
 		},
 	};
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
-	import { useBoard } from '$lib/modules/board';
+	import { useSettings } from '$lib/modules/settings';
+	import type { ThemeMode } from '$lib/modules/board';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Monitor from '@lucide/svelte/icons/monitor';
@@ -14,8 +15,8 @@
 
 	let { collapsed = false }: Props = $props();
 
-	const boardStore = useBoard();
-	const theme = boardStore.theme;
+	const settingsCtx = useSettings();
+	const themeMode = $derived(settingsCtx.getThemeMode() as ThemeMode);
 
 	const modes = [
 		{ value: 'light' as const, Icon: Sun, labelKey: 'light' as const },
@@ -30,11 +31,11 @@
 	} as const;
 
 	function cycleMode() {
-		const currentIndex = modes.findIndex((mode) => mode.value === theme.mode);
-		theme.mode = modes[(currentIndex + 1) % modes.length].value;
+		const currentIndex = modes.findIndex((mode) => mode.value === themeMode);
+		void settingsCtx.set('themeMode', modes[(currentIndex + 1) % modes.length].value);
 	}
 
-	const currentMode = $derived(modes.find((mode) => mode.value === theme.mode)!);
+	const currentMode = $derived(modes.find((mode) => mode.value === themeMode)!);
 </script>
 
 {#if collapsed}
@@ -47,7 +48,10 @@
 	<Tabs class="w-full *:flex-1 *:justify-center">
 		{#each modes as { value, Icon, labelKey } (value)}
 			<SimpleTooltip text="{MODE_LABELS[labelKey]()} mode">
-				<Tab active={theme.mode === value} onclick={() => (theme.mode = value)}>
+				<Tab
+					active={themeMode === value}
+					onclick={() => void settingsCtx.set('themeMode', value)}
+				>
 					<Icon class="size-3.5" />
 					<span>{MODE_LABELS[labelKey]()}</span>
 				</Tab>

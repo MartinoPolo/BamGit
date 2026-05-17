@@ -45,6 +45,7 @@ pub struct CreateCharacterPackRequest {
 #[derive(Debug, Deserialize)]
 pub struct UpdateCharacterPackRequest {
     pub id: String,
+    pub name: Option<String>,
     pub display_name: Option<String>,
     pub language: Option<Option<String>>,
 }
