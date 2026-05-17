@@ -43,6 +43,7 @@ function createSettingsContext() {
 	const overriddenKeys = new SvelteMap<string, SvelteSet<string>>();
 	const activeScope = new StateRaw<SettingScope>('user');
 	const activeDashboardId = new StateRaw<string | null>(null);
+	const returnUrl = new StateRaw<string>('/');
 
 	for (const key of Object.keys(SETTING_DEFAULTS) as SettingKey[]) {
 		const foucValue = browser ? readFoucMirror(key) : null;
@@ -171,6 +172,10 @@ function createSettingsContext() {
 		return isAccentColor(raw) ? raw : SETTING_DEFAULTS.accentColor;
 	}
 
+	function setReturnUrl(url: string): void {
+		returnUrl.current = url;
+	}
+
 	return {
 		get,
 		set,
@@ -178,6 +183,7 @@ function createSettingsContext() {
 		resetOverride,
 		loadSettings,
 		setScope,
+		setReturnUrl,
 		getThemeMode,
 		getAccentColor,
 		get isDark() {
@@ -188,6 +194,9 @@ function createSettingsContext() {
 		},
 		get activeDashboardId() {
 			return activeDashboardId.current;
+		},
+		get returnUrl() {
+			return returnUrl.current;
 		},
 	};
 }

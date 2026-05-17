@@ -236,6 +236,7 @@ pub fn run() {
             raw_requirements_commands::write_raw_requirements,
             seed_commands::seed_demo_workspace,
             seed_commands::delete_demo_workspace,
+            dialog_commands::open_file,
             dialog_commands::pick_folder,
             dialog_commands::save_file,
             github_commands::list_user_repos,

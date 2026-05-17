@@ -4,6 +4,7 @@
 	import { Root as Select } from '$lib/components/shadcn/select/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
+	import SettingOverrideIndicator from '$lib/components/derived/setting-override-indicator/SettingOverrideIndicator.svelte';
 	import {
 		ISSUE_CARD_VARIANTS,
 		ISSUE_CARD_SETTING_RANGES,
@@ -89,9 +90,10 @@
 				</Button>
 			{/each}
 		</div>
-		{#if settingsCtx.isOverridden('variant')}
-			<span class="text-xs text-muted-foreground">● Workspace override</span>
-		{/if}
+		<SettingOverrideIndicator
+			overridden={settingsCtx.isOverridden('variant')}
+			onreset={() => void settingsCtx.resetOverride('variant')}
+		/>
 	</div>
 
 	<Separator />
@@ -173,9 +175,10 @@
 					class="w-full accent-primary"
 					oninput={(event) => handleSliderChange(settingKey, event)}
 				/>
-				{#if settingsCtx.isOverridden(settingKey)}
-					<span class="text-xs text-muted-foreground">● Workspace override</span>
-				{/if}
+				<SettingOverrideIndicator
+					overridden={settingsCtx.isOverridden(settingKey)}
+					onreset={() => void settingsCtx.resetOverride(settingKey)}
+				/>
 			</div>
 		{/each}
 	</div>

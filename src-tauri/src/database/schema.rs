@@ -156,11 +156,11 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         );
 
         CREATE TABLE IF NOT EXISTS workspace_settings (
-            id TEXT PRIMARY KEY,
             dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
             key TEXT NOT NULL,
             value TEXT NOT NULL,
-            UNIQUE(dashboard_id, key)
+            PRIMARY KEY (dashboard_id, key),
+            FOREIGN KEY (dashboard_id) REFERENCES dashboards(id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS issue_dependencies (

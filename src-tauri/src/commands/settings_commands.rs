@@ -86,14 +86,13 @@ pub fn get_workspace_setting(
     let connection = state.read()?;
     let result = connection
         .query_row(
-            "SELECT id, dashboard_id, key, value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
+            "SELECT dashboard_id, key, value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
             rusqlite::params![dashboard_id, key],
             |row| {
                 Ok(WorkspaceSetting {
-                    id: row.get(0)?,
-                    dashboard_id: row.get(1)?,
-                    key: row.get(2)?,
-                    value: row.get(3)?,
+                    dashboard_id: row.get(0)?,
+                    key: row.get(1)?,
+                    value: row.get(2)?,
                 })
             },
         )
@@ -108,13 +107,12 @@ pub fn set_workspace_setting(
     key: String,
     value: String,
 ) -> Result<(), String> {
-    let id = uuid::Uuid::new_v4().to_string();
     let connection = state.write()?;
     connection
         .execute(
-            "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES (?1, ?2, ?3, ?4) \
+            "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES (?1, ?2, ?3) \
              ON CONFLICT(dashboard_id, key) DO UPDATE SET value = excluded.value",
-            rusqlite::params![id, dashboard_id, key, value],
+            rusqlite::params![dashboard_id, key, value],
         )
         .map_err(|error| format!("Failed to set workspace setting: {error}"))?;
     Ok(())
@@ -143,15 +141,14 @@ pub fn get_all_workspace_settings(
 ) -> Result<Vec<WorkspaceSetting>, String> {
     let connection = state.read()?;
     let mut statement = connection
-        .prepare("SELECT id, dashboard_id, key, value FROM workspace_settings WHERE dashboard_id = ?1")
+        .prepare("SELECT dashboard_id, key, value FROM workspace_settings WHERE dashboard_id = ?1")
         .map_err(|error| format!("Failed to prepare query: {error}"))?;
     let settings = statement
         .query_map([&dashboard_id], |row| {
             Ok(WorkspaceSetting {
-                id: row.get(0)?,
-                dashboard_id: row.get(1)?,
-                key: row.get(2)?,
-                value: row.get(3)?,
+                dashboard_id: row.get(0)?,
+                key: row.get(1)?,
+                value: row.get(2)?,
             })
         })
         .map_err(|error| format!("Failed to query settings: {error}"))?
@@ -336,7 +333,7 @@ mod tests {
 
         connection
             .execute(
-                "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'd1', 'theme', 'dark')",
+                "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')",
                 [],
             )
             .unwrap();
@@ -359,13 +356,13 @@ mod tests {
 
         connection
             .execute(
-                "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'd1', 'theme', 'dark')",
+                "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')",
                 [],
             )
             .unwrap();
 
         let result = connection.execute(
-            "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws2', 'd1', 'theme', 'light')",
+            "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'light')",
             [],
         );
 
@@ -380,13 +377,13 @@ mod tests {
 
         connection
             .execute(
-                "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'd1', 'theme', 'dark')",
+                "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')",
                 [],
             )
             .unwrap();
 
         let result = connection.execute(
-            "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws2', 'd2', 'theme', 'light')",
+            "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d2', 'theme', 'light')",
             [],
         );
 
@@ -400,7 +397,7 @@ mod tests {
 
         connection
             .execute(
-                "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'd1', 'theme', 'dark')",
+                "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')",
                 [],
             )
             .unwrap();
@@ -425,7 +422,7 @@ mod tests {
         let connection = setup_test_database();
 
         let result = connection.execute(
-            "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'nonexistent', 'theme', 'dark')",
+            "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('nonexistent', 'theme', 'dark')",
             [],
         );
 
@@ -439,13 +436,13 @@ mod tests {
 
         connection
             .execute(
-                "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'd1', 'theme', 'dark')",
+                "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')",
                 [],
             )
             .unwrap();
         connection
             .execute(
-                "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws2', 'd1', 'font_size', '14')",
+                "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'font_size', '14')",
                 [],
             )
             .unwrap();
@@ -495,7 +492,7 @@ mod tests {
             "INSERT INTO user_settings (key, value) VALUES ('theme', 'light')", [],
         ).unwrap();
         connection.execute(
-            "INSERT INTO workspace_settings (id, dashboard_id, key, value) VALUES ('ws1', 'd1', 'theme', 'dark')", [],
+            "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')", [],
         ).unwrap();
 
         let result = resolve_cascade(&connection, "theme", Some("d1"));

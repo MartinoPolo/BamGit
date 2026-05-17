@@ -1,5 +1,6 @@
 import { createContext } from 'svelte';
 import { goto } from '$app/navigation';
+import { page } from '$app/state';
 import { resolve } from '$app/paths';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { useBoard } from '$lib/modules/board/index.js';
@@ -58,7 +59,12 @@ function createCommandPaletteContext() {
 			category: COMMAND_PALETTE_CATEGORIES.navigation,
 			label: 'Go to Settings',
 			shortcut: shortcutsCtx.getBindingForDisplay('open-settings'),
-			onSelect: () => void goto(resolve('/settings/general')),
+			onSelect: () => {
+				if (!page.url.pathname.startsWith('/settings')) {
+					settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
+				}
+				void goto(resolve('/settings/general'));
+			},
 		},
 	];
 
