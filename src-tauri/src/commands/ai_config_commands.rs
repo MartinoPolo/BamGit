@@ -42,7 +42,7 @@ pub fn set_custom_discovery_paths(
     let connection = state.write()?;
     connection
         .execute(
-            "INSERT OR REPLACE INTO app_settings (key, value) VALUES (?1, ?2)",
+            "INSERT OR REPLACE INTO user_settings (key, value) VALUES (?1, ?2)",
             rusqlite::params!["ai_config_custom_paths", &json],
         )
         .map_err(|e| format!("Failed to save custom paths: {e}"))?;
@@ -1636,7 +1636,7 @@ fn resolve_includes(content: &str, base_dir: &Path) -> String {
 fn load_custom_paths(state: &State<DatabaseState>) -> Result<Vec<CustomDiscoveryPath>, String> {
     let connection = state.read()?;
     let mut statement = connection
-        .prepare("SELECT value FROM app_settings WHERE key = ?1")
+        .prepare("SELECT value FROM user_settings WHERE key = ?1")
         .map_err(|e| format!("Failed to prepare query: {e}"))?;
 
     let json: Option<String> = statement

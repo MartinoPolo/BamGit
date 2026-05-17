@@ -27,6 +27,7 @@
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
 	import { setCharacterPacksContext } from '$lib/modules/character-packs';
 	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
+	import { setSettingsContext } from '$lib/modules/settings';
 	import { setToastsContext, registerMockToastBridge } from '$lib/modules/toasts';
 	import CommandPalette from '$lib/components/blocks/command-palette/CommandPalette.svelte';
 	import RawRequirementsModal from '$lib/components/blocks/issue/RawRequirementsModal.svelte';
@@ -36,6 +37,7 @@
 	let { children } = $props();
 
 	const windowCtx = setWindowContext();
+	const settingsCtx = setSettingsContext();
 	const boardStore = setBoardContext();
 	const selectionCtx = setSelectionContext();
 	initUrlStateSync(selectionCtx);
@@ -60,11 +62,10 @@
 		void preloadCode(resolve('/'));
 		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
-		void preloadCode(resolve('/settings'));
-		void preloadCode(resolve('/workspace-settings'));
+		void preloadCode(resolve('/settings/general'));
 		void preloadCode(resolve('/usage'));
 		void preloadCode(resolve('/quick-ideas'));
-		void preloadCode(resolve('/ai-config'));
+		void settingsCtx.loadSettings();
 		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
@@ -86,7 +87,7 @@
 			id: 'open-settings',
 			label: 'Open Settings',
 			defaultBinding: 'Ctrl+,',
-			callback: () => void goto(resolve('/settings')),
+			callback: () => void goto(resolve('/settings/general')),
 		});
 		shortcutsCtx.registerShortcut({
 			id: 'quick-ideas',

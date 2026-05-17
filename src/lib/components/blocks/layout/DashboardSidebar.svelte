@@ -6,8 +6,6 @@
 	import CodeIcon from '@lucide/svelte/icons/code';
 	import BarChart3Icon from '@lucide/svelte/icons/bar-chart-3';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
-	import WrenchIcon from '@lucide/svelte/icons/wrench';
-	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import PanelLeftIcon from '@lucide/svelte/icons/panel-left';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import BrandMark from '$lib/components/derived/brand-mark/BrandMark.svelte';
@@ -43,9 +41,7 @@
 	const NAV_LABELS = {
 		dashboard: () => m.nav_dashboard(),
 		sessions: () => m.nav_sessions(),
-		ai_config: () => m.nav_ai_config(),
 		usage: () => 'Usage',
-		workspace_settings: () => 'Workspace Settings',
 		settings: () => m.nav_settings(),
 	} as const;
 
@@ -55,13 +51,7 @@
 	const navigationItems = [
 		{ href: resolve('/'), icon: TreesIcon, labelKey: 'dashboard' as const },
 		{ href: resolve('/sessions'), icon: CodeIcon, labelKey: 'sessions' as const },
-		{ href: resolve('/ai-config'), icon: SparklesIcon, labelKey: 'ai_config' as const },
 		{ href: resolve('/usage'), icon: BarChart3Icon, labelKey: 'usage' as const },
-		{
-			href: resolve('/workspace-settings'),
-			icon: WrenchIcon,
-			labelKey: 'workspace_settings' as const,
-		},
 	];
 
 	function isActive(itemHref: string): boolean {
@@ -203,8 +193,8 @@
 				<SidebarNavItem
 					icon={SettingsIcon}
 					label={NAV_LABELS.settings()}
-					href={resolve('/settings')}
-					active={isActive(resolve('/settings'))}
+					href={resolve('/settings/general')}
+					active={isActive(resolve('/settings/general'))}
 					{collapsed}
 				/>
 			{:else}
@@ -217,7 +207,7 @@
 					/>
 					<SimpleTooltip text={NAV_LABELS.settings()} side="top">
 						<a
-							href={resolve('/settings')}
+							href={resolve('/settings/general')}
 							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
 							aria-label={NAV_LABELS.settings()}
 						>

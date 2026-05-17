@@ -352,7 +352,7 @@ Designers have freedom to explore these areas:
 - Filter state + "ready only" toggle: persist per surface in localStorage using `Persisted` class from `$lib/reactivity/persisted.svelte.ts` [Brief decision]
 - View mode and selected PRD: persist per workspace in URL state via `url_state_sync.svelte.ts` [existing pattern]
 
-### Existing Source Files
+### Existing Source Files (https://github.com/MartinoPolo/Grovekeeper)
 
 | File | Lines | Purpose |
 |------|-------|---------|
