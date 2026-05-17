@@ -37,6 +37,7 @@
 		parentIssues,
 		archivedIssues,
 		showArchived,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- accepted prop, used in future portfolio rendering
 		isPortfolio,
 		cacheMap = new Map(),
 		ghAvailable = false,

@@ -28,7 +28,7 @@
 			return;
 		}
 		const folderPath = ctx.issue.worktree_folder ?? ctx.issue.editor_folder;
-		if (!folderPath) {
+		if (folderPath === null || folderPath === undefined) {
 			return;
 		}
 		try {

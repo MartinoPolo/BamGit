@@ -9,7 +9,6 @@ export {
 	type ChipColor,
 	type IssueStateChipResult,
 	type IssueStateChipInput,
-	type WorktreeBadgeTone,
 	type WorktreeBadgeResult,
 } from './types.js';
 export {
@@ -36,7 +35,6 @@ export {
 	computeVariantSlotStyles,
 	styleMapToString,
 	type VariantSlotStyles,
-	type VariantStylesInput,
 } from './issue_card_variant_css.js';
 export {
 	useIssueCardSettings,

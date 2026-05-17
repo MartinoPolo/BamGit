@@ -10,7 +10,7 @@ export interface VariantSlotStyles {
 	readonly preview: Readonly<Record<string, string>>;
 }
 
-export interface VariantStylesInput {
+interface VariantStylesInput {
 	readonly variant: IssueCardVariant;
 	readonly settings: IssueCardAppearanceSettings;
 	readonly issueColor: string;

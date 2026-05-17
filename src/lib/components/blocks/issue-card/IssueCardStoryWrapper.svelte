@@ -30,10 +30,10 @@
 		void issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id);
 		void settingsCtx.loadSettings();
 
-		if (activeIssueId) {
+		if (activeIssueId !== undefined && activeIssueId !== '') {
 			selectionCtx.activateIssue(activeIssueId);
 		}
-		if (hoveredIssueId) {
+		if (hoveredIssueId !== undefined && hoveredIssueId !== '') {
 			selectionCtx.hoverIssue(hoveredIssueId);
 		}
 		if (selectedIssueIds) {

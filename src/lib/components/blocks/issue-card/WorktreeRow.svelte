@@ -10,7 +10,7 @@
 
 	const worktreeFolderName = $derived.by(() => {
 		const folder = ctx.issue.worktree_folder;
-		if (!folder) {
+		if (folder === null || folder === undefined) {
 			return null;
 		}
 		const normalized = folder.replace(/\\/g, '/').replace(/\/+$/, '');
@@ -20,7 +20,7 @@
 
 	const strippedBranchName = $derived.by(() => {
 		const branch = ctx.issue.branch_name;
-		if (!branch) {
+		if (branch === null || branch === undefined) {
 			return null;
 		}
 		return branch.replace(/^(feat|fix|refactor|chore)\//, '');

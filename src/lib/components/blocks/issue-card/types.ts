@@ -33,7 +33,7 @@ export interface IssueStateChipInput {
 	readonly prCiStatus?: 'running' | 'passed' | 'failed' | null;
 }
 
-export type WorktreeBadgeTone = 'warning' | 'success' | 'danger';
+type WorktreeBadgeTone = 'warning' | 'success' | 'danger';
 
 export interface WorktreeBadgeResult {
 	readonly label: string;
