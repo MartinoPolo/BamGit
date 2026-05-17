@@ -78,7 +78,7 @@
 				onPressedChange={(pressed) => (showArchived = pressed)}
 				aria-label="Toggle archived workspaces"
 			>
-				<ArchiveIcon />
+				<ArchiveIcon data-icon="inline-start" />
 			</Toggle>
 			<Popover.Root>
 				<Popover.Trigger>

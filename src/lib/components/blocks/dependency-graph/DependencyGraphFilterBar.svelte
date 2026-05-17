@@ -109,7 +109,7 @@
 			title="Reset filters"
 			aria-label="Reset filters"
 		>
-			<RotateCcwIcon />
+			<RotateCcwIcon data-icon="inline-start" />
 		</Button>
 	{/if}
 </div>

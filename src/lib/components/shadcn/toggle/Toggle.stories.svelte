@@ -106,7 +106,7 @@
 <Story name="Icon Only">
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} size="icon" aria-label="Toggle italic">
-			<ItalicIcon />
+			<ItalicIcon data-icon="inline-start" />
 		</Toggle>
 	{/snippet}
 </Story>
@@ -123,7 +123,7 @@
 								<span class="text-[10px] text-foreground-subtle">{size}</span>
 								<Toggle {...args} {intent} {size} aria-label="Bold">
 									{#if size === 'icon' || size === 'icon-sm'}
-										<BoldIcon />
+										<BoldIcon data-icon="inline-start" />
 									{:else}
 										<BoldIcon data-icon="inline-start" />
 										Bold

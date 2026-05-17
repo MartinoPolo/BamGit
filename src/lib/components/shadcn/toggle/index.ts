@@ -2,7 +2,8 @@ import Root from './Toggle.svelte';
 
 export { Root, Root as Toggle };
 export {
-	toggleVariants,
+	togglePressedVariants,
+	TOGGLE_INTENT_TO_BUTTON_INTENT,
 	type ToggleProps,
 	type ToggleIntent,
 	type ToggleSize,

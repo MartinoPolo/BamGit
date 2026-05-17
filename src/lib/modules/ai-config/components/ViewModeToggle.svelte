@@ -25,9 +25,9 @@
 	size="icon-sm"
 >
 	<ToggleGroup.Item value="card" aria-label="Card view">
-		<LayoutGridIcon />
+		<LayoutGridIcon data-icon="inline-start" />
 	</ToggleGroup.Item>
 	<ToggleGroup.Item value="list" aria-label="List view">
-		<ListIcon />
+		<ListIcon data-icon="inline-start" />
 	</ToggleGroup.Item>
 </ToggleGroup.Root>

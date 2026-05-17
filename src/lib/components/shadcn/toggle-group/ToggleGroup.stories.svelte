@@ -196,13 +196,13 @@
 	{#snippet template(args: Record<string, unknown>)}
 		<ToggleGroup.Root type="single" value="left" size="icon" {...args}>
 			<ToggleGroup.Item value="left" aria-label="Align left">
-				<AlignLeftIcon />
+				<AlignLeftIcon data-icon="inline-start" />
 			</ToggleGroup.Item>
 			<ToggleGroup.Item value="center" aria-label="Align center">
-				<AlignCenterIcon />
+				<AlignCenterIcon data-icon="inline-start" />
 			</ToggleGroup.Item>
 			<ToggleGroup.Item value="right" aria-label="Align right">
-				<AlignRightIcon />
+				<AlignRightIcon data-icon="inline-start" />
 			</ToggleGroup.Item>
 		</ToggleGroup.Root>
 	{/snippet}
@@ -226,26 +226,20 @@
 									{size}
 								>
 									<ToggleGroup.Item value="left" aria-label="Align left">
-										{#if size === 'icon' || size === 'icon-sm'}
-											<AlignLeftIcon />
-										{:else}
-											<AlignLeftIcon data-icon="inline-start" />
+										<AlignLeftIcon data-icon="inline-start" />
+										{#if size !== 'icon' && size !== 'icon-sm'}
 											Left
 										{/if}
 									</ToggleGroup.Item>
 									<ToggleGroup.Item value="center" aria-label="Align center">
-										{#if size === 'icon' || size === 'icon-sm'}
-											<AlignCenterIcon />
-										{:else}
-											<AlignCenterIcon data-icon="inline-start" />
+										<AlignCenterIcon data-icon="inline-start" />
+										{#if size !== 'icon' && size !== 'icon-sm'}
 											Center
 										{/if}
 									</ToggleGroup.Item>
 									<ToggleGroup.Item value="right" aria-label="Align right">
-										{#if size === 'icon' || size === 'icon-sm'}
-											<AlignRightIcon />
-										{:else}
-											<AlignRightIcon data-icon="inline-start" />
+										<AlignRightIcon data-icon="inline-start" />
+										{#if size !== 'icon' && size !== 'icon-sm'}
 											Right
 										{/if}
 									</ToggleGroup.Item>

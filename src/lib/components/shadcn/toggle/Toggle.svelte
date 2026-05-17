@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { Toggle as TogglePrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
-	import { toggleVariants, type ToggleProps } from './toggle-variants.js';
+	import { Button } from '../button/index.js';
+	import {
+		togglePressedVariants,
+		TOGGLE_INTENT_TO_BUTTON_INTENT,
+		type ToggleProps,
+	} from './toggle-variants.js';
 
 	let {
 		class: className,
@@ -13,14 +18,16 @@
 	}: ToggleProps = $props();
 </script>
 
-<TogglePrimitive.Root
-	bind:ref
-	class={cn(toggleVariants({ intent, size }), className)}
-	{...restProps}
->
+<TogglePrimitive.Root bind:ref {...restProps}>
 	{#snippet child({ props })}
-		<button {...props} data-slot="toggle">
+		<Button
+			{...props}
+			intent={TOGGLE_INTENT_TO_BUTTON_INTENT[intent]}
+			{size}
+			class={cn(togglePressedVariants({ intent }), className)}
+			data-slot="toggle"
+		>
 			{@render children?.()}
-		</button>
+		</Button>
 	{/snippet}
 </TogglePrimitive.Root>
