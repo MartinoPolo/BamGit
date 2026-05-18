@@ -4,7 +4,7 @@ test.describe('Issue creation wizard', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/');
 		// Wait for issue cards to ensure page is fully loaded + contexts initialized
-		await page.locator('.card-ic-interactive').first().waitFor({ timeout: 8000 });
+		await page.locator('[data-testid="issue-card"]').first().waitFor({ timeout: 8000 });
 	});
 
 	test('wizard opens via Create Issue button', async ({ page }) => {

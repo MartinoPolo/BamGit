@@ -4,7 +4,7 @@ test.describe('Board URL state — issue activation', () => {
 	test('clicking issue title activates and updates URL with ?issue=', async ({ page }) => {
 		await page.goto('/');
 		// Wait for issue cards to render (async mock data load)
-		const firstCard = page.locator('.card-ic-interactive').first();
+		const firstCard = page.locator('[data-testid="issue-card"]').first();
 		await expect(firstCard).toBeVisible({ timeout: 8000 });
 
 		// Click the title (span with cursor-pointer) to activate the issue
@@ -30,13 +30,13 @@ test.describe('Board URL state — issue activation', () => {
 		await page.goto('/?issue=mock-issue-auth');
 		await page.waitForLoadState('networkidle');
 
-		const activeCard = page.locator('.card-state-active-ic');
+		const activeCard = page.locator('[data-card-state="active"]');
 		await expect(activeCard).toBeVisible({ timeout: 8000 });
 	});
 
 	test('browser back reverts issue activation', async ({ page }) => {
 		await page.goto('/');
-		const firstCard = page.locator('.card-ic-interactive').first();
+		const firstCard = page.locator('[data-testid="issue-card"]').first();
 		await expect(firstCard).toBeVisible({ timeout: 8000 });
 
 		await firstCard.locator('span.cursor-pointer').first().click();
@@ -48,7 +48,7 @@ test.describe('Board URL state — issue activation', () => {
 
 	test('browser forward restores issue activation', async ({ page }) => {
 		await page.goto('/');
-		const firstCard = page.locator('.card-ic-interactive').first();
+		const firstCard = page.locator('[data-testid="issue-card"]').first();
 		await expect(firstCard).toBeVisible({ timeout: 8000 });
 
 		await firstCard.locator('span.cursor-pointer').first().click();
@@ -64,7 +64,7 @@ test.describe('Board URL state — issue activation', () => {
 
 	test('card body click does batch-select (no URL change)', async ({ page }) => {
 		await page.goto('/');
-		const firstCard = page.locator('.card-ic-interactive').first();
+		const firstCard = page.locator('[data-testid="issue-card"]').first();
 		await expect(firstCard).toBeVisible({ timeout: 8000 });
 
 		await firstCard.click();
@@ -72,14 +72,14 @@ test.describe('Board URL state — issue activation', () => {
 		// No URL param change — just batch selection
 		expect(page.url()).not.toContain('issue=');
 		// Card should now have batch-selected class
-		await expect(page.locator('.card-state-selected-primary').first()).toBeVisible();
+		await expect(page.locator('[data-card-state="selected"]').first()).toBeVisible();
 	});
 });
 
 test.describe('Board URL state — tab selection', () => {
 	test('tab switching updates URL tab param', async ({ page }) => {
 		await page.goto('/?issue=mock-issue-auth');
-		const activeCard = page.locator('.card-state-active-ic');
+		const activeCard = page.locator('[data-card-state="active"]');
 		await expect(activeCard).toBeVisible({ timeout: 8000 });
 
 		const dependenciesTab = page.getByRole('tab', { name: /dependencies/i });
@@ -103,7 +103,7 @@ test.describe('Board URL state — tab selection', () => {
 test.describe('Cross-route navigation preserves state', () => {
 	test('navigating away and back restores board state', async ({ page }) => {
 		await page.goto('/');
-		const firstCard = page.locator('.card-ic-interactive').first();
+		const firstCard = page.locator('[data-testid="issue-card"]').first();
 		await expect(firstCard).toBeVisible({ timeout: 8000 });
 
 		// Activate an issue

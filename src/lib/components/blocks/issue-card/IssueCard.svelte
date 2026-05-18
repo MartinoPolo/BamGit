@@ -109,6 +109,8 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	data-testid="issue-card"
+	data-card-state={ctx.cardState}
 	class="{ctx.slotClasses.card} {isPrdHighlighted ? 'ring-2 ring-offset-2 ring-primary/25' : ''}"
 	style={ctx.cardStyleString}
 	onclick={(event) => selection.handleCardClick(issue.id, event)}
