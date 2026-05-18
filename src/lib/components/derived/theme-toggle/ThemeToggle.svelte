@@ -11,9 +11,10 @@
 
 	interface Props {
 		collapsed?: boolean;
+		compact?: boolean;
 	}
 
-	let { collapsed = false }: Props = $props();
+	let { collapsed = false, compact = false }: Props = $props();
 
 	const settingsCtx = useSettings();
 	const themeMode = $derived(settingsCtx.getThemeMode() as ThemeMode);
@@ -38,7 +39,21 @@
 	const currentMode = $derived(modes.find((mode) => mode.value === themeMode)!);
 </script>
 
-{#if collapsed}
+{#if compact}
+	<SimpleTooltip text="{MODE_LABELS[currentMode.labelKey]()} mode" side="top">
+		{#snippet asChild(props)}
+			<button
+				{...props}
+				type="button"
+				class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+				onclick={cycleMode}
+				aria-label="{MODE_LABELS[currentMode.labelKey]()} mode"
+			>
+				<currentMode.Icon size={14} />
+			</button>
+		{/snippet}
+	</SimpleTooltip>
+{:else if collapsed}
 	<SidebarCollapsedItem
 		icon={currentMode.Icon}
 		label="{MODE_LABELS[currentMode.labelKey]()} mode"

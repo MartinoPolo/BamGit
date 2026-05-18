@@ -13,7 +13,6 @@
 	import WorkspaceSelector from '$lib/components/blocks/workspace/WorkspaceSelector.svelte';
 	import UserAvatar from '$lib/components/derived/user-avatar/UserAvatar.svelte';
 	import ThemeToggle from '$lib/components/derived/theme-toggle/ThemeToggle.svelte';
-	import LanguageSwitcher from '$lib/components/derived/language-switcher/LanguageSwitcher.svelte';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
@@ -174,36 +173,27 @@
 		<!-- Spacer -->
 		<div class="flex-1"></div>
 
-		<!-- Language switcher -->
-		<div
-			class="border-t border-border p-2"
-			class:flex={collapsed}
-			class:justify-center={collapsed}
-		>
-			<LanguageSwitcher {collapsed} />
-		</div>
-
-		<!-- Theme toggle -->
-		<div
-			class="border-t border-border p-2"
-			class:flex={collapsed}
-			class:justify-center={collapsed}
-		>
-			<ThemeToggle {collapsed} />
-		</div>
-
 		<!-- User section -->
 		<div
 			class="border-t border-border p-2"
 			class:flex={collapsed}
-			class:justify-center={collapsed}
+			class:flex-col={collapsed}
+			class:items-center={collapsed}
+			class:gap-1={collapsed}
 		>
 			{#if collapsed}
+				<UserAvatar
+					{username}
+					initials={userInitials}
+					activeCount={activeSessionCount}
+					{collapsed}
+				/>
+				<ThemeToggle {collapsed} />
 				<SidebarNavItem
 					icon={SettingsIcon}
 					label={NAV_LABELS.settings()}
 					href={resolve('/settings/general')}
-					active={isActive(resolve('/settings/general'))}
+					active={isActive(resolve('/settings'))}
 					{collapsed}
 					onclick={(event) => {
 						if (onOpenSettings) {
@@ -220,16 +210,22 @@
 						activeCount={activeSessionCount}
 						{collapsed}
 					/>
-					<SimpleTooltip text={NAV_LABELS.settings()} side="top">
-						<button
-							type="button"
-							class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-							aria-label={NAV_LABELS.settings()}
-							onclick={onOpenSettings}
-						>
-							<SettingsIcon size={14} />
-						</button>
-					</SimpleTooltip>
+					<div class="flex items-center gap-0.5">
+						<ThemeToggle compact />
+						<SimpleTooltip text={NAV_LABELS.settings()} side="top">
+							{#snippet asChild(props)}
+								<button
+									{...props}
+									type="button"
+									class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+									aria-label={NAV_LABELS.settings()}
+									onclick={onOpenSettings}
+								>
+									<SettingsIcon size={14} />
+								</button>
+							{/snippet}
+						</SimpleTooltip>
+					</div>
 				</div>
 			{/if}
 		</div>
