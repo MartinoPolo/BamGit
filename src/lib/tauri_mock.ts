@@ -266,6 +266,7 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 		return null;
 	},
 	set_user_setting: () => null,
+	bulk_set_user_settings: () => null,
 	delete_user_setting: () => null,
 	get_all_user_settings: () =>
 		Object.entries(MOCK_USER_SETTINGS).map(([key, value]) => ({ key, value })),

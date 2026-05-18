@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { useSettings } from '$lib/modules/settings';
-	import { getAllUserSettings, setUserSetting } from '$lib/modules/settings/settings_commands.js';
+	import { SETTING_KEYS } from '$lib/modules/settings/types.js';
+	import {
+		getAllUserSettings,
+		bulkSetUserSettings,
+	} from '$lib/modules/settings/settings_commands.js';
 	import { invoke } from '$lib/tauri.js';
 	import { useToasts } from '$lib/modules/toasts/index.js';
 	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
@@ -70,14 +74,34 @@
 				toasts.show({ tone: 'danger', title: 'Invalid settings file' });
 				return;
 			}
+
+			const knownDbKeys: Set<string> = new Set(Object.values(SETTING_KEYS));
+			const validEntries: Record<string, string> = {};
+			const skippedKeys: string[] = [];
 			for (const [key, value] of Object.entries(entries)) {
-				await setUserSetting(key, value);
+				if (knownDbKeys.has(key)) {
+					validEntries[key] = value;
+				} else {
+					skippedKeys.push(key);
+				}
 			}
-			await settings.loadSettings();
-			toasts.show({
-				tone: 'success',
-				title: `Imported ${Object.keys(entries).length} settings`,
-			});
+
+			if (skippedKeys.length > 0) {
+				toasts.show({
+					tone: 'warning',
+					title: `Skipped ${skippedKeys.length} unknown keys`,
+					body: skippedKeys.join(', '),
+				});
+			}
+
+			if (Object.keys(validEntries).length > 0) {
+				await bulkSetUserSettings(validEntries);
+				await settings.loadSettings();
+				toasts.show({
+					tone: 'success',
+					title: `Imported ${Object.keys(validEntries).length} settings`,
+				});
+			}
 		} catch (error) {
 			toasts.show({ tone: 'danger', title: 'Import failed', body: String(error) });
 		}

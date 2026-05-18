@@ -19,7 +19,21 @@ pub async fn open_file(
 
     if let Some(file_path) = path {
         let path_str = file_path.to_string();
-        let content = std::fs::read_to_string(&path_str).map_err(|error| error.to_string())?;
+        let content = tauri::async_runtime::spawn_blocking(move || {
+            const MAX_FILE_SIZE: u64 = 1_048_576; // 1 MB
+            let metadata = std::fs::metadata(&path_str)
+                .map_err(|error| format!("Cannot read file metadata: {error}"))?;
+            if metadata.len() > MAX_FILE_SIZE {
+                return Err(format!(
+                    "File is too large ({:.1} MB). Maximum allowed size is 1 MB.",
+                    metadata.len() as f64 / 1_048_576.0
+                ));
+            }
+            std::fs::read_to_string(&path_str)
+                .map_err(|error| format!("Failed to read file: {error}"))
+        })
+        .await
+        .map_err(|error| error.to_string())??;
         Ok(Some(content))
     } else {
         Ok(None)

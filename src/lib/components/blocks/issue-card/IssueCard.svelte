@@ -101,9 +101,10 @@
 		}
 	}
 
-	const isPrdHighlighted = $derived(
-		getHoveredPrdNumber() !== null && ctx.prdParent?.number === getHoveredPrdNumber(),
-	);
+	const isPrdHighlighted = $derived.by(() => {
+		const hovered = getHoveredPrdNumber();
+		return hovered !== null && ctx.prdParent?.number === hovered;
+	});
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->

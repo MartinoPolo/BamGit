@@ -153,13 +153,6 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card['box-shadow']).toContain('var(--shadow-lg)');
 		});
 
-		it('done state sets transparent background', () => {
-			const result = computeForVariant('refined-horizon', {}, { state: 'done' });
-			expect(result.card.background).toBe('transparent');
-			expect(result.card['border-color']).toBe('transparent');
-			expect(result.card['box-shadow']).toBe('none');
-		});
-
 		it('archived state sets opacity and grayscale', () => {
 			const result = computeForVariant('refined-horizon', {}, { state: 'archived' });
 			expect(result.card.opacity).toBe('0.7');

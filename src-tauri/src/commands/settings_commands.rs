@@ -1,7 +1,27 @@
+use std::collections::HashMap;
+
 use tauri::State;
 
 use crate::database::connection::DatabaseState;
 use crate::models::setting::{UserSetting, WorkspaceSetting};
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+fn query_optional_row<T, F>(
+    connection: &rusqlite::Connection,
+    sql: &str,
+    params: &[&dyn rusqlite::types::ToSql],
+    mapper: F,
+) -> Result<Option<T>, String>
+where
+    F: FnOnce(&rusqlite::Row) -> rusqlite::Result<T>,
+{
+    match connection.query_row(sql, params, mapper) {
+        Ok(value) => Ok(Some(value)),
+        Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
+        Err(error) => Err(format!("Database error: {error}")),
+    }
+}
 
 // ─── User Settings CRUD ─────────────────────────────────────────────────────
 
@@ -11,19 +31,17 @@ pub fn get_user_setting(
     key: String,
 ) -> Result<Option<UserSetting>, String> {
     let connection = state.read()?;
-    let result = connection
-        .query_row(
-            "SELECT key, value FROM user_settings WHERE key = ?1",
-            [&key],
-            |row| {
-                Ok(UserSetting {
-                    key: row.get(0)?,
-                    value: row.get(1)?,
-                })
-            },
-        )
-        .ok();
-    Ok(result)
+    query_optional_row(
+        &connection,
+        "SELECT key, value FROM user_settings WHERE key = ?1",
+        &[&key as &dyn rusqlite::types::ToSql],
+        |row| {
+            Ok(UserSetting {
+                key: row.get(0)?,
+                value: row.get(1)?,
+            })
+        },
+    )
 }
 
 #[tauri::command]
@@ -84,20 +102,18 @@ pub fn get_workspace_setting(
     key: String,
 ) -> Result<Option<WorkspaceSetting>, String> {
     let connection = state.read()?;
-    let result = connection
-        .query_row(
-            "SELECT dashboard_id, key, value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
-            rusqlite::params![dashboard_id, key],
-            |row| {
-                Ok(WorkspaceSetting {
-                    dashboard_id: row.get(0)?,
-                    key: row.get(1)?,
-                    value: row.get(2)?,
-                })
-            },
-        )
-        .ok();
-    Ok(result)
+    query_optional_row(
+        &connection,
+        "SELECT dashboard_id, key, value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
+        &[&dashboard_id as &dyn rusqlite::types::ToSql, &key],
+        |row| {
+            Ok(WorkspaceSetting {
+                dashboard_id: row.get(0)?,
+                key: row.get(1)?,
+                value: row.get(2)?,
+            })
+        },
+    )
 }
 
 #[tauri::command]
@@ -183,28 +199,59 @@ pub fn get_resolved_setting(
     dashboard_id: Option<String>,
 ) -> Result<Option<String>, String> {
     let connection = state.read()?;
+    resolve_setting_cascade(&connection, &key, dashboard_id.as_deref())
+}
 
-    if let Some(ref did) = dashboard_id {
-        let workspace_value: Option<String> = connection
-            .query_row(
-                "SELECT value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
-                rusqlite::params![did, key],
-                |row| row.get(0),
-            )
-            .ok();
+fn resolve_setting_cascade(
+    connection: &rusqlite::Connection,
+    key: &str,
+    dashboard_id: Option<&str>,
+) -> Result<Option<String>, String> {
+    if let Some(did) = dashboard_id {
+        let workspace_value = query_optional_row(
+            connection,
+            "SELECT value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
+            &[&did as &dyn rusqlite::types::ToSql, &key],
+            |row| row.get(0),
+        )?;
         if workspace_value.is_some() {
             return Ok(workspace_value);
         }
     }
 
-    let user_value: Option<String> = connection
-        .query_row(
-            "SELECT value FROM user_settings WHERE key = ?1",
-            [&key],
-            |row| row.get(0),
-        )
-        .ok();
-    Ok(user_value)
+    query_optional_row(
+        connection,
+        "SELECT value FROM user_settings WHERE key = ?1",
+        &[&key as &dyn rusqlite::types::ToSql],
+        |row| row.get(0),
+    )
+}
+
+// ─── Bulk Operations ────────────────────────────────────────────────────────
+
+#[tauri::command]
+pub fn bulk_set_user_settings(
+    state: State<DatabaseState>,
+    entries: HashMap<String, String>,
+) -> Result<(), String> {
+    let connection = state.write()?;
+    let transaction = connection
+        .unchecked_transaction()
+        .map_err(|error| format!("Failed to start transaction: {error}"))?;
+
+    for (key, value) in &entries {
+        transaction
+            .execute(
+                "INSERT OR REPLACE INTO user_settings (key, value) VALUES (?1, ?2)",
+                rusqlite::params![key, value],
+            )
+            .map_err(|error| format!("Failed to set setting '{key}': {error}"))?;
+    }
+
+    transaction
+        .commit()
+        .map_err(|error| format!("Failed to commit bulk settings: {error}"))?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -461,28 +508,6 @@ mod tests {
 
     // ─── Cascade resolution tests ────────────────────────────────────────────
 
-    fn resolve_cascade(connection: &rusqlite::Connection, key: &str, dashboard_id: Option<&str>) -> Option<String> {
-        if let Some(did) = dashboard_id {
-            let ws_value: Option<String> = connection
-                .query_row(
-                    "SELECT value FROM workspace_settings WHERE dashboard_id = ?1 AND key = ?2",
-                    rusqlite::params![did, key],
-                    |row| row.get(0),
-                )
-                .ok();
-            if ws_value.is_some() {
-                return ws_value;
-            }
-        }
-        connection
-            .query_row(
-                "SELECT value FROM user_settings WHERE key = ?1",
-                [key],
-                |row| row.get(0),
-            )
-            .ok()
-    }
-
     #[test]
     fn resolved_setting_returns_workspace_over_user() {
         let connection = setup_test_database();
@@ -495,7 +520,7 @@ mod tests {
             "INSERT INTO workspace_settings (dashboard_id, key, value) VALUES ('d1', 'theme', 'dark')", [],
         ).unwrap();
 
-        let result = resolve_cascade(&connection, "theme", Some("d1"));
+        let result = super::resolve_setting_cascade(&connection, "theme", Some("d1")).unwrap();
         assert_eq!(result, Some("dark".to_string()));
     }
 
@@ -508,7 +533,7 @@ mod tests {
             "INSERT INTO user_settings (key, value) VALUES ('theme', 'light')", [],
         ).unwrap();
 
-        let result = resolve_cascade(&connection, "theme", Some("d1"));
+        let result = super::resolve_setting_cascade(&connection, "theme", Some("d1")).unwrap();
         assert_eq!(result, Some("light".to_string()));
     }
 
@@ -516,7 +541,7 @@ mod tests {
     fn resolved_setting_returns_none_when_nothing_set() {
         let connection = setup_test_database();
 
-        let result = resolve_cascade(&connection, "nonexistent", None);
+        let result = super::resolve_setting_cascade(&connection, "nonexistent", None).unwrap();
         assert_eq!(result, None);
     }
 
@@ -528,7 +553,52 @@ mod tests {
             "INSERT INTO user_settings (key, value) VALUES ('theme', 'system')", [],
         ).unwrap();
 
-        let result = resolve_cascade(&connection, "theme", None);
+        let result = super::resolve_setting_cascade(&connection, "theme", None).unwrap();
         assert_eq!(result, Some("system".to_string()));
+    }
+
+    // ─── Bulk set tests ─────────────────────────────────────────────────────
+
+    #[test]
+    fn bulk_set_user_settings_inserts_all_entries() {
+        let connection = setup_test_database();
+        let mut entries = std::collections::HashMap::new();
+        entries.insert("a".to_string(), "1".to_string());
+        entries.insert("b".to_string(), "2".to_string());
+
+        let transaction = connection.unchecked_transaction().unwrap();
+        for (key, value) in &entries {
+            transaction.execute(
+                "INSERT OR REPLACE INTO user_settings (key, value) VALUES (?1, ?2)",
+                rusqlite::params![key, value],
+            ).unwrap();
+        }
+        transaction.commit().unwrap();
+
+        let count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM user_settings", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn bulk_set_user_settings_is_atomic_on_failure() {
+        let connection = setup_test_database();
+
+        connection.execute(
+            "INSERT INTO user_settings (key, value) VALUES ('existing', 'old')", [],
+        ).unwrap();
+
+        let transaction = connection.unchecked_transaction().unwrap();
+        transaction.execute(
+            "INSERT OR REPLACE INTO user_settings (key, value) VALUES ('existing', 'new')",
+            [],
+        ).unwrap();
+        drop(transaction); // rollback
+
+        let value: String = connection
+            .query_row("SELECT value FROM user_settings WHERE key = 'existing'", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(value, "old");
     }
 }

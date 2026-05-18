@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Root as Select } from '$lib/components/shadcn/select/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
@@ -12,6 +11,9 @@
 		BUTTON_COLOR_OPTIONS,
 		BADGE_STYLE_OPTIONS,
 		PRIORITY_POSITION_OPTIONS,
+		VARIANT_LABELS,
+		BUTTON_COLOR_LABELS,
+		SLIDER_LABELS,
 		type IssueCardVariant,
 		type IssueCardSettingKey,
 		type RangeKey,
@@ -20,15 +22,11 @@
 
 	const settingsCtx = useIssueCardSettings();
 
-	onMount(() => {
-		void settingsCtx.loadSettings();
-	});
+	const activeVariant = $derived(settingsCtx.settings.variant);
 
-	const VARIANT_LABELS: Record<IssueCardVariant, string> = {
-		veil: 'Veil',
-		'refined-horizon': 'Refined Horizon',
-		radiant: 'Radiant',
-	};
+	const variantSpecificKeys = $derived(
+		VARIANT_SPECIFIC_SETTINGS[activeVariant] as readonly IssueCardSettingKey[],
+	);
 
 	const BADGE_STYLE_LABELS: Record<string, string> = {
 		solid: 'Solid (A)',
@@ -36,29 +34,9 @@
 		'bordered-dark': 'Bordered Dark (C)',
 	};
 
-	const BUTTON_COLOR_LABELS: Record<string, string> = {
-		'issue-color': 'Issue Color',
-		'moss-green': 'Moss Green',
-	};
-
-	const activeVariant = $derived(settingsCtx.settings.variant);
-
-	const variantSpecificKeys = $derived(
-		VARIANT_SPECIFIC_SETTINGS[activeVariant] as readonly IssueCardSettingKey[],
-	);
-
 	function isVariantSpecificVisible(key: IssueCardSettingKey): boolean {
 		return variantSpecificKeys.includes(key);
 	}
-
-	const SLIDER_LABELS: Record<string, string> = {
-		labelTint: 'Label Tint',
-		overlayGlow: 'Overlay Glow Intensity',
-		gradientReach: 'Gradient Reach',
-		colorSaturation: 'Color Saturation',
-		headerSaturation: 'Header Saturation',
-		radialIntensity: 'Radial Intensity',
-	};
 
 	function handleSliderChange(key: IssueCardSettingKey, event: Event) {
 		const target = event.target as HTMLInputElement;

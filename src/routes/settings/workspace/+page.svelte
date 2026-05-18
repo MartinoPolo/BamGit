@@ -34,6 +34,7 @@
 
 	let commands = $state<WorkspaceCommand[]>([]);
 	let commandsLoading = $state(true);
+	let commandsError = $state<string | null>(null);
 	let saveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
 	let saveError = $state<string | null>(null);
 	let dirty = $state(false);
@@ -60,12 +61,14 @@
 
 	async function loadCommands(dashboardId: string) {
 		commandsLoading = true;
+		commandsError = null;
 		try {
 			commands = await invoke<WorkspaceCommand[]>('get_workspace_commands_for_dashboard', {
 				dashboardId,
 			});
-		} catch {
+		} catch (err) {
 			commands = [];
+			commandsError = String(err);
 		}
 		commandsLoading = false;
 	}
@@ -161,16 +164,25 @@
 		if (dashboard === null) {
 			return;
 		}
-		await boardStore.archiveDashboard(dashboard.id);
+		try {
+			await boardStore.archiveDashboard(dashboard.id);
+		} catch (err) {
+			saveError = String(err);
+		}
 	}
 
 	async function handleDelete() {
 		if (dashboard === null || confirmDeleteName.trim() !== dashboard.name) {
 			return;
 		}
-		await boardStore.deleteDashboard(dashboard.id, confirmDeleteName.trim());
-		showDeleteConfirm = false;
-		confirmDeleteName = '';
+		try {
+			await boardStore.deleteDashboard(dashboard.id, confirmDeleteName.trim());
+		} catch (err) {
+			saveError = String(err);
+		} finally {
+			showDeleteConfirm = false;
+			confirmDeleteName = '';
+		}
 	}
 </script>
 
@@ -283,6 +295,25 @@
 		<section class="space-y-4">
 			<h3 class="text-base font-medium">Commands</h3>
 			<Separator />
+
+			{#if commandsError}
+				<div
+					class="flex items-center justify-between rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3"
+				>
+					<p class="text-sm text-destructive">{commandsError}</p>
+					<Button
+						intent="secondary"
+						size="sm"
+						onclick={() => {
+							if (dashboard !== null) {
+								void loadCommands(dashboard.id);
+							}
+						}}
+					>
+						Retry
+					</Button>
+				</div>
+			{/if}
 
 			<!-- Server Commands -->
 			<div class="space-y-3">
