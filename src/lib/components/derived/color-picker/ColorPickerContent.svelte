@@ -131,6 +131,17 @@
 		}
 	}
 
+	function handleHexKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			const target = event.currentTarget as HTMLInputElement;
+			const hex = target.value;
+			if (isValidHexColor(hex)) {
+				onSelect(hex);
+			}
+		}
+	}
+
 	function handleNativeInput(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
 		onSelect(target.value);
@@ -192,6 +203,7 @@
 		type="text"
 		value={effectiveColor}
 		onchange={handleHexInput}
+		onkeydown={handleHexKeydown}
 		class="min-w-0 flex-1"
 		placeholder="#000000"
 		aria-label="Hex color value"

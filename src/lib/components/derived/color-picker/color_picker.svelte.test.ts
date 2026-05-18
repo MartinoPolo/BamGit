@@ -42,6 +42,7 @@ describe('ColorPicker', () => {
 		// Click a different color swatch
 		const targetColor = DEFAULT_COLOR_PALETTE[3]; // '#38a169'
 		const swatch = page.getByRole('button', { name: targetColor });
+		await expect.element(swatch).toBeVisible();
 		await swatch.click();
 
 		expect(onSelect).toHaveBeenCalledWith(targetColor);

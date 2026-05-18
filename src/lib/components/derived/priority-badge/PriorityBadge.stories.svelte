@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { fn } from 'storybook/test';
-	import { PriorityBadge, PRIORITY_POSITIONS } from './index.js';
+	import { PriorityBadge, PRIORITY_POSITION_OPTIONS } from './index.js';
 	import { BADGE_STYLES } from '$lib/components/shadcn/badge/index.js';
 
 	const { Story } = defineMeta({
@@ -22,7 +22,7 @@
 			},
 			position: {
 				control: 'select',
-				options: [...PRIORITY_POSITIONS],
+				options: [...PRIORITY_POSITION_OPTIONS],
 			},
 		},
 	});
@@ -64,7 +64,7 @@
 <Story name="Positions" args={{ priority: 'high' }}>
 	{#snippet template(args: PriorityBadgeProps)}
 		<div class="flex flex-col gap-2">
-			{#each PRIORITY_POSITIONS as position (position)}
+			{#each PRIORITY_POSITION_OPTIONS as position (position)}
 				<div class="flex items-center gap-3">
 					<span class="w-40 text-xs text-foreground-muted">{position}</span>
 					<PriorityBadge priority={args.priority} {position} onclick={args.onclick} />

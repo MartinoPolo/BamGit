@@ -221,6 +221,8 @@ pub fn run() {
             color_palette_commands::get_next_available_color,
             color_palette_commands::get_used_colors_for_dashboard,
             terminal_commands::open_terminal,
+            terminal_commands::open_folder_in_explorer,
+            terminal_commands::open_in_editor,
             label_shape_mapping_commands::get_label_shape_mappings,
             label_shape_mapping_commands::upsert_label_shape_mapping,
             keyboard_shortcut_commands::get_custom_bindings,

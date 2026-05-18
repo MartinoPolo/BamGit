@@ -2,7 +2,7 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { IssueStateChip } from './index.js';
 	import { BADGE_STYLES } from '$lib/components/shadcn/badge/index.js';
-	import { CHIP_COLORS } from '$lib/modules/issue-card/index.js';
+	import { CHIP_COLORS } from '$lib/components/blocks/issue-card/index.js';
 
 	const { Story } = defineMeta({
 		title: 'Derived/IssueStateChip',

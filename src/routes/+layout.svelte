@@ -29,6 +29,7 @@
 	import { setCharacterPacksContext } from '$lib/modules/character-packs';
 	import { setCreationWizardContext } from '$lib/modules/creation-wizard';
 	import { setSettingsContext } from '$lib/modules/settings';
+	import { setIssueCardSettingsContext } from '$lib/components/blocks/issue-card/index.js';
 	import { setToastsContext, registerMockToastBridge } from '$lib/modules/toasts';
 	import CommandPalette from '$lib/components/blocks/command-palette/CommandPalette.svelte';
 	import RawRequirementsModal from '$lib/components/blocks/issue/RawRequirementsModal.svelte';
@@ -55,11 +56,13 @@
 	const rawRequirementsCtx = setRawRequirementsContext();
 	const characterPacksCtx = setCharacterPacksContext();
 	setCreationWizardContext();
+	const issueCardSettingsCtx = setIssueCardSettingsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
 	onMount(() => {
 		registerMockToastBridge((title, body) => toastsCtx.show({ tone: 'warning', title, body }));
+		void issueCardSettingsCtx.loadSettings();
 		boardStore.loadDashboards(windowCtx.isWorkspace ? windowCtx.boundDashboardId : null);
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));

@@ -16,7 +16,8 @@
 		onselect,
 	}: SplitButtonProps = $props();
 
-	let selectedValue = $state('');
+	// svelte-ignore state_referenced_locally
+	let selectedValue = $state(defaultValue);
 
 	let selectedLabel = $derived(
 		options.find((option) => option.value === selectedValue)?.label ?? selectedValue,

@@ -38,7 +38,7 @@
 	import type { TreeContextMenuAction } from '$lib/modules/visualization';
 	import { isContextMenuActionEnabled } from './forest_context_menu_utils.js';
 	import { useSelection } from '$lib/modules/board';
-	import { BATCH_SELECTED_GLOW_COLOR } from '$lib/components/blocks/issue/batch_selection_utils.js';
+	import { BATCH_SELECTED_GLOW_COLOR } from '$lib/components/blocks/issue-card/batch_selection_utils.js';
 	import { SPECIAL_LABELS } from '$lib/modules/visualization';
 
 	interface Props {

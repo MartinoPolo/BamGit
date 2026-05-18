@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IssueCardAppearancePanel from '$lib/components/blocks/settings/IssueCardAppearancePanel.svelte';
-	import { setIssueCardSettingsContext } from '$lib/modules/issue-card/index.js';
+	import { setIssueCardSettingsContext } from '$lib/components/blocks/issue-card/index.js';
 
 	setIssueCardSettingsContext();
 </script>

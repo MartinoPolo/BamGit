@@ -9,7 +9,7 @@
 	import { useSettings } from '$lib/modules/settings';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
-	import WorkspaceCard from '$lib/components/blocks/workspace/WorkspaceCard.svelte';
+	import WorkspaceCard from '$lib/components/blocks/workspace-card/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/blocks/workspace/AddWorkspaceCard.svelte';
 	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';

@@ -28,10 +28,13 @@
 
 	/** Wait for options inside the portaled listbox. */
 	async function waitForOptions(): Promise<HTMLElement[]> {
-		const listbox = await waitForListbox();
 		let options: HTMLElement[] = [];
 		await waitFor(() => {
-			options = within(listbox).getAllByRole('option');
+			const listbox = document.querySelector('[role="listbox"]');
+			if (!listbox) {
+				throw new Error('listbox not found');
+			}
+			options = within(listbox as HTMLElement).getAllByRole('option');
 			if (options.length === 0) {
 				throw new Error('no options');
 			}

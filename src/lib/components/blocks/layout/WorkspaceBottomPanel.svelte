@@ -18,7 +18,7 @@
 	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import PrdOverview from '$lib/components/blocks/issue/PrdOverview.svelte';
 	import DependencyGraphView from '$lib/components/blocks/dependency-graph/DependencyGraphView.svelte';
-	import IssueCardList from '$lib/components/blocks/issue/IssueCardList.svelte';
+	import IssueCardGrid from '$lib/components/blocks/issue-card/IssueCardGrid.svelte';
 	import IssueDetail from '$lib/components/blocks/issue/IssueDetail.svelte';
 	import GhSetupBanner from '$lib/components/blocks/github/GhSetupBanner.svelte';
 	import AssignedIssuesPanel from '$lib/components/blocks/issue/AssignedIssuesPanel.svelte';
@@ -175,7 +175,7 @@
 		</Tabs.Root>
 	</div>
 
-	<div class="flex-1 overflow-auto">
+	<div class="flex-1 overflow-x-hidden overflow-y-auto">
 		{#if shouldShowPrdOverview}
 			<PrdOverview
 				title={prdIssue?.name ?? 'Workspace'}
@@ -189,7 +189,7 @@
 					<GhSetupBanner {authStatus} {onconnect} />
 				{/if}
 
-				<IssueCardList
+				<IssueCardGrid
 					{parentIssues}
 					{archivedIssues}
 					{showArchived}

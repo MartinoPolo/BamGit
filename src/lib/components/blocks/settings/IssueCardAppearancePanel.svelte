@@ -14,8 +14,9 @@
 		PRIORITY_POSITION_OPTIONS,
 		type IssueCardVariant,
 		type IssueCardSettingKey,
-	} from '$lib/modules/issue-card/index.js';
-	import { useIssueCardSettings } from '$lib/modules/issue-card/index.js';
+		type RangeKey,
+	} from '$lib/components/blocks/issue-card/index.js';
+	import { useIssueCardSettings } from '$lib/components/blocks/issue-card/index.js';
 
 	const settingsCtx = useIssueCardSettings();
 
@@ -159,7 +160,7 @@
 		<!-- Shared sliders: Label Tint, Overlay Glow -->
 		{#each ['labelTint', 'overlayGlow'] as key (key)}
 			{@const settingKey = key as IssueCardSettingKey}
-			{@const range = ISSUE_CARD_SETTING_RANGES[key]}
+			{@const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey]}
 			{@const value = settingsCtx.settings[settingKey] as number}
 			<div class="space-y-1">
 				<div class="flex items-center justify-between">
@@ -193,7 +194,7 @@
 			{#each ['gradientReach', 'colorSaturation', 'headerSaturation', 'radialIntensity'] as key (key)}
 				{@const settingKey = key as IssueCardSettingKey}
 				{#if isVariantSpecificVisible(settingKey)}
-					{@const range = ISSUE_CARD_SETTING_RANGES[key]}
+					{@const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey]}
 					{@const value = settingsCtx.settings[settingKey] as number}
 					<div class="space-y-1">
 						<div class="flex items-center justify-between">

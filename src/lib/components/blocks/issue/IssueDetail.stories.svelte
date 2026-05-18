@@ -53,6 +53,7 @@
 		has_local_changes: true,
 		ahead_remote_count: 2,
 		fetched_at: '2026-05-14T10:00:00Z',
+		pr_ci_status: null,
 	};
 
 	const worktreeActiveIssue: Issue = {
@@ -73,6 +74,7 @@
 		has_local_changes: false,
 		ahead_remote_count: 0,
 		fetched_at: '2026-05-14T10:00:00Z',
+		pr_ci_status: null,
 	};
 
 	const archivedIssue: Issue = {
@@ -97,6 +99,7 @@
 		has_local_changes: null,
 		ahead_remote_count: null,
 		fetched_at: null,
+		pr_ci_status: null,
 	};
 
 	const paletteColors = [

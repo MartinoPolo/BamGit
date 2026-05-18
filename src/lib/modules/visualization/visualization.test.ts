@@ -112,6 +112,7 @@ function createGitStatus(overrides: Partial<GitStatusCache> = {}): GitStatusCach
 		has_local_changes: null,
 		ahead_remote_count: null,
 		fetched_at: null,
+		pr_ci_status: null,
 		...overrides,
 	};
 }

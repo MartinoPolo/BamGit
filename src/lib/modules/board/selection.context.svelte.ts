@@ -1,7 +1,7 @@
 import { createContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
-import { computeMergedBatchSelection } from '$lib/components/blocks/issue/batch_selection_utils.js';
+import { computeMergedBatchSelection } from '$lib/components/blocks/issue-card/batch_selection_utils.js';
 import { BOTTOM_PANEL_TABS, shouldShowPrdOverview } from './selection.js';
 import type { BottomPanelTab } from './selection.js';
 
@@ -26,6 +26,8 @@ function createSelectionContext() {
 	const batchAnchorId = new StateRaw<string | null>(null);
 	const individuallySelectedIds = new SvelteSet<string>();
 	const rangeSelectedIds = new SvelteSet<string>();
+	const modifierHeld = new StateRaw(false);
+	const flatVisualOrder = new StateRaw<readonly string[]>([]);
 
 	function hoverIssue(issueId: string) {
 		hoveredIssueId.current = issueId;
@@ -33,6 +35,30 @@ function createSelectionContext() {
 
 	function unhover() {
 		hoveredIssueId.current = null;
+	}
+
+	function setModifierHeld(held: boolean) {
+		if (held !== modifierHeld.current) {
+			modifierHeld.current = held;
+		}
+	}
+
+	function setFlatVisualOrder(ids: readonly string[]) {
+		flatVisualOrder.current = ids;
+	}
+
+	function handleCardClick(issueId: string, event: MouseEvent) {
+		if (event.shiftKey) {
+			event.preventDefault();
+			batchRangeSelect(issueId, flatVisualOrder.current);
+			return;
+		}
+		if (event.ctrlKey || event.metaKey) {
+			event.preventDefault();
+			toggleBatchSelect(issueId);
+			return;
+		}
+		selectExclusive(issueId);
 	}
 
 	function clearBatchSelection() {
@@ -48,6 +74,10 @@ function createSelectionContext() {
 	}
 
 	function selectExclusive(issueId: string) {
+		if (batchSelectedIssueIds.size === 1 && batchSelectedIssueIds.has(issueId)) {
+			clearBatchSelection();
+			return;
+		}
 		clearBatchSelection();
 		batchSelectedIssueIds.add(issueId);
 		individuallySelectedIds.add(issueId);
@@ -157,8 +187,14 @@ function createSelectionContext() {
 		get batchAnchorId() {
 			return batchAnchorId.current;
 		},
+		get isModifierHeld() {
+			return modifierHeld.current;
+		},
 		hoverIssue,
 		unhover,
+		setModifierHeld,
+		setFlatVisualOrder,
+		handleCardClick,
 		activateIssue,
 		deactivate,
 		restoreFromUrl,

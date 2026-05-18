@@ -64,10 +64,10 @@
 		await expect(items.length).toBeGreaterThanOrEqual(2);
 
 		await userEvent.keyboard('{ArrowDown}');
-		await expect(items[0]).toHaveFocus();
+		await waitFor(() => expect(items[0]).toHaveAttribute('data-highlighted', ''));
 
 		await userEvent.keyboard('{ArrowDown}');
-		await expect(items[1]).toHaveFocus();
+		await waitFor(() => expect(items[1]).toHaveAttribute('data-highlighted', ''));
 	};
 
 	const playRadioItemEnterSelects = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -82,7 +82,7 @@
 
 		await userEvent.keyboard('{ArrowDown}');
 		const firstRadio = radioItems[0];
-		await expect(firstRadio).toHaveFocus();
+		await waitFor(() => expect(firstRadio).toHaveAttribute('data-highlighted', ''));
 
 		await userEvent.keyboard('{Enter}');
 
