@@ -4,14 +4,16 @@
 	import { setIssuesContext } from '$lib/modules/issues';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
+	import { Dialog as DialogPrimitive } from 'bits-ui';
 	import CommandPalette from './CommandPalette.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
 		children?: Snippet;
+		portalProps?: Omit<DialogPrimitive.PortalProps, 'children'>;
 	}
 
-	let { children }: Props = $props();
+	let { children, portalProps }: Props = $props();
 
 	setBoardContext();
 	setActionsContext();
@@ -23,4 +25,4 @@
 </script>
 
 {@render children?.()}
-<CommandPalette />
+<CommandPalette {portalProps} />

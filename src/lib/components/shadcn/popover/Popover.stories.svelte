@@ -10,6 +10,8 @@
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Popover',
@@ -105,6 +107,9 @@
 
 <Story name="Filter [play: open and escape close]" play={playOpenAndEscapeClose}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close popover" />
+		</StoryKeyboardHints>
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
 				<Popover.Trigger>
@@ -260,6 +265,9 @@
 
 <Story name="Legend [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close popover" />
+		</StoryKeyboardHints>
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
 				<Popover.Trigger>

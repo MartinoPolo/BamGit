@@ -2,6 +2,8 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { expect, userEvent } from 'storybook/test';
 	import * as Accordion from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Accordion',
@@ -178,27 +180,11 @@
 <Story name="Keyboard Navigation [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template()}
 		<div class="w-80">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle item
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Move focus between
-						items
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Home</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">End</kbd> — Jump to first
-						/ last item
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Enter / Space" action="Toggle item" />
+				<KeyboardHint keys="↓ / ↑" action="Move focus between items" />
+				<KeyboardHint keys="Home / End" action="Jump to first / last item" />
+			</StoryKeyboardHints>
 			<Accordion.Root type="single">
 				<Accordion.Item value="item-1">
 					<Accordion.Trigger>What is Grovekeeper?</Accordion.Trigger>

@@ -77,25 +77,25 @@ Stories without play functions never have `[play:]` in their name.
 
 ## Keyboard Shortcut Info Boxes
 
-Stories that demonstrate keyboard interaction must include a visible info box listing available shortcuts. Place it **above** the component inside the story template.
+Stories that demonstrate keyboard interaction must include a visible info box listing available shortcuts. Place it **above** the component inside the story template. Use the `StoryKeyboardHints` and `KeyboardHint` components from `$lib/storybook/`.
 
 ```svelte
-<div class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
-	<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-	<ul class="flex flex-col gap-0.5">
-		<li>
-			<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
-			<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle item
-		</li>
-		<li>
-			<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-			<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate items
-		</li>
-	</ul>
-</div>
+<script>
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
+</script>
+
+<StoryKeyboardHints>
+	<KeyboardHint keys="Enter / Space" action="Toggle item" />
+	<KeyboardHint keys="↓ / ↑" action="Navigate items" />
+	<KeyboardHint keys="Escape" action="Close" />
+</StoryKeyboardHints>
 ```
 
-Document the actual keyboard shortcuts the component supports — check what the play test exercises and what the underlying shadcn-svelte/bits-ui primitive provides.
+- `keys` prop: single key (`"Escape"`) or multiple keys separated by `/` (`"Enter / Space"`, `"↓ / ↑"`).
+- `action` prop: short description of what the shortcut does.
+- Never use raw `<kbd>` elements in stories — always use `KeyboardHint`.
+- Document the actual keyboard shortcuts the component supports — check what the play test exercises and what the underlying shadcn-svelte/bits-ui primitive provides.
 
 ## Overlay Stories
 

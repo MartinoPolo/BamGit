@@ -3,6 +3,8 @@
 	import { expect, userEvent, within } from 'storybook/test';
 	import { Checkbox } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Checkbox',
@@ -94,17 +96,9 @@
 <Story name="Keyboard Toggle [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template(args: CheckboxProps)}
 		<div class="w-80">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle checked
-						state
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Space" action="Toggle checked state" />
+			</StoryKeyboardHints>
 			<Checkbox {...args} />
 		</div>
 	{/snippet}

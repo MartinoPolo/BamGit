@@ -4,9 +4,11 @@
 	import * as Popover from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import BellIcon from '@lucide/svelte/icons/bell';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/NotificationsPopover',
+		title: 'Base/NotificationsPopover',
 		component: Popover.Root,
 		tags: ['autodocs'],
 	});
@@ -153,6 +155,9 @@
 </script>
 
 {#snippet notificationsTemplate()}
+	<StoryKeyboardHints>
+		<KeyboardHint keys="Escape" action="Close popover" />
+	</StoryKeyboardHints>
 	<div class="p-4">
 		<Popover.Root>
 			<Popover.Trigger>

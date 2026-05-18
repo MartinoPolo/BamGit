@@ -3,6 +3,8 @@
 	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import * as ToggleGroup from './index.js';
 	import { TOGGLE_INTENTS, TOGGLE_SIZES } from '../toggle/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/ToggleGroup',
@@ -176,22 +178,10 @@
 <Story name="Keyboard Navigation [play: keyboard navigation]" play={playKeyboardNavigation}>
 	{#snippet template(args: Record<string, unknown>)}
 		<div>
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">→</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">←</kbd> — Move focus between
-						items (loops)
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Select focused
-						item
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="→ / ←" action="Move focus between items (loops)" />
+				<KeyboardHint keys="Space" action="Select focused item" />
+			</StoryKeyboardHints>
 			<ToggleGroup.Root type="single" value="left" {...args}>
 				<ToggleGroup.Item value="left" aria-label="Align left">
 					<AlignLeftIcon data-icon="inline-start" />

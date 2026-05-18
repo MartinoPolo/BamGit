@@ -154,6 +154,8 @@
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	let checkboxChecked = $state(false);
 	let radioValue = $state('middle');
@@ -221,26 +223,12 @@
 <Story name="With Submenus [play: arrow down focuses]" play={playArrowDownFocusesItems}>
 	{#snippet template()}
 		<div>
-			<div
-				class="mb-4 w-72 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate menu items
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select item
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">→</kbd> — Open submenu
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Esc</kbd> — Close menu
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate menu items" />
+				<KeyboardHint keys="Enter" action="Select item" />
+				<KeyboardHint keys="→" action="Open submenu" />
+				<KeyboardHint keys="Esc" action="Close menu" />
+			</StoryKeyboardHints>
 			<ContextMenu.Root>
 				<ContextMenu.Trigger>
 					<div

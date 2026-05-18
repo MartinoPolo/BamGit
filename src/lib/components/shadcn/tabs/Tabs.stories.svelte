@@ -78,6 +78,8 @@
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import BellIcon from '@lucide/svelte/icons/bell';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const TAB_ACTIVE_OPTIONS = [false, true] as const;
 	let defaultActive = $state('Overview');
@@ -148,23 +150,10 @@
 <Story name="With Badge [play: keyboard activation]" play={playKeyboardActivation}>
 	{#snippet template()}
 		<div>
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Activate focused
-						tab
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">→</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">←</kbd> — Move focus between
-						tabs
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Enter / Space" action="Activate focused tab" />
+				<KeyboardHint keys="→ / ←" action="Move focus between tabs" />
+			</StoryKeyboardHints>
 			<Tabs>
 				<Tab active={badgeActive === 'Inbox'} onclick={() => (badgeActive = 'Inbox')}
 					>Inbox <Badge tone="primary" class="ml-1.5">3</Badge></Tab

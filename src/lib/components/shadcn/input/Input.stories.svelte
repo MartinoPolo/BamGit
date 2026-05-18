@@ -131,7 +131,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Type Updates Value" play={playTypeUpdatesValue}>
+<Story name="Type Updates Value [play: type updates value]" play={playTypeUpdatesValue}>
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
 			<Input placeholder="Type here" aria-label="Branch name" {...args} />
@@ -139,7 +139,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Focus On Click" play={playFocusOnClick}>
+<Story name="Focus On Click [play: focus on click]" play={playFocusOnClick}>
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
 			<Input placeholder="Click to focus" aria-label="Branch name" {...args} />
@@ -147,7 +147,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Disabled Rejects Typing" play={playDisabledRejectsTyping}>
+<Story
+	name="Disabled Rejects Typing [play: disabled rejects typing]"
+	play={playDisabledRejectsTyping}
+>
 	{#snippet template(args: InputProps)}
 		<div class="max-w-xs">
 			<Input disabled value="feat/locked-branch" aria-label="Disabled branch" {...args} />

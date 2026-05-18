@@ -15,9 +15,11 @@
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/AccountDropdown',
+		title: 'Base/AccountDropdown',
 		component: Popover.Root,
 		tags: ['autodocs'],
 	});
@@ -115,6 +117,9 @@
 </script>
 
 {#snippet accountDropdownTemplate()}
+	<StoryKeyboardHints>
+		<KeyboardHint keys="Escape" action="Close dropdown" />
+	</StoryKeyboardHints>
 	<div class="p-4">
 		<Popover.Root>
 			<Popover.Trigger>

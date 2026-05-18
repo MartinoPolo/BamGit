@@ -178,6 +178,8 @@
 
 <script lang="ts">
 	import type { ColorThemePickerProps } from './color_theme_picker_types.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	let selectedTheme = $state('monochrome');
 </script>
@@ -254,21 +256,10 @@
 <Story name="Keyboard Navigation [play: keyboard navigation]" play={playKeyboardNavigation}>
 	{#snippet template(args: ColorThemePickerProps)}
 		<div class="flex flex-col gap-4 p-8 pb-48" data-testid="story-wrapper">
-			<div
-				class="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate theme
-						options
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Esc</kbd> — Close popover
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate theme options" />
+				<KeyboardHint keys="Esc" action="Close popover" />
+			</StoryKeyboardHints>
 			<ColorThemePicker
 				{...args}
 				options={TEST_OPTIONS}

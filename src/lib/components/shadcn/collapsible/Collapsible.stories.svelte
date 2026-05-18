@@ -2,6 +2,8 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { expect, userEvent, waitFor } from 'storybook/test';
 	import * as Collapsible from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Collapsible',
@@ -140,17 +142,9 @@
 <Story name="Keyboard Navigation [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template()}
 		<div class="w-80">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle content
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Enter / Space" action="Toggle content" />
+			</StoryKeyboardHints>
 			<Collapsible.Root>
 				<Collapsible.Trigger
 					class="flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium hover:bg-accent"

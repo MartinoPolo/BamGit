@@ -2,6 +2,8 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import { Toggle, TOGGLE_INTENTS, TOGGLE_SIZES } from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Toggle',
@@ -97,16 +99,9 @@
 <Story name="Space Key Toggles [play: space key toggles]" play={playSpaceKeyToggles}>
 	{#snippet template(args: ToggleProps)}
 		<div class="w-80">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle on/off
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Space" action="Toggle on/off" />
+			</StoryKeyboardHints>
 			<Toggle {...args} aria-label="Toggle bold">
 				<BoldIcon data-icon="inline-start" />
 				Bold

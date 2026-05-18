@@ -154,6 +154,8 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import * as SelectCustom from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const providers = [
 		{ value: 'claude-sonnet', label: 'Claude · Sonnet 4.5' },
@@ -381,7 +383,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Disabled select ignores click" play={playDisabledIgnoresClick}>
+<Story
+	name="Disabled Select Ignores Click [play: disabled ignores click]"
+	play={playDisabledIgnoresClick}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -395,7 +400,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Click outside closes dropdown" play={playClickOutsideCloses}>
+<Story
+	name="Click Outside Closes Dropdown [play: click outside closes]"
+	play={playClickOutsideCloses}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -411,26 +419,17 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Keyboard ArrowDown highlights option" play={playKeyboardArrowDown}>
+<Story
+	name="Keyboard ArrowDown Highlights Option [play: arrow down highlights]"
+	play={playKeyboardArrowDown}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate options
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select option
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Esc</kbd> — Close dropdown
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate options" />
+				<KeyboardHint keys="Enter" action="Select option" />
+				<KeyboardHint keys="Esc" action="Close dropdown" />
+			</StoryKeyboardHints>
 			<Label>Provider</Label>
 			<SelectCustom.CustomRoot type="single" bind:value={selectedDefault}>
 				<SelectCustom.CustomTrigger>{selectedDefaultLabel}</SelectCustom.CustomTrigger>

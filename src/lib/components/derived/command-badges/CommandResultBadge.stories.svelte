@@ -24,12 +24,29 @@
 	import type { CommandResultBadgeProps } from './command_result_badge_types.js';
 </script>
 
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex flex-col gap-6">
+			{#each BADGE_STYLES as badgeStyle (badgeStyle)}
+				<div class="flex flex-col gap-2">
+					<p class="text-xs text-foreground-muted">{badgeStyle}</p>
+					<div class="flex flex-wrap items-center gap-3">
+						{#each COMMAND_RESULT_STATES as state (state)}
+							<CommandResultBadge {state} commandName="check:all" {badgeStyle} />
+						{/each}
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="All States">
 	{#snippet template()}
 		<div class="flex flex-wrap items-center gap-3">
-			<CommandResultBadge state="running" commandName="check:all" />
-			<CommandResultBadge state="passed" commandName="check:all" />
-			<CommandResultBadge state="failed" commandName="check:all" />
+			{#each COMMAND_RESULT_STATES as state (state)}
+				<CommandResultBadge {state} commandName="check:all" />
+			{/each}
 		</div>
 	{/snippet}
 </Story>

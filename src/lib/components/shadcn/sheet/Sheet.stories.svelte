@@ -5,6 +5,8 @@
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Sheet',
@@ -165,6 +167,9 @@
 
 <Story name="Top [play: closes on escape]" play={playClosesOnEscape}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close sheet" />
+		</StoryKeyboardHints>
 		<div class="flex items-start justify-center pt-8 pb-32">
 			<Sheet.Root>
 				<Sheet.Trigger>
@@ -195,6 +200,9 @@
 
 <Story name="Bottom [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close sheet" />
+		</StoryKeyboardHints>
 		<div class="flex items-end justify-center pb-8 pt-32">
 			<Sheet.Root>
 				<Sheet.Trigger>

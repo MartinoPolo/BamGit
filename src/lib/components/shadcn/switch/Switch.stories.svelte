@@ -3,6 +3,8 @@
 	import { expect, userEvent, within } from 'storybook/test';
 	import { Switch } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Switch',
@@ -81,16 +83,9 @@
 <Story name="Space Key Toggles [play: space key toggles]" play={playSpaceKeyToggles}>
 	{#snippet template(args: SwitchProps)}
 		<div class="w-80">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle on/off
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Space" action="Toggle on/off" />
+			</StoryKeyboardHints>
 			<Switch {...args} />
 		</div>
 	{/snippet}

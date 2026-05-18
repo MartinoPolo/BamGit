@@ -7,7 +7,7 @@
 	type IssueCardProps = ComponentProps<typeof IssueCard>;
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Issue/IssueCard',
+		title: 'Blocks/IssueCard/IssueCard',
 		component: IssueCard,
 		tags: ['autodocs'],
 		args: {
@@ -257,27 +257,10 @@
 
 <!-- Interaction tests: event propagation -->
 
-<Story name="Test: Priority Click Containment" play={playPriorityClickContainment}>
-	{#snippet template(args: IssueCardProps)}
-		<IssueCardStoryWrapper>
-			<div class="max-w-md">
-				<IssueCard {...args} issue={baseIssue} ghAvailable={true} />
-			</div>
-		</IssueCardStoryWrapper>
-	{/snippet}
-</Story>
-
-<Story name="Test: GitHub Link Containment" play={playGitHubLinkContainment}>
-	{#snippet template(args: IssueCardProps)}
-		<IssueCardStoryWrapper>
-			<div class="max-w-md">
-				<IssueCard {...args} issue={baseIssue} ghAvailable={true} />
-			</div>
-		</IssueCardStoryWrapper>
-	{/snippet}
-</Story>
-
-<Story name="Test: Quick Action Click Containment" play={playQuickActionClickContainment}>
+<Story
+	name="Priority Click Containment [play: priority click contained]"
+	play={playPriorityClickContainment}
+>
 	{#snippet template(args: IssueCardProps)}
 		<IssueCardStoryWrapper>
 			<div class="max-w-md">
@@ -288,7 +271,33 @@
 </Story>
 
 <Story
-	name="Test: Quick Action Right-Click Containment"
+	name="GitHub Link Containment [play: github link contained]"
+	play={playGitHubLinkContainment}
+>
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md">
+				<IssueCard {...args} issue={baseIssue} ghAvailable={true} />
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story
+	name="Quick Action Click Containment [play: quick action click contained]"
+	play={playQuickActionClickContainment}
+>
+	{#snippet template(args: IssueCardProps)}
+		<IssueCardStoryWrapper>
+			<div class="max-w-md">
+				<IssueCard {...args} issue={baseIssue} ghAvailable={true} />
+			</div>
+		</IssueCardStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story
+	name="Quick Action Right-Click Containment [play: right-click contained]"
 	play={playQuickActionRightClickContainment}
 >
 	{#snippet template(args: IssueCardProps)}

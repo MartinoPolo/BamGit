@@ -16,6 +16,18 @@
 	});
 </script>
 
+<Story name="All Visible Variants">
+	{#snippet template()}
+		<div class="flex items-center gap-4 p-4">
+			<SyncBadge behindBaseCount={1} />
+			<SyncBadge behindBaseCount={3} />
+			<SyncBadge behindBaseCount={5} />
+			<SyncBadge behindBaseCount={6} />
+			<SyncBadge behindBaseCount={15} />
+		</div>
+	{/snippet}
+</Story>
+
 <!-- behindBaseCount <= 0 renders nothing — the component is display-only when a worktree is behind base -->
 <Story name="Up To Date (renders nothing)" args={{ behindBaseCount: 0 }}>
 	{#snippet template(args: StoryArgs)}
@@ -40,18 +52,6 @@
 	{#snippet template(args: StoryArgs)}
 		<div class="flex items-center gap-4 p-4">
 			<SyncBadge {...args} />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Visible Variants">
-	{#snippet template()}
-		<div class="flex items-center gap-4 p-4">
-			<SyncBadge behindBaseCount={1} />
-			<SyncBadge behindBaseCount={3} />
-			<SyncBadge behindBaseCount={5} />
-			<SyncBadge behindBaseCount={6} />
-			<SyncBadge behindBaseCount={15} />
 		</div>
 	{/snippet}
 </Story>

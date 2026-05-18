@@ -13,6 +13,8 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Dialog',
@@ -222,6 +224,9 @@
 
 <Story name="Destructive Confirm [play: closes on escape]" play={playClosesOnEscape}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close dialog" />
+		</StoryKeyboardHints>
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
 				<Dialog.Trigger>
@@ -358,6 +363,9 @@
 
 <Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close dialog" />
+		</StoryKeyboardHints>
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
 				<Dialog.Trigger>
@@ -407,6 +415,10 @@
 
 <Story name="Focus Trap [play: focus trap]" play={playFocusTrap}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close dialog" />
+			<KeyboardHint keys="Tab" action="Cycle focus within dialog" />
+		</StoryKeyboardHints>
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
 				<Dialog.Trigger>

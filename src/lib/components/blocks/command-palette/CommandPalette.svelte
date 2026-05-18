@@ -3,6 +3,7 @@
 	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
+	import { Dialog as DialogPrimitive } from 'bits-ui';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import * as Command from '$lib/components/shadcn/command/index.js';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
@@ -12,6 +13,12 @@
 		COMMAND_PALETTE_CATEGORIES,
 		type CommandPaletteCategory,
 	} from '$lib/modules/command-palette/index.js';
+
+	interface Props {
+		portalProps?: Omit<DialogPrimitive.PortalProps, 'children'>;
+	}
+
+	let { portalProps }: Props = $props();
 
 	const paletteCtx = useCommandPalette();
 
@@ -44,6 +51,7 @@
 	<Dialog.Content
 		class="top-[20%] translate-y-0 max-w-135 overflow-hidden p-0"
 		onOpenAutoFocus={handleOpenAutoFocus}
+		{portalProps}
 	>
 		<Dialog.Title class="sr-only">{m.command_palette_title()}</Dialog.Title>
 

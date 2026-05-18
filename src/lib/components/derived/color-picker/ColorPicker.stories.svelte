@@ -145,6 +145,8 @@
 
 <script lang="ts">
 	import type { ColorPickerProps } from './color_picker_types.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const USED_COLORS = ['#e53e3e', '#3182ce', '#38a169', '#805ad5'];
 
@@ -191,26 +193,41 @@
 	play={playHexInputUpdatesPreview}
 >
 	{#snippet template(args: ColorPickerProps)}
-		<div class="flex items-center gap-4 pb-72">
-			<ColorPicker
-				{...args}
-				{selectedColor}
-				onSelect={(color: string) => {
-					handleSelect(color);
-					args.onSelect?.(color);
-				}}
-				portalDisabled={true}
-			/>
-			<span class="font-mono text-xs text-muted-foreground">{selectedColor}</span>
+		<div class="flex flex-col gap-4 pb-72">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Enter" action="Confirm hex input" />
+			</StoryKeyboardHints>
+			<div class="flex items-center gap-4">
+				<ColorPicker
+					{...args}
+					{selectedColor}
+					onSelect={(color: string) => {
+						handleSelect(color);
+						args.onSelect?.(color);
+					}}
+					portalDisabled={true}
+				/>
+				<span class="font-mono text-xs text-muted-foreground">{selectedColor}</span>
+			</div>
 		</div>
 	{/snippet}
 </Story>
 
 <Story name="Escape Closes [play: escape closes popover]" args={{}} play={playEscapeClosesPopover}>
 	{#snippet template(args: ColorPickerProps)}
-		<div class="flex items-center gap-4 pb-72">
-			<ColorPicker {...args} {selectedColor} onSelect={handleSelect} portalDisabled={true} />
-			<span class="font-mono text-xs text-muted-foreground">{selectedColor}</span>
+		<div class="flex flex-col gap-4 pb-72">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Escape" action="Close popover" />
+			</StoryKeyboardHints>
+			<div class="flex items-center gap-4">
+				<ColorPicker
+					{...args}
+					{selectedColor}
+					onSelect={handleSelect}
+					portalDisabled={true}
+				/>
+				<span class="font-mono text-xs text-muted-foreground">{selectedColor}</span>
+			</div>
 		</div>
 	{/snippet}
 </Story>

@@ -112,26 +112,18 @@
 	import HomeIcon from '@lucide/svelte/icons/home';
 	import MoonIcon from '@lucide/svelte/icons/moon';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 </script>
 
 <Story name="Default [play: keyboard navigation]" play={playKeyboardNavigation}>
 	{#snippet template()}
 		<div class="w-100">
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate items
-					</li>
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select item
-					</li>
-					<li>Type to filter items</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate items" />
+				<KeyboardHint keys="Enter" action="Select item" />
+				<li>Type to filter items</li>
+			</StoryKeyboardHints>
 			<Command.Root class="rounded-xl border border-border shadow-md">
 				<Command.Input placeholder="Search commands..." />
 				<Command.List>

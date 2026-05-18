@@ -109,6 +109,8 @@
 
 <script lang="ts">
 	import type { RadioGroupProps } from './radio-group-variants.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 </script>
 
 <Story name="Default [play: click selects option]" play={playClickSelectsOption}>
@@ -164,18 +166,9 @@
 <Story name="Arrow Down Navigation [play: arrow down navigation]" play={playArrowDownNavigation}>
 	{#snippet template(args: RadioGroupProps)}
 		<div>
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Move focus and
-						select option
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Move focus and select option" />
+			</StoryKeyboardHints>
 			<RadioGroup {...args} value="claude">
 				<div class="flex items-center gap-2">
 					<RadioGroupItem value="claude" id="rad-claude" />
@@ -203,18 +196,9 @@
 <Story name="Arrow Up Navigation [play: arrow up navigation]" play={playArrowUpNavigation}>
 	{#snippet template(args: RadioGroupProps)}
 		<div>
-			<div
-				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
-			>
-				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
-				<ul class="flex flex-col gap-0.5">
-					<li>
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
-						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Move focus and
-						select option
-					</li>
-				</ul>
-			</div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Move focus and select option" />
+			</StoryKeyboardHints>
 			<RadioGroup {...args} value="claude">
 				<div class="flex items-center gap-2">
 					<RadioGroupItem value="claude" id="rau-claude" />

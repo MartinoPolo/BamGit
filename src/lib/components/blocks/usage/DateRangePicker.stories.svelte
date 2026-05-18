@@ -136,6 +136,9 @@
 </script>
 
 <script lang="ts">
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
+
 	let selectedRange = $state<{ start: string; end: string } | null>(null);
 </script>
 
@@ -179,6 +182,9 @@
 <Story name="Escape Closes [play: escape closes popover]" play={playEscapeCloses}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Escape" action="Close popover" />
+			</StoryKeyboardHints>
 			<DateRangePicker onselect={() => {}} />
 		</div>
 	{/snippet}
@@ -195,6 +201,9 @@
 <Story name="Escape Containment [play: escape contained]" play={playEscapeContainment}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Escape" action="Close popover" />
+			</StoryKeyboardHints>
 			<DateRangePicker onselect={() => {}} />
 		</div>
 	{/snippet}

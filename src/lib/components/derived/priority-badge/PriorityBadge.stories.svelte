@@ -30,9 +30,32 @@
 
 <script lang="ts">
 	import type { DisplayPriority, PriorityBadgeProps } from './priority_badge_types.js';
+	import { PRIORITY_LABELS } from './priority_badge_types.js';
 
-	const ALL_PRIORITIES: DisplayPriority[] = ['top', 'high', 'low', 'lowest'];
+	const ALL_PRIORITIES = Object.keys(PRIORITY_LABELS) as DisplayPriority[];
 </script>
+
+<Story name="All Variants">
+	{#snippet template(args: PriorityBadgeProps)}
+		<div
+			class="grid gap-x-3 gap-y-2"
+			style="grid-template-columns: auto repeat({BADGE_STYLES.length}, auto);"
+		>
+			<!-- header row -->
+			<div></div>
+			{#each BADGE_STYLES as badgeStyle (badgeStyle)}
+				<span class="text-xs text-foreground-muted">{badgeStyle}</span>
+			{/each}
+			<!-- data rows -->
+			{#each ALL_PRIORITIES as priority (priority)}
+				<span class="text-xs text-foreground-muted self-center">{priority}</span>
+				{#each BADGE_STYLES as badgeStyle (badgeStyle)}
+					<PriorityBadge {priority} {badgeStyle} onclick={args.onclick} />
+				{/each}
+			{/each}
+		</div>
+	{/snippet}
+</Story>
 
 <Story name="All Priorities">
 	{#snippet template(args: PriorityBadgeProps)}
