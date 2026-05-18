@@ -4,6 +4,9 @@
 
 	let {
 		ref = $bindable(null),
+		align = 'start',
+		alignOffset = -4,
+		sideOffset = 2,
 		class: className,
 		...restProps
 	}: ContextMenuPrimitive.SubContentProps = $props();
@@ -11,9 +14,12 @@
 
 <ContextMenuPrimitive.SubContent
 	bind:ref
+	{align}
+	{sideOffset}
+	{alignOffset}
 	data-slot="context-menu-sub-content"
 	class={cn(
-		'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 bg-popover text-popover-foreground min-w-32 rounded-md border p-1 shadow-lg duration-100',
+		'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/10 bg-popover text-popover-foreground min-w-32 rounded-md p-1 shadow-md ring-1 duration-100 z-50 overflow-x-hidden overflow-y-auto outline-none',
 		className,
 	)}
 	{...restProps}
