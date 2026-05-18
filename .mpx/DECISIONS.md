@@ -447,6 +447,20 @@ What: Compile port pattern regex once when process is registered, store `Option<
 Why: Performance. Regex compilation is expensive; matching is cheap. Hot path (every stdout line).
 Rejected: Keep per-line compilation (wasteful), lazy_static (pattern is per-command, not global).
 
+### Log buffer: 1000-line in-memory + temp file for full history
+
+Decided: 2026-05-18
+What: In-memory `Vec<String>` stays capped at 1000 lines as a tail cache for fast display. Each spawned process additionally writes all stdout/stderr to a temp file via `BufWriter<File>`. `get_process_logs` returns the tail cache; `get_full_process_logs` reads from the temp file. Buffer size is hardcoded, not configurable.
+Why: 1000 lines is sufficient for real-time monitoring. Temp file provides full history without unbounded memory growth. Configurable buffer size adds complexity without meaningful user value.
+Rejected: Configurable buffer size (over-engineering), unlimited in-memory (OOM risk), no full log access (frustrating for long-running processes).
+
+### HMR port re-detection handled by continuous regex matching
+
+Decided: 2026-05-18
+What: Port pattern regex runs on every new stdout line. If a new port is detected that differs from the current one, the badge updates automatically via `set_port()` + `process-port-detected` event. No special HMR handling needed.
+Why: Frameworks that restart (nodemon, Vite HMR) re-log their listen address. The existing per-line matching catches it naturally. Frameworks that restart silently without re-logging the port cannot be detected — this is a framework limitation, not a Grovekeeper limitation.
+Rejected: Special HMR detection logic (unnecessary — covered by existing architecture), port polling (wasteful).
+
 ### Five process states with distinct badge visuals
 
 Decided: 2026-05-18
