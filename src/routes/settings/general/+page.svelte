@@ -60,6 +60,24 @@
 		return entries;
 	}
 
+	const KNOWN_DB_KEYS: Set<string> = new Set(Object.values(SETTING_KEYS));
+
+	function filterValidSettings(entries: Record<string, string>): {
+		valid: Record<string, string>;
+		skipped: string[];
+	} {
+		const valid: Record<string, string> = {};
+		const skipped: string[] = [];
+		for (const [key, value] of Object.entries(entries)) {
+			if (KNOWN_DB_KEYS.has(key)) {
+				valid[key] = value;
+			} else {
+				skipped.push(key);
+			}
+		}
+		return { valid, skipped };
+	}
+
 	async function handleImport() {
 		try {
 			const content: string | null = await invoke('open_file', {
@@ -75,31 +93,22 @@
 				return;
 			}
 
-			const knownDbKeys: Set<string> = new Set(Object.values(SETTING_KEYS));
-			const validEntries: Record<string, string> = {};
-			const skippedKeys: string[] = [];
-			for (const [key, value] of Object.entries(entries)) {
-				if (knownDbKeys.has(key)) {
-					validEntries[key] = value;
-				} else {
-					skippedKeys.push(key);
-				}
-			}
+			const { valid, skipped } = filterValidSettings(entries);
 
-			if (skippedKeys.length > 0) {
+			if (skipped.length > 0) {
 				toasts.show({
 					tone: 'warning',
-					title: `Skipped ${skippedKeys.length} unknown keys`,
-					body: skippedKeys.join(', '),
+					title: `Skipped ${skipped.length} unknown keys`,
+					body: skipped.join(', '),
 				});
 			}
 
-			if (Object.keys(validEntries).length > 0) {
-				await bulkSetUserSettings(validEntries);
+			if (Object.keys(valid).length > 0) {
+				await bulkSetUserSettings(valid);
 				await settings.loadSettings();
 				toasts.show({
 					tone: 'success',
-					title: `Imported ${Object.keys(validEntries).length} settings`,
+					title: `Imported ${Object.keys(valid).length} settings`,
 				});
 			}
 		} catch (error) {

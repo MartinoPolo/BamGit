@@ -20,18 +20,20 @@
 	const hasWorkspace = $derived(boardStore.activeDashboard !== null);
 	const workspaceName = $derived(boardStore.activeDashboard?.name ?? '');
 
+	const effectiveDashboardId = $derived(scopeDashboardId ?? boardStore.activeDashboardId);
+	const scopedDashboardId = $derived(scope === 'workspace' ? effectiveDashboardId : null);
+
 	let lastLoadedScope = '';
-	let lastLoadedDashboardId = '';
+	let lastLoadedId = '';
 	$effect(() => {
-		const dashboardId = scopeDashboardId ?? boardStore.activeDashboardId;
-		const effectiveDashboardId = scope === 'workspace' ? (dashboardId ?? '') : '';
-		settingsCtx.setScope(scope, scope === 'workspace' ? dashboardId : null);
-		if (scope === lastLoadedScope && effectiveDashboardId === lastLoadedDashboardId) {
+		settingsCtx.setScope(scope, scopedDashboardId);
+		const newId = scopedDashboardId ?? '';
+		if (scope === lastLoadedScope && newId === lastLoadedId) {
 			return;
 		}
 		lastLoadedScope = scope;
-		lastLoadedDashboardId = effectiveDashboardId;
-		void settingsCtx.loadSettings(scope === 'workspace' ? dashboardId : null);
+		lastLoadedId = newId;
+		void settingsCtx.loadSettings(scopedDashboardId);
 	});
 
 	const visibleCategories = $derived(
