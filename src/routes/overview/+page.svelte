@@ -1,22 +1,30 @@
 ﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { openPath } from '$lib/opener.js';
 	import { invoke } from '$lib/tauri.js';
 	import { useBoard } from '$lib/modules/board';
+	import { useSettings } from '$lib/modules/settings';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import WorkspaceCard from '$lib/components/blocks/workspace-card/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/blocks/workspace/AddWorkspaceCard.svelte';
 	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
 	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
+	import ThemeToggle from '$lib/components/derived/theme-toggle/ThemeToggle.svelte';
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Toggle } from '$lib/components/shadcn/toggle/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
+	const settingsCtx = useSettings();
 	const versionControl = useVersionControl();
 
 	let authWizardOpen = $state(false);
@@ -71,6 +79,23 @@
 			<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
 		</div>
 		<div class="flex items-center gap-2">
+			<ThemeToggle compact />
+			<SimpleTooltip text={m.nav_settings()} side="bottom">
+				{#snippet asChild(props)}
+					<button
+						{...props}
+						type="button"
+						class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+						aria-label={m.nav_settings()}
+						onclick={() => {
+							settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
+							void goto(resolve('/settings/general'));
+						}}
+					>
+						<SettingsIcon size={14} />
+					</button>
+				{/snippet}
+			</SimpleTooltip>
 			<Toggle
 				intent="outline"
 				size="icon"

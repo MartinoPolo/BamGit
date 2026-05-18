@@ -4,6 +4,7 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { preloadCode, goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import DashboardSidebar from '$lib/components/blocks/layout/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/blocks/workspace/DashboardCreateDialog.svelte';
@@ -92,7 +93,12 @@
 			id: 'open-settings',
 			label: 'Open Settings',
 			defaultBinding: 'Ctrl+,',
-			callback: () => void goto(resolve('/settings/general')),
+			callback: () => {
+				if (!isSettingsRoute) {
+					settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
+				}
+				void goto(resolve('/settings/general'));
+			},
 		});
 		shortcutsCtx.registerShortcut({
 			id: 'quick-ideas',
@@ -147,6 +153,7 @@
 
 	const workspaceName = $derived(boardStore.activeDashboard?.name ?? 'Grovekeeper');
 	const activeSessionCount = $derived(sessionStore.activeSessions.length);
+	const isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 </script>
 
 <svelte:window onkeydown={(event) => shortcutsCtx.handleKeydown(event)} />
@@ -154,6 +161,10 @@
 <Tooltip.Provider delayDuration={300} skipDelayDuration={300}>
 	{#if windowCtx.isOverview}
 		<div class="h-screen overflow-auto bg-background text-foreground">
+			{@render children()}
+		</div>
+	{:else if isSettingsRoute}
+		<div class="h-screen overflow-hidden bg-background text-foreground">
 			{@render children()}
 		</div>
 	{:else}
@@ -172,6 +183,18 @@
 				onToggleSidebar={() => boardStore.toggleSidebar()}
 				onEditWorkspace={() => {
 					editingDashboard = boardStore.activeDashboard ?? null;
+				}}
+				onOpenSettings={() => {
+					settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
+					void goto(resolve('/settings/general'));
+				}}
+				onOpenWorkspaceSettings={() => {
+					settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
+					const dashboardId = boardStore.activeDashboard?.id;
+					if (dashboardId !== undefined) {
+						// eslint-disable-next-line svelte/no-navigation-without-resolve -- dynamically constructed query params
+						void goto(`${resolve('/settings/workspace')}?scope=ws&id=${dashboardId}`);
+					}
 				}}
 			/>
 
