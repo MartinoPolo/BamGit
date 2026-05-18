@@ -25,11 +25,17 @@
 
 	const boardStore = useBoard();
 	const settingsCtx = useSettings();
+	const isDev = import.meta.env.DEV;
 
 	const scope = $derived(page.url.searchParams.get('scope') === 'ws' ? 'workspace' : 'user');
 	const scopeDashboardId = $derived(page.url.searchParams.get('id'));
-	const hasWorkspace = $derived(boardStore.activeDashboard !== null);
-	const workspaceName = $derived(boardStore.activeDashboard?.name ?? '');
+	const hasWorkspace = $derived(scopeDashboardId !== null);
+	const scopeDashboard = $derived(
+		scopeDashboardId !== null
+			? (boardStore.dashboards.find((d) => d.id === scopeDashboardId) ?? null)
+			: null,
+	);
+	const workspaceName = $derived(scopeDashboard?.name ?? '');
 
 	$effect(() => {
 		const dashboardId = scopeDashboardId ?? boardStore.activeDashboardId;
@@ -50,6 +56,7 @@
 		label: string;
 		userOnly: boolean;
 		workspaceOnly: boolean;
+		devOnly?: boolean;
 		fullWidth?: boolean;
 		children?: CategoryChild[];
 	}
@@ -148,11 +155,15 @@
 			label: 'Developer Tools',
 			userOnly: true,
 			workspaceOnly: false,
+			devOnly: true,
 		},
 	];
 
 	const visibleCategories = $derived(
 		allCategories.filter((cat) => {
+			if (cat.devOnly && !isDev) {
+				return false;
+			}
 			if (scope === 'workspace') {
 				return !cat.userOnly;
 			}
@@ -188,9 +199,9 @@
 			return;
 		}
 		const currentRoute = page.url.pathname;
-		if (value === 'workspace' && boardStore.activeDashboard !== null) {
+		if (value === 'workspace' && scopeDashboardId !== null) {
 			// eslint-disable-next-line svelte/no-navigation-without-resolve -- dynamically constructed query params
-			void goto(`${currentRoute}?scope=ws&id=${boardStore.activeDashboard.id}`, {
+			void goto(`${currentRoute}?scope=ws&id=${scopeDashboardId}`, {
 				replaceState: true,
 			});
 		} else {
@@ -209,7 +220,7 @@
 			: 'Back to app',
 	);
 
-	const workspaceAccentColor = $derived(boardStore.activeDashboard?.accent_color ?? null);
+	const workspaceAccentColor = $derived(scopeDashboard?.accent_color ?? null);
 </script>
 
 <svelte:window onkeydown={handleEscape} />

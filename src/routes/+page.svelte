@@ -539,7 +539,7 @@
 			<EmptyIssueState onAddIssue={openCreateDialog} />
 		</div>
 	{:else}
-		<div class="flex-1 overflow-hidden">
+		<div class="flex flex-1 flex-col overflow-hidden">
 			<WorkspaceDashboardLayout
 				collapsed={selection.forestCollapsed}
 				onToggle={(value) => {
