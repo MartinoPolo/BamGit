@@ -16,6 +16,8 @@
 			collapsed: false,
 			onToggleSidebar: fn(),
 			onEditWorkspace: fn(),
+			onOpenSettings: fn(),
+			onOpenWorkspaceSettings: fn(),
 		},
 	});
 </script>
@@ -31,6 +33,8 @@
 					collapsed={false}
 					onToggleSidebar={fn()}
 					onEditWorkspace={fn()}
+					onOpenSettings={fn()}
+					onOpenWorkspaceSettings={fn()}
 				/>
 				<div class="flex-1 bg-background p-4">
 					<span class="text-sm text-foreground-muted">Main content area</span>
@@ -51,6 +55,8 @@
 					collapsed={true}
 					onToggleSidebar={fn()}
 					onEditWorkspace={fn()}
+					onOpenSettings={fn()}
+					onOpenWorkspaceSettings={fn()}
 				/>
 				<div class="flex-1 bg-background p-4">
 					<span class="text-sm text-foreground-muted">Main content area</span>
@@ -72,6 +78,8 @@
 					collapsed={false}
 					onToggleSidebar={fn()}
 					onEditWorkspace={fn()}
+					onOpenSettings={fn()}
+					onOpenWorkspaceSettings={fn()}
 				/>
 				<div class="flex-1 bg-background p-4">
 					<span class="text-sm text-foreground-muted">Main content area</span>
@@ -93,6 +101,8 @@
 					collapsed={false}
 					onToggleSidebar={fn()}
 					onEditWorkspace={fn()}
+					onOpenSettings={fn()}
+					onOpenWorkspaceSettings={fn()}
 				/>
 				<div class="flex-1 bg-background p-4">
 					<span class="text-sm text-foreground-muted">Main content area</span>
