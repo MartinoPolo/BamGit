@@ -100,6 +100,13 @@ export function clampSettingValue(key: string, value: number): number {
 
 // ── Parse ────────────────────────────────────────────────────────────
 
+const ENUM_VALIDATORS: Partial<Record<IssueCardSettingKey, readonly string[]>> = {
+	buttonColor: BUTTON_COLOR_OPTIONS,
+	badgeStyle: BADGE_STYLE_OPTIONS,
+	variant: Object.values(ISSUE_CARD_VARIANTS),
+	priorityPosition: PRIORITY_POSITION_OPTIONS,
+};
+
 export function parseSettingValue(key: IssueCardSettingKey, rawValue: string): string | number {
 	if (NUMERIC_SETTING_KEYS.has(key)) {
 		const parsed = Number(rawValue);
@@ -109,25 +116,9 @@ export function parseSettingValue(key: IssueCardSettingKey, rawValue: string): s
 		return clampSettingValue(key, parsed);
 	}
 
-	if (key === 'buttonColor') {
-		return (BUTTON_COLOR_OPTIONS as readonly string[]).includes(rawValue)
-			? rawValue
-			: ISSUE_CARD_SETTING_DEFAULTS[key];
-	}
-	if (key === 'badgeStyle') {
-		return (BADGE_STYLE_OPTIONS as readonly string[]).includes(rawValue)
-			? rawValue
-			: ISSUE_CARD_SETTING_DEFAULTS[key];
-	}
-	if (key === 'variant') {
-		return (Object.values(ISSUE_CARD_VARIANTS) as readonly string[]).includes(rawValue)
-			? rawValue
-			: ISSUE_CARD_SETTING_DEFAULTS[key];
-	}
-	if (key === 'priorityPosition') {
-		return (PRIORITY_POSITION_OPTIONS as readonly string[]).includes(rawValue)
-			? rawValue
-			: ISSUE_CARD_SETTING_DEFAULTS[key];
+	const allowedValues = ENUM_VALIDATORS[key];
+	if (allowedValues) {
+		return allowedValues.includes(rawValue) ? rawValue : ISSUE_CARD_SETTING_DEFAULTS[key];
 	}
 	return rawValue;
 }

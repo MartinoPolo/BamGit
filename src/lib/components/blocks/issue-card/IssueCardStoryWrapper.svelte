@@ -26,6 +26,7 @@
 	const issuesCtx = setIssuesContext();
 	const settingsCtx = setIssueCardSettingsContext();
 
+	// fallow-ignore-next-line complexity
 	onMount(() => {
 		void issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id);
 		void settingsCtx.loadSettings();
