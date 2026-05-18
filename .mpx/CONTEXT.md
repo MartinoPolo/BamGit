@@ -104,6 +104,7 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 | AI Configuration       | implemented (in Settings)  | #94, #320 | —                                                     |
 | AFK/HITL Workflow      | not started                | #92       | —                                                     |
 | Settings (Two-Layer)   | implemented                | #320      | —                                                     |
+| Process Management     | planned                    | #339      | —                                                     |
 | PRD Management         | planned                    | #219      | —                                                     |
 | Keyboard Shortcuts     | implemented                | #87       | —                                                     |
 | Internationalization   | implemented (en + cs)      | #87       | —                                                     |

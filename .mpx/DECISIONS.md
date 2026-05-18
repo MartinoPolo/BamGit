@@ -400,3 +400,63 @@ Decided: 2026-05-17
 What: IssueCardList.svelte renamed to IssueCardGrid.svelte. Stays mostly as-is — layout + interaction coordinator is appropriate for a block component.
 Why: "Grid" more accurately describes the component's role (CSS grid layout, not a list). Consistent with the component's actual rendering.
 Rejected: Further decomposition (already clean), keep "List" name (misleading — it renders a grid).
+
+---
+
+## Process Management
+
+### Headless execution with terminal mode escape hatch
+
+Decided: 2026-05-18
+What: Workspace commands run headlessly by default (piped stdout/stderr, port detection, log capture, badge integration). A `mode` field on `workspace_commands` supports `'headless'` (default) and `'terminal'` (fire-and-forget in external terminal, no tracking). Future `'embedded'` mode reserved for in-app terminal (xterm.js/PTY).
+Why: Headless enables all tracking features (badges, logs, port detection). Terminal mode covers interactive commands that need TTY input (e.g., Storybook without `--ci`). User configures commands for headless compatibility.
+Rejected: Always headless (can't handle interactive prompts), always terminal (loses tracking), auto-inject CI=true (surprising side effects).
+
+### Process state as context module with Tauri event listeners
+
+Decided: 2026-05-18
+What: `processes.context.svelte.ts` subscribes to `process-output`, `process-port-detected`, `process-exited` events. Maintains `SvelteMap<processId, RunningProcess>` + `SvelteMap<issueId, processId[]>` index. Follows existing issues/sessions context pattern.
+Why: Cross-issue state (multiple cards show process badges). Context pattern is established and proven.
+Rejected: Per-component listeners (duplicate subscriptions), global store without context (breaks cleanup).
+
+### Command trigger via context menu submenu
+
+Decided: 2026-05-18
+What: Right-click issue card → "Commands ▸" submenu. Grouped: servers on top, checks below, separated. Running processes show "Stop" + "View Logs". Stopped/completed show "Run" + "View Logs". ServerPortBadge right-click → context menu with "View Logs", "Kill", "Open in Browser".
+Why: Multiple commands per workspace need selection. Context menu is low visual noise, matches existing right-click patterns.
+Rejected: Quick action button (can't select which command), contextual action buttons (conflicts with session-spawning actions), dedicated panel (too prominent).
+
+### Log viewer as near-fullscreen dialog
+
+Decided: 2026-05-18
+What: ProcessLogViewer rendered as Dialog, ~85vh height, ~27:20 aspect ratio, monospace, auto-scroll, stderr coloring, copy button. "Load full log" reads from temp file on disk. In-memory tail cache (1000 lines) for fast display. Future panelization may move logs into a dashboard panel.
+Why: Dialog is front-and-center for focused log reading. Sheet (side drawer) covers other content. Panel system is future work.
+Rejected: Sheet/drawer (obscures cards), inline expansion (too small), full-width (reduces readability).
+
+### Process cleanup on app exit
+
+Decided: 2026-05-18
+What: Tauri `on_exit` hook calls `ProcessManager::cleanup_all()` to kill all tracked processes. No process survives app restart.
+Why: Orphaned processes consume resources and confuse users. External terminal is the escape hatch for persistent processes.
+Rejected: Let processes survive (orphan confusion), optional per-process (complexity without value).
+
+### Pre-compiled regex for port detection
+
+Decided: 2026-05-18
+What: Compile port pattern regex once when process is registered, store `Option<Regex>` in `TrackedProcess`. Current `try_extract_port` recompiles on every stdout line — fix to use stored regex.
+Why: Performance. Regex compilation is expensive; matching is cheap. Hot path (every stdout line).
+Rejected: Keep per-line compilation (wasteful), lazy_static (pattern is per-command, not global).
+
+### Five process states with distinct badge visuals
+
+Decided: 2026-05-18
+What: `running` (spinner), `passed` (green check), `failed` (red X), `timeout` (orange clock), `stopped` (gray square). Timeout is distinct from failure — configurable per command. Stale badges dim (opacity) when `hasLocalChanges` detected.
+Why: Timeout is a different signal than failure (command may have been working). Stale dimming matches v2 design spec.
+Rejected: Three states only (timeout indistinguishable from failure), no stale behavior (misleading results).
+
+### Restart policy with hardcoded limits
+
+Decided: 2026-05-18
+What: `restart_policy` field on `workspace_commands`: `'never'` (default), `'on_failure'`, `'always'`. Max 3 retries, exponential backoff (1s, 2s, 4s). Badge shows restart count. After max retries → failed.
+Why: Dev servers crash; manual restart is tedious. Hardcoded limits prevent restart storms without per-command config complexity.
+Rejected: No restart (tedious for flaky servers), unlimited restart (resource bomb), configurable limits (over-engineering for v1).
