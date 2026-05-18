@@ -5,7 +5,17 @@
 
 	const ctx = useIssueCard();
 
-	const ciStatus = $derived(ctx.cache?.pr_ci_status as 'passed' | 'failed' | 'running' | null);
+	const CI_STATUS_VALUES = ['passed', 'failed', 'running'] as const;
+	type CiStatus = (typeof CI_STATUS_VALUES)[number];
+
+	function parseCiStatus(value: unknown): CiStatus | null {
+		if (typeof value === 'string' && CI_STATUS_VALUES.includes(value as CiStatus)) {
+			return value as CiStatus;
+		}
+		return null;
+	}
+
+	const ciStatus = $derived(parseCiStatus(ctx.cache?.pr_ci_status));
 </script>
 
 <div class="flex min-h-5.5 flex-wrap items-center gap-1">

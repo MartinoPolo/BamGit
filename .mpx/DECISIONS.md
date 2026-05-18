@@ -145,7 +145,7 @@ Rejected: Left sidebar (conflicts with workspace nav), wider/narrower columns, f
 
 ### AI Config: absorbed into settings as category (was: 4th sidebar nav item)
 
-Decided: 2026-05-10. **Reversed: 2026-05-17 per PRD #320.**
+Decided: 2026-05-10. **Superseded by PRD #320 — AI Config now absorbed into /settings/ai-config.**
 What: AI Config moved from standalone `/ai-config` route to `/settings/ai-config` category. Item details still use centered Dialog. Settings layout renders AI config full-width (no `max-w-3xl` constraint).
 Why: PRD #320 unifies all configuration under `/settings/*`. AI Config as a separate nav item fragmented the settings experience.
 Rejected (original): Nesting under Settings (too buried). Reversed because the settings shell now has proper sidebar navigation making it easy to find.
@@ -361,10 +361,10 @@ Rejected: Conditional Svelte markup per variant (bloats component), separate com
 
 ### Issue card appearance: two-tier settings cascade (user + workspace)
 
-Decided: 2026-05-16
-What: 10 appearance settings (variant, badge style, label tint, etc.) stored in app*settings table. User-level keys use `issue_card*`prefix. Workspace overrides use`ws*{dashboard_id}\_issue_card*` prefix and take priority.
-Why: Allows per-dashboard visual tuning without a separate settings table. Matches existing app_settings pattern used by other features.
-Rejected: Separate appearance table (schema migration cost), single global setting (no per-workspace override).
+Decided: 2026-05-16. Updated: 2026-05-17 per PRD #320.
+What: 10 appearance settings (variant, badge style, label tint, etc.) stored via the settings engine. User-level keys use `issue_card_` prefix in `user_settings(key PK, value)`. Workspace overrides stored in `workspace_settings(dashboard_id, key, value)` with `issue_card_` key prefix and take priority via cascade (workspace → user → hardcoded default).
+Why: Allows per-dashboard visual tuning. Two dedicated tables (user*settings, workspace_settings) provide a clean cascade without key-prefix hacks.
+Rejected: Separate appearance table (schema migration cost), single global setting (no per-workspace override), app_settings with ws* prefix (ad-hoc, no type safety).
 
 ### Issue card: hide priority badge for "medium" priority
 

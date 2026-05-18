@@ -56,13 +56,12 @@
 	const rawRequirementsCtx = setRawRequirementsContext();
 	const characterPacksCtx = setCharacterPacksContext();
 	setCreationWizardContext();
-	const issueCardSettingsCtx = setIssueCardSettingsContext();
+	setIssueCardSettingsContext();
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
 	onMount(() => {
 		registerMockToastBridge((title, body) => toastsCtx.show({ tone: 'warning', title, body }));
-		void issueCardSettingsCtx.loadSettings();
 		boardStore.loadDashboards(windowCtx.isWorkspace ? windowCtx.boundDashboardId : null);
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));

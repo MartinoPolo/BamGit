@@ -1,31 +1,19 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
-	import SettingsIcon from '@lucide/svelte/icons/settings';
-	import UserIcon from '@lucide/svelte/icons/user';
-	import PaletteIcon from '@lucide/svelte/icons/palette';
-	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
-	import BellIcon from '@lucide/svelte/icons/bell';
-	import SparklesIcon from '@lucide/svelte/icons/sparkles';
-	import KeyboardIcon from '@lucide/svelte/icons/keyboard';
-	import GlobeIcon from '@lucide/svelte/icons/globe';
-	import WrenchIcon from '@lucide/svelte/icons/wrench';
-	import FolderIcon from '@lucide/svelte/icons/folder';
 	import SidebarNavItem from '$lib/components/derived/sidebar-nav-item/SidebarNavItem.svelte';
 	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { useBoard } from '$lib/modules/board';
 	import { useSettings } from '$lib/modules/settings';
+	import { SETTINGS_CATEGORIES } from '$lib/modules/settings/settings_categories.js';
 	import { cn } from '$lib/utils.js';
-	import type { Component } from 'svelte';
 
 	let { children } = $props();
 
 	const boardStore = useBoard();
 	const settingsCtx = useSettings();
-	const isDev = import.meta.env.DEV;
 
 	const scope = $derived(page.url.searchParams.get('scope') === 'ws' ? 'workspace' : 'user');
 	const scopeDashboardId = $derived(page.url.searchParams.get('id'));
@@ -37,131 +25,25 @@
 	);
 	const workspaceName = $derived(scopeDashboard?.name ?? '');
 
+	const effectiveDashboardId = $derived(scopeDashboardId ?? boardStore.activeDashboardId);
+	const scopedDashboardId = $derived(scope === 'workspace' ? effectiveDashboardId : null);
+
+	let lastLoadedScope = '';
+	let lastLoadedId = '';
 	$effect(() => {
-		const dashboardId = scopeDashboardId ?? boardStore.activeDashboardId;
-		settingsCtx.setScope(scope, scope === 'workspace' ? dashboardId : null);
-		void settingsCtx.loadSettings(scope === 'workspace' ? dashboardId : null);
+		settingsCtx.setScope(scope, scopedDashboardId);
+		const newId = scopedDashboardId ?? '';
+		if (scope === lastLoadedScope && newId === lastLoadedId) {
+			return;
+		}
+		lastLoadedScope = scope;
+		lastLoadedId = newId;
+		void settingsCtx.loadSettings(scopedDashboardId);
 	});
 
-	interface CategoryChild {
-		key: string;
-		path: string;
-		label: string;
-	}
-
-	interface CategoryItem {
-		key: string;
-		path: string;
-		icon: Component<{ size?: number; class?: string }>;
-		label: string;
-		userOnly: boolean;
-		workspaceOnly: boolean;
-		devOnly?: boolean;
-		fullWidth?: boolean;
-		children?: CategoryChild[];
-	}
-
-	const allCategories: CategoryItem[] = [
-		{
-			key: 'workspace',
-			path: resolve('/settings/workspace'),
-			icon: FolderIcon,
-			label: 'Workspace',
-			userOnly: false,
-			workspaceOnly: true,
-		},
-		{
-			key: 'general',
-			path: resolve('/settings/general'),
-			icon: SettingsIcon,
-			label: 'General',
-			userOnly: true,
-			workspaceOnly: false,
-		},
-		{
-			key: 'account',
-			path: resolve('/settings/account'),
-			icon: UserIcon,
-			label: 'Account',
-			userOnly: true,
-			workspaceOnly: false,
-		},
-		{
-			key: 'appearance',
-			path: resolve('/settings/appearance'),
-			icon: PaletteIcon,
-			label: 'Appearance',
-			userOnly: false,
-			workspaceOnly: false,
-		},
-		{
-			key: 'issue-cards',
-			path: resolve('/settings/issue-cards'),
-			icon: LayoutGridIcon,
-			label: 'Issue Cards',
-			userOnly: false,
-			workspaceOnly: false,
-		},
-		{
-			key: 'notifications',
-			path: resolve('/settings/notifications'),
-			icon: BellIcon,
-			label: 'Notifications',
-			userOnly: false,
-			workspaceOnly: false,
-			children: [
-				{ key: 'events', path: resolve('/settings/notifications/events'), label: 'Events' },
-				{
-					key: 'packs',
-					path: resolve('/settings/notifications/packs'),
-					label: 'Sound Packs',
-				},
-				{
-					key: 'characters',
-					path: resolve('/settings/notifications/characters'),
-					label: 'Characters',
-				},
-			],
-		},
-		{
-			key: 'ai-config',
-			path: resolve('/settings/ai-config'),
-			icon: SparklesIcon,
-			label: 'AI Configuration',
-			userOnly: false,
-			workspaceOnly: false,
-			fullWidth: true,
-		},
-		{
-			key: 'shortcuts',
-			path: resolve('/settings/shortcuts'),
-			icon: KeyboardIcon,
-			label: 'Keyboard Shortcuts',
-			userOnly: true,
-			workspaceOnly: false,
-		},
-		{
-			key: 'language',
-			path: resolve('/settings/language'),
-			icon: GlobeIcon,
-			label: 'Language',
-			userOnly: true,
-			workspaceOnly: false,
-		},
-		{
-			key: 'developer-tools',
-			path: resolve('/settings/developer-tools'),
-			icon: WrenchIcon,
-			label: 'Developer Tools',
-			userOnly: true,
-			workspaceOnly: false,
-			devOnly: true,
-		},
-	];
-
 	const visibleCategories = $derived(
-		allCategories.filter((cat) => {
-			if (cat.devOnly && !isDev) {
+		SETTINGS_CATEGORIES.filter((cat) => {
+			if (cat.devOnly === true && !import.meta.env.DEV) {
 				return false;
 			}
 			if (scope === 'workspace') {
@@ -244,7 +126,7 @@
 				>
 					<ToggleGroup.Item value="user" class="flex-1 text-xs">User</ToggleGroup.Item>
 					<ToggleGroup.Item value="workspace" class="flex-1 text-xs"
-						>Workspace</ToggleGroup.Item
+						>Workspace{workspaceName ? `: ${workspaceName}` : ''}</ToggleGroup.Item
 					>
 				</ToggleGroup.Root>
 			</div>

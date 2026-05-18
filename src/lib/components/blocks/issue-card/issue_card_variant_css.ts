@@ -110,6 +110,17 @@ function applyHoverHeaderBrighten(
 	return header;
 }
 
+function applyHoverGlow(
+	card: Record<string, string>,
+	baseHeader: Readonly<Record<string, string>>,
+	issueColor: string,
+): Record<string, string> {
+	card['box-shadow'] =
+		`0 0 20px 2px color-mix(in oklch, ${issueColor} 14%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 12%, transparent), var(--shadow-lg)`;
+	card.transform = 'translateY(-3px)';
+	return applyHoverHeaderBrighten(baseHeader);
+}
+
 function applyStateOverrides(
 	base: VariantSlotStyles,
 	state: IssueCardState,
@@ -122,18 +133,12 @@ function applyStateOverrides(
 	switch (state) {
 		case 'interactive':
 			if (isHovered) {
-				card['box-shadow'] =
-					`0 0 20px 2px color-mix(in oklch, ${issueColor} 14%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 12%, transparent), var(--shadow-lg)`;
-				card.transform = 'translateY(-3px)';
-				header = applyHoverHeaderBrighten(base.header);
+				header = applyHoverGlow(card, base.header, issueColor);
 			}
 			break;
 
 		case 'hovered':
-			card['box-shadow'] =
-				`0 0 20px 2px color-mix(in oklch, ${issueColor} 14%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 12%, transparent), var(--shadow-lg)`;
-			card.transform = 'translateY(-3px)';
-			header = applyHoverHeaderBrighten(base.header);
+			header = applyHoverGlow(card, base.header, issueColor);
 			break;
 
 		case 'selectionHover':
@@ -153,7 +158,6 @@ function applyStateOverrides(
 			if (isHovered) {
 				card['box-shadow'] =
 					`0 0 0 8px color-mix(in oklch, ${issueColor} 50%, transparent), 0 0 28px 6px color-mix(in oklch, ${issueColor} 30%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 20%, transparent), var(--shadow-lg)`;
-				card['box-shadow-offset'] = '50px';
 				card.transform = 'translateY(-2px)';
 				header = applyHoverHeaderBrighten(base.header);
 			}
@@ -170,12 +174,6 @@ function applyStateOverrides(
 				card.transform = 'translateY(-2px)';
 				header = applyHoverHeaderBrighten(base.header);
 			}
-			break;
-
-		case 'done':
-			card.background = 'transparent';
-			card['border-color'] = 'transparent';
-			card['box-shadow'] = 'none';
 			break;
 
 		case 'worktreeSetup':

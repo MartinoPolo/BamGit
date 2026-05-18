@@ -160,8 +160,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
             key TEXT NOT NULL,
             value TEXT NOT NULL,
-            PRIMARY KEY (dashboard_id, key),
-            FOREIGN KEY (dashboard_id) REFERENCES dashboards(id) ON DELETE CASCADE
+            PRIMARY KEY (dashboard_id, key)
         );
 
         CREATE TABLE IF NOT EXISTS issue_dependencies (

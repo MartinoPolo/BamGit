@@ -74,22 +74,30 @@ function createSettingsContext() {
 	}
 
 	async function set(key: SettingKey, value: string): Promise<void> {
+		const previousValue = values.get(key) ?? SETTING_DEFAULTS[key];
 		values.set(key, value);
 		mirrorToLocalStorage(key, value);
 
-		const dbKey = SETTING_KEYS[key];
-		if (
-			activeScope.current === 'workspace' &&
-			activeDashboardId.current !== null &&
-			WORKSPACE_OVERRIDABLE_KEYS.includes(key)
-		) {
-			await setWorkspaceSetting(activeDashboardId.current, dbKey, value);
-			const wsOverrides =
-				overriddenKeys.get(activeDashboardId.current) ?? new SvelteSet<string>();
-			wsOverrides.add(dbKey);
-			overriddenKeys.set(activeDashboardId.current, wsOverrides);
-		} else {
-			await setUserSetting(dbKey, value);
+		try {
+			const dbKey = SETTING_KEYS[key];
+			if (
+				activeScope.current === 'workspace' &&
+				activeDashboardId.current !== null &&
+				WORKSPACE_OVERRIDABLE_KEYS.includes(key)
+			) {
+				await setWorkspaceSetting(activeDashboardId.current, dbKey, value);
+				const wsOverrides =
+					overriddenKeys.get(activeDashboardId.current) ?? new SvelteSet<string>();
+				wsOverrides.add(dbKey);
+				overriddenKeys.set(activeDashboardId.current, wsOverrides);
+			} else {
+				await setUserSetting(dbKey, value);
+			}
+		} catch (error) {
+			values.set(key, previousValue);
+			mirrorToLocalStorage(key, previousValue);
+			console.error('Failed to save setting:', error);
+			throw error;
 		}
 	}
 
