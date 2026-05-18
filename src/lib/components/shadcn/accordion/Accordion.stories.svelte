@@ -14,27 +14,23 @@
 		return Array.from(canvasElement.querySelectorAll('[data-accordion-trigger]'));
 	}
 
-	const playClickExpands = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+	const playSingleOpenSwitches = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const triggers = getAccordionTriggers(canvasElement);
 
-		// All start collapsed in "All Collapsed"
-		await expect(triggers[0]).toHaveAttribute('data-state', 'closed');
+		// Starts with item-1 expanded
+		await expect(triggers[0]).toHaveAttribute('data-state', 'open');
 		await expect(triggers[1]).toHaveAttribute('data-state', 'closed');
+		await expect(triggers[2]).toHaveAttribute('data-state', 'closed');
 
-		// Click first trigger — should expand
-		await userEvent.click(triggers[0]);
-		await expect(triggers[0]).toHaveAttribute('data-state', 'open');
-	};
-
-	const playClickCollapses = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-		const triggers = getAccordionTriggers(canvasElement);
-
-		// "Single Open" starts with item-1 expanded
-		await expect(triggers[0]).toHaveAttribute('data-state', 'open');
-
-		// Click same trigger again — should collapse
-		await userEvent.click(triggers[0]);
+		// Click item-2 — should open it and close item-1 (single mode)
+		await userEvent.click(triggers[1]);
 		await expect(triggers[0]).toHaveAttribute('data-state', 'closed');
+		await expect(triggers[1]).toHaveAttribute('data-state', 'open');
+
+		// Click item-3 — should open it and close item-2
+		await userEvent.click(triggers[2]);
+		await expect(triggers[1]).toHaveAttribute('data-state', 'closed');
+		await expect(triggers[2]).toHaveAttribute('data-state', 'open');
 	};
 
 	const playMultipleBothOpen = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -89,7 +85,7 @@
 	};
 </script>
 
-<Story name="Single Open" play={playClickCollapses}>
+<Story name="Single Open" play={playSingleOpenSwitches}>
 	{#snippet template()}
 		<div class="w-80">
 			<Accordion.Root type="single" value="item-1">
@@ -149,36 +145,6 @@
 	{/snippet}
 </Story>
 
-<Story name="All Collapsed" play={playClickExpands}>
-	{#snippet template()}
-		<div class="w-80">
-			<Accordion.Root type="single">
-				<Accordion.Item value="item-1">
-					<Accordion.Trigger>What is Grovekeeper?</Accordion.Trigger>
-					<Accordion.Content>
-						Grovekeeper is an AI-powered development tool that manages agent sessions
-						and GitHub issues autonomously.
-					</Accordion.Content>
-				</Accordion.Item>
-				<Accordion.Item value="item-2">
-					<Accordion.Trigger>How does it work?</Accordion.Trigger>
-					<Accordion.Content>
-						It integrates with your repository and spawns AI agents to work on issues
-						based on configurable rules and priorities.
-					</Accordion.Content>
-				</Accordion.Item>
-				<Accordion.Item value="item-3">
-					<Accordion.Trigger>Which AI models are supported?</Accordion.Trigger>
-					<Accordion.Content>
-						Claude, GPT-4, and other leading models are supported via configurable
-						providers.
-					</Accordion.Content>
-				</Accordion.Item>
-			</Accordion.Root>
-		</div>
-	{/snippet}
-</Story>
-
 <Story name="Disabled Item" play={playDisabledNoChange}>
 	{#snippet template()}
 		<div class="w-80">
@@ -212,6 +178,27 @@
 <Story name="Keyboard Navigation" play={playKeyboardToggle}>
 	{#snippet template()}
 		<div class="w-80">
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle item
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Move focus between
+						items
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Home</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">End</kbd> — Jump to first
+						/ last item
+					</li>
+				</ul>
+			</div>
 			<Accordion.Root type="single">
 				<Accordion.Item value="item-1">
 					<Accordion.Trigger>What is Grovekeeper?</Accordion.Trigger>
