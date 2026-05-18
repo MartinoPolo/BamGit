@@ -46,19 +46,21 @@ export type PriorityPositionOption = (typeof PRIORITY_POSITION_OPTIONS)[number];
 export const BADGE_STYLE_OPTIONS = ['solid', 'borderless-dark', 'bordered-dark'] as const;
 export type BadgeStyleOption = (typeof BADGE_STYLE_OPTIONS)[number];
 
-// ── Defaults ─────────────────────────────────────────────────────────
+// ── Defaults (derived from SETTING_DEFAULTS — single source of truth) ───
+
+import { SETTING_DEFAULTS } from '$lib/modules/settings/types.js';
 
 export const ISSUE_CARD_SETTING_DEFAULTS = {
-	buttonColor: 'issue-color' as ButtonColorOption,
-	priorityPosition: 'header-right' as PriorityPositionOption,
-	badgeStyle: 'borderless-dark' as BadgeStyleOption,
-	labelTint: 20,
-	overlayGlow: 150,
-	variant: 'refined-horizon' as IssueCardVariant,
-	gradientReach: 60,
-	colorSaturation: 150,
-	headerSaturation: 85,
-	radialIntensity: 75,
+	buttonColor: SETTING_DEFAULTS.issueCardButtonColor as ButtonColorOption,
+	priorityPosition: SETTING_DEFAULTS.issueCardPriorityPosition as PriorityPositionOption,
+	badgeStyle: SETTING_DEFAULTS.issueCardBadgeStyle as BadgeStyleOption,
+	labelTint: Number(SETTING_DEFAULTS.issueCardLabelTint),
+	overlayGlow: Number(SETTING_DEFAULTS.issueCardOverlayGlow),
+	variant: SETTING_DEFAULTS.issueCardVariant as IssueCardVariant,
+	gradientReach: Number(SETTING_DEFAULTS.issueCardGradientReach),
+	colorSaturation: Number(SETTING_DEFAULTS.issueCardColorSaturation),
+	headerSaturation: Number(SETTING_DEFAULTS.issueCardHeaderSaturation),
+	radialIntensity: Number(SETTING_DEFAULTS.issueCardRadialIntensity),
 } as const;
 
 // ── Ranges for numeric settings ──────────────────────────────────────
@@ -146,29 +148,24 @@ export const VARIANT_SPECIFIC_SETTINGS = {
 	radiant: ['radialIntensity'],
 } as const satisfies Record<IssueCardVariant, readonly IssueCardSettingKey[]>;
 
-// ── Setting resolution (used by settings context) ───────────────────
+// ── Display labels (shared across UI components) ────────────────────
 
-interface SettingResolutionResult {
-	readonly value: string | number;
-	readonly isOverridden: boolean;
-}
+export const VARIANT_LABELS: Record<IssueCardVariant, string> = {
+	veil: 'Veil',
+	'refined-horizon': 'Refined Horizon',
+	radiant: 'Radiant',
+};
 
-export function resolveSettingValue(
-	key: IssueCardSettingKey,
-	userRawValue: string | null,
-	workspaceRawValue: string | null,
-): SettingResolutionResult {
-	let value: string | number = ISSUE_CARD_SETTING_DEFAULTS[key];
-	let isOverridden = false;
+export const BUTTON_COLOR_LABELS: Record<string, string> = {
+	'issue-color': 'Issue Color',
+	'moss-green': 'Moss Green',
+};
 
-	if (userRawValue !== null) {
-		value = parseSettingValue(key, userRawValue);
-	}
-
-	if (workspaceRawValue !== null && workspaceRawValue !== '') {
-		value = parseSettingValue(key, workspaceRawValue);
-		isOverridden = true;
-	}
-
-	return { value, isOverridden };
-}
+export const SLIDER_LABELS: Record<string, string> = {
+	labelTint: 'Label Tint',
+	overlayGlow: 'Overlay Glow Intensity',
+	gradientReach: 'Gradient Reach',
+	colorSaturation: 'Color Saturation',
+	headerSaturation: 'Header Saturation',
+	radialIntensity: 'Radial Intensity',
+};

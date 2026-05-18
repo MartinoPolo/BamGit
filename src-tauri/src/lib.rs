@@ -283,6 +283,7 @@ pub fn run() {
             settings_commands::get_all_workspace_settings,
             settings_commands::get_workspace_overridden_keys,
             settings_commands::get_resolved_setting,
+            settings_commands::bulk_set_user_settings,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

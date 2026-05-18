@@ -15,6 +15,9 @@ export const SETTING_KEYS = {
 	// Notifications
 	notificationVolume: 'notification_volume',
 
+	// Editor
+	editorCommand: 'editor_command',
+
 	// Issue Card
 	issueCardVariant: 'issue_card_variant',
 	issueCardButtonColor: 'issue_card_button_color',
@@ -39,6 +42,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	startupBehavior: 'overview',
 	chartColorTheme: 'monochrome',
 	language: 'en',
+	editorCommand: 'code',
 	notificationVolume: '0.7',
 	issueCardVariant: 'refined-horizon',
 	issueCardButtonColor: 'issue-color',

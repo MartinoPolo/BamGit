@@ -86,13 +86,27 @@ pub fn open_folder_in_explorer(folder_path: String) -> Result<(), String> {
     Ok(())
 }
 
-/// Opens a folder in VS Code.
+/// Opens a folder in the configured editor (defaults to VS Code).
 #[tauri::command]
-pub fn open_in_editor(folder_path: String) -> Result<(), String> {
-    Command::new("code")
+pub fn open_in_editor(
+    state: tauri::State<crate::database::connection::DatabaseState>,
+    folder_path: String,
+) -> Result<(), String> {
+    let editor_command = {
+        let connection = state.read()?;
+        connection
+            .query_row(
+                "SELECT value FROM user_settings WHERE key = 'editor_command'",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .unwrap_or_else(|_| "code".to_string())
+    };
+
+    Command::new(&editor_command)
         .arg(&folder_path)
         .spawn()
-        .map_err(|error| format!("Could not open VS Code: {error}"))?;
+        .map_err(|error| format!("Could not open editor '{editor_command}': {error}"))?;
     Ok(())
 }
 

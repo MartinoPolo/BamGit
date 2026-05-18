@@ -60,6 +60,11 @@ function createIssueCardSettingsContext() {
 		await settingsCtx.resetOverride(settingKey);
 	}
 
+	const overriddenKeys = $derived.by(() => {
+		const keys = Object.keys(ISSUE_CARD_KEY_TO_SETTING_KEY) as IssueCardSettingKey[];
+		return new Set(keys.filter((key) => isOverridden(key)));
+	});
+
 	return {
 		get settings(): IssueCardAppearanceSettings {
 			return {
@@ -77,94 +82,9 @@ function createIssueCardSettingsContext() {
 		},
 
 		get overriddenKeys() {
-			const keys = Object.keys(ISSUE_CARD_KEY_TO_SETTING_KEY) as IssueCardSettingKey[];
-			return new Set(keys.filter((key) => isOverridden(key)));
+			return overriddenKeys;
 		},
 
-		set buttonColor(value: ButtonColorOption) {
-			void updateSetting('buttonColor', value);
-		},
-
-		get buttonColor() {
-			return getRaw('buttonColor') as ButtonColorOption;
-		},
-
-		set priorityPosition(value: PriorityPositionOption) {
-			void updateSetting('priorityPosition', value);
-		},
-
-		get priorityPosition() {
-			return getRaw('priorityPosition') as PriorityPositionOption;
-		},
-
-		set badgeStyle(value: BadgeStyleOption) {
-			void updateSetting('badgeStyle', value);
-		},
-
-		get badgeStyle() {
-			return getRaw('badgeStyle') as BadgeStyleOption;
-		},
-
-		set labelTint(value: number) {
-			void updateSetting('labelTint', value);
-		},
-
-		get labelTint() {
-			return getRaw('labelTint') as number;
-		},
-
-		set overlayGlow(value: number) {
-			void updateSetting('overlayGlow', value);
-		},
-
-		get overlayGlow() {
-			return getRaw('overlayGlow') as number;
-		},
-
-		set variant(value: IssueCardVariant) {
-			void updateSetting('variant', value);
-		},
-
-		get variant() {
-			return getRaw('variant') as IssueCardVariant;
-		},
-
-		set gradientReach(value: number) {
-			void updateSetting('gradientReach', value);
-		},
-
-		get gradientReach() {
-			return getRaw('gradientReach') as number;
-		},
-
-		set colorSaturation(value: number) {
-			void updateSetting('colorSaturation', value);
-		},
-
-		get colorSaturation() {
-			return getRaw('colorSaturation') as number;
-		},
-
-		set headerSaturation(value: number) {
-			void updateSetting('headerSaturation', value);
-		},
-
-		get headerSaturation() {
-			return getRaw('headerSaturation') as number;
-		},
-
-		set radialIntensity(value: number) {
-			void updateSetting('radialIntensity', value);
-		},
-
-		get radialIntensity() {
-			return getRaw('radialIntensity') as number;
-		},
-
-		loadSettings() {
-			// No-op: settings are loaded by the unified settings engine
-			return Promise.resolve();
-		},
 		updateSetting,
 		resetOverride,
 		isOverridden,

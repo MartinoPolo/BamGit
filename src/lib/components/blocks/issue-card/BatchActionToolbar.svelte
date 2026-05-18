@@ -18,6 +18,9 @@
 		ISSUE_CARD_SETTING_RANGES,
 		VARIANT_SPECIFIC_SETTINGS,
 		BUTTON_COLOR_OPTIONS,
+		VARIANT_LABELS,
+		BUTTON_COLOR_LABELS,
+		SLIDER_LABELS,
 		useIssueCardSettings,
 		type IssueCardVariant,
 		type IssueCardSettingKey,
@@ -69,26 +72,6 @@
 	let settingsPopoverOpen = $state(false);
 
 	const settingsCtx = useIssueCardSettings();
-
-	const VARIANT_LABELS: Record<IssueCardVariant, string> = {
-		veil: 'Veil',
-		'refined-horizon': 'Refined Horizon',
-		radiant: 'Radiant',
-	};
-
-	const BUTTON_COLOR_LABELS: Record<string, string> = {
-		'issue-color': 'Issue Color',
-		'moss-green': 'Moss Green',
-	};
-
-	const SLIDER_LABELS: Record<string, string> = {
-		labelTint: 'Label Tint',
-		overlayGlow: 'Overlay Glow',
-		gradientReach: 'Gradient Reach',
-		colorSaturation: 'Color Saturation',
-		headerSaturation: 'Header Saturation',
-		radialIntensity: 'Radial Intensity',
-	};
 
 	const activeVariant = $derived(settingsCtx.settings.variant);
 

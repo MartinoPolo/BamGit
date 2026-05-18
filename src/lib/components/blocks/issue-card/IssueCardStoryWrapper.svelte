@@ -24,12 +24,11 @@
 
 	const selectionCtx = setSelectionContext();
 	const issuesCtx = setIssuesContext();
-	const settingsCtx = setIssueCardSettingsContext();
+	setIssueCardSettingsContext();
 
 	// fallow-ignore-next-line complexity
 	onMount(() => {
 		void issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id);
-		void settingsCtx.loadSettings();
 
 		if (activeIssueId !== undefined && activeIssueId !== '') {
 			selectionCtx.activateIssue(activeIssueId);

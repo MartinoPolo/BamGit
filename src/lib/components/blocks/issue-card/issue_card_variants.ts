@@ -8,7 +8,6 @@ export const ISSUE_CARD_STATES = {
 	active: 'active',
 	selectionHover: 'selectionHover',
 	hovered: 'hovered',
-	done: 'done',
 	worktreeSetup: 'worktreeSetup',
 	interactive: 'interactive',
 } as const;
@@ -31,7 +30,6 @@ export const issueCardVariants = tv({
 
 export interface CardStateInput {
 	readonly isArchived: boolean;
-	readonly isDone: boolean;
 	readonly isBatchSelected: boolean;
 	readonly isActive: boolean;
 	readonly isHovered: boolean;
@@ -55,9 +53,6 @@ export function deriveCardState(input: CardStateInput): IssueCardState {
 		}
 		return 'hovered';
 	}
-	if (input.isDone) {
-		return 'done';
-	}
 	if (input.worktreeState === 'pending') {
 		return 'worktreeSetup';
 	}
@@ -72,7 +67,7 @@ export interface IssueCardSlotClasses {
 	readonly preview: string;
 }
 
-export function resolveIssueCardClasses(): IssueCardSlotClasses {
+function resolveIssueCardClasses(): IssueCardSlotClasses {
 	const slots = issueCardVariants();
 	return {
 		card: slots.card(),
@@ -80,3 +75,5 @@ export function resolveIssueCardClasses(): IssueCardSlotClasses {
 		preview: slots.preview(),
 	};
 }
+
+export const ISSUE_CARD_CLASSES: IssueCardSlotClasses = resolveIssueCardClasses();
