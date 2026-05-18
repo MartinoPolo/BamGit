@@ -41,7 +41,7 @@ export const badgeVariants = tv({
 		{ badgeStyle: 'solid', tone: 'primary', class: 'bg-primary text-primary-foreground' },
 		{ badgeStyle: 'solid', tone: 'accent', class: 'bg-accent text-white' },
 		{ badgeStyle: 'solid', tone: 'merged', class: 'bg-status-merged text-white' },
-		{ badgeStyle: 'solid', tone: 'neutral', class: 'bg-foreground-muted text-surface-1' },
+		{ badgeStyle: 'solid', tone: 'neutral', class: 'bg-foreground-muted text-background' },
 	],
 	defaultVariants: {
 		tone: 'neutral',
