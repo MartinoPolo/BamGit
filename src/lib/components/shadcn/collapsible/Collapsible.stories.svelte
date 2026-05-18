@@ -82,7 +82,7 @@
 	};
 </script>
 
-<Story name="Default Closed" play={playClickOpens}>
+<Story name="Default Closed [play: click opens]" play={playClickOpens}>
 	{#snippet template()}
 		<div class="w-80">
 			<Collapsible.Root>
@@ -101,7 +101,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Default Open" play={playClickCloses}>
+<Story name="Default Open [play: click closes]" play={playClickCloses}>
 	{#snippet template()}
 		<div class="w-80">
 			<Collapsible.Root open={true}>
@@ -120,7 +120,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledNoChange}>
+<Story name="Disabled [play: disabled no change]" play={playDisabledNoChange}>
 	{#snippet template()}
 		<div class="w-80">
 			<Collapsible.Root disabled>
@@ -137,9 +137,20 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Navigation" play={playKeyboardToggle}>
+<Story name="Keyboard Navigation [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template()}
 		<div class="w-80">
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle content
+					</li>
+				</ul>
+			</div>
 			<Collapsible.Root>
 				<Collapsible.Trigger
 					class="flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium hover:bg-accent"

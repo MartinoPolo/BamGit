@@ -111,7 +111,7 @@
 	import type { RadioGroupProps } from './radio-group-variants.js';
 </script>
 
-<Story name="Default" play={playClickSelectsOption}>
+<Story name="Default [play: click selects option]" play={playClickSelectsOption}>
 	{#snippet template(args: RadioGroupProps)}
 		<RadioGroup {...args} value="claude">
 			<div class="flex items-center gap-2">
@@ -136,7 +136,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Click Moves Selection" play={playClickMovesSelection}>
+<Story name="Click Moves Selection [play: click moves selection]" play={playClickMovesSelection}>
 	{#snippet template(args: RadioGroupProps)}
 		<RadioGroup {...args} value="claude">
 			<div class="flex items-center gap-2">
@@ -161,53 +161,81 @@
 	{/snippet}
 </Story>
 
-<Story name="Arrow Down Navigation" play={playArrowDownNavigation}>
+<Story name="Arrow Down Navigation [play: arrow down navigation]" play={playArrowDownNavigation}>
 	{#snippet template(args: RadioGroupProps)}
-		<RadioGroup {...args} value="claude">
-			<div class="flex items-center gap-2">
-				<RadioGroupItem value="claude" id="rad-claude" />
-				<Label for="rad-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
-					>Claude</Label
-				>
+		<div>
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Move focus and
+						select option
+					</li>
+				</ul>
 			</div>
-			<div class="flex items-center gap-2">
-				<RadioGroupItem value="codex" id="rad-codex" />
-				<Label for="rad-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
-					>Codex</Label
-				>
-			</div>
-			<div class="flex items-center gap-2">
-				<RadioGroupItem value="cursor" id="rad-cursor" />
-				<Label for="rad-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
-					>Cursor</Label
-				>
-			</div>
-		</RadioGroup>
+			<RadioGroup {...args} value="claude">
+				<div class="flex items-center gap-2">
+					<RadioGroupItem value="claude" id="rad-claude" />
+					<Label for="rad-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Claude</Label
+					>
+				</div>
+				<div class="flex items-center gap-2">
+					<RadioGroupItem value="codex" id="rad-codex" />
+					<Label for="rad-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Codex</Label
+					>
+				</div>
+				<div class="flex items-center gap-2">
+					<RadioGroupItem value="cursor" id="rad-cursor" />
+					<Label for="rad-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Cursor</Label
+					>
+				</div>
+			</RadioGroup>
+		</div>
 	{/snippet}
 </Story>
 
-<Story name="Arrow Up Navigation" play={playArrowUpNavigation}>
+<Story name="Arrow Up Navigation [play: arrow up navigation]" play={playArrowUpNavigation}>
 	{#snippet template(args: RadioGroupProps)}
-		<RadioGroup {...args} value="claude">
-			<div class="flex items-center gap-2">
-				<RadioGroupItem value="claude" id="rau-claude" />
-				<Label for="rau-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
-					>Claude</Label
-				>
+		<div>
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Move focus and
+						select option
+					</li>
+				</ul>
 			</div>
-			<div class="flex items-center gap-2">
-				<RadioGroupItem value="codex" id="rau-codex" />
-				<Label for="rau-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
-					>Codex</Label
-				>
-			</div>
-			<div class="flex items-center gap-2">
-				<RadioGroupItem value="cursor" id="rau-cursor" />
-				<Label for="rau-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
-					>Cursor</Label
-				>
-			</div>
-		</RadioGroup>
+			<RadioGroup {...args} value="claude">
+				<div class="flex items-center gap-2">
+					<RadioGroupItem value="claude" id="rau-claude" />
+					<Label for="rau-claude" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Claude</Label
+					>
+				</div>
+				<div class="flex items-center gap-2">
+					<RadioGroupItem value="codex" id="rau-codex" />
+					<Label for="rau-codex" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Codex</Label
+					>
+				</div>
+				<div class="flex items-center gap-2">
+					<RadioGroupItem value="cursor" id="rau-cursor" />
+					<Label for="rau-cursor" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Cursor</Label
+					>
+				</div>
+			</RadioGroup>
+		</div>
 	{/snippet}
 </Story>
 
@@ -236,7 +264,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledIgnoresInteraction}>
+<Story name="Disabled [play: disabled ignores interaction]" play={playDisabledIgnoresInteraction}>
 	{#snippet template(args: RadioGroupProps)}
 		<RadioGroup {...args} value="claude" disabled>
 			<div class="flex items-center gap-2">

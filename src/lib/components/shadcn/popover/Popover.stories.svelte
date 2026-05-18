@@ -103,7 +103,7 @@
 	let groupBy = $state('repository');
 </script>
 
-<Story name="Filter" play={playOpenAndEscapeClose}>
+<Story name="Filter [play: open and escape close]" play={playOpenAndEscapeClose}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
@@ -173,7 +173,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Sort" play={playSortItemSelection}>
+<Story name="Sort [play: sort item selection]" play={playSortItemSelection}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
@@ -258,7 +258,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Legend" play={playEscapeContainment}>
+<Story name="Legend [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4">
 			<Popover.Root>
@@ -288,7 +288,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Open by Default" play={playClickOutsideCloses}>
+<Story name="Open by Default [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		<div class="flex items-start gap-4 p-4 pb-72">
 			<Popover.Root open={true}>

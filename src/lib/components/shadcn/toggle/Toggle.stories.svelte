@@ -67,7 +67,7 @@
 	import ItalicIcon from '@lucide/svelte/icons/italic';
 </script>
 
-<Story name="Off" play={playClickTogglesOn}>
+<Story name="Off [play: click toggles on]" play={playClickTogglesOn}>
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} aria-label="Toggle bold">
 			<BoldIcon data-icon="inline-start" />
@@ -76,7 +76,7 @@
 	{/snippet}
 </Story>
 
-<Story name="On" play={playClickTogglesOff}>
+<Story name="On [play: click toggles off]" play={playClickTogglesOff}>
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} pressed aria-label="Toggle bold">
 			<BoldIcon data-icon="inline-start" />
@@ -85,7 +85,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledIgnoresClick}>
+<Story name="Disabled [play: disabled ignores click]" play={playDisabledIgnoresClick}>
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} disabled aria-label="Toggle bold">
 			<BoldIcon data-icon="inline-start" />
@@ -94,12 +94,24 @@
 	{/snippet}
 </Story>
 
-<Story name="Space Key Toggles" play={playSpaceKeyToggles}>
+<Story name="Space Key Toggles [play: space key toggles]" play={playSpaceKeyToggles}>
 	{#snippet template(args: ToggleProps)}
-		<Toggle {...args} aria-label="Toggle bold">
-			<BoldIcon data-icon="inline-start" />
-			Bold
-		</Toggle>
+		<div class="w-80">
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle on/off
+					</li>
+				</ul>
+			</div>
+			<Toggle {...args} aria-label="Toggle bold">
+				<BoldIcon data-icon="inline-start" />
+				Bold
+			</Toggle>
+		</div>
 	{/snippet}
 </Story>
 

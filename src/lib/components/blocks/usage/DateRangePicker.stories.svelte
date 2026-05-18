@@ -156,7 +156,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Open Popover" play={playOpenPopover}>
+<Story name="Open Popover [play: popover opens]" play={playOpenPopover}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
 			<DateRangePicker onselect={() => {}} />
@@ -164,7 +164,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Select Range" play={playSelectRange} args={{ onselect: fn() }}>
+<Story
+	name="Select Range [play: range selection fires]"
+	play={playSelectRange}
+	args={{ onselect: fn() }}
+>
 	{#snippet template(args)}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
 			<DateRangePicker onselect={args.onselect} />
@@ -172,7 +176,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Closes" play={playEscapeCloses}>
+<Story name="Escape Closes [play: escape closes popover]" play={playEscapeCloses}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
 			<DateRangePicker onselect={() => {}} />
@@ -180,7 +184,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Click Outside Closes" play={playClickOutsideCloses}>
+<Story name="Click Outside Closes [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
 			<DateRangePicker onselect={() => {}} />
@@ -188,7 +192,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape contained]" play={playEscapeContainment}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
 			<DateRangePicker onselect={() => {}} />

@@ -291,7 +291,7 @@
 
 <!-- ── Interaction tests ─────────────────────────────────────────────── -->
 
-<Story name="Open Dropdown" play={playOpenDropdown}>
+<Story name="Open Dropdown [play: opens dropdown]" play={playOpenDropdown}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
 			<RepoCombobox bind:value={openDropdownValue} />
@@ -299,7 +299,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Search Filter" play={playSearchFilter}>
+<Story name="Search Filter [play: search filter]" play={playSearchFilter}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
 			<RepoCombobox bind:value={searchFilterValue} />
@@ -307,7 +307,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Arrow Down Highlights" play={playArrowDownHighlights}>
+<Story name="Arrow Down Highlights [play: arrow down highlights]" play={playArrowDownHighlights}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
 			<RepoCombobox bind:value={arrowDownValue} />
@@ -315,7 +315,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Enter Selects" play={playEnterSelects}>
+<Story name="Enter Selects [play: enter selects]" play={playEnterSelects}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
 			<RepoCombobox bind:value={enterSelectsValue} />
@@ -323,7 +323,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Closes" play={playEscapeCloses}>
+<Story name="Escape Closes [play: escape closes]" play={playEscapeCloses}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
 			<RepoCombobox bind:value={escapeClosesValue} />
@@ -331,7 +331,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Does Not Propagate" play={playEscapeDoesNotPropagate}>
+<Story
+	name="Escape Does Not Propagate [play: escape does not propagate]"
+	play={playEscapeDoesNotPropagate}
+>
 	{#snippet template()}
 		<div class="w-80 pb-64">
 			<RepoCombobox bind:value={escapePropagationValue} />

@@ -155,7 +155,7 @@
 	}
 </script>
 
-<Story name="Default" args={{}} play={playOpensPopover}>
+<Story name="Default [play: opens popover]" args={{}} play={playOpensPopover}>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4">
 			<ColorPicker {...args} {selectedColor} onSelect={handleSelect} portalDisabled={true} />
@@ -164,7 +164,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Swatch Select" args={{}} play={playSwatchSelectAndClose}>
+<Story
+	name="Swatch Select [play: swatch select and close]"
+	args={{}}
+	play={playSwatchSelectAndClose}
+>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4 pb-72">
 			<ColorPicker
@@ -181,7 +185,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Hex Input" args={{}} play={playHexInputUpdatesPreview}>
+<Story
+	name="Hex Input [play: hex input updates preview]"
+	args={{}}
+	play={playHexInputUpdatesPreview}
+>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4 pb-72">
 			<ColorPicker
@@ -198,7 +206,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Closes" args={{}} play={playEscapeClosesPopover}>
+<Story name="Escape Closes [play: escape closes popover]" args={{}} play={playEscapeClosesPopover}>
 	{#snippet template(args: ColorPickerProps)}
 		<div class="flex items-center gap-4 pb-72">
 			<ColorPicker {...args} {selectedColor} onSelect={handleSelect} portalDisabled={true} />

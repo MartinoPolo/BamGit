@@ -102,7 +102,7 @@
 	};
 </script>
 
-<Story name="Basic" play={playOpensOnClick}>
+<Story name="Basic [play: opens on click]" play={playOpensOnClick}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -120,7 +120,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Separators" play={playArrowDownFocusesItems}>
+<Story name="With Separators [play: arrow down focuses]" play={playArrowDownFocusesItems}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -149,7 +149,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons" play={playEnterSelectsItem}>
+<Story name="With Icons [play: enter selects item]" play={playEnterSelectsItem}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -176,9 +176,26 @@
 	{/snippet}
 </Story>
 
-<Story name="With Keyboard Shortcuts" play={playEscapeClosesMenu}>
+<Story name="With Keyboard Shortcuts [play: escape closes menu]" play={playEscapeClosesMenu}>
 	{#snippet template()}
-		<div class="flex items-start justify-center h-48 pt-4">
+		<div class="flex flex-col items-center h-64 pt-4 gap-4">
+			<div
+				class="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate menu items
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select item
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Esc</kbd> — Close menu
+					</li>
+				</ul>
+			</div>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props })}

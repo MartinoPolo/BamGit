@@ -201,25 +201,25 @@
 	</div>
 {/snippet}
 
-<Story name="Account Dropdown" play={playOpenAndEscapeClose}>
+<Story name="Account Dropdown [play: open and escape close]" play={playOpenAndEscapeClose}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Click Menu Item" play={playClickMenuItem}>
+<Story name="Click Menu Item [play: click menu item]" play={playClickMenuItem}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Click Outside Closes" play={playClickOutsideCloses}>
+<Story name="Click Outside Closes [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}

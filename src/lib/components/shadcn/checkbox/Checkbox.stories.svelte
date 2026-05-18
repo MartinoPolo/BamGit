@@ -64,13 +64,13 @@
 	import type { CheckboxProps } from './checkbox-variants.js';
 </script>
 
-<Story name="Unchecked" play={playClickToCheck}>
+<Story name="Unchecked [play: click to check]" play={playClickToCheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox {...args} />
 	{/snippet}
 </Story>
 
-<Story name="Checked" play={playClickToUncheck}>
+<Story name="Checked [play: click to uncheck]" play={playClickToUncheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox checked {...args} />
 	{/snippet}
@@ -82,7 +82,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledNoChange}>
+<Story name="Disabled [play: disabled no change]" play={playDisabledNoChange}>
 	{#snippet template(args: CheckboxProps)}
 		<div class="flex items-center gap-4">
 			<Checkbox disabled {...args} />
@@ -91,9 +91,22 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Toggle" play={playKeyboardToggle}>
+<Story name="Keyboard Toggle [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template(args: CheckboxProps)}
-		<Checkbox {...args} />
+		<div class="w-80">
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Toggle checked
+						state
+					</li>
+				</ul>
+			</div>
+			<Checkbox {...args} />
+		</div>
 	{/snippet}
 </Story>
 

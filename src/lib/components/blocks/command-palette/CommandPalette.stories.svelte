@@ -139,7 +139,7 @@
 	};
 </script>
 
-<Story name="Open" play={playSearchInputFocused}>
+<Story name="Open [play: search input focused]" play={playSearchInputFocused}>
 	{#snippet template()}
 		<CommandPaletteStoryWrapper>
 			<div class="h-100 w-full"></div>
@@ -147,7 +147,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Filter Results" play={playFilterResults}>
+<Story name="Filter Results [play: filter results]" play={playFilterResults}>
 	{#snippet template()}
 		<CommandPaletteStoryWrapper>
 			<div class="h-100 w-full"></div>
@@ -155,7 +155,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Arrow Down Highlights" play={playArrowDownHighlights}>
+<Story name="Arrow Down Highlights [play: arrow highlights item]" play={playArrowDownHighlights}>
 	{#snippet template()}
 		<CommandPaletteStoryWrapper>
 			<div class="h-100 w-full"></div>
@@ -163,7 +163,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Enter Executes and Closes" play={playEnterExecutesAndCloses}>
+<Story
+	name="Enter Executes and Closes [play: enter executes closes]"
+	play={playEnterExecutesAndCloses}
+>
 	{#snippet template()}
 		<CommandPaletteStoryWrapper>
 			<div class="h-100 w-full"></div>
@@ -171,7 +174,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Closes" play={playEscapeCloses}>
+<Story name="Escape Closes [play: escape closes palette]" play={playEscapeCloses}>
 	{#snippet template()}
 		<CommandPaletteStoryWrapper>
 			<div class="h-100 w-full"></div>
@@ -179,7 +182,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape contained]" play={playEscapeContainment}>
 	{#snippet template()}
 		<CommandPaletteStoryWrapper>
 			<div class="h-100 w-full"></div>

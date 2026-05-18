@@ -129,7 +129,7 @@
 	};
 </script>
 
-<Story name="Create Issue" play={playOpensOnTriggerClick}>
+<Story name="Create Issue [play: opens on trigger]" play={playOpensOnTriggerClick}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -220,7 +220,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Destructive Confirm" play={playClosesOnEscape}>
+<Story name="Destructive Confirm [play: closes on escape]" play={playClosesOnEscape}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -306,7 +306,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Close Button Dismisses" play={playClosesOnCloseButton}>
+<Story name="Close Button Dismisses [play: closes on button]" play={playClosesOnCloseButton}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -356,7 +356,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -405,7 +405,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Focus Trap" play={playFocusTrap}>
+<Story name="Focus Trap [play: focus trap]" play={playFocusTrap}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>

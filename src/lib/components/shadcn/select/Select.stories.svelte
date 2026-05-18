@@ -318,7 +318,7 @@
 
 <!-- ─── Custom (bits-ui) Select Stories ──────────────────────────────────── -->
 
-<Story name="Custom · Default" play={playOpenDropdown}>
+<Story name="Custom · Default [play: open dropdown]" play={playOpenDropdown}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -334,7 +334,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · With Value" play={playSelectOption}>
+<Story name="Custom · With Value [play: select option]" play={playSelectOption}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -367,7 +367,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · Disabled" play={playDisabledIgnoresClick}>
+<Story name="Custom · Disabled [play: disabled ignores click]" play={playDisabledIgnoresClick}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -414,6 +414,23 @@
 <Story name="Test: Keyboard ArrowDown highlights option" play={playKeyboardArrowDown}>
 	{#snippet template()}
 		<div class="max-w-xs">
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate options
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select option
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Esc</kbd> — Close dropdown
+					</li>
+				</ul>
+			</div>
 			<Label>Provider</Label>
 			<SelectCustom.CustomRoot type="single" bind:value={selectedDefault}>
 				<SelectCustom.CustomTrigger>{selectedDefaultLabel}</SelectCustom.CustomTrigger>
@@ -427,7 +444,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · With Groups" play={playEscapeClosesDropdown}>
+<Story name="Custom · With Groups [play: escape closes dropdown]" play={playEscapeClosesDropdown}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -453,7 +470,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · Disabled Item" play={playEscapeDoesNotPropagate}>
+<Story
+	name="Custom · Disabled Item [play: escape no propagation]"
+	play={playEscapeDoesNotPropagate}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>

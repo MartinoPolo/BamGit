@@ -97,7 +97,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Default" play={playTabSwitchToSecond}>
+<Story name="Default [play: tab switch second]" play={playTabSwitchToSecond}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={defaultActive === 'Overview'} onclick={() => (defaultActive = 'Overview')}
@@ -113,7 +113,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons" play={playTabSwitchToThird}>
+<Story name="With Icons [play: tab switch third]" play={playTabSwitchToThird}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={iconsActive === 'Profile'} onclick={() => (iconsActive = 'Profile')}
@@ -131,7 +131,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Disabled Tab" play={playDisabledTabIgnored}>
+<Story name="With Disabled Tab [play: disabled tab ignored]" play={playDisabledTabIgnored}>
 	{#snippet template()}
 		<Tabs>
 			<Tab active={disabledActive === 'Active'} onclick={() => (disabledActive = 'Active')}
@@ -145,19 +145,38 @@
 	{/snippet}
 </Story>
 
-<Story name="With Badge" play={playKeyboardActivation}>
+<Story name="With Badge [play: keyboard activation]" play={playKeyboardActivation}>
 	{#snippet template()}
-		<Tabs>
-			<Tab active={badgeActive === 'Inbox'} onclick={() => (badgeActive = 'Inbox')}
-				>Inbox <Badge tone="primary" class="ml-1.5">3</Badge></Tab
+		<div>
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
 			>
-			<Tab active={badgeActive === 'Drafts'} onclick={() => (badgeActive = 'Drafts')}
-				>Drafts</Tab
-			>
-			<Tab active={badgeActive === 'Archive'} onclick={() => (badgeActive = 'Archive')}
-				>Archive</Tab
-			>
-		</Tabs>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Space</kbd> — Activate focused
+						tab
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">→</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">←</kbd> — Move focus between
+						tabs
+					</li>
+				</ul>
+			</div>
+			<Tabs>
+				<Tab active={badgeActive === 'Inbox'} onclick={() => (badgeActive = 'Inbox')}
+					>Inbox <Badge tone="primary" class="ml-1.5">3</Badge></Tab
+				>
+				<Tab active={badgeActive === 'Drafts'} onclick={() => (badgeActive = 'Drafts')}
+					>Drafts</Tab
+				>
+				<Tab active={badgeActive === 'Archive'} onclick={() => (badgeActive = 'Archive')}
+					>Archive</Tab
+				>
+			</Tabs>
+		</div>
 	{/snippet}
 </Story>
 

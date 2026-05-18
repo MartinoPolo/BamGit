@@ -159,7 +159,7 @@
 	let radioValue = $state('middle');
 </script>
 
-<Story name="Basic Menu" play={playOpensOnRightClick}>
+<Story name="Basic Menu [play: opens on right click]" play={playOpensOnRightClick}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -181,7 +181,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons" play={playClickItemClosesMenu}>
+<Story name="With Icons [play: click closes menu]" play={playClickItemClosesMenu}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -218,38 +218,60 @@
 	{/snippet}
 </Story>
 
-<Story name="With Submenus" play={playArrowDownFocusesItems}>
+<Story name="With Submenus [play: arrow down focuses]" play={playArrowDownFocusesItems}>
 	{#snippet template()}
-		<ContextMenu.Root>
-			<ContextMenu.Trigger>
-				<div
-					class="flex h-36 w-72 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
-				>
-					Right-click here
-				</div>
-			</ContextMenu.Trigger>
-			<ContextMenu.Content portalProps={{ disabled: true }}>
-				<ContextMenu.Item>New File</ContextMenu.Item>
-				<ContextMenu.Item>New Window</ContextMenu.Item>
-				<ContextMenu.Separator />
-				<ContextMenu.Sub>
-					<ContextMenu.SubTrigger>Share</ContextMenu.SubTrigger>
-					<ContextMenu.Portal>
-						<ContextMenu.SubContent>
-							<ContextMenu.Item>Email</ContextMenu.Item>
-							<ContextMenu.Item>Messages</ContextMenu.Item>
-							<ContextMenu.Item>Slack</ContextMenu.Item>
-						</ContextMenu.SubContent>
-					</ContextMenu.Portal>
-				</ContextMenu.Sub>
-				<ContextMenu.Separator />
-				<ContextMenu.Item>Settings</ContextMenu.Item>
-			</ContextMenu.Content>
-		</ContextMenu.Root>
+		<div>
+			<div
+				class="mb-4 w-72 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate menu items
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select item
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">→</kbd> — Open submenu
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Esc</kbd> — Close menu
+					</li>
+				</ul>
+			</div>
+			<ContextMenu.Root>
+				<ContextMenu.Trigger>
+					<div
+						class="flex h-36 w-72 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
+					>
+						Right-click here
+					</div>
+				</ContextMenu.Trigger>
+				<ContextMenu.Content portalProps={{ disabled: true }}>
+					<ContextMenu.Item>New File</ContextMenu.Item>
+					<ContextMenu.Item>New Window</ContextMenu.Item>
+					<ContextMenu.Separator />
+					<ContextMenu.Sub>
+						<ContextMenu.SubTrigger>Share</ContextMenu.SubTrigger>
+						<ContextMenu.Portal>
+							<ContextMenu.SubContent>
+								<ContextMenu.Item>Email</ContextMenu.Item>
+								<ContextMenu.Item>Messages</ContextMenu.Item>
+								<ContextMenu.Item>Slack</ContextMenu.Item>
+							</ContextMenu.SubContent>
+						</ContextMenu.Portal>
+					</ContextMenu.Sub>
+					<ContextMenu.Separator />
+					<ContextMenu.Item>Settings</ContextMenu.Item>
+				</ContextMenu.Content>
+			</ContextMenu.Root>
+		</div>
 	{/snippet}
 </Story>
 
-<Story name="Disabled Items" play={playDisabledItemsNotClickable}>
+<Story name="Disabled Items [play: disabled items]" play={playDisabledItemsNotClickable}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -292,7 +314,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Radio Items" play={playRadioItemEnterSelects}>
+<Story name="Radio Items [play: radio enter selects]" play={playRadioItemEnterSelects}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -314,7 +336,7 @@
 		</ContextMenu.Root>
 	{/snippet}
 </Story>
-<Story name="With Icons And Submenus" play={playEscapeClosesMenu}>
+<Story name="With Icons And Submenus [play: escape closes menu]" play={playEscapeClosesMenu}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -425,7 +447,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment (Dialog)" play={playEscapeContainment}>
+<Story name="Escape Containment (Dialog) [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		<Dialog.Root>
 			<Dialog.Trigger>

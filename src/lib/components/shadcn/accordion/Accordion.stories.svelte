@@ -85,7 +85,7 @@
 	};
 </script>
 
-<Story name="Single Open" play={playSingleOpenSwitches}>
+<Story name="Single Open [play: switches items open]" play={playSingleOpenSwitches}>
 	{#snippet template()}
 		<div class="w-80">
 			<Accordion.Root type="single" value="item-1">
@@ -115,7 +115,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Multiple Open" play={playMultipleBothOpen}>
+<Story name="Multiple Open [play: multiple items open]" play={playMultipleBothOpen}>
 	{#snippet template()}
 		<div class="w-80">
 			<Accordion.Root type="multiple" value={['item-1', 'item-2']}>
@@ -145,7 +145,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled Item" play={playDisabledNoChange}>
+<Story name="Disabled Item [play: disabled no change]" play={playDisabledNoChange}>
 	{#snippet template()}
 		<div class="w-80">
 			<Accordion.Root type="single" value="item-1">
@@ -175,7 +175,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Navigation" play={playKeyboardToggle}>
+<Story name="Keyboard Navigation [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template()}
 		<div class="w-80">
 			<div

@@ -207,25 +207,25 @@
 	</div>
 {/snippet}
 
-<Story name="Notifications Popover" play={playOpenAndEscapeClose}>
+<Story name="Notifications Popover [play: open and escape close]" play={playOpenAndEscapeClose}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Mark All Read" play={playMarkAllRead}>
+<Story name="Mark All Read [play: mark all read]" play={playMarkAllRead}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Click Outside Closes" play={playClickOutsideCloses}>
+<Story name="Click Outside Closes [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}

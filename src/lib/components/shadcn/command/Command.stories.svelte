@@ -114,9 +114,24 @@
 	import PaletteIcon from '@lucide/svelte/icons/palette';
 </script>
 
-<Story name="Default" play={playKeyboardNavigation}>
+<Story name="Default [play: keyboard navigation]" play={playKeyboardNavigation}>
 	{#snippet template()}
 		<div class="w-100">
+			<div
+				class="mb-4 rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground"
+			>
+				<p class="mb-1 font-medium text-foreground">Keyboard shortcuts</p>
+				<ul class="flex flex-col gap-0.5">
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↓</kbd> /
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">↑</kbd> — Navigate items
+					</li>
+					<li>
+						<kbd class="rounded bg-muted px-1 font-mono text-xs">Enter</kbd> — Select item
+					</li>
+					<li>Type to filter items</li>
+				</ul>
+			</div>
 			<Command.Root class="rounded-xl border border-border shadow-md">
 				<Command.Input placeholder="Search commands..." />
 				<Command.List>
@@ -152,7 +167,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Groups" play={playGroupHeadings}>
+<Story name="With Groups [play: group headings]" play={playGroupHeadings}>
 	{#snippet template()}
 		<div class="w-100">
 			<Command.Root class="rounded-xl border border-border shadow-md">
@@ -173,7 +188,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Empty State" play={playEmptyState}>
+<Story name="Empty State [play: empty state]" play={playEmptyState}>
 	{#snippet template()}
 		<div class="w-100">
 			<Command.Root class="rounded-xl border border-border shadow-md">
@@ -190,7 +205,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Filtering" play={playFiltering}>
+<Story name="Filtering [play: filtering]" play={playFiltering}>
 	{#snippet template()}
 		<div class="w-100">
 			<Command.Root class="rounded-xl border border-border shadow-md">

@@ -54,7 +54,7 @@
 </Story>
 
 <Story
-	name="Dropdown Selection"
+	name="Dropdown Selection [play: main button calls onselect]"
 	args={{ options: [...ADOPT_OPTIONS], defaultValue: 'adopt' }}
 	play={async ({ canvasElement, args: playArgs }) => {
 		const canvas = within(canvasElement);
