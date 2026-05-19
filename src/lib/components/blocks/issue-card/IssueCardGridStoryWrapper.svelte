@@ -3,6 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import { setSelectionContext } from '$lib/modules/board/selection.context.svelte.js';
 	import { setIssuesContext } from '$lib/modules/issues/index.js';
+	import { setProcessesContext } from '$lib/modules/processes/index.js';
 	import { setIssueCardSettingsContext } from './index.js';
 	import { MOCK_DASHBOARDS } from '$lib/tauri_mock_data.js';
 
@@ -14,8 +15,12 @@
 
 	setSelectionContext();
 	const issuesCtx = setIssuesContext();
+	const processesCtx = setProcessesContext();
 	setIssueCardSettingsContext();
-	onMount(() => issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id));
+	onMount(() => {
+		void issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id);
+		void processesCtx.loadProcesses();
+	});
 </script>
 
 {@render children?.()}

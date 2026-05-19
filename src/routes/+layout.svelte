@@ -22,6 +22,7 @@
 	import { setIssuesContext } from '$lib/modules/issues';
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
+	import { setProcessesContext } from '$lib/modules/processes';
 	import { setWindowContext, openWorkspaceWindow } from '$lib/modules/window';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
@@ -50,6 +51,7 @@
 	setIssuesContext();
 	const versionControlCtx = setVersionControlContext();
 	setActionsContext();
+	setProcessesContext();
 	const shortcutsCtx = setKeyboardShortcutsContext();
 	const commandPaletteCtx = setCommandPaletteContext();
 	const toastsCtx = setToastsContext();

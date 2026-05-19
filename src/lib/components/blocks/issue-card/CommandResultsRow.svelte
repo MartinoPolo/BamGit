@@ -1,26 +1,44 @@
 <script lang="ts">
 	import { useIssueCard } from './index.js';
+	import { useProcesses } from '$lib/modules/processes';
 	import CommandResultBadge from '$lib/components/derived/command-badges/CommandResultBadge.svelte';
 	import ServerPortBadge from '$lib/components/derived/command-badges/ServerPortBadge.svelte';
+	import type { CommandResultState } from '$lib/components/derived/command-badges/index.js';
+	import type { ProcessStatus } from '$lib/types/generated';
 	import {
 		computeCommandResultsOverflow,
 		MAX_VISIBLE_COMMAND_RESULTS,
 	} from './command_results_overflow.js';
 
-	interface CommandResult {
-		commandName: string;
-		state: 'running' | 'passed' | 'failed';
-		isStale?: boolean;
-	}
-
-	interface Props {
-		commandResults?: CommandResult[];
-		serverPort?: number | null;
-	}
-
-	let { commandResults = [], serverPort = null }: Props = $props();
-
 	const ctx = useIssueCard();
+	const processesCtx = useProcesses();
+
+	const STATUS_TO_BADGE_STATE = {
+		running: 'running',
+		passed: 'passed',
+		failed: 'failed',
+		timeout: 'timeout',
+		stopped: 'stopped',
+	} as const satisfies Record<ProcessStatus, CommandResultState>;
+
+	const issueProcesses = $derived(processesCtx.processesByIssueId.get(ctx.issue.id) ?? []);
+
+	const commandResults = $derived(
+		issueProcesses
+			.filter((p) => p.category !== 'server')
+			.map((p) => ({
+				commandName: p.name,
+				state: STATUS_TO_BADGE_STATE[p.status],
+				isStale: p.status !== 'running' && (ctx.cache?.has_local_changes ?? false),
+			})),
+	);
+
+	const serverPort = $derived.by(() => {
+		const serverProcess = issueProcesses.find(
+			(p) => p.category === 'server' && p.port !== null && p.status === 'running',
+		);
+		return serverProcess?.port ?? null;
+	});
 
 	const visibleResults = $derived(commandResults.slice(0, MAX_VISIBLE_COMMAND_RESULTS));
 	const overflow = $derived(computeCommandResultsOverflow(commandResults.length));

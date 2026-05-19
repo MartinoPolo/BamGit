@@ -4,6 +4,7 @@
 	import type { Issue } from '$lib/modules/issues';
 	import type { GitStatusCache } from '$lib/types/generated';
 	import { setIssuesContext } from '$lib/modules/issues/index.js';
+	import { setProcessesContext } from '$lib/modules/processes/index.js';
 	import {
 		setIssueCardContext,
 		type IssueCardContextProps,
@@ -71,7 +72,11 @@
 	);
 
 	const issuesCtx = setIssuesContext();
-	onMount(() => issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id));
+	const processesCtx = setProcessesContext();
+	onMount(() => {
+		void issuesCtx.loadIssues(MOCK_DASHBOARDS[0].id);
+		void processesCtx.loadProcesses();
+	});
 
 	setIssueCardContext(() => ({
 		issue: resolvedIssue,

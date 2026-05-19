@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -23,8 +22,10 @@ pub struct RunningProcess {
 #[serde(rename_all = "lowercase")]
 pub enum ProcessStatus {
     Running,
-    Stopped,
+    Passed,
     Failed,
+    Timeout,
+    Stopped,
 }
 
 #[derive(Debug)]
@@ -140,16 +141,16 @@ impl ProcessManager {
     }
 }
 
-pub fn try_extract_port(line: &str, pattern: &str) -> Option<u16> {
-    let regex = Regex::new(pattern).ok()?;
-    let captures = regex.captures(line)?;
-    let port_str = captures.get(1)?.as_str();
-    port_str.parse::<u16>().ok()
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use regex::Regex;
+
+    fn try_extract_port(line: &str, pattern: &str) -> Option<u16> {
+        let regex = Regex::new(pattern).ok()?;
+        let captures = regex.captures(line)?;
+        let port_str = captures.get(1)?.as_str();
+        port_str.parse::<u16>().ok()
+    }
 
     #[test]
     fn extract_port_from_vite_output() {
