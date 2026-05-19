@@ -14,6 +14,7 @@
 		size = 'sm',
 		disabled = false,
 		onselect,
+		portalProps,
 	}: SplitButtonProps = $props();
 
 	// svelte-ignore state_referenced_locally
@@ -74,7 +75,7 @@
 				</Button>
 			{/snippet}
 		</DropdownMenu.Trigger>
-		<DropdownMenu.Content align="end">
+		<DropdownMenu.Content align="end" {portalProps}>
 			{#each options as option (option.value)}
 				<DropdownMenu.Item
 					onclick={() => handleOptionSelect(option.value)}

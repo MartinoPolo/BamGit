@@ -15,5 +15,7 @@ export default {
 		// shadcn-svelte uses OKLCH decimal lightness (0.141) and unitless hue (285.823) — both valid CSS
 		'lightness-notation': null,
 		'hue-degree-notation': null,
+		// Tailwind CSS 4 @custom-variant blocks use & nesting outside a scoping root
+		'nesting-selector-no-missing-scoping-root': null,
 	},
 };

@@ -12,7 +12,7 @@
 </script>
 
 {#if overridden}
-	<div class="flex items-center gap-1">
+	<div class="flex items-center gap-1" data-testid="settings-override-indicator">
 		<span class="size-2 rounded-full bg-primary" title="Overridden for this workspace"></span>
 		{#if onreset}
 			<SimpleTooltip text="Reset to default">

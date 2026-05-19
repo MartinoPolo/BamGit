@@ -47,6 +47,27 @@
 	];
 </script>
 
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex flex-col gap-6">
+			{#each BADGE_STYLES as badgeStyle (badgeStyle)}
+				<div class="flex flex-col gap-2">
+					<p class="text-xs text-foreground-muted">{badgeStyle}</p>
+					<div class="flex flex-wrap gap-2">
+						{#each ALL_CHIP_STATES as chip (chip.label)}
+							<IssueStateChip
+								label={chip.label}
+								colorVariable={chip.colorVariable}
+								{badgeStyle}
+							/>
+						{/each}
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="All 22 States">
 	{#snippet template(args: { badgeStyle?: BadgeStyle })}
 		<div class="flex flex-wrap gap-2">

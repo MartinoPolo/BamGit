@@ -4,7 +4,7 @@
 	import IssueCardGrid from './IssueCardGrid.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Issue/IssueCardGrid',
+		title: 'Blocks/IssueCard/IssueCardGrid',
 		component: IssueCardGrid,
 		tags: ['autodocs'],
 	});
@@ -208,7 +208,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: List renders multiple cards" play={playRendersMultipleCards}>
+<Story
+	name="List Renders Multiple Cards [play: list renders cards]"
+	play={playRendersMultipleCards}
+>
 	{#snippet template()}
 		<IssueCardGridStoryWrapper>
 			<IssueCardGrid
@@ -225,7 +228,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Card click keeps list stable" play={playCardClickStable}>
+<Story
+	name="Card Click Keeps List Stable [play: card click keeps list stable]"
+	play={playCardClickStable}
+>
 	{#snippet template()}
 		<IssueCardGridStoryWrapper>
 			<IssueCardGrid
@@ -242,7 +248,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Grid background click does not propagate" play={playGridBackgroundClick}>
+<Story
+	name="Grid Background Click No Propagation [play: grid bg click no propagation]"
+	play={playGridBackgroundClick}
+>
 	{#snippet template()}
 		<IssueCardGridStoryWrapper>
 			<IssueCardGrid

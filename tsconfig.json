@@ -12,7 +12,7 @@
 		"strict": true,
 		"moduleResolution": "bundler"
 	},
-	"exclude": ["../../low-poly-2d-trees/dist/**"]
+	"exclude": ["../../low-poly-2d-trees/dist/**", "src-tauri/**", "node_modules/**", "tests/**"]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	// except $lib which is handled by https://kit.svelte.dev/docs/configuration#files
 	//

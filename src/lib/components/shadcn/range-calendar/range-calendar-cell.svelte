@@ -4,6 +4,12 @@
 	import overridesCss from './range-calendar-cell-overrides.css?raw';
 	import { onMount } from 'svelte';
 
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: RangeCalendarPrimitive.CellProps = $props();
+
 	onMount(() => {
 		if (document.getElementById('range-calendar-cell-overrides')) {
 			return;
@@ -13,12 +19,6 @@
 		style.textContent = overridesCss;
 		document.head.appendChild(style);
 	});
-
-	let {
-		ref = $bindable(null),
-		class: className,
-		...restProps
-	}: RangeCalendarPrimitive.CellProps = $props();
 </script>
 
 <RangeCalendarPrimitive.Cell

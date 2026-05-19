@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { tv } from 'tailwind-variants';
 
 export const badgeVariants = tv({
-	base: 'inline-flex items-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
+	base: 'inline-flex items-center justify-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
 	variants: {
 		tone: {
 			neutral: 'bg-surface-2 text-foreground-muted border-border',
@@ -41,7 +41,7 @@ export const badgeVariants = tv({
 		{ badgeStyle: 'solid', tone: 'primary', class: 'bg-primary text-primary-foreground' },
 		{ badgeStyle: 'solid', tone: 'accent', class: 'bg-accent text-white' },
 		{ badgeStyle: 'solid', tone: 'merged', class: 'bg-status-merged text-white' },
-		{ badgeStyle: 'solid', tone: 'neutral', class: 'bg-foreground-muted text-surface-1' },
+		{ badgeStyle: 'solid', tone: 'neutral', class: 'bg-foreground-muted text-background' },
 	],
 	defaultVariants: {
 		tone: 'neutral',

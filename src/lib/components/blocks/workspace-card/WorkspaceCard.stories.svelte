@@ -6,7 +6,7 @@
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Workspace/WorkspaceCard',
+		title: 'Blocks/WorkspaceCard/WorkspaceCard',
 		component: WorkspaceCard,
 		tags: ['autodocs'],
 	});
@@ -361,61 +361,88 @@
 	</div>
 {/snippet}
 
-<Story name="Test: Renders Content" play={playRendersContent}>
+<Story name="Renders Content [play: renders content]" play={playRendersContent}>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: Card Click Fires Onclick" play={playCardClickFiresOnclick}>
+<Story
+	name="Card Click Fires Onclick [play: card click fires onclick]"
+	play={playCardClickFiresOnclick}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: GitHub Button Stops Propagation" play={playGithubButtonStopsPropagation}>
+<Story
+	name="GitHub Button Stops Propagation [play: github button stops propagation]"
+	play={playGithubButtonStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: Folder Button Stops Propagation" play={playFolderButtonStopsPropagation}>
+<Story
+	name="Folder Button Stops Propagation [play: folder button stops propagation]"
+	play={playFolderButtonStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: Issues Cell Stops Propagation" play={playIssuesStatCellStopsPropagation}>
+<Story
+	name="Issues Cell Stops Propagation [play: issues cell stops propagation]"
+	play={playIssuesStatCellStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: PRs Cell Stops Propagation" play={playPrsStatCellStopsPropagation}>
+<Story
+	name="PRs Cell Stops Propagation [play: prs cell stops propagation]"
+	play={playPrsStatCellStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: Attn Cell Stops Propagation" play={playAttnStatCellStopsPropagation}>
+<Story
+	name="Attn Cell Stops Propagation [play: attn cell stops propagation]"
+	play={playAttnStatCellStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: HITL Cell Stops Propagation" play={playHitlStatCellStopsPropagation}>
+<Story
+	name="HITL Cell Stops Propagation [play: hitl cell stops propagation]"
+	play={playHitlStatCellStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: PRD Row Stops Propagation" play={playPrdRowStopsPropagation}>
+<Story
+	name="PRD Row Stops Propagation [play: prd row stops propagation]"
+	play={playPrdRowStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}
 </Story>
 
-<Story name="Test: AFK Row Stops Propagation" play={playAfkRowStopsPropagation}>
+<Story
+	name="AFK Row Stops Propagation [play: afk row stops propagation]"
+	play={playAfkRowStopsPropagation}
+>
 	{#snippet template()}
 		{@render interactionCard()}
 	{/snippet}

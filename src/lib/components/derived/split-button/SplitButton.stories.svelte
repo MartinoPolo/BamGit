@@ -28,7 +28,7 @@
 
 <Story name="Default" args={{ options: [...ADOPT_OPTIONS], defaultValue: 'adopt' }}>
 	{#snippet template(args: SplitButtonProps)}
-		<SplitButton {...args} />
+		<SplitButton {...args} portalProps={{ disabled: true }} />
 	{/snippet}
 </Story>
 
@@ -37,11 +37,11 @@
 		<div class="flex flex-col gap-4">
 			<div class="flex items-center gap-3">
 				<span class="w-12 text-xs text-foreground-muted">sm</span>
-				<SplitButton {...args} size="sm" />
+				<SplitButton {...args} size="sm" portalProps={{ disabled: true }} />
 			</div>
 			<div class="flex items-center gap-3">
 				<span class="w-12 text-xs text-foreground-muted">md</span>
-				<SplitButton {...args} size="md" />
+				<SplitButton {...args} size="md" portalProps={{ disabled: true }} />
 			</div>
 		</div>
 	{/snippet}
@@ -49,12 +49,12 @@
 
 <Story name="Disabled">
 	{#snippet template(args: SplitButtonProps)}
-		<SplitButton {...args} disabled />
+		<SplitButton {...args} disabled portalProps={{ disabled: true }} />
 	{/snippet}
 </Story>
 
 <Story
-	name="Dropdown Selection"
+	name="Dropdown Selection [play: main button calls onselect]"
 	args={{ options: [...ADOPT_OPTIONS], defaultValue: 'adopt' }}
 	play={async ({ canvasElement, args: playArgs }) => {
 		const canvas = within(canvasElement);
@@ -76,6 +76,6 @@
 	}}
 >
 	{#snippet template(args: SplitButtonProps)}
-		<SplitButton {...args} />
+		<SplitButton {...args} portalProps={{ disabled: true }} />
 	{/snippet}
 </Story>

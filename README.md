@@ -4,20 +4,20 @@ Desktop agent orchestration GUI built with Tauri v2, Svelte 5, and Rust. Unifies
 
 ## Stack
 
-| Layer         | Technology                      |
-| ------------- | ------------------------------- |
-| Framework     | SvelteKit 2 + Svelte 5 (runes)  |
-| Desktop       | Tauri v2 (Rust backend)         |
-| Build         | Vite 7                          |
-| Language      | TypeScript (strict) + Rust      |
-| Styling       | Tailwind CSS 4                  |
-| Database      | SQLite (rusqlite + r2d2 pool)   |
-| Type gen      | ts-rs (Rust → TypeScript)       |
-| Testing       | Vitest + Playwright + Storybook |
-| Linting       | ESLint + Stylelint + OxLint     |
-| Formatting    | Prettier                        |
-| Dead code     | Fallow                          |
-| Component dev | Storybook 10                    |
+| Layer         | Technology                                    |
+| ------------- | --------------------------------------------- |
+| Framework     | SvelteKit 2 + Svelte 5 (runes)                |
+| Desktop       | Tauri v2 (Rust backend)                       |
+| Build         | Vite 7                                        |
+| Language      | TypeScript (strict) + Rust                    |
+| Styling       | Tailwind CSS 4                                |
+| Database      | SQLite (rusqlite + r2d2 pool)                 |
+| Type gen      | ts-rs (Rust → TypeScript)                     |
+| Testing       | Vitest + Playwright + WebdriverIO + Storybook |
+| Linting       | ESLint + Stylelint + OxLint                   |
+| Formatting    | Prettier                                      |
+| Dead code     | Fallow                                        |
+| Component dev | Storybook 10                                  |
 
 ## Getting Started
 
@@ -26,6 +26,7 @@ Desktop agent orchestration GUI built with Tauri v2, Svelte 5, and Rust. Unifies
 - [Node.js](https://nodejs.org/) >= 22
 - [pnpm](https://pnpm.io/)
 - [Rust](https://www.rust-lang.org/tools/install) (for Tauri backend)
+- [tauri-driver](https://crates.io/crates/tauri-driver) (optional, for Tauri E2E tests): `cargo install tauri-driver --locked`
 
 ### Setup
 
@@ -64,10 +65,22 @@ pnpm tauri dev
 
 ### Testing
 
-| Script          | Description                                     |
-| --------------- | ----------------------------------------------- |
-| `pnpm test`     | Unit tests with Vitest (80% coverage threshold) |
-| `pnpm test:e2e` | E2E tests with Playwright (Chromium)            |
+| Tier           | Tool                       | Command              | What it tests                   | Backend                        |
+| -------------- | -------------------------- | -------------------- | ------------------------------- | ------------------------------ |
+| Unit/component | Vitest                     | `pnpm test`          | Logic, components, reactivity   | Mocked                         |
+| E2E (mock)     | Playwright                 | `pnpm e2e`           | Navigation, UI flows, keyboard  | Static build + `tauri_mock.ts` |
+| E2E (native)   | WebdriverIO + tauri-driver | `pnpm e2e:tauri`     | Full app with real Rust/SQLite  | Auto-builds debug binary       |
+| Visual         | Tauri MCP                  | Manual via sub-agent | Screenshots, visual regressions | Running `pnpm tauri dev`       |
+
+#### Tauri E2E Tests
+
+`pnpm e2e:tauri` runs WebdriverIO tests against the real Tauri debug binary with actual SQLite persistence. It auto-builds the debug binary before running (first build ~5-15min, incremental ~30s).
+
+**Requirements:** Windows only (WebView2 + Edge WebDriver). Requires `tauri-driver` installed globally via `cargo install tauri-driver --locked`. Not in CI — run manually during development.
+
+**Config:** `wdio.conf.ts`. Tests in `tests/e2e-tauri/specs/`. Uses `driverProvider: 'official'` with `baseUrl: 'http://tauri.localhost'`.
+
+**When to use:** Features that depend on the Rust backend — settings persistence, database operations, IPC round-trips. Use Playwright (`pnpm e2e`) for pure UI/navigation testing.
 
 ## Architecture
 
@@ -194,6 +207,7 @@ src-tauri/
   tauri.conf.json            # Tauri app config
 static/                      # Static assets
 tests/e2e/                   # Playwright E2E tests
+tests/e2e-tauri/             # WebdriverIO + tauri-driver E2E tests
 .storybook/                  # Storybook configuration
 .github/workflows/           # CI pipeline
 .mpx/                        # Project documentation (architecture, roadmap, etc.)

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command Context Menus — Refined (Variant A)</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 32px 32px 64px; min-height: 100vh; }
+
+  .mockup-layout { display: flex; flex-direction: column; gap: 56px; max-width: 1200px; margin: 0 auto; }
+
+  .scene-label {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: var(--foreground-subtle); letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+
+  .annotation {
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle);
+    line-height: 1.45; max-width: 220px; border-left: 2px solid var(--border);
+    padding-left: 10px; margin-top: 8px;
+  }
+  .annotation strong { color: var(--foreground-muted); font-weight: 600; }
+
+  /* ── Issue Card (context shell) ── */
+  .issue-card {
+    width: 340px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+    overflow: hidden; flex-shrink: 0;
+  }
+  .issue-card-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
+  .issue-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .issue-number { font-family: var(--font-mono); font-size: 11px; color: var(--foreground-subtle); }
+  .issue-title { font-size: 13px; font-weight: 600; color: var(--foreground); padding: 0 14px 6px; line-height: 1.3; }
+  .issue-meta-row { display: flex; align-items: center; gap: 6px; padding: 0 14px; margin-bottom: 6px; }
+  .issue-label {
+    display: inline-flex; align-items: center; height: 18px; padding: 0 6px;
+    font-size: 10px; font-weight: 500; border-radius: 999px; border: 1px solid;
+  }
+  .issue-badges-row {
+    display: flex; align-items: center; gap: 6px; padding: 6px 14px 10px;
+    border-top: 1px solid var(--border); margin-top: 4px; flex-wrap: wrap;
+  }
+
+  /* ── Badges ── */
+  .server-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--font-mono); font-size: 10px; line-height: 1;
+    padding: 3px 7px; border-radius: 4px;
+    background: color-mix(in oklch, var(--status-success) 10%, transparent);
+    color: var(--status-success);
+    border: 1px solid color-mix(in oklch, var(--status-success) 25%, transparent);
+    cursor: pointer;
+  }
+  .server-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--status-success); }
+
+  .cmd-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 18px; border-radius: 999px; font-size: 10px; gap: 4px;
+  }
+  .cmd-badge-circle { width: 18px; padding: 0; }
+  .cmd-badge-pill { padding: 0 7px; }
+
+  .cmd-badge-pass {
+    background: color-mix(in oklch, var(--status-success) 14%, transparent);
+    color: var(--status-success);
+    border: 1px solid color-mix(in oklch, var(--status-success) 25%, transparent);
+  }
+  .cmd-badge-fail {
+    background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+    color: var(--status-danger);
+    border: 1px solid color-mix(in oklch, var(--status-danger) 25%, transparent);
+  }
+  .cmd-badge-running {
+    background: color-mix(in oklch, var(--status-info) 14%, transparent);
+    color: var(--status-info);
+    border: 1px solid color-mix(in oklch, var(--status-info) 25%, transparent);
+  }
+  .cmd-badge-timeout {
+    background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+    color: color-mix(in oklch, var(--status-warning) 70%, var(--foreground));
+    border: 1px solid color-mix(in oklch, var(--status-warning) 25%, transparent);
+  }
+  .cmd-badge-name { font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; }
+
+  .spinner-ring {
+    width: 10px; height: 10px; border: 1.5px solid currentColor;
+    border-top-color: transparent; border-radius: 50%;
+    animation: gk-spin 0.8s linear infinite;
+  }
+
+  .overflow-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 18px; padding: 0 6px; border-radius: 999px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+    background: var(--surface-2); color: var(--foreground-muted);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: background 120ms, border-color 120ms;
+  }
+  .overflow-badge:hover, .overflow-badge.is-hover {
+    background: var(--surface-3); border-color: var(--border-strong); color: var(--foreground);
+  }
+
+  /* ── Context Menu ── */
+  .ctx-menu {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 6px; min-width: 220px; position: relative;
+  }
+  .ctx-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-radius: 6px; font-size: 13px; color: var(--foreground); cursor: default;
+  }
+  .ctx-item:hover, .ctx-item.is-highlighted { background: var(--surface-2); }
+  .ctx-item.is-destructive { color: var(--status-danger); }
+  .ctx-item.is-destructive:hover { background: color-mix(in oklch, var(--status-danger) 10%, transparent); }
+  .ctx-item .ctx-icon {
+    width: 16px; height: 16px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; color: var(--foreground-muted);
+  }
+  .ctx-item .ctx-icon svg { width: 16px; height: 16px; }
+  .ctx-item.is-highlighted .ctx-icon, .ctx-item:hover .ctx-icon { color: var(--foreground); }
+  .ctx-item.is-destructive .ctx-icon { color: var(--status-danger); }
+  .ctx-chevron { margin-left: auto; color: var(--foreground-subtle); font-size: 11px; }
+  .ctx-sep { height: 1px; background: var(--border); margin: 4px -6px; }
+
+  /* ── Submenu ── */
+  .ctx-submenu {
+    position: absolute; left: calc(100% + 6px); top: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 6px; min-width: 300px;
+  }
+
+  /* Group header with bulk actions */
+  .cmd-group-header {
+    display: flex; align-items: center; gap: 6px; padding: 8px 8px 4px;
+  }
+  .cmd-group-label {
+    font-size: var(--text-2xs); font-weight: 600; color: var(--foreground-subtle);
+    letter-spacing: 0.08em; text-transform: uppercase; flex: 1;
+  }
+
+  /* Icon-only button (26px, ghost) */
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: var(--radius-xs); border: none;
+    background: transparent; color: var(--foreground-muted); cursor: pointer;
+    transition: background 120ms, color 120ms;
+    padding: 0; flex-shrink: 0;
+  }
+  .icon-btn:hover, .icon-btn.is-hover {
+    background: var(--surface-2); color: var(--foreground);
+  }
+  .icon-btn.is-destructive { color: var(--foreground-muted); }
+  .icon-btn.is-destructive:hover, .icon-btn.is-destructive.is-hover {
+    background: color-mix(in oklch, var(--status-danger) 12%, transparent);
+    color: var(--status-danger);
+  }
+  .icon-btn.is-success:hover, .icon-btn.is-success.is-hover {
+    background: color-mix(in oklch, var(--status-success) 12%, transparent);
+    color: var(--status-success);
+  }
+  .icon-btn svg { width: 13px; height: 13px; }
+
+  /* Command submenu entry */
+  .cmd-item {
+    display: flex; align-items: center; gap: 8px; padding: 4px 8px;
+    border-radius: 6px; font-size: 13px; color: var(--foreground);
+    cursor: default; min-height: 30px;
+  }
+  .cmd-item:hover, .cmd-item.is-highlighted { background: var(--surface-2); }
+
+  .cmd-state-icon {
+    width: 16px; height: 16px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+  .cmd-state-icon svg { width: 14px; height: 14px; }
+  .cmd-state-icon .dot-running {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--status-success);
+    box-shadow: 0 0 6px color-mix(in oklch, var(--status-success) 50%, transparent);
+  }
+  .cmd-state-icon .spinner-sm {
+    width: 12px; height: 12px; border: 1.5px solid var(--status-info);
+    border-top-color: transparent; border-radius: 50%;
+    animation: gk-spin 0.8s linear infinite;
+  }
+
+  .cmd-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .cmd-port-btn {
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--foreground-subtle);
+    background: transparent; border: 1px solid transparent; border-radius: var(--radius-xs);
+    padding: 1px 5px; cursor: pointer; transition: all 120ms;
+  }
+  .cmd-port-btn:hover, .cmd-port-btn.is-hover {
+    background: var(--surface-3); border-color: var(--border);
+    color: var(--foreground-muted);
+  }
+
+  .cmd-actions { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+
+  /* ── Tooltip ── */
+  .mock-tooltip {
+    position: absolute; background: oklch(0.12 0.02 150);
+    color: oklch(0.97 0.01 130); border: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+    font-size: 11px; padding: 5px 8px; border-radius: 6px;
+    box-shadow: var(--shadow-md); font-family: var(--font-sans);
+    white-space: nowrap; z-index: 50; pointer-events: none;
+  }
+  .mock-tooltip-arrow {
+    position: absolute; width: 6px; height: 6px;
+    background: oklch(0.12 0.02 150); transform: rotate(45deg);
+    border-left: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+    border-bottom: 1px solid color-mix(in oklch, oklch(0.12 0.02 150) 60%, var(--border));
+  }
+
+  /* ── Overflow Popover ── */
+  .overflow-popover {
+    position: absolute; top: calc(100% + 8px); left: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-lg);
+    padding: 6px; min-width: 160px; z-index: 20;
+  }
+  .overflow-popover-item {
+    display: flex; align-items: center; gap: 8px; padding: 5px 8px;
+    border-radius: 4px; font-size: 12px; cursor: pointer;
+  }
+  .overflow-popover-item:hover { background: var(--surface-2); }
+  .overflow-popover-item .opi-icon {
+    width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .overflow-popover-item .opi-icon svg { width: 12px; height: 12px; }
+
+  /* ── Badge context menu ── */
+  .badge-ctx-wrapper { position: relative; display: inline-flex; }
+  .badge-ctx-menu {
+    position: absolute; top: calc(100% + 6px); left: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 6px; min-width: 180px; z-index: 10;
+  }
+  .badge-ctx-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-radius: 6px; font-size: 13px; color: var(--foreground); cursor: default;
+  }
+  .badge-ctx-item:hover, .badge-ctx-item.is-highlighted { background: var(--surface-2); }
+  .badge-ctx-item.is-destructive { color: var(--status-danger); }
+  .badge-ctx-item.is-destructive:hover { background: color-mix(in oklch, var(--status-danger) 10%, transparent); }
+  .badge-ctx-item .bc-icon {
+    width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .badge-ctx-item .bc-icon svg { width: 14px; height: 14px; }
+
+  .badge-highlight { outline: 2px dashed var(--moss-400); outline-offset: 3px; border-radius: 6px; }
+
+  /* ── Hover state showcase ── */
+  .state-row { display: flex; gap: 16px; align-items: center; margin-bottom: 6px; }
+  .state-label {
+    font-family: var(--font-mono); font-size: 10px; color: var(--foreground-subtle);
+    letter-spacing: 0.04em; width: 80px; text-align: right; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+  <div class="gk-eyebrow" style="margin-bottom: 28px; font-size: 11px;">REFINED — VARIANT A + ICON BUTTONS, BULK ACTIONS, HYBRID BADGES, OVERFLOW POPOVER</div>
+
+  <div class="mockup-layout">
+
+    <!-- ════════════════════════════════════════════════════════
+         SCENE 1: Commands Submenu with icon-only action buttons
+         ════════════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 1 — Commands Submenu with Action Buttons &amp; Bulk Actions</div>
+      <div style="display: flex; gap: 16px; align-items: flex-start;">
+
+        <!-- Card (context) -->
+        <div class="issue-card" style="opacity: 0.5;">
+          <div class="issue-card-header">
+            <div class="issue-color-dot" style="background: var(--azure-400);"></div>
+            <span class="issue-number">#341</span>
+          </div>
+          <div class="issue-title">Command context menus &amp; badge interactions</div>
+          <div class="issue-badges-row">
+            <div class="server-badge"><span class="dot"></span> 1420</div>
+            <div class="cmd-badge cmd-badge-circle cmd-badge-pass">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="cmd-badge cmd-badge-circle cmd-badge-fail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main context menu -->
+        <div style="position: relative;">
+          <div class="ctx-menu">
+            <div class="ctx-item" style="opacity: 0.45;"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg></span> Select</div>
+            <div class="ctx-sep"></div>
+            <div class="ctx-item" style="opacity: 0.45;"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></span> Actions <span class="ctx-chevron">&#x203A;</span></div>
+
+            <!-- Commands (highlighted, submenu open) -->
+            <div class="ctx-item is-highlighted">
+              <span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg></span>
+              Commands <span class="ctx-chevron">&#x203A;</span>
+
+              <!-- ═══ Commands Submenu ═══ -->
+              <div class="ctx-submenu" style="top: -42px;">
+
+                <!-- ── SERVERS group ── -->
+                <div class="cmd-group-header">
+                  <span class="cmd-group-label">Servers</span>
+                  <!-- Run All (fast-forward icon) -->
+                  <button class="icon-btn is-success" title="Run All Servers" aria-label="Run All Servers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+                  </button>
+                  <!-- Stop All (square icon) -->
+                  <button class="icon-btn is-destructive" title="Stop All Servers" aria-label="Stop All Servers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                  </button>
+                </div>
+
+                <!-- vite dev — running server -->
+                <div class="cmd-item is-highlighted">
+                  <span class="cmd-state-icon"><span class="dot-running"></span></span>
+                  <span class="cmd-name">vite dev</span>
+                  <button class="cmd-port-btn is-hover" title="View Logs">:1420</button>
+                  <span class="cmd-actions">
+                    <button class="icon-btn is-destructive is-hover" aria-label="Stop vite dev">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                    </button>
+                  </span>
+                </div>
+
+                <!-- storybook — idle -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--foreground-subtle);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35;"><circle cx="12" cy="12" r="1"/></svg>
+                  </span>
+                  <span class="cmd-name" style="color: var(--foreground-muted);">storybook</span>
+                  <span class="cmd-actions">
+                    <button class="icon-btn" aria-label="Run storybook">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    </button>
+                  </span>
+                </div>
+
+                <!-- preview — stopped -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--foreground-subtle);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                  </span>
+                  <span class="cmd-name" style="color: var(--foreground-muted);">preview</span>
+                  <span class="cmd-actions">
+                    <button class="icon-btn" aria-label="Run preview">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    </button>
+                  </span>
+                </div>
+
+                <div class="ctx-sep"></div>
+
+                <!-- ── CHECKS group ── -->
+                <div class="cmd-group-header">
+                  <span class="cmd-group-label">Checks</span>
+                  <button class="icon-btn is-success" title="Run All Checks" aria-label="Run All Checks">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+                  </button>
+                  <button class="icon-btn is-destructive" title="Stop All Checks" aria-label="Stop All Checks">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                  </button>
+                </div>
+
+                <!-- typecheck — running -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon"><span class="spinner-sm"></span></span>
+                  <span class="cmd-name">typecheck</span>
+                  <span class="cmd-actions">
+                    <button class="icon-btn is-destructive" aria-label="Stop typecheck">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                    </button>
+                  </span>
+                </div>
+
+                <!-- lint — passed -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--status-success);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  </span>
+                  <span class="cmd-name">lint</span>
+                  <span class="cmd-actions">
+                    <button class="icon-btn" aria-label="Re-run lint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                  </span>
+                </div>
+
+                <!-- test — failed -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--status-danger);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                  </span>
+                  <span class="cmd-name">test</span>
+                  <span class="cmd-actions">
+                    <button class="icon-btn" aria-label="Re-run test">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                  </span>
+                </div>
+
+                <!-- e2e — timeout -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--status-warning);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </span>
+                  <span class="cmd-name">e2e</span>
+                  <span class="cmd-actions">
+                    <button class="icon-btn" aria-label="Re-run e2e">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ctx-sep"></div>
+            <div class="ctx-item" style="opacity: 0.45;"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg></span> Edit</div>
+            <div class="ctx-item" style="opacity: 0.45;"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16h2"/><path d="M11 12h2"/><path d="M15 8h2"/></svg></span> Priority <span class="ctx-chevron">&#x203A;</span></div>
+            <div class="ctx-sep"></div>
+            <div class="ctx-item" style="opacity: 0.45;"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg></span> Archive</div>
+            <div class="ctx-item is-destructive" style="opacity: 0.45;"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></span> Delete</div>
+          </div>
+        </div>
+
+        <!-- Annotations -->
+        <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 4px;">
+          <div class="annotation"><strong>Icon-only buttons</strong> (22px) for per-command actions: Play (run), Square (stop), RotateCcw (re-run).</div>
+          <div class="annotation"><strong>Bulk actions</strong> in section headers: FastForward (run all), Square (stop all). Green hover for run, red hover for stop.</div>
+          <div class="annotation"><strong>Port button</strong> (:1420) clickable — opens ProcessLogViewer. Hover shows subtle button chrome.</div>
+          <div class="annotation">Row click still fires primary action. Buttons are the <strong>explicit interaction targets</strong> for discoverable actions.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════════════
+         SCENE 2: Button Hover States Reference
+         ════════════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 2 — Button Hover States</div>
+      <div style="display: flex; gap: 40px;">
+
+        <!-- Run button states -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 10px; font-weight: 600;">Run (Play)</div>
+          <div class="state-row">
+            <span class="state-label">default</span>
+            <button class="icon-btn" aria-label="Run">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </button>
+          </div>
+          <div class="state-row">
+            <span class="state-label">hover</span>
+            <button class="icon-btn is-hover" aria-label="Run">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stop button states -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 10px; font-weight: 600;">Stop (Square)</div>
+          <div class="state-row">
+            <span class="state-label">default</span>
+            <button class="icon-btn is-destructive" aria-label="Stop">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+            </button>
+          </div>
+          <div class="state-row">
+            <span class="state-label">hover</span>
+            <button class="icon-btn is-destructive is-hover" aria-label="Stop">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Re-run button states -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 10px; font-weight: 600;">Re-run (RotateCcw)</div>
+          <div class="state-row">
+            <span class="state-label">default</span>
+            <button class="icon-btn" aria-label="Re-run">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+          <div class="state-row">
+            <span class="state-label">hover</span>
+            <button class="icon-btn is-hover" aria-label="Re-run">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Run All button states -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 10px; font-weight: 600;">Run All (FastForward)</div>
+          <div class="state-row">
+            <span class="state-label">default</span>
+            <button class="icon-btn is-success" aria-label="Run All">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+            </button>
+          </div>
+          <div class="state-row">
+            <span class="state-label">hover</span>
+            <button class="icon-btn is-success is-hover" aria-label="Run All">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Port button states -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 10px; font-weight: 600;">Port (→ Log Viewer)</div>
+          <div class="state-row">
+            <span class="state-label">default</span>
+            <button class="cmd-port-btn">:1420</button>
+          </div>
+          <div class="state-row">
+            <span class="state-label">hover</span>
+            <button class="cmd-port-btn is-hover">:1420</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════════════
+         SCENE 3: Hybrid Badge Modes on Card
+         ════════════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 3 — Hybrid Badge Modes: Pills (1-2) vs Circles (3+)</div>
+      <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+
+        <!-- Card A: 2 results → pill mode -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 8px; font-weight: 600;">2 results → pill mode</div>
+          <div class="issue-card" style="width: 320px;">
+            <div class="issue-card-header">
+              <div class="issue-color-dot" style="background: var(--moss-400);"></div>
+              <span class="issue-number">#296</span>
+            </div>
+            <div class="issue-title">Restructure issue card components</div>
+            <div class="issue-badges-row">
+              <div class="server-badge"><span class="dot"></span> 5173</div>
+              <div class="cmd-badge cmd-badge-pill cmd-badge-pass">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M20 6 9 17l-5-5"/></svg>
+                <span class="cmd-badge-name">lint</span>
+              </div>
+              <div class="cmd-badge cmd-badge-pill cmd-badge-fail">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:9px;height:9px;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <span class="cmd-badge-name">test</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card B: 3+ results → circle mode + overflow -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 8px; font-weight: 600;">5 results → circle mode + overflow</div>
+          <div class="issue-card" style="width: 320px;">
+            <div class="issue-card-header">
+              <div class="issue-color-dot" style="background: var(--azure-400);"></div>
+              <span class="issue-number">#341</span>
+            </div>
+            <div class="issue-title">Command context menus &amp; badge interactions</div>
+            <div class="issue-badges-row">
+              <div class="server-badge"><span class="dot"></span> 1420</div>
+              <!-- 3 visible circles -->
+              <div class="cmd-badge cmd-badge-circle cmd-badge-pass">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <div class="cmd-badge cmd-badge-circle cmd-badge-fail">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </div>
+              <div class="cmd-badge cmd-badge-circle cmd-badge-running">
+                <div class="spinner-ring"></div>
+              </div>
+              <!-- Overflow with popover -->
+              <div style="position: relative;">
+                <div class="overflow-badge is-hover">+2</div>
+                <div class="overflow-popover">
+                  <div class="overflow-popover-item">
+                    <span class="opi-icon" style="color: var(--status-warning);">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </span>
+                    <span>e2e</span>
+                    <span style="margin-left: auto; font-size: 10px; color: var(--status-warning);">timeout</span>
+                  </div>
+                  <div class="overflow-popover-item">
+                    <span class="opi-icon" style="color: var(--foreground-subtle);">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                    </span>
+                    <span style="color: var(--foreground-muted);">format</span>
+                    <span style="margin-left: auto; font-size: 10px; color: var(--foreground-subtle);">stopped</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card C: 1 result → pill mode -->
+        <div>
+          <div class="gk-small" style="margin-bottom: 8px; font-weight: 600;">1 result → pill mode</div>
+          <div class="issue-card" style="width: 320px;">
+            <div class="issue-card-header">
+              <div class="issue-color-dot" style="background: var(--plum-400);"></div>
+              <span class="issue-number">#320</span>
+            </div>
+            <div class="issue-title">Settings post-review refinements</div>
+            <div class="issue-badges-row">
+              <div class="cmd-badge cmd-badge-pill cmd-badge-pass">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M20 6 9 17l-5-5"/></svg>
+                <span class="cmd-badge-name">lint</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════════════
+         SCENE 4: ServerPortBadge Right-Click Context Menu
+         ════════════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 4 — ServerPortBadge Right-Click Context Menu</div>
+      <div style="display: flex; gap: 32px; align-items: flex-start;">
+        <div class="issue-card" style="width: 320px;">
+          <div class="issue-card-header">
+            <div class="issue-color-dot" style="background: var(--moss-400);"></div>
+            <span class="issue-number">#296</span>
+          </div>
+          <div class="issue-title">Restructure issue card components</div>
+          <div class="issue-badges-row">
+            <div class="badge-ctx-wrapper">
+              <div class="server-badge badge-highlight"><span class="dot"></span> 5173</div>
+              <div class="badge-ctx-menu">
+                <div class="badge-ctx-item is-highlighted">
+                  <span class="bc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg></span>
+                  View Logs
+                </div>
+                <div class="badge-ctx-item is-destructive">
+                  <span class="bc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                  Kill
+                </div>
+                <div class="ctx-sep" style="margin: 4px -6px;"></div>
+                <div class="badge-ctx-item">
+                  <span class="bc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>
+                  Open in Browser
+                </div>
+              </div>
+            </div>
+            <div class="cmd-badge cmd-badge-pill cmd-badge-pass">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M20 6 9 17l-5-5"/></svg>
+              <span class="cmd-badge-name">lint</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px; padding-top: 8px;">
+          <div class="annotation"><strong>Left-click</strong> on badge → opens localhost:5173 in browser (existing behavior preserved).</div>
+          <div class="annotation"><strong>Right-click</strong> on badge → opens this 3-item context menu. stopPropagation prevents parent card menu.</div>
+          <div class="annotation"><strong>Kill</strong> uses destructive variant. Separator before "Open in Browser" — different intent category.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════════════
+         SCENE 5: Complete Command Entry State Matrix
+         ════════════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 5 — Command Entry States (All 7)</div>
+      <div class="ctx-menu" style="min-width: 320px; max-width: 360px;">
+
+        <!-- Idle -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon" style="color: var(--foreground-subtle);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35;"><circle cx="12" cy="12" r="1"/></svg>
+          </span>
+          <span class="cmd-name" style="color: var(--foreground-muted);">storybook</span>
+          <span class="cmd-actions">
+            <button class="icon-btn" aria-label="Run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+          </span>
+        </div>
+
+        <div class="ctx-sep"></div>
+
+        <!-- Running (server) -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon"><span class="dot-running"></span></span>
+          <span class="cmd-name">vite dev</span>
+          <button class="cmd-port-btn">:1420</button>
+          <span class="cmd-actions">
+            <button class="icon-btn is-destructive" aria-label="Stop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg></button>
+          </span>
+        </div>
+
+        <!-- Running (check) -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon"><span class="spinner-sm"></span></span>
+          <span class="cmd-name">typecheck</span>
+          <span class="cmd-actions">
+            <button class="icon-btn is-destructive" aria-label="Stop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg></button>
+          </span>
+        </div>
+
+        <div class="ctx-sep"></div>
+
+        <!-- Passed -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon" style="color: var(--status-success);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          </span>
+          <span class="cmd-name">lint</span>
+          <span class="cmd-actions">
+            <button class="icon-btn" aria-label="Re-run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+          </span>
+        </div>
+
+        <!-- Failed -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon" style="color: var(--status-danger);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+          </span>
+          <span class="cmd-name">test</span>
+          <span class="cmd-actions">
+            <button class="icon-btn" aria-label="Re-run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+          </span>
+        </div>
+
+        <!-- Timeout -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon" style="color: var(--status-warning);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <span class="cmd-name">e2e</span>
+          <span class="cmd-actions">
+            <button class="icon-btn" aria-label="Re-run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+          </span>
+        </div>
+
+        <!-- Stopped -->
+        <div class="cmd-item">
+          <span class="cmd-state-icon" style="color: var(--foreground-subtle);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+          </span>
+          <span class="cmd-name" style="color: var(--foreground-muted);">preview</span>
+          <span class="cmd-actions">
+            <button class="icon-btn" aria-label="Run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

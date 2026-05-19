@@ -15,9 +15,11 @@
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/AccountDropdown',
+		title: 'Base/AccountDropdown',
 		component: Popover.Root,
 		tags: ['autodocs'],
 	});
@@ -115,6 +117,9 @@
 </script>
 
 {#snippet accountDropdownTemplate()}
+	<StoryKeyboardHints>
+		<KeyboardHint keys="Escape" action="Close dropdown" />
+	</StoryKeyboardHints>
 	<div class="p-4">
 		<Popover.Root>
 			<Popover.Trigger>
@@ -201,25 +206,25 @@
 	</div>
 {/snippet}
 
-<Story name="Account Dropdown" play={playOpenAndEscapeClose}>
+<Story name="Account Dropdown [play: open and escape close]" play={playOpenAndEscapeClose}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Click Menu Item" play={playClickMenuItem}>
+<Story name="Click Menu Item [play: click menu item]" play={playClickMenuItem}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Click Outside Closes" play={playClickOutsideCloses}>
+<Story name="Click Outside Closes [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		{@render accountDropdownTemplate()}
 	{/snippet}

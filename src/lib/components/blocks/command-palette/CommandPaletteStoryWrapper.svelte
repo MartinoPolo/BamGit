@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Dialog as DialogPrimitive } from 'bits-ui';
 	import { setBoardContext } from '$lib/modules/board';
 	import { setActionsContext } from '$lib/modules/actions';
 	import { setIssuesContext } from '$lib/modules/issues';
@@ -9,9 +10,10 @@
 
 	interface Props {
 		children?: Snippet;
+		portalProps?: Omit<DialogPrimitive.PortalProps, 'children'>;
 	}
 
-	let { children }: Props = $props();
+	let { children, portalProps }: Props = $props();
 
 	setBoardContext();
 	setActionsContext();
@@ -23,4 +25,4 @@
 </script>
 
 {@render children?.()}
-<CommandPalette />
+<CommandPalette {portalProps} />

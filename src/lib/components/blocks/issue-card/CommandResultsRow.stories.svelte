@@ -4,7 +4,7 @@
 	import IssueCardSubComponentStoryWrapper from './IssueCardSubComponentStoryWrapper.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Issue/SubComponents/CommandResultsRow',
+		title: 'Blocks/IssueCard/CommandResultsRow',
 		component: CommandResultsRow,
 		tags: ['autodocs'],
 	});

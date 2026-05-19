@@ -58,7 +58,7 @@
 	const mockOnSetupWorktree = fn().mockResolvedValue(undefined);
 </script>
 
-<Story name="Default (GitHub Search)" play={playOpensAtStep1}>
+<Story name="Default (GitHub Search) [play: opens at step 1]" play={playOpensAtStep1}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper>
 			<CreationWizard
@@ -71,7 +71,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Search List Visible" play={playSearchListVisible}>
+<Story name="Search List Visible [play: search list visible]" play={playSearchListVisible}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper>
 			<CreationWizard
@@ -84,7 +84,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Enter Advances to Step 2" play={playEnterAdvancesToStep2}>
+<Story name="Enter Advances to Step 2 [play: enter advances step]" play={playEnterAdvancesToStep2}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper>
 			<CreationWizard
@@ -97,7 +97,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Backspace Goes Back" play={playBackspaceGoesBack}>
+<Story name="Backspace Goes Back [play: backspace goes back]" play={playBackspaceGoesBack}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper initialStep={WIZARD_STEPS.ISSUE_NAME}>
 			<CreationWizard
@@ -110,7 +110,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment (Step 1)" play={playEscapeContainment}>
+<Story name="Escape Containment (Step 1) [play: escape contained]" play={playEscapeContainment}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper>
 			<CreationWizard
@@ -123,7 +123,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment (Step 2)" play={playEscapeFromStep2}>
+<Story name="Escape Containment (Step 2) [play: escape contained]" play={playEscapeFromStep2}>
 	{#snippet template()}
 		<CreationWizardStoryWrapper initialStep={WIZARD_STEPS.ISSUE_NAME}>
 			<CreationWizard

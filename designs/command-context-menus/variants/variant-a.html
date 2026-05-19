@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command Context Menus — Variant A</title>
+<link rel="stylesheet" href="../../tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  .mockup-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .scene {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  .scene-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--foreground-subtle);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+  }
+
+  /* ── Issue Card (simplified, context only) ── */
+  .issue-card {
+    width: 340px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .issue-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px 8px;
+  }
+
+  .issue-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .issue-number {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--foreground-subtle);
+  }
+
+  .issue-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--foreground);
+    padding: 0 14px 6px;
+    line-height: 1.3;
+  }
+
+  .issue-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px;
+    margin-bottom: 6px;
+  }
+
+  .issue-label {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 6px;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 999px;
+    border: 1px solid;
+  }
+
+  .issue-badges-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+
+  .server-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: color-mix(in oklch, var(--status-success) 10%, transparent);
+    color: var(--status-success);
+    border: 1px solid color-mix(in oklch, var(--status-success) 25%, transparent);
+    cursor: pointer;
+  }
+
+  .server-badge .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--status-success);
+  }
+
+  .cmd-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 10px;
+  }
+
+  .cmd-badge-pass {
+    background: color-mix(in oklch, var(--status-success) 14%, transparent);
+    color: var(--status-success);
+    border: 1px solid color-mix(in oklch, var(--status-success) 25%, transparent);
+  }
+
+  .cmd-badge-fail {
+    background: color-mix(in oklch, var(--status-danger) 14%, transparent);
+    color: var(--status-danger);
+    border: 1px solid color-mix(in oklch, var(--status-danger) 25%, transparent);
+  }
+
+  .cmd-badge-running {
+    background: color-mix(in oklch, var(--status-info) 14%, transparent);
+    color: var(--status-info);
+    border: 1px solid color-mix(in oklch, var(--status-info) 25%, transparent);
+    position: relative;
+  }
+
+  .spinner-ring {
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: gk-spin 0.8s linear infinite;
+  }
+
+  /* ── Context Menu ── */
+  .ctx-menu {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    min-width: 220px;
+    position: relative;
+  }
+
+  .ctx-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--foreground);
+    cursor: default;
+    position: relative;
+  }
+
+  .ctx-item:hover,
+  .ctx-item.is-highlighted {
+    background: var(--surface-2);
+  }
+
+  .ctx-item.is-destructive {
+    color: var(--status-danger);
+  }
+
+  .ctx-item.is-destructive:hover {
+    background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+  }
+
+  .ctx-item .ctx-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--foreground-muted);
+  }
+
+  .ctx-item .ctx-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ctx-item.is-highlighted .ctx-icon,
+  .ctx-item:hover .ctx-icon {
+    color: var(--foreground);
+  }
+
+  .ctx-item.is-destructive .ctx-icon {
+    color: var(--status-danger);
+  }
+
+  .ctx-chevron {
+    margin-left: auto;
+    color: var(--foreground-subtle);
+    font-size: 11px;
+  }
+
+  .ctx-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 4px -6px;
+  }
+
+  /* ── Submenu ── */
+  .ctx-submenu {
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    min-width: 260px;
+  }
+
+  .ctx-group-label {
+    padding: 8px 8px 4px;
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    color: var(--foreground-subtle);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .cmd-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--foreground);
+    cursor: default;
+  }
+
+  .cmd-item:hover,
+  .cmd-item.is-highlighted {
+    background: var(--surface-2);
+  }
+
+  .cmd-state-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cmd-state-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cmd-state-icon .dot-running {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--status-success);
+    box-shadow: 0 0 6px color-mix(in oklch, var(--status-success) 50%, transparent);
+  }
+
+  .cmd-state-icon .spinner-sm {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid var(--status-info);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: gk-spin 0.8s linear infinite;
+  }
+
+  .cmd-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cmd-port {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--foreground-subtle);
+  }
+
+  .cmd-action {
+    font-size: 12px;
+    color: var(--foreground-muted);
+    white-space: nowrap;
+    margin-left: auto;
+  }
+
+  .cmd-action.is-destructive {
+    color: var(--status-danger);
+  }
+
+  .cmd-item-idle .cmd-state-icon {
+    color: var(--foreground-subtle);
+  }
+
+  .cmd-item-idle .cmd-state-icon svg {
+    opacity: 0.5;
+  }
+
+  /* ── Badge Context Menu (scene 2) ── */
+  .badge-ctx-wrapper {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .badge-ctx-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    min-width: 180px;
+    z-index: 10;
+  }
+
+  .badge-ctx-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--foreground);
+    cursor: default;
+  }
+
+  .badge-ctx-item:hover,
+  .badge-ctx-item.is-highlighted {
+    background: var(--surface-2);
+  }
+
+  .badge-ctx-item.is-destructive {
+    color: var(--status-danger);
+  }
+
+  .badge-ctx-item.is-destructive:hover {
+    background: color-mix(in oklch, var(--status-danger) 10%, transparent);
+  }
+
+  .badge-ctx-item .bc-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .badge-ctx-item .bc-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ── Connector lines (card → menu) ── */
+  .card-menu-pair {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  /* Annotation callout */
+  .annotation {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--foreground-subtle);
+    line-height: 1.45;
+    max-width: 200px;
+    border-left: 2px solid var(--border);
+    padding-left: 10px;
+    margin-top: 8px;
+  }
+
+  .annotation strong {
+    color: var(--foreground-muted);
+    font-weight: 600;
+  }
+
+  /* Scene 2 layout */
+  .scene-2-grid {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+  }
+
+  .scene-2-card-area {
+    position: relative;
+  }
+
+  .badge-highlight {
+    outline: 2px dashed var(--moss-400);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+  <div class="gk-eyebrow" style="margin-bottom: 28px; font-size: 11px;">VARIANT A: STRUCTURED COMMAND SUBMENU</div>
+
+  <div class="mockup-layout">
+
+    <!-- ═══════════════════════════════════════════════════
+         SCENE 1: Issue Card Context Menu with Commands Submenu
+         ═══════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 1 — Issue Card Context Menu → Commands Submenu</div>
+      <div class="card-menu-pair">
+
+        <!-- Issue Card (reduced opacity context) -->
+        <div class="issue-card" style="opacity: 0.55;">
+          <div class="issue-card-header">
+            <div class="issue-color-dot" style="background: var(--azure-400);"></div>
+            <span class="issue-number">#341</span>
+            <span style="font-size: 11px; color: var(--foreground-subtle); margin-left: auto;">P2</span>
+          </div>
+          <div class="issue-title">Command context menus &amp; badge interactions</div>
+          <div class="issue-meta-row">
+            <span class="issue-label" style="background: color-mix(in oklch, var(--azure-400) 12%, transparent); color: var(--azure-400); border-color: color-mix(in oklch, var(--azure-400) 30%, transparent);">frontend</span>
+            <span class="issue-label" style="background: color-mix(in oklch, var(--moss-400) 12%, transparent); color: var(--moss-400); border-color: color-mix(in oklch, var(--moss-400) 30%, transparent);">UX</span>
+          </div>
+          <div class="issue-badges-row">
+            <div class="server-badge">
+              <span class="dot"></span>
+              1420
+            </div>
+            <div class="cmd-badge cmd-badge-pass">
+              <!-- checkmark -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="cmd-badge cmd-badge-fail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </div>
+            <div class="cmd-badge cmd-badge-running">
+              <div class="spinner-ring"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Context Menu -->
+        <div style="position: relative;">
+          <div class="ctx-menu">
+            <!-- Select -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+              </span>
+              Select
+            </div>
+
+            <div class="ctx-sep"></div>
+
+            <!-- Actions -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </span>
+              Actions
+              <span class="ctx-chevron">&#x203A;</span>
+            </div>
+
+            <!-- Commands (highlighted — submenu open) -->
+            <div class="ctx-item is-highlighted">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+              </span>
+              Commands
+              <span class="ctx-chevron">&#x203A;</span>
+
+              <!-- ── Commands Submenu ── -->
+              <div class="ctx-submenu" style="top: -38px;">
+                <!-- SERVERS group -->
+                <div class="ctx-group-label">Servers</div>
+
+                <!-- Running server: vite dev -->
+                <div class="cmd-item is-highlighted">
+                  <span class="cmd-state-icon">
+                    <span class="dot-running"></span>
+                  </span>
+                  <span class="cmd-name">vite dev</span>
+                  <span class="cmd-port">:1420</span>
+                  <span class="cmd-action is-destructive">Stop</span>
+                </div>
+
+                <!-- Idle server: storybook -->
+                <div class="cmd-item cmd-item-idle">
+                  <span class="cmd-state-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;"><circle cx="12" cy="12" r="1"/></svg>
+                  </span>
+                  <span class="cmd-name">storybook</span>
+                  <span class="cmd-action" style="color: var(--foreground-subtle);">Run</span>
+                </div>
+
+                <!-- Stopped server: preview -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--foreground-subtle);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+                  </span>
+                  <span class="cmd-name" style="color: var(--foreground-muted);">preview</span>
+                  <span class="cmd-action" style="color: var(--foreground-subtle);">Run</span>
+                </div>
+
+                <div class="ctx-sep"></div>
+
+                <!-- CHECKS group -->
+                <div class="ctx-group-label">Checks</div>
+
+                <!-- Running check: typecheck -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon">
+                    <span class="spinner-sm"></span>
+                  </span>
+                  <span class="cmd-name">typecheck</span>
+                  <span class="cmd-action is-destructive">Stop</span>
+                </div>
+
+                <!-- Passed check: lint -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--status-success);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  </span>
+                  <span class="cmd-name">lint</span>
+                  <span class="cmd-action">Re-run</span>
+                </div>
+
+                <!-- Failed check: test -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--status-danger);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                  </span>
+                  <span class="cmd-name">test</span>
+                  <span class="cmd-action">Re-run</span>
+                </div>
+
+                <!-- Timeout check: e2e -->
+                <div class="cmd-item">
+                  <span class="cmd-state-icon" style="color: var(--status-warning);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </span>
+                  <span class="cmd-name">e2e</span>
+                  <span class="cmd-action">Re-run</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ctx-sep"></div>
+
+            <!-- Edit -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+              </span>
+              Edit
+            </div>
+
+            <!-- Priority -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16h2"/><path d="M11 12h2"/><path d="M15 8h2"/></svg>
+              </span>
+              Priority
+              <span class="ctx-chevron">&#x203A;</span>
+            </div>
+
+            <!-- Change Color -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10c0 .9-.1 1.8-.3 2.5-.6 2.2-2.7 3.5-5.5 3.5h-1.7c-1 0-1.7.7-1.7 1.5s.7 1.5 1.7 1.5c.2 0 .4 0 .5-.1"/></svg>
+              </span>
+              Change Color
+            </div>
+
+            <div class="ctx-sep"></div>
+
+            <!-- Setup Worktree -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+              </span>
+              Setup Worktree
+            </div>
+
+            <!-- Archive -->
+            <div class="ctx-item" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+              </span>
+              Archive
+            </div>
+
+            <!-- Delete -->
+            <div class="ctx-item is-destructive" style="opacity: 0.5;">
+              <span class="ctx-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+              </span>
+              Delete
+            </div>
+          </div>
+        </div>
+
+        <!-- Annotations -->
+        <div style="display: flex; flex-direction: column; gap: 24px; padding-top: 4px;">
+          <div class="annotation">
+            <strong>Commands &#x203A;</strong> appears after Actions, before Edit. Hidden when workspace has 0 commands.
+          </div>
+          <div class="annotation">
+            <strong>TerminalSquare</strong> icon for the submenu trigger. Groups: SERVERS on top, CHECKS below separator.
+          </div>
+          <div class="annotation">
+            Each entry shows <strong>state icon</strong> (left), <strong>name</strong> (center), <strong>action label</strong> (right). Click row = primary action.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         SCENE 2: ServerPortBadge Context Menu
+         ═══════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 2 — ServerPortBadge Right-Click Context Menu</div>
+      <div class="scene-2-grid">
+
+        <!-- Card with highlighted badge -->
+        <div class="scene-2-card-area">
+          <div class="issue-card">
+            <div class="issue-card-header">
+              <div class="issue-color-dot" style="background: var(--moss-400);"></div>
+              <span class="issue-number">#296</span>
+              <span style="font-size: 11px; color: var(--foreground-subtle); margin-left: auto;">P1</span>
+            </div>
+            <div class="issue-title">Restructure issue card components</div>
+            <div class="issue-meta-row">
+              <span class="issue-label" style="background: color-mix(in oklch, var(--moss-400) 12%, transparent); color: var(--moss-400); border-color: color-mix(in oklch, var(--moss-400) 30%, transparent);">refactor</span>
+            </div>
+            <div class="issue-badges-row">
+              <div class="badge-ctx-wrapper">
+                <div class="server-badge badge-highlight">
+                  <span class="dot"></span>
+                  5173
+                </div>
+                <!-- Badge Context Menu -->
+                <div class="badge-ctx-menu">
+                  <div class="badge-ctx-item is-highlighted">
+                    <span class="bc-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+                    </span>
+                    View Logs
+                  </div>
+                  <div class="badge-ctx-item is-destructive">
+                    <span class="bc-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </span>
+                    Kill
+                  </div>
+                  <div class="ctx-sep" style="margin: 4px -6px;"></div>
+                  <div class="badge-ctx-item">
+                    <span class="bc-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    </span>
+                    Open in Browser
+                  </div>
+                </div>
+              </div>
+              <div class="cmd-badge cmd-badge-pass">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Annotations -->
+        <div style="display: flex; flex-direction: column; gap: 24px; padding-top: 32px;">
+          <div class="annotation">
+            Right-click on the <strong>green port badge</strong> opens a 3-item menu. Left-click still opens browser.
+          </div>
+          <div class="annotation">
+            <strong>Kill</strong> uses destructive variant (red text). Separator before "Open in Browser" — navigation is a different intent.
+          </div>
+          <div class="annotation">
+            Menu must <strong>stopPropagation</strong> so it doesn't trigger the parent card context menu.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         SCENE 3: All Command Entry States Reference
+         ═══════════════════════════════════════════════════ -->
+    <div>
+      <div class="scene-label">Scene 3 — Command Entry State Reference</div>
+      <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+
+        <div class="ctx-menu" style="min-width: 280px;">
+          <div class="ctx-group-label">All States</div>
+
+          <!-- Idle -->
+          <div class="cmd-item cmd-item-idle">
+            <span class="cmd-state-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;"><circle cx="12" cy="12" r="1"/></svg>
+            </span>
+            <span class="cmd-name" style="color: var(--foreground-muted);">storybook</span>
+            <span class="cmd-action" style="color: var(--foreground-subtle);">Run</span>
+          </div>
+
+          <div class="ctx-sep"></div>
+
+          <!-- Running (server) -->
+          <div class="cmd-item">
+            <span class="cmd-state-icon">
+              <span class="dot-running"></span>
+            </span>
+            <span class="cmd-name">vite dev</span>
+            <span class="cmd-port">:1420</span>
+            <span class="cmd-action is-destructive">Stop</span>
+          </div>
+
+          <!-- Running (check) -->
+          <div class="cmd-item">
+            <span class="cmd-state-icon">
+              <span class="spinner-sm"></span>
+            </span>
+            <span class="cmd-name">typecheck</span>
+            <span class="cmd-action is-destructive">Stop</span>
+          </div>
+
+          <div class="ctx-sep"></div>
+
+          <!-- Passed -->
+          <div class="cmd-item">
+            <span class="cmd-state-icon" style="color: var(--status-success);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <span class="cmd-name">lint</span>
+            <span class="cmd-action">Re-run</span>
+          </div>
+
+          <!-- Failed -->
+          <div class="cmd-item">
+            <span class="cmd-state-icon" style="color: var(--status-danger);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+            </span>
+            <span class="cmd-name">test</span>
+            <span class="cmd-action">Re-run</span>
+          </div>
+
+          <!-- Timeout -->
+          <div class="cmd-item">
+            <span class="cmd-state-icon" style="color: var(--status-warning);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <span class="cmd-name">e2e</span>
+            <span class="cmd-action">Re-run</span>
+          </div>
+
+          <!-- Stopped -->
+          <div class="cmd-item">
+            <span class="cmd-state-icon" style="color: var(--foreground-subtle);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="1"/></svg>
+            </span>
+            <span class="cmd-name" style="color: var(--foreground-muted);">preview</span>
+            <span class="cmd-action" style="color: var(--foreground-subtle);">Run</span>
+          </div>
+        </div>
+
+        <!-- State legend -->
+        <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 32px;">
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Idle</strong> — subtle dot, "Run" action. Click row to run.
+          </div>
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Running (server)</strong> — green glow dot + port. "Stop" in red. Click → View Logs.
+          </div>
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Running (check)</strong> — spinner. "Stop" in red. Click → View Logs.
+          </div>
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Passed</strong> — green CircleCheck. "Re-run" action. Click → View Logs.
+          </div>
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Failed</strong> — red CircleX. "Re-run" action. Click → View Logs.
+          </div>
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Timeout</strong> — orange Clock. "Re-run" action. Click → View Logs.
+          </div>
+          <div class="annotation" style="max-width: 260px;">
+            <strong>Stopped</strong> — gray Square. "Run" action. Click row to run.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

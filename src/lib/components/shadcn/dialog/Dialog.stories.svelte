@@ -13,6 +13,8 @@
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Dialog',
@@ -129,7 +131,7 @@
 	};
 </script>
 
-<Story name="Create Issue" play={playOpensOnTriggerClick}>
+<Story name="Create Issue [play: opens on trigger]" play={playOpensOnTriggerClick}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -220,8 +222,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Destructive Confirm" play={playClosesOnEscape}>
+<Story name="Destructive Confirm [play: closes on escape]" play={playClosesOnEscape}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close dialog" />
+		</StoryKeyboardHints>
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
 				<Dialog.Trigger>
@@ -306,7 +311,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Close Button Dismisses" play={playClosesOnCloseButton}>
+<Story name="Close Button Dismisses [play: closes on button]" play={playClosesOnCloseButton}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
@@ -356,8 +361,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close dialog" />
+		</StoryKeyboardHints>
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
 				<Dialog.Trigger>
@@ -405,8 +413,12 @@
 	{/snippet}
 </Story>
 
-<Story name="Focus Trap" play={playFocusTrap}>
+<Story name="Focus Trap [play: focus trap]" play={playFocusTrap}>
 	{#snippet template()}
+		<StoryKeyboardHints>
+			<KeyboardHint keys="Escape" action="Close dialog" />
+			<KeyboardHint keys="Tab" action="Cycle focus within dialog" />
+		</StoryKeyboardHints>
 		<div class="flex items-center justify-center p-8">
 			<Dialog.Root>
 				<Dialog.Trigger>

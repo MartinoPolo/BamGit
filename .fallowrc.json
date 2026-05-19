@@ -33,7 +33,11 @@
 		"low-poly-2d-trees",
 		"lucide-svelte",
 		"@inlang/paraglide-js",
-		"@internationalized/date"
+		"@internationalized/date",
+		"@wdio/local-runner",
+		"@wdio/mocha-framework",
+		"@wdio/spec-reporter",
+		"@wdio/tauri-service"
 	],
 	"health": {
 		"maxCrap": 60

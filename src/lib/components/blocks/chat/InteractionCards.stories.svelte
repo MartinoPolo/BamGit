@@ -138,7 +138,7 @@
 </Story>
 
 <Story
-	name="Test: Allow Fires Callback"
+	name="Allow Fires Callback [play: allow fires callback]"
 	args={{ onAllow: fn(), onAllowAlways: fn(), onDeny: fn() }}
 	play={playAllowFires}
 >
@@ -159,7 +159,7 @@
 </Story>
 
 <Story
-	name="Test: Deny Fires Callback"
+	name="Deny Fires Callback [play: deny fires callback]"
 	args={{ onAllow: fn(), onAllowAlways: fn(), onDeny: fn() }}
 	play={playDenyFires}
 >
@@ -180,7 +180,7 @@
 </Story>
 
 <Story
-	name="Test: Allow Always Fires Callback"
+	name="Allow Always Fires Callback [play: allow always fires callback]"
 	args={{ onAllow: fn(), onAllowAlways: fn(), onDeny: fn() }}
 	play={playAllowAlwaysFires}
 >

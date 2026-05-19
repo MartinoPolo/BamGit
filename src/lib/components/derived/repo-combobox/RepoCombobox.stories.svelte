@@ -14,11 +14,11 @@
 
 	/* ── Helpers ───────────────────────────────────────────────────────── */
 
-	/** Wait for the portaled listbox to appear and return it. */
-	async function waitForListbox(): Promise<HTMLElement> {
+	/** Wait for the listbox to appear inside the canvas and return it. */
+	async function waitForListbox(canvasElement: HTMLElement): Promise<HTMLElement> {
 		let listbox: HTMLElement | null = null;
 		await waitFor(() => {
-			listbox = document.querySelector('[role="listbox"]');
+			listbox = within(canvasElement).queryByRole('listbox');
 			if (!listbox) {
 				throw new Error('listbox not found');
 			}
@@ -26,15 +26,15 @@
 		return listbox!;
 	}
 
-	/** Wait for options inside the portaled listbox. */
-	async function waitForOptions(): Promise<HTMLElement[]> {
+	/** Wait for options inside the listbox scoped to canvasElement. */
+	async function waitForOptions(canvasElement: HTMLElement): Promise<HTMLElement[]> {
 		let options: HTMLElement[] = [];
 		await waitFor(() => {
-			const listbox = document.querySelector('[role="listbox"]');
+			const listbox = within(canvasElement).queryByRole('listbox');
 			if (!listbox) {
 				throw new Error('listbox not found');
 			}
-			options = within(listbox as HTMLElement).getAllByRole('option');
+			options = within(listbox).getAllByRole('option');
 			if (options.length === 0) {
 				throw new Error('no options');
 			}
@@ -60,14 +60,14 @@
 			await userEvent.click(input);
 			await userEvent.keyboard('{ArrowDown}');
 		}
-		return await waitForListbox();
+		return await waitForListbox(canvasElement);
 	}
 
 	/** Click trigger → dropdown opens, repos list visible. */
 	const playOpenDropdown = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		await openCombobox(canvasElement);
 
-		const options = await waitForOptions();
+		const options = await waitForOptions(canvasElement);
 		// Mock list_user_repos returns 5 repos
 		await expect(options.length).toBe(5);
 		await expect(options[0]).toHaveTextContent('MartinoPolo/grovekeeper');
@@ -80,14 +80,14 @@
 
 		// Open dropdown
 		await openCombobox(canvasElement);
-		await waitForOptions();
+		await waitForOptions(canvasElement);
 
 		// Type "private" — should filter to only the private app
 		await userEvent.type(input, 'private');
 
 		await waitFor(async () => {
-			const listbox = document.querySelector('[role="listbox"]')!;
-			const options = within(listbox as HTMLElement).getAllByRole('option');
+			const listbox = within(canvasElement).getByRole('listbox');
+			const options = within(listbox).getAllByRole('option');
 			await expect(options.length).toBe(1);
 			await expect(options[0]).toHaveTextContent('MartinoPolo/my-private-app');
 		});
@@ -97,14 +97,14 @@
 	const playArrowDownHighlights = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		// Opening via ArrowDown already highlights the first item
 		await openCombobox(canvasElement);
-		await waitForOptions();
+		await waitForOptions(canvasElement);
 
 		// ArrowDown → first option gets data-highlighted
 		await userEvent.keyboard('{ArrowDown}');
 
 		await waitFor(() => {
-			const listbox = document.querySelector('[role="listbox"]')!;
-			const highlighted = (listbox as HTMLElement).querySelector('[data-highlighted]');
+			const listbox = within(canvasElement).getByRole('listbox');
+			const highlighted = listbox.querySelector('[data-highlighted]');
 			if (!highlighted) {
 				throw new Error('no highlighted option');
 			}
@@ -118,7 +118,7 @@
 
 		// Open dropdown
 		await openCombobox(canvasElement);
-		await waitForOptions();
+		await waitForOptions(canvasElement);
 
 		// ArrowDown to highlight the first item, then Enter to select
 		await userEvent.keyboard('{ArrowDown}');
@@ -127,7 +127,7 @@
 
 		// Dropdown should close
 		await waitFor(() => {
-			const lb = document.querySelector('[role="listbox"]');
+			const lb = within(canvasElement).queryByRole('listbox');
 			if (lb) {
 				throw new Error('listbox still open');
 			}
@@ -150,13 +150,13 @@
 
 		// Open dropdown
 		await openCombobox(canvasElement);
-		await waitForOptions();
+		await waitForOptions(canvasElement);
 
 		// Escape → closes without selecting
 		await userEvent.keyboard('{Escape}');
 
 		await waitFor(() => {
-			const listbox = document.querySelector('[role="listbox"]');
+			const listbox = within(canvasElement).queryByRole('listbox');
 			if (listbox) {
 				throw new Error('listbox still open');
 			}
@@ -177,13 +177,13 @@
 
 		// Open dropdown
 		await openCombobox(canvasElement);
-		await waitForOptions();
+		await waitForOptions(canvasElement);
 
 		// Press Escape — should only close the listbox
 		await userEvent.keyboard('{Escape}');
 
 		await waitFor(() => {
-			const listbox = document.querySelector('[role="listbox"]');
+			const listbox = within(canvasElement).queryByRole('listbox');
 			if (listbox) {
 				throw new Error('listbox still open');
 			}
@@ -195,6 +195,9 @@
 </script>
 
 <script lang="ts">
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
+
 	let defaultValue = $state('');
 	let preselectedValue = $state('MartinoPolo/grovekeeper');
 	let recentValue = $state('');
@@ -214,7 +217,7 @@
 <Story name="Default">
 	{#snippet template()}
 		<div class="w-80">
-			<RepoCombobox bind:value={defaultValue} />
+			<RepoCombobox bind:value={defaultValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>
@@ -223,7 +226,11 @@
 <Story name="With Repos List">
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={loadingValue} placeholder="owner/repo" />
+			<RepoCombobox
+				bind:value={loadingValue}
+				placeholder="owner/repo"
+				portalProps={{ disabled: true }}
+			/>
 			<p class="mt-2 text-xs text-foreground-subtle">Open the dropdown to see repos.</p>
 		</div>
 	{/snippet}
@@ -233,7 +240,7 @@
 <Story name="Preselected Value">
 	{#snippet template()}
 		<div class="w-80">
-			<RepoCombobox bind:value={preselectedValue} />
+			<RepoCombobox bind:value={preselectedValue} portalProps={{ disabled: true }} />
 			<p class="mt-2 font-mono text-xs text-foreground-subtle">value: {preselectedValue}</p>
 		</div>
 	{/snippet}
@@ -247,7 +254,7 @@
 <Story name="Loading State">
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={loadingValue} />
+			<RepoCombobox bind:value={loadingValue} portalProps={{ disabled: true }} />
 			<p class="mt-2 text-xs text-foreground-subtle">
 				Open dropdown — "Loading…" flashes while repos fetch.
 			</p>
@@ -268,6 +275,7 @@
 				bind:value={remoteSearchValue}
 				recentRepoNames={RECENT_REPOS}
 				placeholder="Type 'sveltejs' to trigger remote search…"
+				portalProps={{ disabled: true }}
 			/>
 			<p class="mt-2 text-xs text-foreground-subtle">
 				Type ≥2 chars with no local match → search_github_repos is called after 400 ms
@@ -281,7 +289,11 @@
 <Story name="With Recent Repos">
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={recentValue} recentRepoNames={RECENT_REPOS} />
+			<RepoCombobox
+				bind:value={recentValue}
+				recentRepoNames={RECENT_REPOS}
+				portalProps={{ disabled: true }}
+			/>
 			<p class="mt-2 text-xs text-foreground-subtle">
 				Open dropdown — two repos appear at the top with a "Recent" badge.
 			</p>
@@ -291,50 +303,73 @@
 
 <!-- ── Interaction tests ─────────────────────────────────────────────── -->
 
-<Story name="Open Dropdown" play={playOpenDropdown}>
+<Story name="Open Dropdown [play: opens dropdown]" play={playOpenDropdown}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={openDropdownValue} />
+			<RepoCombobox bind:value={openDropdownValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Search Filter" play={playSearchFilter}>
+<Story name="Search Filter [play: search filter]" play={playSearchFilter}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={searchFilterValue} />
+			<RepoCombobox bind:value={searchFilterValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Arrow Down Highlights" play={playArrowDownHighlights}>
+<Story name="Arrow Down Highlights [play: arrow down highlights]" play={playArrowDownHighlights}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={arrowDownValue} />
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate options" />
+				<KeyboardHint keys="Enter" action="Select option" />
+				<KeyboardHint keys="Escape" action="Close dropdown" />
+			</StoryKeyboardHints>
+			<RepoCombobox bind:value={arrowDownValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Enter Selects" play={playEnterSelects}>
+<Story name="Enter Selects [play: enter selects]" play={playEnterSelects}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={enterSelectsValue} />
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate options" />
+				<KeyboardHint keys="Enter" action="Select option" />
+				<KeyboardHint keys="Escape" action="Close dropdown" />
+			</StoryKeyboardHints>
+			<RepoCombobox bind:value={enterSelectsValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Escape Closes" play={playEscapeCloses}>
+<Story name="Escape Closes [play: escape closes]" play={playEscapeCloses}>
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={escapeClosesValue} />
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate options" />
+				<KeyboardHint keys="Enter" action="Select option" />
+				<KeyboardHint keys="Escape" action="Close dropdown" />
+			</StoryKeyboardHints>
+			<RepoCombobox bind:value={escapeClosesValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>
 
-<Story name="Escape Does Not Propagate" play={playEscapeDoesNotPropagate}>
+<Story
+	name="Escape Does Not Propagate [play: escape does not propagate]"
+	play={playEscapeDoesNotPropagate}
+>
 	{#snippet template()}
 		<div class="w-80 pb-64">
-			<RepoCombobox bind:value={escapePropagationValue} />
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate options" />
+				<KeyboardHint keys="Enter" action="Select option" />
+				<KeyboardHint keys="Escape" action="Close dropdown" />
+			</StoryKeyboardHints>
+			<RepoCombobox bind:value={escapePropagationValue} portalProps={{ disabled: true }} />
 		</div>
 	{/snippet}
 </Story>

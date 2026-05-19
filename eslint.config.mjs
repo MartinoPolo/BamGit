@@ -24,6 +24,8 @@ export default [
 			'src/lib/types/generated',
 			'**/*.config.*',
 			'*.d.ts',
+			'tests/**',
+			'wdio.conf.ts',
 		],
 	},
 	...tseslint.configs.recommended,

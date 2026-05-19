@@ -16,6 +16,7 @@
 		placeholder?: string;
 		recentRepoNames?: readonly string[];
 		onchange?: () => void;
+		portalProps?: Combobox.PortalProps;
 	}
 
 	let {
@@ -24,6 +25,7 @@
 		placeholder = 'owner/repo',
 		recentRepoNames = [],
 		onchange,
+		portalProps,
 	}: Props = $props();
 
 	let userRepos = $state<GitHubRepo[]>([]);
@@ -152,7 +154,7 @@
 		</Combobox.Trigger>
 	</div>
 
-	<Combobox.Portal>
+	<Combobox.Portal {...portalProps}>
 		<Combobox.Content
 			class="z-(--z-tooltip) mt-1 max-h-60 w-(--bits-combobox-anchor-width) overflow-y-auto rounded-md border border-border bg-surface-3 shadow-md"
 			sideOffset={4}

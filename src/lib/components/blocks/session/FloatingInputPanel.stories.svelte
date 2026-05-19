@@ -143,7 +143,7 @@
 
 <!-- Interaction tests -->
 
-<Story name="Type Enables Send" play={playTypeEnablesSend}>
+<Story name="Type Enables Send [play: typing enables send]" play={playTypeEnablesSend}>
 	{#snippet template(args: Record<string, unknown>)}
 		<div class="relative h-75 w-full bg-background">
 			<FloatingInputPanel
@@ -155,7 +155,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Click Send Fires Callback" play={playClickSendFiresCallback}>
+<Story
+	name="Click Send Fires Callback [play: send callback fires]"
+	play={playClickSendFiresCallback}
+>
 	{#snippet template(args: Record<string, unknown>)}
 		<div class="relative h-75 w-full bg-background">
 			<FloatingInputPanel
@@ -167,7 +170,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Click Stop Fires Callback" play={playClickStopFiresCallback}>
+<Story
+	name="Click Stop Fires Callback [play: stop callback fires]"
+	play={playClickStopFiresCallback}
+>
 	{#snippet template(args: Record<string, unknown>)}
 		<div class="relative h-75 w-full bg-background">
 			<FloatingInputPanel
@@ -179,7 +185,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled State" play={playDisabledState}>
+<Story name="Disabled State [play: disabled state]" play={playDisabledState}>
 	{#snippet template(args: Record<string, unknown>)}
 		<div class="relative h-75 w-full bg-background">
 			<FloatingInputPanel

@@ -4,7 +4,7 @@
 	import GitHubAuthWizard from './GitHubAuthWizard.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/GitHub/GitHubAuthWizard',
+		title: 'Blocks/GitHubAuth/GitHubAuthWizard',
 		component: GitHubAuthWizard,
 		tags: ['autodocs'],
 	});

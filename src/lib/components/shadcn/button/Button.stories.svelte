@@ -152,7 +152,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Primary" args={{ intent: 'primary' }} play={playClickCallsHandler}>
+<Story
+	name="Primary [play: click calls handler]"
+	args={{ intent: 'primary' }}
+	play={playClickCallsHandler}
+>
 	{#snippet template(args: ButtonProps)}
 		<Button {...args}>Primary</Button>
 	{/snippet}
@@ -237,7 +241,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledIgnoresClick}>
+<Story name="Disabled [play: disabled ignores click]" play={playDisabledIgnoresClick}>
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap items-center gap-4">
 			<Button intent="primary" disabled {...args}>Primary</Button>

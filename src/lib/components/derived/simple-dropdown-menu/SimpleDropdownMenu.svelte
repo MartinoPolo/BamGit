@@ -1,6 +1,8 @@
 <script lang="ts">
-	import type { Component, Snippet } from 'svelte';
+	import type { Component, ComponentProps, Snippet } from 'svelte';
 	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
+	import type { WithoutChildrenOrChild } from '$lib/utils.js';
+	import type DropdownMenuPortal from '$lib/components/shadcn/dropdown-menu/dropdown-menu-portal.svelte';
 
 	// ─── Types ───────────────────────────────────────────────────────────────
 
@@ -18,18 +20,26 @@
 		side?: 'top' | 'bottom' | 'left' | 'right';
 		align?: 'start' | 'center' | 'end';
 		class?: string;
+		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof DropdownMenuPortal>>;
 	}
 
 	// ─── Props ───────────────────────────────────────────────────────────────
 
-	let { items, trigger, side = 'bottom', align = 'end', class: className }: Props = $props();
+	let {
+		items,
+		trigger,
+		side = 'bottom',
+		align = 'end',
+		class: className,
+		portalProps,
+	}: Props = $props();
 </script>
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger>
 		{@render trigger()}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content {side} {align} class={className}>
+	<DropdownMenu.Content {side} {align} class={className} {portalProps}>
 		<DropdownMenu.Group>
 			{#each items as item (item.label)}
 				<DropdownMenu.Item

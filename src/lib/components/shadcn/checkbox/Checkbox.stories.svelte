@@ -3,6 +3,8 @@
 	import { expect, userEvent, within } from 'storybook/test';
 	import { Checkbox } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Checkbox',
@@ -64,13 +66,13 @@
 	import type { CheckboxProps } from './checkbox-variants.js';
 </script>
 
-<Story name="Unchecked" play={playClickToCheck}>
+<Story name="Unchecked [play: click to check]" play={playClickToCheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox {...args} />
 	{/snippet}
 </Story>
 
-<Story name="Checked" play={playClickToUncheck}>
+<Story name="Checked [play: click to uncheck]" play={playClickToUncheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox checked {...args} />
 	{/snippet}
@@ -82,7 +84,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledNoChange}>
+<Story name="Disabled [play: disabled no change]" play={playDisabledNoChange}>
 	{#snippet template(args: CheckboxProps)}
 		<div class="flex items-center gap-4">
 			<Checkbox disabled {...args} />
@@ -91,9 +93,14 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Toggle" play={playKeyboardToggle}>
+<Story name="Keyboard Toggle [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template(args: CheckboxProps)}
-		<Checkbox {...args} />
+		<div class="w-80">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Space" action="Toggle checked state" />
+			</StoryKeyboardHints>
+			<Checkbox {...args} />
+		</div>
 	{/snippet}
 </Story>
 

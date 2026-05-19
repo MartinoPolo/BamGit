@@ -11,6 +11,8 @@
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import ClipboardIcon from '@lucide/svelte/icons/clipboard';
 	import DeleteIcon from '@lucide/svelte/icons/delete';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/DropdownMenu',
@@ -102,7 +104,7 @@
 	};
 </script>
 
-<Story name="Basic" play={playOpensOnClick}>
+<Story name="Basic [play: opens on click]" play={playOpensOnClick}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -120,7 +122,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Separators" play={playArrowDownFocusesItems}>
+<Story name="With Separators [play: arrow down focuses]" play={playArrowDownFocusesItems}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -149,7 +151,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons" play={playEnterSelectsItem}>
+<Story name="With Icons [play: enter selects item]" play={playEnterSelectsItem}>
 	{#snippet template()}
 		<div class="flex items-start justify-center h-48 pt-4">
 			<DropdownMenu.Root>
@@ -176,9 +178,14 @@
 	{/snippet}
 </Story>
 
-<Story name="With Keyboard Shortcuts" play={playEscapeClosesMenu}>
+<Story name="With Keyboard Shortcuts [play: escape closes menu]" play={playEscapeClosesMenu}>
 	{#snippet template()}
-		<div class="flex items-start justify-center h-48 pt-4">
+		<div class="flex flex-col items-center h-64 pt-4 gap-4">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate menu items" />
+				<KeyboardHint keys="Enter" action="Select item" />
+				<KeyboardHint keys="Esc" action="Close menu" />
+			</StoryKeyboardHints>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
 					{#snippet child({ props })}
