@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'svelte/elements';
 import { tv } from 'tailwind-variants';
 
 export const badgeVariants = tv({
-	base: 'inline-flex items-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
+	base: 'inline-flex items-center justify-center gap-1 font-medium border tracking-[0.01em] whitespace-nowrap',
 	variants: {
 		tone: {
 			neutral: 'bg-surface-2 text-foreground-muted border-border',
