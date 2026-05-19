@@ -95,6 +95,36 @@ In inline/CSS transitions: `var(--duration-3)`, `var(--duration-4)`, `var(--dura
 Multi-component animations: register `@keyframes` in app.css + `--animate-*` in `@theme inline`. Components use `animate-*` Tailwind class.
 Single-component animations: define `@keyframes -global-name` in component `<style>`. Reference via `animate-[name_...]`.
 
+## Color Contrast
+
+Mid-tone accent colors (OKLCH L=0.5–0.69) make `accent-foreground` unreliable. **Never use `text-accent-foreground`.**
+
+### Safe Pairings
+
+| Background                   | Text                                 | Notes                                              |
+| ---------------------------- | ------------------------------------ | -------------------------------------------------- |
+| `bg-primary`                 | `text-primary-foreground`            | Always safe                                        |
+| `bg-accent/15`, `/25`, `/50` | inherited `text-foreground`          | Always safe — only these 3 opacities               |
+| `bg-destructive`             | `text-destructive-foreground`        | Always safe                                        |
+| `bg-muted` / `bg-surface-*`  | inherited or `text-muted-foreground` | Always safe                                        |
+| `bg-accent` (full)           | any text                             | **UNSAFE** — never use full accent as bg with text |
+
+### Hover Rules
+
+- On `bg-primary`: `hover:bg-primary/80`
+- On neutral bg: `hover:bg-accent/15` (subtle) or `hover:bg-accent/25` (standard)
+- On `bg-accent/25`: `hover:bg-accent/50`
+- Never: `hover:text-foreground` on dark backgrounds, `hover:text-accent-foreground` anywhere
+
+### After `shadcn add`
+
+Fix these patterns in new components:
+
+1. `focus:bg-accent focus:text-accent-foreground` → `focus:bg-accent/25` (remove text class)
+2. `data-open:bg-accent data-open:text-accent-foreground` → `data-open:bg-accent/25` (remove text class)
+3. `hover:bg-accent` (full) → `hover:bg-accent/25`
+4. Any `text-accent-foreground` → remove (let text inherit `foreground`)
+
 ## Storybook Conventions
 
 - Story files: `ComponentName.stories.svelte` using `defineMeta` + `{#snippet template(args)}`.
