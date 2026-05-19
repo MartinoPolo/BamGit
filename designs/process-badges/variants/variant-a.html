@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Process Badges — Variant A: Consistent Badge System</title>
+	<link rel="stylesheet" href="../../tokens.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		body {
+			margin: 0;
+			padding: var(--space-12) var(--space-16);
+			min-height: 100vh;
+		}
+
+		/* ── Page Layout ───────────────────────────────────── */
+		.page-grid {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-16);
+			max-width: 960px;
+		}
+
+		.section-title {
+			margin-bottom: var(--space-6);
+		}
+
+		.section-desc {
+			margin-bottom: var(--space-8);
+			max-width: 600px;
+		}
+
+		/* ── Badge Style Toggle ────────────────────────────── */
+		.style-toggle {
+			display: flex;
+			align-items: center;
+			gap: var(--space-4);
+			margin-bottom: var(--space-8);
+		}
+		.style-toggle-label {
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--foreground-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+		}
+		.style-toggle-btns {
+			display: flex;
+			gap: var(--space-1);
+		}
+		.style-toggle-btns button {
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			padding: var(--space-1) var(--space-3);
+			border: var(--border-width-1) solid var(--border);
+			border-radius: var(--radius-sm);
+			background: transparent;
+			color: var(--foreground-muted);
+			cursor: pointer;
+		}
+		.style-toggle-btns button.is-active {
+			background: var(--surface-3);
+			color: var(--foreground);
+			border-color: var(--border-strong);
+		}
+
+		/* ── Badge Style Variants ─────────────────────────── */
+		/* Style A (solid): solid background, contrast text */
+		.badge-style-solid .cmd-badge { border-color: transparent; }
+		.badge-style-solid .cmd-badge[data-color="info"] {
+			background: var(--status-info); color: white;
+		}
+		.badge-style-solid .cmd-badge[data-color="success"] {
+			background: var(--status-success); color: white;
+		}
+		.badge-style-solid .cmd-badge[data-color="danger"] {
+			background: var(--status-danger); color: white;
+		}
+		.badge-style-solid .cmd-badge[data-color="warning"] {
+			background: var(--status-warning); color: black;
+		}
+		.badge-style-solid .cmd-badge[data-color="subtle"] {
+			background: var(--foreground-subtle); color: var(--surface);
+		}
+		.badge-style-solid .port-badge {
+			background: var(--status-success); color: white; border-color: transparent;
+		}
+		.badge-style-solid .port-badge .port-dot { background: white; }
+
+		/* Style B (borderless-dark, DEFAULT): tinted bg, colored text, no visible border */
+		.badge-style-borderless .cmd-badge { border-color: transparent; }
+
+		/* Style C (bordered-dark): tinted bg, colored text, visible tinted border */
+		/* Default styling already handles this (no extra rules needed) */
+
+		/* ── CommandResultBadge ────────────────────────────── */
+		.cmd-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font-family: var(--font-mono);
+			font-size: 10px;
+			line-height: 1;
+			overflow: hidden;
+			transition: all 300ms ease-in-out;
+			border-radius: 9999px;
+			border: var(--border-width-1) solid color-mix(in oklch, var(--badge-color) 30%, transparent);
+			background: color-mix(in oklch, var(--badge-color) 14%, transparent);
+			color: var(--badge-color);
+		}
+
+		/* Running state: pill with padding */
+		.cmd-badge.is-running {
+			height: 20px;
+			padding: 0 8px;
+		}
+
+		/* Completed states: collapsed to circle */
+		.cmd-badge.is-collapsed {
+			width: 20px;
+			height: 20px;
+			padding: 0;
+			justify-content: center;
+		}
+
+		/* Stale: dimmed */
+		.cmd-badge.is-stale {
+			opacity: 0.4;
+		}
+
+		/* Spinner for running state */
+		.cmd-spinner {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			border: 2px solid currentColor;
+			border-top-color: transparent;
+			animation: badge-spin 0.8s linear infinite;
+			flex-shrink: 0;
+		}
+		@keyframes badge-spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Icon inside collapsed badge */
+		.cmd-icon {
+			width: 12px;
+			height: 12px;
+			flex-shrink: 0;
+		}
+
+		/* Command name text */
+		.cmd-name {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		/* Restart count */
+		.cmd-restart {
+			opacity: 0.7;
+			margin-left: -2px;
+		}
+
+		/* ── ServerPortBadge ──────────────────────────────── */
+		.port-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font-family: var(--font-mono);
+			font-size: 10px;
+			line-height: 1;
+			height: 20px;
+			padding: 0 8px;
+			border-radius: var(--radius-xs);
+			border: var(--border-width-1) solid color-mix(in oklch, var(--status-success) 30%, transparent);
+			background: color-mix(in oklch, var(--status-success) 14%, transparent);
+			color: var(--status-success);
+			cursor: pointer;
+			user-select: none;
+		}
+		.port-badge:hover { filter: brightness(1.25); }
+		.port-dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			background: var(--status-success);
+			flex-shrink: 0;
+		}
+
+		/* ── Overflow chip ────────────────────────────────── */
+		.overflow-chip {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 20px;
+			padding: 0 6px;
+			border-radius: 9999px;
+			border: var(--border-width-1) solid var(--border);
+			font-family: var(--font-mono);
+			font-size: 10px;
+			line-height: 1;
+			color: var(--foreground-muted);
+		}
+
+		/* ── CommandResultsRow ────────────────────────────── */
+		.cmd-results-row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 4px;
+			min-height: 20px;
+		}
+
+		/* ── Issue Card Shell (context) ───────────────────── */
+		.card-shell {
+			--ic-color: oklch(0.69 0.098 132);
+			border-radius: var(--radius-lg);
+			border: var(--border-width-1) solid color-mix(in oklch, var(--ic-color) 28%, var(--border));
+			background:
+				radial-gradient(
+					ellipse 340px 300px at 12% 58%,
+					color-mix(in oklch, var(--ic-color) 26%, transparent) 0%,
+					color-mix(in oklch, var(--ic-color) 12%, transparent) 42%,
+					color-mix(in oklch, var(--ic-color) 4%, transparent) 65%,
+					transparent 100%
+				),
+				var(--surface);
+			overflow: hidden;
+			width: 520px;
+		}
+
+		/* Card header */
+		.card-header {
+			display: flex;
+			align-items: center;
+			gap: var(--space-4);
+			padding: var(--space-5) var(--space-6);
+			background: linear-gradient(
+				90deg,
+				color-mix(in oklch, var(--surface) 35%, transparent) 0%,
+				color-mix(in oklch, var(--surface) 65%, transparent) 40%,
+				color-mix(in oklch, var(--surface) 80%, transparent) 100%
+			);
+		}
+		.card-header-left {
+			display: flex; align-items: center; gap: var(--space-3); min-width: 0; flex: 1;
+		}
+		.card-issue-num {
+			font-family: var(--font-mono);
+			font-size: var(--text-sm);
+			font-weight: var(--weight-semibold);
+			color: var(--ic-color);
+			white-space: nowrap;
+		}
+		.card-title {
+			font-size: var(--text-md);
+			font-weight: var(--weight-medium);
+			color: var(--foreground);
+			white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+		}
+		.card-priority {
+			font-family: var(--font-mono);
+			font-size: 10px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			padding: 2px 6px;
+			border-radius: var(--radius-xs);
+			background: color-mix(in oklch, var(--status-warning) 14%, transparent);
+			color: var(--status-warning);
+		}
+
+		/* Card body */
+		.card-body {
+			display: flex;
+			gap: var(--space-5);
+			padding: var(--space-4) var(--space-6) var(--space-6);
+		}
+
+		/* Preview thumb (context, reduced opacity) */
+		.card-thumb {
+			width: 80px;
+			height: 90px;
+			border-radius: var(--radius-sm);
+			background: color-mix(in oklch, var(--ic-color) 8%, var(--surface-2));
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			opacity: 0.5;
+		}
+		.card-thumb svg {
+			opacity: 0.4;
+		}
+
+		/* Info rows column */
+		.card-details {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			min-width: 0;
+			flex: 1;
+		}
+
+		/* Muted context rows */
+		.context-row {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			min-height: 20px;
+			font-family: var(--font-mono);
+			font-size: 10px;
+			color: var(--foreground-muted);
+			opacity: 0.45;
+		}
+
+		/* Active Row 4 — full opacity */
+		.active-row {
+			position: relative;
+		}
+		.active-row::before {
+			content: 'ROW 4';
+			position: absolute;
+			left: -48px;
+			top: 50%;
+			transform: translateY(-50%);
+			font-family: var(--font-mono);
+			font-size: 9px;
+			color: var(--foreground-subtle);
+			letter-spacing: 0.1em;
+		}
+
+		/* ── State Matrix ─────────────────────────────────── */
+		.state-matrix {
+			display: grid;
+			grid-template-columns: 100px 1fr;
+			gap: var(--space-3) var(--space-6);
+			align-items: center;
+		}
+		.state-label {
+			font-family: var(--font-mono);
+			font-size: 10px;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--foreground-muted);
+			text-align: right;
+		}
+		.state-demo {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+
+		/* ── Scenario Cards ───────────────────────────────── */
+		.scenario-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+			gap: var(--space-6);
+		}
+		.scenario-card {
+			border: var(--border-width-1) solid var(--border);
+			border-radius: var(--radius-md);
+			padding: var(--space-5) var(--space-6);
+			background: var(--surface);
+		}
+		.scenario-title {
+			font-family: var(--font-mono);
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			color: var(--foreground-muted);
+			margin-bottom: var(--space-4);
+		}
+
+		/* ── Separator ────────────────────────────────────── */
+		.section-sep {
+			border: none;
+			border-top: var(--border-width-1) solid var(--border);
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+
+	<!-- ═══ Header ═══════════════════════════════════════════ -->
+	<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">VARIANT A: CONSISTENT BADGE SYSTEM</div>
+	<h1 class="gk-h2" style="margin-bottom: var(--space-2);">Process Badges & Command Results</h1>
+	<p class="gk-small" style="color: var(--foreground-muted); margin-bottom: var(--space-10); max-width: 640px;">
+		CommandResultBadge with 5 states (running, passed, failed, timeout, stopped), ServerPortBadge,
+		stale dimming, restart count, and overflow — all using <code>resolveBadgeStyleClass()</code> via
+		<code>--badge-color</code> CSS variable, matching existing PriorityBadge and ServerPortBadge patterns.
+	</p>
+
+	<!-- Badge Style Toggle -->
+	<div class="style-toggle">
+		<span class="style-toggle-label">Badge Style</span>
+		<div class="style-toggle-btns" id="style-toggle">
+			<button onclick="setBadgeStyle('solid')">A (Solid)</button>
+			<button class="is-active" onclick="setBadgeStyle('borderless')">B (Borderless)</button>
+			<button onclick="setBadgeStyle('bordered')">C (Bordered)</button>
+		</div>
+	</div>
+
+	<div class="page-grid" id="badge-container">
+
+		<!-- ═══ Section 1: State Matrix ═════════════════════ -->
+		<section>
+			<h2 class="gk-h3 section-title">1. Badge State Reference</h2>
+			<p class="gk-small gk-body section-desc" style="color: var(--foreground-muted);">
+				All five CommandResultBadge states. Running shows as a pill with spinner + name.
+				Completed states collapse to 20×20 icon-only circles.
+			</p>
+
+			<div class="state-matrix">
+
+				<!-- Running -->
+				<span class="state-label">Running</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+						<span class="cmd-spinner"></span>
+						<span class="cmd-name">check:all</span>
+					</span>
+					<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+						<span class="cmd-spinner"></span>
+						<span class="cmd-name">test</span>
+					</span>
+				</div>
+
+				<!-- Running + restart -->
+				<span class="state-label">Restarting</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+						<span class="cmd-spinner"></span>
+						<span class="cmd-name">dev-server</span>
+						<span class="cmd-restart">2/3</span>
+					</span>
+				</div>
+
+				<!-- Passed -->
+				<span class="state-label">Passed</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+							<polyline points="22 4 12 14.01 9 11.01"/>
+						</svg>
+					</span>
+					<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+							<polyline points="22 4 12 14.01 9 11.01"/>
+						</svg>
+					</span>
+				</div>
+
+				<!-- Failed -->
+				<span class="state-label">Failed</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-collapsed" data-color="danger" style="--badge-color: var(--status-danger);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<line x1="15" y1="9" x2="9" y2="15"/>
+							<line x1="9" y1="9" x2="15" y2="15"/>
+						</svg>
+					</span>
+				</div>
+
+				<!-- Timeout -->
+				<span class="state-label">Timeout</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-collapsed" data-color="warning" style="--badge-color: var(--status-warning);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<polyline points="12 6 12 12 16 14"/>
+						</svg>
+					</span>
+				</div>
+
+				<!-- Stopped -->
+				<span class="state-label">Stopped</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-collapsed" data-color="subtle" style="--badge-color: var(--foreground-subtle);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="6" y="6" width="12" height="12" rx="2"/>
+						</svg>
+					</span>
+				</div>
+
+				<!-- Stale -->
+				<span class="state-label">Stale</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-collapsed is-stale" data-color="success" style="--badge-color: var(--status-success);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+							<polyline points="22 4 12 14.01 9 11.01"/>
+						</svg>
+					</span>
+					<span class="cmd-badge is-collapsed is-stale" data-color="danger" style="--badge-color: var(--status-danger);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<line x1="15" y1="9" x2="9" y2="15"/>
+							<line x1="9" y1="9" x2="15" y2="15"/>
+						</svg>
+					</span>
+					<span class="cmd-badge is-collapsed is-stale" data-color="warning" style="--badge-color: var(--status-warning);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<polyline points="12 6 12 12 16 14"/>
+						</svg>
+					</span>
+				</div>
+
+				<!-- Server Port -->
+				<span class="state-label">Server Port</span>
+				<div class="state-demo">
+					<span class="port-badge">
+						<span class="port-dot"></span>
+						3000
+					</span>
+					<span class="port-badge">
+						<span class="port-dot"></span>
+						5173
+					</span>
+				</div>
+
+				<!-- Overflow -->
+				<span class="state-label">Overflow</span>
+				<div class="state-demo">
+					<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+							<polyline points="22 4 12 14.01 9 11.01"/>
+						</svg>
+					</span>
+					<span class="cmd-badge is-collapsed" data-color="danger" style="--badge-color: var(--status-danger);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<line x1="15" y1="9" x2="9" y2="15"/>
+							<line x1="9" y1="9" x2="15" y2="15"/>
+						</svg>
+					</span>
+					<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+						<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+							<polyline points="22 4 12 14.01 9 11.01"/>
+						</svg>
+					</span>
+					<span class="overflow-chip">+2</span>
+				</div>
+
+			</div>
+		</section>
+
+		<hr class="section-sep">
+
+		<!-- ═══ Section 2: In-Card Context ══════════════════ -->
+		<section>
+			<h2 class="gk-h3 section-title">2. Row 4 in Issue Card Context</h2>
+			<p class="gk-small section-desc" style="color: var(--foreground-muted);">
+				Badges live in CommandResultsRow (Row 4) inside the issue card body.
+				Rows 1–3 are dimmed to focus attention on Row 4.
+			</p>
+
+			<div style="display: flex; gap: var(--space-8); flex-wrap: wrap;">
+
+				<!-- Card A: Mixed running + completed -->
+				<div class="card-shell">
+					<div class="card-header">
+						<div class="card-header-left">
+							<span class="card-issue-num">#156</span>
+							<span class="card-title">Add user authentication flow</span>
+						</div>
+						<span class="card-priority">HIGH</span>
+					</div>
+					<div class="card-body">
+						<div class="card-thumb">
+							<svg width="32" height="40" viewBox="0 0 48 56" fill="none">
+								<rect x="21" y="38" width="6" height="14" rx="1" fill="oklch(0.45 0.05 55)"/>
+								<path d="M24 4L8 22h10l-4 10h20l-4-10h10L24 4z" fill="oklch(0.55 0.08 140)"/>
+							</svg>
+						</div>
+						<div class="card-details" style="padding-left: var(--space-10);">
+							<!-- Row 1 (context) -->
+							<div class="context-row">
+								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+								auth-flow/
+								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+								feat/auth-flow
+							</div>
+							<!-- Row 2 (context) -->
+							<div class="context-row">
+								<span style="background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); padding: 1px 6px; border-radius: var(--radius-xs); border: 1px solid color-mix(in oklch, var(--status-success) 30%, transparent);">PR #298 open</span>
+								<span style="background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success); padding: 1px 6px; border-radius: var(--radius-xs); border: 1px solid color-mix(in oklch, var(--status-success) 30%, transparent);">Issue open</span>
+							</div>
+							<!-- Row 3 (context) -->
+							<div class="context-row">
+								<span style="background: color-mix(in oklch, oklch(0.7 0.15 200) 14%, transparent); color: oklch(0.7 0.15 200); padding: 1px 6px; border-radius: 9999px; border: 1px solid color-mix(in oklch, oklch(0.7 0.15 200) 30%, transparent);">auth</span>
+								<span style="background: color-mix(in oklch, oklch(0.7 0.1 300) 14%, transparent); color: oklch(0.7 0.1 300); padding: 1px 6px; border-radius: 9999px; border: 1px solid color-mix(in oklch, oklch(0.7 0.1 300) 30%, transparent);">security</span>
+							</div>
+							<!-- Row 4 (ACTIVE) -->
+							<div class="active-row">
+								<div class="cmd-results-row">
+									<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+										<span class="cmd-spinner"></span>
+										<span class="cmd-name">check:all</span>
+									</span>
+									<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+										<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+											<polyline points="22 4 12 14.01 9 11.01"/>
+										</svg>
+									</span>
+									<span class="port-badge">
+										<span class="port-dot"></span>
+										5173
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Card B: All completed + stale -->
+				<div class="card-shell" style="--ic-color: oklch(0.72 0.14 45);">
+					<div class="card-header">
+						<div class="card-header-left">
+							<span class="card-issue-num">#203</span>
+							<span class="card-title">Refactor database queries</span>
+						</div>
+						<span class="card-priority" style="background: color-mix(in oklch, var(--status-success) 14%, transparent); color: var(--status-success);">MED</span>
+					</div>
+					<div class="card-body">
+						<div class="card-thumb">
+							<svg width="32" height="40" viewBox="0 0 48 56" fill="none">
+								<rect x="21" y="38" width="6" height="14" rx="1" fill="oklch(0.45 0.05 55)"/>
+								<path d="M24 4L8 22h10l-4 10h20l-4-10h10L24 4z" fill="oklch(0.6 0.1 45)"/>
+							</svg>
+						</div>
+						<div class="card-details" style="padding-left: var(--space-10);">
+							<div class="context-row">
+								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+								db-refactor/
+								<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+								refactor/db-queries
+							</div>
+							<div class="context-row">
+								<span style="background: color-mix(in oklch, var(--status-info) 14%, transparent); color: var(--status-info); padding: 1px 6px; border-radius: var(--radius-xs); border: 1px solid color-mix(in oklch, var(--status-info) 30%, transparent);">PR #305 review</span>
+							</div>
+							<div class="context-row">
+								<span style="background: color-mix(in oklch, oklch(0.65 0.12 130) 14%, transparent); color: oklch(0.65 0.12 130); padding: 1px 6px; border-radius: 9999px; border: 1px solid color-mix(in oklch, oklch(0.65 0.12 130) 30%, transparent);">database</span>
+							</div>
+							<!-- Row 4: all completed, stale -->
+							<div class="active-row">
+								<div class="cmd-results-row">
+									<span class="cmd-badge is-collapsed is-stale" data-color="success" style="--badge-color: var(--status-success);">
+										<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+											<polyline points="22 4 12 14.01 9 11.01"/>
+										</svg>
+									</span>
+									<span class="cmd-badge is-collapsed is-stale" data-color="danger" style="--badge-color: var(--status-danger);">
+										<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<circle cx="12" cy="12" r="10"/>
+											<line x1="15" y1="9" x2="9" y2="15"/>
+											<line x1="9" y1="9" x2="15" y2="15"/>
+										</svg>
+									</span>
+									<span class="cmd-badge is-collapsed is-stale" data-color="success" style="--badge-color: var(--status-success);">
+										<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+											<polyline points="22 4 12 14.01 9 11.01"/>
+										</svg>
+									</span>
+									<span class="port-badge">
+										<span class="port-dot"></span>
+										3000
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		<hr class="section-sep">
+
+		<!-- ═══ Section 3: Scenarios ════════════════════════ -->
+		<section>
+			<h2 class="gk-h3 section-title">3. Row 4 Scenarios</h2>
+			<p class="gk-small section-desc" style="color: var(--foreground-muted);">
+				Real-world combinations showing how badges compose in CommandResultsRow.
+			</p>
+
+			<div class="scenario-grid">
+
+				<!-- Scenario: All checks running -->
+				<div class="scenario-card">
+					<div class="scenario-title">All Checks Running</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+							<span class="cmd-spinner"></span>
+							<span class="cmd-name">check:all</span>
+						</span>
+						<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+							<span class="cmd-spinner"></span>
+							<span class="cmd-name">test</span>
+						</span>
+						<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+							<span class="cmd-spinner"></span>
+							<span class="cmd-name">e2e</span>
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: Mixed completion -->
+				<div class="scenario-card">
+					<div class="scenario-title">Mixed (1 Running, 2 Done)</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+							<span class="cmd-spinner"></span>
+							<span class="cmd-name">e2e</span>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="port-badge">
+							<span class="port-dot"></span>
+							5173
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: All passed -->
+				<div class="scenario-card">
+					<div class="scenario-title">All Passed</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="port-badge">
+							<span class="port-dot"></span>
+							3000
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: Failed + timeout -->
+				<div class="scenario-card">
+					<div class="scenario-title">Failed + Timeout</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-collapsed" data-color="danger" style="--badge-color: var(--status-danger);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="10"/>
+								<line x1="15" y1="9" x2="9" y2="15"/>
+								<line x1="9" y1="9" x2="15" y2="15"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="warning" style="--badge-color: var(--status-warning);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="10"/>
+								<polyline points="12 6 12 12 16 14"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: Server restarting -->
+				<div class="scenario-card">
+					<div class="scenario-title">Server Restarting (2/3 Attempts)</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-running" data-color="info" style="--badge-color: var(--status-info);">
+							<span class="cmd-spinner"></span>
+							<span class="cmd-name">dev-server</span>
+							<span class="cmd-restart">2/3</span>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: Overflow -->
+				<div class="scenario-card">
+					<div class="scenario-title">Overflow (3 Visible + 2 Hidden)</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="danger" style="--badge-color: var(--status-danger);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="10"/>
+								<line x1="15" y1="9" x2="9" y2="15"/>
+								<line x1="9" y1="9" x2="15" y2="15"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="overflow-chip">+2</span>
+						<span class="port-badge">
+							<span class="port-dot"></span>
+							8080
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: User stopped -->
+				<div class="scenario-card">
+					<div class="scenario-title">User Stopped + Failed</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-collapsed" data-color="subtle" style="--badge-color: var(--foreground-subtle);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="6" y="6" width="12" height="12" rx="2"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed" data-color="danger" style="--badge-color: var(--status-danger);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="10"/>
+								<line x1="15" y1="9" x2="9" y2="15"/>
+								<line x1="9" y1="9" x2="15" y2="15"/>
+							</svg>
+						</span>
+					</div>
+				</div>
+
+				<!-- Scenario: Empty row -->
+				<div class="scenario-card">
+					<div class="scenario-title">No Commands Configured</div>
+					<div class="cmd-results-row" style="border: 1px dashed var(--border); border-radius: var(--radius-xs); padding: 0 var(--space-3);">
+						<span class="gk-tiny" style="color: var(--foreground-subtle);">min-h-5 preserved</span>
+					</div>
+				</div>
+
+				<!-- Scenario: Stale + server still live -->
+				<div class="scenario-card">
+					<div class="scenario-title">Stale Results, Server Still Live</div>
+					<div class="cmd-results-row">
+						<span class="cmd-badge is-collapsed is-stale" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<span class="cmd-badge is-collapsed is-stale" data-color="success" style="--badge-color: var(--status-success);">
+							<svg class="cmd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+								<polyline points="22 4 12 14.01 9 11.01"/>
+							</svg>
+						</span>
+						<!-- Server port does NOT go stale -->
+						<span class="port-badge">
+							<span class="port-dot"></span>
+							5173
+						</span>
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		<hr class="section-sep">
+
+		<!-- ═══ Section 4: Side-by-side Comparison ══════════ -->
+		<section>
+			<h2 class="gk-h3 section-title">4. Visual Distinctness Check</h2>
+			<p class="gk-small section-desc" style="color: var(--foreground-muted);">
+				Each completed state uses a unique icon AND color combination — no two can be confused.
+			</p>
+
+			<div style="display: flex; gap: var(--space-8); align-items: center;">
+				<div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+					<span class="cmd-badge is-collapsed" data-color="success" style="--badge-color: var(--status-success); width: 28px; height: 28px;">
+						<svg class="cmd-icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+							<polyline points="22 4 12 14.01 9 11.01"/>
+						</svg>
+					</span>
+					<span class="gk-tiny" style="color: var(--status-success);">Passed</span>
+				</div>
+
+				<div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+					<span class="cmd-badge is-collapsed" data-color="danger" style="--badge-color: var(--status-danger); width: 28px; height: 28px;">
+						<svg class="cmd-icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<line x1="15" y1="9" x2="9" y2="15"/>
+							<line x1="9" y1="9" x2="15" y2="15"/>
+						</svg>
+					</span>
+					<span class="gk-tiny" style="color: var(--status-danger);">Failed</span>
+				</div>
+
+				<div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+					<span class="cmd-badge is-collapsed" data-color="warning" style="--badge-color: var(--status-warning); width: 28px; height: 28px;">
+						<svg class="cmd-icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/>
+							<polyline points="12 6 12 12 16 14"/>
+						</svg>
+					</span>
+					<span class="gk-tiny" style="color: var(--status-warning);">Timeout</span>
+				</div>
+
+				<div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+					<span class="cmd-badge is-collapsed" data-color="subtle" style="--badge-color: var(--foreground-subtle); width: 28px; height: 28px;">
+						<svg class="cmd-icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="6" y="6" width="12" height="12" rx="2"/>
+						</svg>
+					</span>
+					<span class="gk-tiny" style="color: var(--foreground-subtle);">Stopped</span>
+				</div>
+
+				<div style="width: 1px; height: 40px; background: var(--border); margin: 0 var(--space-4);"></div>
+
+				<div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+					<span class="port-badge" style="height: 28px; font-size: 12px;">
+						<span class="port-dot" style="width: 8px; height: 8px;"></span>
+						3000
+					</span>
+					<span class="gk-tiny" style="color: var(--status-success);">Server</span>
+				</div>
+			</div>
+		</section>
+
+		<hr class="section-sep">
+
+		<!-- ═══ Section 5: Design Notes ═════════════════════ -->
+		<section>
+			<h2 class="gk-h3 section-title">5. Design Notes</h2>
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); max-width: 720px;">
+				<div>
+					<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Styling Pattern</div>
+					<p class="gk-small" style="color: var(--foreground-muted);">
+						Uses <code>--badge-color</code> CSS variable + <code>resolveBadgeStyleClass()</code>,
+						identical to PriorityBadge and ServerPortBadge. All three badge styles (A/B/C) work
+						via the same <code>color-mix</code> pattern from <code>badge_style_utils.ts</code>.
+					</p>
+				</div>
+				<div>
+					<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Icon Choices</div>
+					<p class="gk-small" style="color: var(--foreground-muted);">
+						Passed: <code>circle-check</code> (existing).
+						Failed: <code>circle-x</code> (existing).
+						Timeout: <code>clock</code> — clock face reads well at 12px, strong timeout association.
+						Stopped: <code>square</code> — universal stop/stop-media icon, rounded corners for softness.
+					</p>
+				</div>
+				<div>
+					<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Restart Count</div>
+					<p class="gk-small" style="color: var(--foreground-muted);">
+						Rendered as plain monospace text <code>2/3</code> appended after the command name in
+						the running pill. Slightly dimmed (<code>opacity: 0.7</code>) to keep focus on the
+						command name. No sub-badge — keeps the pill compact.
+					</p>
+				</div>
+				<div>
+					<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Stale Behavior</div>
+					<p class="gk-small" style="color: var(--foreground-muted);">
+						<code>opacity-40</code> on CommandResultBadge only. ServerPortBadge stays full
+						opacity — the server is still running regardless of file changes. Same stale
+						treatment already implemented in the existing component.
+					</p>
+				</div>
+			</div>
+		</section>
+
+	</div>
+</div>
+
+<script>
+function setBadgeStyle(style) {
+	const container = document.getElementById('badge-container');
+	const toggle = document.getElementById('style-toggle');
+
+	container.classList.remove('badge-style-solid', 'badge-style-borderless', 'badge-style-bordered');
+	container.classList.add('badge-style-' + style);
+
+	toggle.querySelectorAll('button').forEach(btn => btn.classList.remove('is-active'));
+	event.target.classList.add('is-active');
+}
+</script>
+
+</body>
+</html>

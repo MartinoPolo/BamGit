@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Process Log Viewer — Refined: Variant A + UI Fixes</title>
+	<link rel="stylesheet" href="../tokens.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			min-height: 100vh;
+			overflow: hidden;
+		}
+
+		/* ── Viewport Context ───────────────────────────── */
+		.viewport {
+			width: 100vw;
+			height: 100vh;
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.dashboard-hint {
+			position: absolute;
+			inset: 0;
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: var(--space-6);
+			padding: var(--space-16);
+			opacity: 0.15;
+			pointer-events: none;
+		}
+		.dashboard-hint .hint-card {
+			border-radius: var(--radius-lg);
+			border: var(--border-width-1) solid var(--border);
+			background: var(--surface);
+			height: 200px;
+		}
+
+		/* ── Backdrop (matches Dialog.Overlay: 72% opacity, no blur) ── */
+		.backdrop {
+			position: absolute;
+			inset: 0;
+			background: color-mix(in oklch, oklch(0.10 0.02 150) 72%, transparent);
+			z-index: 10;
+		}
+
+		/* ── Dialog (matches Dialog.Content: rounded-xl, border, shadow-lg) ── */
+		.dialog {
+			position: relative;
+			z-index: 20;
+			width: min(620px, 90vw);
+			height: min(765px, 85vh);
+			display: flex;
+			flex-direction: column;
+			border-radius: var(--radius-xl);
+			border: var(--border-width-1) solid var(--border);
+			background: var(--surface);
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+						0 0 0 1px rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+		}
+
+		/* ── Title Bar ──────────────────────────────────── */
+		.title-bar {
+			display: flex;
+			align-items: center;
+			gap: var(--space-3);
+			padding: var(--space-2) var(--space-3);
+			border-bottom: var(--border-width-1) solid var(--border);
+			background: var(--surface);
+			min-height: 40px;
+			flex-shrink: 0;
+		}
+
+		.title-left {
+			display: flex;
+			align-items: center;
+			gap: var(--space-3);
+			flex: 1;
+			min-width: 0;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			flex-shrink: 0;
+		}
+		.status-dot.is-running {
+			background: var(--status-info);
+			animation: pulse-dot 2s ease-in-out infinite;
+		}
+		.status-dot.is-passed { background: var(--status-success); }
+		.status-dot.is-failed { background: var(--status-danger); }
+		.status-dot.is-timeout { background: var(--status-warning); }
+		.status-dot.is-stopped { background: var(--foreground-subtle); }
+
+		@keyframes pulse-dot {
+			0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in oklch, var(--status-info) 40%, transparent); }
+			50% { opacity: 0.7; box-shadow: 0 0 6px 3px color-mix(in oklch, var(--status-info) 20%, transparent); }
+		}
+
+		.title-command {
+			font-family: var(--font-mono);
+			font-size: var(--text-sm);
+			font-weight: var(--weight-medium);
+			color: var(--foreground);
+			white-space: nowrap;
+		}
+
+		.title-sep {
+			color: var(--foreground-subtle);
+			font-size: var(--text-sm);
+		}
+
+		.title-issue {
+			font-family: var(--font-mono);
+			font-size: var(--text-sm);
+			color: var(--foreground-muted);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.title-right {
+			display: flex;
+			align-items: center;
+			gap: var(--space-1);
+			flex-shrink: 0;
+		}
+
+		/* ── Port Badge (reuses ServerPortBadge pattern) ── */
+		.port-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			font-family: var(--font-mono);
+			font-size: 10px;
+			line-height: 1;
+			height: 20px;
+			padding: 0 8px;
+			border-radius: var(--radius-xs);
+			border: var(--border-width-1) solid color-mix(in oklch, var(--status-success) 30%, transparent);
+			background: color-mix(in oklch, var(--status-success) 14%, transparent);
+			color: var(--status-success);
+			cursor: pointer;
+			user-select: none;
+		}
+		.port-badge:hover { filter: brightness(1.25); }
+		.port-dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			background: var(--status-success);
+			flex-shrink: 0;
+		}
+
+		/* ── Buttons (matches Button component: rounded-md, ghost variant) ── */
+		.gk-icon-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: var(--size-control-sm);
+			height: var(--size-control-sm);
+			padding: 0;
+			border-radius: var(--radius-md);
+			border: var(--border-width-1) solid transparent;
+			background: transparent;
+			color: var(--foreground-muted);
+			cursor: pointer;
+			transition: background 150ms ease, color 150ms ease, transform 100ms ease;
+		}
+		.gk-icon-btn:hover {
+			background: var(--surface-2);
+			color: var(--foreground);
+		}
+		.gk-icon-btn:active {
+			transform: scale(0.96);
+		}
+		.gk-icon-btn svg {
+			width: 14px;
+			height: 14px;
+		}
+
+		.gk-sm-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-2);
+			height: var(--size-control-sm);
+			padding: 0 var(--space-3);
+			border-radius: var(--radius-md);
+			border: var(--border-width-1) solid transparent;
+			background: transparent;
+			color: var(--foreground-muted);
+			font-family: var(--font-sans);
+			font-size: var(--text-xs);
+			cursor: pointer;
+			transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 100ms ease;
+		}
+		.gk-sm-btn:hover {
+			background: var(--surface-2);
+			color: var(--foreground);
+		}
+		.gk-sm-btn:active {
+			transform: scale(0.96);
+		}
+		.gk-sm-btn svg {
+			width: 14px;
+			height: 14px;
+		}
+
+		.gk-sm-btn.variant-secondary {
+			border-color: var(--border);
+		}
+		.gk-sm-btn.variant-secondary:hover {
+			border-color: var(--border-strong);
+		}
+
+		.gk-sm-btn.is-toggle-on {
+			background: color-mix(in oklch, var(--primary) 15%, transparent);
+			border-color: color-mix(in oklch, var(--primary) 40%, transparent);
+			color: var(--primary);
+		}
+		.gk-sm-btn.is-toggle-on:hover {
+			background: color-mix(in oklch, var(--primary) 22%, transparent);
+		}
+
+		/* ── Log Body Wrapper (holds scroll area + overlay indicators) ── */
+		.log-body-wrapper {
+			flex: 1;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.log-body {
+			width: 100%;
+			height: 100%;
+			overflow-y: auto;
+			background: var(--surface-2);
+			font-family: var(--font-mono);
+			font-size: 11.5px;
+			line-height: 1.55;
+		}
+
+		.log-line {
+			display: flex;
+			padding: 0 var(--space-3);
+			min-height: 17.8px;
+		}
+		.log-line:hover {
+			background: color-mix(in oklch, var(--foreground) 4%, transparent);
+		}
+
+		.line-num {
+			width: 36px;
+			flex-shrink: 0;
+			text-align: right;
+			padding-right: var(--space-3);
+			color: var(--foreground-subtle);
+			user-select: none;
+			opacity: 0.5;
+		}
+
+		.line-text {
+			flex: 1;
+			white-space: pre-wrap;
+			word-break: break-all;
+			color: var(--foreground);
+			padding: 0 var(--space-1);
+		}
+		.line-text.is-stderr { color: oklch(0.72 0.135 15); }
+		.line-text.is-exit-success { color: var(--status-success); font-weight: var(--weight-medium); }
+		.line-text.is-exit-fail { color: var(--status-danger); font-weight: var(--weight-medium); }
+		.line-text.is-exit-timeout { color: var(--status-warning); font-weight: var(--weight-medium); }
+		.line-text.is-exit-stopped { color: var(--foreground-subtle); font-weight: var(--weight-medium); }
+
+		/* ── Scroll Indicators (positioned on wrapper, outside scroll) ── */
+		.scroll-indicator {
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			padding: var(--space-1) var(--space-4);
+			border-radius: 9999px;
+			background: var(--primary);
+			color: var(--primary-foreground);
+			font-family: var(--font-sans);
+			font-size: var(--text-xs);
+			font-weight: var(--weight-medium);
+			cursor: pointer;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			z-index: 5;
+			transition: opacity 150ms ease;
+		}
+		.scroll-indicator svg {
+			width: 12px;
+			height: 12px;
+		}
+		.scroll-indicator.at-top {
+			top: var(--space-3);
+		}
+		.scroll-indicator.at-bottom {
+			bottom: var(--space-3);
+		}
+		.scroll-indicator.is-hidden {
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		/* ── Footer Toolbar ─────────────────────────────── */
+		.footer {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: var(--space-1) var(--space-3);
+			border-top: var(--border-width-1) solid var(--border);
+			background: var(--surface);
+			min-height: 36px;
+			flex-shrink: 0;
+			gap: var(--space-3);
+		}
+
+		.footer-left {
+			display: flex;
+			align-items: center;
+			gap: var(--space-3);
+		}
+
+		.footer-right {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.footer-line-count {
+			font-family: var(--font-mono);
+			font-size: var(--text-xs);
+			color: var(--foreground-subtle);
+		}
+
+		/* ── MonospaceBlock Section ─────────────────────── */
+		.mb-section {
+			padding: var(--space-12) var(--space-16);
+		}
+
+		.mb-grid {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-8);
+			max-width: 640px;
+		}
+
+		.mb-label {
+			margin-bottom: var(--space-3);
+		}
+
+		.mono-block {
+			position: relative;
+			background: var(--surface-2);
+			border: var(--border-width-1) solid var(--border);
+			border-radius: var(--radius-md);
+			padding: var(--space-3);
+			font-family: var(--font-mono);
+			font-size: 11.5px;
+			line-height: 1.55;
+			color: var(--foreground);
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
+		.mono-block.has-max-height {
+			overflow-y: auto;
+		}
+
+		.mono-block .mb-copy-btn {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: var(--size-control-sm);
+			height: var(--size-control-sm);
+			padding: 0;
+			border-radius: var(--radius-md);
+			border: var(--border-width-1) solid var(--border);
+			background: var(--surface);
+			color: var(--foreground-muted);
+			cursor: pointer;
+			opacity: 0;
+			transition: opacity 150ms ease, background 150ms ease, color 150ms ease;
+		}
+		.mono-block:hover .mb-copy-btn {
+			opacity: 1;
+		}
+		.mono-block .mb-copy-btn:hover {
+			background: var(--surface-2);
+			color: var(--foreground);
+		}
+		.mono-block .mb-copy-btn svg {
+			width: 14px;
+			height: 14px;
+		}
+		.mono-block .mb-copy-btn.is-copied {
+			color: var(--status-success);
+			opacity: 1;
+		}
+
+		/* ── State Showcase ─────────────────────────────── */
+		.states-row {
+			display: flex;
+			gap: var(--space-8);
+			flex-wrap: wrap;
+		}
+
+		.state-card {
+			flex: 1;
+			min-width: 260px;
+			border: var(--border-width-1) solid var(--border);
+			border-radius: var(--radius-md);
+			overflow: hidden;
+		}
+
+		.state-card-header {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			padding: var(--space-2) var(--space-3);
+			border-bottom: var(--border-width-1) solid var(--border);
+			background: var(--surface);
+		}
+
+		.state-card-body {
+			background: var(--surface-2);
+			padding: 0;
+			font-family: var(--font-mono);
+			font-size: 11.5px;
+			line-height: 1.55;
+		}
+		.state-card-body .log-line:last-child { padding-bottom: var(--space-2); }
+		.state-card-body .log-line:first-child { padding-top: var(--space-2); }
+
+		.empty-state {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: var(--space-2);
+			padding: var(--space-12);
+			color: var(--foreground-muted);
+			font-family: var(--font-sans);
+			font-size: var(--text-sm);
+		}
+		.empty-state svg {
+			width: 24px;
+			height: 24px;
+			color: var(--foreground-subtle);
+			animation: pulse-empty 2s ease-in-out infinite;
+		}
+		@keyframes pulse-empty {
+			0%, 100% { opacity: 0.4; }
+			50% { opacity: 0.8; }
+		}
+
+		.page-sep {
+			border: none;
+			border-top: var(--border-width-1) solid var(--border);
+			margin: var(--space-4) 0;
+		}
+	</style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+
+	<!-- ═══ Section Label ═════════════════════════════════ -->
+	<div style="position: fixed; top: var(--space-3); left: var(--space-4); z-index: 100;">
+		<div class="gk-eyebrow">REFINED — VARIANT A + FIXED SCROLL, SINGLE COPY, PORT BADGE, BUTTON STYLING</div>
+	</div>
+
+	<!-- ═══ Part 1: ProcessLogViewer Dialog (Running, mid-scroll) ═══ -->
+	<div class="viewport">
+		<div class="dashboard-hint">
+			<div class="hint-card"></div>
+			<div class="hint-card"></div>
+			<div class="hint-card"></div>
+			<div class="hint-card"></div>
+			<div class="hint-card"></div>
+			<div class="hint-card"></div>
+		</div>
+
+		<div class="backdrop"></div>
+
+		<div class="dialog">
+			<!-- Title Bar: status dot + command + issue + port badge + close -->
+			<div class="title-bar">
+				<div class="title-left">
+					<span class="status-dot is-running"></span>
+					<span class="title-command">dev-server</span>
+					<span class="title-sep">&mdash;</span>
+					<span class="title-issue">#42 fix-auth-bug</span>
+					<span class="port-badge">
+						<span class="port-dot"></span>
+						:1420
+					</span>
+				</div>
+				<div class="title-right">
+					<button class="gk-icon-btn" aria-label="Close dialog">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Log Body Wrapper (holds scroll + overlay indicators) -->
+			<div class="log-body-wrapper">
+				<div class="log-body">
+					<div class="log-line"><span class="line-num">1</span><span class="line-text">$ pnpm dev</span></div>
+					<div class="log-line"><span class="line-num">2</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">3</span><span class="line-text">  VITE v6.3.2  ready in 342 ms</span></div>
+					<div class="log-line"><span class="line-num">4</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">5</span><span class="line-text">  ➜  Local:   http://localhost:1420/</span></div>
+					<div class="log-line"><span class="line-num">6</span><span class="line-text">  ➜  Network: http://192.168.1.42:1420/</span></div>
+					<div class="log-line"><span class="line-num">7</span><span class="line-text">  ➜  press h + enter to show help</span></div>
+					<div class="log-line"><span class="line-num">8</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">9</span><span class="line-text">12:04:31 [vite] hmr update /src/routes/+layout.svelte</span></div>
+					<div class="log-line"><span class="line-num">10</span><span class="line-text">12:04:31 [vite] hmr update /src/lib/components/blocks/issue-card/IssueCard.svelte</span></div>
+					<div class="log-line"><span class="line-num">11</span><span class="line-text">12:04:32 [vite] hmr propagating /src/lib/styles/tokens.css</span></div>
+					<div class="log-line"><span class="line-num">12</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">13</span><span class="line-text is-stderr">12:04:33 [vite] Internal server error: Parse error @:42:18</span></div>
+					<div class="log-line"><span class="line-num">14</span><span class="line-text is-stderr">  Expected token ";"</span></div>
+					<div class="log-line"><span class="line-num">15</span><span class="line-text is-stderr">  42 |   const result = processData(</span></div>
+					<div class="log-line"><span class="line-num">16</span><span class="line-text is-stderr">     |                  ^</span></div>
+					<div class="log-line"><span class="line-num">17</span><span class="line-text is-stderr">  43 |     input.map(item => item.value)</span></div>
+					<div class="log-line"><span class="line-num">18</span><span class="line-text is-stderr">  44 |   )</span></div>
+					<div class="log-line"><span class="line-num">19</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">20</span><span class="line-text">12:04:35 [vite] hmr update /src/lib/components/blocks/issue-card/IssueCard.svelte</span></div>
+					<div class="log-line"><span class="line-num">21</span><span class="line-text">12:04:35 [vite] page reload src/routes/+layout.svelte</span></div>
+					<div class="log-line"><span class="line-num">22</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">23</span><span class="line-text is-stderr">12:04:36 [vite] [plugin:vite-plugin-svelte] /src/lib/components/derived/color-picker/ColorPicker.svelte:18:4</span></div>
+					<div class="log-line"><span class="line-num">24</span><span class="line-text is-stderr">  Warning: A11y: &lt;input type="color"&gt; should have an aria-label attribute</span></div>
+					<div class="log-line"><span class="line-num">25</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">26</span><span class="line-text">12:04:38 [vite] hmr update /src/routes/settings/+layout.svelte</span></div>
+					<div class="log-line"><span class="line-num">27</span><span class="line-text">12:04:39 [vite] hmr update /src/lib/modules/settings/settings.context.svelte.ts</span></div>
+					<div class="log-line"><span class="line-num">28</span><span class="line-text">12:04:40 [vite] hmr propagating /src/lib/components/shadcn/button/Button.svelte</span></div>
+					<div class="log-line"><span class="line-num">29</span><span class="line-text">12:04:41 [vite] hmr update /src/lib/components/blocks/workspace/SessionCard.svelte</span></div>
+					<div class="log-line"><span class="line-num">30</span><span class="line-text">12:04:42 [vite] hmr update /src/lib/components/blocks/session/FloatingInputPanel.svelte</span></div>
+					<div class="log-line"><span class="line-num">31</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">32</span><span class="line-text is-stderr">12:04:43 [vite] [plugin:vite-plugin-svelte] Error compiling component</span></div>
+					<div class="log-line"><span class="line-num">33</span><span class="line-text is-stderr">  /src/routes/dashboard/+page.svelte</span></div>
+					<div class="log-line"><span class="line-num">34</span><span class="line-text is-stderr">  Error: 'items' is not defined. Did you mean to import it?</span></div>
+					<div class="log-line"><span class="line-num">35</span><span class="line-text"></span></div>
+					<div class="log-line"><span class="line-num">36</span><span class="line-text">12:04:45 [vite] hmr update /src/routes/dashboard/+page.svelte</span></div>
+					<div class="log-line"><span class="line-num">37</span><span class="line-text">12:04:46 [vite] hmr propagating /src/app.css (5 modules affected)</span></div>
+					<div class="log-line"><span class="line-num">38</span><span class="line-text">12:04:47 [vite] hmr update /src/lib/components/blocks/layout/TopBar.svelte</span></div>
+				</div>
+
+				<!-- Scroll-to-top (visible when NOT at top) -->
+				<div class="scroll-indicator at-top">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="m18 15-6-6-6 6"/>
+					</svg>
+					Scroll to top
+				</div>
+
+				<!-- Scroll-to-bottom / new output (visible when NOT at bottom) -->
+				<div class="scroll-indicator at-bottom">
+					+42 lines
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="m6 9 6 6 6-6"/>
+					</svg>
+				</div>
+			</div>
+
+			<!-- Footer Toolbar -->
+			<div class="footer">
+				<div class="footer-left">
+					<button class="gk-sm-btn variant-secondary">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+						</svg>
+						Load full log
+					</button>
+					<span class="footer-line-count">1,000 / 2,847 lines</span>
+				</div>
+				<div class="footer-right">
+					<button class="gk-sm-btn variant-secondary">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+						</svg>
+						Copy
+					</button>
+					<button class="gk-sm-btn is-toggle-on" aria-label="Auto-scroll enabled" aria-pressed="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
+						</svg>
+						Auto-scroll
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- ═══ Part 1b: Dialog at bottom (auto-scroll on, no bottom pill) ═══ -->
+	<div style="padding: var(--space-12) var(--space-8) 0;">
+		<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">SCROLL INDICATOR STATES</div>
+		<p class="gk-small" style="color: var(--foreground-muted); margin-bottom: var(--space-8); max-width: 640px;">
+			Scroll-to-top and scroll-to-bottom pills are overlaid on the log body wrapper, outside the scroll container.
+			They appear/disappear based on scroll position. When at the very bottom, the bottom pill hides.
+			When at the very top, the top pill hides. Both are visible when scrolled to the middle.
+		</p>
+
+		<div style="display: flex; gap: var(--space-6); flex-wrap: wrap;">
+			<!-- State: at top (no top pill, bottom pill visible) -->
+			<div style="flex: 1; min-width: 280px;">
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-3);">AT TOP (AUTO-SCROLL OFF)</div>
+				<div class="state-card" style="height: 180px;">
+					<div class="state-card-header">
+						<span class="status-dot is-running"></span>
+						<span class="title-command" style="font-size: 11px;">dev-server</span>
+						<span class="port-badge" style="height: 16px; font-size: 9px; padding: 0 6px;">
+							<span class="port-dot" style="width: 4px; height: 4px;"></span>
+							:1420
+						</span>
+					</div>
+					<div style="position: relative; flex: 1; overflow: hidden; height: 140px;">
+						<div style="background: var(--surface-2); height: 100%; padding: var(--space-2) 0; overflow: hidden; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.55;">
+							<div class="log-line"><span class="line-num">1</span><span class="line-text">$ pnpm dev</span></div>
+							<div class="log-line"><span class="line-num">2</span><span class="line-text">  VITE v6.3.2  ready in 342 ms</span></div>
+							<div class="log-line"><span class="line-num">3</span><span class="line-text">  ➜  Local: http://localhost:1420/</span></div>
+							<div class="log-line"><span class="line-num">4</span><span class="line-text">12:04:31 [vite] hmr update ...</span></div>
+						</div>
+						<!-- Bottom pill visible -->
+						<div class="scroll-indicator at-bottom" style="font-size: 10px; padding: 2px 10px;">
+							+87 lines
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+								<path d="m6 9 6 6 6-6"/>
+							</svg>
+						</div>
+						<!-- Top pill hidden -->
+					</div>
+				</div>
+			</div>
+
+			<!-- State: at bottom (top pill visible, no bottom pill) -->
+			<div style="flex: 1; min-width: 280px;">
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-3);">AT BOTTOM (AUTO-SCROLL ON)</div>
+				<div class="state-card" style="height: 180px;">
+					<div class="state-card-header">
+						<span class="status-dot is-running"></span>
+						<span class="title-command" style="font-size: 11px;">dev-server</span>
+						<span class="port-badge" style="height: 16px; font-size: 9px; padding: 0 6px;">
+							<span class="port-dot" style="width: 4px; height: 4px;"></span>
+							:1420
+						</span>
+					</div>
+					<div style="position: relative; flex: 1; overflow: hidden; height: 140px;">
+						<div style="background: var(--surface-2); height: 100%; padding: var(--space-2) 0; overflow: hidden; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.55;">
+							<div class="log-line"><span class="line-num">86</span><span class="line-text">12:04:46 [vite] hmr propagating ...</span></div>
+							<div class="log-line"><span class="line-num">87</span><span class="line-text">12:04:47 [vite] hmr update TopBar</span></div>
+							<div class="log-line"><span class="line-num">88</span><span class="line-text">12:04:48 [vite] hmr update App.css</span></div>
+							<div class="log-line"><span class="line-num">89</span><span class="line-text">12:04:49 [vite] page reload ...</span></div>
+						</div>
+						<!-- Top pill visible -->
+						<div class="scroll-indicator at-top" style="font-size: 10px; padding: 2px 10px;">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+								<path d="m18 15-6-6-6 6"/>
+							</svg>
+							Scroll to top
+						</div>
+						<!-- Bottom pill hidden -->
+					</div>
+				</div>
+			</div>
+
+			<!-- State: middle (both pills visible) -->
+			<div style="flex: 1; min-width: 280px;">
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-3);">MID-SCROLL (BOTH VISIBLE)</div>
+				<div class="state-card" style="height: 180px;">
+					<div class="state-card-header">
+						<span class="status-dot is-running"></span>
+						<span class="title-command" style="font-size: 11px;">dev-server</span>
+						<span class="port-badge" style="height: 16px; font-size: 9px; padding: 0 6px;">
+							<span class="port-dot" style="width: 4px; height: 4px;"></span>
+							:1420
+						</span>
+					</div>
+					<div style="position: relative; flex: 1; overflow: hidden; height: 140px;">
+						<div style="background: var(--surface-2); height: 100%; padding: var(--space-2) 0; overflow: hidden; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.55;">
+							<div class="log-line"><span class="line-num">20</span><span class="line-text is-stderr">  Parse error @:42:18</span></div>
+							<div class="log-line"><span class="line-num">21</span><span class="line-text is-stderr">  Expected token ";"</span></div>
+							<div class="log-line"><span class="line-num">22</span><span class="line-text">12:04:35 [vite] hmr update ...</span></div>
+							<div class="log-line"><span class="line-num">23</span><span class="line-text">12:04:36 [vite] page reload ...</span></div>
+						</div>
+						<!-- Both pills visible -->
+						<div class="scroll-indicator at-top" style="font-size: 10px; padding: 2px 10px;">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+								<path d="m18 15-6-6-6 6"/>
+							</svg>
+							Scroll to top
+						</div>
+						<div class="scroll-indicator at-bottom" style="font-size: 10px; padding: 2px 10px;">
+							+42 lines
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+								<path d="m6 9 6 6 6-6"/>
+							</svg>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr class="page-sep" style="margin: var(--space-8) var(--space-8) 0;">
+
+	<!-- ═══ Part 2: Process State Variants ════════════════ -->
+	<div style="padding: var(--space-8) var(--space-8);">
+		<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">PROCESS STATE VARIANTS</div>
+		<p class="gk-small" style="color: var(--foreground-muted); margin-bottom: var(--space-8); max-width: 600px;">
+			Title bar status dot and final log line change based on process lifecycle. Port badge shown only for dev-server commands.
+		</p>
+
+		<div class="states-row">
+			<!-- Running (with port) -->
+			<div class="state-card">
+				<div class="state-card-header">
+					<span class="status-dot is-running"></span>
+					<span class="title-command" style="font-size: 11px;">dev-server</span>
+					<span class="title-sep" style="font-size: 11px;">&mdash;</span>
+					<span class="title-issue" style="font-size: 11px;">#42 fix-auth</span>
+					<span class="port-badge" style="height: 16px; font-size: 9px; padding: 0 6px;">
+						<span class="port-dot" style="width: 4px; height: 4px;"></span>
+						:5173
+					</span>
+				</div>
+				<div class="state-card-body">
+					<div class="log-line"><span class="line-num">3</span><span class="line-text">  VITE v6.3.2  ready in 342 ms</span></div>
+					<div class="log-line"><span class="line-num">4</span><span class="line-text">  ➜  Local: http://localhost:5173/</span></div>
+					<div class="log-line"><span class="line-num">5</span><span class="line-text">12:04:31 [vite] hmr update ...</span></div>
+				</div>
+			</div>
+
+			<!-- Passed (no port — check:all is not a server) -->
+			<div class="state-card">
+				<div class="state-card-header">
+					<span class="status-dot is-passed"></span>
+					<span class="title-command" style="font-size: 11px;">check:all</span>
+					<span class="title-sep" style="font-size: 11px;">&mdash;</span>
+					<span class="title-issue" style="font-size: 11px;">#156 auth-flow</span>
+				</div>
+				<div class="state-card-body">
+					<div class="log-line"><span class="line-num">85</span><span class="line-text">  ✓ No lint errors</span></div>
+					<div class="log-line"><span class="line-num">86</span><span class="line-text">  ✓ Types OK</span></div>
+					<div class="log-line"><span class="line-num">87</span><span class="line-text is-exit-success">Process exited (0)</span></div>
+				</div>
+			</div>
+
+			<!-- Failed -->
+			<div class="state-card">
+				<div class="state-card-header">
+					<span class="status-dot is-failed"></span>
+					<span class="title-command" style="font-size: 11px;">test</span>
+					<span class="title-sep" style="font-size: 11px;">&mdash;</span>
+					<span class="title-issue" style="font-size: 11px;">#203 db-queries</span>
+				</div>
+				<div class="state-card-body">
+					<div class="log-line"><span class="line-num">32</span><span class="line-text is-stderr">  ✕ parseIssueNumber › returns null</span></div>
+					<div class="log-line"><span class="line-num">33</span><span class="line-text is-stderr">    Expected: null  Received: undefined</span></div>
+					<div class="log-line"><span class="line-num">34</span><span class="line-text is-exit-fail">Process exited (1)</span></div>
+				</div>
+			</div>
+
+			<!-- Timeout -->
+			<div class="state-card">
+				<div class="state-card-header">
+					<span class="status-dot is-timeout"></span>
+					<span class="title-command" style="font-size: 11px;">e2e</span>
+					<span class="title-sep" style="font-size: 11px;">&mdash;</span>
+					<span class="title-issue" style="font-size: 11px;">#78 perf-test</span>
+				</div>
+				<div class="state-card-body">
+					<div class="log-line"><span class="line-num">113</span><span class="line-text is-stderr">  Timeout exceeded 30000ms</span></div>
+					<div class="log-line"><span class="line-num">114</span><span class="line-text is-stderr">  ".dashboard-grid" not found</span></div>
+					<div class="log-line"><span class="line-num">115</span><span class="line-text is-exit-timeout">Process timed out</span></div>
+				</div>
+			</div>
+
+			<!-- Stopped -->
+			<div class="state-card">
+				<div class="state-card-header">
+					<span class="status-dot is-stopped"></span>
+					<span class="title-command" style="font-size: 11px;">build</span>
+					<span class="title-sep" style="font-size: 11px;">&mdash;</span>
+					<span class="title-issue" style="font-size: 11px;">#42 fix-auth</span>
+				</div>
+				<div class="state-card-body">
+					<div class="log-line"><span class="line-num">7</span><span class="line-text">  vite building for production...</span></div>
+					<div class="log-line"><span class="line-num">8</span><span class="line-text">  transforming (247)...</span></div>
+					<div class="log-line"><span class="line-num">9</span><span class="line-text is-exit-stopped">Process killed</span></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Empty state -->
+		<div style="margin-top: var(--space-8);">
+			<div class="gk-eyebrow" style="margin-bottom: var(--space-3);">EMPTY STATE</div>
+			<div class="state-card" style="max-width: 380px;">
+				<div class="state-card-header">
+					<span class="status-dot is-running"></span>
+					<span class="title-command" style="font-size: 11px;">dev-server</span>
+					<span class="title-sep" style="font-size: 11px;">&mdash;</span>
+					<span class="title-issue" style="font-size: 11px;">#42 fix-auth</span>
+				</div>
+				<div class="state-card-body">
+					<div class="empty-state">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+						</svg>
+						Waiting for output...
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr class="page-sep" style="margin: 0 var(--space-8);">
+
+	<!-- ═══ Part 3: MonospaceBlock Component ══════════════ -->
+	<div class="mb-section">
+		<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">MONOSPACEBLOCK COMPONENT</div>
+		<p class="gk-small" style="color: var(--foreground-muted); margin-bottom: var(--space-8); max-width: 600px;">
+			Shared static code block with optional copy button and max-height scrolling.
+			Replaces inline &lt;pre&gt; patterns in ToolCardExpanded, ToolCardPermission, NoteCard, and AssistantMessage.
+		</p>
+
+		<div class="mb-grid">
+			<!-- Small (3 lines, no copy) -->
+			<div>
+				<div class="gk-eyebrow mb-label">SMALL (3 LINES, NO COPY)</div>
+				<div class="mono-block">Applied 2 edits to src/lib/utils.ts
+Formatted 1 file
+No lint errors found</div>
+			</div>
+
+			<!-- Medium (10 lines, with copy, max-height) -->
+			<div>
+				<div class="gk-eyebrow mb-label">MEDIUM (10 LINES, COPY, MAX-HEIGHT: 200PX)</div>
+				<div class="mono-block has-max-height" style="max-height: 200px;">
+					<button class="mb-copy-btn" aria-label="Copy content">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+						</svg>
+					</button>diff --git a/src/lib/utils.ts b/src/lib/utils.ts
+index 3a8f2e1..b7c9d04 100644
+--- a/src/lib/utils.ts
++++ b/src/lib/utils.ts
+@@ -12,6 +12,14 @@ export function parseIssueNumber(ref: string): number | null {
+   return match ? parseInt(match[1], 10) : null;
+ }
+
++export function formatDuration(ms: number): string {
++  if (ms < 1000) return `${ms}ms`;
++  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
++  const mins = Math.floor(ms / 60_000);
++  const secs = Math.floor((ms % 60_000) / 1000);
++  return `${mins}m ${secs}s`;
++}</div>
+			</div>
+
+			<!-- Large (clipped, with copy) -->
+			<div>
+				<div class="gk-eyebrow mb-label">LARGE (CLIPPED AT 120PX, COPY ON HOVER)</div>
+				<div class="mono-block has-max-height" style="max-height: 120px;">
+					<button class="mb-copy-btn" aria-label="Copy content">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+						</svg>
+					</button>Permission requested: execute_command
+Command: cargo build --release --target x86_64-pc-windows-msvc
+Working directory: C:\_MP_projects\Grovekeeper\src-tauri
+Reason: Building release binary for Windows distribution.
+This will compile the Rust backend with all optimizations enabled.
+
+The build process may take 5-15 minutes depending on
+your system. Incremental builds are faster (~30s) but
+this is a clean release build.
+
+Environment:
+  CARGO_TARGET_DIR=target
+  RUSTFLAGS=-C target-feature=+crt-static
+  RUST_BACKTRACE=1</div>
+			</div>
+
+			<!-- Copied state -->
+			<div>
+				<div class="gk-eyebrow mb-label">COPIED STATE (CHECK ICON, 2S FEEDBACK)</div>
+				<div class="mono-block">
+					<button class="mb-copy-btn is-copied" aria-label="Copied!" style="opacity: 1;">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M20 6 9 17l-5-5"/>
+						</svg>
+					</button>Applied 2 edits to src/lib/utils.ts
+Formatted 1 file</div>
+			</div>
+		</div>
+	</div>
+
+	<hr class="page-sep" style="margin: 0 var(--space-8);">
+
+	<!-- ═══ Part 4: Design Notes ──────────────────────── -->
+	<div style="padding: var(--space-8) var(--space-8) var(--space-16);">
+		<div class="gk-eyebrow" style="margin-bottom: var(--space-6);">DESIGN NOTES</div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); max-width: 720px;">
+			<div>
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Button Styling</div>
+				<p class="gk-small" style="color: var(--foreground-muted);">
+					All buttons match the real <code>Button</code> component: <code>rounded-md</code> (not sm),
+					ghost variant uses <code>bg-transparent hover:bg-surface-2</code>, icon-sm is
+					<code>var(--size-control-sm)</code> (26px), <code>active:scale-96</code>. Footer buttons
+					use <code>variant-secondary</code> with visible border.
+				</p>
+			</div>
+			<div>
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Scroll Indicators</div>
+				<p class="gk-small" style="color: var(--foreground-muted);">
+					Pills are positioned on a wrapper div outside the scroll container using
+					<code>position: absolute</code>. They do not scroll with content. Bottom pill
+					hides when scrolled to bottom. Top pill hides when at top. Click either
+					to jump to that edge.
+				</p>
+			</div>
+			<div>
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Port Badge in Header</div>
+				<p class="gk-small" style="color: var(--foreground-muted);">
+					Reuses existing <code>ServerPortBadge</code> component with <code>:port</code> format.
+					Shown only when a port is detected (dev-server commands). Placed after the issue
+					identifier in the title bar. Not shown for non-server commands like <code>check:all</code>.
+				</p>
+			</div>
+			<div>
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Single Copy Button</div>
+				<p class="gk-small" style="color: var(--foreground-muted);">
+					One copy button in the footer toolbar (removed duplicate from title bar).
+					Uses secondary variant with visible border for discoverability. Same
+					<code>navigator.clipboard + 2s check</code> pattern as CodeBlock.
+				</p>
+			</div>
+			<div>
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Dialog Styling</div>
+				<p class="gk-small" style="color: var(--foreground-muted);">
+					Matches <code>Dialog.Content</code>: <code>rounded-xl</code>, <code>border-border</code>,
+					<code>bg-surface</code>, <code>shadow-lg</code>. Overlay at 72% opacity (matching
+					<code>Dialog.Overlay</code>), no blur per DECISIONS.md.
+				</p>
+			</div>
+			<div>
+				<div class="gk-eyebrow" style="margin-bottom: var(--space-2);">Auto-scroll Toggle</div>
+				<p class="gk-small" style="color: var(--foreground-muted);">
+					Toggle button with <code>aria-pressed</code>. Active state uses primary tint
+					background + primary border. Toggling off pauses auto-scroll; toggling on
+					resumes and jumps to bottom. Scrolling up auto-disables the toggle.
+				</p>
+			</div>
+		</div>
+	</div>
+
+</div>
+</body>
+</html>
