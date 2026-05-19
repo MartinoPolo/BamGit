@@ -59,22 +59,4 @@ describe('CommandResultBadge', () => {
 			await expect.element(badge).toHaveAttribute('aria-label', 'dev: stopped');
 		});
 	});
-
-	describe('stale state', () => {
-		it('applies reduced opacity when stale', async () => {
-			const screen = await render(CommandResultBadge, {
-				props: { state: 'passed', commandName: 'test', isStale: true },
-			});
-			const badge = screen.getByRole('status');
-			await expect.element(badge).toHaveAttribute('aria-label', 'test: passed');
-		});
-
-		it('does not apply reduced opacity when not stale', async () => {
-			const screen = await render(CommandResultBadge, {
-				props: { state: 'passed', commandName: 'test', isStale: false },
-			});
-			const badge = screen.getByRole('status');
-			await expect.element(badge).toHaveAttribute('aria-label', 'test: passed');
-		});
-	});
 });

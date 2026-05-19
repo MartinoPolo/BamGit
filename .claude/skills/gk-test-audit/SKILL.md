@@ -28,7 +28,7 @@ Load these into context before evaluating any test.
 ### Anti-Patterns (flag for removal)
 
 1. **Constant-shape tests**: asserting keys/values of `as const satisfies Record` objects — TypeScript already enforces this
-2. **CSS class assertions**: asserting exact Tailwind classes from `tv()` output — breaks on any design change
+2. **CSS class assertions**: asserting exact Tailwind classes, `tv()` output, animation classes, or `classList.contains()` checks — breaks on any design change. Test observable behavior instead (visibility, aria attributes, computed styles)
 3. **Type-check tests**: verifying that a TypeScript interface is importable/usable — the compiler does this
 4. **Mock-what-you-own**: mocking internal collaborators instead of system boundaries
 5. **Call-count assertions**: `toHaveBeenCalledTimes(1)` on internal methods

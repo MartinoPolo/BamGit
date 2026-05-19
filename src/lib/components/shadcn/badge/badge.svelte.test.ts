@@ -2,10 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import BadgeTestHarness from './BadgeTestHarness.svelte';
 
-function getBadgeElement(screen: Awaited<ReturnType<typeof render>>) {
-	return screen.container.querySelector('[data-slot="badge"]') as HTMLElement;
-}
-
 describe('Badge collapse/expand', () => {
 	describe('expanded (default)', () => {
 		it('renders text content visibly', async () => {
