@@ -15,30 +15,30 @@ describe('Badge collapse/expand', () => {
 			await expect.element(screen.getByText('Passed')).toBeVisible();
 		});
 
-		it('does not apply collapsed class', async () => {
+		it('does not apply collapsed utilities', async () => {
 			const screen = await render(BadgeTestHarness, {
 				props: { tone: 'info', text: 'Running' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(false);
+			expect(badge.classList.contains('gap-0')).toBe(false);
 		});
 
-		it('has collapsible transition class', async () => {
+		it('has transition style', async () => {
 			const screen = await render(BadgeTestHarness, {
 				props: { tone: 'neutral', text: 'Test' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsible')).toBe(true);
+			expect(badge.style.transition).toContain('padding');
 		});
 	});
 
 	describe('collapsed', () => {
-		it('applies badge-collapsed class', async () => {
+		it('applies collapsed utilities', async () => {
 			const screen = await render(BadgeTestHarness, {
 				props: { tone: 'success', collapsed: true, text: 'Passed' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(true);
+			expect(badge.classList.contains('gap-0')).toBe(true);
 		});
 
 		it('hides text via data-badge-text wrapper', async () => {

@@ -18,7 +18,7 @@
 
 <div class="overflow-hidden rounded-0.75 bg-surface-3 {className}" style="height: {height}px">
 	<div
-		class="h-full rounded-0.75 transition-[width] duration-300"
+		class="h-full rounded-0.75 transition-[width] duration-5"
 		style="width: {clampedPercent}%; background: {color}"
 	></div>
 </div>

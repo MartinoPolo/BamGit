@@ -369,7 +369,7 @@
 				<div class="ml-auto flex items-center gap-1.25">
 					{#each navigableSteps as step, index (step)}
 						<div
-							class="h-1.5 transition-all duration-200
+							class="h-1.5 transition-all duration-4
 								{index === currentStepIndex
 								? 'w-4 rounded-sm bg-primary'
 								: index < currentStepIndex

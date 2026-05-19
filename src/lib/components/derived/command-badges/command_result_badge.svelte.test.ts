@@ -20,7 +20,7 @@ describe('CommandResultBadge', () => {
 				props: { state: 'running', commandName: 'test' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(false);
+			expect(badge.classList.contains('gap-0')).toBe(false);
 		});
 
 		it('has role=status and correct aria-label', async () => {
@@ -38,7 +38,7 @@ describe('CommandResultBadge', () => {
 				props: { state: 'passed', commandName: 'test' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(true);
+			expect(badge.classList.contains('gap-0')).toBe(true);
 		});
 
 		it('has correct aria-label', async () => {
@@ -56,7 +56,7 @@ describe('CommandResultBadge', () => {
 				props: { state: 'failed', commandName: 'lint' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(true);
+			expect(badge.classList.contains('gap-0')).toBe(true);
 		});
 
 		it('has correct aria-label', async () => {
@@ -74,7 +74,7 @@ describe('CommandResultBadge', () => {
 				props: { state: 'timeout', commandName: 'build' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(true);
+			expect(badge.classList.contains('gap-0')).toBe(true);
 		});
 
 		it('has correct aria-label', async () => {
@@ -92,7 +92,7 @@ describe('CommandResultBadge', () => {
 				props: { state: 'stopped', commandName: 'dev' },
 			});
 			const badge = getBadgeElement(screen);
-			expect(badge.classList.contains('badge-collapsed')).toBe(true);
+			expect(badge.classList.contains('gap-0')).toBe(true);
 		});
 
 		it('has correct aria-label', async () => {

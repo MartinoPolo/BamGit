@@ -10,7 +10,7 @@
 </script>
 
 <div
-	class="flex flex-col gap-1.5 transition-opacity duration-150 ease-out {dimmed
+	class="flex flex-col gap-1.5 transition-opacity duration-3 ease-out {dimmed
 		? 'opacity-40 hover:opacity-100'
 		: ''}"
 >

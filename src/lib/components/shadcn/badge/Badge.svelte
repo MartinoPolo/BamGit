@@ -15,6 +15,19 @@
 		children,
 		...restProps
 	}: BadgeProps = $props();
+
+	const BADGE_TRANSITION = [
+		'padding var(--duration-5) ease-in-out',
+		'gap var(--duration-5) ease-in-out',
+		'background-color var(--duration-4) ease-in-out',
+		'color var(--duration-4) ease-in-out',
+		'border-color var(--duration-4) ease-in-out',
+	].join(', ');
+
+	const TEXT_TRANSITION = [
+		'opacity var(--duration-4) ease-in-out',
+		'max-width var(--duration-5) ease-in-out',
+	].join(', ');
 </script>
 
 <span
@@ -22,10 +35,10 @@
 	data-slot="badge"
 	class={cn(
 		badgeVariants({ tone, badgeStyle, format, size }),
-		'badge-collapsible',
-		collapsed && 'badge-collapsed',
+		collapsed && 'min-w-5 p-0 gap-0 justify-center rounded-full',
 		className,
 	)}
+	style:transition={BADGE_TRANSITION}
 	{...restProps}
 >
 	{#if icon}
@@ -37,7 +50,7 @@
 		<span
 			class={cn(
 				'size-1.5 shrink-0 rounded-full bg-current',
-				dot === 'pulsing' && 'animate-[badge-pulse_2s_ease-in-out_infinite]',
+				dot === 'pulsing' && 'animate-badge-pulse',
 			)}
 		></span>
 	{/if}
@@ -47,7 +60,7 @@
 			class="inline-flex overflow-hidden whitespace-nowrap"
 			style:opacity={collapsed ? '0' : '1'}
 			style:max-width={collapsed ? '0px' : '200px'}
-			style:transition="opacity 200ms ease-in-out, max-width 300ms ease-in-out"
+			style:transition={TEXT_TRANSITION}
 		>
 			{@render children()}
 		</span>

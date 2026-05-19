@@ -84,9 +84,9 @@
 		outline: none;
 		position: relative;
 		transition:
-			color 150ms ease-out,
-			text-shadow 200ms ease-out,
-			filter 150ms ease-out;
+			color var(--duration-3) ease-out,
+			text-shadow var(--duration-4) ease-out,
+			filter var(--duration-3) ease-out;
 		user-select: none;
 		border-bottom: 1px solid transparent;
 	}

@@ -30,7 +30,7 @@
 		</div>
 		<div class="h-2 w-full overflow-hidden rounded-full bg-muted">
 			<div
-				class="h-full rounded-full bg-primary transition-all duration-300"
+				class="h-full rounded-full bg-primary transition-all duration-5"
 				style:width="{completionPercent}%"
 			></div>
 		</div>
