@@ -1,3 +1,5 @@
+/* stylelint-disable no-descending-specificity */
+
 /*
  * Tailwind CSS 4 cannot generate :has(+ sibling) selectors. Chrome does
  * not support nested :has() inside :has(). This file uses the descendant
