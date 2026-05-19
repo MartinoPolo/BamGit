@@ -21,6 +21,7 @@
 	import SquareCheckIcon from '@lucide/svelte/icons/square-check';
 	import SquareIcon from '@lucide/svelte/icons/square';
 	import ZapIcon from '@lucide/svelte/icons/zap';
+	import CommandSubmenu from './CommandSubmenu.svelte';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -119,6 +120,9 @@
 				</ContextMenu.Portal>
 			</ContextMenu.Sub>
 		{/if}
+
+		<!-- Commands submenu -->
+		<CommandSubmenu dashboardId={issue.dashboard_id} issueId={issue.id} />
 
 		<ContextMenu.Separator />
 

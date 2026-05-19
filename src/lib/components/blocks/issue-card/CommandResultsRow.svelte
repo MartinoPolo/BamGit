@@ -33,12 +33,19 @@
 			})),
 	);
 
-	const serverPort = $derived.by(() => {
-		const serverProcess = issueProcesses.find(
-			(p) => p.category === 'server' && p.port !== null && p.status === 'running',
+	const runningServerProcess = $derived.by(() => {
+		return (
+			issueProcesses.find(
+				(p) => p.category === 'server' && p.port !== null && p.status === 'running',
+			) ?? null
 		);
-		return serverProcess?.port ?? null;
 	});
+
+	const serverPort = $derived(runningServerProcess?.port ?? null);
+
+	function handleKillServerProcess(processId: string) {
+		void processesCtx.killProcess(processId);
+	}
 
 	const visibleResults = $derived(commandResults.slice(0, MAX_VISIBLE_COMMAND_RESULTS));
 	const overflow = $derived(computeCommandResultsOverflow(commandResults.length));
@@ -61,8 +68,13 @@
 				+{overflow.overflowCount}
 			</span>
 		{/if}
-		{#if serverPort !== null}
-			<ServerPortBadge port={serverPort} badgeStyle={ctx.appearanceSettings.badgeStyle} />
+		{#if serverPort !== null && runningServerProcess !== null}
+			<ServerPortBadge
+				port={serverPort}
+				badgeStyle={ctx.appearanceSettings.badgeStyle}
+				processId={runningServerProcess.process_id}
+				onKillProcess={handleKillServerProcess}
+			/>
 		{/if}
 	</div>
 {/if}
