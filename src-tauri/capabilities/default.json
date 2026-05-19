@@ -8,6 +8,8 @@
 		"opener:default",
 		"notification:default",
 		"dialog:default",
-		"mcp-bridge:default"
+		"mcp-bridge:default",
+		"wdio:default",
+		"core:window:allow-minimize"
 	]
 }

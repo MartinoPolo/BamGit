@@ -49,6 +49,9 @@ pub fn run() {
             #[cfg(desktop)]
             {
                 let handle = app.handle().clone();
+
+                #[cfg(debug_assertions)]
+                handle.plugin(tauri_plugin_wdio::init())?;
                 handle.plugin(tauri_plugin_single_instance::init(
                     |app_handle, args, _cwd| {
                         // Parse --dashboard-id=<id> from args

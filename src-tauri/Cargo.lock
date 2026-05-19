@@ -1677,6 +1677,7 @@ dependencies = [
  "tauri-plugin-notification",
  "tauri-plugin-opener",
  "tauri-plugin-single-instance",
+ "tauri-plugin-wdio",
  "tempfile",
  "thiserror 2.0.18",
  "tokio",
@@ -5240,6 +5241,23 @@ dependencies = [
  "tracing",
  "windows-sys 0.60.2",
  "zbus",
+]
+
+[[package]]
+name = "tauri-plugin-wdio"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "222c7f9a9c1e16826fc2112d847ed5a3a6b7983a7d588c6b8d5f43b28f0c60b5"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin",
+ "thiserror 1.0.69",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]
