@@ -10,12 +10,12 @@
 </script>
 
 <li>
-	{#each keyParts as key, i (i)}
+	{#each keyParts as keyPart, i (i)}
 		{#if i > 0}
-			{' / '}
+			<span>/</span>
 		{/if}
-		<kbd class="rounded bg-muted px-1 font-mono text-xs">{key}</kbd>
+		<kbd class="rounded bg-muted px-1 font-mono text-xs">{keyPart}</kbd>
 	{/each}
-	{' — '}
-	{action}
+	<span>—</span>
+	<span>{action}</span>
 </li>

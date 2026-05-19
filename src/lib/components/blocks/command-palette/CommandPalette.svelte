@@ -3,7 +3,7 @@
 	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
 	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
-	import { Dialog as DialogPrimitive } from 'bits-ui';
+	import type { Dialog as DialogPrimitive } from 'bits-ui';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import * as Command from '$lib/components/shadcn/command/index.js';
 	import { Kbd } from '$lib/components/shadcn/kbd/index.js';

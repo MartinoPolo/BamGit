@@ -2,7 +2,7 @@
 	import type { Component, ComponentProps, Snippet } from 'svelte';
 	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
 	import type { WithoutChildrenOrChild } from '$lib/utils.js';
-	import DropdownMenuPortal from '$lib/components/shadcn/dropdown-menu/dropdown-menu-portal.svelte';
+	import type DropdownMenuPortal from '$lib/components/shadcn/dropdown-menu/dropdown-menu-portal.svelte';
 
 	// ─── Types ───────────────────────────────────────────────────────────────
 
