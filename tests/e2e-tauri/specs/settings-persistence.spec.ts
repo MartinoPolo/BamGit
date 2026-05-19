@@ -91,7 +91,7 @@ describe('Settings Persistence — accent color', () => {
 		let clicked = false;
 		for (const button of accentButtons) {
 			const classes = await button.getAttribute('class');
-			if (classes !== null && !classes.includes('border-primary')) {
+			if (classes !== null && classes.includes('border-primary') === false) {
 				await button.click();
 				clicked = true;
 				break;
