@@ -18,7 +18,7 @@ test.describe('Settings entry points', () => {
 		await page.waitForLoadState('networkidle');
 
 		const content = page.locator('main, [class*="flex-col"][class*="p-8"]').first();
-		const gearButton = content.getByRole('button', { name: /settings/i });
+		const gearButton = content.getByRole('button', { name: 'Settings', exact: true });
 		await expect(gearButton).toBeVisible();
 		await gearButton.click();
 
