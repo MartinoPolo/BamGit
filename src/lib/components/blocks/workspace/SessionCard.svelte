@@ -68,7 +68,7 @@
 
 <!-- Using div instead of button to allow nested Stop button -->
 <div
-	class="w-full cursor-pointer rounded-lg border border-border bg-card p-3 text-left transition hover:border-input hover:bg-accent"
+	class="w-full cursor-pointer rounded-lg border border-border bg-card p-3 text-left transition hover:border-input hover:bg-accent/25"
 	role="button"
 	tabindex="0"
 	onclick={() => onClick(session)}

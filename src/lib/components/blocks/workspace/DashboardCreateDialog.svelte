@@ -140,7 +140,7 @@
 							>
 								{#each repoDashboards as repo (repo.id)}
 									<label
-										class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-accent"
+										class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-accent/25"
 									>
 										<Checkbox
 											checked={selectedRepoIds.has(repo.id)}

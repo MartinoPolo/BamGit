@@ -14,9 +14,12 @@
 	class={cn(
 		'flex size-(--cell-size) flex-col items-center justify-center gap-1 rounded-(--cell-radius) p-0 leading-none font-normal whitespace-nowrap select-none',
 		'[&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius)',
-		'not-data-selected:hover:bg-accent/50 not-data-selected:hover:text-accent-foreground',
-		'[&[data-today]:not([data-selected])]:bg-accent [&[data-today]:not([data-selected])]:text-accent-foreground [&[data-today][data-disabled]]:text-muted-foreground',
-		'data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:text-foreground',
+		'not-data-selected:hover:bg-accent/15',
+		// Today (not selected) — light accent tint ensures contrast on all accent colors
+		'[&[data-today]:not([data-selected])]:bg-accent/25 [&[data-today]:not([data-selected])]:hover:bg-accent/50',
+		'[&[data-today][data-disabled]]:text-muted-foreground',
+		// Selected
+		'data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary/80',
 		// Outside months
 		'[&[data-outside-month]:not([data-selected])]:text-muted-foreground [&[data-outside-month]:not([data-selected])]:hover:text-accent-foreground',
 		// Disabled
