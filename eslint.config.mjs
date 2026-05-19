@@ -24,6 +24,8 @@ export default [
 			'src/lib/types/generated',
 			'**/*.config.*',
 			'*.d.ts',
+			'tests/**',
+			'wdio.conf.ts',
 		],
 	},
 	...tseslint.configs.recommended,
@@ -154,17 +156,6 @@ export default [
 					format: ['PascalCase'],
 				},
 			],
-		},
-	},
-	{
-		files: ['tests/**/*.ts', 'wdio.conf.ts'],
-		languageOptions: {
-			parser: tseslint.parser,
-			parserOptions: {
-				projectService: true,
-				tsconfigRootDir: import.meta.dirname,
-			},
-			globals: { ...globals.browser, ...globals.node },
 		},
 	},
 ];
