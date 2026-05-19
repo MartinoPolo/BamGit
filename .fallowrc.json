@@ -37,7 +37,9 @@
 		"@wdio/local-runner",
 		"@wdio/mocha-framework",
 		"@wdio/spec-reporter",
-		"@wdio/tauri-service"
+		"@wdio/tauri-service",
+		"@wdio/tauri-plugin",
+		"@wdio/cli"
 	],
 	"health": {
 		"maxCrap": 60
