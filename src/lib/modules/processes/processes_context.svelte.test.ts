@@ -10,6 +10,8 @@ const MOCK_PROCESS: RunningProcess = {
 	pid: 1234,
 	port: null,
 	status: 'running' as ProcessStatus,
+	restart_count: 0,
+	max_restarts: 3,
 };
 
 const MOCK_PROCESS_2: RunningProcess = {
@@ -21,6 +23,8 @@ const MOCK_PROCESS_2: RunningProcess = {
 	pid: 5678,
 	port: 3000,
 	status: 'running' as ProcessStatus,
+	restart_count: 0,
+	max_restarts: 3,
 };
 
 const mockInvoke = vi.fn();
@@ -166,6 +170,31 @@ describe('processes context (factory)', () => {
 
 		publicApi.closeLogViewer();
 		expect(publicApi.activeLogViewerProcessId).toBeNull();
+	});
+
+	it('handleProcessRestarted updates restart count and status', async () => {
+		mockInvoke.mockResolvedValue({ ...MOCK_PROCESS, status: 'failed' as ProcessStatus });
+		const { publicApi, handleProcessRestarted } = await createCtx();
+
+		await publicApi.runCommand('cmd-1', 'issue-1');
+		// Process starts as failed
+		const before = publicApi.processes.find((p) => p.process_id === 'proc-1');
+		expect(before?.status).toBe('failed');
+
+		handleProcessRestarted(['proc-1', 2, 3]);
+
+		const process = publicApi.processes.find((p) => p.process_id === 'proc-1');
+		expect(process?.restart_count).toBe(2);
+		expect(process?.max_restarts).toBe(3);
+		expect(process?.status).toBe('running');
+	});
+
+	it('handleProcessRestarted ignores unknown process', async () => {
+		const { publicApi, handleProcessRestarted } = await createCtx();
+
+		// Should not throw
+		handleProcessRestarted(['unknown-proc', 1, 3]);
+		expect(publicApi.processes).toHaveLength(0);
 	});
 
 	it('getFullProcessLogs invokes with correct args', async () => {

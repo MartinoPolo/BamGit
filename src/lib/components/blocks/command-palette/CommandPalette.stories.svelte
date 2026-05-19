@@ -15,7 +15,7 @@
 	import { onMount } from 'svelte';
 	import CommandPalette from './CommandPalette.svelte';
 
-	let isMounted = false;
+	let isMounted = $state(false);
 
 	onMount(() => {
 		isMounted = true;

@@ -14,50 +14,115 @@ pub fn open_terminal(folder_path: String, tab_color: Option<String>) -> Result<(
     }
 
     if cfg!(target_os = "windows") {
-        spawn_windows_terminal(&folder_path, tab_color.as_deref())
+        spawn_windows_terminal(&folder_path, tab_color.as_deref(), None)
     } else if cfg!(target_os = "macos") {
-        spawn_macos_terminal(&folder_path)
+        spawn_macos_terminal(&folder_path, None)
     } else {
-        spawn_linux_terminal(&folder_path)
+        spawn_linux_terminal(&folder_path, None)
     }
 }
 
-fn spawn_windows_terminal(folder_path: &str, tab_color: Option<&str>) -> Result<(), String> {
-    let mut command = Command::new("wt");
-    command.args(["-w", "0", "nt", "-d", folder_path]);
-
+/// Opens a terminal window at the given folder path and runs a command.
+///
+/// On Windows, uses Windows Terminal (`wt`) with `cmd /k` to keep the terminal open.
+/// On macOS, uses `osascript` to tell Terminal.app to run the command.
+/// On Linux, tries `x-terminal-emulator`, falling back to `xterm`.
+pub fn open_terminal_with_command(
+    folder_path: &str,
+    command: &str,
+    tab_color: Option<&str>,
+) -> Result<(), String> {
     if let Some(color) = tab_color {
-        command.args(["--tabColor", color]);
+        validate_hex_color(color)?;
     }
 
-    command
-        .spawn()
+    if cfg!(target_os = "windows") {
+        spawn_windows_terminal(folder_path, tab_color, Some(command))
+    } else if cfg!(target_os = "macos") {
+        spawn_macos_terminal(folder_path, Some(command))
+    } else {
+        spawn_linux_terminal(folder_path, Some(command))
+    }
+}
+
+fn spawn_windows_terminal(
+    folder_path: &str,
+    tab_color: Option<&str>,
+    command: Option<&str>,
+) -> Result<(), String> {
+    let mut cmd = Command::new("wt");
+    cmd.args(["-w", "0", "nt", "-d", folder_path]);
+
+    if let Some(color) = tab_color {
+        cmd.args(["--tabColor", color]);
+    }
+
+    if let Some(cmd_str) = command {
+        cmd.args(["cmd", "/k", cmd_str]);
+    }
+
+    cmd.spawn()
         .map_err(|error| format!("Could not open Windows Terminal: {error}"))?;
 
     Ok(())
 }
 
-fn spawn_macos_terminal(folder_path: &str) -> Result<(), String> {
-    Command::new("open")
-        .args(["-a", "Terminal", folder_path])
-        .spawn()
-        .map_err(|error| format!("Could not open Terminal: {error}"))?;
+fn spawn_macos_terminal(folder_path: &str, command: Option<&str>) -> Result<(), String> {
+    match command {
+        Some(cmd) => {
+            let script = format!(
+                "tell application \"Terminal\" to do script \"cd '{}' && {}\"",
+                folder_path.replace('\'', "'\\''"),
+                cmd.replace('\'', "'\\''"),
+            );
+            Command::new("osascript")
+                .args(["-e", &script])
+                .spawn()
+                .map_err(|error| format!("Could not open Terminal: {error}"))?;
+        }
+        None => {
+            Command::new("open")
+                .args(["-a", "Terminal", folder_path])
+                .spawn()
+                .map_err(|error| format!("Could not open Terminal: {error}"))?;
+        }
+    }
 
     Ok(())
 }
 
-fn spawn_linux_terminal(folder_path: &str) -> Result<(), String> {
-    let result = Command::new("x-terminal-emulator")
-        .args(["--working-directory", folder_path])
-        .spawn();
+fn spawn_linux_terminal(folder_path: &str, command: Option<&str>) -> Result<(), String> {
+    let result = match command {
+        Some(cmd) => Command::new("x-terminal-emulator")
+            .args(["--working-directory", folder_path, "-e", cmd])
+            .spawn(),
+        None => Command::new("x-terminal-emulator")
+            .args(["--working-directory", folder_path])
+            .spawn(),
+    };
 
     match result {
         Ok(_) => Ok(()),
         Err(_) => {
-            Command::new("xterm")
-                .current_dir(folder_path)
-                .spawn()
-                .map_err(|error| format!("Could not open terminal: {error}"))?;
+            match command {
+                Some(cmd) => {
+                    let shell_cmd = format!(
+                        "cd '{}' && {}",
+                        folder_path.replace('\'', "'\\''"),
+                        cmd.replace('\'', "'\\''"),
+                    );
+                    Command::new("xterm")
+                        .args(["-e", &shell_cmd])
+                        .spawn()
+                        .map_err(|error| format!("Could not open terminal: {error}"))?;
+                }
+                None => {
+                    Command::new("xterm")
+                        .current_dir(folder_path)
+                        .spawn()
+                        .map_err(|error| format!("Could not open terminal: {error}"))?;
+                }
+            }
 
             Ok(())
         }

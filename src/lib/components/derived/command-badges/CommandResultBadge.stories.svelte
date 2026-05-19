@@ -165,6 +165,43 @@
 	{/snippet}
 </Story>
 
+<Story name="Restart Indicator">
+	{#snippet template()}
+		<div class="flex flex-col gap-4">
+			<p class="text-xs text-foreground-muted">
+				Badges with restart count (shown when restartCount &gt; 0)
+			</p>
+			<div class="flex flex-wrap items-center gap-3">
+				<CommandResultBadge
+					state="running"
+					commandName="dev"
+					restartCount={1}
+					maxRestarts={3}
+				/>
+				<CommandResultBadge
+					state="running"
+					commandName="dev"
+					restartCount={2}
+					maxRestarts={5}
+				/>
+				<CommandResultBadge
+					state="failed"
+					commandName="build"
+					restartCount={3}
+					maxRestarts={3}
+				/>
+				<CommandResultBadge
+					state="running"
+					commandName="test"
+					restartCount={0}
+					maxRestarts={3}
+				/>
+				<CommandResultBadge state="passed" commandName="lint" />
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Interactive" args={{ state: 'running', commandName: 'pnpm test' }}>
 	{#snippet template(args: CommandResultBadgeProps)}
 		<CommandResultBadge {...args} />

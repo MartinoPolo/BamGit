@@ -16,6 +16,8 @@
 		commandName,
 		isStale = false,
 		badgeStyle = 'borderless-dark',
+		restartCount,
+		maxRestarts,
 	}: CommandResultBadgeProps = $props();
 
 	const TONE_MAP: Record<CommandResultState, BadgeTone> = {
@@ -55,4 +57,7 @@
 		{/if}
 	{/snippet}
 	{commandName}
+	{#if restartCount !== undefined && restartCount > 0}
+		<span class="text-[9px] opacity-70">↻{restartCount}/{maxRestarts ?? 3}</span>
+	{/if}
 </Badge>

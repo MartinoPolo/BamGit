@@ -124,3 +124,11 @@ where
     let value: Option<String> = Option::deserialize(deserializer)?;
     Ok(Some(value))
 }
+
+pub fn deserialize_optional_nullable_i64<'de, D>(deserializer: D) -> Result<Option<Option<i64>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let value: Option<i64> = Option::deserialize(deserializer)?;
+    Ok(Some(value))
+}
