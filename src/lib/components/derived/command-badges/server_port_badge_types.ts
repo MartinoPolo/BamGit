@@ -5,4 +5,7 @@ export interface ServerPortBadgeProps {
 	port: number;
 	badgeStyle?: BadgeStyle;
 	onclick?: () => void;
+	processId?: string;
+	onViewLogs?: (processId: string) => void;
+	onKillProcess?: (processId: string) => void;
 }
