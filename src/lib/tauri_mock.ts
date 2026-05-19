@@ -21,6 +21,7 @@ import {
 	MOCK_WINDOW_BINDINGS,
 	MOCK_WORKSPACE_COMMANDS,
 	MOCK_USER_SETTINGS,
+	MOCK_PROCESSES,
 } from './tauri_mock_data.js';
 
 type MockHandler = (args: Record<string, unknown>) => unknown;
@@ -109,9 +110,13 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	unarchive_dashboard: () => null,
 
 	// ─── Process management ───────────────────────────────────────────────────
-	get_running_processes: () => [],
-	get_processes_for_issue: () => [],
-	get_process_logs: () => [],
+	get_running_processes: () => MOCK_PROCESSES,
+	get_processes_for_issue: (args) => MOCK_PROCESSES.filter((p) => p.issue_id === args.issue_id),
+	get_process_logs: () => [
+		'[07:30:01] Starting build...',
+		'[07:30:02] Compiling 42 modules',
+		'[07:30:05] Build complete (3.2s)',
+	],
 
 	// ─── Sessions reads ───────────────────────────────────────────────────────
 	get_sessions: () => MOCK_SESSIONS,

@@ -1,9 +1,10 @@
+use regex::Regex;
 use tauri::{AppHandle, Emitter, State};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use uuid::Uuid;
 
 use crate::database::connection::DatabaseState;
-use crate::process::manager::{try_extract_port, ProcessManager, ProcessStatus, RunningProcess};
+use crate::process::manager::{ProcessManager, ProcessStatus, RunningProcess};
 
 #[tauri::command]
 pub async fn run_workspace_command(
@@ -74,8 +75,9 @@ pub async fn run_workspace_command(
     let task_process_id = process_id.clone();
     let task_pm = process_manager.inner().clone();
     let task_app = app_handle.clone();
-    let task_port_pattern = port_pattern.clone();
     let task_expected_exit_code = expected_exit_code;
+    // Compile once, move into task — avoids per-line recompilation
+    let compiled_port_regex = port_pattern.as_deref().and_then(|p| Regex::new(p).ok());
 
     let join_handle = tokio::spawn(async move {
         if let Some(stdout) = stdout {
@@ -84,10 +86,16 @@ pub async fn run_workspace_command(
             while let Ok(Some(line)) = lines.next_line().await {
                 task_pm.append_log(&task_process_id, line.clone());
 
-                if let Some(ref pattern) = task_port_pattern {
-                    if let Some(port) = try_extract_port(&line, pattern) {
-                        task_pm.set_port(&task_process_id, port);
-                        let _ = task_app.emit("process-port-detected", (&task_process_id, port));
+                if let Some(ref regex) = compiled_port_regex {
+                    if let Some(captures) = regex.captures(&line) {
+                        if let Some(port) = captures
+                            .get(1)
+                            .and_then(|m| m.as_str().parse::<u16>().ok())
+                        {
+                            task_pm.set_port(&task_process_id, port);
+                            let _ =
+                                task_app.emit("process-port-detected", (&task_process_id, port));
+                        }
                     }
                 }
 
@@ -100,7 +108,7 @@ pub async fn run_workspace_command(
         let final_status = match exit_status {
             Ok(status) => {
                 if !is_server && status.code() == Some(task_expected_exit_code as i32) {
-                    ProcessStatus::Stopped
+                    ProcessStatus::Passed
                 } else if !is_server {
                     ProcessStatus::Failed
                 } else {
@@ -114,7 +122,6 @@ pub async fn run_workspace_command(
         let _ = task_app.emit("process-exited", (&task_process_id, &final_status));
     });
 
-    // Also spawn stderr reader
     if let Some(stderr) = stderr {
         let stderr_pm = process_manager.inner().clone();
         let stderr_process_id = process_id.clone();

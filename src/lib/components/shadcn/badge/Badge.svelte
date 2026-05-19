@@ -8,6 +8,7 @@
 		badgeStyle = 'bordered-dark',
 		format = 'default',
 		size = 'default',
+		collapsed = false,
 		dot,
 		icon,
 		ref = $bindable(null),
@@ -19,11 +20,18 @@
 <span
 	bind:this={ref}
 	data-slot="badge"
-	class={cn(badgeVariants({ tone, badgeStyle, format, size }), className)}
+	class={cn(
+		badgeVariants({ tone, badgeStyle, format, size }),
+		'badge-collapsible',
+		collapsed && 'badge-collapsed',
+		className,
+	)}
 	{...restProps}
 >
 	{#if icon}
-		{@render icon()}
+		<span data-badge-icon class="inline-flex shrink-0">
+			{@render icon()}
+		</span>
 	{/if}
 	{#if dot}
 		<span
@@ -33,5 +41,15 @@
 			)}
 		></span>
 	{/if}
-	{@render children?.()}
+	{#if children}
+		<span
+			data-badge-text
+			class="inline-flex overflow-hidden whitespace-nowrap"
+			style:opacity={collapsed ? '0' : '1'}
+			style:max-width={collapsed ? '0px' : '200px'}
+			style:transition="opacity 200ms ease-in-out, max-width 300ms ease-in-out"
+		>
+			{@render children()}
+		</span>
+	{/if}
 </span>

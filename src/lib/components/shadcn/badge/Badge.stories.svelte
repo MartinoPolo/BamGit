@@ -42,6 +42,19 @@
 	import type { BadgeProps } from './badge-variants.js';
 	import CheckIcon from '@lucide/svelte/icons/circle-check';
 	import AlertIcon from '@lucide/svelte/icons/triangle-alert';
+	import XIcon from '@lucide/svelte/icons/circle-x';
+	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
+
+	let collapseDemoStates = $state<Record<string, boolean>>({
+		success: false,
+		danger: false,
+		warning: false,
+		info: false,
+	});
+
+	function toggleCollapse(tone: string) {
+		collapseDemoStates[tone] = !collapseDemoStates[tone];
+	}
 </script>
 
 <Story name="All Variants">
@@ -117,6 +130,76 @@
 			<Badge format="mono" {...args}>v2.1.0</Badge>
 			<Badge format="mono" {...args}>GET</Badge>
 			<Badge format="mono" {...args}>200</Badge>
+		</div>
+	{/snippet}
+</Story>
+
+<Story name="Collapsible">
+	{#snippet template(args: BadgeProps)}
+		<div class="flex flex-col gap-6">
+			<p class="text-xs text-foreground-muted">
+				Click badges to toggle collapse/expand animation
+			</p>
+			<div class="flex flex-wrap items-center gap-3">
+				<button type="button" onclick={() => toggleCollapse('success')}>
+					<Badge tone="success" collapsed={collapseDemoStates.success} {...args}>
+						{#snippet icon()}<CheckIcon class="size-3" />{/snippet}
+						Passed
+					</Badge>
+				</button>
+				<button type="button" onclick={() => toggleCollapse('danger')}>
+					<Badge tone="danger" collapsed={collapseDemoStates.danger} {...args}>
+						{#snippet icon()}<XIcon class="size-3" />{/snippet}
+						Failed
+					</Badge>
+				</button>
+				<button type="button" onclick={() => toggleCollapse('warning')}>
+					<Badge tone="warning" collapsed={collapseDemoStates.warning} {...args}>
+						{#snippet icon()}<AlertIcon class="size-3" />{/snippet}
+						Warning
+					</Badge>
+				</button>
+				<button type="button" onclick={() => toggleCollapse('info')}>
+					<Badge tone="info" collapsed={collapseDemoStates.info} {...args}>
+						{#snippet icon()}<LoaderCircleIcon class="size-3 animate-spin" />{/snippet}
+						Running
+					</Badge>
+				</button>
+			</div>
+			<div class="flex flex-col gap-2">
+				<p class="text-xs font-medium text-foreground-muted">Always collapsed</p>
+				<div class="flex flex-wrap items-center gap-3">
+					<Badge tone="success" collapsed>
+						{#snippet icon()}<CheckIcon class="size-3" />{/snippet}
+						Passed
+					</Badge>
+					<Badge tone="danger" collapsed>
+						{#snippet icon()}<XIcon class="size-3" />{/snippet}
+						Failed
+					</Badge>
+					<Badge tone="warning" collapsed>
+						{#snippet icon()}<AlertIcon class="size-3" />{/snippet}
+						Warning
+					</Badge>
+				</div>
+			</div>
+			<div class="flex flex-col gap-2">
+				<p class="text-xs font-medium text-foreground-muted">Always expanded</p>
+				<div class="flex flex-wrap items-center gap-3">
+					<Badge tone="success">
+						{#snippet icon()}<CheckIcon class="size-3" />{/snippet}
+						Passed
+					</Badge>
+					<Badge tone="danger">
+						{#snippet icon()}<XIcon class="size-3" />{/snippet}
+						Failed
+					</Badge>
+					<Badge tone="info">
+						{#snippet icon()}<LoaderCircleIcon class="size-3 animate-spin" />{/snippet}
+						Running
+					</Badge>
+				</div>
+			</div>
 		</div>
 	{/snippet}
 </Story>
