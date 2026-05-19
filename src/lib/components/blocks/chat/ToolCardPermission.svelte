@@ -4,6 +4,7 @@
 	import CornerDownLeftIcon from '@lucide/svelte/icons/corner-down-left';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Kbd, KbdGroup } from '$lib/components/shadcn/kbd/index.js';
+	import { MonospaceBlock } from '$lib/components/base/monospace-block/index.js';
 	import { extractToolDetail, getToolAccentColor } from './tool_card_utils.js';
 
 	interface Props {
@@ -40,8 +41,10 @@
 		<div class="w-0.75 shrink-0 bg-status-warning"></div>
 		<div class="flex-1 px-3 py-2.5">
 			{#if detail}
-				<pre
-					class="m-0 mb-3 whitespace-pre-wrap font-mono text-[11.5px] leading-normal text-foreground-muted">{detail}</pre>
+				<MonospaceBlock
+					content={detail}
+					class="m-0 mb-3 rounded-none border-0 bg-transparent p-0 text-foreground-muted"
+				/>
 			{/if}
 			<div class="flex gap-1.5">
 				<Button intent="primary" size="sm" class="h-(--size-control-md)" onclick={onAllow}>

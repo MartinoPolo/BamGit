@@ -271,6 +271,7 @@ pub fn run() {
             process_commands::get_running_processes,
             process_commands::get_processes_for_issue,
             process_commands::get_process_logs,
+            process_commands::get_full_process_logs,
             workspace_command_commands::create_workspace_command,
             workspace_command_commands::get_workspace_commands_for_dashboard,
             workspace_command_commands::update_workspace_command,

@@ -110,4 +110,72 @@ describe('processes context (factory)', () => {
 		const process = publicApi.processes.find((p) => p.process_id === 'proc-1');
 		expect(process?.port).toBe(8080);
 	});
+
+	it('handleProcessOutput stores stdout line in logLines', async () => {
+		const { publicApi, handleProcessOutput } = await createCtx();
+
+		handleProcessOutput(['proc-1', 'stdout', 'hello world']);
+
+		const lines = publicApi.logLines.get('proc-1');
+		expect(lines).toHaveLength(1);
+		expect(lines![0]).toEqual({ stream: 'stdout', text: 'hello world' });
+	});
+
+	it('handleProcessOutput stores stderr line in logLines', async () => {
+		const { publicApi, handleProcessOutput } = await createCtx();
+
+		handleProcessOutput(['proc-1', 'stderr', 'error message']);
+
+		const lines = publicApi.logLines.get('proc-1');
+		expect(lines).toHaveLength(1);
+		expect(lines![0]).toEqual({ stream: 'stderr', text: 'error message' });
+	});
+
+	it('handleProcessOutput accumulates lines for the same process', async () => {
+		const { publicApi, handleProcessOutput } = await createCtx();
+
+		handleProcessOutput(['proc-1', 'stdout', 'line 1']);
+		handleProcessOutput(['proc-1', 'stdout', 'line 2']);
+		handleProcessOutput(['proc-1', 'stderr', 'error']);
+
+		const lines = publicApi.logLines.get('proc-1');
+		expect(lines).toHaveLength(3);
+		expect(lines![2]).toEqual({ stream: 'stderr', text: 'error' });
+	});
+
+	it('handleProcessOutput caps at 1000 lines', async () => {
+		const { publicApi, handleProcessOutput } = await createCtx();
+
+		for (let i = 0; i < 1050; i++) {
+			handleProcessOutput(['proc-1', 'stdout', `line ${i}`]);
+		}
+
+		const lines = publicApi.logLines.get('proc-1');
+		expect(lines).toHaveLength(1000);
+		expect(lines![0].text).toBe('line 50');
+		expect(lines![999].text).toBe('line 1049');
+	});
+
+	it('openLogViewer and closeLogViewer manage activeLogViewerProcessId', async () => {
+		const { publicApi } = await createCtx();
+
+		expect(publicApi.activeLogViewerProcessId).toBeNull();
+
+		publicApi.openLogViewer('proc-1');
+		expect(publicApi.activeLogViewerProcessId).toBe('proc-1');
+
+		publicApi.closeLogViewer();
+		expect(publicApi.activeLogViewerProcessId).toBeNull();
+	});
+
+	it('getFullProcessLogs invokes with correct args', async () => {
+		mockInvoke.mockResolvedValue('full log content\nline 2');
+		const { publicApi } = await createCtx();
+
+		const result = await publicApi.getFullProcessLogs('proc-1');
+		expect(mockInvoke).toHaveBeenCalledWith('get_full_process_logs', {
+			process_id: 'proc-1',
+		});
+		expect(result).toBe('full log content\nline 2');
+	});
 });
