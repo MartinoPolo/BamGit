@@ -15,7 +15,7 @@
 	let deletePackName = $state('');
 </script>
 
-<section class="space-y-4">
+<section class="flex flex-col gap-4">
 	<div class="flex items-center justify-between">
 		<div>
 			<h2 class="text-lg font-medium">Characters</h2>
@@ -36,7 +36,7 @@
 		</div>
 	</div>
 
-	<div class="space-y-2">
+	<div class="flex flex-col gap-2">
 		{#each characterPacks.packs as pack (pack.id)}
 			<CharacterListCard
 				{pack}

@@ -21,7 +21,7 @@ import {
 	setWorkspaceSetting,
 	deleteWorkspaceSetting,
 } from './settings_commands.js';
-import { isThemeMode, isAccentColor } from '$lib/modules/board/types.js';
+import { isThemeMode, isAccentColor, type ThemeMode } from '$lib/modules/board/types.js';
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -170,9 +170,10 @@ function createSettingsContext() {
 		activeDashboardId.current = dashboardId ?? null;
 	}
 
-	function getThemeMode(): string {
+	function getThemeMode(): ThemeMode {
 		const raw = values.get('themeMode') ?? SETTING_DEFAULTS.themeMode;
-		return isThemeMode(raw) ? raw : SETTING_DEFAULTS.themeMode;
+		// SETTING_DEFAULTS.themeMode is always 'system', a valid ThemeMode
+		return isThemeMode(raw) ? raw : (SETTING_DEFAULTS.themeMode as ThemeMode);
 	}
 
 	function getAccentColor(): string {

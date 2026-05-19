@@ -187,14 +187,14 @@
 </script>
 
 {#if dashboard === null}
-	<div class="space-y-4">
+	<div class="flex flex-col gap-4">
 		<h2 class="text-lg font-medium">Workspace</h2>
 		<p class="text-sm text-muted-foreground">
 			No workspace selected. Workspace settings are available when a workspace is active.
 		</p>
 	</div>
 {:else}
-	<div class="space-y-8">
+	<div class="flex flex-col gap-8">
 		<div class="flex items-center justify-between">
 			<div>
 				<h2 class="text-lg font-medium">{dashboard.name}</h2>
@@ -219,17 +219,17 @@
 		{/if}
 
 		<!-- General Section -->
-		<section class="space-y-4">
+		<section class="flex flex-col gap-4">
 			<h3 class="text-base font-medium">General</h3>
 			<Separator />
 
-			<div class="space-y-4">
-				<div class="space-y-1.5">
+			<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-1.5">
 					<Label for="ws-name">Name</Label>
 					<Input id="ws-name" bind:value={name} oninput={markDirty} required />
 				</div>
 
-				<div class="space-y-1.5">
+				<div class="flex flex-col gap-1.5">
 					<Label>Accent Color</Label>
 					<ColorPickerContent
 						colors={WORKSPACE_ACCENT_PALETTE}
@@ -242,7 +242,7 @@
 				</div>
 
 				{#if isRepo}
-					<div class="space-y-1.5">
+					<div class="flex flex-col gap-1.5">
 						<Label for="ws-repo">GitHub Repository</Label>
 						<RepoCombobox
 							id="ws-repo"
@@ -252,12 +252,12 @@
 						/>
 					</div>
 
-					<div class="space-y-1.5">
+					<div class="flex flex-col gap-1.5">
 						<Label for="ws-folder">Local Folder</Label>
 						<PathInput id="ws-folder" bind:value={localFolder} onchange={markDirty} />
 					</div>
 
-					<div class="space-y-1.5">
+					<div class="flex flex-col gap-1.5">
 						<Label for="ws-branch">Default Base Branch</Label>
 						<Input
 							id="ws-branch"
@@ -272,11 +272,11 @@
 
 		<!-- Worktrees Section (repo only) -->
 		{#if isRepo}
-			<section class="space-y-4">
+			<section class="flex flex-col gap-4">
 				<h3 class="text-base font-medium">Worktrees</h3>
 				<Separator />
 
-				<div class="space-y-1.5">
+				<div class="flex flex-col gap-1.5">
 					<Label for="ws-worktree-parent">Worktree Parent Folder</Label>
 					<PathInput
 						id="ws-worktree-parent"
@@ -292,7 +292,7 @@
 		{/if}
 
 		<!-- Commands Section -->
-		<section class="space-y-4">
+		<section class="flex flex-col gap-4">
 			<h3 class="text-base font-medium">Commands</h3>
 			<Separator />
 
@@ -316,7 +316,7 @@
 			{/if}
 
 			<!-- Server Commands -->
-			<div class="space-y-3">
+			<div class="flex flex-col gap-3">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<ServerIcon size={16} class="text-muted-foreground" />
@@ -335,7 +335,7 @@
 				{#if commandsLoading}
 					<div class="py-4 text-center text-sm text-muted-foreground">Loading...</div>
 				{:else}
-					<div class="space-y-2">
+					<div class="flex flex-col gap-2">
 						{#each serverCommands as command (command.id)}
 							<WorkspaceCommandRow
 								{command}
@@ -357,7 +357,7 @@
 			<Separator />
 
 			<!-- Check Commands -->
-			<div class="space-y-3">
+			<div class="flex flex-col gap-3">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<SquareCheckIcon size={16} class="text-muted-foreground" />
@@ -376,7 +376,7 @@
 				{#if commandsLoading}
 					<div class="py-4 text-center text-sm text-muted-foreground">Loading...</div>
 				{:else}
-					<div class="space-y-2">
+					<div class="flex flex-col gap-2">
 						{#each checkCommands as command (command.id)}
 							<WorkspaceCommandRow
 								{command}
@@ -397,11 +397,11 @@
 		</section>
 
 		<!-- Danger Zone -->
-		<section class="space-y-4">
+		<section class="flex flex-col gap-4">
 			<h3 class="text-base font-medium text-destructive">Danger Zone</h3>
 			<Separator />
 
-			<div class="space-y-3 rounded-md border border-destructive/30 p-4">
+			<div class="flex flex-col gap-3 rounded-md border border-destructive/30 p-4">
 				<div class="flex items-center justify-between">
 					<div>
 						<p class="text-sm font-medium">Archive workspace</p>
@@ -436,7 +436,7 @@
 
 				{#if showDeleteConfirm}
 					<div
-						class="space-y-2 rounded border border-destructive/20 bg-destructive/5 p-3"
+						class="flex flex-col gap-2 rounded border border-destructive/20 bg-destructive/5 p-3"
 					>
 						<p class="text-xs text-muted-foreground">
 							Type <strong>{dashboard.name}</strong> to confirm deletion:

@@ -39,7 +39,7 @@ export function aggregateSessionState(sessions: readonly SessionState[]): Aggreg
 
 // ─── mapIssueToStateDimensions — maps raw inputs to StateDimensions ───────────
 
-const KNOWN_PR_STATES: ReadonlySet<ForestPullRequestState> = new Set([
+const KNOWN_PR_STATES = new Set([
 	'draft',
 	'open',
 	'review-requested',
@@ -50,13 +50,15 @@ const KNOWN_PR_STATES: ReadonlySet<ForestPullRequestState> = new Set([
 	'closed',
 ]);
 
-const KNOWN_BRANCH_STATUSES: ReadonlySet<string> = new Set([
-	'active',
-	'local',
-	'remote-gone',
-	'deleted',
-	'unknown',
-]);
+const PASSTHROUGH_BRANCH_STATUSES = new Set(['active', 'remote-gone', 'deleted']);
+
+function isPassthroughBranchStatus(raw: string): raw is ForestBranchStatus {
+	return PASSTHROUGH_BRANCH_STATUSES.has(raw);
+}
+
+function isKnownPrState(raw: string): raw is ForestPullRequestState {
+	return KNOWN_PR_STATES.has(raw);
+}
 
 function mapBranchStatus(
 	issueBranchName: string | null,
@@ -65,21 +67,24 @@ function mapBranchStatus(
 	if (issueBranchName === null) {
 		return 'no-branch';
 	}
-	if (raw == null || raw === 'unknown' || !KNOWN_BRANCH_STATUSES.has(raw)) {
+	if (raw == null || raw === 'unknown') {
 		return 'active';
 	}
 	if (raw === 'local') {
 		return 'local-only';
 	}
-	return raw as ForestBranchStatus;
+	if (isPassthroughBranchStatus(raw)) {
+		return raw;
+	}
+	return 'active';
 }
 
 function mapPrState(raw: string | null | undefined): ForestPullRequestState {
 	if (raw == null) {
 		return 'no-pr';
 	}
-	if (KNOWN_PR_STATES.has(raw as ForestPullRequestState)) {
-		return raw as ForestPullRequestState;
+	if (isKnownPrState(raw)) {
+		return raw;
 	}
 	return 'open';
 }

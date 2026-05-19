@@ -90,6 +90,7 @@ export const ISSUE_CARD_SETTING_RANGES = {
 
 // ── Clamp ────────────────────────────────────────────────────────────
 
+// fallow-ignore-next-line unused-type
 export type RangeKey = keyof typeof ISSUE_CARD_SETTING_RANGES;
 
 export function clampSettingValue(key: string, value: number): number {
@@ -150,17 +151,20 @@ export const VARIANT_SPECIFIC_SETTINGS = {
 
 // ── Display labels (shared across UI components) ────────────────────
 
+// fallow-ignore-next-line unused-export
 export const VARIANT_LABELS: Record<IssueCardVariant, string> = {
 	veil: 'Veil',
 	'refined-horizon': 'Refined Horizon',
 	radiant: 'Radiant',
 };
 
+// fallow-ignore-next-line unused-export
 export const BUTTON_COLOR_LABELS: Record<string, string> = {
 	'issue-color': 'Issue Color',
 	'moss-green': 'Moss Green',
 };
 
+// fallow-ignore-next-line unused-export
 export const SLIDER_LABELS: Record<string, string> = {
 	labelTint: 'Label Tint',
 	overlayGlow: 'Overlay Glow Intensity',

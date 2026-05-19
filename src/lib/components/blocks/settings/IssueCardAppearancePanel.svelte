@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Root as Select } from '$lib/components/shadcn/select/index.js';
+	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import SettingOverrideIndicator from '$lib/components/derived/setting-override-indicator/SettingOverrideIndicator.svelte';
@@ -48,27 +48,31 @@
 	}
 </script>
 
-<section class="space-y-4">
+<section class="flex flex-col gap-4">
 	<h2 class="text-lg font-medium">Issue Cards</h2>
 	<p class="text-sm text-muted-foreground">
 		Customize the appearance of issue cards across all workspaces.
 	</p>
 
 	<!-- Variant Selector -->
-	<div class="space-y-2">
+	<div class="flex flex-col gap-2">
 		<Label>Card Variant</Label>
-		<div class="flex gap-2">
+		<ToggleGroup.Root
+			type="single"
+			value={activeVariant}
+			onValueChange={(v) => {
+				if (v !== undefined && v !== '') {
+					handleSelectChange('variant', v);
+				}
+			}}
+			size="sm"
+			class="flex gap-2"
+		>
 			{#each Object.keys(ISSUE_CARD_VARIANTS) as variantKey (variantKey)}
 				{@const v = variantKey as IssueCardVariant}
-				<Button
-					intent={activeVariant === v ? 'primary' : 'secondary'}
-					size="sm"
-					onclick={() => handleSelectChange('variant', v)}
-				>
-					{VARIANT_LABELS[v]}
-				</Button>
+				<ToggleGroup.Item value={v}>{VARIANT_LABELS[v]}</ToggleGroup.Item>
 			{/each}
-		</div>
+		</ToggleGroup.Root>
 		<SettingOverrideIndicator
 			overridden={settingsCtx.isOverridden('variant')}
 			onreset={() => void settingsCtx.resetOverride('variant')}
@@ -78,7 +82,7 @@
 	<Separator />
 
 	<!-- Shared Settings -->
-	<div class="space-y-3">
+	<div class="flex flex-col gap-3">
 		<h3 class="text-sm font-medium text-muted-foreground">General</h3>
 
 		<!-- Button Color -->
@@ -140,7 +144,7 @@
 			{@const settingKey = key as IssueCardSettingKey}
 			{@const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey]}
 			{@const value = settingsCtx.settings[settingKey] as number}
-			<div class="space-y-1">
+			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<Label>{SLIDER_LABELS[key]}</Label>
 					<span class="text-xs tabular-nums text-muted-foreground">{value}%</span>
@@ -165,7 +169,7 @@
 	<!-- Variant-Specific Settings -->
 	{#if variantSpecificKeys.length > 0}
 		<Separator />
-		<div class="space-y-3">
+		<div class="flex flex-col gap-3">
 			<h3 class="text-sm font-medium text-muted-foreground">
 				{VARIANT_LABELS[activeVariant]} Settings
 			</h3>
@@ -174,7 +178,7 @@
 				{#if isVariantSpecificVisible(settingKey)}
 					{@const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey]}
 					{@const value = settingsCtx.settings[settingKey] as number}
-					<div class="space-y-1">
+					<div class="flex flex-col gap-1">
 						<div class="flex items-center justify-between">
 							<Label>{SLIDER_LABELS[key]}</Label>
 							<span class="text-xs tabular-nums text-muted-foreground">{value}%</span>

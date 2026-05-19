@@ -69,7 +69,7 @@
 	});
 </script>
 
-<section class="space-y-4">
+<section class="flex flex-col gap-4">
 	<h2 class="text-lg font-medium">{m.shortcuts_title()}</h2>
 	<p class="text-sm text-muted-foreground">
 		{m.shortcuts_description()}
@@ -78,7 +78,7 @@
 	{#if shortcutsCtx.allBindings.length === 0}
 		<p class="text-sm text-muted-foreground italic">{m.shortcuts_empty()}</p>
 	{:else}
-		<div class="space-y-2">
+		<div class="flex flex-col gap-2">
 			{#each shortcutsCtx.allBindings as shortcutBinding (shortcutBinding.actionId)}
 				<div
 					class="flex items-center justify-between rounded border border-border bg-muted/50 px-3 py-2"

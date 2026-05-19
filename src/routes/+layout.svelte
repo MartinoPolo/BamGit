@@ -160,7 +160,7 @@
 
 <svelte:window onkeydown={(event) => shortcutsCtx.handleKeydown(event)} />
 
-<Tooltip.Provider delayDuration={300} skipDelayDuration={300}>
+<Tooltip.Provider delayDuration={300} skipDelayDuration={300} disableHoverableContent>
 	{#if windowCtx.isOverview}
 		<div class="h-screen overflow-auto bg-background text-foreground">
 			{@render children()}

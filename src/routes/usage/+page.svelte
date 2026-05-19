@@ -277,7 +277,7 @@
 					<h3 class="text-base font-semibold">Activity breakdown</h3>
 				</div>
 				<div class="px-4 pb-4">
-					<div class="space-y-2">
+					<div class="flex flex-col gap-2">
 						<div
 							class="grid grid-cols-[120px_1fr_64px_44px_44px] gap-2 text-xs font-medium text-muted-foreground"
 						>
@@ -335,7 +335,7 @@
 						<h3 class="text-base font-semibold">Top sessions</h3>
 					</div>
 					<div class="px-4 pb-4">
-						<div class="space-y-2">
+						<div class="flex flex-col gap-2">
 							{#each data.top_sessions as session (session.session_id)}
 								<div class="flex items-center justify-between text-sm">
 									<div class="flex items-center gap-2 truncate">
@@ -363,7 +363,7 @@
 						<h3 class="text-base font-semibold">Tool calls</h3>
 					</div>
 					<div class="px-4 pb-4">
-						<div class="space-y-1.5">
+						<div class="flex flex-col gap-1.5">
 							{#each data.tool_usage as tool (tool.tool_name)}
 								<div class="grid grid-cols-[80px_1fr_48px] items-center gap-2">
 									<span class="truncate text-sm">{tool.tool_name}</span>

@@ -8,8 +8,8 @@
 	};
 </script>
 
-<div class="space-y-8">
-	<section class="space-y-4">
+<div class="flex flex-col gap-8">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">Language</h2>
 			<p class="mt-1 text-sm text-muted-foreground">

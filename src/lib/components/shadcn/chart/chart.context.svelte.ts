@@ -1,5 +1,6 @@
+import { createContext } from 'svelte';
 import type { Tooltip } from 'layerchart';
-import { getContext, setContext, type Component, type Snippet } from 'svelte';
+import type { Component, Snippet } from 'svelte';
 
 export const THEMES = { light: '', dark: '.dark' } as const;
 
@@ -56,16 +57,27 @@ export function getPayloadConfigFromPayload(
 	return configLabelKey in config ? config[configLabelKey] : config[key as keyof typeof config];
 }
 
+// ─── Context ──────────────────────────────────────────────────────────────────
+
 interface ChartContextValue {
 	config: ChartConfig;
 }
 
-const chartContextKey = Symbol('chart-context');
+type ChartContext = ReturnType<typeof createChartContext>;
+
+const [useChart, setChartInternal] = createContext<ChartContext>();
+export { useChart };
 
 export function setChartContext(value: ChartContextValue) {
-	return setContext(chartContextKey, value);
+	const ctx = createChartContext(value);
+	setChartInternal(ctx);
+	return ctx;
 }
 
-export function useChart() {
-	return getContext<ChartContextValue>(chartContextKey);
+function createChartContext(value: ChartContextValue) {
+	return {
+		get config() {
+			return value.config;
+		},
+	};
 }

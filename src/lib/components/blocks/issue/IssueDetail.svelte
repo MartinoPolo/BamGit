@@ -16,6 +16,7 @@
 	import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 	import GitBranch from '@lucide/svelte/icons/git-branch';
 	import GitBranchPlus from '@lucide/svelte/icons/git-branch-plus';
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
 
 	interface Props extends IssueCardCallbacks {
 		issue: Issue;
@@ -137,7 +138,8 @@
 
 	<!-- Priority quick-change -->
 	{#if !isArchived}
-		<div class="flex flex-wrap gap-1 border-t border-border pt-3">
+		<Separator />
+		<div class="flex flex-wrap gap-1 pt-3">
 			{#each PRIORITY_OPTIONS as option (option.value)}
 				<button
 					onclick={() => onChangePriority(issue.id, option.value)}
@@ -155,7 +157,8 @@
 	{/if}
 
 	<!-- Action buttons -->
-	<div class="flex flex-wrap gap-1.5 border-t border-border pt-3">
+	<Separator />
+	<div class="flex flex-wrap gap-1.5 pt-3">
 		<SimpleTooltip text={m.issue_card_edit()}>
 			<Button intent="ghost" size="sm" onclick={() => onEdit(issue)}>
 				<Pencil size={14} />

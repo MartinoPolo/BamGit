@@ -13,6 +13,7 @@
 	import IssueCard from './IssueCard.svelte';
 	import IssueCardContextMenu from './IssueCardContextMenu.svelte';
 	import BatchActionToolbar from './BatchActionToolbar.svelte';
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -279,7 +280,8 @@
 
 	<!-- Archived issues section -->
 	{#if showArchived && archivedIssues.length > 0}
-		<div class="mt-4 border-t border-border pt-4">
+		<div class="mt-4">
+			<Separator class="mb-4" />
 			<h3
 				class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60"
 			>

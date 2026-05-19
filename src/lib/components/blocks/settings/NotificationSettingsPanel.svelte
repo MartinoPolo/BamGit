@@ -13,6 +13,7 @@
 	import VolumeIcon from '@lucide/svelte/icons/volume-2';
 	import PackageIcon from '@lucide/svelte/icons/package';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
+	import PlayIcon from '@lucide/svelte/icons/play';
 	import { useSettings } from '$lib/modules/settings';
 
 	interface Props {
@@ -63,8 +64,8 @@
 	};
 
 	const TIER_STYLES: Record<string, string> = {
-		critical: 'text-red-400',
-		important: 'text-amber-400',
+		critical: 'text-destructive',
+		important: 'text-status-warning',
 		normal: 'text-muted-foreground',
 	};
 
@@ -120,7 +121,7 @@
 	}
 </script>
 
-<div class="space-y-6">
+<div class="flex flex-col gap-6">
 	{#if showEventsTable}
 		<!-- Header + Global Volume -->
 		<div>
@@ -266,7 +267,7 @@
 											aria-label="Play test sound"
 											onclick={() => handleTestSound(config.event_type)}
 										>
-											&#9654;
+											<PlayIcon data-icon="inline-start" />
 										</Button>
 									</SimpleTooltip>
 								{:else}
@@ -298,7 +299,7 @@
 		{#if notificationStore.soundPacks.length === 0}
 			<p class="text-sm text-muted-foreground">No sound packs installed.</p>
 		{:else}
-			<div class="space-y-2">
+			<div class="flex flex-col gap-2">
 				{#each notificationStore.soundPacks as pack (pack.name)}
 					<div
 						class="flex items-center justify-between rounded-lg border border-border px-4 py-3"

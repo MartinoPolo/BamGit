@@ -20,3 +20,13 @@ export {
 	Text as InputGroupText,
 	Textarea as InputGroupTextarea,
 };
+
+export {
+	inputGroupAddonVariants,
+	type InputGroupAddonAlign,
+} from './input-group-addon-variants.js';
+
+export {
+	inputGroupButtonVariants,
+	type InputGroupButtonSize,
+} from './input-group-button-variants.js';

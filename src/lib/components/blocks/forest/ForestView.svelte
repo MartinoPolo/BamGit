@@ -486,7 +486,7 @@
 								<button
 									{...triggerProps}
 									type="button"
-									class="absolute border-0 bg-transparent p-0 transition-transform focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
+									class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
 									style:left="{positioned.x}px"
 									style:top="{positioned.y}px"
 									style:width="{size.width}px"

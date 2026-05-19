@@ -16,8 +16,8 @@
 	let editInitials = $state(settingsCtx.get('userInitials'));
 </script>
 
-<div class="space-y-8">
-	<section class="space-y-4">
+<div class="flex flex-col gap-8">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">{m.settings_user_title()}</h2>
 			<p class="mt-1 text-sm text-muted-foreground">
@@ -25,7 +25,7 @@
 			</p>
 		</div>
 		<div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-			<div class="flex-1 space-y-1">
+			<div class="flex flex-1 flex-col gap-1">
 				<Label for="username-input">{m.settings_username_label()}</Label>
 				<Input
 					id="username-input"
@@ -33,7 +33,7 @@
 					onchange={() => void settingsCtx.set('username', editUsername)}
 				/>
 			</div>
-			<div class="w-24 space-y-1">
+			<div class="flex w-24 flex-col gap-1">
 				<Label for="initials-input">{m.settings_initials_label()}</Label>
 				<Input
 					id="initials-input"
@@ -45,7 +45,7 @@
 		</div>
 	</section>
 
-	<section class="space-y-4">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">GitHub</h2>
 			<p class="mt-1 text-sm text-muted-foreground">

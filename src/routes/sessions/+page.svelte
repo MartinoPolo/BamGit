@@ -89,13 +89,13 @@
 	</div>
 {:else}
 	<!-- Session list -->
-	<div class="space-y-4 p-4">
+	<div class="flex flex-col gap-4 p-4">
 		<div class="flex items-center justify-between">
 			<h1 class="text-xl font-semibold text-foreground">{m.session_title()}</h1>
 		</div>
 
 		<!-- Spawn form -->
-		<div class="space-y-2 rounded-lg border border-border bg-muted/50 p-4">
+		<div class="flex flex-col gap-2 rounded-lg border border-border bg-muted/50 p-4">
 			<h3 class="text-sm font-medium text-foreground">{m.session_new()}</h3>
 			<Input
 				placeholder={m.session_placeholder_working_dir()}
@@ -124,7 +124,7 @@
 
 		<!-- Discovered external sessions -->
 		{#if store.discoveredSessions.length > 0}
-			<div class="space-y-2">
+			<div class="flex flex-col gap-2">
 				<h3 class="text-sm font-medium text-muted-foreground">
 					{m.session_external({ count: store.discoveredSessions.length })}
 				</h3>
@@ -136,7 +136,7 @@
 
 		<!-- Active sessions -->
 		{#if store.activeSessions.length > 0}
-			<div class="space-y-2">
+			<div class="flex flex-col gap-2">
 				<h3 class="text-sm font-medium text-muted-foreground">{m.session_active()}</h3>
 				{#each store.activeSessions as session (session.id)}
 					<SessionCard {session} onClick={handleSelect} onTerminate={handleTerminate} />
@@ -146,7 +146,7 @@
 
 		<!-- Finished sessions -->
 		{#if store.finishedSessions.length > 0}
-			<div class="space-y-2">
+			<div class="flex flex-col gap-2">
 				<h3 class="text-sm font-medium text-muted-foreground">{m.session_completed()}</h3>
 				{#each store.finishedSessions as session (session.id)}
 					<SessionCard {session} onClick={handleSelect} onTerminate={handleTerminate} />

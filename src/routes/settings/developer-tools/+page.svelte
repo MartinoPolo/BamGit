@@ -31,8 +31,8 @@
 </script>
 
 {#if import.meta.env.DEV}
-	<div class="space-y-8">
-		<section class="space-y-4">
+	<div class="flex flex-col gap-8">
+		<section class="flex flex-col gap-4">
 			<div>
 				<h2 class="text-lg font-medium">Demo Workspace</h2>
 				<p class="mt-1 text-sm text-muted-foreground">
@@ -66,7 +66,7 @@
 		</section>
 	</div>
 {:else}
-	<div class="space-y-4">
+	<div class="flex flex-col gap-4">
 		<h2 class="text-lg font-medium">Developer Tools</h2>
 		<p class="text-sm text-muted-foreground">
 			Developer tools are only available in development builds.

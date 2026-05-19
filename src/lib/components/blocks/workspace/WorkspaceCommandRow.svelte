@@ -2,7 +2,6 @@
 	import type { WorkspaceCommand } from '$lib/types/generated';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { Label } from '$lib/components/shadcn/label/index.js';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import GripVerticalIcon from '@lucide/svelte/icons/grip-vertical';
 
@@ -26,8 +25,8 @@
 
 	<div class="flex flex-1 flex-col gap-2">
 		<div class="flex gap-2">
-			<div class="flex-1 space-y-1">
-				<Label class="text-xs text-muted-foreground">Name</Label>
+			<div class="flex flex-1 flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Name</span>
 				<Input
 					value={command.name}
 					onchange={(e) => onUpdate(command.id, 'name', e.currentTarget.value)}
@@ -35,8 +34,8 @@
 					class="h-8 text-sm"
 				/>
 			</div>
-			<div class="flex-[2] space-y-1">
-				<Label class="text-xs text-muted-foreground">Command</Label>
+			<div class="flex flex-[2] flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Command</span>
 				<Input
 					value={command.command}
 					onchange={(e) => onUpdate(command.id, 'command', e.currentTarget.value)}
@@ -47,8 +46,8 @@
 		</div>
 
 		{#if isServer}
-			<div class="space-y-1">
-				<Label class="text-xs text-muted-foreground">Port Pattern (regex)</Label>
+			<div class="flex flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Port Pattern (regex)</span>
 				<Input
 					value={command.port_pattern ?? ''}
 					onchange={(e) => {
@@ -60,8 +59,8 @@
 				/>
 			</div>
 		{:else}
-			<div class="w-32 space-y-1">
-				<Label class="text-xs text-muted-foreground">Expected Exit Code</Label>
+			<div class="flex w-32 flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Expected Exit Code</span>
 				<Input
 					type="number"
 					value={String(command.expected_exit_code)}

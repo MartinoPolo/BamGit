@@ -1,3 +1,4 @@
+export { type Side } from './sheet-variants.js';
 import Root from './sheet.svelte';
 import Portal from './sheet-portal.svelte';
 import Trigger from './sheet-trigger.svelte';

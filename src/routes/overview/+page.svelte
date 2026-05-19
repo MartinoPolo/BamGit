@@ -29,7 +29,7 @@
 
 	let authWizardOpen = $state(false);
 
-	let workspaces = $state<OverviewWorkspaceData[]>([]);
+	let workspaces = $state.raw<OverviewWorkspaceData[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let showArchived = $state(false);
@@ -108,7 +108,12 @@
 			<Popover.Root>
 				<Popover.Trigger>
 					{#snippet child({ props })}
-						<Button {...props} intent="secondary" size="icon">
+						<Button
+							{...props}
+							intent="secondary"
+							size="icon"
+							aria-label="GitHub connection settings"
+						>
 							<GithubIcon data-icon="inline-start" />
 						</Button>
 					{/snippet}

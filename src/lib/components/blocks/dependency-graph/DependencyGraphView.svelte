@@ -172,7 +172,7 @@
 </script>
 
 <div class="dep-graph-root">
-	<div class="dep-graph-toolbar">
+	<div class="dep-graph-toolbar border-b border-border">
 		<DependencyGraphViewSwitcher
 			{viewMode}
 			{selectedPrdId}
@@ -324,7 +324,6 @@
 		align-items: center;
 		gap: 12px;
 		padding: 8px 12px;
-		border-bottom: 1px solid var(--border);
 		background: var(--card);
 	}
 

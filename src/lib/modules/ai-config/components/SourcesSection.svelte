@@ -130,7 +130,10 @@
 			>
 				<ChevronRightIcon
 					data-icon="inline-start"
-					class={cn('transition-transform', aiConfig.sourcesExpanded && 'rotate-90')}
+					class={cn(
+						'transition-transform duration-2',
+						aiConfig.sourcesExpanded && 'rotate-90',
+					)}
 				/>
 				Sources ({sourcesCount})
 			</Button>

@@ -37,7 +37,6 @@
 	}
 
 	onMount(() => {
-		selectedValue = defaultValue;
 		if (settingsKey !== undefined && settingsKey !== '') {
 			void getUserSetting(settingsKey).then((setting) => {
 				if (setting !== null && setting.value !== '') {

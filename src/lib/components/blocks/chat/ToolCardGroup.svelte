@@ -23,7 +23,7 @@
 		<ChevronRightIcon
 			size={12}
 			strokeWidth={2}
-			class={cn('transition-transform', expanded && 'rotate-90')}
+			class={cn('transition-transform duration-2', expanded && 'rotate-90')}
 		/>
 		<span>{messages.length} tool calls</span>
 		<div class="h-px flex-1 bg-border"></div>

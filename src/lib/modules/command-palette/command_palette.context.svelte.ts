@@ -79,9 +79,7 @@ function createCommandPaletteContext() {
 				return `Current: ${settingsCtx.getThemeMode()}`;
 			},
 			onSelect: () => {
-				const currentIndex = themeCycleOrder.indexOf(
-					settingsCtx.getThemeMode() as ThemeMode,
-				);
+				const currentIndex = themeCycleOrder.indexOf(settingsCtx.getThemeMode());
 				const nextIndex = (currentIndex + 1) % themeCycleOrder.length;
 				void settingsCtx.set('themeMode', themeCycleOrder[nextIndex]);
 			},

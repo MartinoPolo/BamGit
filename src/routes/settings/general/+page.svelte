@@ -117,8 +117,8 @@
 	}
 </script>
 
-<div class="space-y-8">
-	<section class="space-y-4">
+<div class="flex flex-col gap-8">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">Startup</h2>
 			<p class="mt-1 text-sm text-muted-foreground">
@@ -137,7 +137,7 @@
 		</Tabs>
 	</section>
 
-	<section class="space-y-4">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">Chart Color Theme</h2>
 			<p class="mt-1 text-sm text-muted-foreground">
@@ -154,7 +154,7 @@
 
 	<Separator />
 
-	<section class="space-y-4">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">Configuration</h2>
 			<p class="mt-1 text-sm text-muted-foreground">

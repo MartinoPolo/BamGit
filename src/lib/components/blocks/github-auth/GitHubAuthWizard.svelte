@@ -249,7 +249,7 @@
 						class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
 					>
 						{#if copied}
-							<CheckCircle2 size={16} class="text-green-500" />
+							<CheckCircle2 size={16} class="text-status-success" />
 						{:else}
 							<Copy size={16} />
 						{/if}
@@ -257,7 +257,7 @@
 				</button>
 
 				{#if copied}
-					<p class="text-xs text-green-500">Copied to clipboard!</p>
+					<p class="text-xs text-status-success">Copied to clipboard!</p>
 				{/if}
 
 				<!-- Timer -->
@@ -295,7 +295,7 @@
 				</div>
 			{:else if phase.kind === 'success'}
 				<div class="flex flex-col items-center gap-3 py-4">
-					<CheckCircle2 size={32} class="text-green-500" />
+					<CheckCircle2 size={32} class="text-status-success" />
 					{#if phase.user.avatar_url}
 						<img
 							src={phase.user.avatar_url}

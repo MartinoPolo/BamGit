@@ -108,9 +108,9 @@
 	}
 </script>
 
-<div class="space-y-8">
+<div class="flex flex-col gap-8">
 	<!-- Theme Mode -->
-	<section class="space-y-4">
+	<section class="flex flex-col gap-4">
 		<div class="flex items-center gap-2">
 			<div>
 				<h2 class="text-lg font-medium">Theme</h2>
@@ -135,7 +135,7 @@
 	</section>
 
 	<!-- Accent Color -->
-	<section class="space-y-4">
+	<section class="flex flex-col gap-4">
 		<div class="flex items-center gap-2">
 			<div>
 				<h2 class="text-lg font-medium">{m.settings_accent_title()}</h2>
@@ -169,7 +169,7 @@
 	</section>
 
 	<!-- Color Palettes -->
-	<section class="space-y-4">
+	<section class="flex flex-col gap-4">
 		<div>
 			<h2 class="text-lg font-medium">{m.palette_settings_title()}</h2>
 			<p class="mt-1 text-sm text-muted-foreground">
@@ -206,7 +206,7 @@
 		{#each customPalettes as palette (palette.id)}
 			<div class="rounded border border-border bg-muted/50 p-3">
 				{#if editingPaletteId === palette.id}
-					<div class="space-y-2">
+					<div class="flex flex-col gap-2">
 						<Input bind:value={editName} placeholder={m.palette_placeholder_name()} />
 						<Textarea
 							bind:value={editColorsInput}
@@ -261,7 +261,7 @@
 
 		{#if creating}
 			<div class="rounded border border-dashed border-input p-3">
-				<div class="space-y-2">
+				<div class="flex flex-col gap-2">
 					<Input bind:value={newPaletteName} placeholder={m.palette_placeholder_name()} />
 					<Textarea
 						bind:value={newPaletteColorsInput}

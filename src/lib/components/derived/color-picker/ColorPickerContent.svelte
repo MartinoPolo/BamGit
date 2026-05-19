@@ -155,7 +155,7 @@
 			bind:this={swatchElements[index]}
 			type="button"
 			tabindex={index === focusedIndex ? 0 : -1}
-			class="flex h-7 w-7 items-center justify-center rounded-sm border border-border outline-none transition-transform
+			class="flex h-7 w-7 items-center justify-center rounded-sm border border-border outline-none transition-transform duration-2
 				{color === effectiveColor ? 'scale-110 ring-2 ring-ring ring-inset' : ''}
 				{isUsed ? 'opacity-30 cursor-not-allowed' : 'hover:scale-110'}"
 			style="background-color: {color}"
@@ -180,7 +180,7 @@
 
 <div class="flex flex-1 items-center justify-center gap-2">
 	<label
-		class="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border shadow-sm transition-transform hover:scale-105"
+		class="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border shadow-sm transition-transform duration-2 hover:scale-105"
 		style="background-color: {effectiveColor}"
 	>
 		{#if displayText}

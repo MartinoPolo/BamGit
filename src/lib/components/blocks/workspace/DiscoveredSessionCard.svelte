@@ -54,10 +54,11 @@
 
 		<div class="flex shrink-0 items-center gap-2">
 			<span
-				class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white {badge.color}"
+				class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-primary-foreground {badge.color}"
 			>
 				{#if session.status === 'working'}
-					<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span>
+					<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-foreground"
+					></span>
 				{/if}
 				{badgeLabel}
 			</span>

@@ -143,6 +143,7 @@
 	--duration-3: 160ms;
 	--duration-4: 220ms;
 	--duration-5: 320ms;
+	--default-transition-duration: 0s;
 	--animate-shimmer: shimmer 1.4s linear infinite;
 	--animate-ws-pulse-ring: ws-pulse-ring 2s ease-in-out infinite;
 	--animate-ws-led: ws-led 2.4s ease-in-out infinite;

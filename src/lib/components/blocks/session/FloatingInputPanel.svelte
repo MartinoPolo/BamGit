@@ -59,7 +59,7 @@
 						size={10}
 						strokeWidth={2}
 						class={cn(
-							'text-foreground-subtle transition-transform',
+							'text-foreground-subtle transition-transform duration-2',
 							showImages && 'rotate-180',
 						)}
 					/>
@@ -77,6 +77,7 @@
 								>
 									#{i + 1}
 								</span>
+								<!-- intentional: bg-black/40 and text-white are overlay backdrop colors -->
 								<button
 									class="absolute top-0.5 right-0.5 flex size-3.5 cursor-pointer items-center justify-center rounded-0.75 border-none bg-black/40 p-0 text-white"
 									onclick={() => imageCount--}

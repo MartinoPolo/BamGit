@@ -5,6 +5,7 @@
 	import * as Popover from '$lib/components/shadcn/popover/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
+	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import ArchiveRestoreIcon from '@lucide/svelte/icons/archive-restore';
@@ -220,43 +221,55 @@
 					{/snippet}
 				</Popover.Trigger>
 				<Popover.Content class="w-72 p-3" align="end" sideOffset={8}>
-					<div class="space-y-3">
+					<div class="flex flex-col gap-3">
 						<h4 class="text-sm font-medium">Card Appearance</h4>
 
 						<!-- Variant selector -->
-						<div class="space-y-1.5">
+						<div class="flex flex-col gap-1.5">
 							<Label class="text-xs">Variant</Label>
-							<div class="flex gap-1">
+							<ToggleGroup.Root
+								type="single"
+								value={activeVariant}
+								onValueChange={(v) => {
+									if (v !== undefined && v !== '') {
+										void settingsCtx.updateSetting(
+											'variant',
+											v as IssueCardVariant,
+										);
+									}
+								}}
+								size="sm"
+								class="flex gap-1"
+							>
 								{#each Object.keys(ISSUE_CARD_VARIANTS) as variantKey (variantKey)}
 									{@const v = variantKey as IssueCardVariant}
-									<Button
-										intent={activeVariant === v ? 'primary' : 'secondary'}
-										size="sm"
-										onclick={() => void settingsCtx.updateSetting('variant', v)}
-									>
+									<ToggleGroup.Item value={v}>
 										{VARIANT_LABELS[v]}
-									</Button>
+									</ToggleGroup.Item>
 								{/each}
-							</div>
+							</ToggleGroup.Root>
 						</div>
 
 						<!-- Button Color -->
-						<div class="space-y-1.5">
+						<div class="flex flex-col gap-1.5">
 							<Label class="text-xs">Action Button Color</Label>
-							<div class="flex gap-1">
+							<ToggleGroup.Root
+								type="single"
+								value={settingsCtx.settings.buttonColor}
+								onValueChange={(option) => {
+									if (option !== undefined && option !== '') {
+										void settingsCtx.updateSetting('buttonColor', option);
+									}
+								}}
+								size="sm"
+								class="flex gap-1"
+							>
 								{#each BUTTON_COLOR_OPTIONS as option (option)}
-									<Button
-										intent={settingsCtx.settings.buttonColor === option
-											? 'primary'
-											: 'secondary'}
-										size="sm"
-										onclick={() =>
-											void settingsCtx.updateSetting('buttonColor', option)}
-									>
+									<ToggleGroup.Item value={option}>
 										{BUTTON_COLOR_LABELS[option] ?? option}
-									</Button>
+									</ToggleGroup.Item>
 								{/each}
-							</div>
+							</ToggleGroup.Root>
 						</div>
 
 						<Separator />
@@ -266,7 +279,7 @@
 							{@const settingKey = key as IssueCardSettingKey}
 							{@const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey]}
 							{@const value = settingsCtx.settings[settingKey] as number}
-							<div class="space-y-0.5">
+							<div class="flex flex-col gap-0.5">
 								<div class="flex items-center justify-between">
 									<Label class="text-xs">{SLIDER_LABELS[key]}</Label>
 									<span class="text-[10px] tabular-nums text-muted-foreground"
@@ -296,7 +309,7 @@
 								{#if variantSpecificKeys.includes(settingKey)}
 									{@const range = ISSUE_CARD_SETTING_RANGES[key as RangeKey]}
 									{@const value = settingsCtx.settings[settingKey] as number}
-									<div class="space-y-0.5">
+									<div class="flex flex-col gap-0.5">
 										<div class="flex items-center justify-between">
 											<Label class="text-xs">{SLIDER_LABELS[key]}</Label>
 											<span

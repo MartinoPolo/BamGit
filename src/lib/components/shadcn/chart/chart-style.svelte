@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { THEMES, type ChartConfig } from './chart-utils.js';
+	import { THEMES, type ChartConfig } from './chart.context.svelte.js';
 
 	let { id, config }: { id: string; config: ChartConfig } = $props();
 

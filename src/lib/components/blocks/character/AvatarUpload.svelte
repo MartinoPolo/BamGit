@@ -89,6 +89,7 @@
 >
 	{#if avatarUrl}
 		<img src={avatarUrl} alt="Character avatar" class="size-full object-cover" />
+		<!-- intentional: bg-black/50 and text-white are overlay backdrop colors -->
 		<div
 			class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
 		>
