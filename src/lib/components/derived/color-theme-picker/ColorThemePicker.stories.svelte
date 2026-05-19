@@ -178,11 +178,13 @@
 
 <script lang="ts">
 	import type { ColorThemePickerProps } from './color_theme_picker_types.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	let selectedTheme = $state('monochrome');
 </script>
 
-<Story name="Default" play={playOpensPopoverWithRadioGroup}>
+<Story name="Default [play: opens popover with radio group]" play={playOpensPopoverWithRadioGroup}>
 	{#snippet template(args: ColorThemePickerProps)}
 		<div class="flex items-start gap-4 p-8 pb-48" data-testid="story-wrapper">
 			<ColorThemePicker
@@ -200,7 +202,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Select Option" play={playSelectsOptionAndCloses}>
+<Story name="Select Option [play: selects option and closes]" play={playSelectsOptionAndCloses}>
 	{#snippet template(args: ColorThemePickerProps)}
 		<div class="flex items-start gap-4 p-8 pb-48" data-testid="story-wrapper">
 			<ColorThemePicker
@@ -218,7 +220,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Checked State" play={playCheckedStateAndIcon}>
+<Story name="Checked State [play: checked state and icon]" play={playCheckedStateAndIcon}>
 	{#snippet template(args: ColorThemePickerProps)}
 		<div class="flex items-start gap-4 p-8 pb-48" data-testid="story-wrapper">
 			<ColorThemePicker
@@ -234,7 +236,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Closes" play={playEscapeClosesPopover}>
+<Story name="Escape Closes [play: escape closes popover]" play={playEscapeClosesPopover}>
 	{#snippet template(args: ColorThemePickerProps)}
 		<div class="flex items-start gap-4 p-8 pb-48" data-testid="story-wrapper">
 			<ColorThemePicker
@@ -251,9 +253,13 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Navigation" play={playKeyboardNavigation}>
+<Story name="Keyboard Navigation [play: keyboard navigation]" play={playKeyboardNavigation}>
 	{#snippet template(args: ColorThemePickerProps)}
-		<div class="flex items-start gap-4 p-8 pb-48" data-testid="story-wrapper">
+		<div class="flex flex-col gap-4 p-8 pb-48" data-testid="story-wrapper">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate theme options" />
+				<KeyboardHint keys="Esc" action="Close popover" />
+			</StoryKeyboardHints>
 			<ColorThemePicker
 				{...args}
 				options={TEST_OPTIONS}

@@ -177,7 +177,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Sidebar Sections Are Visible" play={playSidebarSectionsAreVisible}>
+<Story
+	name="Sidebar Sections Are Visible [play: sidebar sections visible]"
+	play={playSidebarSectionsAreVisible}
+>
 	{#snippet template()}
 		<div class="flex h-150">
 			<div class="flex-1 bg-background p-4">
@@ -194,7 +197,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Collapse And Expand Toggle" play={playCollapseAndExpandToggle}>
+<Story
+	name="Collapse And Expand Toggle [play: collapse expand toggle]"
+	play={playCollapseAndExpandToggle}
+>
 	{#snippet template()}
 		<div class="flex h-150">
 			<div class="flex-1 bg-background p-4">

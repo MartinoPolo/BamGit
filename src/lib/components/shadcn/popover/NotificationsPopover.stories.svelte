@@ -4,9 +4,11 @@
 	import * as Popover from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import BellIcon from '@lucide/svelte/icons/bell';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/NotificationsPopover',
+		title: 'Base/NotificationsPopover',
 		component: Popover.Root,
 		tags: ['autodocs'],
 	});
@@ -69,7 +71,7 @@
 		await expectPopoverClosed(canvasElement);
 	};
 
-	/** Click "Mark all read" button inside popover -> button is accessible. */
+	/** Click "Mark all read" → unread count drops to zero, button disables, highlights removed. */
 	const playMarkAllRead = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
 		const trigger = findBellTrigger(canvasElement);
 
@@ -78,12 +80,25 @@
 		const content = getPopoverContent(canvasElement)!;
 		const contentScope = within(content);
 
-		// "Mark all read" button exists inside popover
+		// Before: 3 unread, button enabled, highlight rows present
+		await expect(contentScope.getByText(/3 unread/)).toBeVisible();
 		const markAllReadButton = contentScope.getByRole('button', { name: /mark all read/i });
-		await expect(markAllReadButton).toBeVisible();
+		await expect(markAllReadButton).toBeEnabled();
+		expect(content.querySelectorAll('[data-unread]').length).toBe(3);
 
-		// Click it (verifies the button is interactive)
+		// Click "Mark all read"
 		await userEvent.click(markAllReadButton);
+
+		// After: no unread label, button disabled, no highlight rows
+		await waitFor(() => {
+			expect(contentScope.queryByText(/unread/)).toBeNull();
+		});
+		await waitFor(() => {
+			expect(markAllReadButton).toBeDisabled();
+		});
+		await waitFor(() => {
+			expect(content.querySelectorAll('[data-unread]').length).toBe(0);
+		});
 	};
 
 	/** Click outside the popover -> popover closes. */
@@ -152,7 +167,21 @@
 	] as const;
 </script>
 
+<script lang="ts">
+	let notifications = $state(NOTIFICATIONS.map((n) => ({ ...n, unread: n.unread as boolean })));
+	let unreadCount = $derived(notifications.filter((n) => n.unread).length);
+
+	function markAllRead() {
+		for (const notification of notifications) {
+			notification.unread = false;
+		}
+	}
+</script>
+
 {#snippet notificationsTemplate()}
+	<StoryKeyboardHints>
+		<KeyboardHint keys="Escape" action="Close popover" />
+	</StoryKeyboardHints>
 	<div class="p-4">
 		<Popover.Root>
 			<Popover.Trigger>
@@ -161,20 +190,31 @@
 						<Button intent="secondary" size="icon" aria-label="Demo" {...props}>
 							<BellIcon data-icon="inline-start" />
 						</Button>
-						<span class="absolute right-1 top-1 size-1.75 rounded-full bg-status-danger"
-						></span>
+						{#if unreadCount > 0}
+							<span
+								class="absolute right-1 top-1 size-1.75 rounded-full bg-status-danger"
+							></span>
+						{/if}
 					</div>
 				{/snippet}
 			</Popover.Trigger>
 			<Popover.Content class="w-75 p-0" align="end" portalProps={{ disabled: true }}>
 				<div class="flex items-center justify-between border-b border-border px-3 py-2.5">
-					<div class="text-(length:--text-md) font-semibold">Inbox · 3 unread</div>
-					<Button intent="ghost" size="sm">Mark all read</Button>
+					<div class="text-(length:--text-md) font-semibold">
+						Inbox{unreadCount > 0 ? ` · ${unreadCount} unread` : ''}
+					</div>
+					<Button
+						intent="ghost"
+						size="sm"
+						onclick={markAllRead}
+						disabled={unreadCount === 0}>Mark all read</Button
+					>
 				</div>
 				<div class="max-h-80 overflow-y-auto">
-					{#each NOTIFICATIONS as notification (notification.title)}
+					{#each notifications as notification (notification.title)}
 						<div
 							class="flex gap-2.5 border-b border-border px-3 py-2.5 last:border-b-0"
+							data-unread={notification.unread ? '' : undefined}
 							style={notification.unread
 								? 'background: color-mix(in oklch, var(--primary) 4%, transparent)'
 								: ''}
@@ -207,25 +247,25 @@
 	</div>
 {/snippet}
 
-<Story name="Notifications Popover" play={playOpenAndEscapeClose}>
+<Story name="Notifications Popover [play: open and escape close]" play={playOpenAndEscapeClose}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Mark All Read" play={playMarkAllRead}>
+<Story name="Mark All Read [play: mark all read]" play={playMarkAllRead}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Click Outside Closes" play={playClickOutsideCloses}>
+<Story name="Click Outside Closes [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment" play={playEscapeContainment}>
+<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		{@render notificationsTemplate()}
 	{/snippet}

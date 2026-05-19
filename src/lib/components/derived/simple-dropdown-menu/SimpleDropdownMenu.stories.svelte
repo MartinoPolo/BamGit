@@ -24,6 +24,7 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				items={[
 					{ label: 'Edit', onSelect: () => console.log('Edit') },
 					{ label: 'Duplicate', onSelect: () => console.log('Duplicate') },
@@ -45,6 +46,7 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				items={[
 					{ label: 'Edit', icon: PencilIcon, onSelect: () => console.log('Edit') },
 					{ label: 'Copy', icon: CopyIcon, onSelect: () => console.log('Copy') },
@@ -71,6 +73,7 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				items={[
 					{ label: 'Edit', icon: PencilIcon, onSelect: () => console.log('Edit') },
 					{ label: 'Copy', icon: CopyIcon, onSelect: () => console.log('Copy') },
@@ -97,6 +100,7 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				items={[
 					{ label: 'Edit', icon: PencilIcon, onSelect: () => console.log('Edit') },
 					{
@@ -134,6 +138,7 @@
 	{#snippet template()}
 		<div class="flex items-center justify-center gap-6 p-8">
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				side="bottom"
 				align="start"
 				items={[
@@ -147,6 +152,7 @@
 			</SimpleDropdownMenu>
 
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				side="bottom"
 				align="center"
 				items={[
@@ -160,6 +166,7 @@
 			</SimpleDropdownMenu>
 
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				side="bottom"
 				align="end"
 				items={[
@@ -173,6 +180,7 @@
 			</SimpleDropdownMenu>
 
 			<SimpleDropdownMenu
+				portalProps={{ disabled: true }}
 				side="top"
 				align="end"
 				items={[

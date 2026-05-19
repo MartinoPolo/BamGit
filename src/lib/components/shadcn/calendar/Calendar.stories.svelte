@@ -113,7 +113,7 @@
 </script>
 
 <!-- 1. Default — no preselected date, shows current month -->
-<Story name="Default" play={playClickDateSelection}>
+<Story name="Default [play: date selection]" play={playClickDateSelection}>
 	{#snippet template()}
 		<div class="p-4">
 			<Calendar type="single" />
@@ -122,7 +122,7 @@
 </Story>
 
 <!-- 2. Preselected Date — May 15, 2026 -->
-<Story name="Preselected Date" play={playPreselectedAriaSelected}>
+<Story name="Preselected Date [play: aria selected]" play={playPreselectedAriaSelected}>
 	{#snippet template()}
 		<div class="p-4">
 			<Calendar type="single" value={new CalendarDate(2026, 5, 15) as DateValue} />
@@ -131,7 +131,7 @@
 </Story>
 
 <!-- 3. Min Max Constraint — selectable range: today-7d to today+30d -->
-<Story name="Min Max Constraint" play={playNextMonth}>
+<Story name="Min Max Constraint [play: next month navigation]" play={playNextMonth}>
 	{#snippet template()}
 		<div class="p-4">
 			<Calendar
@@ -144,7 +144,7 @@
 </Story>
 
 <!-- 4. Disabled Dates — weekends (Sat/Sun) are non-interactive -->
-<Story name="Disabled Weekends" play={playPrevMonth}>
+<Story name="Disabled Weekends [play: prev month navigation]" play={playPrevMonth}>
 	{#snippet template()}
 		<div class="p-4">
 			<Calendar

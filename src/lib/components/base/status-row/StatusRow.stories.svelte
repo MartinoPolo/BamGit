@@ -103,7 +103,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Click Calls Onclick" args={{ onclick: fn() }} play={playClickCallsOnclick}>
+<Story
+	name="Click Calls Onclick [play: click calls onclick]"
+	args={{ onclick: fn() }}
+	play={playClickCallsOnclick}
+>
 	{#snippet template(args: StatusRowProps)}
 		<div class="w-73">
 			<StatusRow {...args} active label="AFK loop running" meta="3 sessions" />

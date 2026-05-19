@@ -1,6 +1,14 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { IssueColorButton } from './index.js';
+	import { BUTTON_TEXT_SIZES } from '$lib/components/shadcn/button/index.js';
+
+	const SAMPLE_COLORS = [
+		{ label: 'green', value: '#4CAF50' },
+		{ label: 'blue', value: '#2196F3' },
+		{ label: 'red', value: '#FF5722' },
+		{ label: 'none', value: null },
+	] as const;
 
 	const { Story } = defineMeta({
 		title: 'Derived/IssueColorButton',
@@ -11,6 +19,23 @@
 
 <script lang="ts">
 </script>
+
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex flex-col gap-6">
+			{#each BUTTON_TEXT_SIZES as size (size)}
+				<div class="flex flex-col gap-2">
+					<span class="text-xs text-foreground-muted">{size}</span>
+					<div class="flex flex-wrap items-center gap-3">
+						{#each SAMPLE_COLORS as { label, value } (label)}
+							<IssueColorButton color={value} {size}>{label}</IssueColorButton>
+						{/each}
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+</Story>
 
 <Story name="With Colors">
 	{#snippet template()}
@@ -37,9 +62,9 @@
 <Story name="Sizes">
 	{#snippet template()}
 		<div class="flex flex-wrap items-center gap-3">
-			<IssueColorButton color="#4CAF50" size="sm">Small</IssueColorButton>
-			<IssueColorButton color="#4CAF50" size="md">Medium</IssueColorButton>
-			<IssueColorButton color="#4CAF50" size="lg">Large</IssueColorButton>
+			{#each BUTTON_TEXT_SIZES as size (size)}
+				<IssueColorButton color="#4CAF50" {size}>{size}</IssueColorButton>
+			{/each}
 		</div>
 	{/snippet}
 </Story>

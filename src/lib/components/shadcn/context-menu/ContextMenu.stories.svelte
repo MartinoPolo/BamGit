@@ -154,12 +154,14 @@
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	let checkboxChecked = $state(false);
 	let radioValue = $state('middle');
 </script>
 
-<Story name="Basic Menu" play={playOpensOnRightClick}>
+<Story name="Basic Menu [play: opens on right click]" play={playOpensOnRightClick}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -181,7 +183,7 @@
 	{/snippet}
 </Story>
 
-<Story name="With Icons" play={playClickItemClosesMenu}>
+<Story name="With Icons [play: click closes menu]" play={playClickItemClosesMenu}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -218,38 +220,46 @@
 	{/snippet}
 </Story>
 
-<Story name="With Submenus" play={playArrowDownFocusesItems}>
+<Story name="With Submenus [play: arrow down focuses]" play={playArrowDownFocusesItems}>
 	{#snippet template()}
-		<ContextMenu.Root>
-			<ContextMenu.Trigger>
-				<div
-					class="flex h-36 w-72 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
-				>
-					Right-click here
-				</div>
-			</ContextMenu.Trigger>
-			<ContextMenu.Content portalProps={{ disabled: true }}>
-				<ContextMenu.Item>New File</ContextMenu.Item>
-				<ContextMenu.Item>New Window</ContextMenu.Item>
-				<ContextMenu.Separator />
-				<ContextMenu.Sub>
-					<ContextMenu.SubTrigger>Share</ContextMenu.SubTrigger>
-					<ContextMenu.Portal>
-						<ContextMenu.SubContent>
-							<ContextMenu.Item>Email</ContextMenu.Item>
-							<ContextMenu.Item>Messages</ContextMenu.Item>
-							<ContextMenu.Item>Slack</ContextMenu.Item>
-						</ContextMenu.SubContent>
-					</ContextMenu.Portal>
-				</ContextMenu.Sub>
-				<ContextMenu.Separator />
-				<ContextMenu.Item>Settings</ContextMenu.Item>
-			</ContextMenu.Content>
-		</ContextMenu.Root>
+		<div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate menu items" />
+				<KeyboardHint keys="Enter" action="Select item" />
+				<KeyboardHint keys="→" action="Open submenu" />
+				<KeyboardHint keys="Esc" action="Close menu" />
+			</StoryKeyboardHints>
+			<ContextMenu.Root>
+				<ContextMenu.Trigger>
+					<div
+						class="flex h-36 w-72 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
+					>
+						Right-click here
+					</div>
+				</ContextMenu.Trigger>
+				<ContextMenu.Content portalProps={{ disabled: true }}>
+					<ContextMenu.Item>New File</ContextMenu.Item>
+					<ContextMenu.Item>New Window</ContextMenu.Item>
+					<ContextMenu.Separator />
+					<ContextMenu.Sub>
+						<ContextMenu.SubTrigger>Share</ContextMenu.SubTrigger>
+						<ContextMenu.Portal>
+							<ContextMenu.SubContent>
+								<ContextMenu.Item>Email</ContextMenu.Item>
+								<ContextMenu.Item>Messages</ContextMenu.Item>
+								<ContextMenu.Item>Slack</ContextMenu.Item>
+							</ContextMenu.SubContent>
+						</ContextMenu.Portal>
+					</ContextMenu.Sub>
+					<ContextMenu.Separator />
+					<ContextMenu.Item>Settings</ContextMenu.Item>
+				</ContextMenu.Content>
+			</ContextMenu.Root>
+		</div>
 	{/snippet}
 </Story>
 
-<Story name="Disabled Items" play={playDisabledItemsNotClickable}>
+<Story name="Disabled Items [play: disabled items]" play={playDisabledItemsNotClickable}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -292,7 +302,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Radio Items" play={playRadioItemEnterSelects}>
+<Story name="Radio Items [play: radio enter selects]" play={playRadioItemEnterSelects}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -314,7 +324,7 @@
 		</ContextMenu.Root>
 	{/snippet}
 </Story>
-<Story name="With Icons And Submenus" play={playEscapeClosesMenu}>
+<Story name="With Icons And Submenus [play: escape closes menu]" play={playEscapeClosesMenu}>
 	{#snippet template()}
 		<ContextMenu.Root>
 			<ContextMenu.Trigger>
@@ -425,7 +435,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Escape Containment (Dialog)" play={playEscapeContainment}>
+<Story name="Escape Containment (Dialog) [play: escape containment]" play={playEscapeContainment}>
 	{#snippet template()}
 		<Dialog.Root>
 			<Dialog.Trigger>

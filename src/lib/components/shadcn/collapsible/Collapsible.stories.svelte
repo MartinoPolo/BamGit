@@ -2,6 +2,8 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { expect, userEvent, waitFor } from 'storybook/test';
 	import * as Collapsible from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Collapsible',
@@ -82,7 +84,7 @@
 	};
 </script>
 
-<Story name="Default Closed" play={playClickOpens}>
+<Story name="Default Closed [play: click opens]" play={playClickOpens}>
 	{#snippet template()}
 		<div class="w-80">
 			<Collapsible.Root>
@@ -101,7 +103,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Default Open" play={playClickCloses}>
+<Story name="Default Open [play: click closes]" play={playClickCloses}>
 	{#snippet template()}
 		<div class="w-80">
 			<Collapsible.Root open={true}>
@@ -120,7 +122,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledNoChange}>
+<Story name="Disabled [play: disabled no change]" play={playDisabledNoChange}>
 	{#snippet template()}
 		<div class="w-80">
 			<Collapsible.Root disabled>
@@ -137,9 +139,12 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Navigation" play={playKeyboardToggle}>
+<Story name="Keyboard Navigation [play: keyboard toggle]" play={playKeyboardToggle}>
 	{#snippet template()}
 		<div class="w-80">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Enter / Space" action="Toggle content" />
+			</StoryKeyboardHints>
 			<Collapsible.Root>
 				<Collapsible.Trigger
 					class="flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium hover:bg-accent"

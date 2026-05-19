@@ -106,7 +106,7 @@
 					Actions
 				</ContextMenu.SubTrigger>
 				<ContextMenu.Portal>
-					<ContextMenu.SubContent alignOffset={0} sideOffset={10}>
+					<ContextMenu.SubContent>
 						{#each allContextualActions as action (action.id)}
 							<ContextMenu.Item
 								disabled={action.disabled}
@@ -143,7 +143,7 @@
 				Priority
 			</ContextMenu.SubTrigger>
 			<ContextMenu.Portal>
-				<ContextMenu.SubContent alignOffset={0} sideOffset={10}>
+				<ContextMenu.SubContent>
 					{#each PRIORITY_OPTIONS as option (option.value)}
 						<ContextMenu.Item onclick={() => onChangePriority(issue.id, option.value)}>
 							{#if issue.priority === option.value}

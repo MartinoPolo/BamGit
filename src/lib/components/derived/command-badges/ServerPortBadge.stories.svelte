@@ -24,13 +24,7 @@
 	import type { ServerPortBadgeProps } from './server_port_badge_types.js';
 </script>
 
-<Story name="Default">
-	{#snippet template(args: ServerPortBadgeProps)}
-		<ServerPortBadge port={5173} onclick={args.onclick} />
-	{/snippet}
-</Story>
-
-<Story name="Badge Styles">
+<Story name="All Variants">
 	{#snippet template(args: ServerPortBadgeProps)}
 		<div class="flex flex-col gap-4">
 			{#each BADGE_STYLES as style (style)}
@@ -40,6 +34,12 @@
 				</div>
 			{/each}
 		</div>
+	{/snippet}
+</Story>
+
+<Story name="Default">
+	{#snippet template(args: ServerPortBadgeProps)}
+		<ServerPortBadge port={5173} onclick={args.onclick} />
 	{/snippet}
 </Story>
 

@@ -3,6 +3,8 @@
 	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import * as ToggleGroup from './index.js';
 	import { TOGGLE_INTENTS, TOGGLE_SIZES } from '../toggle/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/ToggleGroup',
@@ -97,7 +99,7 @@
 	import AlignRightIcon from '@lucide/svelte/icons/align-right';
 </script>
 
-<Story name="Single Select" play={playSingleSelect}>
+<Story name="Single Select [play: single select]" play={playSingleSelect}>
 	{#snippet template(args: Record<string, unknown>)}
 		<ToggleGroup.Root type="single" value="left" {...args}>
 			<ToggleGroup.Item value="left" aria-label="Align left">
@@ -116,7 +118,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Multiple Select" play={playMultipleSelect}>
+<Story name="Multiple Select [play: multiple select]" play={playMultipleSelect}>
 	{#snippet template(args: Record<string, unknown>)}
 		<ToggleGroup.Root type="multiple" {...args}>
 			<ToggleGroup.Item value="bold" aria-label="Bold">
@@ -154,7 +156,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled Item" play={playDisabledItemIgnored}>
+<Story name="Disabled Item [play: disabled item ignored]" play={playDisabledItemIgnored}>
 	{#snippet template(args: Record<string, unknown>)}
 		<ToggleGroup.Root type="single" value="left" {...args}>
 			<ToggleGroup.Item value="left" aria-label="Align left">
@@ -173,22 +175,28 @@
 	{/snippet}
 </Story>
 
-<Story name="Keyboard Navigation" play={playKeyboardNavigation}>
+<Story name="Keyboard Navigation [play: keyboard navigation]" play={playKeyboardNavigation}>
 	{#snippet template(args: Record<string, unknown>)}
-		<ToggleGroup.Root type="single" value="left" {...args}>
-			<ToggleGroup.Item value="left" aria-label="Align left">
-				<AlignLeftIcon data-icon="inline-start" />
-				Left
-			</ToggleGroup.Item>
-			<ToggleGroup.Item value="center" aria-label="Align center">
-				<AlignCenterIcon data-icon="inline-start" />
-				Center
-			</ToggleGroup.Item>
-			<ToggleGroup.Item value="right" aria-label="Align right">
-				<AlignRightIcon data-icon="inline-start" />
-				Right
-			</ToggleGroup.Item>
-		</ToggleGroup.Root>
+		<div>
+			<StoryKeyboardHints>
+				<KeyboardHint keys="→ / ←" action="Move focus between items (loops)" />
+				<KeyboardHint keys="Space" action="Select focused item" />
+			</StoryKeyboardHints>
+			<ToggleGroup.Root type="single" value="left" {...args}>
+				<ToggleGroup.Item value="left" aria-label="Align left">
+					<AlignLeftIcon data-icon="inline-start" />
+					Left
+				</ToggleGroup.Item>
+				<ToggleGroup.Item value="center" aria-label="Align center">
+					<AlignCenterIcon data-icon="inline-start" />
+					Center
+				</ToggleGroup.Item>
+				<ToggleGroup.Item value="right" aria-label="Align right">
+					<AlignRightIcon data-icon="inline-start" />
+					Right
+				</ToggleGroup.Item>
+			</ToggleGroup.Root>
+		</div>
 	{/snippet}
 </Story>
 

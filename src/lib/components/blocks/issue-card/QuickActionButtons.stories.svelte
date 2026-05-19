@@ -4,7 +4,7 @@
 	import IssueCardSubComponentStoryWrapper from './IssueCardSubComponentStoryWrapper.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Issue/SubComponents/QuickActionButtons',
+		title: 'Blocks/IssueCard/QuickActionButtons',
 		component: QuickActionButtons,
 		tags: ['autodocs'],
 	});

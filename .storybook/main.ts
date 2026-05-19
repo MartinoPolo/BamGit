@@ -17,6 +17,16 @@ const config: StorybookConfig = {
 	viteFinal: async (config) => ({
 		...config,
 		root: config.root?.replace(/\\/g, '/') ?? process.cwd().replace(/\\/g, '/'),
+		server: {
+			...config.server,
+			warmup: {
+				clientFiles: [
+					'./src/**/*.stories.svelte',
+					'./src/**/*.stories.ts',
+					'./src/lib/components/**/*.svelte',
+				],
+			},
+		},
 	}),
 };
 

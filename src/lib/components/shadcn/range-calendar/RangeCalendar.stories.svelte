@@ -103,7 +103,7 @@
 	const placeholder = new CalendarDate(2026, 5, 1);
 </script>
 
-<Story name="Empty" play={playSelectFullRange}>
+<Story name="Empty [play: select full range]" play={playSelectFullRange}>
 	{#snippet template()}
 		<div class="p-4">
 			<RangeCalendar {placeholder} />
@@ -111,7 +111,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Partial Selection" play={playSelectStart}>
+<Story name="Partial Selection [play: select start]" play={playSelectStart}>
 	{#snippet template()}
 		<div class="p-4">
 			<RangeCalendar value={partialRange} {placeholder} />
@@ -119,7 +119,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Full Range" play={playFullRangePreselected}>
+<Story name="Full Range [play: range preselected]" play={playFullRangePreselected}>
 	{#snippet template()}
 		<div class="p-4">
 			<RangeCalendar value={fullRange} {placeholder} />
@@ -127,7 +127,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Single Month" play={playSelectFullRange}>
+<Story name="Single Month [play: select full range]" play={playSelectFullRange}>
 	{#snippet template()}
 		<div class="p-4">
 			<RangeCalendar numberOfMonths={1} {placeholder} />

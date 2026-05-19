@@ -117,7 +117,7 @@
 </script>
 
 <Story
-	name="Running"
+	name="Running [play: state badge rendered]"
 	args={{ session: makeSession(), onClick, onTerminate }}
 	play={playRunningStateRendered}
 >
@@ -139,7 +139,7 @@
 </Story>
 
 <Story
-	name="Needs Input"
+	name="Needs Input [play: state badge rendered]"
 	args={{
 		session: makeSession({
 			id: 'story-needs-input',
@@ -172,7 +172,7 @@
 </Story>
 
 <Story
-	name="Errored"
+	name="Errored [play: state badge rendered]"
 	args={{
 		session: makeSession({
 			id: 'story-errored',
@@ -205,7 +205,7 @@
 </Story>
 
 <Story
-	name="Finished"
+	name="Finished [play: no terminate button]"
 	args={{
 		session: makeSession({
 			id: 'story-finished',
@@ -240,7 +240,7 @@
 </Story>
 
 <Story
-	name="With Cost"
+	name="With Cost [play: token cost display]"
 	args={{
 		session: makeSession({
 			id: 'story-with-cost',
@@ -298,7 +298,7 @@
 </Story>
 
 <Story
-	name="Click Fires Callback"
+	name="Click Fires Callback [play: click calls handler]"
 	args={{ session: makeSession(), onClick, onTerminate }}
 	play={playCardClickFiresOnClick}
 >
@@ -320,7 +320,7 @@
 </Story>
 
 <Story
-	name="Terminate Stops Propagation"
+	name="Terminate Stops Propagation [play: stop propagation]"
 	args={{ session: makeSession(), onClick, onTerminate }}
 	play={playTerminateStopsPropagation}
 >

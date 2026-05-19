@@ -2,6 +2,8 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { expect, userEvent, waitFor, within } from 'storybook/test';
 	import { Toggle, TOGGLE_INTENTS, TOGGLE_SIZES } from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Toggle',
@@ -67,7 +69,7 @@
 	import ItalicIcon from '@lucide/svelte/icons/italic';
 </script>
 
-<Story name="Off" play={playClickTogglesOn}>
+<Story name="Off [play: click toggles on]" play={playClickTogglesOn}>
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} aria-label="Toggle bold">
 			<BoldIcon data-icon="inline-start" />
@@ -76,7 +78,7 @@
 	{/snippet}
 </Story>
 
-<Story name="On" play={playClickTogglesOff}>
+<Story name="On [play: click toggles off]" play={playClickTogglesOff}>
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} pressed aria-label="Toggle bold">
 			<BoldIcon data-icon="inline-start" />
@@ -85,7 +87,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Disabled" play={playDisabledIgnoresClick}>
+<Story name="Disabled [play: disabled ignores click]" play={playDisabledIgnoresClick}>
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} disabled aria-label="Toggle bold">
 			<BoldIcon data-icon="inline-start" />
@@ -94,12 +96,17 @@
 	{/snippet}
 </Story>
 
-<Story name="Space Key Toggles" play={playSpaceKeyToggles}>
+<Story name="Space Key Toggles [play: space key toggles]" play={playSpaceKeyToggles}>
 	{#snippet template(args: ToggleProps)}
-		<Toggle {...args} aria-label="Toggle bold">
-			<BoldIcon data-icon="inline-start" />
-			Bold
-		</Toggle>
+		<div class="w-80">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Space" action="Toggle on/off" />
+			</StoryKeyboardHints>
+			<Toggle {...args} aria-label="Toggle bold">
+				<BoldIcon data-icon="inline-start" />
+				Bold
+			</Toggle>
+		</div>
 	{/snippet}
 </Story>
 

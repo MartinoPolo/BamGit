@@ -82,15 +82,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Tabs Are Visible" args={{ collapsed: false }} play={playTabsVisible}>
-	{#snippet template(args: ToggleProps)}
-		<div class="w-56 rounded-lg bg-sidebar p-2">
-			<ThemeToggle {...args} />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Test: Click Cycles Theme" args={{ collapsed: false }} play={playClickCyclesTabs}>
+<Story
+	name="Tabs Are Visible [play: tabs visible]"
+	args={{ collapsed: false }}
+	play={playTabsVisible}
+>
 	{#snippet template(args: ToggleProps)}
 		<div class="w-56 rounded-lg bg-sidebar p-2">
 			<ThemeToggle {...args} />
@@ -99,7 +95,19 @@
 </Story>
 
 <Story
-	name="Test: Collapsed Button Visible"
+	name="Click Cycles Theme [play: click cycles theme]"
+	args={{ collapsed: false }}
+	play={playClickCyclesTabs}
+>
+	{#snippet template(args: ToggleProps)}
+		<div class="w-56 rounded-lg bg-sidebar p-2">
+			<ThemeToggle {...args} />
+		</div>
+	{/snippet}
+</Story>
+
+<Story
+	name="Collapsed Button Visible [play: collapsed button visible]"
 	args={{ collapsed: true }}
 	play={playCollapsedButtonVisible}
 >
@@ -111,7 +119,7 @@
 </Story>
 
 <Story
-	name="Test: Collapsed Click Cycles Theme"
+	name="Collapsed Click Cycles Theme [play: collapsed click cycles]"
 	args={{ collapsed: true }}
 	play={playCollapsedClickCycles}
 >

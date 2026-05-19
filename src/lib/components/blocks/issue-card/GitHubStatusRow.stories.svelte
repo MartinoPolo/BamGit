@@ -4,7 +4,7 @@
 	import IssueCardSubComponentStoryWrapper from './IssueCardSubComponentStoryWrapper.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Issue/SubComponents/GitHubStatusRow',
+		title: 'Blocks/IssueCard/GitHubStatusRow',
 		component: GitHubStatusRow,
 		tags: ['autodocs'],
 	});

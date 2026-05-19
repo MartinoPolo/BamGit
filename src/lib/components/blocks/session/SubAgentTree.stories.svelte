@@ -257,7 +257,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Tree Nodes Are Visible" play={playTreeNodesAreVisible}>
+<Story name="Tree Nodes Are Visible [play: tree nodes visible]" play={playTreeNodesAreVisible}>
 	{#snippet template()}
 		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={canonicalTree} activeAgentId="explore" />
@@ -265,7 +265,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Expand Collapse Children" play={playExpandCollapse}>
+<Story name="Expand Collapse Children [play: expand collapse children]" play={playExpandCollapse}>
 	{#snippet template()}
 		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={canonicalTree} />
@@ -273,7 +273,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: OnSelect Fires on Node Click" args={{ onSelect: fn() }} play={playOnSelectFires}>
+<Story
+	name="OnSelect Fires on Node Click [play: onselect fires on click]"
+	args={{ onSelect: fn() }}
+	play={playOnSelectFires}
+>
 	{#snippet template({ onSelect })}
 		<div class="w-65 rounded-lg border border-border bg-(--sidebar-bg,var(--surface)) p-2">
 			<SubAgentTree agents={canonicalTree} {onSelect} />

@@ -1,7 +1,11 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import GitHubBadge from './GitHubBadge.svelte';
+	import { ISSUE_STATE_CONFIG, PR_STATE_CONFIG } from './github_badge_variants.js';
 	import type { PullRequestState } from '$lib/types/generated';
+
+	const issueStates = Object.keys(ISSUE_STATE_CONFIG) as Array<keyof typeof ISSUE_STATE_CONFIG>;
+	const prStates = Object.keys(PR_STATE_CONFIG) as Array<keyof typeof PR_STATE_CONFIG>;
 
 	interface StoryArgs {
 		type: 'issue' | 'pr';
@@ -22,6 +26,35 @@
 	});
 </script>
 
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex flex-col gap-4">
+			<div>
+				<p class="mb-2 text-sm font-medium text-muted-foreground">Issue States</p>
+				<div class="flex flex-wrap items-center gap-3">
+					{#each issueStates as state, i (state)}
+						<div class="flex flex-col items-center gap-1">
+							<GitHubBadge type="issue" {state} number={10 + i} url={null} />
+							<span class="text-xs text-foreground-muted">{state}</span>
+						</div>
+					{/each}
+				</div>
+			</div>
+			<div>
+				<p class="mb-2 text-sm font-medium text-muted-foreground">PR States</p>
+				<div class="flex flex-wrap items-center gap-3">
+					{#each prStates as state, i (state)}
+						<div class="flex flex-col items-center gap-1">
+							<GitHubBadge type="pr" {state} number={20 + i} url={null} />
+							<span class="text-xs text-foreground-muted">{state}</span>
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Issue Open" args={{ type: 'issue', state: 'open', number: 42, url: null }}>
 	{#snippet template(args: StoryArgs)}
 		<GitHubBadge {...args} />
@@ -37,8 +70,12 @@
 <Story name="All Issue States">
 	{#snippet template()}
 		<div class="flex flex-wrap items-center gap-3">
-			<GitHubBadge type="issue" state="open" number={10} url={null} />
-			<GitHubBadge type="issue" state="closed" number={11} url={null} />
+			{#each issueStates as state, i (state)}
+				<div class="flex flex-col items-center gap-1">
+					<GitHubBadge type="issue" {state} number={10 + i} url={null} />
+					<span class="text-xs text-foreground-muted">{state}</span>
+				</div>
+			{/each}
 		</div>
 	{/snippet}
 </Story>
@@ -46,14 +83,12 @@
 <Story name="All PR States">
 	{#snippet template()}
 		<div class="flex flex-wrap items-center gap-3">
-			<GitHubBadge type="pr" state="open" number={20} url={null} />
-			<GitHubBadge type="pr" state="draft" number={21} url={null} />
-			<GitHubBadge type="pr" state="review-requested" number={22} url={null} />
-			<GitHubBadge type="pr" state="changes-requested" number={23} url={null} />
-			<GitHubBadge type="pr" state="approved" number={24} url={null} />
-			<GitHubBadge type="pr" state="ready-to-merge" number={25} url={null} />
-			<GitHubBadge type="pr" state="merged" number={26} url={null} />
-			<GitHubBadge type="pr" state="closed" number={27} url={null} />
+			{#each prStates as state, i (state)}
+				<div class="flex flex-col items-center gap-1">
+					<GitHubBadge type="pr" {state} number={20 + i} url={null} />
+					<span class="text-xs text-foreground-muted">{state}</span>
+				</div>
+			{/each}
 		</div>
 	{/snippet}
 </Story>
@@ -64,33 +99,6 @@
 			<GitHubBadge type="issue" state="open" number={10} url={null} disabled />
 			<GitHubBadge type="pr" state="open" number={20} url={null} disabled />
 			<GitHubBadge type="pr" state="merged" number={26} url={null} disabled />
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All Variants">
-	{#snippet template()}
-		<div class="flex flex-col gap-4">
-			<div>
-				<p class="mb-2 text-sm font-medium text-muted-foreground">Issue States</p>
-				<div class="flex flex-wrap items-center gap-3">
-					<GitHubBadge type="issue" state="open" number={10} url={null} />
-					<GitHubBadge type="issue" state="closed" number={11} url={null} />
-				</div>
-			</div>
-			<div>
-				<p class="mb-2 text-sm font-medium text-muted-foreground">PR States</p>
-				<div class="flex flex-wrap items-center gap-3">
-					<GitHubBadge type="pr" state="open" number={20} url={null} />
-					<GitHubBadge type="pr" state="draft" number={21} url={null} />
-					<GitHubBadge type="pr" state="review-requested" number={22} url={null} />
-					<GitHubBadge type="pr" state="changes-requested" number={23} url={null} />
-					<GitHubBadge type="pr" state="approved" number={24} url={null} />
-					<GitHubBadge type="pr" state="ready-to-merge" number={25} url={null} />
-					<GitHubBadge type="pr" state="merged" number={26} url={null} />
-					<GitHubBadge type="pr" state="closed" number={27} url={null} />
-				</div>
-			</div>
 		</div>
 	{/snippet}
 </Story>

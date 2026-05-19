@@ -3,6 +3,8 @@
 	import { expect, userEvent, within } from 'storybook/test';
 	import { Switch } from './index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Base/Switch',
@@ -54,19 +56,19 @@
 	import type { SwitchProps } from './switch-variants.js';
 </script>
 
-<Story name="Off" play={playClickTogglesOn}>
+<Story name="Off [play: click toggles on]" play={playClickTogglesOn}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} />
 	{/snippet}
 </Story>
 
-<Story name="On" play={playClickTogglesOff}>
+<Story name="On [play: click toggles off]" play={playClickTogglesOff}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} checked />
 	{/snippet}
 </Story>
 
-<Story name="Disabled Off" play={playDisabledIgnoresClick}>
+<Story name="Disabled Off [play: disabled ignores click]" play={playDisabledIgnoresClick}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} disabled />
 	{/snippet}
@@ -78,9 +80,14 @@
 	{/snippet}
 </Story>
 
-<Story name="Space Key Toggles" play={playSpaceKeyToggles}>
+<Story name="Space Key Toggles [play: space key toggles]" play={playSpaceKeyToggles}>
 	{#snippet template(args: SwitchProps)}
-		<Switch {...args} />
+		<div class="w-80">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="Space" action="Toggle on/off" />
+			</StoryKeyboardHints>
+			<Switch {...args} />
+		</div>
 	{/snippet}
 </Story>
 

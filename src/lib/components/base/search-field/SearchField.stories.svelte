@@ -175,7 +175,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Typing Updates Value" play={playTypingUpdatesValue}>
+<Story name="Typing Updates Value [play: typing updates value]" play={playTypingUpdatesValue}>
 	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
 			<SearchField placeholder="Search…" aria-label="Search" {...args} />
@@ -183,7 +183,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Clear Field Empties Value" play={playClearFieldEmptiesValue}>
+<Story
+	name="Clear Field Empties Value [play: clear empties value]"
+	play={playClearFieldEmptiesValue}
+>
 	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
 			<SearchField placeholder="Search…" aria-label="Search" {...args} />
@@ -191,7 +194,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Oninput Callback Fires" args={{ oninput: fn() }} play={playOninputCallbackFires}>
+<Story
+	name="Oninput Callback Fires [play: oninput callback fires]"
+	args={{ oninput: fn() }}
+	play={playOninputCallbackFires}
+>
 	{#snippet template(args: SearchFieldProps)}
 		<div class="max-w-xs">
 			<SearchField placeholder="Search…" aria-label="Search" {...args} />

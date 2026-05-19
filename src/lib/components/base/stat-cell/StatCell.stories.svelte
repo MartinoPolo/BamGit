@@ -145,7 +145,11 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Click Calls Onclick" args={{ onclick: fn() }} play={playClickCallsOnclick}>
+<Story
+	name="Click Calls Onclick [play: click calls onclick]"
+	args={{ onclick: fn() }}
+	play={playClickCallsOnclick}
+>
 	{#snippet template(args: StatCellProps)}
 		<div class="w-17.5">
 			<StatCell {...args} label="ISSUES" value={12} icon={ListChecksIcon} />

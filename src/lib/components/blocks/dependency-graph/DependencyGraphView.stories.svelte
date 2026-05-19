@@ -166,7 +166,7 @@
 	const onhitlquickstart = fn();
 </script>
 
-<Story name="With Dependencies" play={playNodesVisible}>
+<Story name="With Dependencies [play: nodes visible]" play={playNodesVisible}>
 	{#snippet template()}
 		<DependencyGraphStoryWrapper>
 			<div class="min-h-[400px] w-full">
@@ -180,7 +180,7 @@
 	{/snippet}
 </Story>
 
-<Story name="View Mode Switcher" play={playViewModeSwitcher}>
+<Story name="View Mode Switcher [play: tabs switch view]" play={playViewModeSwitcher}>
 	{#snippet template()}
 		<DependencyGraphStoryWrapper>
 			<div class="min-h-[400px] w-full">
@@ -194,7 +194,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Filter Bar Toggles" play={playFilterBarToggles}>
+<Story name="Filter Bar Toggles [play: filter toggles nodes]" play={playFilterBarToggles}>
 	{#snippet template()}
 		<DependencyGraphStoryWrapper>
 			<div class="min-h-[400px] w-full">
@@ -208,7 +208,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Node Select" play={playNodeSelect}>
+<Story name="Node Select [play: node selected state]" play={playNodeSelect}>
 	{#snippet template()}
 		<DependencyGraphStoryWrapper>
 			<div class="min-h-[400px] w-full">
@@ -222,7 +222,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Empty Graph" play={playEmptyState}>
+<Story name="Empty Graph [play: empty state message]" play={playEmptyState}>
 	{#snippet template()}
 		<DependencyGraphStoryWrapper>
 			<div class="min-h-[400px] w-full">

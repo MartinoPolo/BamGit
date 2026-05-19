@@ -154,6 +154,8 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import * as SelectCustom from './index.js';
+	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
+	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
 	const providers = [
 		{ value: 'claude-sonnet', label: 'Claude · Sonnet 4.5' },
@@ -318,7 +320,7 @@
 
 <!-- ─── Custom (bits-ui) Select Stories ──────────────────────────────────── -->
 
-<Story name="Custom · Default" play={playOpenDropdown}>
+<Story name="Custom · Default [play: open dropdown]" play={playOpenDropdown}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -334,7 +336,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · With Value" play={playSelectOption}>
+<Story name="Custom · With Value [play: select option]" play={playSelectOption}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -367,7 +369,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · Disabled" play={playDisabledIgnoresClick}>
+<Story name="Custom · Disabled [play: disabled ignores click]" play={playDisabledIgnoresClick}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -381,7 +383,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Disabled select ignores click" play={playDisabledIgnoresClick}>
+<Story
+	name="Disabled Select Ignores Click [play: disabled ignores click]"
+	play={playDisabledIgnoresClick}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -395,7 +400,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Click outside closes dropdown" play={playClickOutsideCloses}>
+<Story
+	name="Click Outside Closes Dropdown [play: click outside closes]"
+	play={playClickOutsideCloses}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -411,9 +419,17 @@
 	{/snippet}
 </Story>
 
-<Story name="Test: Keyboard ArrowDown highlights option" play={playKeyboardArrowDown}>
+<Story
+	name="Keyboard ArrowDown Highlights Option [play: arrow down highlights]"
+	play={playKeyboardArrowDown}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
+			<StoryKeyboardHints>
+				<KeyboardHint keys="↓ / ↑" action="Navigate options" />
+				<KeyboardHint keys="Enter" action="Select option" />
+				<KeyboardHint keys="Esc" action="Close dropdown" />
+			</StoryKeyboardHints>
 			<Label>Provider</Label>
 			<SelectCustom.CustomRoot type="single" bind:value={selectedDefault}>
 				<SelectCustom.CustomTrigger>{selectedDefaultLabel}</SelectCustom.CustomTrigger>
@@ -427,7 +443,7 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · With Groups" play={playEscapeClosesDropdown}>
+<Story name="Custom · With Groups [play: escape closes dropdown]" play={playEscapeClosesDropdown}>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>
@@ -453,7 +469,10 @@
 	{/snippet}
 </Story>
 
-<Story name="Custom · Disabled Item" play={playEscapeDoesNotPropagate}>
+<Story
+	name="Custom · Disabled Item [play: escape no propagation]"
+	play={playEscapeDoesNotPropagate}
+>
 	{#snippet template()}
 		<div class="max-w-xs">
 			<Label>Provider</Label>

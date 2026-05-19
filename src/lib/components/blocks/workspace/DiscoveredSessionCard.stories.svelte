@@ -162,7 +162,7 @@
 </Story>
 
 <Story
-	name="Test: Adopt Fires Callback"
+	name="Adopt Fires Callback [play: adopt fires callback]"
 	args={{ session: makeMockDiscoveredSession(), onAdopt: fn() }}
 	play={playAdoptFiresCallback}
 >
@@ -177,7 +177,7 @@
 </Story>
 
 <Story
-	name="Test: Session Info Visible"
+	name="Session Info Visible [play: session info visible]"
 	args={{ session: makeMockDiscoveredSession(), onAdopt: fn() }}
 	play={playSessionInfoVisible}
 >

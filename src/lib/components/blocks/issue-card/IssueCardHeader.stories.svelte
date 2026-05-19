@@ -4,7 +4,7 @@
 	import IssueCardSubComponentStoryWrapper from './IssueCardSubComponentStoryWrapper.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Blocks/Issue/SubComponents/IssueCardHeader',
+		title: 'Blocks/IssueCard/IssueCardHeader',
 		component: IssueCardHeader,
 		tags: ['autodocs'],
 	});
