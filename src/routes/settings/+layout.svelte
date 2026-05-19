@@ -110,7 +110,13 @@
 <div class="grid h-screen overflow-hidden" style:grid-template-columns="240px 1fr">
 	<aside class="flex h-full flex-col overflow-y-auto border-r border-border bg-sidebar">
 		<div class="p-3">
-			<Button intent="ghost" size="sm" class="w-full justify-start" onclick={handleBack}>
+			<Button
+				intent="ghost"
+				size="sm"
+				class="w-full justify-start"
+				onclick={handleBack}
+				data-testid="settings-back-button"
+			>
 				<ArrowLeftIcon data-icon="inline-start" />
 				{backLabel}
 			</Button>
@@ -123,9 +129,17 @@
 					value={scope}
 					onValueChange={handleScopeChange}
 					class="w-full"
+					data-testid="settings-scope-switcher"
 				>
-					<ToggleGroup.Item value="user" class="flex-1 text-xs">User</ToggleGroup.Item>
-					<ToggleGroup.Item value="workspace" class="flex-1 text-xs"
+					<ToggleGroup.Item
+						value="user"
+						class="flex-1 text-xs"
+						data-testid="settings-scope-user">User</ToggleGroup.Item
+					>
+					<ToggleGroup.Item
+						value="workspace"
+						class="flex-1 text-xs"
+						data-testid="settings-scope-workspace"
 						>Workspace{workspaceName ? `: ${workspaceName}` : ''}</ToggleGroup.Item
 					>
 				</ToggleGroup.Root>
@@ -177,6 +191,7 @@
 				style:border-color={workspaceAccentColor ?? 'var(--primary)'}
 				style:background-color="{workspaceAccentColor ?? 'var(--primary)'}10"
 				style:color={workspaceAccentColor ?? 'var(--primary)'}
+				data-testid="settings-workspace-banner"
 			>
 				{workspaceName}
 			</div>

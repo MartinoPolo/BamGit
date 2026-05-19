@@ -33,4 +33,4 @@ jobs:
               run: pnpm exec fallow audit --format json --quiet --explain --base origin/${{ github.base_ref }}
             - run: pnpm exec playwright install --with-deps chromium
             - run: pnpm test -- --coverage
-            - run: pnpm test:e2e
+            - run: pnpm e2e

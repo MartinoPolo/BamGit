@@ -26,7 +26,7 @@ Tauri v2 (Rust backend) + SvelteKit (static adapter) + Vite
 TypeScript (strict)
 Tailwind CSS 4
 SQLite (rusqlite, bundled)
-Vitest, Playwright, Storybook
+Vitest, Playwright, WebdriverIO (Tauri E2E), Storybook
 
 ## Commands
 
@@ -36,7 +36,8 @@ Vitest, Playwright, Storybook
 `pnpm check:fallow` -- dead-code regression gate
 `pnpm check:all` -- full check suite (format + lint + fallow + typecheck + eslint)
 `pnpm test` -- unit tests
-`pnpm test:e2e` -- E2E tests
+`pnpm e2e` -- E2E tests (Playwright, static build + mocks, no Tauri backend)
+`pnpm e2e:tauri` -- E2E tests (builds debug binary, then WebdriverIO + tauri-driver, real SQLite)
 `pnpm db:reset` -- delete SQLite database (app recreates it on next launch)
 
 ## Context Budget
@@ -74,6 +75,12 @@ Always fix unrelated errors you encounter (merge artifacts, stale imports, broke
 ## Testing
 
 - TDD: write tests first, then implement.
+
+### Tauri E2E Tests (WebdriverIO)
+
+Tests in `tests/e2e-tauri/specs/`. Config: `wdio.conf.ts`. Runs against `src-tauri/target/debug/grovekeeper.exe`.
+
+**When to use:** Testing features that depend on the Rust backend — settings persistence, database operations, IPC round-trips, worktree operations. Not for pure UI testing (use Playwright for that).
 
 ## Visual Testing (Tauri MCP)
 
