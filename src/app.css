@@ -689,6 +689,23 @@
 	}
 }
 
+.badge-collapsible {
+	transition:
+		width 300ms ease-in-out,
+		padding 300ms ease-in-out,
+		background-color 200ms ease-in-out,
+		color 200ms ease-in-out,
+		border-color 200ms ease-in-out;
+}
+
+.badge-collapsed {
+	width: 1.25rem;
+	height: 1.25rem;
+	padding: 0;
+	justify-content: center;
+	border-radius: 9999px;
+}
+
 @keyframes badge-pulse {
 	0%,
 	100% {

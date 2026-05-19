@@ -16,7 +16,7 @@ import {
 import type { IssueCardAppearanceSettings, IssueCardVariant } from './issue_card_settings.js';
 import {
 	deriveCardState,
-	resolveIssueCardClasses,
+	ISSUE_CARD_CLASSES,
 	type IssueCardState,
 	type IssueCardSlotClasses,
 } from './issue_card_variants.js';
@@ -93,6 +93,29 @@ function mapCacheToPrState(cache: GitStatusCache | null): ForestPullRequestState
 
 /** @internal - exported only for testing */
 export function createIssueCardContext(getProps: () => IssueCardContextProps) {
+	const cardState = $derived.by(() => {
+		const props = getProps();
+		return deriveCardState({
+			isArchived: props.issue.status === 'archived',
+			isBatchSelected: props.isBatchSelected,
+			isActive: props.isActive,
+			isHovered: props.isHovered,
+			isModifierHeld: props.isModifierHeld,
+			worktreeState: props.issue.worktree_state,
+		});
+	});
+
+	const variantSlotStyles = $derived.by(() => {
+		const props = getProps();
+		return computeVariantSlotStyles({
+			variant: props.appearanceSettings.variant,
+			settings: props.appearanceSettings,
+			issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
+			state: cardState,
+			isHovered: props.isHovered,
+		});
+	});
+
 	return {
 		// Passthrough inputs
 		get issue(): Issue {
@@ -152,19 +175,10 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			return deriveWorktreeBadge(getProps().issue.worktree_state);
 		},
 		get cardState(): IssueCardState {
-			const props = getProps();
-			return deriveCardState({
-				isArchived: props.issue.status === 'archived',
-				isDone: false,
-				isBatchSelected: props.isBatchSelected,
-				isActive: props.isActive,
-				isHovered: props.isHovered,
-				isModifierHeld: props.isModifierHeld,
-				worktreeState: props.issue.worktree_state,
-			});
+			return cardState;
 		},
 		get slotClasses(): IssueCardSlotClasses {
-			return resolveIssueCardClasses();
+			return ISSUE_CARD_CLASSES;
 		},
 		get chipState(): IssueStateChipResult | null {
 			const props = getProps();
@@ -188,23 +202,16 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			return getProps().appearanceSettings;
 		},
 		get variantSlotStyles(): VariantSlotStyles {
-			const props = getProps();
-			return computeVariantSlotStyles({
-				variant: props.appearanceSettings.variant,
-				settings: props.appearanceSettings,
-				issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
-				state: this.cardState,
-				isHovered: props.isHovered,
-			});
+			return variantSlotStyles;
 		},
 		get cardStyleString(): string {
-			return styleMapToString(this.variantSlotStyles.card);
+			return styleMapToString(variantSlotStyles.card);
 		},
 		get headerStyleString(): string {
-			return styleMapToString(this.variantSlotStyles.header);
+			return styleMapToString(variantSlotStyles.header);
 		},
 		get previewStyleString(): string {
-			return styleMapToString(this.variantSlotStyles.preview);
+			return styleMapToString(variantSlotStyles.preview);
 		},
 
 		// Callbacks

@@ -10,44 +10,9 @@
 	});
 </script>
 
-<Story name="Mixed States + Server">
+<Story name="Live Data (from process context)">
 	{#snippet template()}
-		<IssueCardSubComponentStoryWrapper>
-			<div class="w-80">
-				<CommandResultsRow
-					commandResults={[
-						{ commandName: 'check:all', state: 'passed' },
-						{ commandName: 'test', state: 'running' },
-						{ commandName: 'build', state: 'failed' },
-					]}
-					serverPort={5173}
-				/>
-			</div>
-		</IssueCardSubComponentStoryWrapper>
-	{/snippet}
-</Story>
-
-<Story name="Overflow (+2)">
-	{#snippet template()}
-		<IssueCardSubComponentStoryWrapper>
-			<div class="w-80">
-				<CommandResultsRow
-					commandResults={[
-						{ commandName: 'check:all', state: 'passed' },
-						{ commandName: 'test:unit', state: 'passed' },
-						{ commandName: 'test:e2e', state: 'running' },
-						{ commandName: 'lint', state: 'passed' },
-						{ commandName: 'build', state: 'failed' },
-					]}
-				/>
-			</div>
-		</IssueCardSubComponentStoryWrapper>
-	{/snippet}
-</Story>
-
-<Story name="Empty (Hidden)">
-	{#snippet template()}
-		<IssueCardSubComponentStoryWrapper>
+		<IssueCardSubComponentStoryWrapper issue={{ id: 'mock-issue-auth' }}>
 			<div class="w-80">
 				<CommandResultsRow />
 			</div>
@@ -55,16 +20,44 @@
 	{/snippet}
 </Story>
 
-<Story name="Stale Results">
+<Story name="With Local Changes (stale badges)">
 	{#snippet template()}
-		<IssueCardSubComponentStoryWrapper>
+		<IssueCardSubComponentStoryWrapper
+			issue={{ id: 'mock-issue-auth' }}
+			cache={{ has_local_changes: true }}
+		>
 			<div class="w-80">
-				<CommandResultsRow
-					commandResults={[
-						{ commandName: 'check:all', state: 'passed', isStale: true },
-						{ commandName: 'test', state: 'failed', isStale: true },
-					]}
-				/>
+				<CommandResultsRow />
+			</div>
+		</IssueCardSubComponentStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Failed Check">
+	{#snippet template()}
+		<IssueCardSubComponentStoryWrapper issue={{ id: 'mock-issue-dark-mode' }}>
+			<div class="w-80">
+				<CommandResultsRow />
+			</div>
+		</IssueCardSubComponentStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Timeout State">
+	{#snippet template()}
+		<IssueCardSubComponentStoryWrapper issue={{ id: 'mock-issue-perf' }}>
+			<div class="w-80">
+				<CommandResultsRow />
+			</div>
+		</IssueCardSubComponentStoryWrapper>
+	{/snippet}
+</Story>
+
+<Story name="Empty (No Processes)">
+	{#snippet template()}
+		<IssueCardSubComponentStoryWrapper issue={{ id: 'mock-issue-onboarding' }}>
+			<div class="w-80">
+				<CommandResultsRow />
 			</div>
 		</IssueCardSubComponentStoryWrapper>
 	{/snippet}

@@ -42,7 +42,7 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 **Deep Module** — Ousterhout pattern: small interface, large implementation. Each module exposes `use{Feature}()` factory.
 **Design Token** — OKLCH CSS custom property in `app.css` under `@theme inline`. Semantic tokens swap via `[data-theme]`.
 **Accent Color** — Theme applied via `data-accent` on `<html>`. 12 presets. Overrides `--primary`, `--accent`, `--ring`.
-**Appearance Settings** — 10 per-card user preferences (variant, badge style, label tint, etc.) stored in `app_settings` with `issue_card_` prefix; workspace overrides use `ws_{dashboard_id}_issue_card_` prefix.
+**Appearance Settings** — 10 per-card user preferences (variant, badge style, label tint, etc.) stored in `user_settings` with `issue_card_` key prefix; workspace overrides stored in `workspace_settings(dashboard_id, key)` and take priority via the settings engine cascade.
 **State Mapping** — Priority-ordered rule table for tree stage, accessories, overlays, glow, animations. See`.mpx/STATE_MAPPING.md`.
 **State Chip Cascade** — 22-rule priority-ordered derivation in `derive_issue_state_chip.ts` mapping 8 state dimensions to a single {label, color} display chip.
 
@@ -54,7 +54,16 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 **Execution Phase** — Current step in an active session: analyzing, tdd, reviewing, testing, fixing, shipping.
 **Sub-Agent Bird** — Visual bird on tree canopy for spawned sub-agents. Six types: owl, robin, sparrow, cardinal, hummingbird, parrot.
 
+**Settings Engine** — cascade resolution system (workspace → user → hardcoded default) in `src/lib/modules/settings/`.
+**User Settings** — global defaults in `user_settings(key PK, value)` SQLite table.
+**Workspace Settings** — per-workspace overrides in `workspace_settings(dashboard_id, key, value)` with PK `(dashboard_id, key)`.
+**FOUC Prevention** — localStorage mirror (`grovekeeper_settings_` prefix) applying theme/accent before Tauri bridge loads.
+**Settings Scope** — User/Workspace toggle in settings shell sidebar header.
+**Override Indicator** — colored dot + "Reset to default" button on workspace-overridden values.
+**returnUrl** — stored URL for Escape/back button to exit settings without walking category history.
+
 **Creation Wizard** — 5-step keyboard-driven modal: GitHub search → name → worktree → color → progress.
+**Sidebar Navigation** — 3 items: Dashboard, Sessions, Usage. AI Configuration and Workspace Settings are absorbed into the `/settings/*` route and no longer appear as top-level nav items.
 **Command Palette** — `Ctrl+K` overlay. Fuzzy search across actions, navigation, issues. Consumes action registry.
 **Action Registry** — Module maintaining executable actions. Auto-appear in command palette with keyboard shortcuts.
 **Quick Ideas** — `Ctrl+Shift+I` modal for raw notes into `.mpx/RAW_REQUIREMENTS.md`.
@@ -79,25 +88,26 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 
 ## Core Features
 
-| Feature                | Status                           | PRD       | Design                                                |
-| ---------------------- | -------------------------------- | --------- | ----------------------------------------------------- |
-| Workspace Dashboard    | implemented                      | #87, #89  | `designs/issue-card-v2/`                              |
-| Issue Card v2 Redesign | implemented                      | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
-| Overview Dashboard     | implemented                      | #96       | `claude_design/Workspace Card.html`                   |
-| Issue Creation         | implemented                      | #89       | `claude_design/Creation Wizard.html`                  |
-| Session Management     | partial (UI done)                | #90       | `claude_design/Session Chat View.html`                |
-| Session Chat UI        | partial (components built)       | #90       | `claude_design/Session Chat View.html`                |
-| Forest Visualization   | partial (rendering done)         | #88       | `.mpx/STATE_MAPPING.md`                               |
-| Git/GitHub Integration | implemented                      | #91       | —                                                     |
-| Notification System    | implemented                      | #95       | —                                                     |
-| Character Pack System  | implemented                      | #95       | —                                                     |
-| Metrics & Statistics   | implemented                      | #93       | —                                                     |
-| AI Configuration       | implemented (moving to Settings) | #94       | —                                                     |
-| AFK/HITL Workflow      | not started                      | #92       | —                                                     |
-| Settings (Two-Layer)   | refactoring                      | #96, #255 | —                                                     |
-| PRD Management         | planned                          | #219      | —                                                     |
-| Keyboard Shortcuts     | implemented                      | #87       | —                                                     |
-| Internationalization   | implemented (en + cs)            | #87       | —                                                     |
+| Feature                | Status                     | PRD       | Design                                                |
+| ---------------------- | -------------------------- | --------- | ----------------------------------------------------- |
+| Workspace Dashboard    | implemented                | #87, #89  | `designs/issue-card-v2/`                              |
+| Issue Card v2 Redesign | implemented                | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
+| Overview Dashboard     | implemented                | #96       | `claude_design/Workspace Card.html`                   |
+| Issue Creation         | implemented                | #89       | `claude_design/Creation Wizard.html`                  |
+| Session Management     | partial (UI done)          | #90       | `claude_design/Session Chat View.html`                |
+| Session Chat UI        | partial (components built) | #90       | `claude_design/Session Chat View.html`                |
+| Forest Visualization   | partial (rendering done)   | #88       | `.mpx/STATE_MAPPING.md`                               |
+| Git/GitHub Integration | implemented                | #91       | —                                                     |
+| Notification System    | implemented                | #95       | —                                                     |
+| Character Pack System  | implemented                | #95       | —                                                     |
+| Metrics & Statistics   | implemented                | #93       | —                                                     |
+| AI Configuration       | implemented (in Settings)  | #94, #320 | —                                                     |
+| AFK/HITL Workflow      | not started                | #92       | —                                                     |
+| Settings (Two-Layer)   | implemented                | #320      | —                                                     |
+| Process Management     | planned                    | #339      | —                                                     |
+| PRD Management         | planned                    | #219      | —                                                     |
+| Keyboard Shortcuts     | implemented                | #87       | —                                                     |
+| Internationalization   | implemented (en + cs)      | #87       | —                                                     |
 
 ## Key Constraints
 

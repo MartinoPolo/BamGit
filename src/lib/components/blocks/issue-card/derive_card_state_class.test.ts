@@ -4,7 +4,6 @@ import { deriveCardState, ISSUE_CARD_STATES, type CardStateInput } from './issue
 function makeInput(overrides: Partial<CardStateInput> = {}): CardStateInput {
 	return {
 		isArchived: false,
-		isDone: false,
 		isBatchSelected: false,
 		isActive: false,
 		isHovered: false,
@@ -61,25 +60,9 @@ describe('deriveCardState', () => {
 		);
 	});
 
-	it('done -> done', () => {
-		expect(deriveCardState(makeInput({ isDone: true }))).toBe(ISSUE_CARD_STATES.done);
-	});
-
 	it('worktree pending -> worktreeSetup', () => {
 		expect(deriveCardState(makeInput({ worktreeState: 'pending' }))).toBe(
 			ISSUE_CARD_STATES.worktreeSetup,
-		);
-	});
-
-	it('priority: archived > done', () => {
-		expect(deriveCardState(makeInput({ isArchived: true, isDone: true }))).toBe(
-			ISSUE_CARD_STATES.archived,
-		);
-	});
-
-	it('priority: done > worktreeSetup', () => {
-		expect(deriveCardState(makeInput({ isDone: true, worktreeState: 'pending' }))).toBe(
-			ISSUE_CARD_STATES.done,
 		);
 	});
 });

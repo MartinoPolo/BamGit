@@ -69,6 +69,7 @@ export type BadgeProps = WithElementRef<HTMLAttributes<HTMLSpanElement>, HTMLSpa
 	badgeStyle?: BadgeStyle;
 	format?: BadgeFormat;
 	size?: BadgeSize;
+	collapsed?: boolean;
 	dot?: BadgeDot;
 	icon?: Snippet;
 	children?: Snippet;

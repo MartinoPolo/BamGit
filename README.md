@@ -153,7 +153,10 @@ src/
     overview/+page.svelte    # Multi-workspace overview (workspace card grid)
     quick-ideas/+page.svelte # Quick Ideas full-page view (raw requirements capture)
     sessions/+page.svelte    # Session management
-    settings/+page.svelte    # Configuration + keyboard shortcuts
+    settings/+layout.svelte           # Settings shell (sidebar nav, scope switcher, returnUrl)
+    settings/appearance/+page.svelte  # Appearance settings (theme, accent)
+    settings/issue-cards/+page.svelte # Issue card appearance settings
+    settings/ai-config/+page.svelte   # AI Configuration (skills, MCP, rules)
   lib/
     modules/                 # Deep domain modules ($lib/modules/*)
       sessions/              # Session spawn, terminate, state, events
@@ -168,8 +171,9 @@ src/
       creation-wizard/       # 5-step keyboard-driven issue creation wizard
       raw-requirements/      # Quick Ideas capture and markdown parsing
       window/                # Multi-window context, window type detection
+      settings/              # Two-layer settings engine, cascade resolution, FOUC prevention
     types/generated/         # ts-rs output — DO NOT EDIT
-    reactivity/              # Shared primitives (StateRaw, Persisted)
+    reactivity/              # Shared primitives (StateRaw)
     paraglide/               # Generated i18n runtime (Paraglide JS)
     components/              # UI components (design system + app-level)
     i18n/                    # Error/notification key → Paraglide message translators

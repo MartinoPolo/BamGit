@@ -60,7 +60,6 @@ describe('ISSUE_CARD_STATES', () => {
 			'selectionHover',
 			'selected',
 			'archived',
-			'done',
 			'worktreeSetup',
 			'interactive',
 		];
