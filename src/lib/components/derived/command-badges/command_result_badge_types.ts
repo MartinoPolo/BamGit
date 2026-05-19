@@ -10,4 +10,6 @@ export interface CommandResultBadgeProps {
 	commandName: string;
 	isStale?: boolean;
 	badgeStyle?: BadgeStyle;
+	restartCount?: number;
+	maxRestarts?: number;
 }

@@ -15,6 +15,10 @@ pub struct RunningProcess {
     pub pid: u32,
     pub port: Option<u16>,
     pub status: ProcessStatus,
+    #[ts(type = "number")]
+    pub restart_count: u32,
+    #[ts(type = "number")]
+    pub max_restarts: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS, PartialEq)]
@@ -101,6 +105,20 @@ impl ProcessManager {
         }
     }
 
+    pub fn set_pid(&self, process_id: &str, pid: u32) {
+        let mut guard = self.processes.lock().unwrap();
+        if let Some(tracked) = guard.get_mut(process_id) {
+            tracked.info.pid = pid;
+        }
+    }
+
+    pub fn set_restart_count(&self, process_id: &str, count: u32) {
+        let mut guard = self.processes.lock().unwrap();
+        if let Some(tracked) = guard.get_mut(process_id) {
+            tracked.info.restart_count = count;
+        }
+    }
+
     pub fn set_status(&self, process_id: &str, status: ProcessStatus) {
         let mut guard = self.processes.lock().unwrap();
         if let Some(tracked) = guard.get_mut(process_id) {
@@ -132,6 +150,8 @@ impl ProcessManager {
             pid,
             port: None,
             status: ProcessStatus::Running,
+            restart_count: 0,
+            max_restarts: crate::process::lifecycle::MAX_RESTARTS,
         };
         let tracked = TrackedProcess {
             info,

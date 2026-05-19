@@ -13,6 +13,7 @@ export interface ProcessLogLine {
 type ProcessPortDetectedPayload = [string, number];
 type ProcessExitedPayload = [string, ProcessStatus];
 type ProcessOutputPayload = [string, 'stdout' | 'stderr', string];
+type ProcessRestartedPayload = [string, number, number];
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -22,19 +23,25 @@ const [useProcesses, setProcessesInternal] = createContext<ProcessesContext>();
 export { useProcesses };
 
 export function setProcessesContext() {
-	const { publicApi, handlePortDetected, handleProcessExited, handleProcessOutput } =
-		createProcessesContext();
+	const {
+		publicApi,
+		handlePortDetected,
+		handleProcessExited,
+		handleProcessOutput,
+		handleProcessRestarted,
+	} = createProcessesContext();
 	setProcessesInternal(publicApi);
 
 	let cancelled = false;
 	let unlistenPort: UnlistenFn | null = null;
 	let unlistenExited: UnlistenFn | null = null;
 	let unlistenOutput: UnlistenFn | null = null;
+	let unlistenRestarted: UnlistenFn | null = null;
 
 	onMount(async () => {
 		void publicApi.loadProcesses();
 
-		const [portUn, exitedUn, outputUn] = await Promise.all([
+		const [portUn, exitedUn, outputUn, restartedUn] = await Promise.all([
 			listen<ProcessPortDetectedPayload>('process-port-detected', (event) => {
 				handlePortDetected(event.payload);
 			}),
@@ -44,18 +51,23 @@ export function setProcessesContext() {
 			listen<ProcessOutputPayload>('process-output', (event) => {
 				handleProcessOutput(event.payload);
 			}),
+			listen<ProcessRestartedPayload>('process-restarted', (event) => {
+				handleProcessRestarted(event.payload);
+			}),
 		]);
 
 		if (cancelled) {
 			portUn();
 			exitedUn();
 			outputUn();
+			restartedUn();
 			return;
 		}
 
 		unlistenPort = portUn;
 		unlistenExited = exitedUn;
 		unlistenOutput = outputUn;
+		unlistenRestarted = restartedUn;
 	});
 
 	onDestroy(() => {
@@ -63,6 +75,7 @@ export function setProcessesContext() {
 		unlistenPort?.();
 		unlistenExited?.();
 		unlistenOutput?.();
+		unlistenRestarted?.();
 	});
 
 	return publicApi;
@@ -107,6 +120,16 @@ export function createProcessesContext() {
 		}
 	}
 
+	function handleProcessRestarted(payload: ProcessRestartedPayload) {
+		const [processId, restartCount, maxRestarts] = payload;
+		const process = processes.find((p) => p.process_id === processId);
+		if (process) {
+			process.restart_count = restartCount;
+			process.max_restarts = maxRestarts;
+			process.status = 'running';
+		}
+	}
+
 	const maxFrontendLogLines = 1000;
 
 	function handleProcessOutput(payload: ProcessOutputPayload) {
@@ -148,12 +171,14 @@ export function createProcessesContext() {
 			processes = await invoke<RunningProcess[]>('get_running_processes');
 		},
 
-		async runCommand(commandId: string, issueId: string): Promise<RunningProcess> {
-			const process = await invoke<RunningProcess>('run_workspace_command', {
+		async runCommand(commandId: string, issueId: string): Promise<RunningProcess | null> {
+			const process = await invoke<RunningProcess | null>('run_workspace_command', {
 				command_id: commandId,
 				issue_id: issueId,
 			});
-			processes = [...processes, process];
+			if (process) {
+				processes = [...processes, process];
+			}
 			return process;
 		},
 
@@ -174,5 +199,11 @@ export function createProcessesContext() {
 		},
 	};
 
-	return { publicApi, handlePortDetected, handleProcessExited, handleProcessOutput };
+	return {
+		publicApi,
+		handlePortDetected,
+		handleProcessExited,
+		handleProcessOutput,
+		handleProcessRestarted,
+	};
 }

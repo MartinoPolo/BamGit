@@ -126,6 +126,9 @@
 					expected_exit_code: 0,
 					sort_order:
 						category === 'server' ? serverCommands.length : checkCommands.length,
+					mode: 'headless',
+					restart_policy: 'never',
+					timeout_seconds: null,
 				},
 			});
 			commands = [...commands, created];

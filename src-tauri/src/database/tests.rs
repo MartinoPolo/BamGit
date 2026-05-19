@@ -1375,6 +1375,115 @@ mod tests {
         assert!(result.is_err(), "Invalid category should be rejected");
     }
 
+    // --- workspace_commands mode constraint tests ---
+
+    #[test]
+    fn workspace_commands_mode_accepts_valid_values() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        for (idx, mode) in ["headless", "terminal"].iter().enumerate() {
+            let id = format!("wc-mode-{idx}");
+            let result = connection.execute(
+                "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, mode) VALUES (?1, 'd1', 'server', 'test', 'echo', ?2)",
+                rusqlite::params![id, mode],
+            );
+            assert!(result.is_ok(), "Mode '{mode}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn workspace_commands_mode_rejects_invalid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        let result = connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, mode) VALUES ('wc1', 'd1', 'server', 'test', 'echo', 'embedded')",
+            [],
+        );
+        assert!(result.is_err(), "Invalid mode should be rejected");
+    }
+
+    #[test]
+    fn workspace_commands_mode_defaults_to_headless() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command) VALUES ('wc1', 'd1', 'server', 'test', 'echo')",
+            [],
+        ).unwrap();
+        let mode: String = connection.query_row(
+            "SELECT mode FROM workspace_commands WHERE id = 'wc1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(mode, "headless");
+    }
+
+    // --- workspace_commands restart_policy constraint tests ---
+
+    #[test]
+    fn workspace_commands_restart_policy_accepts_valid_values() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        for (idx, policy) in ["never", "on_failure", "always"].iter().enumerate() {
+            let id = format!("wc-rp-{idx}");
+            let result = connection.execute(
+                "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, restart_policy) VALUES (?1, 'd1', 'server', 'test', 'echo', ?2)",
+                rusqlite::params![id, policy],
+            );
+            assert!(result.is_ok(), "Restart policy '{policy}' should be accepted");
+        }
+    }
+
+    #[test]
+    fn workspace_commands_restart_policy_rejects_invalid() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        let result = connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, restart_policy) VALUES ('wc1', 'd1', 'server', 'test', 'echo', 'retry')",
+            [],
+        );
+        assert!(result.is_err(), "Invalid restart_policy should be rejected");
+    }
+
+    #[test]
+    fn workspace_commands_restart_policy_defaults_to_never() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command) VALUES ('wc1', 'd1', 'server', 'test', 'echo')",
+            [],
+        ).unwrap();
+        let policy: String = connection.query_row(
+            "SELECT restart_policy FROM workspace_commands WHERE id = 'wc1'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(policy, "never");
+    }
+
+    // --- workspace_commands timeout_seconds tests ---
+
+    #[test]
+    fn workspace_commands_timeout_seconds_accepts_null_and_integer() {
+        let connection = setup_test_database();
+        insert_test_dashboard(&connection, "d1", "repo");
+        // Insert with null (default)
+        connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command) VALUES ('wc-null', 'd1', 'server', 'test', 'echo')",
+            [],
+        ).unwrap();
+        let timeout: Option<i64> = connection.query_row(
+            "SELECT timeout_seconds FROM workspace_commands WHERE id = 'wc-null'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(timeout, None);
+
+        // Insert with explicit value
+        connection.execute(
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, timeout_seconds) VALUES ('wc-30', 'd1', 'server', 'test', 'echo', 30)",
+            [],
+        ).unwrap();
+        let timeout: Option<i64> = connection.query_row(
+            "SELECT timeout_seconds FROM workspace_commands WHERE id = 'wc-30'", [], |r| r.get(0)
+        ).unwrap();
+        assert_eq!(timeout, Some(30));
+    }
+
     // --- model_pricing_cache constraint tests ---
 
     #[test]

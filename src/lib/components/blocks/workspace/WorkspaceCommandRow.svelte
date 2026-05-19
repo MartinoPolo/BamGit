@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { WorkspaceCommand } from '$lib/types/generated';
 	import { Input } from '$lib/components/shadcn/input/index.js';
+	import { Select } from '$lib/components/shadcn/select/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import GripVerticalIcon from '@lucide/svelte/icons/grip-vertical';
@@ -73,6 +74,55 @@
 					class="h-8 text-sm"
 				/>
 			</div>
+		{/if}
+
+		<div class="flex gap-2">
+			<div class="flex w-28 flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Mode</span>
+				<Select
+					value={command.mode}
+					onchange={(e) => onUpdate(command.id, 'mode', e.currentTarget.value)}
+					class="h-8 text-sm"
+				>
+					<option value="headless">Headless</option>
+					<option value="terminal">Terminal</option>
+				</Select>
+			</div>
+			<div class="flex w-32 flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Restart Policy</span>
+				<Select
+					value={command.restart_policy}
+					onchange={(e) => onUpdate(command.id, 'restart_policy', e.currentTarget.value)}
+					class="h-8 text-sm"
+				>
+					<option value="never">Never</option>
+					<option value="on_failure">On Failure</option>
+					<option value="always">Always</option>
+				</Select>
+			</div>
+			<div class="flex w-24 flex-col gap-1">
+				<span class="text-xs text-muted-foreground">Timeout (s)</span>
+				<Input
+					type="number"
+					value={command.timeout_seconds !== null ? String(command.timeout_seconds) : ''}
+					onchange={(e) => {
+						const raw = e.currentTarget.value.trim();
+						onUpdate(
+							command.id,
+							'timeout_seconds',
+							raw === '' ? null : parseInt(raw, 10),
+						);
+					}}
+					placeholder={isServer ? '∞' : '30'}
+					class="h-8 text-sm"
+				/>
+			</div>
+		</div>
+
+		{#if command.mode === 'terminal'}
+			<p class="text-[10px] text-muted-foreground">
+				Terminal mode: opens in external terminal, no process tracking or badges.
+			</p>
 		{/if}
 	</div>
 

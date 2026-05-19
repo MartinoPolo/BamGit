@@ -1431,6 +1431,9 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		port_pattern: 'Local:\\s+http://localhost:(\\d+)',
 		expected_exit_code: 0,
 		sort_order: 0,
+		mode: 'headless',
+		restart_policy: 'never',
+		timeout_seconds: null,
 	},
 	{
 		id: 'mock-cmd-frontend-only',
@@ -1441,6 +1444,9 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		port_pattern: 'localhost:(\\d+)',
 		expected_exit_code: 0,
 		sort_order: 1,
+		mode: 'headless',
+		restart_policy: 'on_failure',
+		timeout_seconds: null,
 	},
 	{
 		id: 'mock-cmd-check-all',
@@ -1451,6 +1457,9 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		port_pattern: null,
 		expected_exit_code: 0,
 		sort_order: 0,
+		mode: 'headless',
+		restart_policy: 'never',
+		timeout_seconds: 60,
 	},
 	{
 		id: 'mock-cmd-test',
@@ -1461,6 +1470,9 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		port_pattern: null,
 		expected_exit_code: 0,
 		sort_order: 1,
+		mode: 'terminal',
+		restart_policy: 'never',
+		timeout_seconds: null,
 	},
 ];
 
@@ -1476,6 +1488,8 @@ export const MOCK_PROCESSES: RunningProcess[] = [
 		pid: 12340,
 		port: 1420,
 		status: 'running',
+		restart_count: 0,
+		max_restarts: 3,
 	},
 	{
 		process_id: 'mock-proc-check-all',
@@ -1486,6 +1500,8 @@ export const MOCK_PROCESSES: RunningProcess[] = [
 		pid: 12341,
 		port: null,
 		status: 'passed',
+		restart_count: 0,
+		max_restarts: 3,
 	},
 	{
 		process_id: 'mock-proc-test',
@@ -1496,6 +1512,8 @@ export const MOCK_PROCESSES: RunningProcess[] = [
 		pid: 12342,
 		port: null,
 		status: 'running',
+		restart_count: 0,
+		max_restarts: 3,
 	},
 	{
 		process_id: 'mock-proc-lint-fail',
@@ -1506,6 +1524,8 @@ export const MOCK_PROCESSES: RunningProcess[] = [
 		pid: 12343,
 		port: null,
 		status: 'failed',
+		restart_count: 1,
+		max_restarts: 3,
 	},
 	{
 		process_id: 'mock-proc-timeout',
@@ -1516,6 +1536,8 @@ export const MOCK_PROCESSES: RunningProcess[] = [
 		pid: 12344,
 		port: null,
 		status: 'timeout',
+		restart_count: 0,
+		max_restarts: 3,
 	},
 	{
 		process_id: 'mock-proc-stopped',
@@ -1526,6 +1548,8 @@ export const MOCK_PROCESSES: RunningProcess[] = [
 		pid: 12345,
 		port: null,
 		status: 'stopped',
+		restart_count: 0,
+		max_restarts: 3,
 	},
 ];
 

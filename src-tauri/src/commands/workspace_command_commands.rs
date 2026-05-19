@@ -4,19 +4,32 @@ use uuid::Uuid;
 
 use crate::database::connection::DatabaseState;
 use crate::models::workspace_command::{
-    CommandCategory, CreateWorkspaceCommandRequest, UpdateWorkspaceCommandRequest, WorkspaceCommand,
+    CommandCategory, CommandMode, CreateWorkspaceCommandRequest, RestartPolicy,
+    UpdateWorkspaceCommandRequest, WorkspaceCommand,
 };
 
 use super::shared::resolve_nullable_field;
 
 const SELECT_COLUMNS: &str =
-    "id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order";
+    "id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order, mode, restart_policy, timeout_seconds";
 
 fn row_to_workspace_command(row: &Row) -> Result<WorkspaceCommand, rusqlite::Error> {
     let category_string: String = row.get(2)?;
     let category = CommandCategory::from_db(category_string).map_err(|error| {
         rusqlite::Error::FromSqlConversionFailure(2, rusqlite::types::Type::Text, error.into())
     })?;
+
+    let mode_string: String = row.get(8)?;
+    let mode = CommandMode::from_db(mode_string).map_err(|error| {
+        rusqlite::Error::FromSqlConversionFailure(8, rusqlite::types::Type::Text, error.into())
+    })?;
+
+    let restart_policy_string: String = row.get(9)?;
+    let restart_policy = RestartPolicy::from_db(restart_policy_string).map_err(|error| {
+        rusqlite::Error::FromSqlConversionFailure(9, rusqlite::types::Type::Text, error.into())
+    })?;
+
+    let timeout_seconds: Option<i64> = row.get(10)?;
 
     Ok(WorkspaceCommand {
         id: row.get(0)?,
@@ -27,6 +40,9 @@ fn row_to_workspace_command(row: &Row) -> Result<WorkspaceCommand, rusqlite::Err
         port_pattern: row.get(5)?,
         expected_exit_code: row.get(6)?,
         sort_order: row.get(7)?,
+        mode,
+        restart_policy,
+        timeout_seconds,
     })
 }
 
@@ -40,8 +56,8 @@ pub fn create_workspace_command(
 
     connection
         .execute(
-            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order) \
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order, mode, restart_policy, timeout_seconds) \
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
             rusqlite::params![
                 id,
                 request.dashboard_id,
@@ -51,6 +67,9 @@ pub fn create_workspace_command(
                 request.port_pattern,
                 request.expected_exit_code.unwrap_or(0),
                 request.sort_order.unwrap_or(0),
+                request.mode.unwrap_or(CommandMode::Headless).to_string(),
+                request.restart_policy.unwrap_or(RestartPolicy::Never).to_string(),
+                request.timeout_seconds,
             ],
         )
         .map_err(|error| format!("Failed to create workspace command: {error}"))?;
@@ -104,11 +123,15 @@ pub fn update_workspace_command(
     let port_pattern = resolve_nullable_field(request.port_pattern, existing.port_pattern);
     let expected_exit_code = request.expected_exit_code.unwrap_or(existing.expected_exit_code);
     let sort_order = request.sort_order.unwrap_or(existing.sort_order);
+    let mode = request.mode.unwrap_or(existing.mode);
+    let restart_policy = request.restart_policy.unwrap_or(existing.restart_policy);
+    let timeout_seconds = resolve_nullable_field(request.timeout_seconds, existing.timeout_seconds);
 
     connection
         .execute(
             "UPDATE workspace_commands SET name = ?1, category = ?2, command = ?3, port_pattern = ?4, \
-             expected_exit_code = ?5, sort_order = ?6 WHERE id = ?7",
+             expected_exit_code = ?5, sort_order = ?6, mode = ?7, restart_policy = ?8, timeout_seconds = ?9 \
+             WHERE id = ?10",
             rusqlite::params![
                 name,
                 category.to_string(),
@@ -116,6 +139,9 @@ pub fn update_workspace_command(
                 port_pattern,
                 expected_exit_code,
                 sort_order,
+                mode.to_string(),
+                restart_policy.to_string(),
+                timeout_seconds,
                 existing.id,
             ],
         )

@@ -30,6 +30,8 @@
 				commandName: p.name,
 				state: STATUS_TO_BADGE_STATE[p.status],
 				isStale: p.status !== 'running' && (ctx.cache?.has_local_changes ?? false),
+				restartCount: p.restart_count,
+				maxRestarts: p.max_restarts,
 			})),
 	);
 
@@ -62,6 +64,8 @@
 				state={result.state}
 				commandName={result.commandName}
 				isStale={result.isStale}
+				restartCount={result.restartCount}
+				maxRestarts={result.maxRestarts}
 				badgeStyle={ctx.appearanceSettings.badgeStyle}
 			/>
 		{/each}

@@ -12,6 +12,9 @@ function makeCommand(overrides: Partial<WorkspaceCommand> = {}): WorkspaceComman
 		port_pattern: null,
 		expected_exit_code: 0,
 		sort_order: 0,
+		mode: 'headless',
+		restart_policy: 'never',
+		timeout_seconds: null,
 		...overrides,
 	};
 }
@@ -26,6 +29,8 @@ function makeProcess(overrides: Partial<RunningProcess> = {}): RunningProcess {
 		pid: 1234,
 		port: 3000,
 		status: 'running',
+		restart_count: 0,
+		max_restarts: 3,
 		...overrides,
 	};
 }

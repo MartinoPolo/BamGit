@@ -237,7 +237,10 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             command TEXT NOT NULL,
             port_pattern TEXT,
             expected_exit_code INTEGER NOT NULL DEFAULT 0,
-            sort_order INTEGER NOT NULL DEFAULT 0
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            mode TEXT NOT NULL DEFAULT 'headless' CHECK (mode IN ('headless', 'terminal')),
+            restart_policy TEXT NOT NULL DEFAULT 'never' CHECK (restart_policy IN ('never', 'on_failure', 'always')),
+            timeout_seconds INTEGER
         );
 
         CREATE TABLE IF NOT EXISTS model_pricing_cache (
