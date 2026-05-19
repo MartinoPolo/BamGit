@@ -156,4 +156,15 @@ export default [
 			],
 		},
 	},
+	{
+		files: ['tests/**/*.ts', 'wdio.conf.ts'],
+		languageOptions: {
+			parser: tseslint.parser,
+			parserOptions: {
+				tsconfigRootDir: import.meta.dirname,
+				project: 'tests/tsconfig.json',
+			},
+			globals: { ...globals.browser, ...globals.node },
+		},
+	},
 ];
