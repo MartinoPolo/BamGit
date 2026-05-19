@@ -37,7 +37,7 @@
 		<span
 			class={cn(
 				'size-1.5 shrink-0 rounded-full bg-current',
-				dot === 'pulsing' && 'animate-[badge-pulse_2s_ease-in-out_infinite]',
+				dot === 'pulsing' && 'animate-badge-pulse',
 			)}
 		></span>
 	{/if}

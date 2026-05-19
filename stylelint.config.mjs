@@ -8,6 +8,10 @@ export default {
 			true,
 			{ ignoreAtRules: ['theme', 'custom-variant', 'plugin', 'apply', 'layer'] },
 		],
+		// Svelte :global() pseudo-class
+		'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['global'] }],
+		// Svelte -global- keyframe prefix
+		'keyframes-name-pattern': null,
 		// shadcn-svelte uses OKLCH decimal lightness (0.141) and unitless hue (285.823) — both valid CSS
 		'lightness-notation': null,
 		'hue-degree-notation': null,

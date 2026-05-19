@@ -75,6 +75,26 @@ Use Button as the template for variant-bearing components.
 - Use `data-icon="inline-start"` (prefix) or `data-icon="inline-end"` (suffix) on icons inside `Button`. Component CSS sizes icons automatically via these attributes.
 - No `size-*` classes on icons inside components — the component handles sizing.
 
+## Duration Tokens
+
+Use these instead of hardcoded millisecond values:
+
+| Token          | Value | Tailwind class | Use for                            |
+| -------------- | ----- | -------------- | ---------------------------------- |
+| `--duration-1` | 90ms  | `duration-1`   | Micro-interactions (menu appear)   |
+| `--duration-2` | 120ms | `duration-2`   | Fast feedback (button press)       |
+| `--duration-3` | 160ms | `duration-3`   | Hover states, card transitions     |
+| `--duration-4` | 220ms | `duration-4`   | General UI transitions             |
+| `--duration-5` | 320ms | `duration-5`   | Expansion, progress, layout shifts |
+
+In Tailwind classes: `duration-3`, `duration-4`, `duration-5`.
+In inline/CSS transitions: `var(--duration-3)`, `var(--duration-4)`, `var(--duration-5)`.
+
+## Animation Patterns
+
+Multi-component animations: register `@keyframes` in app.css + `--animate-*` in `@theme inline`. Components use `animate-*` Tailwind class.
+Single-component animations: define `@keyframes -global-name` in component `<style>`. Reference via `animate-[name_...]`.
+
 ## Storybook Conventions
 
 - Story files: `ComponentName.stories.svelte` using `defineMeta` + `{#snippet template(args)}`.

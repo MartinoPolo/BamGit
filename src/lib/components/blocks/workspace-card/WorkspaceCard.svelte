@@ -176,7 +176,7 @@
 		accentBarColor={accentColor}
 		{gradientTint}
 		class={cn(
-			'group relative isolate h-full cursor-pointer transition-all duration-200',
+			'group relative isolate h-full cursor-pointer transition-all duration-4',
 			'hover:-translate-y-0.5 gk-ws-hover-glow',
 			isDormant && 'opacity-[0.72] saturate-[0.7]',
 		)}
@@ -310,7 +310,7 @@
 								class="flex-1 h-1 rounded-full bg-[color-mix(in_oklch,var(--foreground)_10%,transparent)] overflow-hidden"
 							>
 								<div
-									class="h-full rounded-full transition-[width] duration-300 ease-out"
+									class="h-full rounded-full transition-[width] duration-5 ease-out"
 									style="width: {prdProgressPercent}%; background: var(--ws-accent);"
 								></div>
 							</div>
@@ -358,3 +358,13 @@
 		</div></Card.Card
 	>
 </button>
+
+<style>
+	:global(.gk-ws-hover-glow):hover {
+		border-color: color-mix(in srgb, var(--ws-accent) 55%, var(--border));
+		box-shadow:
+			0 4px 6px -1px rgb(0 0 0 / 10%),
+			0 2px 4px -2px rgb(0 0 0 / 10%),
+			0 0 24px color-mix(in oklch, var(--ws-accent) 18%, transparent);
+	}
+</style>

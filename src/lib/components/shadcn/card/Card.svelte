@@ -37,3 +37,37 @@
 		<div class="gk-card-shimmer"></div>
 	{/if}
 </div>
+
+<style>
+	:global(.gk-card-gradient-tint) {
+		position: relative;
+		isolation: isolate;
+	}
+
+	:global(.gk-card-gradient-tint)::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: linear-gradient(
+			180deg,
+			color-mix(in oklch, var(--gk-card-tint-color) 8%, transparent) 0%,
+			transparent 60%
+		);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	:global(.gk-card-shimmer) {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			transparent 0%,
+			color-mix(in oklch, var(--foreground) 4%, transparent) 50%,
+			transparent 100%
+		);
+		background-size: 200% 100%;
+		animation: shimmer 2s infinite linear;
+	}
+</style>

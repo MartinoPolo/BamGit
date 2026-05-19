@@ -67,7 +67,7 @@
 </script>
 
 <aside
-	class="h-full overflow-hidden border-r border-border bg-sidebar transition-[width] duration-200"
+	class="h-full overflow-hidden border-r border-border bg-sidebar transition-[width] duration-4"
 	style:width={collapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)'}
 >
 	<div

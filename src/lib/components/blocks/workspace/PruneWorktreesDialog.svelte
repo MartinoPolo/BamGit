@@ -63,7 +63,7 @@
 				<div class="flex flex-col gap-2">
 					{#each prunableIssues as issue (issue.issue_id)}
 						<label
-							class="flex cursor-pointer items-center gap-3 rounded px-2 py-1.5 hover:bg-accent"
+							class="flex cursor-pointer items-center gap-3 rounded px-2 py-1.5 hover:bg-accent/25"
 						>
 							<Checkbox
 								checked={selectedIds.has(issue.issue_id)}

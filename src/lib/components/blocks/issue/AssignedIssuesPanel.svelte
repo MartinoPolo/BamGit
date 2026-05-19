@@ -370,7 +370,7 @@
 				{#each filteredUnlinked as issue (issue.number)}
 					<div
 						class={cn(
-							'assigned-table-grid cursor-pointer items-center border-b border-border/40 text-xs transition-colors hover:bg-accent/40',
+							'assigned-table-grid cursor-pointer items-center border-b border-border/40 text-xs transition-colors hover:bg-accent/25',
 							selectedNumbers.has(issue.number) && 'bg-primary/5',
 						)}
 						style="height: 38px;"
