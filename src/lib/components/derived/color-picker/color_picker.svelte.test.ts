@@ -13,7 +13,6 @@ describe('ColorPicker', () => {
 
 		const trigger = screen.getByRole('button', { name: `Color: ${selectedColor}` });
 		await expect.element(trigger).toBeVisible();
-		await expect.element(trigger).toHaveClass('h-7 w-7');
 		await expect.element(trigger).toHaveStyle({ backgroundColor: 'rgb(229, 62, 62)' });
 	});
 

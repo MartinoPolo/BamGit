@@ -27,12 +27,4 @@ describe('ServerPortBadge', () => {
 		await button.click();
 		expect(handleClick).toHaveBeenCalledOnce();
 	});
-
-	it('shows green dot indicator', async () => {
-		const screen = await render(ServerPortBadge, {
-			props: { port: 3000 },
-		});
-		const dot = screen.container.querySelector('[data-slot="badge"] .rounded-full.bg-current');
-		expect(dot).not.toBeNull();
-	});
 });

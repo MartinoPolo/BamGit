@@ -63,11 +63,11 @@ describe('renderMarkdown', () => {
 		expect(result).toContain('rel="noopener noreferrer"');
 	});
 
-	it('renders fenced code blocks with language class', () => {
+	it('renders fenced code blocks with language attribute', () => {
 		const result = renderMarkdown('```typescript\nconst x = 1;\n```');
 		expect(result).toContain('<code');
 		expect(result).toContain('const x = 1;');
-		expect(result).toMatch(/language-typescript/);
+		expect(result).toContain('data-language="typescript"');
 	});
 
 	it('renders code blocks without language', () => {
