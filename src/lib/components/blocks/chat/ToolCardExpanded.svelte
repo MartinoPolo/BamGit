@@ -4,6 +4,7 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as Card from '$lib/components/shadcn/card/index.js';
+	import { MonospaceBlock } from '$lib/components/base/monospace-block/index.js';
 	import {
 		extractToolDetail,
 		extractToolOutput,
@@ -62,8 +63,10 @@
 			class="w-0.75 shrink-0"
 			style="background: {(message.isError ?? false) ? 'var(--status-danger)' : accentColor}"
 		></div>
-		<pre
-			class="m-0 max-h-65 flex-1 overflow-auto break-all whitespace-pre-wrap px-3 py-2.5 font-mono text-[11.5px] leading-undefined text-foreground-muted">{output ||
-				detail}</pre>
+		<MonospaceBlock
+			content={output || detail}
+			maxHeight="16.25rem"
+			class="m-0 flex-1 break-all rounded-none border-0 bg-transparent px-3 py-2.5 text-foreground-muted"
+		/>
 	</div>
 </Card.Card>

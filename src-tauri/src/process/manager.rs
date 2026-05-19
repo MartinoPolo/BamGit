@@ -28,11 +28,22 @@ pub enum ProcessStatus {
     Stopped,
 }
 
-#[derive(Debug)]
 struct TrackedProcess {
     info: RunningProcess,
     abort_handle: tokio::task::AbortHandle,
     log_buffer: Vec<String>,
+    log_file_path: std::path::PathBuf,
+    log_writer: std::io::BufWriter<std::fs::File>,
+}
+
+impl std::fmt::Debug for TrackedProcess {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TrackedProcess")
+            .field("info", &self.info)
+            .field("log_buffer_len", &self.log_buffer.len())
+            .field("log_file_path", &self.log_file_path)
+            .finish()
+    }
 }
 
 const MAX_LOG_LINES: usize = 1000;
@@ -69,8 +80,12 @@ impl ProcessManager {
     }
 
     pub fn append_log(&self, process_id: &str, line: String) {
+        use std::io::Write;
         let mut guard = self.processes.lock().unwrap();
         if let Some(tracked) = guard.get_mut(process_id) {
+            if let Err(err) = writeln!(tracked.log_writer, "{line}") {
+                eprintln!("Failed to write to process log file: {err}");
+            }
             tracked.log_buffer.push(line);
             if tracked.log_buffer.len() > MAX_LOG_LINES {
                 let drain_count = tracked.log_buffer.len() - MAX_LOG_LINES;
@@ -102,7 +117,12 @@ impl ProcessManager {
         name: String,
         pid: u32,
         abort_handle: tokio::task::AbortHandle,
-    ) {
+    ) -> Result<(), std::io::Error> {
+        let log_file_path =
+            std::env::temp_dir().join(format!("grovekeeper-proc-{process_id}.log"));
+        let file = std::fs::File::create(&log_file_path)?;
+        let log_writer = std::io::BufWriter::new(file);
+
         let info = RunningProcess {
             process_id: process_id.clone(),
             command_id,
@@ -117,8 +137,27 @@ impl ProcessManager {
             info,
             abort_handle,
             log_buffer: Vec::new(),
+            log_file_path,
+            log_writer,
         };
         self.processes.lock().unwrap().insert(process_id, tracked);
+        Ok(())
+    }
+
+    pub fn get_full_logs(&self, process_id: &str) -> Option<String> {
+        let path = {
+            let guard = self.processes.lock().unwrap();
+            guard.get(process_id)?.log_file_path.clone()
+        };
+        std::fs::read_to_string(&path).ok()
+    }
+
+    pub fn flush_log(&self, process_id: &str) {
+        use std::io::Write;
+        let mut guard = self.processes.lock().unwrap();
+        if let Some(tracked) = guard.get_mut(process_id) {
+            let _ = tracked.log_writer.flush();
+        }
     }
 
     pub fn kill_process(&self, process_id: &str) -> bool {
@@ -132,10 +171,23 @@ impl ProcessManager {
         }
     }
 
+    #[allow(dead_code)]
+    pub fn remove_process(&self, process_id: &str) -> bool {
+        let mut guard = self.processes.lock().unwrap();
+        if let Some(tracked) = guard.remove(process_id) {
+            tracked.abort_handle.abort();
+            let _ = std::fs::remove_file(&tracked.log_file_path);
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn cleanup_all(&self) {
         let mut guard = self.processes.lock().unwrap();
         for tracked in guard.values() {
             tracked.abort_handle.abort();
+            let _ = std::fs::remove_file(&tracked.log_file_path);
         }
         guard.clear();
     }
