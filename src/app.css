@@ -151,6 +151,7 @@
 		from {
 			height: 0;
 		}
+
 		to {
 			height: var(--bits-accordion-content-height, auto);
 		}
@@ -160,6 +161,7 @@
 		from {
 			height: var(--bits-accordion-content-height, auto);
 		}
+
 		to {
 			height: 0;
 		}
