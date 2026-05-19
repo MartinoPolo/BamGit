@@ -74,7 +74,7 @@ Always fix unrelated errors you encounter (merge artifacts, stale imports, broke
 
 ## Testing
 
-- TDD: write tests first, then implement.
+- When writing tests, always derive expected behavior from requirements (GitHub issue descriptions and comments, `DECISIONS.md`, `CONTEXT.md`, or other docs) — never adapt tests to match the implementation. If a test reveals a bug, report it to the user or fix it immediately.
 
 ### Tauri E2E Tests (WebdriverIO)
 
