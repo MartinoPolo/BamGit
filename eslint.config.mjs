@@ -161,8 +161,8 @@ export default [
 		languageOptions: {
 			parser: tseslint.parser,
 			parserOptions: {
+				projectService: true,
 				tsconfigRootDir: import.meta.dirname,
-				project: 'tests/tsconfig.json',
 			},
 			globals: { ...globals.browser, ...globals.node },
 		},
