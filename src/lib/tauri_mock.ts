@@ -47,6 +47,7 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'discover_ai_config',
 	'run_workspace_command',
 	'kill_workspace_process',
+	'get_full_process_logs',
 	'github_device_flow_start',
 	'github_device_flow_poll',
 	'test_notification_sound',
@@ -115,8 +116,16 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	get_process_logs: () => [
 		'[07:30:01] Starting build...',
 		'[07:30:02] Compiling 42 modules',
+		'[stderr] Warning: unused variable `x`',
 		'[07:30:05] Build complete (3.2s)',
 	],
+	get_full_process_logs: () =>
+		Array.from({ length: 50 }, (_, i) => {
+			if (i % 7 === 3) {
+				return `[stderr] Warning at line ${i * 10}: potential issue`;
+			}
+			return `[07:30:${String(i).padStart(2, '0')}] Processing step ${i + 1} of 50...`;
+		}).join('\n'),
 
 	// ─── Sessions reads ───────────────────────────────────────────────────────
 	get_sessions: () => MOCK_SESSIONS,

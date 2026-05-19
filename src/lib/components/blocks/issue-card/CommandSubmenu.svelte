@@ -47,8 +47,12 @@
 	}
 
 	function handleViewLogs(entry: CommandEntry) {
-		if (onViewLogs && entry.process) {
-			onViewLogs(entry.process.process_id);
+		if (entry.process) {
+			if (onViewLogs) {
+				onViewLogs(entry.process.process_id);
+			} else {
+				processesContext.openLogViewer(entry.process.process_id);
+			}
 		}
 	}
 

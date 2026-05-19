@@ -35,6 +35,7 @@
 	import CommandPalette from '$lib/components/blocks/command-palette/CommandPalette.svelte';
 	import RawRequirementsModal from '$lib/components/blocks/issue/RawRequirementsModal.svelte';
 	import ToastContainer from '$lib/components/derived/toast-container/ToastContainer.svelte';
+	import { ProcessLogViewer } from '$lib/components/blocks/process-log/index.js';
 	import type { Dashboard } from '$lib/types/generated';
 
 	let { children } = $props();
@@ -222,4 +223,5 @@
 
 <CommandPalette />
 <RawRequirementsModal />
+<ProcessLogViewer />
 <ToastContainer />

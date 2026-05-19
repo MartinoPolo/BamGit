@@ -3,12 +3,18 @@ import { invoke, listen, type UnlistenFn } from '$lib/tauri.js';
 import type { ProcessStatus, RunningProcess } from '$lib/types/generated';
 import { SvelteMap } from 'svelte/reactivity';
 
-// ─── Event payload types ───────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────
+
+export interface ProcessLogLine {
+	stream: 'stdout' | 'stderr';
+	text: string;
+}
 
 type ProcessPortDetectedPayload = [string, number];
 type ProcessExitedPayload = [string, ProcessStatus];
+type ProcessOutputPayload = [string, 'stdout' | 'stderr', string];
 
-// ─── Context ───────────────────────────────────────────────────────────────
+// ─── Context ──────────────────────────────────────────────────────────────
 
 type ProcessesContext = ReturnType<typeof createProcessesContext>['publicApi'];
 
@@ -16,49 +22,59 @@ const [useProcesses, setProcessesInternal] = createContext<ProcessesContext>();
 export { useProcesses };
 
 export function setProcessesContext() {
-	const { publicApi, handlePortDetected, handleProcessExited } = createProcessesContext();
+	const { publicApi, handlePortDetected, handleProcessExited, handleProcessOutput } =
+		createProcessesContext();
 	setProcessesInternal(publicApi);
 
 	let cancelled = false;
 	let unlistenPort: UnlistenFn | null = null;
 	let unlistenExited: UnlistenFn | null = null;
+	let unlistenOutput: UnlistenFn | null = null;
 
 	onMount(async () => {
 		void publicApi.loadProcesses();
 
-		const [portUn, exitedUn] = await Promise.all([
+		const [portUn, exitedUn, outputUn] = await Promise.all([
 			listen<ProcessPortDetectedPayload>('process-port-detected', (event) => {
 				handlePortDetected(event.payload);
 			}),
 			listen<ProcessExitedPayload>('process-exited', (event) => {
 				handleProcessExited(event.payload);
 			}),
+			listen<ProcessOutputPayload>('process-output', (event) => {
+				handleProcessOutput(event.payload);
+			}),
 		]);
 
 		if (cancelled) {
 			portUn();
 			exitedUn();
+			outputUn();
 			return;
 		}
 
 		unlistenPort = portUn;
 		unlistenExited = exitedUn;
+		unlistenOutput = outputUn;
 	});
 
 	onDestroy(() => {
 		cancelled = true;
 		unlistenPort?.();
 		unlistenExited?.();
+		unlistenOutput?.();
 	});
 
 	return publicApi;
 }
 
-// ─── Factory ───────────────────────────────────────────────────────────────
+// ─── Factory ──────────────────────────────────────────────────────────────
 
 /** @internal - exported only for testing */
 export function createProcessesContext() {
 	let processes = $state<RunningProcess[]>([]);
+	const logLines = new SvelteMap<string, ProcessLogLine[]>();
+	let activeLogViewerProcessId = $state<string | null>(null);
 
 	const processesByIssueId = $derived.by(() => {
 		const map = new SvelteMap<string, RunningProcess[]>();
@@ -91,6 +107,19 @@ export function createProcessesContext() {
 		}
 	}
 
+	const maxFrontendLogLines = 1000;
+
+	function handleProcessOutput(payload: ProcessOutputPayload) {
+		const [processId, stream, line] = payload;
+		const logLine: ProcessLogLine = { stream, text: line };
+		const existing = logLines.get(processId) ?? [];
+		const updated = [...existing, logLine];
+		if (updated.length > maxFrontendLogLines) {
+			updated.splice(0, updated.length - maxFrontendLogLines);
+		}
+		logLines.set(processId, updated);
+	}
+
 	// ─── Public interface ──────────────────────────────────────────────────
 
 	const publicApi = {
@@ -99,6 +128,20 @@ export function createProcessesContext() {
 		},
 		get processesByIssueId() {
 			return processesByIssueId;
+		},
+		get logLines() {
+			return logLines;
+		},
+		get activeLogViewerProcessId() {
+			return activeLogViewerProcessId;
+		},
+
+		openLogViewer(processId: string) {
+			activeLogViewerProcessId = processId;
+		},
+
+		closeLogViewer() {
+			activeLogViewerProcessId = null;
 		},
 
 		async loadProcesses() {
@@ -125,7 +168,11 @@ export function createProcessesContext() {
 		async getProcessLogs(processId: string): Promise<string[]> {
 			return invoke<string[]>('get_process_logs', { process_id: processId });
 		},
+
+		async getFullProcessLogs(processId: string): Promise<string> {
+			return invoke<string>('get_full_process_logs', { process_id: processId });
+		},
 	};
 
-	return { publicApi, handlePortDetected, handleProcessExited };
+	return { publicApi, handlePortDetected, handleProcessExited, handleProcessOutput };
 }

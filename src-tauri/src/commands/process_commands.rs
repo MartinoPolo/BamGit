@@ -99,7 +99,7 @@ pub async fn run_workspace_command(
                     }
                 }
 
-                let _ = task_app.emit("process-output", (&task_process_id, &line));
+                let _ = task_app.emit("process-output", (&task_process_id, "stdout", &line));
             }
         }
 
@@ -118,6 +118,7 @@ pub async fn run_workspace_command(
             Err(_) => ProcessStatus::Failed,
         };
 
+        task_pm.flush_log(&task_process_id);
         task_pm.set_status(&task_process_id, final_status.clone());
         let _ = task_app.emit("process-exited", (&task_process_id, &final_status));
     });
@@ -131,20 +132,22 @@ pub async fn run_workspace_command(
             let mut lines = reader.lines();
             while let Ok(Some(line)) = lines.next_line().await {
                 stderr_pm.append_log(&stderr_process_id, format!("[stderr] {line}"));
-                let _ = stderr_app.emit("process-output", (&stderr_process_id, &line));
+                let _ = stderr_app.emit("process-output", (&stderr_process_id, "stderr", &line));
             }
         });
     }
 
-    process_manager.register(
-        process_id.clone(),
-        command_id,
-        issue_id,
-        category,
-        name,
-        pid,
-        join_handle.abort_handle(),
-    );
+    process_manager
+        .register(
+            process_id.clone(),
+            command_id,
+            issue_id,
+            category,
+            name,
+            pid,
+            join_handle.abort_handle(),
+        )
+        .map_err(|err| format!("Failed to create process log file: {err}"))?;
 
     let info = process_manager
         .list_processes()
@@ -189,5 +192,15 @@ pub fn get_process_logs(
 ) -> Result<Vec<String>, String> {
     process_manager
         .get_process_logs(&process_id)
+        .ok_or_else(|| "ERR_PROCESS_NOT_FOUND".to_string())
+}
+
+#[tauri::command]
+pub fn get_full_process_logs(
+    process_manager: State<ProcessManager>,
+    process_id: String,
+) -> Result<String, String> {
+    process_manager
+        .get_full_logs(&process_id)
         .ok_or_else(|| "ERR_PROCESS_NOT_FOUND".to_string())
 }

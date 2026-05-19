@@ -47,6 +47,10 @@
 		void processesCtx.killProcess(processId);
 	}
 
+	function handleViewLogs(processId: string) {
+		processesCtx.openLogViewer(processId);
+	}
+
 	const visibleResults = $derived(commandResults.slice(0, MAX_VISIBLE_COMMAND_RESULTS));
 	const overflow = $derived(computeCommandResultsOverflow(commandResults.length));
 </script>
@@ -74,6 +78,7 @@
 				badgeStyle={ctx.appearanceSettings.badgeStyle}
 				processId={runningServerProcess.process_id}
 				onKillProcess={handleKillServerProcess}
+				onViewLogs={handleViewLogs}
 			/>
 		{/if}
 	</div>
