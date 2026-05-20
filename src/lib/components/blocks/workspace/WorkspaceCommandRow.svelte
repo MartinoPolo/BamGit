@@ -3,18 +3,55 @@
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
+	import { PORT_PATTERN_PRESETS } from './port_pattern_presets.js';
+	import { useProcesses } from '$lib/modules/processes';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import GripVerticalIcon from '@lucide/svelte/icons/grip-vertical';
+	import PlayIcon from '@lucide/svelte/icons/play';
 
 	interface Props {
 		command: WorkspaceCommand;
+		dashboardId: string;
 		onUpdate: (id: string, field: string, value: string | number | null) => void;
 		onDelete: (id: string) => void;
 	}
 
-	let { command, onUpdate, onDelete }: Props = $props();
+	let { command, dashboardId, onUpdate, onDelete }: Props = $props();
 
+	const processesCtx = useProcesses();
 	const isServer = $derived(command.category === 'server');
+	let testRunning = $state(false);
+
+	const selectedPresetId = $derived.by(() => {
+		const currentPattern = command.port_pattern;
+		if (currentPattern === null || currentPattern === '') {
+			return 'custom';
+		}
+		const matched = PORT_PATTERN_PRESETS.find(
+			(p) => p.regex !== null && p.regex === currentPattern,
+		);
+		return matched?.id ?? 'custom';
+	});
+
+	function handlePresetChange(presetId: string) {
+		const preset = PORT_PATTERN_PRESETS.find((p) => p.id === presetId);
+		if (preset === undefined) {
+			return;
+		}
+		onUpdate(command.id, 'port_pattern', preset.regex);
+	}
+
+	async function handleTestCommand() {
+		if (testRunning || command.command.trim() === '') {
+			return;
+		}
+		testRunning = true;
+		try {
+			await processesCtx.testCommand(command.id, dashboardId);
+		} finally {
+			testRunning = false;
+		}
+	}
 </script>
 
 <div class="group flex items-start gap-2 rounded-md border border-border bg-surface-1 p-3">
@@ -49,15 +86,28 @@
 		{#if isServer}
 			<div class="flex flex-col gap-1">
 				<span class="text-xs text-muted-foreground">Port Pattern (regex)</span>
-				<Input
-					value={command.port_pattern ?? ''}
-					onchange={(e) => {
-						const value = e.currentTarget.value.trim();
-						onUpdate(command.id, 'port_pattern', value === '' ? null : value);
-					}}
-					placeholder="e.g. localhost:(\d+)"
-					class="h-8 font-mono text-sm"
-				/>
+				<div class="flex gap-2">
+					<Select
+						value={selectedPresetId}
+						onchange={(e) => handlePresetChange(e.currentTarget.value)}
+						class="h-8 w-44 shrink-0 text-sm"
+					>
+						{#each PORT_PATTERN_PRESETS as preset (preset.id)}
+							<option value={preset.id}>
+								{preset.label}{preset.recommended ? ' ✦' : ''}
+							</option>
+						{/each}
+					</Select>
+					<Input
+						value={command.port_pattern ?? ''}
+						onchange={(e) => {
+							const value = e.currentTarget.value.trim();
+							onUpdate(command.id, 'port_pattern', value === '' ? null : value);
+						}}
+						placeholder="e.g. localhost:(\d+)"
+						class="h-8 flex-1 font-mono text-sm"
+					/>
+				</div>
 			</div>
 		{:else}
 			<div class="flex w-32 flex-col gap-1">
@@ -126,13 +176,25 @@
 		{/if}
 	</div>
 
-	<Button
-		intent="ghost"
-		size="icon-sm"
-		aria-label="Delete command"
-		class="mt-1 shrink-0 text-muted-foreground hover:text-destructive"
-		onclick={() => onDelete(command.id)}
-	>
-		<TrashIcon data-icon="inline-end" />
-	</Button>
+	<div class="mt-1 flex shrink-0 flex-col gap-1">
+		<Button
+			intent="ghost"
+			size="icon-sm"
+			aria-label="Test command"
+			class="text-muted-foreground hover:text-foreground"
+			disabled={testRunning || command.command.trim() === ''}
+			onclick={handleTestCommand}
+		>
+			<PlayIcon data-icon="inline-end" />
+		</Button>
+		<Button
+			intent="ghost"
+			size="icon-sm"
+			aria-label="Delete command"
+			class="text-muted-foreground hover:text-destructive"
+			onclick={() => onDelete(command.id)}
+		>
+			<TrashIcon data-icon="inline-end" />
+		</Button>
+	</div>
 </div>

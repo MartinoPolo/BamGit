@@ -197,6 +197,16 @@ export function createProcessesContext() {
 		async getFullProcessLogs(processId: string): Promise<string> {
 			return invoke<string>('get_full_process_logs', { process_id: processId });
 		},
+
+		async testCommand(commandId: string, dashboardId: string): Promise<string> {
+			const testProcessId = await invoke<string>('test_workspace_command', {
+				command_id: commandId,
+				dashboard_id: dashboardId,
+			});
+			logLines.set(testProcessId, []);
+			activeLogViewerProcessId = testProcessId;
+			return testProcessId;
+		},
 	};
 
 	return {
