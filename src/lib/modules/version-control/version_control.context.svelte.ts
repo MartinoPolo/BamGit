@@ -1,5 +1,5 @@
 import { createContext } from 'svelte';
-import { SvelteMap } from 'svelte/reactivity';
+import { SvelteDate, SvelteMap } from 'svelte/reactivity';
 import { invoke } from '$lib/tauri.js';
 import type {
 	AssignedIssue,
@@ -30,6 +30,7 @@ export function isCacheStale(
 	return entries.some(
 		(entry) =>
 			entry.fetched_at == null ||
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity -- pure utility function, not reactive state
 			Date.now() - new Date(entry.fetched_at).getTime() > thresholdMs,
 	);
 }
@@ -68,7 +69,7 @@ function createVersionControlContext() {
 	let assignedIssues = $state<AssignedIssue[]>([]);
 	let assignedIssuesHasMore = $state(false);
 	let assignedIssuesLimit = $state(50);
-	let assignedIssuesLastSynced = $state<Date | null>(null);
+	let assignedIssuesLastSynced = $state<SvelteDate | null>(null);
 	let assignedIssuesLoading = $state(false);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
@@ -97,7 +98,7 @@ function createVersionControlContext() {
 			});
 			assignedIssues = result.issues;
 			assignedIssuesHasMore = result.has_more;
-			assignedIssuesLastSynced = new Date();
+			assignedIssuesLastSynced = new SvelteDate();
 		} catch (err) {
 			error = String(err);
 			console.error('Failed to load assigned issues:', err);
