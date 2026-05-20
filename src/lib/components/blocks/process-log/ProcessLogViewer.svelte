@@ -3,6 +3,8 @@
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { useProcesses, type ProcessLogLine } from '$lib/modules/processes';
+	import type { ProcessStatus } from '$lib/types/generated';
+	import { listen, type UnlistenFn } from '$lib/tauri.js';
 	import ServerPortBadge from '$lib/components/derived/command-badges/ServerPortBadge.svelte';
 	import XIcon from '@lucide/svelte/icons/x';
 	import CopyIcon from '@lucide/svelte/icons/copy';
@@ -23,6 +25,29 @@
 		timeout: 'bg-status-warning',
 		stopped: 'bg-foreground-subtle',
 	} as const;
+
+	const EXIT_MESSAGES = {
+		passed: {
+			colorClass: 'text-status-success',
+			process: 'Process exited (0)',
+			test: 'Test passed (exit 0)',
+		},
+		failed: {
+			colorClass: 'text-status-danger',
+			process: 'Process exited (non-zero)',
+			test: 'Test failed (non-zero)',
+		},
+		timeout: {
+			colorClass: 'text-status-warning',
+			process: 'Process timed out',
+			test: 'Test timed out',
+		},
+		stopped: {
+			colorClass: 'text-foreground-subtle',
+			process: 'Process killed',
+			test: 'Test stopped',
+		},
+	} as const satisfies Record<string, { colorClass: string; process: string; test: string }>;
 
 	const processId = $derived(processesCtx.activeLogViewerProcessId);
 	const isOpen = $derived(processId !== null);
@@ -49,23 +74,21 @@
 	let isAtBottom = $state(true);
 	let linesBelowCount = $state(0);
 
+	let testExitStatus = $state<ProcessStatus | null>(null);
+
 	const effectiveLines = $derived(fullLogLoaded ? displayLines : streamingLines);
-	const isTerminal = $derived(process !== null && process.status !== 'running');
+	const isTestRun = $derived(processId !== null && processId.startsWith('test-'));
+	const isTerminal = $derived(
+		isTestRun ? testExitStatus !== null : process !== null && process.status !== 'running',
+	);
 
 	const exitMessage = $derived.by(() => {
-		if (process === null || process.status === 'running') {
+		const status = isTestRun ? testExitStatus : (process?.status ?? null);
+		if (status === null || status === 'running') {
 			return null;
 		}
-		switch (process.status) {
-			case 'passed':
-				return { text: 'Process exited (0)', colorClass: 'text-status-success' };
-			case 'failed':
-				return { text: 'Process exited (non-zero)', colorClass: 'text-status-danger' };
-			case 'timeout':
-				return { text: 'Process timed out', colorClass: 'text-status-warning' };
-			case 'stopped':
-				return { text: 'Process killed', colorClass: 'text-foreground-subtle' };
-		}
+		const msg = EXIT_MESSAGES[status];
+		return { text: isTestRun ? msg.test : msg.process, colorClass: msg.colorClass };
 	});
 
 	function handleScroll() {
@@ -119,7 +142,37 @@
 			isAtTop = true;
 			isAtBottom = true;
 			linesBelowCount = 0;
+			testExitStatus = null;
 		}
+	});
+
+	let testExitUnlisten: UnlistenFn | null = null;
+
+	$effect(() => {
+		const currentId = processId;
+		if (currentId === null || !currentId.startsWith('test-')) {
+			testExitUnlisten?.();
+			testExitUnlisten = null;
+			return;
+		}
+		let cancelled = false;
+		void listen<[string, ProcessStatus]>('process-exited', (event) => {
+			const [exitProcessId, status] = event.payload;
+			if (exitProcessId === currentId) {
+				testExitStatus = status;
+			}
+		}).then((unlisten) => {
+			if (cancelled) {
+				unlisten();
+				return;
+			}
+			testExitUnlisten = unlisten;
+		});
+		return () => {
+			cancelled = true;
+			testExitUnlisten?.();
+			testExitUnlisten = null;
+		};
 	});
 
 	async function handleCopy() {
@@ -189,6 +242,13 @@
 				{#if process.port !== null}
 					<ServerPortBadge port={process.port} />
 				{/if}
+			{:else if isTestRun}
+				{@const dotClass =
+					testExitStatus === null
+						? STATUS_DOT_CLASSES.running
+						: STATUS_DOT_CLASSES[testExitStatus]}
+				<span class={cn('size-2 shrink-0 rounded-full', dotClass)}></span>
+				<span class="truncate text-sm font-semibold">Test Run</span>
 			{:else}
 				<span class="text-sm text-foreground-muted">Process</span>
 			{/if}
@@ -271,7 +331,7 @@
 		<div class="flex h-9 shrink-0 items-center gap-2 border-t border-border px-3">
 			<!-- Left: Load full log + line count -->
 			<div class="flex items-center gap-2">
-				{#if !fullLogLoaded && effectiveLines.length > 0}
+				{#if !isTestRun && !fullLogLoaded && effectiveLines.length > 0}
 					<Button
 						intent="secondary"
 						size="sm"

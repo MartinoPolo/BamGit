@@ -342,6 +342,7 @@
 						{#each serverCommands as command (command.id)}
 							<WorkspaceCommandRow
 								{command}
+								dashboardId={dashboard.id}
 								onUpdate={handleUpdateCommand}
 								onDelete={handleDeleteCommand}
 							/>
@@ -383,6 +384,7 @@
 						{#each checkCommands as command (command.id)}
 							<WorkspaceCommandRow
 								{command}
+								dashboardId={dashboard.id}
 								onUpdate={handleUpdateCommand}
 								onDelete={handleDeleteCommand}
 							/>

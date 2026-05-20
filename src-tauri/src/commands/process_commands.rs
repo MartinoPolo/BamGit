@@ -8,6 +8,32 @@ use crate::models::workspace_command::{CommandCategory, CommandMode, RestartPoli
 use crate::process::lifecycle::{backoff_delay, resolve_timeout, should_restart, MAX_RESTARTS};
 use crate::process::manager::{ProcessManager, ProcessStatus, RunningProcess};
 
+fn spawn_shell_command(
+    command: &str,
+    working_dir: &str,
+) -> std::io::Result<tokio::process::Child> {
+    #[cfg(target_os = "windows")]
+    {
+        tokio::process::Command::new("cmd")
+            .args(["/C", command])
+            .current_dir(working_dir)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .kill_on_drop(true)
+            .spawn()
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        tokio::process::Command::new("sh")
+            .args(["-c", command])
+            .current_dir(working_dir)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .kill_on_drop(true)
+            .spawn()
+    }
+}
+
 #[tauri::command]
 pub async fn run_workspace_command(
     state: State<'_, DatabaseState>,
@@ -110,30 +136,7 @@ pub async fn run_workspace_command(
                 handle.abort();
             }
 
-            let spawn_result = {
-                #[cfg(target_os = "windows")]
-                {
-                    tokio::process::Command::new("cmd")
-                        .args(["/C", &task_command_str])
-                        .current_dir(&task_working_dir)
-                        .stdout(std::process::Stdio::piped())
-                        .stderr(std::process::Stdio::piped())
-                        .kill_on_drop(true)
-                        .spawn()
-                }
-                #[cfg(not(target_os = "windows"))]
-                {
-                    tokio::process::Command::new("sh")
-                        .args(["-c", &task_command_str])
-                        .current_dir(&task_working_dir)
-                        .stdout(std::process::Stdio::piped())
-                        .stderr(std::process::Stdio::piped())
-                        .kill_on_drop(true)
-                        .spawn()
-                }
-            };
-
-            let mut child = match spawn_result {
+            let mut child = match spawn_shell_command(&task_command_str, &task_working_dir) {
                 Ok(child) => child,
                 Err(error) => {
                     eprintln!("Failed to spawn process: {error}");
@@ -315,4 +318,141 @@ pub fn get_full_process_logs(
     process_manager
         .get_full_logs(&process_id)
         .ok_or_else(|| "ERR_PROCESS_NOT_FOUND".to_string())
+}
+
+const DEFAULT_TEST_TIMEOUT_SECONDS: u64 = 10;
+
+#[tauri::command]
+pub async fn test_workspace_command(
+    state: State<'_, DatabaseState>,
+    app_handle: AppHandle,
+    command_id: String,
+    dashboard_id: String,
+) -> Result<String, String> {
+    let (command_str, name, timeout_seconds, working_directory) = {
+        let connection = state.read()?;
+        connection
+            .query_row(
+                "SELECT wc.command, wc.name, wc.timeout_seconds, d.local_folder \
+                 FROM workspace_commands wc \
+                 JOIN dashboards d ON wc.dashboard_id = d.id \
+                 WHERE wc.id = ?1 AND d.id = ?2",
+                rusqlite::params![command_id, dashboard_id],
+                |row| {
+                    Ok((
+                        row.get::<_, String>(0)?,
+                        row.get::<_, String>(1)?,
+                        row.get::<_, Option<i64>>(2)?,
+                        row.get::<_, Option<String>>(3)?,
+                    ))
+                },
+            )
+            .map_err(|_| "ERR_COMMAND_OR_DASHBOARD_NOT_FOUND".to_string())?
+    };
+
+    let working_dir = working_directory
+        .ok_or_else(|| "No local folder configured for this workspace".to_string())?;
+
+    let timeout_secs = match timeout_seconds {
+        Some(s) if s > 0 => s as u64,
+        _ => DEFAULT_TEST_TIMEOUT_SECONDS,
+    };
+
+    let test_process_id = format!("test-{}", Uuid::new_v4());
+
+    let task_process_id = test_process_id.clone();
+    let task_app = app_handle;
+
+    tokio::spawn(async move {
+        let mut child = match spawn_shell_command(&command_str, &working_dir) {
+            Ok(child) => child,
+            Err(error) => {
+                let _ = task_app.emit(
+                    "process-output",
+                    (&task_process_id, "stderr", &format!("Failed to spawn: {error}")),
+                );
+                let _ = task_app.emit(
+                    "process-exited",
+                    (&task_process_id, &ProcessStatus::Failed),
+                );
+                return;
+            }
+        };
+
+        let stderr = child.stderr.take();
+        let stderr_process_id = task_process_id.clone();
+        let stderr_app = task_app.clone();
+        let stderr_handle = if let Some(stderr) = stderr {
+            Some(tokio::spawn(async move {
+                let reader = BufReader::new(stderr);
+                let mut lines = reader.lines();
+                while let Ok(Some(line)) = lines.next_line().await {
+                    let _ = stderr_app.emit(
+                        "process-output",
+                        (&stderr_process_id, "stderr", &line),
+                    );
+                }
+            }))
+        } else {
+            None
+        };
+
+        let timeout_duration = std::time::Duration::from_secs(timeout_secs);
+        let stream_and_wait = async {
+            if let Some(stdout) = child.stdout.take() {
+                let reader = BufReader::new(stdout);
+                let mut lines = reader.lines();
+                while let Ok(Some(line)) = lines.next_line().await {
+                    let _ = task_app.emit(
+                        "process-output",
+                        (&task_process_id, "stdout", &line),
+                    );
+                }
+            }
+            child.wait().await.ok().and_then(|s| s.code())
+        };
+
+        let (is_timeout, exit_code) =
+            match tokio::time::timeout(timeout_duration, stream_and_wait).await {
+                Ok(code) => (false, code),
+                Err(_) => {
+                    let _ = child.kill().await;
+                    (true, None)
+                }
+            };
+
+        if let Some(handle) = stderr_handle {
+            handle.abort();
+        }
+
+        let _ = task_app.emit(
+            "process-output",
+            (
+                &task_process_id,
+                "stdout",
+                &format!(
+                    "--- test complete: {} (exit {}) ---",
+                    name,
+                    if is_timeout {
+                        "timeout".to_string()
+                    } else {
+                        exit_code.map_or("unknown".to_string(), |c| c.to_string())
+                    }
+                ),
+            ),
+        );
+
+        let final_status = if is_timeout {
+            ProcessStatus::Timeout
+        } else {
+            match exit_code {
+                Some(0) => ProcessStatus::Passed,
+                _ => ProcessStatus::Failed,
+            }
+        };
+
+        let _ = task_app.emit("process-exited", (&task_process_id, &final_status));
+    });
+
+    Ok(test_process_id)
 }
