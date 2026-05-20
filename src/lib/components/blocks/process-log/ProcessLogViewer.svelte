@@ -26,6 +26,29 @@
 		stopped: 'bg-foreground-subtle',
 	} as const;
 
+	const EXIT_MESSAGES = {
+		passed: {
+			colorClass: 'text-status-success',
+			process: 'Process exited (0)',
+			test: 'Test passed (exit 0)',
+		},
+		failed: {
+			colorClass: 'text-status-danger',
+			process: 'Process exited (non-zero)',
+			test: 'Test failed (non-zero)',
+		},
+		timeout: {
+			colorClass: 'text-status-warning',
+			process: 'Process timed out',
+			test: 'Test timed out',
+		},
+		stopped: {
+			colorClass: 'text-foreground-subtle',
+			process: 'Process killed',
+			test: 'Test stopped',
+		},
+	} as const satisfies Record<string, { colorClass: string; process: string; test: string }>;
+
 	const processId = $derived(processesCtx.activeLogViewerProcessId);
 	const isOpen = $derived(processId !== null);
 
@@ -60,34 +83,12 @@
 	);
 
 	const exitMessage = $derived.by(() => {
-		if (isTestRun) {
-			if (testExitStatus === null || testExitStatus === 'running') {
-				return null;
-			}
-			switch (testExitStatus) {
-				case 'passed':
-					return { text: 'Test passed (exit 0)', colorClass: 'text-status-success' };
-				case 'failed':
-					return { text: 'Test failed (non-zero)', colorClass: 'text-status-danger' };
-				case 'timeout':
-					return { text: 'Test timed out', colorClass: 'text-status-warning' };
-				case 'stopped':
-					return { text: 'Test stopped', colorClass: 'text-foreground-subtle' };
-			}
-		}
-		if (process === null || process.status === 'running') {
+		const status = isTestRun ? testExitStatus : (process?.status ?? null);
+		if (status === null || status === 'running') {
 			return null;
 		}
-		switch (process.status) {
-			case 'passed':
-				return { text: 'Process exited (0)', colorClass: 'text-status-success' };
-			case 'failed':
-				return { text: 'Process exited (non-zero)', colorClass: 'text-status-danger' };
-			case 'timeout':
-				return { text: 'Process timed out', colorClass: 'text-status-warning' };
-			case 'stopped':
-				return { text: 'Process killed', colorClass: 'text-foreground-subtle' };
-		}
+		const msg = EXIT_MESSAGES[status];
+		return { text: isTestRun ? msg.test : msg.process, colorClass: msg.colorClass };
 	});
 
 	function handleScroll() {
