@@ -125,6 +125,27 @@ fn parse_label_nodes_to_json(label_nodes: &[serde_json::Value]) -> String {
     serde_json::to_string(&labels).unwrap_or_else(|_| "[]".to_string())
 }
 
+/// Extract CI status from a PR node's statusCheckRollup.
+/// Maps GitHub's StatusState enum to app-level status strings.
+fn resolve_ci_status_from_pr_node(pr_node: &serde_json::Value) -> Option<String> {
+    let state = pr_node
+        .get("commits")?
+        .get("nodes")?
+        .as_array()?
+        .first()?
+        .get("commit")?
+        .get("statusCheckRollup")?
+        .get("state")?
+        .as_str()?;
+
+    match state {
+        "SUCCESS" => Some("passed".to_string()),
+        "FAILURE" | "ERROR" => Some("failed".to_string()),
+        "PENDING" | "EXPECTED" => Some("running".to_string()),
+        _ => None,
+    }
+}
+
 /// Build a GraphQL query to fetch multiple issues and their associated PRs in one call.
 fn build_bulk_sync_graphql_query(
     owner: &str,
@@ -150,7 +171,7 @@ fn build_bulk_sync_graphql_query(
                 .replace('}', "\\}");
             fragments.push(format!(
                 "pr_{index}: pullRequests(headRefName: \"{escaped}\", first: 1, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ \
-                 nodes {{ number state url isDraft reviewRequests(first: 10) {{ nodes {{ requestedReviewer {{ ... on User {{ login }} ... on Team {{ name }} }} }} }} latestReviews(first: 1) {{ nodes {{ state }} }} }} }}"
+                 nodes {{ number state url isDraft reviewRequests(first: 10) {{ nodes {{ requestedReviewer {{ ... on User {{ login }} ... on Team {{ name }} }} }} }} latestReviews(first: 1) {{ nodes {{ state }} }} commits(last: 1) {{ nodes {{ commit {{ statusCheckRollup {{ state }} }} }} }} }} }}"
             ));
         }
     }
@@ -810,6 +831,7 @@ pub async fn sync_all_github_state(
         let mut pr_state = None;
         let mut pr_number = None;
         let mut pr_url = None;
+        let mut pr_ci_status: Option<String> = None;
         let mut labels_json: Option<String> = None;
 
         // Parse issue state and labels
@@ -886,6 +908,7 @@ pub async fn sync_all_github_state(
                         pr_state = Some(resolve_pull_request_state(&pr));
                         pr_number = Some(pr.number);
                         pr_url = Some(pr.url);
+                        pr_ci_status = resolve_ci_status_from_pr_node(pr_node);
                     }
                 }
             }
@@ -905,7 +928,7 @@ pub async fn sync_all_github_state(
             has_local_changes: None,
             ahead_remote_count: None,
             fetched_at: None,
-            pr_ci_status: None,
+            pr_ci_status,
         });
     }
 
@@ -1687,5 +1710,96 @@ mod tests {
     async fn current_user_login_returns_none_when_not_connected() {
         let client = GitHubClient::new();
         assert_eq!(client.current_user_login().await, None);
+    }
+
+    // --- CI status tests ---
+
+    #[test]
+    fn graphql_query_includes_status_check_rollup() {
+        let query = build_bulk_sync_graphql_query(
+            "owner", "repo", &[1], &[Some("feature-branch")],
+        );
+        assert!(query.contains("statusCheckRollup"), "PR fragment should request statusCheckRollup");
+        assert!(query.contains("commits(last: 1)"), "PR fragment should request last commit");
+    }
+
+    #[test]
+    fn parse_ci_status_success() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": [{"commit": {"statusCheckRollup": {"state": "SUCCESS"}}}]}
+        }"#).unwrap();
+        let ci_status = resolve_ci_status_from_pr_node(&pr_json);
+        assert_eq!(ci_status.as_deref(), Some("passed"));
+    }
+
+    #[test]
+    fn parse_ci_status_failure() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": [{"commit": {"statusCheckRollup": {"state": "FAILURE"}}}]}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json).as_deref(), Some("failed"));
+    }
+
+    #[test]
+    fn parse_ci_status_error() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": [{"commit": {"statusCheckRollup": {"state": "ERROR"}}}]}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json).as_deref(), Some("failed"));
+    }
+
+    #[test]
+    fn parse_ci_status_pending() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": [{"commit": {"statusCheckRollup": {"state": "PENDING"}}}]}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json).as_deref(), Some("running"));
+    }
+
+    #[test]
+    fn parse_ci_status_expected() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": [{"commit": {"statusCheckRollup": {"state": "EXPECTED"}}}]}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json).as_deref(), Some("running"));
+    }
+
+    #[test]
+    fn parse_ci_status_null_rollup() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": [{"commit": {"statusCheckRollup": null}}]}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json), None);
+    }
+
+    #[test]
+    fn parse_ci_status_no_commits() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []},
+            "commits": {"nodes": []}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json), None);
+    }
+
+    #[test]
+    fn parse_ci_status_missing_commits_field() {
+        let pr_json: serde_json::Value = serde_json::from_str(r#"{
+            "number": 10, "state": "OPEN", "url": "https://github.com/o/r/pull/10",
+            "isDraft": false, "reviewRequests": {"nodes": []}, "latestReviews": {"nodes": []}
+        }"#).unwrap();
+        assert_eq!(resolve_ci_status_from_pr_node(&pr_json), None);
     }
 }

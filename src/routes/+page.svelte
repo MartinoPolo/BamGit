@@ -133,7 +133,15 @@
 		}
 		untrack(() => {
 			issueStore.loadIssues(dashboardId);
-			versionControlStore.loadStates(dashboardId);
+			void versionControlStore.loadStates(dashboardId).then(() => {
+				if (githubRepoParts && versionControlStore.shouldSync()) {
+					versionControlStore.syncAll(
+						dashboardId,
+						githubRepoParts.owner,
+						githubRepoParts.repo,
+					);
+				}
+			});
 			actionStore.loadActions(dashboardId);
 			if (githubRepoParts) {
 				versionControlStore.loadAssignedIssues(githubRepoParts.owner, githubRepoParts.repo);

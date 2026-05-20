@@ -1,5 +1,5 @@
 import { createContext } from 'svelte';
-import { SvelteMap } from 'svelte/reactivity';
+import { SvelteDate, SvelteMap } from 'svelte/reactivity';
 import { invoke } from '$lib/tauri.js';
 import type {
 	AssignedIssue,
@@ -14,6 +14,26 @@ type SyncResult =
 	| { status: 'success'; result: SyncAllResult }
 	| { status: 'already-syncing' }
 	| { status: 'error'; message: string };
+
+// ─── Staleness ─────────────────────────────────────────────────────────────
+
+const STALENESS_THRESHOLD_MINUTES = 5;
+
+export function isCacheStale(
+	entries: ReadonlyArray<{ fetched_at: string | null }>,
+	thresholdMinutes: number = STALENESS_THRESHOLD_MINUTES,
+): boolean {
+	if (entries.length === 0) {
+		return true;
+	}
+	const thresholdMs = thresholdMinutes * 60 * 1000;
+	return entries.some(
+		(entry) =>
+			entry.fetched_at == null ||
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity -- pure utility function, not reactive state
+			Date.now() - new Date(entry.fetched_at).getTime() > thresholdMs,
+	);
+}
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -49,7 +69,7 @@ function createVersionControlContext() {
 	let assignedIssues = $state<AssignedIssue[]>([]);
 	let assignedIssuesHasMore = $state(false);
 	let assignedIssuesLimit = $state(50);
-	let assignedIssuesLastSynced = $state<Date | null>(null);
+	let assignedIssuesLastSynced = $state<SvelteDate | null>(null);
 	let assignedIssuesLoading = $state(false);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
@@ -78,7 +98,7 @@ function createVersionControlContext() {
 			});
 			assignedIssues = result.issues;
 			assignedIssuesHasMore = result.has_more;
-			assignedIssuesLastSynced = new Date();
+			assignedIssuesLastSynced = new SvelteDate();
 		} catch (err) {
 			error = String(err);
 			console.error('Failed to load assigned issues:', err);
@@ -127,6 +147,10 @@ function createVersionControlContext() {
 
 		getState(issueId: string): GitStatusCache | undefined {
 			return stateMap.get(issueId);
+		},
+
+		shouldSync(): boolean {
+			return isCacheStale(Array.from(stateMap.values()));
 		},
 
 		async loadStates(dashboardId: string) {
