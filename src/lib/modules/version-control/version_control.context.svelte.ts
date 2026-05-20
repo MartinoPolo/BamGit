@@ -15,6 +15,25 @@ type SyncResult =
 	| { status: 'already-syncing' }
 	| { status: 'error'; message: string };
 
+// ─── Staleness ─────────────────────────────────────────────────────────────
+
+const STALENESS_THRESHOLD_MINUTES = 5;
+
+export function isCacheStale(
+	entries: ReadonlyArray<{ fetched_at: string | null }>,
+	thresholdMinutes: number = STALENESS_THRESHOLD_MINUTES,
+): boolean {
+	if (entries.length === 0) {
+		return true;
+	}
+	const thresholdMs = thresholdMinutes * 60 * 1000;
+	return entries.some(
+		(entry) =>
+			entry.fetched_at == null ||
+			Date.now() - new Date(entry.fetched_at).getTime() > thresholdMs,
+	);
+}
+
 // ─── Context ────────────────────────────────────────────────────────────────
 
 type VersionControlContext = ReturnType<typeof createVersionControlContext>;
@@ -127,6 +146,10 @@ function createVersionControlContext() {
 
 		getState(issueId: string): GitStatusCache | undefined {
 			return stateMap.get(issueId);
+		},
+
+		shouldSync(): boolean {
+			return isCacheStale(Array.from(stateMap.values()));
 		},
 
 		async loadStates(dashboardId: string) {

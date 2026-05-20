@@ -1034,7 +1034,7 @@ export const MOCK_GIT_STATUSES: GitStatusCache[] = [
 		has_local_changes: false,
 		ahead_remote_count: 0,
 		fetched_at: '2026-05-03T12:00:00Z',
-		pr_ci_status: 'passed',
+		pr_ci_status: null,
 	},
 	{
 		issue_id: ISSUE_CONFLICT,
