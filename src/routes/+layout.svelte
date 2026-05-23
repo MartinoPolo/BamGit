@@ -2,7 +2,8 @@
 	import '@fontsource/geist';
 	import '@fontsource/geist-mono';
 	import '../app.css';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { preloadCode, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
@@ -52,7 +53,33 @@
 	setIssuesContext();
 	const versionControlCtx = setVersionControlContext();
 	setActionsContext();
-	setProcessesContext();
+
+	const RESTART_CI_REFRESH_DELAY_MS = 5_000;
+	const pendingRefreshIssueIds = new SvelteSet<string>();
+	let restartRefreshTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	function batchedCiRefreshOnRestart(issueId: string) {
+		pendingRefreshIssueIds.add(issueId);
+		if (restartRefreshTimeout !== null) {
+			clearTimeout(restartRefreshTimeout);
+		}
+		restartRefreshTimeout = setTimeout(() => {
+			for (const id of pendingRefreshIssueIds) {
+				versionControlCtx.refreshGitStatus(id);
+			}
+			pendingRefreshIssueIds.clear();
+			restartRefreshTimeout = null;
+		}, RESTART_CI_REFRESH_DELAY_MS);
+	}
+
+	setProcessesContext(batchedCiRefreshOnRestart);
+
+	onDestroy(() => {
+		if (restartRefreshTimeout !== null) {
+			clearTimeout(restartRefreshTimeout);
+		}
+		pendingRefreshIssueIds.clear();
+	});
 	const shortcutsCtx = setKeyboardShortcutsContext();
 	const commandPaletteCtx = setCommandPaletteContext();
 	const toastsCtx = setToastsContext();
