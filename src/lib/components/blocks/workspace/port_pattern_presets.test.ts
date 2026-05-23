@@ -1,14 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PORT_PATTERN_PRESETS } from './port_pattern_presets.js';
-
-function extractPort(line: string, pattern: string): number | null {
-	const regex = new RegExp(pattern);
-	const match = regex.exec(line);
-	if (match === null || match[1] === undefined) {
-		return null;
-	}
-	return parseInt(match[1], 10);
-}
+import { PORT_PATTERN_PRESETS, extractPort, validateRegex } from './port_pattern_presets.js';
 
 describe('PORT_PATTERN_PRESETS', () => {
 	it('has at least 4 regex presets plus Custom', () => {
@@ -30,6 +21,42 @@ describe('PORT_PATTERN_PRESETS', () => {
 	it('has exactly one recommended preset', () => {
 		const recommended = PORT_PATTERN_PRESETS.filter((p) => p.recommended === true);
 		expect(recommended).toHaveLength(1);
+	});
+});
+
+describe('extractPort', () => {
+	it('returns port number on match', () => {
+		expect(extractPort('localhost:3000', String.raw`localhost:(\d+)`)).toBe(3000);
+	});
+
+	it('returns null on no match', () => {
+		expect(extractPort('Compiling...', String.raw`localhost:(\d+)`)).toBeNull();
+	});
+
+	it('handles empty string input', () => {
+		expect(extractPort('', String.raw`localhost:(\d+)`)).toBeNull();
+	});
+});
+
+describe('validateRegex', () => {
+	it('returns null for valid pattern', () => {
+		expect(validateRegex(String.raw`localhost:(\d+)`)).toBeNull();
+	});
+
+	it('returns error string for invalid regex', () => {
+		expect(validateRegex('(((invalid')).not.toBeNull();
+	});
+
+	it('returns null for all preset patterns', () => {
+		for (const preset of PORT_PATTERN_PRESETS) {
+			if (preset.regex !== null) {
+				expect(validateRegex(preset.regex)).toBeNull();
+			}
+		}
+	});
+
+	it('returns null for empty string', () => {
+		expect(validateRegex('')).toBeNull();
 	});
 });
 
