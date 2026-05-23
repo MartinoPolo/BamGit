@@ -2,11 +2,13 @@ use std::time::Duration;
 
 use crate::models::workspace_command::{CommandCategory, RestartPolicy};
 
-pub const MAX_RESTARTS: u32 = 3;
+pub const DEFAULT_MAX_RESTART_COUNT: i64 = 3;
+pub const DEFAULT_BACKOFF_BASE_DELAY_MS: i64 = 1000;
 const DEFAULT_CHECK_TIMEOUT_SECONDS: u64 = 30;
 
-pub fn backoff_delay(restart_count: u32) -> Duration {
-    Duration::from_secs(1u64 << restart_count.min(30))
+pub fn backoff_delay(restart_count: u32, base_delay_ms: u64) -> Duration {
+    let multiplier = 1u64 << restart_count.min(30);
+    Duration::from_millis(base_delay_ms.saturating_mul(multiplier))
 }
 
 pub fn resolve_timeout(category: &CommandCategory, timeout_seconds: Option<i64>) -> Option<Duration> {
@@ -25,8 +27,9 @@ pub fn should_restart(
     exit_code: Option<i32>,
     is_timeout: bool,
     restart_count: u32,
+    max_restarts: u32,
 ) -> bool {
-    if restart_count >= MAX_RESTARTS {
+    if restart_count >= max_restarts {
         return false;
     }
     match policy {
@@ -51,18 +54,54 @@ mod tests {
     // --- backoff_delay ---
 
     #[test]
-    fn backoff_delay_first_retry() {
-        assert_eq!(backoff_delay(0), Duration::from_secs(1));
+    fn backoff_delay_base_1000_first_retry() {
+        assert_eq!(backoff_delay(0, 1000), Duration::from_millis(1000));
     }
 
     #[test]
-    fn backoff_delay_second_retry() {
-        assert_eq!(backoff_delay(1), Duration::from_secs(2));
+    fn backoff_delay_base_1000_second_retry() {
+        assert_eq!(backoff_delay(1, 1000), Duration::from_millis(2000));
     }
 
     #[test]
-    fn backoff_delay_third_retry() {
-        assert_eq!(backoff_delay(2), Duration::from_secs(4));
+    fn backoff_delay_base_1000_third_retry() {
+        assert_eq!(backoff_delay(2, 1000), Duration::from_millis(4000));
+    }
+
+    #[test]
+    fn backoff_delay_base_500_first_retry() {
+        assert_eq!(backoff_delay(0, 500), Duration::from_millis(500));
+    }
+
+    #[test]
+    fn backoff_delay_base_500_second_retry() {
+        assert_eq!(backoff_delay(1, 500), Duration::from_millis(1000));
+    }
+
+    #[test]
+    fn backoff_delay_base_500_third_retry() {
+        assert_eq!(backoff_delay(2, 500), Duration::from_millis(2000));
+    }
+
+    #[test]
+    fn backoff_delay_base_2000_first_retry() {
+        assert_eq!(backoff_delay(0, 2000), Duration::from_millis(2000));
+    }
+
+    #[test]
+    fn backoff_delay_base_2000_second_retry() {
+        assert_eq!(backoff_delay(1, 2000), Duration::from_millis(4000));
+    }
+
+    #[test]
+    fn backoff_delay_base_2000_third_retry() {
+        assert_eq!(backoff_delay(2, 2000), Duration::from_millis(8000));
+    }
+
+    #[test]
+    fn backoff_delay_high_count_no_overflow() {
+        assert_eq!(backoff_delay(30, 1000), Duration::from_millis(1_073_741_824_000));
+        assert_eq!(backoff_delay(63, u64::MAX), Duration::from_millis(u64::MAX));
     }
 
     // --- resolve_timeout ---
@@ -102,40 +141,58 @@ mod tests {
 
     #[test]
     fn should_restart_never_policy() {
-        assert!(!should_restart(&RestartPolicy::Never, Some(1), false, 0));
-        assert!(!should_restart(&RestartPolicy::Never, Some(0), false, 0));
-        assert!(!should_restart(&RestartPolicy::Never, None, true, 0));
+        assert!(!should_restart(&RestartPolicy::Never, Some(1), false, 0, 3));
+        assert!(!should_restart(&RestartPolicy::Never, Some(0), false, 0, 3));
+        assert!(!should_restart(&RestartPolicy::Never, None, true, 0, 3));
     }
 
     #[test]
     fn should_restart_on_failure_nonzero() {
-        assert!(should_restart(&RestartPolicy::OnFailure, Some(1), false, 0));
+        assert!(should_restart(&RestartPolicy::OnFailure, Some(1), false, 0, 3));
     }
 
     #[test]
     fn should_restart_on_failure_zero() {
-        assert!(!should_restart(&RestartPolicy::OnFailure, Some(0), false, 0));
+        assert!(!should_restart(&RestartPolicy::OnFailure, Some(0), false, 0, 3));
     }
 
     #[test]
     fn should_restart_on_failure_timeout() {
-        assert!(should_restart(&RestartPolicy::OnFailure, None, true, 0));
+        assert!(should_restart(&RestartPolicy::OnFailure, None, true, 0, 3));
     }
 
     #[test]
     fn should_restart_always_zero() {
-        assert!(should_restart(&RestartPolicy::Always, Some(0), false, 0));
+        assert!(should_restart(&RestartPolicy::Always, Some(0), false, 0, 3));
     }
 
     #[test]
     fn should_restart_always_nonzero() {
-        assert!(should_restart(&RestartPolicy::Always, Some(1), false, 0));
+        assert!(should_restart(&RestartPolicy::Always, Some(1), false, 0, 3));
     }
 
     #[test]
     fn should_restart_max_reached() {
-        assert!(!should_restart(&RestartPolicy::Always, Some(1), false, 3));
-        assert!(!should_restart(&RestartPolicy::OnFailure, Some(1), false, 3));
-        assert!(!should_restart(&RestartPolicy::Never, Some(1), false, 3));
+        assert!(!should_restart(&RestartPolicy::Always, Some(1), false, 3, 3));
+        assert!(!should_restart(&RestartPolicy::OnFailure, Some(1), false, 3, 3));
+        assert!(!should_restart(&RestartPolicy::Never, Some(1), false, 3, 3));
+    }
+
+    #[test]
+    fn should_restart_custom_max_1() {
+        assert!(!should_restart(&RestartPolicy::Always, Some(1), false, 1, 1));
+        assert!(should_restart(&RestartPolicy::Always, Some(1), false, 0, 1));
+    }
+
+    #[test]
+    fn should_restart_custom_max_5() {
+        assert!(should_restart(&RestartPolicy::OnFailure, Some(1), false, 4, 5));
+        assert!(!should_restart(&RestartPolicy::OnFailure, Some(1), false, 5, 5));
+    }
+
+    #[test]
+    fn should_restart_max_zero_always_false() {
+        assert!(!should_restart(&RestartPolicy::Always, Some(1), false, 0, 0));
+        assert!(!should_restart(&RestartPolicy::OnFailure, Some(1), false, 0, 0));
     }
 }

@@ -135,6 +135,7 @@ impl ProcessManager {
         name: String,
         pid: u32,
         abort_handle: tokio::task::AbortHandle,
+        max_restarts: u32,
     ) -> Result<(), std::io::Error> {
         let log_file_path =
             std::env::temp_dir().join(format!("grovekeeper-proc-{process_id}.log"));
@@ -151,7 +152,7 @@ impl ProcessManager {
             port: None,
             status: ProcessStatus::Running,
             restart_count: 0,
-            max_restarts: crate::process::lifecycle::MAX_RESTARTS,
+            max_restarts,
         };
         let tracked = TrackedProcess {
             info,

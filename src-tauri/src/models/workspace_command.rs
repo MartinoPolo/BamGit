@@ -100,6 +100,10 @@ pub struct WorkspaceCommand {
     pub sort_order: i64,
     pub mode: CommandMode,
     pub restart_policy: RestartPolicy,
+    #[ts(type = "number")]
+    pub max_restart_count: i64,
+    #[ts(type = "number")]
+    pub backoff_base_delay_ms: i64,
     #[ts(type = "number | null")]
     pub timeout_seconds: Option<i64>,
 }
@@ -115,6 +119,8 @@ pub struct CreateWorkspaceCommandRequest {
     pub sort_order: Option<i64>,
     pub mode: Option<CommandMode>,
     pub restart_policy: Option<RestartPolicy>,
+    pub max_restart_count: Option<i64>,
+    pub backoff_base_delay_ms: Option<i64>,
     pub timeout_seconds: Option<i64>,
 }
 
@@ -130,6 +136,8 @@ pub struct UpdateWorkspaceCommandRequest {
     pub sort_order: Option<i64>,
     pub mode: Option<CommandMode>,
     pub restart_policy: Option<RestartPolicy>,
+    pub max_restart_count: Option<i64>,
+    pub backoff_base_delay_ms: Option<i64>,
     #[serde(default, deserialize_with = "crate::models::dashboard::deserialize_optional_nullable_i64")]
     pub timeout_seconds: Option<Option<i64>>,
 }

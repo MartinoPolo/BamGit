@@ -240,6 +240,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             sort_order INTEGER NOT NULL DEFAULT 0,
             mode TEXT NOT NULL DEFAULT 'headless' CHECK (mode IN ('headless', 'terminal')),
             restart_policy TEXT NOT NULL DEFAULT 'never' CHECK (restart_policy IN ('never', 'on_failure', 'always')),
+            max_restart_count INTEGER NOT NULL DEFAULT 3 CHECK (max_restart_count >= 0),
+            backoff_base_delay_ms INTEGER NOT NULL DEFAULT 1000 CHECK (backoff_base_delay_ms >= 0),
             timeout_seconds INTEGER
         );
 
