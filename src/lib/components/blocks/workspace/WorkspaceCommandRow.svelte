@@ -3,11 +3,14 @@
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Select } from '$lib/components/shadcn/select/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { PORT_PATTERN_PRESETS } from './port_pattern_presets.js';
+	import { PORT_PATTERN_PRESETS, extractPort, validateRegex } from './port_pattern_presets.js';
 	import { useProcesses } from '$lib/modules/processes';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import GripVerticalIcon from '@lucide/svelte/icons/grip-vertical';
 	import PlayIcon from '@lucide/svelte/icons/play';
+	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
+	import CircleXIcon from '@lucide/svelte/icons/circle-x';
+	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 
 	interface Props {
 		command: WorkspaceCommand;
@@ -21,6 +24,28 @@
 	const processesCtx = useProcesses();
 	const isServer = $derived(command.category === 'server');
 	let testRunning = $state(false);
+	let portPatternTestInput = $state('');
+
+	const regexValidationError = $derived(
+		command.port_pattern !== null && command.port_pattern !== ''
+			? validateRegex(command.port_pattern)
+			: null,
+	);
+
+	const portPatternTestResult = $derived.by(() => {
+		if (
+			command.port_pattern === null ||
+			command.port_pattern === '' ||
+			portPatternTestInput === ''
+		) {
+			return null;
+		}
+		if (regexValidationError !== null) {
+			return null;
+		}
+		const port = extractPort(portPatternTestInput, command.port_pattern);
+		return port !== null ? { matched: true as const, port } : { matched: false as const };
+	});
 
 	const selectedPresetId = $derived.by(() => {
 		const currentPattern = command.port_pattern;
@@ -109,6 +134,35 @@
 					/>
 				</div>
 			</div>
+
+			{#if command.port_pattern}
+				<div class="flex flex-col gap-1">
+					<Input
+						value={portPatternTestInput}
+						oninput={(e) => {
+							portPatternTestInput = e.currentTarget.value;
+						}}
+						placeholder="Paste sample stdout to test pattern..."
+						class="h-7 font-mono text-xs"
+					/>
+					{#if regexValidationError}
+						<div class="flex items-center gap-1 text-destructive text-xs">
+							<TriangleAlertIcon size={12} />
+							<span>{regexValidationError}</span>
+						</div>
+					{:else if portPatternTestResult?.matched === true}
+						<div class="flex items-center gap-1 text-status-success text-xs">
+							<CircleCheckIcon size={12} />
+							<span>Port: {portPatternTestResult.port}</span>
+						</div>
+					{:else if portPatternTestResult?.matched === false}
+						<div class="flex items-center gap-1 text-muted-foreground text-xs">
+							<CircleXIcon size={12} />
+							<span>No match</span>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		{:else}
 			<div class="flex w-32 flex-col gap-1">
 				<span class="text-xs text-muted-foreground">Expected Exit Code</span>
