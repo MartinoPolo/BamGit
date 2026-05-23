@@ -169,6 +169,41 @@
 			</div>
 		</div>
 
+		{#if command.restart_policy !== 'never'}
+			<div class="flex gap-2">
+				<div class="flex w-28 flex-col gap-1">
+					<span class="text-xs text-muted-foreground">Max Retries</span>
+					<Input
+						type="number"
+						value={String(command.max_restart_count)}
+						onchange={(e) =>
+							onUpdate(
+								command.id,
+								'max_restart_count',
+								Math.max(0, parseInt(e.currentTarget.value, 10) || 0),
+							)}
+						min="0"
+						class="h-8 text-sm"
+					/>
+				</div>
+				<div class="flex w-36 flex-col gap-1">
+					<span class="text-xs text-muted-foreground">Backoff Base (ms)</span>
+					<Input
+						type="number"
+						value={String(command.backoff_base_delay_ms)}
+						onchange={(e) =>
+							onUpdate(
+								command.id,
+								'backoff_base_delay_ms',
+								parseInt(e.currentTarget.value, 10) || 100,
+							)}
+						min="100"
+						class="h-8 text-sm"
+					/>
+				</div>
+			</div>
+		{/if}
+
 		{#if command.mode === 'terminal'}
 			<p class="text-[10px] text-muted-foreground">
 				Terminal mode: opens in external terminal, no process tracking or badges.

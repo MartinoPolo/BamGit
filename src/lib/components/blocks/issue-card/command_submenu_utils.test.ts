@@ -14,6 +14,8 @@ function makeCommand(overrides: Partial<WorkspaceCommand> = {}): WorkspaceComman
 		sort_order: 0,
 		mode: 'headless',
 		restart_policy: 'never',
+		max_restart_count: 3,
+		backoff_base_delay_ms: 1000,
 		timeout_seconds: null,
 		...overrides,
 	};

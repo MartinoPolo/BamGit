@@ -3,4 +3,4 @@ import type { CommandCategory } from "./CommandCategory";
 import type { CommandMode } from "./CommandMode";
 import type { RestartPolicy } from "./RestartPolicy";
 
-export type WorkspaceCommand = { id: string, dashboard_id: string, category: CommandCategory, name: string, command: string, port_pattern: string | null, expected_exit_code: number, sort_order: number, mode: CommandMode, restart_policy: RestartPolicy, timeout_seconds: number | null, };
+export type WorkspaceCommand = { id: string, dashboard_id: string, category: CommandCategory, name: string, command: string, port_pattern: string | null, expected_exit_code: number, sort_order: number, mode: CommandMode, restart_policy: RestartPolicy, max_restart_count: number, backoff_base_delay_ms: number, timeout_seconds: number | null, };

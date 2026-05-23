@@ -7,11 +7,12 @@ use crate::models::workspace_command::{
     CommandCategory, CommandMode, CreateWorkspaceCommandRequest, RestartPolicy,
     UpdateWorkspaceCommandRequest, WorkspaceCommand,
 };
+use crate::process::lifecycle::{DEFAULT_BACKOFF_BASE_DELAY_MS, DEFAULT_MAX_RESTART_COUNT};
 
 use super::shared::resolve_nullable_field;
 
 const SELECT_COLUMNS: &str =
-    "id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order, mode, restart_policy, timeout_seconds";
+    "id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order, mode, restart_policy, max_restart_count, backoff_base_delay_ms, timeout_seconds";
 
 fn row_to_workspace_command(row: &Row) -> Result<WorkspaceCommand, rusqlite::Error> {
     let category_string: String = row.get(2)?;
@@ -29,7 +30,7 @@ fn row_to_workspace_command(row: &Row) -> Result<WorkspaceCommand, rusqlite::Err
         rusqlite::Error::FromSqlConversionFailure(9, rusqlite::types::Type::Text, error.into())
     })?;
 
-    let timeout_seconds: Option<i64> = row.get(10)?;
+    let timeout_seconds: Option<i64> = row.get(12)?;
 
     Ok(WorkspaceCommand {
         id: row.get(0)?,
@@ -42,6 +43,8 @@ fn row_to_workspace_command(row: &Row) -> Result<WorkspaceCommand, rusqlite::Err
         sort_order: row.get(7)?,
         mode,
         restart_policy,
+        max_restart_count: row.get(10)?,
+        backoff_base_delay_ms: row.get(11)?,
         timeout_seconds,
     })
 }
@@ -56,8 +59,8 @@ pub fn create_workspace_command(
 
     connection
         .execute(
-            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order, mode, restart_policy, timeout_seconds) \
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+            "INSERT INTO workspace_commands (id, dashboard_id, category, name, command, port_pattern, expected_exit_code, sort_order, mode, restart_policy, max_restart_count, backoff_base_delay_ms, timeout_seconds) \
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
             rusqlite::params![
                 id,
                 request.dashboard_id,
@@ -69,6 +72,8 @@ pub fn create_workspace_command(
                 request.sort_order.unwrap_or(0),
                 request.mode.unwrap_or(CommandMode::Headless).to_string(),
                 request.restart_policy.unwrap_or(RestartPolicy::Never).to_string(),
+                request.max_restart_count.unwrap_or(DEFAULT_MAX_RESTART_COUNT),
+                request.backoff_base_delay_ms.unwrap_or(DEFAULT_BACKOFF_BASE_DELAY_MS),
                 request.timeout_seconds,
             ],
         )
@@ -125,13 +130,16 @@ pub fn update_workspace_command(
     let sort_order = request.sort_order.unwrap_or(existing.sort_order);
     let mode = request.mode.unwrap_or(existing.mode);
     let restart_policy = request.restart_policy.unwrap_or(existing.restart_policy);
+    let max_restart_count = request.max_restart_count.unwrap_or(existing.max_restart_count);
+    let backoff_base_delay_ms = request.backoff_base_delay_ms.unwrap_or(existing.backoff_base_delay_ms);
     let timeout_seconds = resolve_nullable_field(request.timeout_seconds, existing.timeout_seconds);
 
     connection
         .execute(
             "UPDATE workspace_commands SET name = ?1, category = ?2, command = ?3, port_pattern = ?4, \
-             expected_exit_code = ?5, sort_order = ?6, mode = ?7, restart_policy = ?8, timeout_seconds = ?9 \
-             WHERE id = ?10",
+             expected_exit_code = ?5, sort_order = ?6, mode = ?7, restart_policy = ?8, \
+             max_restart_count = ?9, backoff_base_delay_ms = ?10, timeout_seconds = ?11 \
+             WHERE id = ?12",
             rusqlite::params![
                 name,
                 category.to_string(),
@@ -141,6 +149,8 @@ pub fn update_workspace_command(
                 sort_order,
                 mode.to_string(),
                 restart_policy.to_string(),
+                max_restart_count,
+                backoff_base_delay_ms,
                 timeout_seconds,
                 existing.id,
             ],
