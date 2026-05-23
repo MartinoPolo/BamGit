@@ -22,14 +22,14 @@ type ProcessesContext = ReturnType<typeof createProcessesContext>['publicApi'];
 const [useProcesses, setProcessesInternal] = createContext<ProcessesContext>();
 export { useProcesses };
 
-export function setProcessesContext() {
+export function setProcessesContext(onProcessRestarted?: (issueId: string) => void) {
 	const {
 		publicApi,
 		handlePortDetected,
 		handleProcessExited,
 		handleProcessOutput,
 		handleProcessRestarted,
-	} = createProcessesContext();
+	} = createProcessesContext(onProcessRestarted);
 	setProcessesInternal(publicApi);
 
 	let cancelled = false;
@@ -84,7 +84,7 @@ export function setProcessesContext() {
 // ─── Factory ──────────────────────────────────────────────────────────────
 
 /** @internal - exported only for testing */
-export function createProcessesContext() {
+export function createProcessesContext(onProcessRestarted?: (issueId: string) => void) {
 	let processes = $state<RunningProcess[]>([]);
 	const logLines = new SvelteMap<string, ProcessLogLine[]>();
 	let activeLogViewerProcessId = $state<string | null>(null);
@@ -127,6 +127,7 @@ export function createProcessesContext() {
 			process.restart_count = restartCount;
 			process.max_restarts = maxRestarts;
 			process.status = 'running';
+			onProcessRestarted?.(process.issue_id);
 		}
 	}
 
