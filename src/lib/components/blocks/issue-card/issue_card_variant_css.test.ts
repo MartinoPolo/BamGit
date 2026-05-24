@@ -9,7 +9,7 @@ function makeSettings(
 	return {
 		buttonColor: 'issue-color',
 		priorityPosition: 'header-right',
-		badgeStyle: 'borderless-dark',
+		badgeStyle: 'subtle',
 		labelTint: 20,
 		overlayGlow: 150,
 		variant: 'refined-horizon',
@@ -159,10 +159,10 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card.filter).toBe('grayscale(0.8)');
 		});
 
-		it('selected state uses issue-color outline and glow', () => {
+		it('selected state uses --primary outline and glow', () => {
 			const result = computeForVariant('refined-horizon', {}, { state: 'selected' });
-			expect(result.card.outline).toContain('#ff5500');
-			expect(result.card['box-shadow']).toContain('#ff5500');
+			expect(result.card.outline).toContain('var(--primary)');
+			expect(result.card['box-shadow']).toContain('var(--primary)');
 		});
 	});
 

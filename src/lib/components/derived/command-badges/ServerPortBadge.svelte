@@ -9,7 +9,7 @@
 
 	let {
 		port,
-		badgeStyle = 'borderless-dark',
+		badgeStyle = 'subtle',
 		onclick,
 		processId,
 		onViewLogs,

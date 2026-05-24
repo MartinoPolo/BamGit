@@ -20,8 +20,8 @@ export const badgeVariants = tv({
 			merged: 'bg-[color-mix(in_oklch,var(--status-merged)_14%,transparent)] text-status-merged border-[color-mix(in_oklch,var(--status-merged)_30%,transparent)]',
 		},
 		badgeStyle: {
-			'bordered-dark': '',
-			'borderless-dark': 'border-transparent',
+			outlined: '',
+			subtle: 'border-transparent',
 			solid: 'border-transparent',
 		},
 		format: {
@@ -45,7 +45,7 @@ export const badgeVariants = tv({
 	],
 	defaultVariants: {
 		tone: 'neutral',
-		badgeStyle: 'bordered-dark',
+		badgeStyle: 'outlined',
 		format: 'default',
 		size: 'default',
 	},

@@ -142,11 +142,12 @@ function applyStateOverrides(
 			break;
 
 		case 'selectionHover':
-			card.outline = `3px solid ${issueColor}`;
+			card.outline = `3px solid var(--primary)`;
 			card['outline-offset'] = '-3px';
 			card['box-shadow'] =
-				`0 0 24px 4px color-mix(in oklch, ${issueColor} 28%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 18%, transparent), var(--shadow-lg)`;
+				`0 0 24px 4px color-mix(in oklch, var(--primary) 28%, transparent), 0 6px 16px 0 color-mix(in oklch, var(--primary) 18%, transparent), var(--shadow-lg)`;
 			card.transform = 'translateY(-3px)';
+			card.cursor = 'pointer';
 			header = applyHoverHeaderBrighten(base.header);
 			break;
 
@@ -164,21 +165,20 @@ function applyStateOverrides(
 			break;
 
 		case 'selected':
-			card.outline = `3px solid ${issueColor}`;
+			card.outline = `3px solid var(--primary)`;
 			card['outline-offset'] = '-3px';
 			card['box-shadow'] =
-				`0 0 20px 2px color-mix(in oklch, ${issueColor} 22%, transparent), 0 4px 12px 0 color-mix(in oklch, ${issueColor} 14%, transparent), var(--shadow-lg)`;
+				`0 0 20px 2px color-mix(in oklch, var(--primary) 22%, transparent), 0 4px 12px 0 color-mix(in oklch, var(--primary) 14%, transparent), var(--shadow-lg)`;
 			if (isHovered) {
 				card['box-shadow'] =
-					`0 0 24px 4px color-mix(in oklch, ${issueColor} 28%, transparent), 0 6px 16px 0 color-mix(in oklch, ${issueColor} 18%, transparent), var(--shadow-lg)`;
+					`0 0 24px 4px color-mix(in oklch, var(--primary) 28%, transparent), 0 6px 16px 0 color-mix(in oklch, var(--primary) 18%, transparent), var(--shadow-lg)`;
 				card.transform = 'translateY(-2px)';
 				header = applyHoverHeaderBrighten(base.header);
 			}
 			break;
 
 		case 'worktreeSetup':
-			card['border-style'] = 'dashed';
-			card['border-color'] = 'var(--muted)';
+			card['border-color'] = 'transparent';
 			card.opacity = '0.6';
 			break;
 
@@ -200,6 +200,7 @@ export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlot
 		'--ic-color': issueColor,
 		'--ic-header-text':
 			variant === 'veil' ? getContrastTextColor(issueColor) : 'var(--foreground)',
+		'--ic-number-color': variant === 'radiant' ? issueColor : 'inherit',
 		'--ic-overlay-glow': String(settings.overlayGlow / 100),
 	};
 

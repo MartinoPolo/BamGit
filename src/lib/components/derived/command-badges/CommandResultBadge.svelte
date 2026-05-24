@@ -15,7 +15,7 @@
 		state,
 		commandName,
 		isStale = false,
-		badgeStyle = 'borderless-dark',
+		badgeStyle = 'subtle',
 		restartCount,
 		maxRestarts,
 	}: CommandResultBadgeProps = $props();

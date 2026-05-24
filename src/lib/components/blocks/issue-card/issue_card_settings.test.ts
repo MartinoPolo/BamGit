@@ -55,7 +55,7 @@ describe('issue_card_settings', () => {
 		it('has correct string defaults', () => {
 			expect(ISSUE_CARD_SETTING_DEFAULTS.buttonColor).toBe('issue-color');
 			expect(ISSUE_CARD_SETTING_DEFAULTS.priorityPosition).toBe('header-right');
-			expect(ISSUE_CARD_SETTING_DEFAULTS.badgeStyle).toBe('borderless-dark');
+			expect(ISSUE_CARD_SETTING_DEFAULTS.badgeStyle).toBe('subtle');
 			expect(ISSUE_CARD_SETTING_DEFAULTS.variant).toBe('refined-horizon');
 		});
 
@@ -162,7 +162,7 @@ describe('issue_card_settings', () => {
 			const settings: IssueCardAppearanceSettings = {
 				buttonColor: 'issue-color',
 				priorityPosition: 'header-right',
-				badgeStyle: 'borderless-dark',
+				badgeStyle: 'subtle',
 				labelTint: 20,
 				overlayGlow: 150,
 				variant: 'refined-horizon',
@@ -214,8 +214,8 @@ describe('issue_card_settings', () => {
 	});
 
 	describe('BADGE_STYLE_OPTIONS', () => {
-		it('contains solid, borderless-dark, bordered-dark', () => {
-			expect(BADGE_STYLE_OPTIONS).toEqual(['solid', 'borderless-dark', 'bordered-dark']);
+		it('contains solid, subtle, outlined', () => {
+			expect(BADGE_STYLE_OPTIONS).toEqual(['solid', 'subtle', 'outlined']);
 		});
 	});
 });

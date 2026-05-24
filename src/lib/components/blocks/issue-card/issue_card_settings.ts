@@ -43,7 +43,7 @@ export const PRIORITY_POSITION_OPTIONS = [
 ] as const;
 export type PriorityPositionOption = (typeof PRIORITY_POSITION_OPTIONS)[number];
 
-export const BADGE_STYLE_OPTIONS = ['solid', 'borderless-dark', 'bordered-dark'] as const;
+export const BADGE_STYLE_OPTIONS = ['solid', 'subtle', 'outlined'] as const;
 export type BadgeStyleOption = (typeof BADGE_STYLE_OPTIONS)[number];
 
 // ── Defaults (derived from SETTING_DEFAULTS — single source of truth) ───

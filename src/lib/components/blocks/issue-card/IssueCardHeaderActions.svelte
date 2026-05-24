@@ -16,7 +16,11 @@
 
 <div class="flex shrink-0 items-center gap-1.5">
 	{#if ctx.chipState}
-		<IssueStateChip label={ctx.chipState.label} colorVariable={ctx.chipState.colorVariable} />
+		<IssueStateChip
+			label={ctx.chipState.label}
+			colorVariable={ctx.chipState.colorVariable}
+			badgeStyle={ctx.appearanceSettings.badgeStyle}
+		/>
 	{/if}
 
 	{#if displayPriority !== null && ctx.prioritiesEnabled}

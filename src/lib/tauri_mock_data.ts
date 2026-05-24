@@ -1772,7 +1772,7 @@ export const MOCK_USER_SETTINGS: Record<string, string> = {
 	issue_card_variant: 'refined-horizon',
 	issue_card_button_color: 'issue-color',
 	issue_card_priority_position: 'header-right',
-	issue_card_badge_style: 'borderless-dark',
+	issue_card_badge_style: 'subtle',
 	issue_card_label_tint: '20',
 	issue_card_overlay_glow: '150',
 	issue_card_gradient_reach: '60',

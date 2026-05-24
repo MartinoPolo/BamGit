@@ -3,7 +3,7 @@
 	import { resolveBadgeStyleClass } from '$lib/components/shadcn/badge/badge_style_utils.js';
 	import type { IssueStateChipProps } from './issue_state_chip_types.js';
 
-	let { label, colorVariable, badgeStyle = 'borderless-dark' }: IssueStateChipProps = $props();
+	let { label, colorVariable, badgeStyle = 'subtle' }: IssueStateChipProps = $props();
 
 	let chipColorValue = $derived(`var(${colorVariable})`);
 

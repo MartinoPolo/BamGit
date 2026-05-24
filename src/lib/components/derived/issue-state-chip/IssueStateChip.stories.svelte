@@ -123,7 +123,7 @@
 
 <Story
 	name="Single Chip"
-	args={{ label: 'EXECUTING', colorVariable: CHIP_COLORS.success, badgeStyle: 'borderless-dark' }}
+	args={{ label: 'EXECUTING', colorVariable: CHIP_COLORS.success, badgeStyle: 'subtle' }}
 >
 	{#snippet template(args: IssueStateChipProps)}
 		<IssueStateChip {...args} />
