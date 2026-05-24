@@ -45,7 +45,7 @@
 		await expect(canvas.getByText(/3 sessions/)).toBeInTheDocument();
 
 		// Branch info visible
-		await expect(canvas.getByText(/dev · 5 worktrees/)).toBeInTheDocument();
+		await expect(canvas.getByText(/dev \/ 5 worktrees/)).toBeInTheDocument();
 
 		// PRD row visible
 		await expect(canvas.getByText(/3 PRDs/)).toBeInTheDocument();
