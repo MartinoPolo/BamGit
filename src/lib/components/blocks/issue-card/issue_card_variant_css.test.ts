@@ -24,7 +24,7 @@ function makeSettings(
 function computeForVariant(
 	variant: IssueCardAppearanceSettings['variant'],
 	overrides: Partial<IssueCardAppearanceSettings> = {},
-	options: { issueColor?: string; state?: IssueCardState } = {},
+	options: { issueColor?: string; state?: IssueCardState; isDone?: boolean } = {},
 ) {
 	return computeVariantSlotStyles({
 		variant,
@@ -32,6 +32,7 @@ function computeForVariant(
 		issueColor: options.issueColor ?? '#ff5500',
 		state: options.state ?? 'interactive',
 		isHovered: false,
+		isDone: options.isDone ?? false,
 	});
 }
 
@@ -147,6 +148,7 @@ describe('computeVariantSlotStyles', () => {
 				settings: makeSettings(),
 				issueColor: '#ff5500',
 				state: 'hovered',
+				isDone: false,
 				isHovered: true,
 			});
 			expect(result.card.transform).toBe('translateY(-3px)');
@@ -163,6 +165,46 @@ describe('computeVariantSlotStyles', () => {
 			const result = computeForVariant('refined-horizon', {}, { state: 'selected' });
 			expect(result.card.outline).toContain('var(--primary)');
 			expect(result.card['box-shadow']).toContain('var(--primary)');
+		});
+
+		it('done state sets transparent bg, transparent border, no shadow', () => {
+			const result = computeForVariant('refined-horizon', {}, { state: 'done' });
+			expect(result.card.background).toBe('transparent');
+			expect(result.card['border-color']).toBe('transparent');
+			expect(result.card['box-shadow']).toBe('none');
+		});
+
+		it('done state does NOT set opacity (full opacity)', () => {
+			const result = computeForVariant('refined-horizon', {}, { state: 'done' });
+			expect(result.card.opacity).toBeUndefined();
+		});
+
+		it('hovered state with isDone uses neutral bg/border instead of issue-color glow', () => {
+			const result = computeVariantSlotStyles({
+				variant: 'refined-horizon',
+				settings: makeSettings(),
+				issueColor: '#ff5500',
+				state: 'hovered',
+				isHovered: true,
+				isDone: true,
+			});
+			expect(result.card.background).toBe('var(--surface)');
+			expect(result.card['border-color']).toBe('var(--border)');
+			expect(result.card['box-shadow']).toBe('var(--shadow-sm)');
+			expect(result.card.transform).toBe('translateY(-2px)');
+		});
+
+		it('hovered state without isDone uses issue-color glow as before', () => {
+			const result = computeVariantSlotStyles({
+				variant: 'refined-horizon',
+				settings: makeSettings(),
+				issueColor: '#ff5500',
+				state: 'hovered',
+				isHovered: true,
+				isDone: false,
+			});
+			expect(result.card['box-shadow']).toContain('#ff5500');
+			expect(result.card.transform).toBe('translateY(-3px)');
 		});
 	});
 
