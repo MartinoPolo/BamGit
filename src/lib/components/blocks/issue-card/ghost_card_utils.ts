@@ -1,6 +1,19 @@
 import type { AssignedIssue } from '$lib/types/generated';
 import type { Issue } from '$lib/modules/issues';
+import type { SplitButtonOption } from '$lib/components/derived/split-button/split_button_types.js';
 import { categorizeAssignedIssues } from '$lib/components/blocks/issue/assigned_issues_utils.js';
+
+export const ADOPT_ACTION_VALUES = {
+	NO_WORKTREE: 'adopt',
+	WITH_WORKTREE: 'adopt-worktree',
+} as const;
+
+export const ADOPT_SPLIT_BUTTON_OPTIONS: readonly SplitButtonOption[] = [
+	{ value: ADOPT_ACTION_VALUES.WITH_WORKTREE, label: 'Adopt with Worktree' },
+	{ value: ADOPT_ACTION_VALUES.NO_WORKTREE, label: 'Adopt (no worktree)' },
+] as const;
+
+export const ADOPT_SETTINGS_KEY = 'adopt_default_action';
 
 export function assignedIssueToGhostIssue(assigned: AssignedIssue): Issue {
 	return {

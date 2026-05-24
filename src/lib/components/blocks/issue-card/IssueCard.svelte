@@ -15,6 +15,12 @@
 		type IssueCardAppearanceSettings,
 	} from './index.js';
 	import { getHoveredPrdNumber } from './prd_hover_store.svelte.js';
+	import {
+		ADOPT_ACTION_VALUES,
+		ADOPT_SPLIT_BUTTON_OPTIONS,
+		ADOPT_SETTINGS_KEY,
+	} from './ghost_card_utils.js';
+	import SplitButton from '$lib/components/derived/split-button/SplitButton.svelte';
 	import IssueCardHeader from './IssueCardHeader.svelte';
 	import IssueCardPreview from './IssueCardPreview.svelte';
 	import WorktreeRow from './WorktreeRow.svelte';
@@ -42,6 +48,8 @@
 		onExecuteAction?: (actionId: string, issueId: string) => void;
 		onPriorityClick?: () => void;
 		onQuickActionAssignFolder?: (issueId: string) => void;
+		onAdoptNoWorktree?: (issueId: string) => void;
+		onAdoptWithWorktree?: (issueId: string) => void;
 	}
 
 	let {
@@ -58,6 +66,8 @@
 		onExecuteAction,
 		onPriorityClick,
 		onQuickActionAssignFolder,
+		onAdoptNoWorktree,
+		onAdoptWithWorktree,
 	}: Props = $props();
 
 	const selection = useSelection();
@@ -101,6 +111,14 @@
 	function handleContextualAction(actionId: ActionId) {
 		if (onExecuteAction) {
 			onExecuteAction(actionId, issue.id);
+		}
+	}
+
+	function handleAdoptSelect(value: string) {
+		if (value === ADOPT_ACTION_VALUES.WITH_WORKTREE && onAdoptWithWorktree) {
+			onAdoptWithWorktree(issue.id);
+		} else if (value === ADOPT_ACTION_VALUES.NO_WORKTREE && onAdoptNoWorktree) {
+			onAdoptNoWorktree(issue.id);
 		}
 	}
 
@@ -158,6 +176,21 @@
 			<ContextualActionButtons
 				derivedActions={contextualActions}
 				onExecute={handleContextualAction}
+			/>
+		</div>
+	{/if}
+
+	<!-- Ghost card adopt split-button -->
+	{#if ctx.isGhost && (onAdoptNoWorktree || onAdoptWithWorktree)}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<div class="absolute bottom-2 right-2.5" onclick={(event) => event.stopPropagation()}>
+			<SplitButton
+				options={ADOPT_SPLIT_BUTTON_OPTIONS}
+				defaultValue={ADOPT_ACTION_VALUES.WITH_WORKTREE}
+				settingsKey={ADOPT_SETTINGS_KEY}
+				size="sm"
+				onselect={handleAdoptSelect}
 			/>
 		</div>
 	{/if}
