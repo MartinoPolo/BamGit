@@ -47,7 +47,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	issueCardVariant: 'refined-horizon',
 	issueCardButtonColor: 'issue-color',
 	issueCardPriorityPosition: 'header-right',
-	issueCardBadgeStyle: 'borderless-dark',
+	issueCardBadgeStyle: 'subtle',
 	issueCardLabelTint: '20',
 	issueCardOverlayGlow: '150',
 	issueCardGradientReach: '60',

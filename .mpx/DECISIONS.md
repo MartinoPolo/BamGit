@@ -118,9 +118,10 @@ Rejected: Left accent border (AI design cliché), solid header band (too heavy),
 ### Issue-color rings for hover/active, --primary for batch selection
 
 Decided: 2026-05-06
-What: Hover = 2px ring in issue color, no glow. Active = 3px ring + 14px glow in issue color. Selected (batch) = `--primary` moss green. Implemented via `box-shadow` (not Tailwind ring utilities).
+What: Hover = 2px ring in issue color, no glow. Active = 3px ring + 14px glow in issue color. Selected (batch) = `--primary` moss green. selectionHover also uses `--primary`. Implemented via `box-shadow` (not Tailwind ring utilities).
 Why: Issue-color rings create strong visual identity per card. Batch selection is system-level, not issue-specific.
 Rejected: Fixed yellow/green for all states (no issue identity), blue for batch (collides with blue issues), Tailwind ring-\* (can't do blur glow).
+Note: Re-confirmed 2026-05-24: selected + selectionHover use `--primary`. Active uses issue color. Requirements doc updated to match.
 
 ### Ghost cards for non-adopted issues in accordion
 
@@ -213,6 +214,69 @@ Decided: 2026-05-15
 What: "Done" computed from `github_issue_state='closed'` + `pr_state='merged'`. No DB status column. Visual: transparent bg, no borders, floating dim content.
 Why: No schema migration needed. Archiving remains the only explicit status toggle.
 Rejected: New `active/done/archived` DB column (unnecessary migration).
+
+### Badge styles: Solid / Subtle / Outlined (renamed)
+
+Decided: 2026-05-24
+What: Badge styles renamed from solid/borderless-dark/bordered-dark to Solid/Subtle/Outlined. Style A (Solid) is truly opaque background with WCAG contrast text. Style B (Subtle) is tinted background, no border. Style C (Outlined) is tinted background with border.
+Why: Old names referenced dark mode ("borderless-dark"), meaningless in light mode. "Solid" was misleading (was actually 20% opacity tint).
+Rejected: Keeping old names (confusing in light mode), numbered styles (not descriptive).
+
+### Badge color-mix uses sRGB, not OKLCH
+
+Decided: 2026-05-24
+What: Badge background color-mix formulas in `badge_style_utils.ts` use `color-mix(in srgb, ...)` instead of `color-mix(in oklch, ...)`.
+Why: OKLCH hue rotation artifact — mixing saturated colors with achromatic white in light mode causes hue to swing through pink/magenta instead of maintaining the source hue.
+Rejected: OKLCH with custom surface blend (adds complexity), higher opacity percentage (doesn't fix root cause).
+
+### Mute button moved from header to context menu
+
+Decided: 2026-05-24
+What: Mute toggle removed from header quick-action buttons. Moved to context menu. Header retains 3 quick-action buttons: Open Folder, Open Terminal, Open Editor.
+Why: Header was crowded (PRD#, issue#, title, chip, priority badge, 4 buttons). Mute is less frequently used than open actions.
+Rejected: Remove all 4 buttons (open actions are high-frequency), keep all 4 (header too crowded).
+
+### Context menu "Open" nested submenu
+
+Decided: 2026-05-24
+What: Context menu has a "Commands and Actions" section with an "Open" submenu containing Open Folder, Open Terminal, Open Editor — each with appropriate icons. Mute toggle in the middle section near worktree items.
+Why: Groups related open actions. Follows VS Code context menu pattern.
+Rejected: Flat list (too many top-level items), separate "Open" top-level group.
+
+### Session overlays as composable layer on top of IssueCardState
+
+Decided: 2026-05-24
+What: Error (red tint + pulse) and needs-input (amber pulse) visual overlays are a CSS layer composed on top of the existing IssueCardState, not new state entries. A card can be active + errored simultaneously. Executing state has NO overlay (chip only) — confirmed.
+Why: Session state is orthogonal to interaction state. A card shouldn't lose its active/selected appearance when a session errors.
+Rejected: Adding error/needs-input to IssueCardState (prevents active+errored combo), separate overlay component (unnecessary DOM).
+
+### worktreeSetup state is borderless, not dashed
+
+Decided: 2026-05-24
+What: worktreeSetup cards are muted/borderless (similar to Done — "not yet born"). No dashed border. Dashed borders are reserved exclusively for ghost cards.
+Why: Spec REQ-IS-8 explicitly says "muted/borderless". The previous implementation incorrectly applied ghost card dashing to worktreeSetup.
+Rejected: Dashed border on worktreeSetup (wrong spec mapping, looks broken at sub-pixel widths).
+
+### Issue number color: radiant-only uses issue color
+
+Decided: 2026-05-24
+What: In the Radiant variant, the issue number (#NNN) renders in the issue's assigned color. In Veil and Refined Horizon, it inherits the header text color. Controlled via `--ic-number-color` CSS custom property.
+Why: Radiant has a dark/non-colorized header where issue color aids identification. Veil/Horizon headers are already color-saturated — issue color on the number would be too similar to the background.
+Rejected: Issue color on all variants (poor contrast on Horizon), foreground on all variants (loses color identity on Radiant).
+
+### Ghost cards extend IssueCard via 'ghost' state
+
+Decided: 2026-05-24
+What: Ghost cards (non-adopted assigned issues) rendered by adding 'ghost' to IssueCardState and handling it in applyStateOverrides(). Same IssueCard component reused. Table view kept as "compact row" alternative via view switcher.
+Why: Ghost cards share structure (header, preview, labels, body grid). Separate component would duplicate the shell. View switcher already planned (REQ-LY-3).
+Rejected: Separate GhostCard component (duplication), table-only (loses visual context).
+
+### Dev-only comparison toggle for A/B visual testing
+
+Decided: 2026-05-24
+What: Dev-only toggle in the existing Issues preview panel. Toggles a specific setting and all cards update live. Small label explains what's being compared and where to observe it.
+Why: Need visual comparison for design decisions (e.g., radiant preview opacity). Dev-only keeps it out of the user-facing product.
+Rejected: Storybook-only (can't see in context of real dashboard), private GitHub repo (overkill), user-facing feature (not needed for end users).
 
 ### View switcher: card grid vs compact rows
 

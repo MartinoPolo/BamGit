@@ -5,7 +5,7 @@
 	let {
 		class: className,
 		tone = 'neutral',
-		badgeStyle = 'bordered-dark',
+		badgeStyle = 'outlined',
 		format = 'default',
 		size = 'default',
 		collapsed = false,

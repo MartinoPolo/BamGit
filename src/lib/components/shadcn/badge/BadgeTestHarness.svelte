@@ -13,7 +13,7 @@
 
 	let {
 		tone = 'neutral',
-		badgeStyle = 'bordered-dark',
+		badgeStyle = 'outlined',
 		collapsed = false,
 		dot,
 		text = '',

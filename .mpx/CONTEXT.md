@@ -46,6 +46,7 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 **State Mapping** — Priority-ordered rule table for tree stage, accessories, overlays, glow, animations. See`.mpx/STATE_MAPPING.md`.
 **State Chip Cascade** — 22-rule priority-ordered derivation in `derive_issue_state_chip.ts` mapping 8 state dimensions to a single {label, color} display chip.
 
+**Badge Style** — One of three chip/badge rendering modes: Solid (opaque bg), Subtle (tinted bg, no border), Outlined (tinted bg + border). Stored as `issue_card_badge_style` setting.
 **Card Variant** — CSS-only visual mode (Veil, Horizon, Radiant) applied via `data-variant` attribute + `--card-*` custom properties. No JS branching.
 **CommandResultsRow** — Sub-component displaying command result badges (check/test/server) on issue card Row 4.
 **PRD Hover Store** — Module-level store (`prd_hover_store.svelte.ts`) enabling cross-card highlight when hovering a PRD number badge.
@@ -88,26 +89,26 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 
 ## Core Features
 
-| Feature                | Status                     | PRD       | Design                                                |
-| ---------------------- | -------------------------- | --------- | ----------------------------------------------------- |
-| Workspace Dashboard    | implemented                | #87, #89  | `designs/issue-card-v2/`                              |
-| Issue Card v2 Redesign | implemented                | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
-| Overview Dashboard     | implemented                | #96       | `claude_design/Workspace Card.html`                   |
-| Issue Creation         | implemented                | #89       | `claude_design/Creation Wizard.html`                  |
-| Session Management     | partial (UI done)          | #90       | `claude_design/Session Chat View.html`                |
-| Session Chat UI        | partial (components built) | #90       | `claude_design/Session Chat View.html`                |
-| Forest Visualization   | partial (rendering done)   | #88       | `.mpx/STATE_MAPPING.md`                               |
-| Git/GitHub Integration | implemented                | #91       | —                                                     |
-| Notification System    | implemented                | #95       | —                                                     |
-| Character Pack System  | implemented                | #95       | —                                                     |
-| Metrics & Statistics   | implemented                | #93       | —                                                     |
-| AI Configuration       | implemented (in Settings)  | #94, #320 | —                                                     |
-| AFK/HITL Workflow      | not started                | #92       | —                                                     |
-| Settings (Two-Layer)   | implemented                | #320      | —                                                     |
-| Process Management     | planned                    | #339      | —                                                     |
-| PRD Management         | planned                    | #219      | —                                                     |
-| Keyboard Shortcuts     | implemented                | #87       | —                                                     |
-| Internationalization   | implemented (en + cs)      | #87       | —                                                     |
+| Feature                | Status                      | PRD       | Design                                                |
+| ---------------------- | --------------------------- | --------- | ----------------------------------------------------- |
+| Workspace Dashboard    | implemented                 | #87, #89  | `designs/issue-card-v2/`                              |
+| Issue Card v2 Redesign | implemented                 | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
+| Overview Dashboard     | implemented                 | #96       | `claude_design/Workspace Card.html`                   |
+| Issue Creation         | implemented                 | #89       | `claude_design/Creation Wizard.html`                  |
+| Session Management     | partial (UI done)           | #90       | `claude_design/Session Chat View.html`                |
+| Session Chat UI        | partial (components built)  | #90       | `claude_design/Session Chat View.html`                |
+| Forest Visualization   | partial (rendering done)    | #88       | `.mpx/STATE_MAPPING.md`                               |
+| Git/GitHub Integration | implemented                 | #91       | —                                                     |
+| Notification System    | implemented                 | #95       | —                                                     |
+| Character Pack System  | implemented                 | #95       | —                                                     |
+| Metrics & Statistics   | implemented                 | #93       | —                                                     |
+| AI Configuration       | implemented (in Settings)   | #94, #320 | —                                                     |
+| AFK/HITL Workflow      | not started                 | #92       | —                                                     |
+| Settings (Two-Layer)   | implemented                 | #320      | —                                                     |
+| Process Management     | partial (commands + badges) | #339      | —                                                     |
+| PRD Management         | planned                     | #219      | —                                                     |
+| Keyboard Shortcuts     | implemented                 | #87       | —                                                     |
+| Internationalization   | implemented (en + cs)       | #87       | —                                                     |
 
 ## Key Constraints
 

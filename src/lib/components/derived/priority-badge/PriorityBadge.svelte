@@ -10,7 +10,7 @@
 	let {
 		priority,
 		position = 'header-right',
-		badgeStyle = 'borderless-dark',
+		badgeStyle = 'subtle',
 		onclick,
 	}: PriorityBadgeProps = $props();
 

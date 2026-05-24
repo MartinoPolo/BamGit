@@ -67,7 +67,7 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_variant', 'refined-horizon');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_button_color', 'issue-color');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_priority_position', 'header-right');
-         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_badge_style', 'borderless-dark');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_badge_style', 'subtle');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_label_tint', '20');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_overlay_glow', '150');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_gradient_reach', '60');

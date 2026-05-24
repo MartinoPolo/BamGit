@@ -62,13 +62,15 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					class="hover:underline hover:opacity-100"
-					style="color: inherit;"
+					style="color: var(--ic-number-color, inherit);"
 					onclick={(event) => event.stopPropagation()}
 					>#{ctx.issue.github_issue_number ?? '—'}</a
 				>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			{:else}
-				#{ctx.issue.github_issue_number ?? '—'}
+				<span style="color: var(--ic-number-color, inherit);"
+					>#{ctx.issue.github_issue_number ?? '—'}</span
+				>
 			{/if}
 		</span>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->

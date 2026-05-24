@@ -12,7 +12,8 @@ use crate::models::git_status::{
 
 const GIT_STATUS_SELECT_COLUMNS_ALIASED: &str =
     "g.issue_id, g.branch_status, g.pr_state, g.pr_number, g.pr_url, g.github_issue_state, \
-     g.behind_base_count, g.merge_conflict, g.has_local_changes, g.ahead_remote_count, g.fetched_at";
+     g.behind_base_count, g.merge_conflict, g.has_local_changes, g.ahead_remote_count, g.fetched_at, \
+     g.pr_ci_status";
 
 #[tauri::command]
 pub fn refresh_git_status(

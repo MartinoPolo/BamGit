@@ -30,8 +30,8 @@
 
 	const BADGE_STYLE_LABELS: Record<string, string> = {
 		solid: 'Solid (A)',
-		'borderless-dark': 'Borderless Dark (B)',
-		'bordered-dark': 'Bordered Dark (C)',
+		subtle: 'Subtle (B)',
+		outlined: 'Outlined (C)',
 	};
 
 	function isVariantSpecificVisible(key: IssueCardSettingKey): boolean {
