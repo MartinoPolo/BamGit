@@ -1,6 +1,7 @@
 import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
 import type { IssueCardAppearanceSettings, IssueCardVariant } from './issue_card_settings.js';
 import type { IssueCardState } from './issue_card_variants.js';
+import type { SessionOverlay } from './types.js';
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -17,6 +18,7 @@ interface VariantStylesInput {
 	readonly state: IssueCardState;
 	readonly isHovered: boolean;
 	readonly isDone: boolean;
+	readonly sessionOverlay: SessionOverlay;
 	readonly labels: ReadonlyArray<{ readonly name: string; readonly color: string }>;
 }
 
@@ -210,6 +212,43 @@ function applyStateOverrides(
 	return { card, header, preview: base.preview };
 }
 
+// ── Session overlay ──────────────────────────────────────────
+
+function applySessionOverlay(
+	base: VariantSlotStyles,
+	sessionOverlay: SessionOverlay,
+): VariantSlotStyles {
+	if (sessionOverlay === null) {
+		return base;
+	}
+
+	const card: Record<string, string> = { ...base.card };
+	const existingBoxShadow = card['box-shadow'] ?? '';
+
+	const overlayConfig = {
+		error: {
+			colorVar: 'var(--session-errored)',
+			animation: 'ic-error-pulse 2s ease-in-out infinite',
+		},
+		'needs-input': {
+			colorVar: 'var(--session-needs-input)',
+			animation: 'ic-needs-input-pulse 2s ease-in-out infinite',
+		},
+	} as const satisfies Record<
+		NonNullable<SessionOverlay>,
+		{ colorVar: string; animation: string }
+	>;
+
+	const config = overlayConfig[sessionOverlay];
+	card['border-color'] = config.colorVar;
+	card['animation'] = config.animation;
+	card['box-shadow'] =
+		`0 0 calc(16px * var(--ic-overlay-glow)) calc(2px * var(--ic-overlay-glow)) color-mix(in oklch, ${config.colorVar} 25%, transparent)${existingBoxShadow ? `, ${existingBoxShadow}` : ''}`;
+	card['--ic-session-tint'] = config.colorVar;
+
+	return { card, header: base.header, preview: base.preview };
+}
+
 // ── Ghost label tinting ──────────────────────────────────────
 
 const GHOST_NEUTRAL_BASE = '#1e1e1e';
@@ -258,7 +297,7 @@ function computeGhostLabelTint(
 // ── Main export ───────────────────────────────────────────────
 
 export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlotStyles {
-	const { variant, issueColor, settings, state, isHovered, labels } = input;
+	const { variant, issueColor, settings, state, isHovered, sessionOverlay, labels } = input;
 
 	// Ghost cards bypass variant-specific styling
 	if (state === 'ghost') {
@@ -317,5 +356,6 @@ export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlot
 		preview: base.preview,
 	};
 
-	return applyStateOverrides(base, state, isHovered, issueColor, input.isDone);
+	const afterState = applyStateOverrides(base, state, isHovered, issueColor, input.isDone);
+	return applySessionOverlay(afterState, sessionOverlay);
 }
