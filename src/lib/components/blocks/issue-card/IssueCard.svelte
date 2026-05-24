@@ -32,6 +32,7 @@
 		issue: Issue;
 		cache?: GitStatusCache | null;
 		ghAvailable?: boolean;
+		isGhost?: boolean;
 		notificationDotColor?: string | null;
 		prdParent?: PrdParent | null;
 		prioritiesEnabled?: boolean;
@@ -47,6 +48,7 @@
 		issue,
 		cache = null,
 		ghAvailable = false,
+		isGhost = false,
 		notificationDotColor = null,
 		prdParent = null,
 		prioritiesEnabled = true,
@@ -64,6 +66,7 @@
 		issue,
 		cache,
 		ghAvailable,
+		isGhost,
 		notificationDotColor,
 		prdParent,
 		prioritiesEnabled,
@@ -112,6 +115,7 @@
 <div
 	data-testid="issue-card"
 	data-card-state={ctx.cardState}
+	data-session-overlay={ctx.sessionOverlay}
 	class="{ctx.slotClasses.card} {isPrdHighlighted ? 'ring-2 ring-offset-2 ring-primary/25' : ''}"
 	style={ctx.cardStyleString}
 	onclick={(event) => selection.handleCardClick(issue.id, event)}
@@ -124,6 +128,13 @@
 			style="background: color-mix(in oklch, {ctx.color} {ctx.cardState === 'active'
 				? '10'
 				: '8'}%, transparent);"
+		></div>
+	{/if}
+
+	{#if ctx.sessionOverlay}
+		<div
+			class="pointer-events-none absolute inset-0 z-1 rounded-lg"
+			style="background: color-mix(in oklch, var(--ic-session-tint, transparent) 8%, transparent);"
 		></div>
 	{/if}
 
@@ -142,7 +153,7 @@
 	</div>
 
 	<!-- Contextual action buttons -->
-	{#if !ctx.isArchived && onExecuteAction}
+	{#if !ctx.isArchived && !ctx.isGhost && onExecuteAction}
 		<div class="absolute bottom-2 right-2.5 flex items-center gap-1">
 			<ContextualActionButtons
 				derivedActions={contextualActions}

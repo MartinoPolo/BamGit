@@ -10,6 +10,7 @@ export {
 	type IssueStateChipResult,
 	type IssueStateChipInput,
 	type WorktreeBadgeResult,
+	type SessionOverlay,
 } from './types.js';
 export {
 	ISSUE_CARD_VARIANTS,
@@ -22,6 +23,8 @@ export {
 	BADGE_STYLE_OPTIONS,
 	clampSettingValue,
 	parseSettingValue,
+	isPreviewPosition,
+	PREVIEW_POSITION_CLASSES,
 	VARIANT_LABELS,
 	BUTTON_COLOR_LABELS,
 	SLIDER_LABELS,
@@ -30,6 +33,7 @@ export {
 	type IssueCardSettingKey,
 	type ButtonColorOption,
 	type PriorityPositionOption,
+	type PreviewPosition,
 	type BadgeStyleOption,
 	type RangeKey,
 } from './issue_card_settings.js';

@@ -15,13 +15,21 @@
 	import PaletteIcon from '@lucide/svelte/icons/palette';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import ArchiveRestoreIcon from '@lucide/svelte/icons/archive-restore';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
+	import FolderIcon from '@lucide/svelte/icons/folder';
+	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 	import GitBranchMinusIcon from '@lucide/svelte/icons/git-branch-minus';
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import SquareCheckIcon from '@lucide/svelte/icons/square-check';
 	import SquareIcon from '@lucide/svelte/icons/square';
+	import Volume2Icon from '@lucide/svelte/icons/volume-2';
+	import VolumeXIcon from '@lucide/svelte/icons/volume-x';
 	import ZapIcon from '@lucide/svelte/icons/zap';
+	import VscodeIcon from '$lib/components/derived/icons/VscodeIcon.svelte';
 	import CommandSubmenu from './CommandSubmenu.svelte';
+	import { useIssues } from '$lib/modules/issues';
+	import { invoke } from '$lib/tauri.js';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -79,7 +87,37 @@
 		issue.worktree_state !== 'none' && issue.worktree_state !== 'removed',
 	);
 
+	const issuesStore = useIssues();
+
+	const folderPath = $derived(issue.worktree_folder ?? issue.editor_folder);
+
 	const selectLabel = $derived(isBatchSelected ? 'Deselect' : 'Select');
+
+	async function handleOpenAction(command: string) {
+		if (folderPath == null) {
+			return;
+		}
+		try {
+			if (command === 'open_terminal') {
+				await invoke(command, { folderPath, tabColor: issue.color });
+			} else {
+				await invoke(command, { folderPath });
+			}
+		} catch (error) {
+			console.error(`Failed to ${command}:`, error);
+		}
+	}
+
+	async function handleToggleMute() {
+		try {
+			await invoke('toggle_issue_sound_mute', { issueId: issue.id });
+			issuesStore.patchIssueLocal(issue.id, {
+				is_sound_muted: !issue.is_sound_muted,
+			});
+		} catch (error) {
+			console.error('Failed to toggle mute:', error);
+		}
+	}
 </script>
 
 <ContextMenu.Root>
@@ -123,6 +161,39 @@
 
 		<!-- Commands submenu -->
 		<CommandSubmenu dashboardId={issue.dashboard_id} issueId={issue.id} />
+
+		<!-- Open submenu -->
+		<ContextMenu.Sub>
+			<ContextMenu.SubTrigger>
+				<ExternalLinkIcon class="size-4" />
+				Open
+			</ContextMenu.SubTrigger>
+			<ContextMenu.Portal>
+				<ContextMenu.SubContent>
+					<ContextMenu.Item
+						disabled={!hasWorktree}
+						onclick={() => void handleOpenAction('open_folder_in_explorer')}
+					>
+						<FolderIcon class="size-4" />
+						Open Folder
+					</ContextMenu.Item>
+					<ContextMenu.Item
+						disabled={!hasWorktree}
+						onclick={() => void handleOpenAction('open_terminal')}
+					>
+						<TerminalIcon class="size-4" />
+						Open Terminal
+					</ContextMenu.Item>
+					<ContextMenu.Item
+						disabled={!hasWorktree}
+						onclick={() => void handleOpenAction('open_in_editor')}
+					>
+						<VscodeIcon class="size-4" />
+						Open Editor
+					</ContextMenu.Item>
+				</ContextMenu.SubContent>
+			</ContextMenu.Portal>
+		</ContextMenu.Sub>
 
 		<ContextMenu.Separator />
 
@@ -171,6 +242,17 @@
 		{/if}
 
 		<ContextMenu.Separator />
+
+		<!-- Mute toggle -->
+		<ContextMenu.Item onclick={() => void handleToggleMute()}>
+			{#if issue.is_sound_muted}
+				<VolumeXIcon class="size-4" />
+				Unmute
+			{:else}
+				<Volume2Icon class="size-4" />
+				Mute
+			{/if}
+		</ContextMenu.Item>
 
 		<!-- Setup / Remove Worktree -->
 		{#if hasWorktree}

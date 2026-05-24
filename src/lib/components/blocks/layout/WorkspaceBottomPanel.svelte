@@ -19,10 +19,12 @@
 	import PrdOverview from '$lib/components/blocks/issue/PrdOverview.svelte';
 	import DependencyGraphView from '$lib/components/blocks/dependency-graph/DependencyGraphView.svelte';
 	import IssueCardGrid from '$lib/components/blocks/issue-card/IssueCardGrid.svelte';
+	import DevComparisonToggle from '$lib/components/blocks/issue-card/DevComparisonToggle.svelte';
 	import IssueDetail from '$lib/components/blocks/issue/IssueDetail.svelte';
 	import GhSetupBanner from '$lib/components/blocks/github/GhSetupBanner.svelte';
 	import AssignedIssuesPanel from '$lib/components/blocks/issue/AssignedIssuesPanel.svelte';
-	import { categorizeAssignedIssues } from '$lib/components/blocks/issue/assigned_issues_utils.js';
+	import { getUnlinkedOpenAssignedIssues } from '$lib/components/blocks/issue-card/ghost_card_utils.js';
+	import GhostCardAccordion from '$lib/components/blocks/issue-card/GhostCardAccordion.svelte';
 
 	// fallow-ignore-next-line code-duplication
 	interface Props extends IssueCardCallbacks {
@@ -126,11 +128,7 @@
 		return computeStageCounts(visualizations);
 	});
 
-	const unlinkedCount = $derived(
-		categorizeAssignedIssues(assignedIssues, issues).unlinked.filter(
-			(issue) => issue.state !== 'CLOSED',
-		).length,
-	);
+	const unlinkedCount = $derived(getUnlinkedOpenAssignedIssues(assignedIssues, issues).length);
 
 	function handleTabClick(tab: BottomPanelTab) {
 		if (selection.activeTab === tab) {
@@ -189,6 +187,8 @@
 					<GhSetupBanner {authStatus} {onconnect} />
 				{/if}
 
+				<DevComparisonToggle />
+
 				<IssueCardGrid
 					{parentIssues}
 					{archivedIssues}
@@ -211,6 +211,13 @@
 					{onExecuteAction}
 					{onChangeColor}
 					onBatchPrune={onPrune ? () => onPrune!() : undefined}
+				/>
+
+				<GhostCardAccordion
+					{assignedIssues}
+					dashboardIssues={issues}
+					{onWizardOpen}
+					{onQuickAddWithWorktree}
 				/>
 			</div>
 		{:else if defaultTab === BOTTOM_PANEL_TABS.kanban}

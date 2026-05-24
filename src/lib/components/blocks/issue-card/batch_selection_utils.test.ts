@@ -55,7 +55,9 @@ describe('computeRangeSelection', () => {
 describe('ISSUE_CARD_STATES', () => {
 	it('has all expected state keys', () => {
 		const expectedKeys = [
+			'ghost',
 			'active',
+			'done',
 			'hovered',
 			'selectionHover',
 			'selected',

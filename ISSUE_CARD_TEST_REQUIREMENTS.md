@@ -84,7 +84,7 @@ Represents assigned-but-not-adopted GitHub issues. Appears in Assigned Issues ac
 
 ### REQ-HD-8: Quick-Action Buttons
 
-- 4 buttons: Open Folder, Open Terminal, Open Editor, Mute toggle
+- 3 buttons: Open Folder, Open Terminal, Open Editor (mute toggle moved to context menu)
 - Icon-only, standard component sizes
 - Ghost style: NO visible background by default (fully transparent)
 - Background appears ONLY on hover
@@ -601,6 +601,18 @@ Multiple sessions: worst active state wins: `needs-input > errored > needs-revie
 - Grouped: servers above checks
 - State-aware actions per entry (Run/Stop/View Logs)
 - Right-click on ServerPortBadge: View Logs, Kill, Open in Browser
+
+### REQ-CM-5: Open Submenu
+
+- "Open" submenu with ExternalLinkIcon trigger
+- 3 items: Open Folder (FolderIcon), Open Terminal (TerminalIcon), Open Editor (VscodeIcon)
+- All items disabled when no worktree assigned
+- Uses `invoke()` to call `open_folder_in_explorer`, `open_terminal`, `open_in_editor`
+
+### REQ-CM-6: Mute Toggle
+
+- Context menu item shows "Mute" (Volume2Icon) when unmuted, "Unmute" (VolumeXIcon) when muted
+- Calls `invoke('toggle_issue_sound_mute')` and patches local state
 
 ### REQ-CM-4: Batch Context Menu
 
