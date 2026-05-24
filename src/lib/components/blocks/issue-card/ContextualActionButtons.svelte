@@ -42,10 +42,17 @@
 	const ctx = useIssueCard();
 
 	const primaryIntent = $derived<ButtonIntent>(
-		ctx.appearanceSettings.buttonColor === 'issue-color' ? 'issue-color' : 'contextual-primary',
+		ctx.cardState === 'done'
+			? 'secondary'
+			: ctx.appearanceSettings.buttonColor === 'issue-color'
+				? 'issue-color'
+				: 'contextual-primary',
 	);
 
 	const issueColorStyle = $derived.by(() => {
+		if (ctx.cardState === 'done') {
+			return '';
+		}
 		if (ctx.appearanceSettings.buttonColor !== 'issue-color') {
 			return '';
 		}

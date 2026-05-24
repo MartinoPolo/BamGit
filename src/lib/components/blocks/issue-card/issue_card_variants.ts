@@ -5,6 +5,7 @@ import { tv } from 'tailwind-variants';
 export const ISSUE_CARD_STATES = {
 	ghost: 'ghost',
 	archived: 'archived',
+	done: 'done',
 	selected: 'selected',
 	active: 'active',
 	selectionHover: 'selectionHover',
@@ -20,7 +21,7 @@ export type IssueCardState = (typeof ISSUE_CARD_STATES)[keyof typeof ISSUE_CARD_
 // fallow-ignore-next-line unused-export
 export const issueCardVariants = tv({
 	slots: {
-		card: 'group relative overflow-hidden rounded-lg border outline-none transition-[box-shadow,transform,opacity,filter] duration-3',
+		card: 'group relative overflow-hidden rounded-lg border outline-none transition-[box-shadow,transform,opacity,filter,background,border-color] duration-3',
 		header: 'flex min-h-8 items-center justify-between gap-2.5 px-3 py-1.5',
 		preview:
 			'relative flex size-25 shrink-0 items-end justify-center overflow-hidden rounded-1.75 border border-[color-mix(in_oklch,var(--ic-color)_20%,var(--border))]',
@@ -32,6 +33,7 @@ export const issueCardVariants = tv({
 export interface CardStateInput {
 	readonly isGhost: boolean;
 	readonly isArchived: boolean;
+	readonly isDone: boolean;
 	readonly isBatchSelected: boolean;
 	readonly isActive: boolean;
 	readonly isHovered: boolean;
@@ -45,6 +47,9 @@ export function deriveCardState(input: CardStateInput): IssueCardState {
 	}
 	if (input.isArchived) {
 		return 'archived';
+	}
+	if (input.isDone && !input.isBatchSelected && !input.isActive && !input.isHovered) {
+		return 'done';
 	}
 	if (input.isBatchSelected) {
 		return 'selected';

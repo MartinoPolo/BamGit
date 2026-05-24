@@ -6,6 +6,8 @@ import type {
 	ForestSyncStatus,
 } from '$lib/modules/visualization/types.js';
 
+export type SessionOverlay = 'error' | 'needs-input' | null;
+
 export const CHIP_COLORS = {
 	error: '--chip-error',
 	warning: '--chip-warning',

@@ -8,6 +8,7 @@ import { deriveWorktreeBadge } from './derive_worktree_badge.js';
 import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
 import type { AggregateSessionState } from '$lib/modules/visualization/types.js';
 import type { ForestPullRequestState, ForestSyncStatus } from '$lib/modules/visualization/types.js';
+import type { SessionOverlay } from './types.js';
 import {
 	computeVariantSlotStyles,
 	styleMapToString,
@@ -57,6 +58,17 @@ export function setIssueCardContext(getProps: () => IssueCardContextProps) {
 	return ctx;
 }
 
+/** @internal - exported only for testing */
+export function deriveSessionOverlay(sessionState: SessionStateProp): SessionOverlay {
+	if (sessionState === 'error') {
+		return 'error';
+	}
+	if (sessionState === 'hitl') {
+		return 'needs-input';
+	}
+	return null;
+}
+
 function mapSessionStateToAggregate(sessionState: SessionStateProp): AggregateSessionState {
 	if (sessionState === null) {
 		return 'no-session';
@@ -94,11 +106,17 @@ function mapCacheToPrState(cache: GitStatusCache | null): ForestPullRequestState
 
 /** @internal - exported only for testing */
 export function createIssueCardContext(getProps: () => IssueCardContextProps) {
+	const isDone = $derived.by(() => {
+		const props = getProps();
+		return props.cache?.github_issue_state === 'closed' && props.cache?.pr_state === 'merged';
+	});
+
 	const cardState = $derived.by(() => {
 		const props = getProps();
 		return deriveCardState({
 			isGhost: props.isGhost ?? false,
 			isArchived: props.issue.status === 'archived',
+			isDone,
 			isBatchSelected: props.isBatchSelected,
 			isActive: props.isActive,
 			isHovered: props.isHovered,
@@ -106,6 +124,8 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			worktreeState: props.issue.worktree_state,
 		});
 	});
+
+	const sessionOverlay = $derived.by(() => deriveSessionOverlay(getProps().sessionState));
 
 	const variantSlotStyles = $derived.by(() => {
 		const props = getProps();
@@ -115,6 +135,8 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
 			state: cardState,
 			isHovered: props.isHovered,
+			isDone,
+			sessionOverlay,
 			labels: props.issue.labels,
 		});
 	});
@@ -138,6 +160,9 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		},
 		get sessionState(): IssueCardContextProps['sessionState'] {
 			return getProps().sessionState;
+		},
+		get sessionOverlay(): SessionOverlay {
+			return sessionOverlay;
 		},
 		get visualization(): TreeVisualization | undefined {
 			return getProps().visualization;
@@ -172,6 +197,9 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		},
 		get isArchived(): boolean {
 			return getProps().issue.status === 'archived';
+		},
+		get isDone(): boolean {
+			return isDone;
 		},
 		get hasWorktree(): boolean {
 			const worktreeState = getProps().issue.worktree_state;

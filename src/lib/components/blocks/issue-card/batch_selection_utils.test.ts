@@ -57,6 +57,7 @@ describe('ISSUE_CARD_STATES', () => {
 		const expectedKeys = [
 			'ghost',
 			'active',
+			'done',
 			'hovered',
 			'selectionHover',
 			'selected',
