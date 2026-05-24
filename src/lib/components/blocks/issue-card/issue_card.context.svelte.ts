@@ -8,6 +8,7 @@ import { deriveWorktreeBadge } from './derive_worktree_badge.js';
 import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
 import type { AggregateSessionState } from '$lib/modules/visualization/types.js';
 import type { ForestPullRequestState, ForestSyncStatus } from '$lib/modules/visualization/types.js';
+import type { SessionOverlay } from './types.js';
 import {
 	computeVariantSlotStyles,
 	styleMapToString,
@@ -54,6 +55,17 @@ export function setIssueCardContext(getProps: () => IssueCardContextProps) {
 	const ctx = createIssueCardContext(getProps);
 	setIssueCardInternal(ctx);
 	return ctx;
+}
+
+/** @internal - exported only for testing */
+export function deriveSessionOverlay(sessionState: SessionStateProp): SessionOverlay {
+	if (sessionState === 'error') {
+		return 'error';
+	}
+	if (sessionState === 'hitl') {
+		return 'needs-input';
+	}
+	return null;
 }
 
 function mapSessionStateToAggregate(sessionState: SessionStateProp): AggregateSessionState {
@@ -105,6 +117,8 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		});
 	});
 
+	const sessionOverlay = $derived.by(() => deriveSessionOverlay(getProps().sessionState));
+
 	const variantSlotStyles = $derived.by(() => {
 		const props = getProps();
 		return computeVariantSlotStyles({
@@ -113,6 +127,7 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
 			state: cardState,
 			isHovered: props.isHovered,
+			sessionOverlay,
 		});
 	});
 
@@ -135,6 +150,9 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		},
 		get sessionState(): IssueCardContextProps['sessionState'] {
 			return getProps().sessionState;
+		},
+		get sessionOverlay(): SessionOverlay {
+			return sessionOverlay;
 		},
 		get visualization(): TreeVisualization | undefined {
 			return getProps().visualization;

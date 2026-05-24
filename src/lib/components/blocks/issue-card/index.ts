@@ -10,6 +10,7 @@ export {
 	type IssueStateChipResult,
 	type IssueStateChipInput,
 	type WorktreeBadgeResult,
+	type SessionOverlay,
 } from './types.js';
 export {
 	ISSUE_CARD_VARIANTS,
