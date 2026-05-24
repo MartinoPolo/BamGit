@@ -99,9 +99,10 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card['--ic-header-text']).toBe('#ffffff');
 		});
 
-		it('preview has gradient background', () => {
-			const result = computeForVariant('veil');
+		it('preview has gradient background with issue color', () => {
+			const result = computeForVariant('veil', {}, { issueColor: '#ff5500' });
 			expect(result.preview.background).toContain('linear-gradient');
+			expect(result.preview.background).toContain('#ff5500');
 		});
 	});
 
@@ -151,10 +152,27 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card['--ic-header-text']).toBe('var(--foreground)');
 		});
 
-		it('preview uses gradient with theme-aware surface variables', () => {
-			const result = computeForVariant('radiant');
+		it('preview background is opaque dark surface without issue color', () => {
+			const result = computeForVariant('radiant', {}, { issueColor: '#ff5500' });
+			expect(result.preview.background).toBe(
+				'color-mix(in oklch, var(--surface) 85%, black)',
+			);
+			expect(result.preview.background).not.toContain('#ff5500');
+			expect(result.preview.background).not.toContain('linear-gradient');
+		});
+
+		it('card body radial gradient glow still uses issueColor', () => {
+			const result = computeForVariant('radiant', {}, { issueColor: '#00cc88' });
+			expect(result.card.background).toContain('#00cc88');
+			expect(result.card.background).toContain('radial-gradient');
+		});
+	});
+
+	describe('other variants preview backgrounds unchanged', () => {
+		it('refined-horizon preview still uses linear-gradient with issue color', () => {
+			const result = computeForVariant('refined-horizon', {}, { issueColor: '#ff5500' });
 			expect(result.preview.background).toContain('linear-gradient');
-			expect(result.preview.background).toContain('var(--surface-2)');
+			expect(result.preview.background).toContain('#ff5500');
 		});
 	});
 

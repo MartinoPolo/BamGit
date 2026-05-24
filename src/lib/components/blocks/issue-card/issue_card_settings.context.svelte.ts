@@ -1,6 +1,7 @@
 import { createContext } from 'svelte';
 import { useSettings } from '$lib/modules/settings/index.js';
 import type { SettingKey } from '$lib/modules/settings/index.js';
+import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import {
 	parseSettingValue,
 	type IssueCardAppearanceSettings,
@@ -10,6 +11,7 @@ import {
 	type PriorityPositionOption,
 	type BadgeStyleOption,
 } from './issue_card_settings.js';
+import { applyComparisonOverride } from './dev_comparison_toggle.js';
 
 type IssueCardSettingsContext = ReturnType<typeof createIssueCardSettingsContext>;
 
@@ -65,6 +67,12 @@ function createIssueCardSettingsContext() {
 		return new Set(keys.filter((key) => isOverridden(key)));
 	});
 
+	const comparisonEnabled = new StateRaw(false);
+
+	function toggleComparison() {
+		comparisonEnabled.current = !comparisonEnabled.current;
+	}
+
 	return {
 		get settings(): IssueCardAppearanceSettings {
 			return {
@@ -81,10 +89,19 @@ function createIssueCardSettingsContext() {
 			};
 		},
 
+		get comparisonSettings(): IssueCardAppearanceSettings {
+			return applyComparisonOverride(this.settings, comparisonEnabled.current);
+		},
+
+		get comparisonEnabled() {
+			return comparisonEnabled.current;
+		},
+
 		get overriddenKeys() {
 			return overriddenKeys;
 		},
 
+		toggleComparison,
 		updateSetting,
 		resetOverride,
 		isOverridden,

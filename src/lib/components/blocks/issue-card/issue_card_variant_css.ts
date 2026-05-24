@@ -98,7 +98,7 @@ function computeRadiantStyles(
 			background: `linear-gradient(90deg, color-mix(in oklch, var(--surface) 35%, transparent) 0%, color-mix(in oklch, var(--surface) 65%, transparent) 40%, color-mix(in oklch, var(--surface) 80%, transparent) 100%)`,
 		},
 		preview: {
-			background: `linear-gradient(135deg, color-mix(in oklch, ${issueColor} 5%, var(--surface-2)) 0%, var(--surface-3) 100%)`,
+			background: 'color-mix(in oklch, var(--surface) 85%, black)',
 		},
 	};
 }
