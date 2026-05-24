@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import type { AssignedIssue } from '$lib/types/generated';
 import type { Issue } from '$lib/modules/issues';
-import { assignedIssueToGhostIssue, getUnlinkedOpenAssignedIssues } from './ghost_card_utils.js';
+import {
+	assignedIssueToGhostIssue,
+	getUnlinkedOpenAssignedIssues,
+	ADOPT_ACTION_VALUES,
+	ADOPT_SPLIT_BUTTON_OPTIONS,
+	ADOPT_SETTINGS_KEY,
+} from './ghost_card_utils.js';
 
 function makeAssignedIssue(overrides: Partial<AssignedIssue> = {}): AssignedIssue {
 	return {
@@ -95,6 +101,38 @@ describe('assignedIssueToGhostIssue', () => {
 	it('handles parent_issue_number: null without affecting parent_issue_id', () => {
 		const result = assignedIssueToGhostIssue(makeAssignedIssue({ parent_issue_number: null }));
 		expect(result.parent_issue_id).toBeNull();
+	});
+});
+
+describe('ADOPT_ACTION_VALUES', () => {
+	it('defines adopt and adopt-worktree values', () => {
+		expect(ADOPT_ACTION_VALUES.NO_WORKTREE).toBe('adopt');
+		expect(ADOPT_ACTION_VALUES.WITH_WORKTREE).toBe('adopt-worktree');
+	});
+});
+
+describe('ADOPT_SPLIT_BUTTON_OPTIONS', () => {
+	it('has two options in correct order (with-worktree first as default)', () => {
+		expect(ADOPT_SPLIT_BUTTON_OPTIONS).toHaveLength(2);
+		expect(ADOPT_SPLIT_BUTTON_OPTIONS[0]).toEqual({
+			value: 'adopt-worktree',
+			label: 'Adopt with Worktree',
+		});
+		expect(ADOPT_SPLIT_BUTTON_OPTIONS[1]).toEqual({
+			value: 'adopt',
+			label: 'Adopt (no worktree)',
+		});
+	});
+
+	it('option values match ADOPT_ACTION_VALUES', () => {
+		expect(ADOPT_SPLIT_BUTTON_OPTIONS[0].value).toBe(ADOPT_ACTION_VALUES.WITH_WORKTREE);
+		expect(ADOPT_SPLIT_BUTTON_OPTIONS[1].value).toBe(ADOPT_ACTION_VALUES.NO_WORKTREE);
+	});
+});
+
+describe('ADOPT_SETTINGS_KEY', () => {
+	it('is adopt_default_action', () => {
+		expect(ADOPT_SETTINGS_KEY).toBe('adopt_default_action');
 	});
 });
 

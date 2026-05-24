@@ -57,13 +57,6 @@
 		}
 		sortColumn = SORT_COLUMNS[nextIndex];
 	}
-
-	function handleCardClick(ghostIssue: Issue) {
-		const assigned = assignedIssueByNumber.get(ghostIssue.github_issue_number!);
-		if (assigned && onWizardOpen) {
-			onWizardOpen(assigned);
-		}
-	}
 </script>
 
 {#if count > 0}
@@ -104,25 +97,31 @@
 				style="grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));"
 			>
 				{#each ghostIssues as issue (issue.id)}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<div onclick={() => handleCardClick(issue)} class="cursor-pointer">
-						<IssueCard
-							{issue}
-							isGhost={true}
-							appearanceSettings={issueCardSettingsCtx.settings}
-							onQuickActionAssignFolder={onQuickAddWithWorktree
-								? () => {
-										const assigned = assignedIssueByNumber.get(
-											issue.github_issue_number!,
-										);
-										if (assigned) {
-											onQuickAddWithWorktree(assigned);
-										}
+					<IssueCard
+						{issue}
+						isGhost={true}
+						appearanceSettings={issueCardSettingsCtx.settings}
+						onAdoptNoWorktree={onWizardOpen
+							? () => {
+									const assigned = assignedIssueByNumber.get(
+										issue.github_issue_number!,
+									);
+									if (assigned) {
+										onWizardOpen(assigned);
 									}
-								: undefined}
-						/>
-					</div>
+								}
+							: undefined}
+						onAdoptWithWorktree={onQuickAddWithWorktree
+							? () => {
+									const assigned = assignedIssueByNumber.get(
+										issue.github_issue_number!,
+									);
+									if (assigned) {
+										onQuickAddWithWorktree(assigned);
+									}
+								}
+							: undefined}
+					/>
 				{/each}
 			</div>
 		</Collapsible.Content>
