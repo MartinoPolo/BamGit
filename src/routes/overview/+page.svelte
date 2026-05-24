@@ -1,33 +1,32 @@
-﻿<script lang="ts">
+<script lang="ts">
+	import { onMount } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { openPath } from '$lib/opener.js';
-	import { invoke } from '$lib/tauri.js';
 	import { useBoard } from '$lib/modules/board';
-	import { useSettings } from '$lib/modules/settings';
+	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
+	import { USAGE_SCOPES } from '$lib/modules/usage/usage_types.js';
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
-	import WorkspaceCard from '$lib/components/blocks/workspace-card/WorkspaceCard.svelte';
-	import AddWorkspaceCard from '$lib/components/blocks/workspace/AddWorkspaceCard.svelte';
-	import GitHubStatusCard from '$lib/components/blocks/github/GitHubStatusCard.svelte';
-	import GitHubAuthWizard from '$lib/components/blocks/github-auth/GitHubAuthWizard.svelte';
-	import ThemeToggle from '$lib/components/derived/theme-toggle/ThemeToggle.svelte';
-	import * as Popover from '$lib/components/shadcn/popover/index.js';
-	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { Toggle } from '$lib/components/shadcn/toggle/index.js';
-	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
-	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
-	import SettingsIcon from '@lucide/svelte/icons/settings';
-	import ArchiveIcon from '@lucide/svelte/icons/archive';
+	import OverviewHeader from '$lib/components/blocks/overview/OverviewHeader.svelte';
+	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
+	import OverviewWorkspaceGrid from '$lib/components/blocks/overview/OverviewWorkspaceGrid.svelte';
+	import {
+		calculateOverviewWorkspaceTotals,
+		deriveRecentWorkspaceActivities,
+		estimateMonthlyCacheSavings,
+		getMaximumToolCallCount,
+	} from '$lib/modules/overview/overview_summary.js';
+	import { formatWorkspaceActivityRelativeTime } from '$lib/modules/overview/overview_time.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
-	const settingsCtx = useSettings();
 	const versionControl = useVersionControl();
+	const usageCtx = setUsageContext();
 
-	let authWizardOpen = $state(false);
+	usageCtx.scope.current = USAGE_SCOPES.global;
+	usageCtx.activePeriod.current = 'thirty-days';
 
 	let workspaces = $state.raw<OverviewWorkspaceData[]>([]);
 	let loading = $state(true);
@@ -35,7 +34,7 @@
 	let showArchived = $state(false);
 
 	$effect(() => {
-		void boardStore.dashboards; // re-run when workspace list changes
+		void boardStore.dashboards;
 		const includeArchived = showArchived;
 		void (async () => {
 			loading = true;
@@ -50,6 +49,27 @@
 		})();
 	});
 
+	onMount(() => {
+		void usageCtx.loadData();
+		return () => usageCtx.clearTimers();
+	});
+
+	const workspaceTotals = $derived(calculateOverviewWorkspaceTotals(workspaces));
+	const recentWorkspaceActivities = $derived(deriveRecentWorkspaceActivities(workspaces, 4));
+	const usageData = $derived(usageCtx.dashboardData.current);
+	const maxToolCallCount = $derived(getMaximumToolCallCount(usageData?.tool_usage ?? []));
+	const maxTrendCost = $derived(
+		Math.max(...(usageData?.time_bucket_costs.map((entry) => entry.cost_usd) ?? []), 0.01),
+	);
+	const cacheSavingsEstimate = $derived(
+		usageData
+			? estimateMonthlyCacheSavings(
+					usageData.stats.total_cost_usd,
+					usageData.stats.cache_hit_ratio,
+				)
+			: 0,
+	);
+
 	async function handleOpenWorkspace(dashboardId: string) {
 		try {
 			await openWorkspaceWindow(dashboardId);
@@ -58,110 +78,68 @@
 		}
 	}
 
-	function handleGithubClick(githubRepo: string) {
-		window.open(`https://github.com/${githubRepo}`, '_blank');
+	function handleGithubClick(workspace: OverviewWorkspaceData) {
+		if (workspace.github_repo == null) {
+			handleConfigWizard(workspace.dashboard_id);
+			return;
+		}
+		window.open(`https://github.com/${workspace.github_repo}`, '_blank');
 	}
 
-	function handleFolderClick(localFolder: string) {
-		void openPath(localFolder);
+	function handleFolderClick(workspace: OverviewWorkspaceData) {
+		if (workspace.local_folder == null) {
+			handleConfigWizard(workspace.dashboard_id);
+			return;
+		}
+		void openPath(workspace.local_folder);
 	}
 
 	function handleConfigWizard(_dashboardId: string) {
-		// TODO: open config wizard for workspace
 		console.info('Config wizard for', _dashboardId);
+	}
+
+	function openUsagePage() {
+		void goto(resolve('/usage'));
 	}
 </script>
 
-<div class="flex flex-col gap-6 p-8">
-	<div class="flex items-end justify-between">
-		<div>
-			<h1 class="text-2xl font-bold text-foreground">{m.app_name()}</h1>
-			<p class="text-sm text-muted-foreground">{m.overview_subtitle()}</p>
-		</div>
-		<div class="flex items-center gap-2">
-			<ThemeToggle compact />
-			<SimpleTooltip text={m.nav_settings()} side="bottom">
-				{#snippet asChild(props)}
-					<button
-						{...props}
-						type="button"
-						class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-						aria-label={m.nav_settings()}
-						onclick={() => {
-							settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
-							void goto(resolve('/settings/general'));
-						}}
-					>
-						<SettingsIcon size={14} />
-					</button>
-				{/snippet}
-			</SimpleTooltip>
-			<Toggle
-				intent="outline"
-				size="icon"
-				pressed={showArchived}
-				onPressedChange={(pressed) => (showArchived = pressed)}
-				aria-label="Toggle archived workspaces"
-			>
-				<ArchiveIcon data-icon="inline-start" />
-			</Toggle>
-			<Popover.Root>
-				<Popover.Trigger>
-					{#snippet child({ props })}
-						<Button
-							{...props}
-							intent="secondary"
-							size="icon"
-							aria-label="GitHub connection settings"
-						>
-							<GithubIcon data-icon="inline-start" />
-						</Button>
-					{/snippet}
-				</Popover.Trigger>
-				<Popover.Content class="w-80" align="end">
-					<GitHubStatusCard
-						borderless
-						authStatus={versionControl.authStatus}
-						ghAvailability={versionControl.ghAvailability}
-						onconnect={() => (authWizardOpen = true)}
-						ondisconnect={async () => {
-							await invoke('github_logout');
-							await versionControl.checkAvailability();
-						}}
-					/>
-				</Popover.Content>
-			</Popover.Root>
-		</div>
+<div
+	class="flex min-h-full bg-[radial-gradient(780px_380px_at_5%_16%,color-mix(in_oklch,var(--moss-500)_13%,transparent),transparent_72%),radial-gradient(620px_320px_at_72%_-4%,color-mix(in_oklch,var(--teal-500)_8%,transparent),transparent_66%),linear-gradient(180deg,color-mix(in_oklch,var(--surface)_32%,transparent),transparent_420px),var(--background)] px-10 pt-9.5 pb-16 max-md:px-4.5 max-md:py-6"
+>
+	<div
+		class="mx-auto flex min-h-[calc(100vh-102px)] w-full max-w-[1840px] flex-col max-md:min-h-[calc(100vh-56px)]"
+	>
+		<OverviewHeader
+			{showArchived}
+			onShowArchivedChange={(pressed) => (showArchived = pressed)}
+			{versionControl}
+		/>
+
+		{#if loading}
+			<p class="text-muted-foreground">{m.overview_loading()}</p>
+		{:else if error !== null}
+			<p class="text-destructive">{m.error_prefix({ message: error })}</p>
+		{:else}
+			<OverviewWorkspaceGrid
+				{workspaces}
+				onAddWorkspace={() => (boardStore.showCreateDialog = true)}
+				onOpenWorkspace={handleOpenWorkspace}
+				onGithubClick={handleGithubClick}
+				onFolderClick={handleFolderClick}
+				onConfigureWorkspace={handleConfigWizard}
+			/>
+
+			<OverviewSummaryBasin
+				{usageData}
+				{cacheSavingsEstimate}
+				{maxToolCallCount}
+				{maxTrendCost}
+				activities={recentWorkspaceActivities}
+				totals={workspaceTotals}
+				formatRelativeTime={formatWorkspaceActivityRelativeTime}
+				onOpenUsage={openUsagePage}
+				onOpenWorkspace={handleOpenWorkspace}
+			/>
+		{/if}
 	</div>
-
-	{#if loading}
-		<p class="text-muted-foreground">{m.overview_loading()}</p>
-	{:else if error !== null}
-		<p class="text-destructive">{m.error_prefix({ message: error })}</p>
-	{:else}
-		<div class="grid auto-rows-[1fr] grid-cols-[repeat(auto-fill,340px)] gap-4">
-			{#each workspaces as workspace (workspace.dashboard_id)}
-				<WorkspaceCard
-					{workspace}
-					onclick={() => handleOpenWorkspace(workspace.dashboard_id)}
-					onGithubClick={workspace.github_repo != null
-						? () => handleGithubClick(workspace.github_repo!)
-						: () => handleConfigWizard(workspace.dashboard_id)}
-					onFolderClick={workspace.local_folder != null
-						? () => handleFolderClick(workspace.local_folder!)
-						: () => handleConfigWizard(workspace.dashboard_id)}
-					onGithubRightClick={() => handleConfigWizard(workspace.dashboard_id)}
-					onFolderRightClick={() => handleConfigWizard(workspace.dashboard_id)}
-				/>
-			{/each}
-			<AddWorkspaceCard onclick={() => (boardStore.showCreateDialog = true)} />
-		</div>
-	{/if}
 </div>
-
-{#if authWizardOpen}
-	<GitHubAuthWizard
-		bind:open={authWizardOpen}
-		onconnected={() => void versionControl.checkAvailability()}
-	/>
-{/if}

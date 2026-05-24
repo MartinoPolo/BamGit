@@ -1,5 +1,4 @@
 ﻿<script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
 	import * as Card from '$lib/components/shadcn/card/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { StatCell } from '$lib/components/base/stat-cell/index.js';
@@ -16,6 +15,7 @@
 	import SparklesIcon from '@lucide/svelte/icons/sparkles';
 	import CostLink from '$lib/components/blocks/usage/CostLink.svelte';
 	import { cn } from '$lib/utils.js';
+	import { formatWorkspaceActivityRelativeTime } from '$lib/modules/overview/overview_time.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 	import {
 		AFK_LOOP_RUNNING,
@@ -67,11 +67,14 @@
 	);
 
 	const accentColor = $derived(getVariantAccentColor(variant, originalAccent));
-	const gradientTint = $derived(`color-mix(in oklch, ${accentColor} 8%, transparent)`);
 
 	const isAfkOn = $derived(workspace.afk_loop_status === AFK_LOOP_RUNNING);
 	const isEmpty = $derived(variant === 'empty');
 	const isDormant = $derived(variant === 'dormant');
+	const isArchived = $derived(workspace.status === 'archived');
+	const isMissingConfiguration = $derived(
+		workspace.github_repo == null || workspace.local_folder == null,
+	);
 
 	const issuesSuffix = $derived(`/${workspace.open_issue_count}`);
 
@@ -107,8 +110,10 @@
 		if (workspace.active_session_count > 0) {
 			return `${workspace.active_session_count} sessions`;
 		}
-		const relativeTime = formatRelativeTime(workspace.last_activity);
-		return relativeTime !== m.workspace_no_activity() ? `last ${relativeTime}` : undefined;
+		const relativeTime = formatWorkspaceActivityRelativeTime(workspace.last_activity);
+		return relativeTime !== formatWorkspaceActivityRelativeTime(null)
+			? `last ${relativeTime}`
+			: undefined;
 	});
 
 	const prdProgressPercent = $derived(
@@ -124,32 +129,6 @@
 			.map((word) => word[0]?.toUpperCase() ?? '')
 			.join(''),
 	);
-
-	function formatRelativeTime(isoString: string | null): string {
-		if (isoString == null) {
-			return m.workspace_no_activity();
-		}
-		const date = new Date(isoString);
-		const now = new Date();
-		const diffMs = now.getTime() - date.getTime();
-		const diffMinutes = Math.floor(diffMs / 60000);
-
-		if (diffMinutes < 1) {
-			return m.time_just_now();
-		}
-		if (diffMinutes < 60) {
-			return m.time_minutes_ago({ count: String(diffMinutes) });
-		}
-		const diffHours = Math.floor(diffMinutes / 60);
-		if (diffHours < 24) {
-			return m.time_hours_ago({ count: String(diffHours) });
-		}
-		const diffDays = Math.floor(diffHours / 24);
-		if (diffDays === 1) {
-			return m.workspace_yesterday();
-		}
-		return m.time_days_ago({ count: String(diffDays) });
-	}
 
 	function handleIconClick(event: MouseEvent, handler?: () => void) {
 		event.stopPropagation();
@@ -173,12 +152,19 @@
 >
 	<Card.Card
 		padding="none"
-		accentBarColor={accentColor}
-		{gradientTint}
 		class={cn(
-			'group relative isolate h-full cursor-pointer transition-all duration-4',
-			'hover:-translate-y-0.5 gk-ws-hover-glow',
+			'group relative isolate h-full min-h-[198px] cursor-pointer overflow-hidden rounded-lg bg-surface transition-all duration-4',
+			'border-[color-mix(in_oklch,var(--ws-accent)_25%,var(--border))]',
+			'shadow-[0_16px_34px_rgb(0_0_0_/_20%),inset_0_0_4px_color-mix(in_oklch,var(--ws-accent)_22%,transparent),inset_0_1px_0_color-mix(in_oklch,var(--foreground)_6%,transparent)]',
+			"before:pointer-events-none before:absolute before:inset-0 before:z-0 before:rounded-[inherit] before:content-['']",
+			'before:bg-[radial-gradient(250px_210px_at_0%_100%,color-mix(in_oklch,var(--ws-accent)_30%,transparent),transparent_68%),radial-gradient(180px_150px_at_12%_84%,color-mix(in_oklch,var(--ws-accent)_18%,transparent),transparent_72%),linear-gradient(180deg,color-mix(in_oklch,var(--surface-2)_56%,transparent),transparent_55%)]',
+			'hover:-translate-y-0.5 hover:border-[color-mix(in_oklch,var(--ws-accent)_58%,var(--border))]',
+			'hover:shadow-[0_22px_48px_rgb(0_0_0_/_26%),0_0_34px_color-mix(in_oklch,var(--ws-accent)_18%,transparent),inset_0_0_14px_color-mix(in_oklch,var(--ws-accent)_21%,transparent),inset_0_1px_0_color-mix(in_oklch,var(--foreground)_7%,transparent)]',
 			isDormant && 'opacity-[0.72] saturate-[0.7]',
+			isArchived &&
+				'opacity-[0.54] grayscale-[0.35] saturate-[0.62] before:bg-[radial-gradient(250px_210px_at_0%_100%,color-mix(in_oklch,var(--foreground-subtle)_12%,transparent),transparent_68%),linear-gradient(180deg,color-mix(in_oklch,var(--surface-2)_42%,transparent),transparent_55%)]',
+			isMissingConfiguration &&
+				'border-[color-mix(in_oklch,var(--status-warning)_24%,var(--border))]',
 		)}
 	>
 		{#if variant === 'active'}
@@ -210,7 +196,7 @@
 						>
 							<GitBranchIcon class="size-3 shrink-0" />
 							<span class="truncate">
-								{workspace.default_branch ?? 'main'} · {workspace.worktree_count} worktrees
+								{workspace.default_branch ?? 'main'} / {workspace.worktree_count} worktrees
 							</span>
 						</span>
 					</div>
@@ -245,11 +231,11 @@
 				{#if isEmpty}
 					<!-- Empty placeholder content -->
 					<div
-						class="flex h-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-border px-4 py-6"
+						class="flex h-full flex-col items-center justify-center gap-2 rounded-sm border border-dashed border-[color-mix(in_oklch,var(--ws-accent)_28%,var(--border))] bg-[color-mix(in_oklch,var(--ws-accent)_7%,transparent)] px-4 py-6"
 					>
 						<SparklesIcon class="size-5 text-foreground-subtle" />
 						<span class="text-xs font-medium text-foreground-muted">
-							Newly created — open to track issues
+							Newly created - open to track issues
 						</span>
 					</div>
 				{:else}
@@ -288,7 +274,14 @@
 					</div>
 
 					<!-- PRD row -->
-					{#if workspace.prd_count > 0}
+					{#if isMissingConfiguration}
+						<div
+							class="mb-1.5 flex h-7.5 items-center gap-2 rounded-sm border border-[color-mix(in_oklch,var(--status-warning)_35%,transparent)] bg-[color-mix(in_oklch,var(--status-warning)_10%,transparent)] px-2.5 text-[11px] font-medium text-status-warning"
+						>
+							<TriangleAlertIcon class="size-3 shrink-0" strokeWidth={1.7} />
+							<span class="truncate">Configuration incomplete</span>
+						</div>
+					{:else if workspace.prd_count > 0}
 						<button
 							type="button"
 							class="mb-1.5 flex w-full cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface-2 px-2.5 py-1.5 hover:border-border-strong"
@@ -329,6 +322,7 @@
 						active={isAfkOn}
 						label={isAfkOn ? 'AFK loop running' : 'AFK loop off'}
 						meta={afkMeta}
+						activeColor={accentColor}
 						onclick={onAfkClick}
 					/>
 				{/if}
@@ -352,19 +346,9 @@
 					class="flex items-center gap-1 font-mono text-[10.5px] text-foreground-subtle"
 				>
 					<ClockIcon class="size-3" />
-					{formatRelativeTime(workspace.last_activity)}
+					{formatWorkspaceActivityRelativeTime(workspace.last_activity)}
 				</span>
 			</div>
 		</div></Card.Card
 	>
 </button>
-
-<style>
-	:global(.gk-ws-hover-glow):hover {
-		border-color: color-mix(in srgb, var(--ws-accent) 55%, var(--border));
-		box-shadow:
-			0 4px 6px -1px rgb(0 0 0 / 10%),
-			0 2px 4px -2px rgb(0 0 0 / 10%),
-			0 0 24px color-mix(in oklch, var(--ws-accent) 18%, transparent);
-	}
-</style>

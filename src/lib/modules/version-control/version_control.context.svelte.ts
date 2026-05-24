@@ -37,7 +37,7 @@ export function isCacheStale(
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
-type VersionControlContext = ReturnType<typeof createVersionControlContext>;
+export type VersionControlContext = ReturnType<typeof createVersionControlContext>;
 
 const [useVersionControl, setVersionControlInternal] = createContext<VersionControlContext>();
 export { useVersionControl };

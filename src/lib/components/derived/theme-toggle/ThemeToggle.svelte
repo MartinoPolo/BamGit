@@ -8,13 +8,15 @@
 	import SidebarCollapsedItem from '$lib/components/derived/sidebar-collapsed-item/SidebarCollapsedItem.svelte';
 	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
+	import { cn } from '$lib/utils.js';
 
 	interface Props {
 		collapsed?: boolean;
 		compact?: boolean;
+		class?: string;
 	}
 
-	let { collapsed = false, compact = false }: Props = $props();
+	let { collapsed = false, compact = false, class: className }: Props = $props();
 
 	const settingsCtx = useSettings();
 	const themeMode = $derived(settingsCtx.getThemeMode() as ThemeMode);
@@ -45,7 +47,10 @@
 			<button
 				{...props}
 				type="button"
-				class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+				class={cn(
+					'rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground',
+					className,
+				)}
 				onclick={cycleMode}
 				aria-label="{MODE_LABELS[currentMode.labelKey]()} mode"
 			>
