@@ -5,6 +5,7 @@ function makeInput(overrides: Partial<CardStateInput> = {}): CardStateInput {
 	return {
 		isGhost: false,
 		isArchived: false,
+		isDone: false,
 		isBatchSelected: false,
 		isActive: false,
 		isHovered: false,
@@ -64,6 +65,34 @@ describe('deriveCardState', () => {
 	it('worktree pending -> worktreeSetup', () => {
 		expect(deriveCardState(makeInput({ worktreeState: 'pending' }))).toBe(
 			ISSUE_CARD_STATES.worktreeSetup,
+		);
+	});
+
+	it('isDone true with no other flags -> done', () => {
+		expect(deriveCardState(makeInput({ isDone: true }))).toBe(ISSUE_CARD_STATES.done);
+	});
+
+	it('isDone true + isBatchSelected -> selected (batch overrides done)', () => {
+		expect(deriveCardState(makeInput({ isDone: true, isBatchSelected: true }))).toBe(
+			ISSUE_CARD_STATES.selected,
+		);
+	});
+
+	it('isDone true + isActive -> active (active overrides done)', () => {
+		expect(deriveCardState(makeInput({ isDone: true, isActive: true }))).toBe(
+			ISSUE_CARD_STATES.active,
+		);
+	});
+
+	it('isDone true + isHovered -> hovered (hover overrides done)', () => {
+		expect(deriveCardState(makeInput({ isDone: true, isHovered: true }))).toBe(
+			ISSUE_CARD_STATES.hovered,
+		);
+	});
+
+	it('isDone true + isArchived -> archived (archived highest priority)', () => {
+		expect(deriveCardState(makeInput({ isDone: true, isArchived: true }))).toBe(
+			ISSUE_CARD_STATES.archived,
 		);
 	});
 

@@ -106,11 +106,17 @@ function mapCacheToPrState(cache: GitStatusCache | null): ForestPullRequestState
 
 /** @internal - exported only for testing */
 export function createIssueCardContext(getProps: () => IssueCardContextProps) {
+	const isDone = $derived.by(() => {
+		const props = getProps();
+		return props.cache?.github_issue_state === 'closed' && props.cache?.pr_state === 'merged';
+	});
+
 	const cardState = $derived.by(() => {
 		const props = getProps();
 		return deriveCardState({
 			isGhost: props.isGhost ?? false,
 			isArchived: props.issue.status === 'archived',
+			isDone,
 			isBatchSelected: props.isBatchSelected,
 			isActive: props.isActive,
 			isHovered: props.isHovered,
@@ -129,6 +135,7 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			issueColor: props.issue.color ?? DEFAULT_ISSUE_COLOR,
 			state: cardState,
 			isHovered: props.isHovered,
+			isDone,
 			sessionOverlay,
 			labels: props.issue.labels,
 		});
@@ -190,6 +197,9 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		},
 		get isArchived(): boolean {
 			return getProps().issue.status === 'archived';
+		},
+		get isDone(): boolean {
+			return isDone;
 		},
 		get hasWorktree(): boolean {
 			const worktreeState = getProps().issue.worktree_state;
