@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useIssueCard } from './index.js';
+	import { useIssueCard, isPreviewPosition } from './index.js';
 	import IssueStateChip from '$lib/components/derived/issue-state-chip/IssueStateChip.svelte';
 	import { PriorityBadge } from '$lib/components/derived/priority-badge/index.js';
 	import type { DisplayPriority } from '$lib/components/derived/priority-badge/priority_badge_types.js';
@@ -23,7 +23,7 @@
 		/>
 	{/if}
 
-	{#if displayPriority !== null && ctx.prioritiesEnabled}
+	{#if displayPriority !== null && ctx.prioritiesEnabled && !isPreviewPosition(ctx.appearanceSettings.priorityPosition)}
 		<PriorityBadge
 			priority={displayPriority}
 			position={ctx.appearanceSettings.priorityPosition}
