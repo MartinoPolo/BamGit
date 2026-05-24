@@ -31,15 +31,3 @@
 		</IssueCardSubComponentStoryWrapper>
 	{/snippet}
 </Story>
-
-<Story name="Muted">
-	{#snippet template()}
-		<IssueCardSubComponentStoryWrapper
-			issue={{
-				is_sound_muted: true,
-			}}
-		>
-			<QuickActionButtons />
-		</IssueCardSubComponentStoryWrapper>
-	{/snippet}
-</Story>

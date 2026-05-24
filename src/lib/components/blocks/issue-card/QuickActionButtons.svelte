@@ -4,8 +4,6 @@
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import VscodeIcon from '$lib/components/derived/icons/VscodeIcon.svelte';
-	import Volume2Icon from '@lucide/svelte/icons/volume-2';
-	import VolumeXIcon from '@lucide/svelte/icons/volume-x';
 	import { useIssueCard } from './index.js';
 	import { useIssues } from '$lib/modules/issues';
 	import { invoke } from '$lib/tauri.js';
@@ -62,18 +60,6 @@
 		event.stopPropagation();
 		void handleAssignFolder();
 	}
-
-	async function handleToggleMute(event: MouseEvent) {
-		event.stopPropagation();
-		try {
-			await invoke('toggle_issue_sound_mute', { issueId: ctx.issue.id });
-			issuesStore.patchIssueLocal(ctx.issue.id, {
-				is_sound_muted: !ctx.issue.is_sound_muted,
-			});
-		} catch (error) {
-			console.error('Failed to toggle mute:', error);
-		}
-	}
 </script>
 
 <div class="ml-0.5 flex items-center gap-0.5" style="color: inherit;">
@@ -113,29 +99,6 @@
 			oncontextmenu={handleQuickActionContextMenu}
 		>
 			<VscodeIcon data-icon="inline-end" />
-		</Button>
-	</SimpleTooltip>
-	<SimpleTooltip
-		text={ctx.issue.is_sound_muted
-			? 'Unmute sounds for this issue'
-			: 'Mute sounds for this issue'}
-	>
-		<Button
-			intent="ghost-overlay"
-			size="icon-sm"
-			aria-label="Toggle mute"
-			class={ctx.issue.is_sound_muted ? 'opacity-35!' : ''}
-			onclick={handleToggleMute}
-			oncontextmenu={(event: MouseEvent) => {
-				event.preventDefault();
-				event.stopPropagation();
-			}}
-		>
-			{#if ctx.issue.is_sound_muted}
-				<VolumeXIcon strokeWidth={1.7} data-icon="inline-start" />
-			{:else}
-				<Volume2Icon strokeWidth={1.7} data-icon="inline-start" />
-			{/if}
 		</Button>
 	</SimpleTooltip>
 </div>
