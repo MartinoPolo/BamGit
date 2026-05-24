@@ -13,6 +13,7 @@
 		<link rel="stylesheet" href="../../tokens.css" />
 		<style>
 			.overview-c {
+				display: flex;
 				min-height: 100vh;
 				padding: 38px 40px 64px;
 				background:
@@ -24,6 +25,10 @@
 			}
 
 			.shell {
+				display: flex;
+				width: 100%;
+				min-height: calc(100vh - 102px);
+				flex-direction: column;
 				max-width: 1840px;
 				margin: 0 auto;
 			}
@@ -446,7 +451,8 @@
 				display: grid;
 				grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
 				gap: 16px;
-				margin-top: 28px;
+				margin-top: auto;
+				padding-top: 28px;
 			}
 
 			.basin-panel {
@@ -605,6 +611,10 @@
 			@media (max-width: 760px) {
 				.overview-c {
 					padding: 22px 16px 44px;
+				}
+
+				.shell {
+					min-height: calc(100vh - 66px);
 				}
 
 				.header {

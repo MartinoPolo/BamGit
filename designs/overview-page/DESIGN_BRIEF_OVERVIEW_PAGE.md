@@ -40,6 +40,7 @@ The Overview page is Grovekeeper's startup surface: a multi-workspace launcher s
 - Bottom summary area:
   - Cost and usage summary sourced from the existing Usage page metrics
   - Recent activity list
+  - Anchored to the bottom of the viewport when the workspace grid is short; flows below cards when content exceeds the viewport
 
 ## Required Workspace Card Data
 
@@ -80,6 +81,8 @@ The Overview page is Grovekeeper's startup surface: a multi-workspace launcher s
 Inspired by issue-card v2 variant C: color blooms from the lower-left / workspace mark area. Cards use radial emanation, inner glow, and richer depth while keeping stats plain and legible.
 
 The bottom section combines compact Usage page metrics with recent activity so wide Overview layouts do not feel empty. It is an overview glance surface, not a replacement for `/usage`; values should link or navigate to `/usage` when implemented.
+
+The bottom section should consume remaining vertical space rather than immediately following the last workspace card. Use a column layout with `margin-top: auto` or equivalent so short grids keep the summary at the bottom edge without becoming fixed or overlaying content.
 
 ## Output
 
