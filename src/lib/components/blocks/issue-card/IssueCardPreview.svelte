@@ -15,7 +15,7 @@
 			></span>
 		</SimpleTooltip>
 	{/if}
-	{#if ctx.visualization}
+	{#if !ctx.isGhost && ctx.visualization}
 		<div
 			class="absolute inset-0"
 			style="transform: scale(1.4); transform-origin: bottom center;"
