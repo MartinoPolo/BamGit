@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { computeVariantSlotStyles, styleMapToString } from './issue_card_variant_css.js';
+import { deriveSessionOverlay } from './issue_card.context.svelte.js';
 import type { IssueCardAppearanceSettings } from './issue_card_settings.js';
 import type { IssueCardState } from './issue_card_variants.js';
+import type { SessionOverlay } from './types.js';
 
 function makeSettings(
 	overrides: Partial<IssueCardAppearanceSettings> = {},
@@ -28,6 +30,7 @@ function computeForVariant(
 		issueColor?: string;
 		state?: IssueCardState;
 		isHovered?: boolean;
+		sessionOverlay?: SessionOverlay;
 		labels?: ReadonlyArray<{ name: string; color: string }>;
 	} = {},
 ) {
@@ -37,6 +40,28 @@ function computeForVariant(
 		issueColor: options.issueColor ?? '#ff5500',
 		state: options.state ?? 'interactive',
 		isHovered: options.isHovered ?? false,
+		sessionOverlay: options.sessionOverlay ?? null,
+		labels: options.labels ?? [],
+	});
+}
+
+function computeHovered(
+	variant: IssueCardAppearanceSettings['variant'],
+	overrides: Partial<IssueCardAppearanceSettings> = {},
+	options: {
+		issueColor?: string;
+		state?: IssueCardState;
+		sessionOverlay?: SessionOverlay;
+		labels?: ReadonlyArray<{ name: string; color: string }>;
+	} = {},
+) {
+	return computeVariantSlotStyles({
+		variant,
+		settings: makeSettings({ variant, ...overrides }),
+		issueColor: options.issueColor ?? '#ff5500',
+		state: options.state ?? 'hovered',
+		isHovered: true,
+		sessionOverlay: options.sessionOverlay ?? null,
 		labels: options.labels ?? [],
 	});
 }
@@ -154,6 +179,7 @@ describe('computeVariantSlotStyles', () => {
 				issueColor: '#ff5500',
 				state: 'hovered',
 				isHovered: true,
+				sessionOverlay: null,
 				labels: [],
 			});
 			expect(result.card.transform).toBe('translateY(-3px)');
@@ -177,6 +203,149 @@ describe('computeVariantSlotStyles', () => {
 		it('converts style map to CSS string', () => {
 			const result = styleMapToString({ background: 'red', color: 'blue' });
 			expect(result).toBe('background: red; color: blue');
+		});
+	});
+
+	describe('session overlay', () => {
+		it('B1: error overlay sets border-color to session-errored', () => {
+			const result = computeForVariant('refined-horizon', {}, { sessionOverlay: 'error' });
+			expect(result.card['border-color']).toContain('session-errored');
+		});
+
+		it('B2: error overlay sets animation to ic-error-pulse', () => {
+			const result = computeForVariant('refined-horizon', {}, { sessionOverlay: 'error' });
+			expect(result.card['animation']).toContain('ic-error-pulse');
+		});
+
+		it('B3: error overlay sets box-shadow with red glow color', () => {
+			const result = computeForVariant('refined-horizon', {}, { sessionOverlay: 'error' });
+			expect(result.card['box-shadow']).toContain('var(--session-errored)');
+		});
+
+		it('B4: needs-input overlay sets border-color to session-needs-input', () => {
+			const result = computeForVariant(
+				'refined-horizon',
+				{},
+				{ sessionOverlay: 'needs-input' },
+			);
+			expect(result.card['border-color']).toContain('session-needs-input');
+		});
+
+		it('B5: needs-input overlay sets animation to ic-needs-input-pulse', () => {
+			const result = computeForVariant(
+				'refined-horizon',
+				{},
+				{ sessionOverlay: 'needs-input' },
+			);
+			expect(result.card['animation']).toContain('ic-needs-input-pulse');
+		});
+
+		it('B6: needs-input overlay sets box-shadow with amber glow', () => {
+			const result = computeForVariant(
+				'refined-horizon',
+				{},
+				{ sessionOverlay: 'needs-input' },
+			);
+			expect(result.card['box-shadow']).toContain('var(--session-needs-input)');
+		});
+
+		it('B7: null overlay applies no animation and leaves border-color unchanged', () => {
+			const withOverlay = computeForVariant('refined-horizon', {}, { sessionOverlay: null });
+			const baseline = computeForVariant('refined-horizon');
+			expect(withOverlay.card['animation']).toBeUndefined();
+			expect(withOverlay.card['border-color']).toBe(baseline.card['border-color']);
+		});
+
+		it('B8: active + error has both outline from active and border/animation from error', () => {
+			const result = computeForVariant(
+				'refined-horizon',
+				{},
+				{ state: 'active', sessionOverlay: 'error' },
+			);
+			expect(result.card['outline']).toContain('#ff5500');
+			expect(result.card['border-color']).toContain('session-errored');
+			expect(result.card['animation']).toContain('ic-error-pulse');
+		});
+
+		it('B9: selected + needs-input has both outline from selected and border/animation from needs-input', () => {
+			const result = computeForVariant(
+				'refined-horizon',
+				{},
+				{ state: 'selected', sessionOverlay: 'needs-input' },
+			);
+			expect(result.card['outline']).toContain('var(--primary)');
+			expect(result.card['border-color']).toContain('session-needs-input');
+			expect(result.card['animation']).toContain('ic-needs-input-pulse');
+		});
+
+		it('B10: hovered + error has hover transform and error overlay border/animation', () => {
+			const result = computeHovered('refined-horizon', {}, { sessionOverlay: 'error' });
+			expect(result.card['transform']).toContain('translateY');
+			expect(result.card['border-color']).toContain('session-errored');
+			expect(result.card['animation']).toContain('ic-error-pulse');
+		});
+
+		it('B11: overlayGlow 100 produces scale factor 1, overlayGlow 200 produces 2', () => {
+			const at100 = computeForVariant(
+				'refined-horizon',
+				{ overlayGlow: 100 },
+				{ sessionOverlay: 'error' },
+			);
+			expect(at100.card['--ic-overlay-glow']).toBe('1');
+
+			const at200 = computeForVariant(
+				'refined-horizon',
+				{ overlayGlow: 200 },
+				{ sessionOverlay: 'error' },
+			);
+			expect(at200.card['--ic-overlay-glow']).toBe('2');
+			expect(at100.card['box-shadow']).toContain('var(--ic-overlay-glow)');
+		});
+
+		it('B12: error overlay box-shadow is appended to existing state box-shadow', () => {
+			const activeBase = computeForVariant(
+				'refined-horizon',
+				{},
+				{ state: 'active', sessionOverlay: null },
+			);
+			const activeWithError = computeForVariant(
+				'refined-horizon',
+				{},
+				{ state: 'active', sessionOverlay: 'error' },
+			);
+			const existingShadow = activeBase.card['box-shadow'];
+			expect(activeWithError.card['box-shadow']).toContain(existingShadow);
+			expect(activeWithError.card['box-shadow']).toContain('var(--session-errored)');
+		});
+	});
+
+	describe('deriveSessionOverlay (B13)', () => {
+		it('maps error sessionState to error overlay', () => {
+			expect(deriveSessionOverlay('error')).toBe('error');
+		});
+
+		it('maps hitl sessionState to needs-input overlay', () => {
+			expect(deriveSessionOverlay('hitl')).toBe('needs-input');
+		});
+
+		it('maps executing sessionState to null overlay', () => {
+			expect(deriveSessionOverlay('executing')).toBeNull();
+		});
+
+		it('maps null sessionState to null overlay', () => {
+			expect(deriveSessionOverlay(null)).toBeNull();
+		});
+
+		it('maps review sessionState to null overlay', () => {
+			expect(deriveSessionOverlay('review')).toBeNull();
+		});
+
+		it('maps paused sessionState to null overlay', () => {
+			expect(deriveSessionOverlay('paused')).toBeNull();
+		});
+
+		it('maps done sessionState to null overlay', () => {
+			expect(deriveSessionOverlay('done')).toBeNull();
 		});
 	});
 
