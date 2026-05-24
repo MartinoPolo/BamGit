@@ -15,7 +15,7 @@
 </script>
 
 <div class="flex shrink-0 items-center gap-1.5">
-	{#if ctx.chipState}
+	{#if !ctx.isGhost && ctx.chipState}
 		<IssueStateChip
 			label={ctx.chipState.label}
 			colorVariable={ctx.chipState.colorVariable}
@@ -35,5 +35,7 @@
 		/>
 	{/if}
 
-	<QuickActionButtons />
+	{#if !ctx.isGhost}
+		<QuickActionButtons />
+	{/if}
 </div>

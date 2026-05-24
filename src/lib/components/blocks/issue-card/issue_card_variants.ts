@@ -3,6 +3,7 @@ import { tv } from 'tailwind-variants';
 // ── Card state (visual priority cascade) ─────────────────────────────
 
 export const ISSUE_CARD_STATES = {
+	ghost: 'ghost',
 	archived: 'archived',
 	selected: 'selected',
 	active: 'active',
@@ -29,6 +30,7 @@ export const issueCardVariants = tv({
 // ── Derive card state from inputs ────────────────────────────────────
 
 export interface CardStateInput {
+	readonly isGhost: boolean;
 	readonly isArchived: boolean;
 	readonly isBatchSelected: boolean;
 	readonly isActive: boolean;
@@ -38,6 +40,9 @@ export interface CardStateInput {
 }
 
 export function deriveCardState(input: CardStateInput): IssueCardState {
+	if (input.isGhost) {
+		return 'ghost';
+	}
 	if (input.isArchived) {
 		return 'archived';
 	}

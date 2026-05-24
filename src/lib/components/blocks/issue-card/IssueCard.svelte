@@ -32,6 +32,7 @@
 		issue: Issue;
 		cache?: GitStatusCache | null;
 		ghAvailable?: boolean;
+		isGhost?: boolean;
 		notificationDotColor?: string | null;
 		prdParent?: PrdParent | null;
 		prioritiesEnabled?: boolean;
@@ -47,6 +48,7 @@
 		issue,
 		cache = null,
 		ghAvailable = false,
+		isGhost = false,
 		notificationDotColor = null,
 		prdParent = null,
 		prioritiesEnabled = true,
@@ -64,6 +66,7 @@
 		issue,
 		cache,
 		ghAvailable,
+		isGhost,
 		notificationDotColor,
 		prdParent,
 		prioritiesEnabled,
@@ -150,7 +153,7 @@
 	</div>
 
 	<!-- Contextual action buttons -->
-	{#if !ctx.isArchived && onExecuteAction}
+	{#if !ctx.isArchived && !ctx.isGhost && onExecuteAction}
 		<div class="absolute bottom-2 right-2.5 flex items-center gap-1">
 			<ContextualActionButtons
 				derivedActions={contextualActions}
