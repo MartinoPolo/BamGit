@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Overview Page - Variant C: Radial Understory</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../../tokens.css" />
+		<style>
+			.overview-c {
+				display: flex;
+				min-height: 100vh;
+				padding: 38px 40px 64px;
+				background:
+					radial-gradient(780px 380px at 5% 16%, color-mix(in oklch, var(--moss-500) 13%, transparent), transparent 72%),
+					radial-gradient(620px 320px at 72% -4%, color-mix(in oklch, var(--teal-500) 8%, transparent), transparent 66%),
+					linear-gradient(180deg, color-mix(in oklch, var(--surface) 32%, transparent), transparent 420px),
+					var(--background);
+				color: var(--foreground);
+			}
+
+			.shell {
+				display: flex;
+				width: 100%;
+				min-height: calc(100vh - 102px);
+				flex-direction: column;
+				max-width: 1840px;
+				margin: 0 auto;
+			}
+
+			.variant-label {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 16px;
+				margin-bottom: 32px;
+				color: var(--foreground-subtle);
+			}
+
+			.theme-links {
+				display: inline-flex;
+				gap: 6px;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				text-transform: none;
+			}
+
+			.theme-link {
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				background: color-mix(in oklch, var(--surface) 84%, transparent);
+				padding: 4px 8px;
+				color: var(--foreground-muted);
+				text-decoration: none;
+			}
+
+			.theme-link:hover {
+				border-color: color-mix(in oklch, var(--moss-400) 44%, var(--border));
+				color: var(--foreground);
+			}
+
+			.header {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				align-items: end;
+				gap: 24px;
+				margin-bottom: 34px;
+			}
+
+			.title-block {
+				display: grid;
+				gap: 5px;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: var(--text-3xl);
+				font-weight: var(--weight-semibold);
+				letter-spacing: 0;
+				line-height: var(--leading-tight);
+			}
+
+			.subtitle {
+				margin: 0;
+				color: var(--foreground-muted);
+				font-size: var(--text-md);
+			}
+
+			.controls {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.control,
+			.action {
+				display: grid;
+				place-items: center;
+				border: 1px solid color-mix(in oklch, var(--foreground) 11%, transparent);
+				background:
+					radial-gradient(42px 34px at 18% 86%, color-mix(in oklch, var(--moss-400) 12%, transparent), transparent 72%),
+					color-mix(in oklch, var(--surface) 86%, transparent);
+				color: var(--foreground-muted);
+				box-shadow: inset 0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent);
+			}
+
+			.control {
+				width: 36px;
+				height: 36px;
+				border-radius: var(--radius-lg);
+			}
+
+			.action {
+				width: 27px;
+				height: 27px;
+				border-color: transparent;
+				border-radius: var(--radius-sm);
+			}
+
+			.control svg,
+			.action svg {
+				width: 14px;
+				height: 14px;
+				stroke-width: 1.7;
+			}
+
+			.control.is-active,
+			.control:hover,
+			.action:hover {
+				border-color: color-mix(in oklch, var(--moss-400) 44%, var(--border));
+				color: var(--foreground);
+				box-shadow:
+					0 0 22px color-mix(in oklch, var(--moss-400) 15%, transparent),
+					inset 0 1px 0 color-mix(in oklch, var(--foreground) 7%, transparent);
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, 340px);
+				gap: 16px;
+				align-items: stretch;
+			}
+
+			.card {
+				--workspace-accent: var(--moss-400);
+				position: relative;
+				isolation: isolate;
+				display: flex;
+				min-height: 198px;
+				flex-direction: column;
+				overflow: hidden;
+				border: 1px solid color-mix(in oklch, var(--workspace-accent) 25%, var(--border));
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				box-shadow:
+					0 16px 34px rgb(0 0 0 / 20%),
+					inset 0 0 4px color-mix(in oklch, var(--workspace-accent) 22%, transparent),
+					inset 0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent);
+				transition:
+					transform var(--duration-3) var(--ease-out),
+					border-color var(--duration-3) var(--ease-out),
+					box-shadow var(--duration-3) var(--ease-out);
+			}
+
+			.card::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				z-index: -1;
+				background:
+					radial-gradient(250px 210px at 0% 100%, color-mix(in oklch, var(--workspace-accent) 30%, transparent), transparent 68%),
+					radial-gradient(180px 150px at 12% 84%, color-mix(in oklch, var(--workspace-accent) 18%, transparent), transparent 72%),
+					linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 56%, transparent), transparent 55%);
+				opacity: 0.92;
+			}
+
+			.card:hover {
+				transform: translateY(-2px);
+				border-color: color-mix(in oklch, var(--workspace-accent) 58%, var(--border));
+				box-shadow:
+					0 22px 48px rgb(0 0 0 / 26%),
+					0 0 34px color-mix(in oklch, var(--workspace-accent) 18%, transparent),
+					inset 0 0 14px color-mix(in oklch, var(--workspace-accent) 21%, transparent),
+					inset 0 1px 0 color-mix(in oklch, var(--foreground) 7%, transparent);
+			}
+
+			.card.is-urgent {
+				--workspace-accent: var(--status-danger);
+			}
+
+			.card.is-hitl {
+				--workspace-accent: var(--status-warning);
+			}
+
+			.card.is-active {
+				--workspace-accent: var(--teal-400);
+			}
+
+			.card.is-active::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: inherit;
+				box-shadow: inset 0 0 30px color-mix(in oklch, var(--workspace-accent) 24%, transparent);
+				animation: bloom 3.6s ease-in-out infinite;
+				pointer-events: none;
+			}
+
+			.card.is-dormant {
+				opacity: 0.72;
+				filter: saturate(0.68);
+			}
+
+			.card.is-archived {
+				opacity: 0.54;
+				filter: grayscale(0.35) saturate(0.62);
+			}
+
+			.card.is-archived::before {
+				background:
+					radial-gradient(250px 210px at 0% 100%, color-mix(in oklch, var(--foreground-subtle) 12%, transparent), transparent 68%),
+					linear-gradient(180deg, color-mix(in oklch, var(--surface-2) 42%, transparent), transparent 55%);
+			}
+
+			.card-body {
+				position: relative;
+				z-index: 1;
+				display: flex;
+				flex: 1;
+				flex-direction: column;
+				padding: 14px;
+			}
+
+			.top {
+				display: grid;
+				grid-template-columns: 39px minmax(0, 1fr) auto;
+				align-items: center;
+				gap: 10px;
+				margin-bottom: 12px;
+			}
+
+			.mark {
+				display: grid;
+				place-items: center;
+				width: 39px;
+				height: 39px;
+				border: 1px solid color-mix(in oklch, var(--workspace-accent) 42%, var(--border));
+				border-radius: var(--radius-md);
+				background:
+					radial-gradient(42px 38px at 14% 88%, color-mix(in oklch, var(--workspace-accent) 34%, transparent), transparent 72%),
+					var(--surface-2);
+				color: var(--foreground);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				box-shadow: inset 0 0 12px color-mix(in oklch, var(--workspace-accent) 18%, transparent);
+			}
+
+			.name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				font-size: var(--text-lg);
+				font-weight: var(--weight-semibold);
+				letter-spacing: 0;
+			}
+
+			.meta {
+				margin-top: 2px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				color: var(--foreground-muted);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+			}
+
+			.actions {
+				display: flex;
+				gap: 3px;
+			}
+
+			.stats {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 6px;
+				margin-bottom: 8px;
+			}
+
+			.stat {
+				min-width: 0;
+				border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+				border-radius: var(--radius-sm);
+				background: color-mix(in oklch, var(--surface) 64%, var(--surface-2));
+				padding: 8px 9px 7px;
+				box-shadow: inset 0 1px 0 color-mix(in oklch, var(--foreground) 5%, transparent);
+			}
+
+			.stat-label {
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+			}
+
+			.stat-value {
+				margin-top: 5px;
+				font-family: var(--font-mono);
+				font-size: var(--text-xl);
+				line-height: 1;
+			}
+
+			.stat-value small {
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			.stat.is-danger {
+				border-color: color-mix(in oklch, var(--status-danger) 48%, var(--border));
+				background: color-mix(in oklch, var(--status-danger) 15%, var(--surface-2));
+				color: var(--status-danger);
+			}
+
+			.stat.is-warning {
+				border-color: color-mix(in oklch, var(--status-warning) 42%, var(--border));
+				background: color-mix(in oklch, var(--status-warning) 13%, var(--surface-2));
+				color: var(--status-warning);
+			}
+
+			.row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+				border-radius: var(--radius-sm);
+				background: color-mix(in oklch, var(--surface-2) 62%, transparent);
+				padding: 8px 10px;
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			.prd {
+				margin-bottom: 7px;
+			}
+
+			.track {
+				height: 5px;
+				flex: 1;
+				overflow: hidden;
+				border-radius: 999px;
+				background: color-mix(in oklch, var(--foreground) 10%, transparent);
+			}
+
+			.track span {
+				display: block;
+				width: var(--progress);
+				height: 100%;
+				border-radius: inherit;
+				background: linear-gradient(90deg, var(--workspace-accent), color-mix(in oklch, var(--workspace-accent) 45%, white));
+			}
+
+			.led {
+				width: 8px;
+				height: 8px;
+				flex: 0 0 auto;
+				border-radius: 999px;
+				background: var(--foreground-subtle);
+			}
+
+			.is-active .led {
+				background: var(--moss-400);
+				box-shadow: 0 0 14px color-mix(in oklch, var(--moss-400) 75%, transparent);
+			}
+
+			.row-meta {
+				margin-left: auto;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				white-space: nowrap;
+			}
+
+			.footer {
+				display: flex;
+				justify-content: space-between;
+				margin-top: auto;
+				padding-top: 11px;
+				border-top: 1px dashed color-mix(in oklch, var(--foreground) 10%, transparent);
+				color: var(--foreground-subtle);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+			}
+
+			.cost {
+				color: var(--moss-300);
+				font-weight: var(--weight-semibold);
+			}
+
+			.empty {
+				display: grid;
+				min-height: 86px;
+				place-items: center;
+				margin-bottom: 7px;
+				border: 1px dashed color-mix(in oklch, var(--workspace-accent) 28%, var(--border));
+				border-radius: var(--radius-sm);
+				background: color-mix(in oklch, var(--workspace-accent) 7%, transparent);
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			.add-card {
+				position: relative;
+				display: grid;
+				min-height: 198px;
+				place-items: center;
+				overflow: hidden;
+				border: 1.5px dashed color-mix(in oklch, var(--moss-400) 28%, var(--border));
+				border-radius: var(--radius-lg);
+				background:
+					radial-gradient(230px 190px at 0% 100%, color-mix(in oklch, var(--moss-400) 14%, transparent), transparent 70%),
+					color-mix(in oklch, var(--surface) 72%, transparent);
+				color: var(--foreground-muted);
+			}
+
+			.add-inner {
+				display: grid;
+				place-items: center;
+				gap: 10px;
+				font-size: var(--text-md);
+				font-weight: var(--weight-medium);
+			}
+
+			.add-plus {
+				display: grid;
+				place-items: center;
+				width: 44px;
+				height: 44px;
+				border: 1px solid color-mix(in oklch, var(--moss-400) 35%, var(--border));
+				border-radius: var(--radius-lg);
+				background:
+					radial-gradient(44px 38px at 20% 86%, color-mix(in oklch, var(--moss-400) 26%, transparent), transparent 70%),
+					var(--surface-2);
+				font-size: 24px;
+			}
+
+			.overview-basin {
+				display: grid;
+				grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+				gap: 16px;
+				margin-top: auto;
+				padding-top: 28px;
+			}
+
+			.basin-panel {
+				min-height: 118px;
+				border: 1px solid color-mix(in oklch, var(--moss-400) 18%, var(--border));
+				border-radius: var(--radius-lg);
+				background:
+					radial-gradient(280px 150px at 0% 100%, color-mix(in oklch, var(--moss-400) 11%, transparent), transparent 70%),
+					color-mix(in oklch, var(--surface) 72%, transparent);
+				padding: 14px;
+				box-shadow: inset 0 1px 0 color-mix(in oklch, var(--foreground) 5%, transparent);
+			}
+
+			.basin-title {
+				color: var(--foreground-muted);
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				text-transform: uppercase;
+			}
+
+			.basin-bars {
+				display: grid;
+				gap: 10px;
+				margin-top: 14px;
+			}
+
+			.usage-kpis {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 10px;
+				margin-top: 14px;
+			}
+
+			.usage-kpi {
+				border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+				border-radius: var(--radius-md);
+				background:
+					radial-gradient(120px 80px at 0% 100%, color-mix(in oklch, var(--workspace-accent, var(--moss-400)) 10%, transparent), transparent 70%),
+					color-mix(in oklch, var(--surface-2) 58%, transparent);
+				padding: 10px;
+			}
+
+			.usage-label {
+				color: var(--foreground-subtle);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				text-transform: uppercase;
+			}
+
+			.usage-value {
+				margin-top: 5px;
+				color: var(--foreground);
+				font-family: var(--font-mono);
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				line-height: 1;
+			}
+
+			.usage-note {
+				margin-top: 5px;
+				color: var(--foreground-muted);
+				font-size: var(--text-2xs);
+			}
+
+			.usage-split {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
+				gap: 14px;
+				margin-top: 14px;
+			}
+
+			.basin-row {
+				display: grid;
+				grid-template-columns: 112px 1fr auto;
+				align-items: center;
+				gap: 10px;
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			.basin-row .track {
+				height: 6px;
+			}
+
+			.tool-rows {
+				display: grid;
+				gap: 8px;
+			}
+
+			.tool-row {
+				display: grid;
+				grid-template-columns: 82px 1fr 42px;
+				align-items: center;
+				gap: 8px;
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			.mini-chart {
+				display: grid;
+				grid-template-columns: repeat(14, 1fr);
+				align-items: end;
+				gap: 4px;
+				height: 78px;
+				border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+				border-radius: var(--radius-md);
+				background: color-mix(in oklch, var(--surface-2) 48%, transparent);
+				padding: 10px;
+			}
+
+			.mini-bar {
+				min-height: 4px;
+				height: var(--height);
+				border-radius: 999px 999px 2px 2px;
+				background: color-mix(in oklch, var(--workspace-accent, var(--moss-400)) var(--intensity), var(--surface-3));
+			}
+
+			.basin-list {
+				display: grid;
+				gap: 8px;
+				margin-top: 13px;
+			}
+
+			.basin-item {
+				display: flex;
+				justify-content: space-between;
+				gap: 12px;
+				border-bottom: 1px dashed color-mix(in oklch, var(--foreground) 9%, transparent);
+				padding-bottom: 8px;
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			@keyframes bloom {
+				0%,
+				100% {
+					opacity: 0.48;
+				}
+				50% {
+					opacity: 1;
+				}
+			}
+
+			@media (max-width: 980px) {
+				.overview-basin {
+					grid-template-columns: 1fr;
+				}
+
+				.usage-split,
+				.usage-kpis {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 760px) {
+				.overview-c {
+					padding: 22px 16px 44px;
+				}
+
+				.shell {
+					min-height: calc(100vh - 66px);
+				}
+
+				.header {
+					grid-template-columns: 1fr;
+				}
+
+				.grid {
+					grid-template-columns: minmax(0, 1fr);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="gk-root theme-dark overview-c" id="overview-root" data-theme="dark">
+			<main class="shell">
+				<div class="gk-eyebrow variant-label">
+					<span>Variant C: Radial Understory</span>
+					<span class="theme-links" aria-label="Preview theme">
+						<a class="theme-link" href="?theme=dark">Dark</a>
+						<a class="theme-link" href="?theme=light">Light</a>
+					</span>
+				</div>
+				<header class="header">
+					<div class="title-block">
+						<h1>Grovekeeper</h1>
+						<p class="subtitle">Your workspaces</p>
+					</div>
+					<div class="controls" aria-label="Overview controls">
+						<button class="control" aria-label="Theme">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" /></svg>
+						</button>
+						<button class="control" aria-label="Settings">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 1 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.3 7A2 2 0 1 1 7.1 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 1 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z" /></svg>
+						</button>
+						<button class="control is-active" aria-label="Archive">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18" /><path d="M5 7v12h14V7" /><path d="M8 11h8" /><path d="M4 3h16v4H4z" /></svg>
+						</button>
+						<button class="control" aria-label="GitHub">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.5-.4 7-1.7 7-7.5a5.8 5.8 0 0 0-1.6-4 5.4 5.4 0 0 0-.1-4s-1.3-.4-4.3 1.6a14.9 14.9 0 0 0-7.8 0C4.2-1.4 2.9-1 2.9-1a5.4 5.4 0 0 0-.1 4A5.8 5.8 0 0 0 1 7c0 5.8 3.5 7.1 7 7.5a4.8 4.8 0 0 0-1 3.5v4" /></svg>
+						</button>
+					</div>
+				</header>
+
+				<section class="grid" aria-label="Workspace cards">
+					<article class="card" style="--workspace-accent: var(--moss-400)">
+						<div class="card-body">
+							<div class="top">
+								<div class="mark">G</div>
+								<div><div class="name">Grovekeeper</div><div class="meta">dev - 1 worktrees</div></div>
+								<div class="actions"><button class="action" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.5-.4 7-1.7 7-7.5a5.8 5.8 0 0 0-1.6-4" /></svg></button><button class="action" aria-label="Folder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /><path d="M19 12h2M3 12h2M12 3v2M12 19v2" /></svg></button></div>
+							</div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">1<small>/3</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">HITL</div><div class="stat-value">0</div></div></div>
+							<div class="row prd"><span>1 PRD</span><div class="track" style="--progress: 38%"><span></span></div><span class="row-meta">3/8 done</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span><span class="row-meta">last 18m</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.00</span></span><span>just now</span></footer>
+						</div>
+					</article>
+
+					<article class="card is-dormant" style="--workspace-accent: var(--bark-500)">
+						<div class="card-body">
+							<div class="top"><div class="mark">O</div><div><div class="name">Obsidian</div><div class="meta">main - 0 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">0<small>/1</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">HITL</div><div class="stat-value">0</div></div></div>
+							<div class="row prd"><span>No PRD</span><div class="track" style="--progress: 0%"><span></span></div><span class="row-meta">0/0 done</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span><span class="row-meta">No activity</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.00</span></span><span>4d ago</span></footer>
+						</div>
+					</article>
+
+					<article class="card is-urgent">
+						<div class="card-body">
+							<div class="top"><div class="mark">F</div><div><div class="name">Forest Demo</div><div class="meta">main - 16 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">15<small>/20</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">6</div></div><div class="stat is-danger"><div class="stat-label">ATTN</div><div class="stat-value">2</div></div><div class="stat is-warning"><div class="stat-label">HITL</div><div class="stat-value">1</div></div></div>
+							<div class="row prd"><span>3 PRDs</span><div class="track" style="--progress: 72%"><span></span></div><span class="row-meta">18/25 done</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span><span class="row-meta">1 sessions</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.00</span></span><span>Yesterday</span></footer>
+						</div>
+					</article>
+
+					<article class="card is-hitl">
+						<div class="card-body">
+							<div class="top"><div class="mark">MP</div><div><div class="name">Agent Skills Standard</div><div class="meta">spec - 9 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">9<small>/14</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">1</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat is-warning"><div class="stat-label">HITL</div><div class="stat-value">3</div></div></div>
+							<div class="row prd"><span>1 PRD</span><div class="track" style="--progress: 61%"><span></span></div><span class="row-meta">8/13 done</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span><span class="row-meta">last 1h</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.64</span></span><span>1h ago</span></footer>
+						</div>
+					</article>
+
+					<article class="card is-active">
+						<div class="card-body">
+							<div class="top"><div class="mark">LC</div><div><div class="name">Low Poly Trees</div><div class="meta">render - 5 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">7<small>/12</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">2</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">HITL</div><div class="stat-value">0</div></div></div>
+							<div class="row prd"><span>2 PRDs</span><div class="track" style="--progress: 55%"><span></span></div><span class="row-meta">11/20 done</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop running</span><span class="row-meta">3 sessions</span></div>
+							<footer class="footer"><span>today <span class="cost">$2.18</span></span><span>3m ago</span></footer>
+						</div>
+					</article>
+
+					<article class="card is-active" style="--workspace-accent: var(--sage-400)">
+						<div class="card-body">
+							<div class="top"><div class="mark">AF</div><div><div class="name">AFK Idle Loop</div><div class="meta">auto - 2 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">4<small>/9</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">HITL</div><div class="stat-value">0</div></div></div>
+							<div class="row prd"><span>1 PRD</span><div class="track" style="--progress: 20%"><span></span></div><span class="row-meta">2/10 done</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop running</span><span class="row-meta">idle</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.12</span></span><span>12m ago</span></footer>
+						</div>
+					</article>
+
+					<article class="card" style="--workspace-accent: var(--azure-400)">
+						<div class="card-body">
+							<div class="top"><div class="mark">N</div><div><div class="name">New Workspace</div><div class="meta">main - 0 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="empty">Newly created - open to track issues</div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.00</span></span><span>No activity</span></footer>
+						</div>
+					</article>
+
+					<article class="card" style="--workspace-accent: var(--plum-400)">
+						<div class="card-body">
+							<div class="top"><div class="mark">CF</div><div><div class="name">Needs Configuration</div><div class="meta">main - 0 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">0<small>/0</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">HITL</div><div class="stat-value">0</div></div></div>
+							<div class="row prd"><span>Repo/folder missing</span><div class="track" style="--progress: 0%"><span></span></div><span class="row-meta">config</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span></div>
+							<footer class="footer"><span>today <span class="cost">$0.00</span></span><span>No activity</span></footer>
+						</div>
+					</article>
+
+					<article class="card is-archived" style="--workspace-accent: var(--foreground-subtle)">
+						<div class="card-body">
+							<div class="top"><div class="mark">AR</div><div><div class="name">Archived Prototype</div><div class="meta">archive - 3 worktrees</div></div><div class="actions"><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h6l2 2h8v10H4z" /></svg></button><button class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /></svg></button></div></div>
+							<div class="stats"><div class="stat"><div class="stat-label">ISSUES</div><div class="stat-value">2<small>/5</small></div></div><div class="stat"><div class="stat-label">PRS</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">ATTN</div><div class="stat-value">0</div></div><div class="stat"><div class="stat-label">HITL</div><div class="stat-value">0</div></div></div>
+							<div class="row prd"><span>Archived</span><div class="track" style="--progress: 80%"><span></span></div><span class="row-meta">hidden normally</span></div>
+							<div class="row"><span class="led"></span><span>AFK loop off</span></div>
+							<footer class="footer"><span>total <span class="cost">$4.92</span></span><span>21d ago</span></footer>
+						</div>
+					</article>
+
+					<article class="add-card"><div class="add-inner"><div class="add-plus">+</div><div>Add workspace</div></div></article>
+				</section>
+
+				<section class="overview-basin" aria-label="Overview summary">
+					<div class="basin-panel">
+						<div class="basin-title">Cost and usage</div>
+						<div class="usage-kpis">
+							<div class="usage-kpi" style="--workspace-accent: var(--moss-400)">
+								<div class="usage-label">Total cost</div>
+								<div class="usage-value">$42.18</div>
+								<div class="usage-note">-8% vs previous period</div>
+							</div>
+							<div class="usage-kpi" style="--workspace-accent: var(--teal-400)">
+								<div class="usage-label">Sessions</div>
+								<div class="usage-value">186</div>
+								<div class="usage-note">+22 this week</div>
+							</div>
+							<div class="usage-kpi" style="--workspace-accent: var(--gold-400)">
+								<div class="usage-label">One-shot rate</div>
+								<div class="usage-value">68%</div>
+								<div class="usage-note">industry avg ~62%</div>
+							</div>
+							<div class="usage-kpi" style="--workspace-accent: var(--azure-400)">
+								<div class="usage-label">Cache hit</div>
+								<div class="usage-value">41%</div>
+								<div class="usage-note">saving ~$15.56/mo</div>
+							</div>
+						</div>
+						<div class="usage-split">
+							<div>
+								<div class="basin-title">14-day cost trend</div>
+								<div class="mini-chart" aria-label="14-day cost trend">
+									<span class="mini-bar" style="--height: 34%; --intensity: 28%"></span>
+									<span class="mini-bar" style="--height: 42%; --intensity: 34%"></span>
+									<span class="mini-bar" style="--height: 22%; --intensity: 22%"></span>
+									<span class="mini-bar" style="--height: 58%; --intensity: 46%"></span>
+									<span class="mini-bar" style="--height: 63%; --intensity: 52%"></span>
+									<span class="mini-bar" style="--height: 28%; --intensity: 24%"></span>
+									<span class="mini-bar" style="--height: 18%; --intensity: 18%"></span>
+									<span class="mini-bar" style="--height: 72%; --intensity: 60%"></span>
+									<span class="mini-bar" style="--height: 88%; --intensity: 72%"></span>
+									<span class="mini-bar" style="--height: 46%; --intensity: 38%"></span>
+									<span class="mini-bar" style="--height: 35%; --intensity: 30%"></span>
+									<span class="mini-bar" style="--height: 66%; --intensity: 54%"></span>
+									<span class="mini-bar" style="--height: 40%; --intensity: 34%"></span>
+									<span class="mini-bar" style="--height: 25%; --intensity: 22%"></span>
+								</div>
+							</div>
+							<div>
+								<div class="basin-title">Top tool usage</div>
+								<div class="tool-rows">
+									<div class="tool-row"><span>Bash</span><div class="track" style="--progress: 82%"><span></span></div><span class="row-meta">428</span></div>
+									<div class="tool-row"><span>Read</span><div class="track" style="--progress: 67%"><span></span></div><span class="row-meta">351</span></div>
+									<div class="tool-row"><span>Edit</span><div class="track" style="--progress: 43%"><span></span></div><span class="row-meta">227</span></div>
+									<div class="tool-row"><span>Search</span><div class="track" style="--progress: 31%"><span></span></div><span class="row-meta">164</span></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="basin-panel">
+						<div class="basin-title">Recent activity</div>
+						<div class="basin-list">
+							<div class="basin-item"><span>Low Poly Trees spawned 2 AFK sessions</span><span class="row-meta">3m</span></div>
+							<div class="basin-item"><span>Forest Demo has PRs needing attention</span><span class="row-meta">1h</span></div>
+							<div class="basin-item"><span>Grovekeeper issue sync completed</span><span class="row-meta">just now</span></div>
+						</div>
+					</div>
+				</section>
+			</main>
+		</div>
+		<script>
+			const theme = new URLSearchParams(window.location.search).get('theme');
+			if (theme === 'light') {
+				const root = document.getElementById('overview-root');
+				root.classList.remove('theme-dark');
+				root.classList.add('theme-light');
+				root.dataset.theme = 'light';
+			}
+		</script>
+	</body>
+</html>

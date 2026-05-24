@@ -40,6 +40,7 @@ export interface IssueCardContextProps {
 	sessionState: SessionStateProp;
 	visualization: TreeVisualization | undefined;
 	appearanceSettings: IssueCardAppearanceSettings;
+	isGhost?: boolean;
 	isActive: boolean;
 	isHovered: boolean;
 	isBatchSelected: boolean;
@@ -101,6 +102,7 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 	const cardState = $derived.by(() => {
 		const props = getProps();
 		return deriveCardState({
+			isGhost: props.isGhost ?? false,
 			isArchived: props.issue.status === 'archived',
 			isDone,
 			isBatchSelected: props.isBatchSelected,
@@ -120,6 +122,7 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 			state: cardState,
 			isHovered: props.isHovered,
 			isDone,
+			labels: props.issue.labels,
 		});
 	});
 
@@ -145,6 +148,9 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		},
 		get visualization(): TreeVisualization | undefined {
 			return getProps().visualization;
+		},
+		get isGhost(): boolean {
+			return cardState === 'ghost';
 		},
 		get isActive(): boolean {
 			return getProps().isActive;
