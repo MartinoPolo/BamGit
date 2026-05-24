@@ -29,8 +29,34 @@
 			}
 
 			.variant-label {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 16px;
 				margin-bottom: 32px;
 				color: var(--foreground-subtle);
+			}
+
+			.theme-links {
+				display: inline-flex;
+				gap: 6px;
+				font-family: var(--font-mono);
+				font-size: var(--text-2xs);
+				text-transform: none;
+			}
+
+			.theme-link {
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				background: color-mix(in oklch, var(--surface) 84%, transparent);
+				padding: 4px 8px;
+				color: var(--foreground-muted);
+				text-decoration: none;
+			}
+
+			.theme-link:hover {
+				border-color: color-mix(in oklch, var(--moss-400) 44%, var(--border));
+				color: var(--foreground);
 			}
 
 			.header {
@@ -418,7 +444,7 @@
 
 			.overview-basin {
 				display: grid;
-				grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+				grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
 				gap: 16px;
 				margin-top: 28px;
 			}
@@ -448,6 +474,51 @@
 				margin-top: 14px;
 			}
 
+			.usage-kpis {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 10px;
+				margin-top: 14px;
+			}
+
+			.usage-kpi {
+				border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+				border-radius: var(--radius-md);
+				background:
+					radial-gradient(120px 80px at 0% 100%, color-mix(in oklch, var(--workspace-accent, var(--moss-400)) 10%, transparent), transparent 70%),
+					color-mix(in oklch, var(--surface-2) 58%, transparent);
+				padding: 10px;
+			}
+
+			.usage-label {
+				color: var(--foreground-subtle);
+				font-size: var(--text-2xs);
+				font-weight: var(--weight-semibold);
+				text-transform: uppercase;
+			}
+
+			.usage-value {
+				margin-top: 5px;
+				color: var(--foreground);
+				font-family: var(--font-mono);
+				font-size: var(--text-xl);
+				font-weight: var(--weight-semibold);
+				line-height: 1;
+			}
+
+			.usage-note {
+				margin-top: 5px;
+				color: var(--foreground-muted);
+				font-size: var(--text-2xs);
+			}
+
+			.usage-split {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
+				gap: 14px;
+				margin-top: 14px;
+			}
+
 			.basin-row {
 				display: grid;
 				grid-template-columns: 112px 1fr auto;
@@ -459,6 +530,39 @@
 
 			.basin-row .track {
 				height: 6px;
+			}
+
+			.tool-rows {
+				display: grid;
+				gap: 8px;
+			}
+
+			.tool-row {
+				display: grid;
+				grid-template-columns: 82px 1fr 42px;
+				align-items: center;
+				gap: 8px;
+				color: var(--foreground-muted);
+				font-size: var(--text-xs);
+			}
+
+			.mini-chart {
+				display: grid;
+				grid-template-columns: repeat(14, 1fr);
+				align-items: end;
+				gap: 4px;
+				height: 78px;
+				border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+				border-radius: var(--radius-md);
+				background: color-mix(in oklch, var(--surface-2) 48%, transparent);
+				padding: 10px;
+			}
+
+			.mini-bar {
+				min-height: 4px;
+				height: var(--height);
+				border-radius: 999px 999px 2px 2px;
+				background: color-mix(in oklch, var(--workspace-accent, var(--moss-400)) var(--intensity), var(--surface-3));
 			}
 
 			.basin-list {
@@ -491,6 +595,11 @@
 				.overview-basin {
 					grid-template-columns: 1fr;
 				}
+
+				.usage-split,
+				.usage-kpis {
+					grid-template-columns: 1fr;
+				}
 			}
 
 			@media (max-width: 760px) {
@@ -509,9 +618,15 @@
 		</style>
 	</head>
 	<body>
-		<div class="gk-root theme-dark overview-c">
+		<div class="gk-root theme-dark overview-c" id="overview-root" data-theme="dark">
 			<main class="shell">
-				<div class="gk-eyebrow variant-label">Variant C: Radial Understory</div>
+				<div class="gk-eyebrow variant-label">
+					<span>Variant C: Radial Understory</span>
+					<span class="theme-links" aria-label="Preview theme">
+						<a class="theme-link" href="?theme=dark">Dark</a>
+						<a class="theme-link" href="?theme=light">Light</a>
+					</span>
+				</div>
 				<header class="header">
 					<div class="title-block">
 						<h1>Grovekeeper</h1>
@@ -632,11 +747,58 @@
 
 				<section class="overview-basin" aria-label="Overview summary">
 					<div class="basin-panel">
-						<div class="basin-title">Workspace forest health</div>
-						<div class="basin-bars">
-							<div class="basin-row"><span>AFK ready</span><div class="track" style="--progress: 64%"><span></span></div><span class="row-meta">38 issues</span></div>
-							<div class="basin-row"><span>Needs input</span><div class="track" style="--progress: 18%; --workspace-accent: var(--status-warning)"><span></span></div><span class="row-meta">4 HITL</span></div>
-							<div class="basin-row"><span>PR attention</span><div class="track" style="--progress: 12%; --workspace-accent: var(--status-danger)"><span></span></div><span class="row-meta">2 PRs</span></div>
+						<div class="basin-title">Cost and usage</div>
+						<div class="usage-kpis">
+							<div class="usage-kpi" style="--workspace-accent: var(--moss-400)">
+								<div class="usage-label">Total cost</div>
+								<div class="usage-value">$42.18</div>
+								<div class="usage-note">-8% vs previous period</div>
+							</div>
+							<div class="usage-kpi" style="--workspace-accent: var(--teal-400)">
+								<div class="usage-label">Sessions</div>
+								<div class="usage-value">186</div>
+								<div class="usage-note">+22 this week</div>
+							</div>
+							<div class="usage-kpi" style="--workspace-accent: var(--gold-400)">
+								<div class="usage-label">One-shot rate</div>
+								<div class="usage-value">68%</div>
+								<div class="usage-note">industry avg ~62%</div>
+							</div>
+							<div class="usage-kpi" style="--workspace-accent: var(--azure-400)">
+								<div class="usage-label">Cache hit</div>
+								<div class="usage-value">41%</div>
+								<div class="usage-note">saving ~$15.56/mo</div>
+							</div>
+						</div>
+						<div class="usage-split">
+							<div>
+								<div class="basin-title">14-day cost trend</div>
+								<div class="mini-chart" aria-label="14-day cost trend">
+									<span class="mini-bar" style="--height: 34%; --intensity: 28%"></span>
+									<span class="mini-bar" style="--height: 42%; --intensity: 34%"></span>
+									<span class="mini-bar" style="--height: 22%; --intensity: 22%"></span>
+									<span class="mini-bar" style="--height: 58%; --intensity: 46%"></span>
+									<span class="mini-bar" style="--height: 63%; --intensity: 52%"></span>
+									<span class="mini-bar" style="--height: 28%; --intensity: 24%"></span>
+									<span class="mini-bar" style="--height: 18%; --intensity: 18%"></span>
+									<span class="mini-bar" style="--height: 72%; --intensity: 60%"></span>
+									<span class="mini-bar" style="--height: 88%; --intensity: 72%"></span>
+									<span class="mini-bar" style="--height: 46%; --intensity: 38%"></span>
+									<span class="mini-bar" style="--height: 35%; --intensity: 30%"></span>
+									<span class="mini-bar" style="--height: 66%; --intensity: 54%"></span>
+									<span class="mini-bar" style="--height: 40%; --intensity: 34%"></span>
+									<span class="mini-bar" style="--height: 25%; --intensity: 22%"></span>
+								</div>
+							</div>
+							<div>
+								<div class="basin-title">Top tool usage</div>
+								<div class="tool-rows">
+									<div class="tool-row"><span>Bash</span><div class="track" style="--progress: 82%"><span></span></div><span class="row-meta">428</span></div>
+									<div class="tool-row"><span>Read</span><div class="track" style="--progress: 67%"><span></span></div><span class="row-meta">351</span></div>
+									<div class="tool-row"><span>Edit</span><div class="track" style="--progress: 43%"><span></span></div><span class="row-meta">227</span></div>
+									<div class="tool-row"><span>Search</span><div class="track" style="--progress: 31%"><span></span></div><span class="row-meta">164</span></div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="basin-panel">
@@ -650,5 +812,14 @@
 				</section>
 			</main>
 		</div>
+		<script>
+			const theme = new URLSearchParams(window.location.search).get('theme');
+			if (theme === 'light') {
+				const root = document.getElementById('overview-root');
+				root.classList.remove('theme-dark');
+				root.classList.add('theme-light');
+				root.dataset.theme = 'light';
+			}
+		</script>
 	</body>
 </html>

@@ -24,6 +24,7 @@ The Overview page is Grovekeeper's startup surface: a multi-workspace launcher s
 - Page title: Grovekeeper
 - Subtitle: Your workspaces
 - Top-right controls: theme, settings, archive, GitHub connection
+- Mockup theme preview links: `?theme=dark` and `?theme=light`
 - Workspace card grid with at least these states:
   - Healthy/default
   - Dormant
@@ -36,6 +37,9 @@ The Overview page is Grovekeeper's startup surface: a multi-workspace launcher s
   - Archived
   - Empty/new workspace
   - Add workspace card
+- Bottom summary area:
+  - Cost and usage summary sourced from the existing Usage page metrics
+  - Recent activity list
 
 ## Required Workspace Card Data
 
@@ -60,12 +64,22 @@ The Overview page is Grovekeeper's startup surface: a multi-workspace launcher s
 - Do not use decorative orbs/blobs.
 - Use the Grovekeeper forest/tooling identity: moss, bark, amber, repo/worktree/session language.
 - Use the issue-card radial/gradient inspiration with restraint: the gradient provides identity, while stat cells remain plain and legible.
+- Bottom summary must reuse Usage page concepts instead of creating a separate "workspace forest health" concept:
+  - Total cost with delta
+  - Session count
+  - One-shot rate
+  - Cache hit ratio / savings
+  - Cost trend
+  - Tool usage
+  - Recent activity
 
 ## Variant Direction
 
 ### Variant C - Radial Understory
 
 Inspired by issue-card v2 variant C: color blooms from the lower-left / workspace mark area. Cards use radial emanation, inner glow, and richer depth while keeping stats plain and legible.
+
+The bottom section combines compact Usage page metrics with recent activity so wide Overview layouts do not feel empty. It is an overview glance surface, not a replacement for `/usage`; values should link or navigate to `/usage` when implemented.
 
 ## Output
 
