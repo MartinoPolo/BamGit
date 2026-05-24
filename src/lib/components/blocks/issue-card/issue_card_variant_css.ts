@@ -17,6 +17,7 @@ interface VariantStylesInput {
 	readonly issueColor: string;
 	readonly state: IssueCardState;
 	readonly isHovered: boolean;
+	readonly isDone: boolean;
 	readonly sessionOverlay: SessionOverlay;
 	readonly labels: ReadonlyArray<{ readonly name: string; readonly color: string }>;
 }
@@ -129,6 +130,7 @@ function applyStateOverrides(
 	state: IssueCardState,
 	isHovered: boolean,
 	issueColor: string,
+	isDone: boolean = false,
 ): VariantSlotStyles {
 	const card: Record<string, string> = { ...base.card };
 	let header: Readonly<Record<string, string>> = base.header;
@@ -143,8 +145,21 @@ function applyStateOverrides(
 			}
 			break;
 
+		case 'done':
+			card.background = 'transparent';
+			card['border-color'] = 'transparent';
+			card['box-shadow'] = 'none';
+			break;
+
 		case 'hovered':
-			header = applyHoverGlow(card, base.header, issueColor);
+			if (isDone) {
+				card.background = 'var(--surface)';
+				card['border-color'] = 'var(--border)';
+				card['box-shadow'] = 'var(--shadow-sm)';
+				card.transform = 'translateY(-2px)';
+			} else {
+				header = applyHoverGlow(card, base.header, issueColor);
+			}
 			break;
 
 		case 'selectionHover':
@@ -341,6 +356,6 @@ export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlot
 		preview: base.preview,
 	};
 
-	const afterState = applyStateOverrides(base, state, isHovered, issueColor);
+	const afterState = applyStateOverrides(base, state, isHovered, issueColor, input.isDone);
 	return applySessionOverlay(afterState, sessionOverlay);
 }

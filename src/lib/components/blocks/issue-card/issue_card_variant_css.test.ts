@@ -30,6 +30,7 @@ function computeForVariant(
 		issueColor?: string;
 		state?: IssueCardState;
 		isHovered?: boolean;
+		isDone?: boolean;
 		sessionOverlay?: SessionOverlay;
 		labels?: ReadonlyArray<{ name: string; color: string }>;
 	} = {},
@@ -40,6 +41,7 @@ function computeForVariant(
 		issueColor: options.issueColor ?? '#ff5500',
 		state: options.state ?? 'interactive',
 		isHovered: options.isHovered ?? false,
+		isDone: options.isDone ?? false,
 		sessionOverlay: options.sessionOverlay ?? null,
 		labels: options.labels ?? [],
 	});
@@ -51,6 +53,7 @@ function computeHovered(
 	options: {
 		issueColor?: string;
 		state?: IssueCardState;
+		isDone?: boolean;
 		sessionOverlay?: SessionOverlay;
 		labels?: ReadonlyArray<{ name: string; color: string }>;
 	} = {},
@@ -61,6 +64,7 @@ function computeHovered(
 		issueColor: options.issueColor ?? '#ff5500',
 		state: options.state ?? 'hovered',
 		isHovered: true,
+		isDone: options.isDone ?? false,
 		sessionOverlay: options.sessionOverlay ?? null,
 		labels: options.labels ?? [],
 	});
@@ -178,6 +182,7 @@ describe('computeVariantSlotStyles', () => {
 				settings: makeSettings(),
 				issueColor: '#ff5500',
 				state: 'hovered',
+				isDone: false,
 				isHovered: true,
 				sessionOverlay: null,
 				labels: [],
@@ -196,6 +201,50 @@ describe('computeVariantSlotStyles', () => {
 			const result = computeForVariant('refined-horizon', {}, { state: 'selected' });
 			expect(result.card.outline).toContain('var(--primary)');
 			expect(result.card['box-shadow']).toContain('var(--primary)');
+		});
+
+		it('done state sets transparent bg, transparent border, no shadow', () => {
+			const result = computeForVariant('refined-horizon', {}, { state: 'done' });
+			expect(result.card.background).toBe('transparent');
+			expect(result.card['border-color']).toBe('transparent');
+			expect(result.card['box-shadow']).toBe('none');
+		});
+
+		it('done state does NOT set opacity (full opacity)', () => {
+			const result = computeForVariant('refined-horizon', {}, { state: 'done' });
+			expect(result.card.opacity).toBeUndefined();
+		});
+
+		it('hovered state with isDone uses neutral bg/border instead of issue-color glow', () => {
+			const result = computeVariantSlotStyles({
+				variant: 'refined-horizon',
+				settings: makeSettings(),
+				issueColor: '#ff5500',
+				state: 'hovered',
+				isHovered: true,
+				isDone: true,
+				sessionOverlay: null,
+				labels: [],
+			});
+			expect(result.card.background).toBe('var(--surface)');
+			expect(result.card['border-color']).toBe('var(--border)');
+			expect(result.card['box-shadow']).toBe('var(--shadow-sm)');
+			expect(result.card.transform).toBe('translateY(-2px)');
+		});
+
+		it('hovered state without isDone uses issue-color glow as before', () => {
+			const result = computeVariantSlotStyles({
+				variant: 'refined-horizon',
+				settings: makeSettings(),
+				issueColor: '#ff5500',
+				state: 'hovered',
+				isHovered: true,
+				isDone: false,
+				sessionOverlay: null,
+				labels: [],
+			});
+			expect(result.card['box-shadow']).toContain('#ff5500');
+			expect(result.card.transform).toBe('translateY(-3px)');
 		});
 	});
 
