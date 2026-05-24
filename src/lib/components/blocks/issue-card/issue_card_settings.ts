@@ -46,6 +46,26 @@ export type PriorityPositionOption = (typeof PRIORITY_POSITION_OPTIONS)[number];
 export const BADGE_STYLE_OPTIONS = ['solid', 'subtle', 'outlined'] as const;
 export type BadgeStyleOption = (typeof BADGE_STYLE_OPTIONS)[number];
 
+// ── Preview position helpers ─────────────────────────────────────────
+
+export function isPreviewPosition(position: PriorityPositionOption): position is PreviewPosition {
+	return position !== 'header-right';
+}
+
+export const PREVIEW_POSITION_CLASSES = {
+	'preview-tl': 'absolute top-1 left-1',
+	'preview-tr': 'absolute top-1 right-1',
+	'preview-bl': 'absolute bottom-1 left-1',
+	'preview-br': 'absolute bottom-1 right-1',
+	'preview-top-half': 'absolute top-1 left-1/2 -translate-x-1/2',
+	'preview-bottom-half': 'absolute bottom-1 left-1/2 -translate-x-1/2',
+	'preview-top-inside': 'absolute top-2 left-1/2 -translate-x-1/2',
+	'preview-bottom-inside': 'absolute bottom-2 left-1/2 -translate-x-1/2',
+} as const satisfies Record<Exclude<PriorityPositionOption, 'header-right'>, string>;
+
+// fallow-ignore-next-line unused-type
+export type PreviewPosition = Exclude<PriorityPositionOption, 'header-right'>;
+
 // ── Defaults (derived from SETTING_DEFAULTS — single source of truth) ───
 
 import { SETTING_DEFAULTS } from '$lib/modules/settings/types.js';

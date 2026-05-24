@@ -10,6 +10,8 @@ import {
 	BUTTON_COLOR_OPTIONS,
 	PRIORITY_POSITION_OPTIONS,
 	BADGE_STYLE_OPTIONS,
+	isPreviewPosition,
+	PREVIEW_POSITION_CLASSES,
 	type IssueCardVariant,
 	type IssueCardAppearanceSettings,
 } from './issue_card_settings.js';
@@ -216,6 +218,52 @@ describe('issue_card_settings', () => {
 	describe('BADGE_STYLE_OPTIONS', () => {
 		it('contains solid, subtle, outlined', () => {
 			expect(BADGE_STYLE_OPTIONS).toEqual(['solid', 'subtle', 'outlined']);
+		});
+	});
+
+	describe('isPreviewPosition', () => {
+		it('returns false for header-right', () => {
+			expect(isPreviewPosition('header-right')).toBe(false);
+		});
+
+		it('returns true for each of the 8 preview positions', () => {
+			const previewPositions = [
+				'preview-bottom-half',
+				'preview-top-half',
+				'preview-bottom-inside',
+				'preview-top-inside',
+				'preview-tl',
+				'preview-tr',
+				'preview-bl',
+				'preview-br',
+			] as const;
+
+			for (const position of previewPositions) {
+				expect(isPreviewPosition(position)).toBe(true);
+			}
+		});
+	});
+
+	describe('PREVIEW_POSITION_CLASSES', () => {
+		it('has entries for all 8 preview positions and no header-right entry', () => {
+			const keys = Object.keys(PREVIEW_POSITION_CLASSES);
+			expect(keys).toHaveLength(8);
+			expect(keys).not.toContain('header-right');
+			expect(keys).toContain('preview-bottom-half');
+			expect(keys).toContain('preview-top-half');
+			expect(keys).toContain('preview-bottom-inside');
+			expect(keys).toContain('preview-top-inside');
+			expect(keys).toContain('preview-tl');
+			expect(keys).toContain('preview-tr');
+			expect(keys).toContain('preview-bl');
+			expect(keys).toContain('preview-br');
+		});
+
+		it('each entry is a non-empty string containing absolute', () => {
+			for (const classes of Object.values(PREVIEW_POSITION_CLASSES)) {
+				expect(classes).toBeTruthy();
+				expect(classes).toContain('absolute');
+			}
 		});
 	});
 });
