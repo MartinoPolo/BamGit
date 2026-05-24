@@ -201,6 +201,9 @@ export function createIssueCardContext(getProps: () => IssueCardContextProps) {
 		get isDone(): boolean {
 			return isDone;
 		},
+		get hasContextualActions(): boolean {
+			return !this.isArchived && !this.isGhost && getProps().onExecuteAction !== undefined;
+		},
 		get hasWorktree(): boolean {
 			const worktreeState = getProps().issue.worktree_state;
 			return worktreeState === 'active' || worktreeState === 'pending';

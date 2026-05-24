@@ -45,12 +45,14 @@
 	<div class="flex shrink-0 items-center gap-1">
 		{#if ctx.worktreeBadge && ctx.issue.worktree_state !== 'active'}
 			<Badge tone={ctx.worktreeBadge.tone} size="compact">
-				{#if ctx.issue.worktree_state === 'pending'}
-					<span
-						class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
-					></span>
-				{/if}
-				{ctx.worktreeBadge.label}
+				<span class="inline-flex items-center gap-1">
+					{#if ctx.issue.worktree_state === 'pending'}
+						<span
+							class="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent"
+						></span>
+					{/if}
+					{ctx.worktreeBadge.label}
+				</span>
 			</Badge>
 		{/if}
 		{#if ctx.cache?.behind_base_count != null}

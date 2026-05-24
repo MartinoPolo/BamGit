@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ScrollTextIcon from '@lucide/svelte/icons/scroll-text';
 	import { useIssueCard } from './index.js';
 	import { setHoveredPrdNumber } from './prd_hover_store.svelte.js';
 	import IssueCardHeaderActions from './IssueCardHeaderActions.svelte';
@@ -30,28 +31,35 @@
 	style="{ctx.headerStyleString}; color: var(--ic-header-text, {ctx.headerTextColor});"
 >
 	<div
-		class="flex min-w-0 flex-1 items-baseline gap-1.5"
+		class="flex min-w-0 flex-1 items-center gap-1.5"
 		style="filter: brightness(var(--header-brightness, 1)) saturate(var(--header-saturate, 1)); transition: filter var(--duration-3) ease;"
 	>
-		<span class="shrink-0 font-mono text-[11px] font-semibold opacity-72">
+		<span
+			class="inline-flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-semibold opacity-72"
+		>
 			{#if hasPrdLabel && ctx.prdParent?.url}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->
 				<a
 					href={ctx.prdParent.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="hover:underline hover:opacity-100"
+					class="inline-flex items-center gap-0.5 hover:underline hover:opacity-100"
 					style="color: inherit;"
 					onclick={(event) => event.stopPropagation()}
 					onmouseenter={handlePrdMouseEnter}
-					onmouseleave={handlePrdMouseLeave}>{ctx.prdParent.number}</a
+					onmouseleave={handlePrdMouseLeave}
+					><ScrollTextIcon class="size-3" />{ctx.prdParent.number}</a
 				>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				<span class="opacity-50">/</span>
 			{:else if hasPrdLabel && ctx.prdParent}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<span onmouseenter={handlePrdMouseEnter} onmouseleave={handlePrdMouseLeave}>
-					{ctx.prdParent.number}
+				<span
+					class="inline-flex items-center gap-0.5"
+					onmouseenter={handlePrdMouseEnter}
+					onmouseleave={handlePrdMouseLeave}
+				>
+					<ScrollTextIcon class="size-3" />{ctx.prdParent.number}
 				</span>
 				<span class="opacity-50">/</span>
 			{/if}
