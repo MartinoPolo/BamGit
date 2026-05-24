@@ -16,7 +16,8 @@
 		onKillProcess,
 	}: ServerPortBadgeProps = $props();
 
-	function handleClick() {
+	function handleClick(event: MouseEvent) {
+		event.stopPropagation();
 		if (onclick !== undefined) {
 			onclick();
 		} else {
@@ -44,7 +45,7 @@
 {#snippet badgeButton()}
 	<button
 		type="button"
-		class="cursor-pointer select-none hover:brightness-125"
+		class="inline-flex items-center cursor-pointer select-none hover:brightness-125"
 		onclick={handleClick}
 		aria-label="Open port {port}"
 	>
@@ -56,9 +57,9 @@
 
 {#if processId}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div oncontextmenu={(event) => event.stopPropagation()}>
+	<div class="flex" oncontextmenu={(event) => event.stopPropagation()}>
 		<ContextMenu.Root>
-			<ContextMenu.Trigger>
+			<ContextMenu.Trigger class="flex">
 				{@render badgeButton()}
 			</ContextMenu.Trigger>
 

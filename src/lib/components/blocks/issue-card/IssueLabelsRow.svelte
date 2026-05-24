@@ -16,7 +16,7 @@
 </script>
 
 {#if ctx.issue.labels.length > 0}
-	<div class="flex flex-wrap items-center gap-1">
+	<div class="flex flex-wrap items-center gap-1" class:pr-68={ctx.hasContextualActions}>
 		{#each visibleLabels as label (label.name)}
 			<Badge
 				size="compact"

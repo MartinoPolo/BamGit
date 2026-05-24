@@ -58,7 +58,7 @@
 </script>
 
 {#if commandResults.length > 0 || serverPort !== null}
-	<div class="flex min-h-5 flex-wrap items-center gap-1">
+	<div class="flex min-h-5 flex-wrap items-center gap-1" class:pr-68={ctx.hasContextualActions}>
 		{#each visibleResults as result (result.commandName)}
 			<CommandResultBadge
 				state={result.state}
