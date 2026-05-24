@@ -19,6 +19,7 @@
 	import PrdOverview from '$lib/components/blocks/issue/PrdOverview.svelte';
 	import DependencyGraphView from '$lib/components/blocks/dependency-graph/DependencyGraphView.svelte';
 	import IssueCardGrid from '$lib/components/blocks/issue-card/IssueCardGrid.svelte';
+	import DevComparisonToggle from '$lib/components/blocks/issue-card/DevComparisonToggle.svelte';
 	import IssueDetail from '$lib/components/blocks/issue/IssueDetail.svelte';
 	import GhSetupBanner from '$lib/components/blocks/github/GhSetupBanner.svelte';
 	import AssignedIssuesPanel from '$lib/components/blocks/issue/AssignedIssuesPanel.svelte';
@@ -185,6 +186,8 @@
 				{#if authStatus && authStatus.status === 'not-connected'}
 					<GhSetupBanner {authStatus} {onconnect} />
 				{/if}
+
+				<DevComparisonToggle />
 
 				<IssueCardGrid
 					{parentIssues}
