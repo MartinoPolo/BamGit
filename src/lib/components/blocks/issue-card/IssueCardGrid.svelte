@@ -270,7 +270,7 @@
 						prdParent={getPrdParent(issue)}
 						{prioritiesEnabled}
 						visualization={getVisualization?.(issue.id)}
-						appearanceSettings={issueCardSettingsCtx.settings}
+						appearanceSettings={issueCardSettingsCtx.comparisonSettings}
 						{onExecuteAction}
 					/>
 				</IssueCardContextMenu>
@@ -309,7 +309,7 @@
 								{ghAvailable}
 								prdParent={getPrdParent(issue)}
 								visualization={getVisualization?.(issue.id)}
-								appearanceSettings={issueCardSettingsCtx.settings}
+								appearanceSettings={issueCardSettingsCtx.comparisonSettings}
 							/>
 						</IssueCardContextMenu>
 					</div>
