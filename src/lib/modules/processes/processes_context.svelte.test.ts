@@ -42,9 +42,9 @@ describe('processes context (factory)', () => {
 		mockListen.mockReset().mockResolvedValue(() => {});
 	});
 
-	async function createCtx() {
+	async function createCtx(onProcessRestarted?: (issueId: string) => void) {
 		const { createProcessesContext } = await import('./processes.context.svelte.js');
-		return createProcessesContext();
+		return createProcessesContext(onProcessRestarted);
 	}
 
 	it('loadProcesses calls get_running_processes and populates state', async () => {
@@ -195,6 +195,42 @@ describe('processes context (factory)', () => {
 		// Should not throw
 		handleProcessRestarted(['unknown-proc', 1, 3]);
 		expect(publicApi.processes).toHaveLength(0);
+	});
+
+	it('handleProcessRestarted calls onProcessRestarted callback with issue_id', async () => {
+		const callback = vi.fn();
+		const { publicApi, handleProcessRestarted } = await createCtx(callback);
+
+		mockInvoke.mockResolvedValue(MOCK_PROCESS);
+		await publicApi.runCommand('cmd-1', 'issue-1');
+
+		handleProcessRestarted(['proc-1', 1, 3]);
+
+		expect(callback).toHaveBeenCalledOnce();
+		expect(callback).toHaveBeenCalledWith('issue-1');
+	});
+
+	it('handleProcessRestarted does NOT call callback for unknown process', async () => {
+		const callback = vi.fn();
+		const { handleProcessRestarted } = await createCtx(callback);
+
+		handleProcessRestarted(['unknown-proc', 1, 3]);
+
+		expect(callback).not.toHaveBeenCalled();
+	});
+
+	it('createProcessesContext works without callback (backwards compat)', async () => {
+		const { publicApi, handleProcessRestarted } = await createCtx();
+
+		mockInvoke.mockResolvedValue(MOCK_PROCESS);
+		await publicApi.runCommand('cmd-1', 'issue-1');
+
+		// Should not throw even without callback
+		handleProcessRestarted(['proc-1', 1, 3]);
+
+		const process = publicApi.processes.find((p) => p.process_id === 'proc-1');
+		expect(process?.restart_count).toBe(1);
+		expect(process?.status).toBe('running');
 	});
 
 	it('getFullProcessLogs invokes with correct args', async () => {

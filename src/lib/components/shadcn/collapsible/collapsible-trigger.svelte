@@ -12,6 +12,6 @@
 <CollapsiblePrimitive.Trigger
 	bind:ref
 	data-slot="collapsible-trigger"
-	class={cn(className)}
+	class={cn('cursor-pointer', className)}
 	{...restProps}
 />

@@ -1433,6 +1433,8 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		sort_order: 0,
 		mode: 'headless',
 		restart_policy: 'never',
+		max_restart_count: 3,
+		backoff_base_delay_ms: 1000,
 		timeout_seconds: null,
 	},
 	{
@@ -1446,6 +1448,8 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		sort_order: 1,
 		mode: 'headless',
 		restart_policy: 'on_failure',
+		max_restart_count: 3,
+		backoff_base_delay_ms: 1000,
 		timeout_seconds: null,
 	},
 	{
@@ -1459,6 +1463,8 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		sort_order: 0,
 		mode: 'headless',
 		restart_policy: 'never',
+		max_restart_count: 3,
+		backoff_base_delay_ms: 1000,
 		timeout_seconds: 60,
 	},
 	{
@@ -1472,6 +1478,8 @@ export const MOCK_WORKSPACE_COMMANDS: WorkspaceCommand[] = [
 		sort_order: 1,
 		mode: 'terminal',
 		restart_policy: 'never',
+		max_restart_count: 3,
+		backoff_base_delay_ms: 1000,
 		timeout_seconds: null,
 	},
 ];

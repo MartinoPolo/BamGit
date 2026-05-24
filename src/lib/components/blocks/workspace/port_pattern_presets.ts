@@ -32,3 +32,21 @@ export const PORT_PATTERN_PRESETS = [
 ] as const;
 
 export type PortPatternPreset = (typeof PORT_PATTERN_PRESETS)[number];
+
+export function extractPort(line: string, pattern: string): number | null {
+	const regex = new RegExp(pattern);
+	const match = regex.exec(line);
+	if (match === null || match[1] === undefined) {
+		return null;
+	}
+	return parseInt(match[1], 10);
+}
+
+export function validateRegex(pattern: string): string | null {
+	try {
+		new RegExp(pattern);
+		return null;
+	} catch (error) {
+		return error instanceof SyntaxError ? error.message : 'Invalid regex';
+	}
+}

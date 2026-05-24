@@ -104,6 +104,8 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 		sort_order: (request as Record<string, unknown>).sort_order ?? 0,
 		mode: (request as Record<string, unknown>).mode ?? 'headless',
 		restart_policy: (request as Record<string, unknown>).restart_policy ?? 'never',
+		max_restart_count: (request as Record<string, unknown>).max_restart_count ?? 3,
+		backoff_base_delay_ms: (request as Record<string, unknown>).backoff_base_delay_ms ?? 1000,
 		timeout_seconds: (request as Record<string, unknown>).timeout_seconds ?? null,
 	}),
 	update_workspace_command: ({ request }) => request,

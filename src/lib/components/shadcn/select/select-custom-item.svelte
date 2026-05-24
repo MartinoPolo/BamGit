@@ -19,7 +19,7 @@
 	{label}
 	data-slot="select-item"
 	class={cn(
-		'flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-(length:--text-md) text-foreground outline-none transition-colors',
+		'flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-(length:--text-md) text-foreground outline-none transition-colors',
 		'data-highlighted:bg-surface-2',
 		'data-[selected=]:bg-primary-soft',
 		'data-disabled:pointer-events-none data-disabled:opacity-50',

@@ -12,7 +12,7 @@
 <RangeCalendarPrimitive.Day
 	bind:ref
 	class={cn(
-		'flex size-(--cell-size) flex-col items-center justify-center gap-1 rounded-(--cell-radius) p-0 leading-none font-normal whitespace-nowrap select-none',
+		'flex size-(--cell-size) flex-col items-center justify-center gap-1 rounded-(--cell-radius) p-0 leading-none font-normal whitespace-nowrap select-none cursor-pointer',
 		'[&:not([data-selected]):not([data-highlighted])]:hover:bg-accent/15',
 		// Today (not selected) — light accent tint ensures contrast on all accent colors
 		'[&[data-today]:not([data-selected])]:bg-accent/25 [&[data-today]:not([data-selected])]:hover:bg-accent/50',

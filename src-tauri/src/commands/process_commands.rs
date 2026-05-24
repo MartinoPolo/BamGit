@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use crate::database::connection::DatabaseState;
 use crate::models::workspace_command::{CommandCategory, CommandMode, RestartPolicy};
-use crate::process::lifecycle::{backoff_delay, resolve_timeout, should_restart, MAX_RESTARTS};
+use crate::process::lifecycle::{backoff_delay, resolve_timeout, should_restart};
 use crate::process::manager::{ProcessManager, ProcessStatus, RunningProcess};
 
 fn spawn_shell_command(
@@ -51,6 +51,8 @@ pub async fn run_workspace_command(
         working_directory,
         mode,
         restart_policy,
+        max_restart_count,
+        backoff_base_delay_ms,
         timeout_seconds,
     ) = {
         let connection = state.read()?;
@@ -58,7 +60,8 @@ pub async fn run_workspace_command(
         connection
             .query_row(
                 "SELECT wc.command, wc.name, wc.category, wc.port_pattern, wc.expected_exit_code, \
-                 COALESCE(i.worktree_folder, d.local_folder), wc.mode, wc.restart_policy, wc.timeout_seconds \
+                 COALESCE(i.worktree_folder, d.local_folder), wc.mode, wc.restart_policy, \
+                 wc.max_restart_count, wc.backoff_base_delay_ms, wc.timeout_seconds \
                  FROM workspace_commands wc \
                  JOIN issues i ON i.id = ?2 \
                  JOIN dashboards d ON i.dashboard_id = d.id \
@@ -74,7 +77,9 @@ pub async fn run_workspace_command(
                         row.get::<_, Option<String>>(5)?,
                         row.get::<_, String>(6)?,
                         row.get::<_, String>(7)?,
-                        row.get::<_, Option<i64>>(8)?,
+                        row.get::<_, i64>(8)?,
+                        row.get::<_, i64>(9)?,
+                        row.get::<_, Option<i64>>(10)?,
                     ))
                 },
             )
@@ -124,6 +129,8 @@ pub async fn run_workspace_command(
     let task_command_str = command_str;
     let task_working_dir = working_dir;
     let task_restart_policy = restart_policy;
+    let task_max_restart_count = max_restart_count as u32;
+    let task_backoff_base_delay_ms = backoff_base_delay_ms as u64;
     // Compile once — avoids per-line recompilation
     let compiled_port_regex = port_pattern.as_deref().and_then(|p| Regex::new(p).ok());
 
@@ -234,15 +241,16 @@ pub async fn run_workspace_command(
                 exit_code,
                 is_timeout,
                 restart_count,
+                task_max_restart_count,
             ) {
                 restart_count += 1;
                 task_pm.set_restart_count(&task_process_id, restart_count);
                 task_pm.set_status(&task_process_id, ProcessStatus::Running);
                 let _ = task_app.emit(
                     "process-restarted",
-                    (&task_process_id, restart_count, MAX_RESTARTS),
+                    (&task_process_id, restart_count, task_max_restart_count),
                 );
-                tokio::time::sleep(backoff_delay(restart_count - 1)).await;
+                tokio::time::sleep(backoff_delay(restart_count - 1, task_backoff_base_delay_ms)).await;
                 continue;
             }
 
@@ -261,6 +269,7 @@ pub async fn run_workspace_command(
             name,
             0, // PID is set inside the task once child spawns
             join_handle.abort_handle(),
+            task_max_restart_count,
         )
         .map_err(|err| format!("Failed to create process log file: {err}"))?;
 
