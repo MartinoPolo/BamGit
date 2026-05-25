@@ -12,6 +12,7 @@
 	import OverviewHeader from '$lib/components/blocks/overview/OverviewHeader.svelte';
 	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
 	import OverviewWorkspaceGrid from '$lib/components/blocks/overview/OverviewWorkspaceGrid.svelte';
+	import WorkspaceDeleteDialog from '$lib/components/blocks/workspace/WorkspaceDeleteDialog.svelte';
 	import {
 		calculateOverviewWorkspaceTotals,
 		deriveRecentWorkspaceActivities,
@@ -70,6 +71,41 @@
 			: 0,
 	);
 
+	let deleteTarget = $state<{ id: string; name: string } | null>(null);
+
+	async function handleArchiveWorkspace(workspace: OverviewWorkspaceData) {
+		try {
+			await boardStore.archiveDashboard(workspace.dashboard_id);
+		} catch (err) {
+			console.error('Failed to archive workspace:', err);
+		}
+	}
+
+	async function handleUnarchiveWorkspace(workspace: OverviewWorkspaceData) {
+		try {
+			await boardStore.unarchiveDashboard(workspace.dashboard_id);
+		} catch (err) {
+			console.error('Failed to unarchive workspace:', err);
+		}
+	}
+
+	function handleDeleteWorkspace(workspace: OverviewWorkspaceData) {
+		deleteTarget = { id: workspace.dashboard_id, name: workspace.name };
+	}
+
+	async function handleConfirmDeleteWorkspace() {
+		if (deleteTarget === null) {
+			return;
+		}
+		try {
+			await boardStore.deleteDashboard(deleteTarget.id, deleteTarget.name);
+		} catch (err) {
+			console.error('Failed to delete workspace:', err);
+		} finally {
+			deleteTarget = null;
+		}
+	}
+
 	async function handleOpenWorkspace(dashboardId: string) {
 		try {
 			await openWorkspaceWindow(dashboardId);
@@ -127,6 +163,16 @@
 				onGithubClick={handleGithubClick}
 				onFolderClick={handleFolderClick}
 				onConfigureWorkspace={handleConfigWizard}
+				onArchive={handleArchiveWorkspace}
+				onUnarchive={handleUnarchiveWorkspace}
+				onDelete={handleDeleteWorkspace}
+			/>
+
+			<WorkspaceDeleteDialog
+				open={deleteTarget !== null}
+				workspaceName={deleteTarget?.name ?? ''}
+				onconfirm={handleConfirmDeleteWorkspace}
+				onclose={() => (deleteTarget = null)}
 			/>
 
 			<OverviewSummaryBasin

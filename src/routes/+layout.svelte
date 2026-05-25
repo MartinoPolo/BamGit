@@ -172,7 +172,7 @@
 		}
 	}
 
-	async function handleDeleteDashboard(id: string) {
+	async function handleArchiveDashboard(id: string) {
 		try {
 			await boardStore.archiveDashboard(id);
 		} catch (err) {
@@ -245,7 +245,7 @@
 	dashboard={editingDashboard}
 	onClose={() => (editingDashboard = null)}
 	onUpdate={handleUpdateDashboard}
-	onDelete={handleDeleteDashboard}
+	onArchive={handleArchiveDashboard}
 />
 
 <CommandPalette />

@@ -264,6 +264,16 @@
 	"btn_create": "Create",
 	"btn_delete": "Delete",
 	"btn_confirm_delete": "Confirm Delete",
+	"btn_archive": "Archive",
+	"btn_confirm_archive": "Confirm Archive",
+	"btn_unarchive": "Restore",
+	"workspace_archive_confirm_title": "Archive Workspace",
+	"workspace_archive_confirm_body": "This workspace will be hidden from the sidebar. You can restore it later.",
+	"workspace_delete_confirm_title": "Delete Workspace",
+	"workspace_delete_confirm_body": "This action is permanent. All workspace data including issues, sessions, and settings will be deleted.",
+	"workspace_delete_name_placeholder": "Type workspace name to confirm",
+	"workspace_delete_name_mismatch": "Name does not match",
+	"workspace_status_archived": "Archived",
 
 	"settings_title": "Settings",
 
