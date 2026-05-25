@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { openPath } from '$lib/opener.js';
-	import { useBoard } from '$lib/modules/board';
+	import { useBoard, type UpdateDashboardRequest } from '$lib/modules/board';
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
 	import { USAGE_SCOPES } from '$lib/modules/usage/usage_types.js';
 	import { useVersionControl } from '$lib/modules/version-control';
@@ -12,6 +12,7 @@
 	import OverviewHeader from '$lib/components/blocks/overview/OverviewHeader.svelte';
 	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
 	import OverviewWorkspaceGrid from '$lib/components/blocks/overview/OverviewWorkspaceGrid.svelte';
+	import DashboardEditDialog from '$lib/components/blocks/workspace/DashboardEditDialog.svelte';
 	import WorkspaceDeleteDialog from '$lib/components/blocks/workspace/WorkspaceDeleteDialog.svelte';
 	import {
 		calculateOverviewWorkspaceTotals,
@@ -20,7 +21,7 @@
 		getMaximumToolCallCount,
 	} from '$lib/modules/overview/overview_summary.js';
 	import { formatWorkspaceActivityRelativeTime } from '$lib/modules/overview/overview_time.js';
-	import type { OverviewWorkspaceData } from '$lib/types/generated';
+	import type { Dashboard, OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
 	const versionControl = useVersionControl();
@@ -72,6 +73,7 @@
 	);
 
 	let deleteTarget = $state<{ id: string; name: string } | null>(null);
+	let editingDashboard = $state<Dashboard | null>(null);
 
 	async function handleArchiveWorkspace(workspace: OverviewWorkspaceData) {
 		try {
@@ -89,6 +91,14 @@
 		}
 	}
 
+	async function handleArchiveById(dashboardId: string) {
+		try {
+			await boardStore.archiveDashboard(dashboardId);
+		} catch (err) {
+			console.error('Failed to archive dashboard:', err);
+		}
+	}
+
 	function handleDeleteWorkspace(workspace: OverviewWorkspaceData) {
 		deleteTarget = { id: workspace.dashboard_id, name: workspace.name };
 	}
@@ -103,6 +113,27 @@
 			console.error('Failed to delete workspace:', err);
 		} finally {
 			deleteTarget = null;
+		}
+	}
+
+	function handleEditWorkspace(workspace: OverviewWorkspaceData) {
+		const dashboard = boardStore.dashboards.find((d) => d.id === workspace.dashboard_id);
+		if (dashboard) {
+			editingDashboard = dashboard;
+		}
+	}
+
+	function handleOpenSettings(workspace: OverviewWorkspaceData) {
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- URL built with resolve() + dynamic search params
+		void goto(`${resolve('/settings/workspace')}?scope=ws&id=${workspace.dashboard_id}`);
+	}
+
+	async function handleUpdateDashboard(request: UpdateDashboardRequest) {
+		try {
+			await boardStore.updateDashboard(request);
+			await boardStore.refreshDashboards();
+		} catch (err) {
+			console.error('Failed to update dashboard:', err);
 		}
 	}
 
@@ -163,6 +194,8 @@
 				onGithubClick={handleGithubClick}
 				onFolderClick={handleFolderClick}
 				onConfigureWorkspace={handleConfigWizard}
+				onEdit={handleEditWorkspace}
+				onSettings={handleOpenSettings}
 				onArchive={handleArchiveWorkspace}
 				onUnarchive={handleUnarchiveWorkspace}
 				onDelete={handleDeleteWorkspace}
@@ -173,6 +206,13 @@
 				workspaceName={deleteTarget?.name ?? ''}
 				onconfirm={handleConfirmDeleteWorkspace}
 				onclose={() => (deleteTarget = null)}
+			/>
+
+			<DashboardEditDialog
+				dashboard={editingDashboard}
+				onClose={() => (editingDashboard = null)}
+				onUpdate={handleUpdateDashboard}
+				onArchive={handleArchiveById}
 			/>
 
 			<OverviewSummaryBasin

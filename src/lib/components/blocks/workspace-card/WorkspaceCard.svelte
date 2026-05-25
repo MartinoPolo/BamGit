@@ -1,19 +1,14 @@
 ﻿<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import * as Card from '$lib/components/shadcn/card/index.js';
-	import * as DropdownMenu from '$lib/components/shadcn/dropdown-menu/index.js';
 	import { Badge } from '$lib/components/shadcn/badge/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { StatCell } from '$lib/components/base/stat-cell/index.js';
 	import { StatusRow } from '$lib/components/base/status-row/index.js';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
-	import ArchiveIcon from '@lucide/svelte/icons/archive';
-	import ArchiveRestoreIcon from '@lucide/svelte/icons/archive-restore';
-	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import ListChecksIcon from '@lucide/svelte/icons/list-checks';
 	import GitPullRequestIcon from '@lucide/svelte/icons/git-pull-request';
-	import Trash2Icon from '@lucide/svelte/icons/trash-2';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
@@ -44,9 +39,6 @@
 		onHitlClick?: () => void;
 		onPrdClick?: () => void;
 		onAfkClick?: () => void;
-		onArchive?: () => void;
-		onUnarchive?: () => void;
-		onDelete?: () => void;
 	}
 
 	let {
@@ -62,9 +54,6 @@
 		onHitlClick,
 		onPrdClick,
 		onAfkClick,
-		onArchive,
-		onUnarchive,
-		onDelete,
 	}: Props = $props();
 
 	const originalAccent = $derived(workspace.accent_color ?? 'oklch(0.580 0.096 134)');
@@ -243,48 +232,6 @@
 					>
 						<FolderIcon strokeWidth={1.7} data-icon="inline-end" />
 					</Button>
-					<DropdownMenu.Root>
-						<DropdownMenu.Trigger>
-							{#snippet child({ props })}
-								<Button
-									{...props}
-									intent="ghost"
-									size="icon"
-									class="size-6.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-									aria-label="Workspace actions"
-									onclick={(event: MouseEvent) => event.stopPropagation()}
-								>
-									<EllipsisVerticalIcon
-										strokeWidth={1.7}
-										data-icon="inline-end"
-									/>
-								</Button>
-							{/snippet}
-						</DropdownMenu.Trigger>
-						<DropdownMenu.Content side="bottom" align="end">
-							<DropdownMenu.Group>
-								{#if isArchived}
-									<DropdownMenu.Item onSelect={() => onUnarchive?.()}>
-										<ArchiveRestoreIcon />
-										{m.btn_unarchive()}
-									</DropdownMenu.Item>
-									<DropdownMenu.Separator />
-									<DropdownMenu.Item
-										variant="destructive"
-										onSelect={() => onDelete?.()}
-									>
-										<Trash2Icon />
-										{m.btn_delete()}
-									</DropdownMenu.Item>
-								{:else}
-									<DropdownMenu.Item onSelect={() => onArchive?.()}>
-										<ArchiveIcon />
-										{m.btn_archive()}
-									</DropdownMenu.Item>
-								{/if}
-							</DropdownMenu.Group>
-						</DropdownMenu.Content>
-					</DropdownMenu.Root>
 				</div>
 			</div>
 
