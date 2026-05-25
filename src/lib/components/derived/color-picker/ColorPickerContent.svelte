@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Input } from '$lib/components/shadcn/input/index.js';
-	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import type { ColorPickerContentProps } from './color_picker_types.js';
 	import { DEFAULT_COLOR_PALETTE, getContrastTextColor, isValidHexColor } from './color_utils.js';
 
@@ -176,9 +175,7 @@
 	{/each}
 </div>
 
-<Separator class="my-2" />
-
-<div class="flex flex-1 items-center justify-center gap-2">
+<div class="mt-2 flex flex-1 items-center justify-center gap-2">
 	<label
 		class="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border shadow-sm transition-transform duration-2 hover:scale-105"
 		style="background-color: {effectiveColor}"

@@ -42,7 +42,6 @@
 
 	"onboarding_title": "Create your first dashboard",
 	"onboarding_description_repo": "A <strong>repo dashboard</strong> tracks issues for a single repository.",
-	"onboarding_description_portfolio": "A <strong>portfolio dashboard</strong> groups multiple repos together.",
 	"onboarding_create": "Create Dashboard",
 
 	"empty_issues_title": "No issues yet",
@@ -59,19 +58,16 @@
 
 	"dashboard_create_title": "Create Dashboard",
 	"dashboard_edit_title": "Edit Dashboard",
-	"dashboard_type_repo": "Repo",
-	"dashboard_type_portfolio": "Portfolio",
 	"dashboard_field_name": "Name *",
 	"dashboard_field_github_repo": "GitHub Repo",
 	"dashboard_field_local_folder": "Local Folder",
 	"dashboard_field_default_base_branch": "Default Base Branch",
 	"dashboard_field_worktree_parent_folder": "Worktree Parent Folder",
-	"dashboard_field_repo_dashboards": "Repo Dashboards",
-	"dashboard_no_repo_dashboards": "No repo dashboards yet. Create one first.",
 	"dashboard_placeholder_name": "My Project",
 	"dashboard_placeholder_github_repo": "owner/repo",
 	"dashboard_placeholder_local_folder": "C:/projects/my-project",
 	"dashboard_placeholder_base_branch": "main",
+	"dashboard_placeholder_branch_select_repo_first": "Select a repo first",
 	"dashboard_placeholder_worktree_parent": "C:/worktrees/my-project",
 
 	"issue_create_title": "Create Issue",
@@ -263,7 +259,6 @@
 	"err_dashboard_not_found": "Dashboard not found",
 	"err_issue_not_found": "Issue not found",
 	"err_action_not_found": "Action not found",
-	"err_portfolio_not_found": "Portfolio pointer not found",
 	"err_no_sound_file": "No sound file configured for this event type",
 	"err_notification_service_unavailable": "NotificationService not available",
 

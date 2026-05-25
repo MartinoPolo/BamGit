@@ -73,7 +73,6 @@
 					{parentIssues}
 					archivedIssues={[]}
 					showArchived={false}
-					isPortfolio={false}
 					ghAvailable={true}
 					prioritiesEnabled={true}
 					{paletteColors}
@@ -98,7 +97,6 @@
 					{parentIssues}
 					archivedIssues={[]}
 					showArchived={false}
-					isPortfolio={false}
 					ghAvailable={true}
 					prioritiesEnabled={true}
 					{paletteColors}
@@ -123,7 +121,6 @@
 					parentIssues={[]}
 					archivedIssues={[]}
 					showArchived={false}
-					isPortfolio={false}
 					ghAvailable={false}
 					prioritiesEnabled={true}
 					paletteColors={[]}
@@ -148,7 +145,6 @@
 					{parentIssues}
 					archivedIssues={[]}
 					showArchived={false}
-					isPortfolio={false}
 					ghAvailable={false}
 					prioritiesEnabled={true}
 					{paletteColors}
@@ -174,7 +170,6 @@
 					{parentIssues}
 					archivedIssues={[]}
 					showArchived={false}
-					isPortfolio={false}
 					ghAvailable={true}
 					prioritiesEnabled={true}
 					{paletteColors}

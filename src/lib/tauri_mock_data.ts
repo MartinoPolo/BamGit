@@ -22,8 +22,6 @@ import type {
 // ─── Stable IDs ───────────────────────────────────────────────────────────────
 
 const DASHBOARD_GROVEKEEPER = 'mock-dash-grovekeeper';
-const DASHBOARD_PORTFOLIO = 'mock-dash-portfolio';
-
 const ISSUE_AUTH_MIDDLEWARE = 'mock-issue-auth';
 const ISSUE_DARK_MODE = 'mock-issue-dark-mode';
 const ISSUE_PERF_AUDIT = 'mock-issue-perf';
@@ -70,21 +68,6 @@ export const MOCK_DASHBOARDS: Dashboard[] = [
 		accent_color: '#62874b',
 		chart_color_theme: 'monochrome',
 		default_shape: 'oak',
-		priorities_enabled: true,
-		status: 'active',
-	},
-	{
-		id: DASHBOARD_PORTFOLIO,
-		name: 'All Projects',
-		type: 'portfolio',
-		github_repo: null,
-		local_folder: null,
-		default_base_branch: null,
-		worktree_parent_folder: null,
-		color_palette_id: null,
-		accent_color: null,
-		chart_color_theme: null,
-		default_shape: 'pine',
 		priorities_enabled: true,
 		status: 'active',
 	},

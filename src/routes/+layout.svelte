@@ -138,20 +138,9 @@
 		});
 	});
 
-	async function handleCreateDashboard(
-		request: CreateDashboardRequest,
-		selectedRepoIds: string[],
-	) {
+	async function handleCreateDashboard(request: CreateDashboardRequest) {
 		try {
 			const created = await boardStore.createDashboard(request);
-			if (request.type === 'portfolio' && selectedRepoIds.length > 0) {
-				for (const repoId of selectedRepoIds) {
-					await boardStore.addRepoToPortfolio({
-						portfolio_dashboard_id: created.id,
-						repo_dashboard_id: repoId,
-					});
-				}
-			}
 			await boardStore.refreshDashboards();
 			if (windowCtx.isOverview) {
 				await openWorkspaceWindow(created.id);
@@ -236,7 +225,6 @@
 
 <DashboardCreateDialog
 	open={boardStore.showCreateDialog}
-	repoDashboards={boardStore.repoDashboards}
 	onClose={() => (boardStore.showCreateDialog = false)}
 	onCreate={handleCreateDashboard}
 />
