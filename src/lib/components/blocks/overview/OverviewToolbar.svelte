@@ -23,7 +23,6 @@
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import { useOverviewToolbar } from './overview_toolbar.context.svelte.js';
-	import { overviewActionButtonClass } from './overview_style.js';
 	import {
 		OVERVIEW_SORT_MODES,
 		OVERVIEW_SORT_DIRECTIONS,
@@ -52,6 +51,17 @@
 
 	let searchFieldRef = $state<HTMLInputElement | null>(null);
 	let authWizardOpen = $state(false);
+
+	const githubDotColor = $derived.by(() => {
+		const { authStatus, ghAvailability } = versionControl;
+		if (authStatus.status === 'oauth-connected') {
+			return 'bg-status-success';
+		}
+		if (authStatus.status === 'cli-connected' || ghAvailability === 'available') {
+			return 'bg-status-warning';
+		}
+		return null;
+	});
 
 	function openSettings() {
 		settingsCtx.setReturnUrl(page.url.pathname + page.url.search);
@@ -88,29 +98,26 @@
 
 	<!-- Sort -->
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			{#snippet child({ props })}
-				<SimpleTooltip text="Sort" side="bottom">
-					{#snippet asChild(tooltipProps)}
-						<Button
-							{...props}
-							{...tooltipProps}
-							intent="ghost"
-							size="icon-sm"
-							aria-label="Sort workspaces"
-							class={[overviewActionButtonClass, 'relative']}
-						>
-							<ArrowUpDownIcon data-icon="inline-start" />
-							{#if toolbar.isNonDefaultSort}
-								<span
-									class="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
-								></span>
-							{/if}
-						</Button>
-					{/snippet}
-				</SimpleTooltip>
-			{/snippet}
-		</DropdownMenu.Trigger>
+		<SimpleTooltip text="Sort" side="bottom">
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						intent="ghost"
+						size="icon"
+						aria-label="Sort workspaces"
+						class="relative"
+					>
+						<ArrowUpDownIcon data-icon="inline-start" />
+						{#if toolbar.isNonDefaultSort}
+							<span
+								class="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
+							></span>
+						{/if}
+					</Button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+		</SimpleTooltip>
 		<DropdownMenu.Content align="end" class="w-48">
 			<DropdownMenu.Label>Sort by</DropdownMenu.Label>
 			<DropdownMenu.RadioGroup
@@ -148,29 +155,26 @@
 
 	<!-- Filter -->
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			{#snippet child({ props })}
-				<SimpleTooltip text="Filter" side="bottom">
-					{#snippet asChild(tooltipProps)}
-						<Button
-							{...props}
-							{...tooltipProps}
-							intent="ghost"
-							size="icon-sm"
-							aria-label="Filter workspaces"
-							class={[overviewActionButtonClass, 'relative']}
-						>
-							<FilterIcon data-icon="inline-start" />
-							{#if toolbar.isNonDefaultFilter}
-								<span
-									class="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
-								></span>
-							{/if}
-						</Button>
-					{/snippet}
-				</SimpleTooltip>
-			{/snippet}
-		</DropdownMenu.Trigger>
+		<SimpleTooltip text="Filter" side="bottom">
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						intent="ghost"
+						size="icon"
+						aria-label="Filter workspaces"
+						class="relative"
+					>
+						<FilterIcon data-icon="inline-start" />
+						{#if toolbar.isNonDefaultFilter}
+							<span
+								class="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
+							></span>
+						{/if}
+					</Button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+		</SimpleTooltip>
 		<DropdownMenu.Content align="end" class="w-48">
 			<DropdownMenu.RadioGroup
 				value={toolbar.filterMode.current}
@@ -193,50 +197,44 @@
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 
-	<Separator orientation="vertical" class="h-4" />
+	<Separator orientation="vertical" class="!h-5" />
 
 	<!-- Archive toggle -->
 	<SimpleTooltip text="Show archived" side="bottom">
-		{#snippet asChild(props)}
-			<Toggle
-				{...props}
-				intent="outline"
-				size="icon-sm"
-				pressed={toolbar.showArchived.current}
-				onPressedChange={(pressed) => (toolbar.showArchived.current = pressed)}
-				aria-label="Toggle archived workspaces"
-				class={overviewActionButtonClass}
-			>
-				<ArchiveIcon data-icon="inline-start" />
-			</Toggle>
-		{/snippet}
+		<Toggle
+			intent="default"
+			size="icon"
+			pressed={toolbar.showArchived.current}
+			onPressedChange={(pressed) => (toolbar.showArchived.current = pressed)}
+			aria-label="Toggle archived workspaces"
+			class="data-[state=on]:border-border"
+		>
+			<ArchiveIcon data-icon="inline-start" />
+		</Toggle>
 	</SimpleTooltip>
 
 	<!-- Footer Settings -->
 	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			{#snippet child({ props })}
-				<SimpleTooltip text="Card footer" side="bottom">
-					{#snippet asChild(tooltipProps)}
-						<Button
-							{...props}
-							{...tooltipProps}
-							intent="ghost"
-							size="icon-sm"
-							aria-label="Configure workspace card footer"
-							class={[overviewActionButtonClass, 'relative']}
-						>
-							<SlidersHorizontalIcon data-icon="inline-start" />
-							{#if toolbar.isNonDefaultFooter}
-								<span
-									class="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
-								></span>
-							{/if}
-						</Button>
-					{/snippet}
-				</SimpleTooltip>
-			{/snippet}
-		</DropdownMenu.Trigger>
+		<SimpleTooltip text="Card footer" side="bottom">
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						intent="ghost"
+						size="icon"
+						aria-label="Configure workspace card footer"
+						class="relative"
+					>
+						<SlidersHorizontalIcon data-icon="inline-start" />
+						{#if toolbar.isNonDefaultFooter}
+							<span
+								class="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
+							></span>
+						{/if}
+					</Button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+		</SimpleTooltip>
 		<DropdownMenu.Content align="end" class="w-56">
 			<DropdownMenu.Label>Workspace card footer</DropdownMenu.Label>
 			<DropdownMenu.RadioGroup
@@ -256,10 +254,10 @@
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 
-	<Separator orientation="vertical" class="h-4" />
+	<Separator orientation="vertical" class="!h-5" />
 
 	<!-- Theme Toggle -->
-	<ThemeToggle compact class={overviewActionButtonClass} />
+	<ThemeToggle compact />
 
 	<!-- Settings -->
 	<SimpleTooltip text={m.nav_settings()} side="bottom">
@@ -267,10 +265,9 @@
 			<Button
 				{...props}
 				intent="ghost"
-				size="icon-sm"
+				size="icon"
 				aria-label={m.nav_settings()}
 				onclick={openSettings}
-				class={overviewActionButtonClass}
 			>
 				<SettingsIcon data-icon="inline-start" />
 			</Button>
@@ -284,15 +281,19 @@
 				<Button
 					{...props}
 					intent="ghost"
-					size="icon-sm"
+					size="icon"
 					aria-label="GitHub connection settings"
-					class={overviewActionButtonClass}
+					class="relative"
 				>
 					<GithubIcon data-icon="inline-start" />
+					{#if githubDotColor}
+						<span class="absolute top-1 right-1 size-1.5 rounded-full {githubDotColor}"
+						></span>
+					{/if}
 				</Button>
 			{/snippet}
 		</Popover.Trigger>
-		<Popover.Content class="w-80" align="end">
+		<Popover.Content class="w-80 p-3" align="end">
 			<GitHubStatusCard
 				borderless
 				authStatus={versionControl.authStatus}

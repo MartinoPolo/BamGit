@@ -5,18 +5,25 @@
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Monitor from '@lucide/svelte/icons/monitor';
+	import { Button } from '$lib/components/shadcn/button/index.js';
 	import SidebarCollapsedItem from '$lib/components/derived/sidebar-collapsed-item/SidebarCollapsedItem.svelte';
 	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
-	import { cn } from '$lib/utils.js';
+	import type { ButtonSize } from '$lib/components/shadcn/button/button-variants.js';
 
 	interface Props {
 		collapsed?: boolean;
 		compact?: boolean;
+		size?: ButtonSize;
 		class?: string;
 	}
 
-	let { collapsed = false, compact = false, class: className }: Props = $props();
+	let {
+		collapsed = false,
+		compact = false,
+		size = 'icon' as const,
+		class: className,
+	}: Props = $props();
 
 	const settingsCtx = useSettings();
 	const themeMode = $derived(settingsCtx.getThemeMode() as ThemeMode);
@@ -42,20 +49,18 @@
 </script>
 
 {#if compact}
-	<SimpleTooltip text="{MODE_LABELS[currentMode.labelKey]()} mode" side="top">
+	<SimpleTooltip text="{MODE_LABELS[currentMode.labelKey]()} mode" side="bottom">
 		{#snippet asChild(props)}
-			<button
+			<Button
 				{...props}
-				type="button"
-				class={cn(
-					'rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground',
-					className,
-				)}
+				intent="ghost"
+				{size}
 				onclick={cycleMode}
 				aria-label="{MODE_LABELS[currentMode.labelKey]()} mode"
+				class={className}
 			>
-				<currentMode.Icon size={14} />
-			</button>
+				<currentMode.Icon data-icon="inline-start" />
+			</Button>
 		{/snippet}
 	</SimpleTooltip>
 {:else if collapsed}
