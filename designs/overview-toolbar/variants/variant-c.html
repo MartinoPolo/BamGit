@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview Toolbar — Variant C: Segmented Groups</title>
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .theme-dark {
+      color-scheme: dark;
+      --background: oklch(0.155 0.018 150);
+      --surface: oklch(0.19 0.02 150);
+      --surface-2: oklch(0.225 0.022 150);
+      --surface-hover: oklch(0.265 0.024 150);
+      --surface-3: oklch(0.265 0.024 150);
+      --foreground: oklch(0.965 0.01 130);
+      --foreground-muted: oklch(0.73 0.018 135);
+      --foreground-subtle: oklch(0.56 0.02 140);
+      --border: oklch(0.295 0.022 148);
+      --border-strong: oklch(0.38 0.028 145);
+      --primary: oklch(0.720 0.17 145);
+      --primary-fg: oklch(0.135 0.02 150);
+      --primary-soft: oklch(0.305 0.045 145);
+      --ring: oklch(0.720 0.17 145);
+      --moss-400: oklch(0.720 0.17 145);
+      --status-success: oklch(0.720 0.17 145);
+      --status-warning: oklch(0.770 0.155 75);
+      --status-danger: oklch(0.620 0.205 25);
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+
+    /* ─── Page layout ─── */
+    .page-wrapper {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    .section-title {
+      margin-top: 64px;
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .section-title:first-of-type {
+      margin-top: 32px;
+    }
+
+    /* ─── Context fading ─── */
+    .context-faded {
+      opacity: 0.3;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ─── Segment pill ─── */
+    .segment {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 0;
+    }
+
+    .segment-separator {
+      width: 1px;
+      height: 14px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ─── Segment trigger button ─── */
+    .seg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 22px;
+      border: none;
+      background: transparent;
+      color: var(--foreground-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: background 120ms ease, color 120ms ease;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      padding: 0;
+    }
+
+    .seg-btn:hover {
+      background: var(--surface-hover);
+      color: var(--foreground);
+    }
+
+    .seg-btn:active {
+      transform: scale(0.94);
+    }
+
+    .seg-btn:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 1px;
+    }
+
+    .seg-btn[data-state="open"] {
+      background: var(--surface-3);
+      color: var(--foreground);
+    }
+
+    .seg-btn[data-state="disabled"] {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .seg-btn[data-state="active-fill"] {
+      background: var(--primary);
+      color: var(--primary-fg);
+    }
+
+    /* Accent dot for non-default state */
+    .seg-btn .accent-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    /* ─── Search segment ─── */
+    .search-segment {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 10px;
+      height: 28px;
+      width: 260px;
+      max-width: 280px;
+      gap: 6px;
+    }
+
+    .search-segment:focus-within {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px oklch(0.720 0.17 145 / 0.18);
+    }
+
+    .search-segment svg {
+      flex-shrink: 0;
+      color: var(--foreground-subtle);
+    }
+
+    .search-input {
+      border: none;
+      background: transparent;
+      color: var(--foreground);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      height: 100%;
+      width: 100%;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--foreground-subtle);
+    }
+
+    .search-clear {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border: none;
+      background: var(--surface-2);
+      color: var(--foreground-muted);
+      border-radius: 3px;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+    }
+
+    .search-clear:hover {
+      background: var(--surface-3);
+      color: var(--foreground);
+    }
+
+    .search-kbd {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ─── GitHub status chip ─── */
+    .github-chip {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 8px 2px 6px;
+      height: 26px;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+
+    .github-chip:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-strong);
+    }
+
+    .github-chip svg {
+      color: var(--foreground-muted);
+    }
+
+    .github-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .github-dot.connected { background: var(--status-success); }
+    .github-dot.warning { background: var(--status-warning); }
+    .github-dot.error { background: var(--status-danger); }
+
+    /* ─── Toolbar layout ─── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    .toolbar-spacer {
+      flex: 1;
+    }
+
+    /* ─── Popover ─── */
+    .popover-showcase {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .popover-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .popover-meta-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.04em;
+    }
+
+    .popover-check {
+      color: var(--primary);
+      margin-left: auto;
+    }
+
+    .popover-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-subtle);
+      margin-left: auto;
+    }
+
+    .popover-summary {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-subtle);
+      padding: 6px 8px 2px;
+    }
+
+    .popover-preview {
+      margin: 4px 8px 4px;
+      padding: 6px 8px;
+      border-top: 1px dashed var(--border);
+      background: var(--surface-2);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+    }
+
+    .sort-meta {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+      margin-left: auto;
+    }
+
+    /* ─── Anatomy diagram ─── */
+    .anatomy-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .anatomy-segment {
+      position: relative;
+      transform: scale(2.5);
+      transform-origin: top left;
+      margin-bottom: 40px;
+    }
+
+    .anatomy-labels {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    .anatomy-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .anatomy-label::before {
+      content: '';
+      width: 8px;
+      height: 1px;
+      background: var(--foreground-subtle);
+    }
+
+    /* ─── State showcase ─── */
+    .states-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .state-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .state-cell-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── Placeholder cards ─── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .card-placeholder {
+      height: 140px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-placeholder-bar {
+      height: 10px;
+      background: var(--surface-2);
+      border-radius: 4px;
+    }
+
+    .card-placeholder-bar.short { width: 55%; }
+    .card-placeholder-bar.medium { width: 75%; }
+    .card-placeholder-bar.long { width: 90%; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 640px) {
+      .page-wrapper {
+        padding: 24px 16px;
+      }
+      .search-segment {
+        width: 180px;
+      }
+      .popover-showcase {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+  <div class="page-wrapper">
+
+    <p class="gk-eyebrow">VARIANT C: SEGMENTED GROUPS</p>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: IN-CONTEXT VIEW                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 class="gk-h2 section-title">1. In-Context View</h2>
+
+    <!-- Faded header -->
+    <div class="context-faded" style="margin-bottom: 12px;">
+      <h1 style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin: 0;">Grovekeeper</h1>
+      <p style="font-size: 13px; color: var(--foreground-muted); margin: 4px 0 0;">Your workspaces</p>
+    </div>
+
+    <!-- TOOLBAR — full opacity -->
+    <div class="toolbar" role="toolbar" aria-label="Workspace controls">
+
+      <!-- Search segment -->
+      <div class="search-segment" role="group" aria-label="Search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" placeholder="Search workspaces..." aria-label="Search workspaces">
+        <span class="search-kbd">
+          <span class="gk-kbd">Ctrl</span><span class="gk-kbd">F</span>
+        </span>
+      </div>
+
+      <!-- Spacer -->
+      <div class="toolbar-spacer"></div>
+
+      <!-- Sort + Filter segment -->
+      <div class="segment" role="group" aria-label="Sort and filter">
+        <!-- Sort -->
+        <button type="button" class="seg-btn" aria-label="Sort workspaces" title="Sort">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+        </button>
+        <span class="segment-separator"></span>
+        <!-- Filter -->
+        <button type="button" class="seg-btn" aria-label="Filter workspaces" title="Filter">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </button>
+      </div>
+
+      <!-- Archive + Footer Settings segment -->
+      <div class="segment" role="group" aria-label="Archive and settings">
+        <!-- Archive -->
+        <button type="button" class="seg-btn" aria-label="Show archived" title="Show archived">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+        </button>
+        <span class="segment-separator"></span>
+        <!-- Footer Settings -->
+        <button type="button" class="seg-btn" aria-label="Card footer content" title="Card footer content">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg>
+        </button>
+      </div>
+
+      <!-- GitHub status chip -->
+      <button type="button" class="github-chip" aria-label="GitHub status: connected">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        <span class="github-dot connected"></span>
+      </button>
+    </div>
+
+    <!-- Faded card grid -->
+    <div class="context-faded">
+      <div class="card-grid">
+        <div class="card-placeholder">
+          <div class="card-placeholder-bar short"></div>
+          <div class="card-placeholder-bar long"></div>
+          <div class="card-placeholder-bar medium"></div>
+        </div>
+        <div class="card-placeholder">
+          <div class="card-placeholder-bar medium"></div>
+          <div class="card-placeholder-bar short"></div>
+          <div class="card-placeholder-bar long"></div>
+        </div>
+        <div class="card-placeholder">
+          <div class="card-placeholder-bar long"></div>
+          <div class="card-placeholder-bar medium"></div>
+          <div class="card-placeholder-bar short"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: ALL POPOVERS                                -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 class="gk-h2 section-title">2. All Popovers</h2>
+
+    <div class="popover-showcase">
+
+      <!-- Sort popover -->
+      <div class="popover-wrapper">
+        <span class="popover-meta-label">Sort (180px)</span>
+        <div class="gk-popover" style="min-width: 180px; width: 180px;">
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Name (A-Z)</span>
+            <span class="sort-meta">abc</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="true" style="color: var(--foreground);">
+            <span>Activity</span>
+            <span class="sort-meta">recent</span>
+            <svg class="popover-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Issue count</span>
+            <span class="sort-meta">most</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Cost</span>
+            <span class="sort-meta">today</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter popover -->
+      <div class="popover-wrapper">
+        <span class="popover-meta-label">Filter (220px)</span>
+        <div class="gk-popover" style="min-width: 220px; width: 220px;">
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="true" style="color: var(--foreground);">
+            <span>All</span>
+            <span class="popover-count">8</span>
+            <svg class="popover-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Active</span>
+            <span class="popover-count">3</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Needs Attention</span>
+            <span class="popover-count">2</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Dormant</span>
+            <span class="popover-count">1</span>
+          </div>
+          <div class="gk-popover-divider"></div>
+          <div class="popover-summary">8 workspaces shown</div>
+        </div>
+      </div>
+
+      <!-- Footer Settings popover -->
+      <div class="popover-wrapper">
+        <span class="popover-meta-label">Footer Settings (260px)</span>
+        <div class="gk-popover" style="min-width: 260px; width: 260px;">
+          <div class="gk-popover-label">WORKSPACE CARD FOOTER</div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="true" style="color: var(--foreground);">
+            <span>Today's cost</span>
+            <span class="sort-meta">today $4.82</span>
+            <svg class="popover-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Week's cost</span>
+            <span class="sort-meta">week $23.40</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Total cost</span>
+            <span class="sort-meta">total $142.50</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Active sessions</span>
+            <span class="sort-meta">2 sessions</span>
+          </div>
+          <div class="gk-popover-item" role="menuitemradio" aria-checked="false">
+            <span>Last activity</span>
+            <span class="sort-meta">3m ago</span>
+          </div>
+          <div class="popover-preview">
+            <span style="opacity: 0.7;">Footer preview:</span> today $4.82
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: SEGMENT ANATOMY                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 class="gk-h2 section-title">3. Segment Anatomy</h2>
+
+    <div class="anatomy-container">
+      <!-- Enlarged segment -->
+      <div style="padding: 24px 0 80px;">
+        <div class="anatomy-segment">
+          <div class="segment" role="group" aria-label="Sort and filter (anatomy)">
+            <!-- Sort: hovered state -->
+            <button type="button" class="seg-btn" style="background: var(--surface-hover); color: var(--foreground);" aria-label="Sort (hover demo)">
+              <span class="accent-dot"></span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+            </button>
+            <span class="segment-separator"></span>
+            <!-- Filter: default state -->
+            <button type="button" class="seg-btn" aria-label="Filter (default demo)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Labels -->
+      <div class="anatomy-labels" style="margin-left: 32px;">
+        <div class="anatomy-label">Pill background: <code style="font-family: var(--font-mono); font-size: 10.5px; color: var(--primary);">surface</code> with 1px <code style="font-family: var(--font-mono); font-size: 10.5px; color: var(--primary);">border</code></div>
+        <div class="anatomy-label">Border-radius: 6px (radius-sm)</div>
+        <div class="anatomy-label">Padding: 2px (breathing room around buttons)</div>
+        <div class="anatomy-label">Inner separator: 1px solid border, height 14px, vertically centered</div>
+        <div class="anatomy-label">Hover bg on individual button: <code style="font-family: var(--font-mono); font-size: 10.5px; color: var(--primary);">surface-hover</code></div>
+        <div class="anatomy-label">Accent dot: 4px circle, <code style="font-family: var(--font-mono); font-size: 10.5px; color: var(--primary);">primary</code>, top-right of individual button</div>
+        <div class="anatomy-label">Button inner radius: 4px (fits within pill radius)</div>
+        <div class="anatomy-label">Gap between segments: 8px</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: TRIGGER STATES                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 class="gk-h2 section-title">4. Trigger States</h2>
+
+    <div class="states-row">
+
+      <!-- Default -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" aria-label="Default state">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Default</span>
+      </div>
+
+      <!-- Hover -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" style="background: var(--surface-hover); color: var(--foreground);" aria-label="Hover state">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Hover</span>
+      </div>
+
+      <!-- Active (dot) -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" aria-label="Active dot state">
+            <span class="accent-dot"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Active (dot)</span>
+      </div>
+
+      <!-- Open -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" data-state="open" aria-label="Popover open state">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Open</span>
+      </div>
+
+      <!-- Focus -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" style="outline: 2px solid var(--ring); outline-offset: 1px;" aria-label="Focus state">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Focus</span>
+      </div>
+
+      <!-- Disabled -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" data-state="disabled" aria-label="Disabled state" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Disabled</span>
+      </div>
+
+      <!-- Active fill (archive) -->
+      <div class="state-cell">
+        <div class="segment">
+          <button type="button" class="seg-btn" data-state="active-fill" aria-label="Active fill state">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </button>
+        </div>
+        <span class="state-cell-label">Active Fill</span>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: GITHUB STATUS STATES                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <h2 class="gk-h2 section-title">5. GitHub Status States</h2>
+
+    <div class="states-row">
+
+      <!-- Connected -->
+      <div class="state-cell">
+        <button type="button" class="github-chip" aria-label="GitHub: connected">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          <span class="github-dot connected"></span>
+        </button>
+        <span class="state-cell-label">Connected</span>
+      </div>
+
+      <!-- Warning -->
+      <div class="state-cell">
+        <button type="button" class="github-chip" aria-label="GitHub: warning">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          <span class="github-dot warning"></span>
+        </button>
+        <span class="state-cell-label">Warning</span>
+      </div>
+
+      <!-- Error -->
+      <div class="state-cell">
+        <button type="button" class="github-chip" aria-label="GitHub: error">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          <span class="github-dot error"></span>
+        </button>
+        <span class="state-cell-label">Error</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

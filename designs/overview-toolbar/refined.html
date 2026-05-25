@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview Toolbar — Refined (Variant B)</title>
+  <link rel="stylesheet" href="../tokens.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── REFINED: Variant B + all refinements ──────────────────── */
+    .theme-dark {
+      color-scheme: dark;
+      --background: oklch(0.155 0.018 150);
+      --surface: oklch(0.19 0.02 150);
+      --surface-2: oklch(0.225 0.022 150);
+      --surface-hover: oklch(0.265 0.024 150);
+      --surface-3: oklch(0.265 0.024 150);
+      --foreground: oklch(0.965 0.01 130);
+      --foreground-muted: oklch(0.73 0.018 135);
+      --foreground-subtle: oklch(0.56 0.02 140);
+      --border: oklch(0.295 0.022 148);
+      --border-strong: oklch(0.38 0.028 145);
+      --primary: oklch(0.720 0.17 145);
+      --primary-fg: oklch(0.135 0.02 150);
+      --primary-soft: oklch(0.305 0.045 145);
+      --ring: oklch(0.720 0.17 145);
+      --moss-400: oklch(0.720 0.17 145);
+      --status-success: oklch(0.720 0.17 145);
+      --status-warning: oklch(0.770 0.155 75);
+      --status-danger: oklch(0.620 0.205 25);
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+
+    body { margin: 0; padding: 0; }
+
+    .variant-page {
+      padding: 32px 40px 64px;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .variant-label { margin-bottom: 40px; }
+
+    /* ── Section headers ───────────────────────────────────────── */
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .section-spacer { height: 48px; }
+
+    /* ── In-context rendering ──────────────────────────────────── */
+    .context-wrapper {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--background);
+    }
+    .context-header {
+      padding: 24px 24px 16px;
+      opacity: 0.3;
+    }
+    .context-header h1 {
+      font-family: var(--font-sans);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--foreground);
+      margin: 0 0 4px;
+    }
+    .context-header p {
+      font-size: 13px;
+      color: var(--foreground-muted);
+      margin: 0;
+    }
+
+    /* ── TOOLBAR — Contained Bar ──────────────────────────────── */
+    .toolbar-contained {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: color-mix(in oklch, var(--surface) 70%, var(--background));
+      border-bottom: 1px solid var(--border);
+      min-height: 40px;
+    }
+    .toolbar-spacer { flex: 1; }
+    .toolbar-separator {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── Search field ──────────────────────────────────────────── */
+    .toolbar-search {
+      position: relative;
+      width: 240px;
+      max-width: 280px;
+      min-width: 200px;
+    }
+    .toolbar-search-icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--foreground-subtle);
+      pointer-events: none;
+    }
+    .toolbar-search-input {
+      width: 100%;
+      height: 28px;
+      padding: 0 60px 0 28px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--foreground);
+      background: color-mix(in oklch, var(--surface-2) 50%, var(--background));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+    .toolbar-search-input::placeholder { color: var(--foreground-subtle); }
+    .toolbar-search-input:focus {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 18%, transparent);
+    }
+    .toolbar-search-kbd {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    /* ── Toolbar trigger buttons ───────────────────────────────── */
+    .toolbar-trigger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      padding: 0;
+      transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    }
+    .toolbar-trigger:hover {
+      background: var(--surface-2);
+      color: var(--foreground);
+    }
+    .toolbar-trigger:active { transform: scale(0.94); }
+    .toolbar-trigger:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 1px;
+    }
+    .toolbar-trigger:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .toolbar-trigger.is-open {
+      background: var(--surface-3);
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    .toolbar-trigger.is-active-intent {
+      background: var(--primary);
+      color: var(--primary-fg);
+      border-color: transparent;
+    }
+    .toolbar-trigger.is-active-intent:hover {
+      background: color-mix(in oklch, var(--primary) 85%, white 15%);
+      color: var(--primary-fg);
+    }
+
+    /* Active indicator dot */
+    .toolbar-trigger .active-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 1.5px color-mix(in oklch, var(--surface) 70%, var(--background));
+    }
+
+    /* Status dot overlay (for GitHub) */
+    .toolbar-trigger .status-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1.5px color-mix(in oklch, var(--surface) 70%, var(--background));
+    }
+    .status-dot.is-connected { background: var(--status-success); }
+    .status-dot.is-warning { background: var(--status-warning); }
+    .status-dot.is-error { background: var(--status-danger); }
+
+    /* ── Tooltip (SimpleTooltip) ───────────────────────────────── */
+    .tooltip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      padding: 4px 8px;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--foreground);
+      box-shadow: 0 4px 12px -4px rgba(0,0,0,0.5);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: var(--border);
+    }
+    .tooltip::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 3px solid transparent;
+      border-top-color: var(--surface-3);
+      z-index: 1;
+    }
+    .tooltip-wrapper {
+      position: relative;
+      display: inline-flex;
+    }
+
+    /* ── Skeleton cards with radial gradient ───────────────────── */
+    .context-cards {
+      padding: 20px 24px 24px;
+      opacity: 0.3;
+    }
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .skeleton-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        ellipse at 15% 85%,
+        color-mix(in oklch, var(--moss-400) 5%, transparent) 0%,
+        color-mix(in oklch, var(--moss-400) 2%, transparent) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+    .skeleton-card::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      height: 10px;
+      border-radius: 3px;
+      background: var(--surface-2);
+    }
+    .skeleton-card .skel-row {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      height: 6px;
+      border-radius: 2px;
+      background: var(--surface-2);
+    }
+    .skeleton-card .skel-row.r1 { top: 38px; right: 60%; }
+    .skeleton-card .skel-row.r2 { top: 54px; }
+    .skeleton-card .skel-row.r3 { top: 70px; right: 40%; }
+    .skeleton-card .skel-row.r4 { top: 106px; right: 55%; }
+    @media (max-width: 640px) {
+      .skeleton-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Popovers showcase ─────────────────────────────────────── */
+    .popovers-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .popover-showcase {
+      display: flex;
+      flex-direction: column;
+    }
+    .popover-showcase-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* Popover card */
+    .pop-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px -8px rgba(0,0,0,0.55), 0 2px 6px -2px rgba(0,0,0,0.4);
+      padding: 6px;
+    }
+    .pop-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      transition: background 100ms ease;
+    }
+    .pop-item:hover { background: var(--surface-hover); }
+    .pop-item.is-selected { color: var(--foreground); }
+    .pop-item .check-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+    .pop-item .check-placeholder {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .pop-item .pop-label { flex: 1; min-width: 0; }
+    .pop-item .pop-meta {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+      font-variant-numeric: tabular-nums;
+    }
+    .pop-separator {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 8px;
+    }
+    .pop-separator.dashed {
+      background: none;
+      border-top: 1px dashed var(--border);
+    }
+    .pop-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 8px 4px;
+    }
+    .pop-footer {
+      margin-top: 2px;
+      padding: 6px 8px 4px;
+      border-top: 1px dashed var(--border);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-subtle);
+      font-variant-numeric: tabular-nums;
+    }
+    .pop-preview {
+      margin-top: 2px;
+      padding: 6px 10px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-muted);
+    }
+    .pop-preview-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    /* ── Secondary sort (de-emphasized) ────────────────────────── */
+    .secondary-sort-section {
+      opacity: 0.75;
+    }
+    .secondary-sort-section .pop-item {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+    .secondary-sort-section .pop-meta {
+      font-size: 10px;
+    }
+    .optional-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--foreground-subtle);
+      background: var(--surface-2);
+      border-radius: var(--radius-xs);
+      padding: 1px 5px;
+      margin-left: 6px;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+    }
+
+    /* ── States showcase ───────────────────────────────────────── */
+    .states-row {
+      display: flex;
+      gap: 24px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .state-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .state-cell-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    /* ── GitHub status states (icon-only) ──────────────────────── */
+    .gh-states-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      align-items: flex-end;
+    }
+
+    /* ── Component mapping section ─────────────────────────────── */
+    .mapping-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .mapping-table th {
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mapping-table td {
+      padding: 6px 12px;
+      color: var(--foreground-muted);
+      border-bottom: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+    }
+    .mapping-table td:first-child {
+      font-family: var(--font-mono);
+      color: var(--foreground);
+      font-size: 11px;
+    }
+    .mapping-table td:nth-child(2) {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-subtle);
+    }
+
+    /* ── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .toolbar-contained { padding: 6px 12px; gap: 4px; }
+      .toolbar-search { width: 160px; min-width: 140px; }
+      .variant-page { padding: 20px 16px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gk-root theme-dark">
+    <div class="variant-page">
+      <p class="gk-eyebrow variant-label">REFINED — VARIANT B + GITHUB ICON-ONLY, THEME/SETTINGS, SORT DIRECTION, SECONDARY SORT, TOOLTIPS</p>
+
+      <!-- ════════════════════════════════════════════════════════════
+           1. IN-CONTEXT RENDERING
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">1. In-context rendering</div>
+      <div class="context-wrapper">
+        <!-- Page header (30% opacity) -->
+        <div class="context-header">
+          <h1>Grovekeeper</h1>
+          <p>Your workspaces</p>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar-contained" role="toolbar" aria-label="Workspace toolbar">
+          <!-- Search -->
+          <div class="toolbar-search">
+            <span class="toolbar-search-icon">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" class="toolbar-search-input" placeholder="Search workspaces..." aria-label="Search workspaces">
+            <span class="toolbar-search-kbd"><span class="gk-kbd">Ctrl+F</span></span>
+          </div>
+
+          <div class="toolbar-spacer"></div>
+
+          <!-- Sort (with tooltip example) -->
+          <div class="tooltip-wrapper">
+            <span class="tooltip">Sort</span>
+            <button type="button" class="toolbar-trigger" aria-label="Sort workspaces">
+              <span class="active-dot"></span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+            </button>
+          </div>
+
+          <!-- Filter -->
+          <button type="button" class="toolbar-trigger" aria-label="Filter workspaces">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </button>
+
+          <div class="toolbar-separator"></div>
+
+          <!-- Archive -->
+          <button type="button" class="toolbar-trigger" aria-label="Show archived">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </button>
+
+          <!-- Footer Settings -->
+          <button type="button" class="toolbar-trigger" aria-label="Card footer content">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+          </button>
+
+          <div class="toolbar-separator"></div>
+
+          <!-- Theme toggle (moon = dark mode) -->
+          <button type="button" class="toolbar-trigger" aria-label="Toggle theme">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+
+          <!-- Settings -->
+          <button type="button" class="toolbar-trigger" aria-label="Settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+
+          <!-- GitHub status (icon-only with status dot) -->
+          <div class="tooltip-wrapper">
+            <span class="tooltip">GitHub: syncing</span>
+            <button type="button" class="toolbar-trigger" aria-label="GitHub sync status">
+              <span class="status-dot is-connected"></span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cards (30% opacity with radial gradient) -->
+        <div class="context-cards">
+          <div class="skeleton-grid">
+            <div class="skeleton-card">
+              <div class="skel-row r1"></div>
+              <div class="skel-row r2"></div>
+              <div class="skel-row r3"></div>
+              <div class="skel-row r4"></div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skel-row r1"></div>
+              <div class="skel-row r2"></div>
+              <div class="skel-row r3"></div>
+              <div class="skel-row r4"></div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skel-row r1"></div>
+              <div class="skel-row r2"></div>
+              <div class="skel-row r3"></div>
+              <div class="skel-row r4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           2. ALL POPOVERS
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">2. Popover contents — DropdownMenu.RadioGroup pattern</div>
+      <div class="popovers-row">
+
+        <!-- ── Sort popover (enhanced with direction + secondary) ── -->
+        <div class="popover-showcase">
+          <div class="popover-showcase-label">Sort (DropdownMenu)</div>
+          <div class="pop-card" style="width: 210px;">
+            <!-- Primary sort — RadioGroup -->
+            <div class="pop-eyebrow">SORT BY</div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Name</span>
+              <span class="pop-meta">A→Z</span>
+            </div>
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="pop-label">Activity</span>
+              <span class="pop-meta">recent</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Issue count</span>
+              <span class="pop-meta">most</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Cost</span>
+              <span class="pop-meta">today</span>
+            </div>
+
+            <!-- Direction (same RadioItem style) -->
+            <div class="pop-separator dashed"></div>
+            <div class="pop-eyebrow">DIRECTION</div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Ascending</span>
+              <span class="pop-meta">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              </span>
+            </div>
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="pop-label">Descending</span>
+              <span class="pop-meta">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </span>
+            </div>
+
+            <!-- Secondary sort (optional) -->
+            <div class="pop-separator dashed"></div>
+            <div class="secondary-sort-section">
+              <div class="pop-eyebrow">THEN BY <span class="optional-badge">optional</span></div>
+              <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="pop-label">None</span>
+              </div>
+              <div class="pop-item" role="menuitemradio" aria-checked="false">
+                <span class="check-placeholder"></span>
+                <span class="pop-label">Name</span>
+                <span class="pop-meta">A→Z</span>
+              </div>
+              <div class="pop-item" role="menuitemradio" aria-checked="false">
+                <span class="check-placeholder"></span>
+                <span class="pop-label">Issue count</span>
+                <span class="pop-meta">most</span>
+              </div>
+              <div class="pop-item" role="menuitemradio" aria-checked="false">
+                <span class="check-placeholder"></span>
+                <span class="pop-label">Cost</span>
+                <span class="pop-meta">today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Filter popover ──────────────────────────────────────── -->
+        <div class="popover-showcase">
+          <div class="popover-showcase-label">Filter (DropdownMenu)</div>
+          <div class="pop-card" style="width: 220px;">
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="pop-label">All</span>
+              <span class="pop-meta">8</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Active</span>
+              <span class="pop-meta">3</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Needs Attention</span>
+              <span class="pop-meta">2</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Dormant</span>
+              <span class="pop-meta">1</span>
+            </div>
+            <div class="pop-footer"><span style="color: var(--foreground-muted); font-weight: 600;">8</span> workspaces shown</div>
+          </div>
+        </div>
+
+        <!-- ── Footer Settings popover ─────────────────────────────── -->
+        <div class="popover-showcase">
+          <div class="popover-showcase-label">Footer Settings (DropdownMenu)</div>
+          <div class="pop-card" style="width: 260px;">
+            <div class="pop-eyebrow">WORKSPACE CARD FOOTER</div>
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="pop-label">Today's cost</span>
+              <span class="pop-meta">today $4.82</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">This week's cost</span>
+              <span class="pop-meta">week $23.40</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Total cost</span>
+              <span class="pop-meta">total $142.50</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Active sessions</span>
+              <span class="pop-meta">2 sessions</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span class="pop-label">Last activity</span>
+              <span class="pop-meta">3m ago</span>
+            </div>
+            <div class="pop-preview">
+              <span class="pop-preview-dot"></span>
+              <span>$4.82 spent today</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           3. TRIGGER BUTTON STATES
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">3. Trigger button states</div>
+      <div class="states-row">
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Default</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1" style="background: var(--surface-2); color: var(--foreground);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Hover</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <span class="active-dot"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Active (dot)</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-open" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Open</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1" style="outline: 2px solid var(--ring); outline-offset: 1px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Focus</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Disabled</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-active-intent" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </button>
+          <span class="state-cell-label">Active intent<br>(archive on)</span>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           4. GITHUB STATUS STATES (icon-only)
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">4. GitHub status states (icon-only with dot)</div>
+      <div class="gh-states-row">
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <span class="status-dot is-connected"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </button>
+          <span class="state-cell-label">Connected</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <span class="status-dot is-warning"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </button>
+          <span class="state-cell-label">Warning</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <span class="status-dot is-error"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </button>
+          <span class="state-cell-label">Error</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1" style="color: var(--foreground-subtle);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </button>
+          <span class="state-cell-label">Not configured</span>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           5. THEME TOGGLE STATES
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">5. Theme toggle cycle states</div>
+      <div class="states-row">
+        <div class="state-cell">
+          <div class="tooltip-wrapper">
+            <span class="tooltip">Theme: dark</span>
+            <button type="button" class="toolbar-trigger" tabindex="-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+          </div>
+          <span class="state-cell-label">Dark (moon)</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          </button>
+          <span class="state-cell-label">Light (sun)</span>
+        </div>
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          </button>
+          <span class="state-cell-label">System (monitor)</span>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           6. COMPONENT MAPPING
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">6. Component mapping</div>
+      <table class="mapping-table">
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Component</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sort / Filter / Footer</td>
+            <td>DropdownMenu + RadioGroup + RadioItem</td>
+            <td>Native single-select with auto check marks, keyboard nav (arrows, Enter, Esc)</td>
+          </tr>
+          <tr>
+            <td>Direction toggle</td>
+            <td>DropdownMenu.RadioGroup</td>
+            <td>Second RadioGroup in same DropdownMenu — Ascending / Descending as standard RadioItems</td>
+          </tr>
+          <tr>
+            <td>Archive button</td>
+            <td>Button intent="ghost" / "primary"</td>
+            <td>Toggles between ghost (off) and primary (on, filled moss-400)</td>
+          </tr>
+          <tr>
+            <td>Search</td>
+            <td>SearchField (existing base)</td>
+            <td>Existing component at $lib/components/base/search-field</td>
+          </tr>
+          <tr>
+            <td>Theme toggle</td>
+            <td>ThemeToggle compact</td>
+            <td>Existing component, cycles dark → light → system</td>
+          </tr>
+          <tr>
+            <td>Settings</td>
+            <td>Button intent="ghost" size="icon-sm"</td>
+            <td>Navigates to /settings/general. Wrap in SimpleTooltip</td>
+          </tr>
+          <tr>
+            <td>GitHub status</td>
+            <td>Button intent="ghost" + Popover</td>
+            <td>Icon-only with status dot overlay. Click opens GitHubStatusCard popover</td>
+          </tr>
+          <tr>
+            <td>Tooltips</td>
+            <td>SimpleTooltip (existing)</td>
+            <td>On every icon button. asChild pattern for keyboard-accessible triggers</td>
+          </tr>
+          <tr>
+            <td>Separators</td>
+            <td>Separator (vertical)</td>
+            <td>1px × 16px between control groups</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</body>
+</html>
