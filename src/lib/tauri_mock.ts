@@ -348,6 +348,12 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 			is_private: true,
 		},
 	],
+	list_repo_branches: () => [
+		{ name: 'main' },
+		{ name: 'dev' },
+		{ name: 'feature/auth' },
+		{ name: 'fix/login-bug' },
+	],
 	search_github_repos: () => [
 		{
 			name: 'svelte',
@@ -901,13 +907,6 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	}),
 	update_dashboard: ({ request }) => request,
 	delete_dashboard: () => null,
-	add_repo_to_portfolio: () => ({
-		id: `mock-ptr-${crypto.randomUUID().slice(0, 8)}`,
-		portfolio_dashboard_id: '',
-		repo_dashboard_id: '',
-		sort_order: 0,
-	}),
-	remove_repo_from_portfolio: () => null,
 	create_color_palette: ({ request }) => ({
 		id: `mock-pal-${crypto.randomUUID().slice(0, 8)}`,
 		...(request as object),

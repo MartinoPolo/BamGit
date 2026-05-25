@@ -16,7 +16,6 @@ pub mod label_shape_mapping;
 pub mod metrics;
 pub mod notification;
 pub mod overview;
-pub mod portfolio;
 pub mod session;
 pub mod window_binding;
 pub mod setting;

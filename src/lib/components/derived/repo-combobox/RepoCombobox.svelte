@@ -146,6 +146,18 @@
 			{id}
 			{placeholder}
 			oninput={handleInput}
+			onclick={() => {
+				if (!open) {
+					handleOpenChange(true);
+				}
+			}}
+			onfocus={() => {
+				setTimeout(() => {
+					if (!open) {
+						handleOpenChange(true);
+					}
+				}, 0);
+			}}
 			class={cn(inputVariants(), 'pr-8')}
 			aria-label="GitHub repository"
 		/>
@@ -156,7 +168,7 @@
 
 	<Combobox.Portal {...portalProps}>
 		<Combobox.Content
-			class="z-(--z-tooltip) mt-1 max-h-60 w-(--bits-combobox-anchor-width) overflow-y-auto rounded-md border border-border bg-surface-3 shadow-md"
+			class="z-(--z-tooltip) mt-1 max-h-60 w-(--bits-combobox-anchor-width) overflow-y-auto rounded-md border border-border bg-surface p-1.5 shadow-md"
 			sideOffset={4}
 		>
 			{#if loadingUserRepos || searchingRemote}
@@ -167,7 +179,7 @@
 				<Combobox.Item
 					value={repoFullName(repo)}
 					label={repoFullName(repo)}
-					class="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm data-highlighted:bg-surface-2"
+					class="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm data-highlighted:bg-surface-2"
 				>
 					{#snippet children({ selected })}
 						{#if repo.is_private}

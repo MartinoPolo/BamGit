@@ -8,7 +8,6 @@ const ERROR_KEY_MAP: Record<string, () => string> = {
 	ERR_DASHBOARD_NOT_FOUND: () => m.err_dashboard_not_found(),
 	ERR_ISSUE_NOT_FOUND: () => m.err_issue_not_found(),
 	ERR_ACTION_NOT_FOUND: () => m.err_action_not_found(),
-	ERR_PORTFOLIO_NOT_FOUND: () => m.err_portfolio_not_found(),
 	ERR_NO_SOUND_FILE: () => m.err_no_sound_file(),
 	ERR_NOTIFICATION_SERVICE_UNAVAILABLE: () => m.err_notification_service_unavailable(),
 	ERR_GIT_BASH_NOT_FOUND: () => m.err_git_bash_not_found(),
