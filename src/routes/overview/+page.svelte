@@ -3,7 +3,8 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { openPath } from '$lib/opener.js';
+	import { invoke } from '$lib/tauri.js';
+	import { openUrl } from '$lib/opener.js';
 	import { useBoard, type UpdateDashboardRequest } from '$lib/modules/board';
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
 	import { USAGE_SCOPES } from '$lib/modules/usage/usage_types.js';
@@ -14,6 +15,7 @@
 	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
 	import OverviewWorkspaceGrid from '$lib/components/blocks/overview/OverviewWorkspaceGrid.svelte';
 	import DashboardEditDialog from '$lib/components/blocks/workspace/DashboardEditDialog.svelte';
+	import GithubRepoDialog from '$lib/components/blocks/workspace/GithubRepoDialog.svelte';
 	import WorkspaceDeleteDialog from '$lib/components/blocks/workspace/WorkspaceDeleteDialog.svelte';
 	import { setOverviewToolbarContext } from '$lib/components/blocks/overview/overview_toolbar.context.svelte.js';
 	import {
@@ -87,6 +89,7 @@
 
 	let deleteTarget = $state<{ id: string; name: string } | null>(null);
 	let editingDashboard = $state<Dashboard | null>(null);
+	let githubRepoTarget = $state<{ id: string; currentRepo: string } | null>(null);
 
 	async function handleArchiveWorkspace(workspace: OverviewWorkspaceData) {
 		try {
@@ -160,22 +163,58 @@
 
 	function handleGithubClick(workspace: OverviewWorkspaceData) {
 		if (workspace.github_repo == null) {
-			handleConfigWizard(workspace.dashboard_id);
+			handleGithubRightClick(workspace);
 			return;
 		}
-		window.open(`https://github.com/${workspace.github_repo}`, '_blank');
+		void openUrl(`https://github.com/${workspace.github_repo}`);
 	}
 
-	function handleFolderClick(workspace: OverviewWorkspaceData) {
+	async function handleFolderClick(workspace: OverviewWorkspaceData) {
 		if (workspace.local_folder == null) {
-			handleConfigWizard(workspace.dashboard_id);
+			void handleFolderRightClick(workspace);
 			return;
 		}
-		void openPath(workspace.local_folder);
+		try {
+			await invoke('open_folder_in_explorer', { folderPath: workspace.local_folder });
+		} catch (err) {
+			console.error('Failed to open folder:', err);
+		}
 	}
 
-	function handleConfigWizard(_dashboardId: string) {
-		console.info('Config wizard for', _dashboardId);
+	function handleGithubRightClick(workspace: OverviewWorkspaceData) {
+		githubRepoTarget = {
+			id: workspace.dashboard_id,
+			currentRepo: workspace.github_repo ?? '',
+		};
+	}
+
+	async function handleGithubRepoConfirm(repo: string | null) {
+		if (githubRepoTarget === null) {
+			return;
+		}
+		try {
+			await boardStore.updateDashboard({ id: githubRepoTarget.id, github_repo: repo });
+			await boardStore.refreshDashboards();
+		} catch (err) {
+			console.error('Failed to update GitHub repo:', err);
+		} finally {
+			githubRepoTarget = null;
+		}
+	}
+
+	async function handleFolderRightClick(workspace: OverviewWorkspaceData) {
+		try {
+			const folder = await invoke<string | null>('pick_folder');
+			if (folder !== null) {
+				await boardStore.updateDashboard({
+					id: workspace.dashboard_id,
+					local_folder: folder,
+				});
+				await boardStore.refreshDashboards();
+			}
+		} catch (err) {
+			console.error('Failed to assign folder:', err);
+		}
 	}
 
 	function openUsagePage() {
@@ -211,7 +250,8 @@
 				onOpenWorkspace={handleOpenWorkspace}
 				onGithubClick={handleGithubClick}
 				onFolderClick={handleFolderClick}
-				onConfigureWorkspace={handleConfigWizard}
+				onGithubRightClick={handleGithubRightClick}
+				onFolderRightClick={handleFolderRightClick}
 				onEdit={handleEditWorkspace}
 				onSettings={handleOpenSettings}
 				onArchive={handleArchiveWorkspace}
@@ -231,6 +271,13 @@
 				onClose={() => (editingDashboard = null)}
 				onUpdate={handleUpdateDashboard}
 				onArchive={handleArchiveById}
+			/>
+
+			<GithubRepoDialog
+				open={githubRepoTarget !== null}
+				currentRepo={githubRepoTarget?.currentRepo ?? ''}
+				onconfirm={handleGithubRepoConfirm}
+				onclose={() => (githubRepoTarget = null)}
 			/>
 
 			<OverviewSummaryBasin

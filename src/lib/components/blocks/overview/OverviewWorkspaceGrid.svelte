@@ -15,7 +15,8 @@
 		onOpenWorkspace: (dashboardId: string) => void;
 		onGithubClick: (workspace: OverviewWorkspaceData) => void;
 		onFolderClick: (workspace: OverviewWorkspaceData) => void;
-		onConfigureWorkspace: (dashboardId: string) => void;
+		onGithubRightClick: (workspace: OverviewWorkspaceData) => void;
+		onFolderRightClick: (workspace: OverviewWorkspaceData) => void;
 		onEdit: (workspace: OverviewWorkspaceData) => void;
 		onSettings: (workspace: OverviewWorkspaceData) => void;
 		onArchive: (workspace: OverviewWorkspaceData) => void;
@@ -30,7 +31,8 @@
 		onOpenWorkspace,
 		onGithubClick,
 		onFolderClick,
-		onConfigureWorkspace,
+		onGithubRightClick,
+		onFolderRightClick,
 		onEdit,
 		onSettings,
 		onArchive,
@@ -57,8 +59,8 @@
 				onclick={() => onOpenWorkspace(workspace.dashboard_id)}
 				onGithubClick={() => onGithubClick(workspace)}
 				onFolderClick={() => onFolderClick(workspace)}
-				onGithubRightClick={() => onConfigureWorkspace(workspace.dashboard_id)}
-				onFolderRightClick={() => onConfigureWorkspace(workspace.dashboard_id)}
+				onGithubRightClick={() => onGithubRightClick(workspace)}
+				onFolderRightClick={() => onFolderRightClick(workspace)}
 			/>
 		</WorkspaceCardContextMenu>
 	{/each}

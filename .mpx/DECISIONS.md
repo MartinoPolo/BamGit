@@ -538,3 +538,35 @@ Decided: 2026-05-18
 What: `restart_policy` field on `workspace_commands`: `'never'` (default), `'on_failure'`, `'always'`. Max 3 retries, exponential backoff (1s, 2s, 4s). Badge shows restart count. After max retries → failed.
 Why: Dev servers crash; manual restart is tedious. Hardcoded limits prevent restart storms without per-command config complexity.
 Rejected: No restart (tedious for flaky servers), unlimited restart (resource bomb), configurable limits (over-engineering for v1).
+
+---
+
+## Dashboard Dialogs
+
+### Portfolio type removed entirely
+
+Decided: 2026-05-25
+What: Remove portfolio dashboard type completely — DB table (`portfolio_dashboard_pointers`), 3 Rust commands, TS types, board context references, i18n keys, mock handlers. Dashboard type is always 'repo'. `dashboards.type` column CHECK constraint updated.
+Why: Never implemented beyond wiring. IssueCardGrid portfolio rendering was stub. YAGNI — no user need demonstrated. Git history preserves the pattern if ever needed.
+Rejected: Hide from UI only (dead code accumulates), keep for future (unused complexity across 31 files).
+
+### Branch suggestions via GitHub REST API
+
+Decided: 2026-05-25
+What: New `list_repo_branches` Tauri command using `GET /repos/{owner}/{repo}/branches?sort=updated` via existing `GitHubClient`. Base branch field is a combobox (type custom or pick from suggestions). Disabled until repo selected. Clears and re-fetches on repo change.
+Why: GitHub API works regardless of local clone state. Combobox allows typing branches that don't exist yet. `?sort=updated` surfaces recently-committed branches first.
+Rejected: Local git branch listing (requires local clone first), select-only (can't type new branches), always-enabled field (no suggestions without repo).
+
+### Worktree parent auto-default from local folder
+
+Decided: 2026-05-25
+What: Selecting a local folder auto-sets worktree parent to `{path}-worktrees`. Once user manually edits the worktree field, auto-updating stops (tracked via `worktreeManuallyEdited` flag). Subsequent local folder changes do not overwrite manual edits.
+Why: Matches the convention already documented in CONTEXT.md (`{parent}/{name}-worktrees/`). Manual edit flag prevents surprising overwrites.
+Rejected: Always overwrite (loses manual edits), never auto-set (friction for common case).
+
+### RepoCombobox styling aligned to Select pattern
+
+Decided: 2026-05-25
+What: RepoCombobox container and item styling aligned to the custom Select component: `bg-surface` container, `p-1.5` padding, `px-2 py-1.5` items, `rounded-sm` items, `data-highlighted:bg-surface-2` highlight. Auto-opens on input click and focus (not just trigger icon).
+Why: RepoCombobox had inconsistencies — `bg-surface-3` container, no container padding, `px-3` items, no rounded corners on items. Select is the closest semantic match (both are combobox-type components).
+Rejected: Align to DropdownMenu pattern (`bg-popover`, `focus:bg-accent/25`) — semantically wrong for a form combobox.
