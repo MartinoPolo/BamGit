@@ -10,10 +10,17 @@
 	import { useVersionControl } from '$lib/modules/version-control';
 	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
 	import OverviewHeader from '$lib/components/blocks/overview/OverviewHeader.svelte';
+	import OverviewToolbar from '$lib/components/blocks/overview/OverviewToolbar.svelte';
 	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
 	import OverviewWorkspaceGrid from '$lib/components/blocks/overview/OverviewWorkspaceGrid.svelte';
 	import DashboardEditDialog from '$lib/components/blocks/workspace/DashboardEditDialog.svelte';
 	import WorkspaceDeleteDialog from '$lib/components/blocks/workspace/WorkspaceDeleteDialog.svelte';
+	import { setOverviewToolbarContext } from '$lib/components/blocks/overview/overview_toolbar.context.svelte.js';
+	import {
+		searchWorkspaces,
+		filterWorkspaces,
+		sortWorkspaces,
+	} from '$lib/components/blocks/overview/overview_toolbar_types.js';
 	import {
 		calculateOverviewWorkspaceTotals,
 		deriveRecentWorkspaceActivities,
@@ -26,6 +33,7 @@
 	const boardStore = useBoard();
 	const versionControl = useVersionControl();
 	const usageCtx = setUsageContext();
+	const toolbar = setOverviewToolbarContext();
 
 	usageCtx.scope.current = USAGE_SCOPES.global;
 	usageCtx.activePeriod.current = 'thirty-days';
@@ -33,11 +41,10 @@
 	let workspaces = $state.raw<OverviewWorkspaceData[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	let showArchived = $state(false);
 
 	$effect(() => {
 		void boardStore.dashboards;
-		const includeArchived = showArchived;
+		const includeArchived = toolbar.showArchived.current;
 		void (async () => {
 			loading = true;
 			try {
@@ -54,6 +61,12 @@
 	onMount(() => {
 		void usageCtx.loadData();
 		return () => usageCtx.clearTimers();
+	});
+
+	const displayedWorkspaces = $derived.by(() => {
+		const searched = searchWorkspaces(workspaces, toolbar.searchQuery.current);
+		const filtered = filterWorkspaces(searched, toolbar.filterMode.current);
+		return sortWorkspaces(filtered, toolbar.sortMode.current, toolbar.sortDirection.current);
 	});
 
 	const workspaceTotals = $derived(calculateOverviewWorkspaceTotals(workspaces));
@@ -176,11 +189,15 @@
 	<div
 		class="mx-auto flex min-h-[calc(100vh-102px)] w-full max-w-[1840px] flex-col max-md:min-h-[calc(100vh-56px)]"
 	>
-		<OverviewHeader
-			{showArchived}
-			onShowArchivedChange={(pressed) => (showArchived = pressed)}
-			{versionControl}
-		/>
+		<OverviewHeader />
+
+		<div class="mb-6">
+			<OverviewToolbar
+				{versionControl}
+				filteredCount={displayedWorkspaces.length}
+				totalCount={workspaces.length}
+			/>
+		</div>
 
 		{#if loading}
 			<p class="text-muted-foreground">{m.overview_loading()}</p>
@@ -188,7 +205,8 @@
 			<p class="text-destructive">{m.error_prefix({ message: error })}</p>
 		{:else}
 			<OverviewWorkspaceGrid
-				{workspaces}
+				workspaces={displayedWorkspaces}
+				footerContent={toolbar.footerContent.current}
 				onAddWorkspace={() => (boardStore.showCreateDialog = true)}
 				onOpenWorkspace={handleOpenWorkspace}
 				onGithubClick={handleGithubClick}

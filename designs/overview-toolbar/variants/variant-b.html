@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Variant B: Contained Bar — Overview Toolbar</title>
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Variant B: Contained Bar ─────────────────────────────── */
+    .theme-dark {
+      color-scheme: dark;
+      --background: oklch(0.155 0.018 150);
+      --surface: oklch(0.19 0.02 150);
+      --surface-2: oklch(0.225 0.022 150);
+      --surface-hover: oklch(0.265 0.024 150);
+      --surface-3: oklch(0.265 0.024 150);
+      --foreground: oklch(0.965 0.01 130);
+      --foreground-muted: oklch(0.73 0.018 135);
+      --foreground-subtle: oklch(0.56 0.02 140);
+      --border: oklch(0.295 0.022 148);
+      --border-strong: oklch(0.38 0.028 145);
+      --primary: oklch(0.720 0.17 145);
+      --primary-fg: oklch(0.135 0.02 150);
+      --primary-soft: oklch(0.305 0.045 145);
+      --ring: oklch(0.720 0.17 145);
+      --moss-400: oklch(0.720 0.17 145);
+      --status-success: oklch(0.720 0.17 145);
+      --status-warning: oklch(0.770 0.155 75);
+      --status-danger: oklch(0.620 0.205 25);
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .variant-page {
+      padding: 32px 40px 64px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .variant-label {
+      margin-bottom: 40px;
+    }
+
+    /* ── Section headers ───────────────────────────────────────── */
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .section-spacer {
+      height: 48px;
+    }
+
+    /* ── In-context rendering ──────────────────────────────────── */
+    .context-wrapper {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--background);
+    }
+
+    .context-header {
+      padding: 24px 24px 16px;
+      opacity: 0.3;
+    }
+    .context-header h1 {
+      font-family: var(--font-sans);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--foreground);
+      margin: 0 0 4px;
+    }
+    .context-header p {
+      font-size: 13px;
+      color: var(--foreground-muted);
+      margin: 0;
+    }
+
+    /* ── TOOLBAR — Contained Bar style ─────────────────────────── */
+    .toolbar-contained {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      min-height: 44px;
+    }
+
+    .toolbar-spacer {
+      flex: 1;
+    }
+
+    .toolbar-separator {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── Search field (contained variant) ──────────────────────── */
+    .toolbar-search {
+      position: relative;
+      width: 240px;
+      max-width: 280px;
+      min-width: 200px;
+    }
+    .toolbar-search-icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--foreground-subtle);
+      pointer-events: none;
+    }
+    .toolbar-search-input {
+      width: 100%;
+      height: 28px;
+      padding: 0 60px 0 28px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--foreground);
+      background: color-mix(in oklch, var(--surface-2) 60%, var(--background));
+      border: 1px solid var(--surface-2);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+    .toolbar-search-input::placeholder {
+      color: var(--foreground-subtle);
+    }
+    .toolbar-search-input:focus {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 18%, transparent);
+    }
+    .toolbar-search-kbd {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .toolbar-search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: var(--surface-3);
+      border-radius: var(--radius-xs);
+      color: var(--foreground-muted);
+      cursor: pointer;
+      padding: 0;
+    }
+    .toolbar-search-clear:hover {
+      background: var(--border);
+      color: var(--foreground);
+    }
+
+    /* ── Toolbar trigger buttons ───────────────────────────────── */
+    .toolbar-trigger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      padding: 0;
+      transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    }
+    .toolbar-trigger:hover {
+      background: var(--surface-2);
+      color: var(--foreground);
+    }
+    .toolbar-trigger:active {
+      transform: scale(0.94);
+    }
+    .toolbar-trigger:focus-visible {
+      outline: 2px solid var(--moss-400);
+      outline-offset: 1px;
+    }
+    .toolbar-trigger:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .toolbar-trigger.is-open {
+      background: var(--surface-3);
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    .toolbar-trigger.is-active-intent {
+      background: var(--primary);
+      color: var(--primary-fg);
+      border-color: transparent;
+    }
+    .toolbar-trigger.is-active-intent:hover {
+      background: color-mix(in oklch, var(--primary) 85%, black 15%);
+      color: var(--primary-fg);
+    }
+
+    /* Active indicator dot */
+    .toolbar-trigger .active-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--moss-400);
+      box-shadow: 0 0 0 1.5px var(--surface);
+    }
+
+    /* ── GitHub status chip ────────────────────────────────────── */
+    .gh-status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 24px;
+      padding: 0 8px 0 6px;
+      border-radius: var(--radius-full);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-muted);
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+    .gh-status-chip:hover {
+      background: var(--surface-3);
+      border-color: var(--border-strong);
+    }
+    .gh-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .gh-status-dot.is-connected { background: var(--status-success); }
+    .gh-status-dot.is-warning { background: var(--status-warning); }
+    .gh-status-dot.is-error { background: var(--status-danger); }
+    .gh-status-text {
+      display: none;
+    }
+    @media (min-width: 900px) {
+      .gh-status-text {
+        display: inline;
+      }
+    }
+
+    /* ── Skeleton cards (context below) ────────────────────────── */
+    .context-cards {
+      padding: 20px 24px 24px;
+      opacity: 0.3;
+    }
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .skeleton-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton-card::after {
+      content: '';
+      position: absolute;
+      inset: 16px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(
+        90deg,
+        var(--surface-2) 0%,
+        var(--surface-3) 50%,
+        var(--surface-2) 100%
+      );
+      background-size: 200% 100%;
+      animation: gk-shimmer 2s linear infinite;
+    }
+    @media (max-width: 640px) {
+      .skeleton-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Popovers showcase (below in-context) ──────────────────── */
+    .popovers-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 8px;
+    }
+    @media (max-width: 800px) {
+      .popovers-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .popover-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .popover-showcase-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* Popover card */
+    .pop-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 8px;
+    }
+    .pop-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      transition: background 100ms ease;
+    }
+    .pop-item:hover {
+      background: var(--surface-2);
+    }
+    .pop-item.is-selected {
+      color: var(--foreground);
+    }
+    .pop-item .check-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+    .pop-item .check-placeholder {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .pop-item .pop-meta {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--foreground-subtle);
+    }
+    .pop-footer {
+      margin-top: 4px;
+      padding: 8px 8px 4px;
+      border-top: 1px dashed var(--border);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-subtle);
+    }
+    .pop-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 8px 4px;
+    }
+    .pop-preview {
+      margin-top: 4px;
+      padding: 8px 10px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--foreground-muted);
+    }
+    .pop-preview-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    /* ── Trigger states showcase ───────────────────────────────── */
+    .states-row {
+      display: flex;
+      gap: 24px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .state-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .state-cell-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--foreground-subtle);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── GitHub status states showcase ─────────────────────────── */
+    .gh-states-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    /* ── Responsive toolbar ────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .toolbar-contained {
+        padding: 8px 12px;
+        gap: 4px;
+      }
+      .toolbar-search {
+        width: 160px;
+        min-width: 140px;
+      }
+      .variant-page {
+        padding: 20px 16px 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gk-root theme-dark">
+    <div class="variant-page">
+      <p class="gk-eyebrow variant-label">VARIANT B: CONTAINED BAR</p>
+
+      <!-- ════════════════════════════════════════════════════════════
+           IN-CONTEXT RENDERING
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">In-context rendering</div>
+      <div class="context-wrapper">
+        <!-- Page header (30% opacity) -->
+        <div class="context-header">
+          <h1>Grovekeeper</h1>
+          <p>Your workspaces</p>
+        </div>
+
+        <!-- TOOLBAR (full opacity) -->
+        <div class="toolbar-contained" role="toolbar" aria-label="Workspace toolbar">
+          <!-- Search -->
+          <div class="toolbar-search">
+            <span class="toolbar-search-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" class="toolbar-search-input" placeholder="Search workspaces..." aria-label="Search workspaces">
+            <span class="toolbar-search-kbd"><span class="gk-kbd">Ctrl+F</span></span>
+          </div>
+
+          <!-- Spacer -->
+          <div class="toolbar-spacer"></div>
+
+          <!-- Sort -->
+          <button type="button" class="toolbar-trigger" aria-label="Sort workspaces" title="Sort">
+            <span class="active-dot"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+
+          <!-- Filter -->
+          <button type="button" class="toolbar-trigger" aria-label="Filter workspaces" title="Filter">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </button>
+
+          <!-- Separator -->
+          <div class="toolbar-separator"></div>
+
+          <!-- Archive -->
+          <button type="button" class="toolbar-trigger" aria-label="Toggle archived workspaces" title="Archive">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </button>
+
+          <!-- Footer Settings -->
+          <button type="button" class="toolbar-trigger" aria-label="Footer settings" title="Footer Settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+          </button>
+
+          <!-- Separator -->
+          <div class="toolbar-separator"></div>
+
+          <!-- GitHub Status -->
+          <button type="button" class="gh-status-chip" aria-label="GitHub sync status: connected">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            <span class="gh-status-dot is-connected"></span>
+            <span class="gh-status-text">Synced</span>
+          </button>
+        </div>
+
+        <!-- Cards below (30% opacity) -->
+        <div class="context-cards">
+          <div class="skeleton-grid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           POPOVER STATES
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">Popover contents</div>
+      <div class="popovers-row">
+        <!-- Sort popover -->
+        <div class="popover-showcase">
+          <div class="popover-showcase-label">Sort</div>
+          <div class="pop-card" style="width: 180px;">
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Name</span>
+              <span class="pop-meta">A&#8594;Z</span>
+            </div>
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Activity</span>
+              <span class="pop-meta">recent</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Issue count</span>
+              <span class="pop-meta">most</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Cost</span>
+              <span class="pop-meta">today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter popover -->
+        <div class="popover-showcase">
+          <div class="popover-showcase-label">Filter</div>
+          <div class="pop-card" style="width: 220px;">
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>All</span>
+              <span class="pop-meta">8</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Active</span>
+              <span class="pop-meta">3</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Needs Attention</span>
+              <span class="pop-meta">2</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Dormant</span>
+              <span class="pop-meta">1</span>
+            </div>
+            <div class="pop-footer">8 workspaces shown</div>
+          </div>
+        </div>
+
+        <!-- Footer Settings popover -->
+        <div class="popover-showcase">
+          <div class="popover-showcase-label">Footer Settings</div>
+          <div class="pop-card" style="width: 260px;">
+            <div class="pop-eyebrow">WORKSPACE CARD FOOTER</div>
+            <div class="pop-item is-selected" role="menuitemradio" aria-checked="true">
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Today's cost</span>
+              <span class="pop-meta">today $4.82</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>This week's cost</span>
+              <span class="pop-meta">week $23.40</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Total cost</span>
+              <span class="pop-meta">total $142.50</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Active sessions</span>
+              <span class="pop-meta">2 sessions</span>
+            </div>
+            <div class="pop-item" role="menuitemradio" aria-checked="false">
+              <span class="check-placeholder"></span>
+              <span>Last activity</span>
+              <span class="pop-meta">3m ago</span>
+            </div>
+            <div class="pop-preview">
+              <span class="pop-preview-dot"></span>
+              <span>$4.82 spent today</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           TRIGGER STATES
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">Trigger button states</div>
+      <div class="states-row">
+        <!-- Default -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-frozen" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Default</span>
+        </div>
+
+        <!-- Hover -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-frozen" tabindex="-1" style="background: var(--surface-2); color: var(--foreground);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Hover</span>
+        </div>
+
+        <!-- Active (with dot) -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-frozen" tabindex="-1">
+            <span class="active-dot"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Active (dot)</span>
+        </div>
+
+        <!-- Open -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-open is-frozen" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Open</span>
+        </div>
+
+        <!-- Focus -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-frozen" tabindex="-1" style="outline: 2px solid var(--moss-400); outline-offset: 1px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Focus</span>
+        </div>
+
+        <!-- Disabled -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-frozen" tabindex="-1" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+          </button>
+          <span class="state-cell-label">Disabled</span>
+        </div>
+
+        <!-- Active intent (archive on) -->
+        <div class="state-cell">
+          <button type="button" class="toolbar-trigger is-active-intent is-frozen" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </button>
+          <span class="state-cell-label">Active intent</span>
+        </div>
+      </div>
+
+      <div class="section-spacer"></div>
+
+      <!-- ════════════════════════════════════════════════════════════
+           GITHUB STATUS STATES
+           ════════════════════════════════════════════════════════════ -->
+      <div class="section-title">GitHub status states</div>
+      <div class="gh-states-row">
+        <!-- Connected -->
+        <button type="button" class="gh-status-chip is-frozen" tabindex="-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span class="gh-status-dot is-connected"></span>
+          <span class="gh-status-text" style="display: inline;">Synced</span>
+        </button>
+
+        <!-- Warning -->
+        <button type="button" class="gh-status-chip is-frozen" tabindex="-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span class="gh-status-dot is-warning"></span>
+          <span class="gh-status-text" style="display: inline;">Rate limited</span>
+        </button>
+
+        <!-- Error -->
+        <button type="button" class="gh-status-chip is-frozen" tabindex="-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span class="gh-status-dot is-error"></span>
+          <span class="gh-status-text" style="display: inline;">Disconnected</span>
+        </button>
+      </div>
+
+    </div><!-- /.variant-page -->
+  </div><!-- /.gk-root -->
+</body>
+</html>
