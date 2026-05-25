@@ -20,10 +20,10 @@
 		dashboard: Dashboard | null;
 		onClose: () => void;
 		onUpdate: (request: UpdateDashboardRequest) => void;
-		onDelete: (id: string) => void;
+		onArchive: (id: string) => void;
 	}
 
-	let { dashboard, onClose, onUpdate, onDelete }: Props = $props();
+	let { dashboard, onClose, onUpdate, onArchive }: Props = $props();
 
 	const versionControl = useVersionControl();
 
@@ -34,7 +34,7 @@
 	let worktreeParentFolder = $state('');
 	let accentColor = $state(WORKSPACE_ACCENT_PALETTE[0]);
 	let authWizardOpen = $state(false);
-	let confirmDelete = $state(false);
+	let confirmArchive = $state(false);
 
 	const open = $derived(dashboard !== null);
 
@@ -47,7 +47,7 @@
 				defaultBaseBranch = dashboard!.default_base_branch ?? '';
 				worktreeParentFolder = dashboard!.worktree_parent_folder ?? '';
 				accentColor = dashboard!.accent_color ?? WORKSPACE_ACCENT_PALETTE[0];
-				confirmDelete = false;
+				confirmArchive = false;
 			});
 		}
 	});
@@ -70,15 +70,15 @@
 		onClose();
 	}
 
-	function handleDelete() {
+	function handleArchive() {
 		if (dashboard === null) {
 			return;
 		}
-		if (!confirmDelete) {
-			confirmDelete = true;
+		if (!confirmArchive) {
+			confirmArchive = true;
 			return;
 		}
-		onDelete(dashboard.id);
+		onArchive(dashboard.id);
 		onClose();
 	}
 
@@ -153,8 +153,8 @@
 				</Dialog.Body>
 
 				<Dialog.Footer class="justify-between">
-					<Button intent="danger" type="button" size="sm" onclick={handleDelete}>
-						{confirmDelete ? m.btn_confirm_delete() : m.btn_delete()}
+					<Button intent="danger" type="button" size="sm" onclick={handleArchive}>
+						{confirmArchive ? m.btn_confirm_archive() : m.btn_archive()}
 					</Button>
 					<div class="flex gap-2">
 						<Button intent="ghost" type="button" onclick={onClose}>

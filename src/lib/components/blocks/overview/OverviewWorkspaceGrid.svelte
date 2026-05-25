@@ -10,6 +10,9 @@
 		onGithubClick: (workspace: OverviewWorkspaceData) => void;
 		onFolderClick: (workspace: OverviewWorkspaceData) => void;
 		onConfigureWorkspace: (dashboardId: string) => void;
+		onArchive: (workspace: OverviewWorkspaceData) => void;
+		onUnarchive: (workspace: OverviewWorkspaceData) => void;
+		onDelete: (workspace: OverviewWorkspaceData) => void;
 	}
 
 	let {
@@ -19,6 +22,9 @@
 		onGithubClick,
 		onFolderClick,
 		onConfigureWorkspace,
+		onArchive,
+		onUnarchive,
+		onDelete,
 	}: Props = $props();
 </script>
 
@@ -33,6 +39,9 @@
 			onFolderClick={() => onFolderClick(workspace)}
 			onGithubRightClick={() => onConfigureWorkspace(workspace.dashboard_id)}
 			onFolderRightClick={() => onConfigureWorkspace(workspace.dashboard_id)}
+			onArchive={() => onArchive(workspace)}
+			onUnarchive={() => onUnarchive(workspace)}
+			onDelete={() => onDelete(workspace)}
 		/>
 	{/each}
 	<AddWorkspaceCard onclick={onAddWorkspace} />
