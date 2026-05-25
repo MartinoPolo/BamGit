@@ -1787,4 +1787,5 @@ export const MOCK_USER_SETTINGS: Record<string, string> = {
 	issue_card_color_saturation: '150',
 	issue_card_header_saturation: '85',
 	issue_card_radial_intensity: '75',
+	overview_footer_content: 'cost-today',
 };

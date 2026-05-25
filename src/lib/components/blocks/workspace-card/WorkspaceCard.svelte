@@ -25,6 +25,10 @@
 	import { formatWorkspaceActivityRelativeTime } from '$lib/modules/overview/overview_time.js';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
 	import {
+		OVERVIEW_FOOTER_CONTENT_DEFAULT,
+		type OverviewFooterContent,
+	} from '$lib/components/blocks/overview/overview_toolbar_types.js';
+	import {
 		AFK_LOOP_RUNNING,
 		deriveWorkspaceCardVariant,
 		getVariantAccentColor,
@@ -33,6 +37,7 @@
 
 	interface Props {
 		workspace: OverviewWorkspaceData;
+		footerContent?: OverviewFooterContent;
 		onclick: () => void;
 		onGithubClick?: () => void;
 		onFolderClick?: () => void;
@@ -51,6 +56,7 @@
 
 	let {
 		workspace,
+		footerContent = OVERVIEW_FOOTER_CONTENT_DEFAULT,
 		onclick,
 		onGithubClick,
 		onFolderClick,
@@ -389,26 +395,50 @@
 				{/if}
 			</div>
 
-			<!-- Footer: cost + activity -->
+			<!-- Footer: configurable content + activity -->
 			<div
 				class="mt-2.5 flex items-center justify-between border-t border-dashed border-border pt-2"
 			>
 				<span
 					class="flex items-center gap-1 font-mono text-[10.5px] text-foreground-subtle"
 				>
-					today <CostLink
-						costUsd={workspace.total_cost_usd ?? 0}
-						period="today"
-						scope="workspace"
-						size="sm"
-					/>
+					{#if footerContent === 'cost-today'}
+						today <CostLink
+							costUsd={workspace.total_cost_usd ?? 0}
+							period="today"
+							scope="workspace"
+							size="sm"
+						/>
+					{:else if footerContent === 'cost-week'}
+						week <CostLink
+							costUsd={workspace.total_cost_usd ?? 0}
+							period="week"
+							scope="workspace"
+							size="sm"
+						/>
+					{:else if footerContent === 'cost-total'}
+						total <CostLink
+							costUsd={workspace.total_cost_usd ?? 0}
+							period="all"
+							scope="workspace"
+							size="sm"
+						/>
+					{:else if footerContent === 'sessions'}
+						<UserIcon class="size-3" />
+						{workspace.active_session_count} sessions
+					{:else if footerContent === 'last-activity'}
+						<ClockIcon class="size-3" />
+						{formatWorkspaceActivityRelativeTime(workspace.last_activity)}
+					{/if}
 				</span>
-				<span
-					class="flex items-center gap-1 font-mono text-[10.5px] text-foreground-subtle"
-				>
-					<ClockIcon class="size-3" />
-					{formatWorkspaceActivityRelativeTime(workspace.last_activity)}
-				</span>
+				{#if footerContent !== 'last-activity'}
+					<span
+						class="flex items-center gap-1 font-mono text-[10.5px] text-foreground-subtle"
+					>
+						<ClockIcon class="size-3" />
+						{formatWorkspaceActivityRelativeTime(workspace.last_activity)}
+					</span>
+				{/if}
 			</div>
 		</div></Card.Card
 	>

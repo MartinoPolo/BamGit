@@ -74,7 +74,8 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_color_saturation', '150');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_header_saturation', '85');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('issue_card_radial_intensity', '75');
-         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('editor_command', 'code');",
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('editor_command', 'code');
+         INSERT OR IGNORE INTO user_settings (key, value) VALUES ('overview_footer_content', 'cost-today');",
     )?;
     connection.execute(
         "INSERT OR IGNORE INTO user_settings (key, value) VALUES ('notification_volume', ?1)",
