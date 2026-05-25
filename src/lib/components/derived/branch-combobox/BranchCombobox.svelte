@@ -129,14 +129,18 @@
 			{placeholder}
 			{disabled}
 			oninput={handleInput}
-			onfocus={() => {
-				if (!disabled) {
+			onclick={() => {
+				if (!disabled && !open) {
 					handleOpenChange(true);
 				}
 			}}
-			onclick={() => {
+			onfocus={() => {
 				if (!disabled) {
-					handleOpenChange(true);
+					setTimeout(() => {
+						if (!open) {
+							handleOpenChange(true);
+						}
+					}, 0);
 				}
 			}}
 			class={cn(inputVariants(), 'pr-8', disabled && 'cursor-not-allowed opacity-50')}

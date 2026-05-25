@@ -146,8 +146,18 @@
 			{id}
 			{placeholder}
 			oninput={handleInput}
-			onfocus={() => handleOpenChange(true)}
-			onclick={() => handleOpenChange(true)}
+			onclick={() => {
+				if (!open) {
+					handleOpenChange(true);
+				}
+			}}
+			onfocus={() => {
+				setTimeout(() => {
+					if (!open) {
+						handleOpenChange(true);
+					}
+				}, 0);
+			}}
 			class={cn(inputVariants(), 'pr-8')}
 			aria-label="GitHub repository"
 		/>
