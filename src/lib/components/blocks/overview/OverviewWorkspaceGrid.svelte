@@ -2,9 +2,14 @@
 	import WorkspaceCard from '$lib/components/blocks/workspace-card/WorkspaceCard.svelte';
 	import AddWorkspaceCard from '$lib/components/blocks/workspace/AddWorkspaceCard.svelte';
 	import type { OverviewWorkspaceData } from '$lib/types/generated';
+	import {
+		OVERVIEW_FOOTER_CONTENT_DEFAULT,
+		type OverviewFooterContent,
+	} from './overview_toolbar_types.js';
 
 	interface Props {
 		workspaces: OverviewWorkspaceData[];
+		footerContent?: OverviewFooterContent;
 		onAddWorkspace: () => void;
 		onOpenWorkspace: (dashboardId: string) => void;
 		onGithubClick: (workspace: OverviewWorkspaceData) => void;
@@ -17,6 +22,7 @@
 
 	let {
 		workspaces,
+		footerContent = OVERVIEW_FOOTER_CONTENT_DEFAULT,
 		onAddWorkspace,
 		onOpenWorkspace,
 		onGithubClick,
@@ -34,6 +40,7 @@
 	{#each workspaces as workspace (workspace.dashboard_id)}
 		<WorkspaceCard
 			{workspace}
+			{footerContent}
 			onclick={() => onOpenWorkspace(workspace.dashboard_id)}
 			onGithubClick={() => onGithubClick(workspace)}
 			onFolderClick={() => onFolderClick(workspace)}

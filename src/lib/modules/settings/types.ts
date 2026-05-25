@@ -29,6 +29,9 @@ export const SETTING_KEYS = {
 	issueCardColorSaturation: 'issue_card_color_saturation',
 	issueCardHeaderSaturation: 'issue_card_header_saturation',
 	issueCardRadialIntensity: 'issue_card_radial_intensity',
+
+	// Overview
+	overviewFooterContent: 'overview_footer_content',
 } as const;
 
 export type SettingKey = keyof typeof SETTING_KEYS;
@@ -54,6 +57,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	issueCardColorSaturation: '150',
 	issueCardHeaderSaturation: '85',
 	issueCardRadialIntensity: '75',
+	overviewFooterContent: 'cost-today',
 };
 
 // Settings that can be overridden per workspace
