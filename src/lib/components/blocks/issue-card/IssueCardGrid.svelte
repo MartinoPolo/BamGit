@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue } from '$lib/modules/issues';
-	import type { GitStatusCache } from '$lib/types/generated';
+	import type { GitStatusCache, SessionState } from '$lib/types/generated';
 	import type { IssueCardCallbacks, IssuePriority } from '$lib/modules/issues';
 	import type { TreeVisualization } from '$lib/modules/visualization';
 	import { SPECIAL_LABELS } from '$lib/modules/visualization/constants.js';
@@ -9,7 +9,9 @@
 		type ContextualActionInput,
 	} from '$lib/modules/contextual-actions';
 	import { useSelection } from '$lib/modules/board';
+	import { useSessions } from '$lib/modules/sessions';
 	import { useIssueCardSettings } from './index.js';
+	import type { SessionStateProp } from './index.js';
 	import IssueCard from './IssueCard.svelte';
 	import IssueCardContextMenu from './IssueCardContextMenu.svelte';
 	import BatchActionToolbar from './BatchActionToolbar.svelte';
@@ -65,6 +67,39 @@
 
 	const selection = useSelection();
 	const issueCardSettingsCtx = useIssueCardSettings();
+	const sessionsCtx = useSessions();
+
+	const GENERATED_STATE_TO_CARD_PROP: Record<SessionState, NonNullable<SessionStateProp>> = {
+		running: 'executing',
+		'needs-input': 'hitl',
+		'needs-review': 'review',
+		errored: 'error',
+		paused: 'paused',
+		finished: 'done',
+	};
+
+	function mapSessionsToCardProp(
+		sessions: readonly { state: SessionState }[] | undefined,
+	): SessionStateProp {
+		if (!sessions || sessions.length === 0) {
+			return null;
+		}
+		const priorityOrder: SessionState[] = [
+			'needs-input',
+			'errored',
+			'needs-review',
+			'running',
+			'paused',
+			'finished',
+		];
+		const stateSet = new Set(sessions.map((s) => s.state));
+		for (const state of priorityOrder) {
+			if (stateSet.has(state)) {
+				return GENERATED_STATE_TO_CARD_PROP[state];
+			}
+		}
+		return null;
+	}
 
 	const flatVisualOrder = $derived.by(() => {
 		const order: Issue[] = [];
@@ -195,9 +230,10 @@
 	// fallow-ignore-next-line complexity
 	function getDerivedActions(issue: Issue) {
 		const cache = cacheMap.get(issue.id);
+		const issueSessions = sessionsCtx.sessionsByIssueId.get(issue.id);
 		const input: ContextualActionInput = {
 			worktreeState: issue.worktree_state,
-			sessionState: null,
+			sessionState: mapSessionsToCardProp(issueSessions),
 			prState: cache?.pr_state ?? null,
 			hasLocalChanges: cache?.has_local_changes ?? false,
 			aheadRemoteCount: cache?.ahead_remote_count ?? 0,
@@ -269,6 +305,9 @@
 						notificationDotColor={getNotificationDotColor?.(issue.id) ?? null}
 						prdParent={getPrdParent(issue)}
 						{prioritiesEnabled}
+						sessionState={mapSessionsToCardProp(
+							sessionsCtx.sessionsByIssueId.get(issue.id),
+						)}
 						visualization={getVisualization?.(issue.id)}
 						appearanceSettings={issueCardSettingsCtx.comparisonSettings}
 						{onExecuteAction}

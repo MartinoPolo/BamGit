@@ -104,6 +104,7 @@
 		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
+		void sessionStore.loadSessions();
 
 		shortcutsCtx.registerShortcut({
 			id: 'command-palette',

@@ -138,11 +138,11 @@
 	--ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
 	--ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);
 	--ease-in: cubic-bezier(0.5, 0, 0.75, 0);
-	--duration-1: 90ms;
-	--duration-2: 120ms;
-	--duration-3: 160ms;
-	--duration-4: 220ms;
-	--duration-5: 320ms;
+	--transition-duration-1: 90ms;
+	--transition-duration-2: 120ms;
+	--transition-duration-3: 160ms;
+	--transition-duration-4: 220ms;
+	--transition-duration-5: 320ms;
 	--default-transition-duration: 0s;
 	--animate-shimmer: shimmer 1.4s linear infinite;
 	--animate-ws-pulse-ring: ws-pulse-ring 2s ease-in-out infinite;
