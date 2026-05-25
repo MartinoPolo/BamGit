@@ -51,6 +51,9 @@ export default defineConfig({
 			],
 		},
 	},
+	optimizeDeps: {
+		include: ['@lucide/svelte/icons/filter'],
+	},
 	test: {
 		passWithNoTests: true,
 		expect: {
