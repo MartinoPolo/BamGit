@@ -1,17 +1,11 @@
 import { createContext } from 'svelte';
 import { invoke } from '$lib/tauri.js';
-import type {
-	Dashboard,
-	ColorPalette,
-	PortfolioDashboardPointer,
-	LabelShapeMapping,
-} from '$lib/types/generated';
+import type { Dashboard, ColorPalette, LabelShapeMapping } from '$lib/types/generated';
 import type {
 	CreateDashboardRequest,
 	UpdateDashboardRequest,
 	CreateColorPaletteRequest,
 	UpdateColorPaletteRequest,
-	AddRepoToPortfolioRequest,
 } from './types.js';
 import {
 	findPaletteForDashboard,
@@ -56,7 +50,6 @@ function createBoardContext() {
 	);
 
 	const repoDashboards = $derived(dashboards.filter((d) => d.type === 'repo'));
-	const portfolioDashboards = $derived(dashboards.filter((d) => d.type === 'portfolio'));
 
 	// ── Color palette state ────────────────────────────────────────────────
 	let palettes = $state<ColorPalette[]>([]);
@@ -77,9 +70,6 @@ function createBoardContext() {
 		},
 		get repoDashboards() {
 			return repoDashboards;
-		},
-		get portfolioDashboards() {
-			return portfolioDashboards;
 		},
 		get sidebarCollapsed() {
 			return sidebarCollapsed;
@@ -154,23 +144,6 @@ function createBoardContext() {
 		async deleteDashboard(id: string, confirmName: string): Promise<void> {
 			await invoke('delete_dashboard', { id, confirmName });
 			await this.refreshDashboards();
-		},
-
-		// Portfolio
-		async addRepoToPortfolio(
-			request: AddRepoToPortfolioRequest,
-		): Promise<PortfolioDashboardPointer> {
-			return invoke('add_repo_to_portfolio', { request });
-		},
-
-		async removeRepoFromPortfolio(
-			portfolioDashboardId: string,
-			repoDashboardId: string,
-		): Promise<void> {
-			return invoke('remove_repo_from_portfolio', {
-				portfolioDashboardId,
-				repoDashboardId,
-			});
 		},
 
 		// Color palettes

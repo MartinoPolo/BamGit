@@ -1,53 +1,56 @@
-﻿<script lang="ts">
+<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import type { CreateDashboardRequest } from '$lib/modules/board';
-	import type { Dashboard } from '$lib/types/generated';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import * as ToggleGroup from '$lib/components/shadcn/toggle-group/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
 	import { Label } from '$lib/components/shadcn/label/index.js';
-	import { Checkbox } from '$lib/components/shadcn/checkbox/index.js';
 	import { ColorPickerContent } from '$lib/components/derived/color-picker/index.js';
 	import { WORKSPACE_ACCENT_PALETTE } from '$lib/components/derived/color-picker/color_utils.js';
 	import PathInput from '$lib/components/derived/path-input/PathInput.svelte';
 	import RepoCombobox from '$lib/components/derived/repo-combobox/RepoCombobox.svelte';
-	import { buildCreateDashboardRequest } from '$lib/components/blocks/issue/dialog_helpers.js';
+	import BranchCombobox from '$lib/components/derived/branch-combobox/BranchCombobox.svelte';
+	import {
+		buildCreateDashboardRequest,
+		deriveWorktreeFolder,
+	} from '$lib/components/blocks/issue/dialog_helpers.js';
 
 	interface Props {
 		open: boolean;
-		repoDashboards: Dashboard[];
 		onClose: () => void;
-		onCreate: (request: CreateDashboardRequest, selectedRepoIds: string[]) => void;
+		onCreate: (request: CreateDashboardRequest) => void;
 	}
 
-	let { open, repoDashboards, onClose, onCreate }: Props = $props();
+	let { open, onClose, onCreate }: Props = $props();
 
-	let dashboardType = $state<'repo' | 'portfolio'>('repo');
 	let name = $state('');
 	let githubRepo = $state('');
 	let localFolder = $state('');
 	let defaultBaseBranch = $state('');
 	let worktreeParentFolder = $state('');
 	let accentColor = $state(WORKSPACE_ACCENT_PALETTE[0]);
-	let selectedRepoIds = $state<Set<string>>(new Set());
+	let worktreeManuallyEdited = $state(false);
+
+	$effect(() => {
+		if (localFolder && !worktreeManuallyEdited) {
+			worktreeParentFolder = deriveWorktreeFolder(localFolder);
+		}
+	});
 
 	function resetForm() {
-		dashboardType = 'repo';
 		name = '';
 		githubRepo = '';
 		localFolder = '';
 		defaultBaseBranch = '';
 		worktreeParentFolder = '';
 		accentColor = WORKSPACE_ACCENT_PALETTE[0];
-		selectedRepoIds = new Set();
+		worktreeManuallyEdited = false;
 	}
 
 	function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		const request = buildCreateDashboardRequest(
 			name,
-			dashboardType,
 			accentColor,
 			githubRepo,
 			localFolder,
@@ -57,7 +60,7 @@
 		if (request === null) {
 			return;
 		}
-		onCreate(request, [...selectedRepoIds]);
+		onCreate(request);
 		resetForm();
 		onClose();
 	}
@@ -82,27 +85,6 @@
 			</Dialog.Header>
 
 			<Dialog.Body class="flex flex-col gap-4">
-				<!-- Type selector -->
-				<ToggleGroup.Root
-					type="single"
-					value={dashboardType}
-					onValueChange={(value: string) => {
-						if (value) {
-							dashboardType = value as 'repo' | 'portfolio';
-						}
-					}}
-					intent="outline"
-					size="sm"
-					class="flex gap-2"
-				>
-					<ToggleGroup.Item value="repo" class="flex-1">
-						◆ {m.dashboard_type_repo()}
-					</ToggleGroup.Item>
-					<ToggleGroup.Item value="portfolio" class="flex-1">
-						◇ {m.dashboard_type_portfolio()}
-					</ToggleGroup.Item>
-				</ToggleGroup.Root>
-
 				<!-- Name -->
 				<div class="flex flex-col gap-1.5">
 					<Label for="dashboard-name">{m.dashboard_field_name()}</Label>
@@ -114,7 +96,58 @@
 					/>
 				</div>
 
-				<!-- Accent color -->
+				<!-- GitHub Repo -->
+				<div class="flex flex-col gap-1.5">
+					<Label for="dashboard-github-repo">{m.dashboard_field_github_repo()}</Label>
+					<RepoCombobox
+						id="dashboard-github-repo"
+						bind:value={githubRepo}
+						placeholder={m.dashboard_placeholder_github_repo()}
+					/>
+				</div>
+
+				<!-- Default Base Branch -->
+				<div class="flex flex-col gap-1.5">
+					<Label for="dashboard-base-branch"
+						>{m.dashboard_field_default_base_branch()}</Label
+					>
+					<BranchCombobox
+						id="dashboard-base-branch"
+						bind:value={defaultBaseBranch}
+						{githubRepo}
+						disabled={!githubRepo}
+						placeholder={githubRepo
+							? m.dashboard_placeholder_base_branch()
+							: m.dashboard_placeholder_branch_select_repo_first()}
+					/>
+				</div>
+
+				<!-- Local Folder -->
+				<div class="flex flex-col gap-1.5">
+					<Label for="dashboard-local-folder">{m.dashboard_field_local_folder()}</Label>
+					<PathInput
+						id="dashboard-local-folder"
+						bind:value={localFolder}
+						placeholder={m.dashboard_placeholder_local_folder()}
+					/>
+				</div>
+
+				<!-- Worktree Parent Folder -->
+				<div class="flex flex-col gap-1.5">
+					<Label for="dashboard-worktree-folder"
+						>{m.dashboard_field_worktree_parent_folder()}</Label
+					>
+					<PathInput
+						id="dashboard-worktree-folder"
+						bind:value={worktreeParentFolder}
+						placeholder={m.dashboard_placeholder_worktree_parent()}
+						onchange={() => {
+							worktreeManuallyEdited = true;
+						}}
+					/>
+				</div>
+
+				<!-- Accent Color -->
 				<div class="flex flex-col gap-1.5">
 					<Label>{m.palette_color_palette()}</Label>
 					<ColorPickerContent
@@ -123,88 +156,6 @@
 						onSelect={(color) => (accentColor = color)}
 					/>
 				</div>
-
-				<!-- Repo-specific fields -->
-				{#if dashboardType === 'portfolio'}
-					<fieldset class="flex flex-col gap-1">
-						<legend class="text-xs text-muted-foreground"
-							>{m.dashboard_field_repo_dashboards()}</legend
-						>
-						{#if repoDashboards.length === 0}
-							<p class="text-xs text-muted-foreground">
-								{m.dashboard_no_repo_dashboards()}
-							</p>
-						{:else}
-							<div
-								class="flex flex-col gap-1 rounded border border-input bg-muted p-2"
-							>
-								{#each repoDashboards as repo (repo.id)}
-									<label
-										class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-accent/25"
-									>
-										<Checkbox
-											checked={selectedRepoIds.has(repo.id)}
-											onCheckedChange={(checked) => {
-												const next = new Set(selectedRepoIds);
-												if (checked === true) {
-													next.add(repo.id);
-												} else {
-													next.delete(repo.id);
-												}
-												selectedRepoIds = next;
-											}}
-										/>
-										<span class="text-foreground">{repo.name}</span>
-										{#if repo.github_repo}
-											<span class="text-xs text-muted-foreground"
-												>{repo.github_repo}</span
-											>
-										{/if}
-									</label>
-								{/each}
-							</div>
-						{/if}
-					</fieldset>
-				{:else if dashboardType === 'repo'}
-					<div class="flex flex-col gap-1.5">
-						<Label for="dashboard-github-repo">{m.dashboard_field_github_repo()}</Label>
-						<RepoCombobox
-							id="dashboard-github-repo"
-							bind:value={githubRepo}
-							placeholder={m.dashboard_placeholder_github_repo()}
-						/>
-					</div>
-					<div class="flex flex-col gap-1.5">
-						<Label for="dashboard-local-folder"
-							>{m.dashboard_field_local_folder()}</Label
-						>
-						<PathInput
-							id="dashboard-local-folder"
-							bind:value={localFolder}
-							placeholder={m.dashboard_placeholder_local_folder()}
-						/>
-					</div>
-					<div class="flex flex-col gap-1.5">
-						<Label for="dashboard-base-branch"
-							>{m.dashboard_field_default_base_branch()}</Label
-						>
-						<Input
-							id="dashboard-base-branch"
-							bind:value={defaultBaseBranch}
-							placeholder={m.dashboard_placeholder_base_branch()}
-						/>
-					</div>
-					<div class="flex flex-col gap-1.5">
-						<Label for="dashboard-worktree-folder"
-							>{m.dashboard_field_worktree_parent_folder()}</Label
-						>
-						<PathInput
-							id="dashboard-worktree-folder"
-							bind:value={worktreeParentFolder}
-							placeholder={m.dashboard_placeholder_worktree_parent()}
-						/>
-					</div>
-				{/if}
 			</Dialog.Body>
 
 			<Dialog.Footer>

@@ -15,7 +15,7 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
         CREATE TABLE IF NOT EXISTS dashboards (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
-            type TEXT NOT NULL CHECK (type IN ('repo', 'portfolio')),
+            type TEXT NOT NULL CHECK (type IN ('repo')),
             github_repo TEXT,
             local_folder TEXT,
             default_base_branch TEXT,
@@ -53,14 +53,6 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             character_pack_id TEXT,
             character_avatar TEXT,
             is_sound_muted INTEGER NOT NULL DEFAULT 0
-        );
-
-        CREATE TABLE IF NOT EXISTS portfolio_dashboard_pointers (
-            id TEXT PRIMARY KEY,
-            portfolio_dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
-            repo_dashboard_id TEXT NOT NULL REFERENCES dashboards(id) ON DELETE CASCADE,
-            sort_order INTEGER NOT NULL DEFAULT 0,
-            UNIQUE(portfolio_dashboard_id, repo_dashboard_id)
         );
 
         CREATE TABLE IF NOT EXISTS label_shape_mappings (

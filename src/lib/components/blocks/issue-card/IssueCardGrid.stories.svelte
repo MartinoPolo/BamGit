@@ -130,7 +130,6 @@
 				parentIssues={allIssues}
 				archivedIssues={[]}
 				showArchived={false}
-				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}
@@ -147,7 +146,6 @@
 				parentIssues={[]}
 				archivedIssues={[]}
 				showArchived={false}
-				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}
@@ -164,7 +162,6 @@
 				parentIssues={singleIssue}
 				archivedIssues={[]}
 				showArchived={false}
-				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}
@@ -181,24 +178,6 @@
 				parentIssues={allIssues}
 				{archivedIssues}
 				showArchived={true}
-				isPortfolio={false}
-				getChildren={getChildrenStub}
-				getNotificationDotColor={getNotificationDotColorStub}
-				getVisualization={getVisualizationStub}
-				{...callbacks}
-			/>
-		</IssueCardGridStoryWrapper>
-	{/snippet}
-</Story>
-
-<Story name="Portfolio Mode">
-	{#snippet template()}
-		<IssueCardGridStoryWrapper>
-			<IssueCardGrid
-				parentIssues={allIssues}
-				archivedIssues={[]}
-				showArchived={false}
-				isPortfolio={true}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}
@@ -218,7 +197,6 @@
 				parentIssues={allIssues}
 				archivedIssues={[]}
 				showArchived={false}
-				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}
@@ -238,7 +216,6 @@
 				parentIssues={allIssues}
 				archivedIssues={[]}
 				showArchived={false}
-				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}
@@ -258,7 +235,6 @@
 				parentIssues={allIssues}
 				archivedIssues={[]}
 				showArchived={false}
-				isPortfolio={false}
 				getChildren={getChildrenStub}
 				getNotificationDotColor={getNotificationDotColorStub}
 				getVisualization={getVisualizationStub}

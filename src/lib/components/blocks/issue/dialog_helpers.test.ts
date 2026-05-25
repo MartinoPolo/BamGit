@@ -105,14 +105,21 @@ describe('buildUpdateIssueRequest', () => {
 
 describe('buildCreateDashboardRequest', () => {
 	it('builds repo request with accent color', () => {
-		const result = buildCreateDashboardRequest('My Repo', 'repo', '#62874b', '', '', '', '');
-		expect(result).toEqual({ name: 'My Repo', type: 'repo', accent_color: '#62874b' });
+		const result = buildCreateDashboardRequest('My Repo', '#62874b', '', '', '', '');
+		expect(result).toEqual({
+			name: 'My Repo',
+			type: 'repo',
+			accent_color: '#62874b',
+			github_repo: undefined,
+			local_folder: undefined,
+			default_base_branch: undefined,
+			worktree_parent_folder: undefined,
+		});
 	});
 
-	it('includes repo-specific fields for repo type', () => {
+	it('includes all fields when provided', () => {
 		const result = buildCreateDashboardRequest(
 			'My Repo',
-			'repo',
 			'#62874b',
 			'owner/repo',
 			'/local',
@@ -125,32 +132,17 @@ describe('buildCreateDashboardRequest', () => {
 		expect(result?.worktree_parent_folder).toBe('/worktrees');
 	});
 
-	it('ignores repo fields for portfolio type', () => {
-		const result = buildCreateDashboardRequest(
-			'Portfolio',
-			'portfolio',
-			'#62874b',
-			'owner/repo',
-			'/local',
-			'main',
-			'/worktrees',
-		);
-		expect(result?.github_repo).toBeUndefined();
-		expect(result?.local_folder).toBeUndefined();
-	});
-
 	it('returns null for empty name', () => {
-		expect(buildCreateDashboardRequest('', 'repo', '#62874b', '', '', '', '')).toBeNull();
+		expect(buildCreateDashboardRequest('', '#62874b', '', '', '', '')).toBeNull();
 	});
 });
 
 describe('buildUpdateDashboardRequest', () => {
-	const repoDashboard = { id: 'dash-1', type: 'repo' };
-	const portfolioDashboard = { id: 'dash-2', type: 'portfolio' };
+	const dashboard = { id: 'dash-1' };
 
-	it('builds update request for repo dashboard', () => {
+	it('builds update request', () => {
 		const result = buildUpdateDashboardRequest(
-			repoDashboard,
+			dashboard,
 			'Updated',
 			'#62874b',
 			'owner/repo',
@@ -169,29 +161,16 @@ describe('buildUpdateDashboardRequest', () => {
 		});
 	});
 
-	it('excludes repo fields for portfolio dashboard', () => {
-		const result = buildUpdateDashboardRequest(
-			portfolioDashboard,
-			'Updated',
-			null,
-			'owner/repo',
-			'/local',
-			'main',
-			'/worktrees',
-		);
-		expect(result?.github_repo).toBeUndefined();
-	});
-
 	it('returns null when dashboard is null', () => {
 		expect(buildUpdateDashboardRequest(null, 'Test', null, '', '', '', '')).toBeNull();
 	});
 
 	it('returns null for empty name', () => {
-		expect(buildUpdateDashboardRequest(repoDashboard, '', null, '', '', '', '')).toBeNull();
+		expect(buildUpdateDashboardRequest(dashboard, '', null, '', '', '', '')).toBeNull();
 	});
 
-	it('nullifies empty string fields for repo type', () => {
-		const result = buildUpdateDashboardRequest(repoDashboard, 'Test', null, '', '', '', '');
+	it('nullifies empty string fields', () => {
+		const result = buildUpdateDashboardRequest(dashboard, 'Test', null, '', '', '', '');
 		expect(result?.github_repo).toBeNull();
 		expect(result?.local_folder).toBeNull();
 	});

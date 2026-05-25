@@ -20,7 +20,6 @@ mod tests {
             "actions",
             "notification_config",
             "git_status_cache",
-            "portfolio_dashboard_pointers",
             "keyboard_shortcuts",
             "window_workspace_bindings",
             "user_settings",
@@ -74,7 +73,7 @@ mod tests {
     }
 
     #[test]
-    fn dashboard_type_check_constraint_accepts_portfolio() {
+    fn dashboard_type_check_constraint_rejects_portfolio() {
         let connection = setup_test_database();
 
         let result = connection.execute(
@@ -83,8 +82,8 @@ mod tests {
         );
 
         assert!(
-            result.is_ok(),
-            "Dashboard type 'portfolio' should be accepted"
+            result.is_err(),
+            "Dashboard type 'portfolio' should be rejected"
         );
     }
 
@@ -568,106 +567,6 @@ mod tests {
             .unwrap();
 
         assert_eq!(count, 0, "Deleting dashboard should cascade to issues");
-    }
-
-    // --- Portfolio pointer tests ---
-
-    #[test]
-    fn portfolio_pointer_crud_round_trip() {
-        let connection = setup_test_database();
-        insert_test_dashboard(&connection, "p1", "portfolio");
-        insert_test_dashboard(&connection, "r1", "repo");
-
-        // Create
-        connection
-            .execute(
-                "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'p1', 'r1')",
-                [],
-            )
-            .unwrap();
-
-        // Read
-        let repo_id: String = connection
-            .query_row(
-                "SELECT repo_dashboard_id FROM portfolio_dashboard_pointers WHERE id = 'ptr1'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert_eq!(repo_id, "r1");
-
-        // Delete
-        let rows_affected = connection
-            .execute(
-                "DELETE FROM portfolio_dashboard_pointers WHERE id = 'ptr1'",
-                [],
-            )
-            .unwrap();
-        assert_eq!(rows_affected, 1);
-    }
-
-    #[test]
-    fn portfolio_pointer_rejects_invalid_dashboard_ids() {
-        let connection = setup_test_database();
-
-        let result = connection.execute(
-            "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'bad1', 'bad2')",
-            [],
-        );
-
-        assert!(result.is_err(), "Invalid dashboard IDs should be rejected");
-    }
-
-    #[test]
-    fn portfolio_pointer_unique_constraint() {
-        let connection = setup_test_database();
-        insert_test_dashboard(&connection, "p1", "portfolio");
-        insert_test_dashboard(&connection, "r1", "repo");
-
-        connection
-            .execute(
-                "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'p1', 'r1')",
-                [],
-            )
-            .unwrap();
-
-        let result = connection.execute(
-            "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr2', 'p1', 'r1')",
-            [],
-        );
-
-        assert!(
-            result.is_err(),
-            "Duplicate portfolio-repo pair should be rejected"
-        );
-    }
-
-    #[test]
-    fn delete_dashboard_cascades_to_portfolio_pointers() {
-        let connection = setup_test_database();
-        insert_test_dashboard(&connection, "p1", "portfolio");
-        insert_test_dashboard(&connection, "r1", "repo");
-
-        connection
-            .execute(
-                "INSERT INTO portfolio_dashboard_pointers (id, portfolio_dashboard_id, repo_dashboard_id) VALUES ('ptr1', 'p1', 'r1')",
-                [],
-            )
-            .unwrap();
-
-        connection
-            .execute("DELETE FROM dashboards WHERE id = 'p1'", [])
-            .unwrap();
-
-        let count: i64 = connection
-            .query_row(
-                "SELECT COUNT(*) FROM portfolio_dashboard_pointers",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-
-        assert_eq!(count, 0, "Deleting portfolio should cascade to pointers");
     }
 
     #[test]

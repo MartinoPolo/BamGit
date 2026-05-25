@@ -32,7 +32,6 @@
 		parentIssues: Issue[];
 		archivedIssues: Issue[];
 		showArchived: boolean;
-		isPortfolio: boolean;
 		cacheMap?: Map<string, GitStatusCache>;
 		ghAvailable?: boolean;
 		prioritiesEnabled?: boolean;
@@ -60,7 +59,6 @@
 		parentIssues,
 		archivedIssues,
 		showArchived,
-		isPortfolio,
 		cacheMap = new Map(),
 		ghAvailable = false,
 		prioritiesEnabled = true,
@@ -193,7 +191,6 @@
 					{parentIssues}
 					{archivedIssues}
 					{showArchived}
-					{isPortfolio}
 					{cacheMap}
 					{ghAvailable}
 					{prioritiesEnabled}
