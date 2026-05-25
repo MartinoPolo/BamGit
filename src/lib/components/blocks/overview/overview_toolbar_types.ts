@@ -3,16 +3,16 @@ import type { OverviewWorkspaceData } from '$lib/types/generated';
 // --- Const objects & derived types ---
 
 export const OVERVIEW_SORT_MODES = {
-	name: 'name',
 	activity: 'activity',
+	name: 'name',
 	'issue-count': 'issue-count',
 	cost: 'cost',
 } as const;
 export type OverviewSortMode = (typeof OVERVIEW_SORT_MODES)[keyof typeof OVERVIEW_SORT_MODES];
 
 export const OVERVIEW_SORT_DIRECTIONS = {
-	ascending: 'ascending',
 	descending: 'descending',
+	ascending: 'ascending',
 } as const;
 export type OverviewSortDirection =
 	(typeof OVERVIEW_SORT_DIRECTIONS)[keyof typeof OVERVIEW_SORT_DIRECTIONS];
