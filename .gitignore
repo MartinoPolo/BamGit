@@ -39,6 +39,9 @@ obj/
 src/lib/paraglide/
 .nuxt/
 
+# Playwright
+test-results/
+
 # Svelte / Vite
 /package
 vite.config.js.timestamp-*
