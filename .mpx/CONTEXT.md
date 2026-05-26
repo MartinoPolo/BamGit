@@ -109,10 +109,12 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 | PRD Management         | planned                     | #219      | —                                                     |
 | Keyboard Shortcuts     | implemented                 | #87       | —                                                     |
 | Internationalization   | implemented (en + cs)       | #87       | —                                                     |
+| Single-Window Nav      | planned                     | #398      | —                                                     |
 
 ## Key Constraints
 
 - SPA mode (ssr=false, static adapter with fallback). No server-side rendering.
+  <<<<<<< Updated upstream
 - Single Tauri process, single-window SPA navigation. Multi-window optional via `single_instance` plugin.
 - Frontend owns all user-facing text. Rust returns error keys. Paraglide for i18n.
 - No versioned DB migrations (pre-production). `schema::create_tables()` + `seed_defaults()`.
