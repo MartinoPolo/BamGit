@@ -32,7 +32,7 @@
 >
 	<div
 		class="flex min-w-0 flex-1 items-center gap-1.5"
-		style="filter: brightness(var(--header-brightness, 1)) saturate(var(--header-saturate, 1)); transition: filter var(--duration-3) ease;"
+		style="filter: brightness(var(--header-brightness, 1)) saturate(var(--header-saturate, 1));"
 	>
 		<span
 			class="inline-flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-semibold opacity-85"

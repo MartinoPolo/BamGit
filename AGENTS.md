@@ -39,6 +39,7 @@ Vitest, Playwright, WebdriverIO (Tauri E2E), Storybook
 `pnpm e2e` -- E2E tests (Playwright, static build + mocks, no Tauri backend)
 `pnpm e2e:tauri` -- E2E tests (builds debug binary, then WebdriverIO + tauri-driver, real SQLite)
 `pnpm db:reset` -- delete SQLite database (app recreates it on next launch)
+`npx playwright test tests/perf/ --config tests/perf/playwright.perf.config.ts --project dev` -- dashboard perf benchmarks (requires dev server running, see `tests/perf/README.md`)
 
 ## Context Budget
 

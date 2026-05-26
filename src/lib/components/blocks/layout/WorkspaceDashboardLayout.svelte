@@ -39,9 +39,11 @@
 			onToggle?.(false);
 		}}
 	>
-		<div class="flex h-full flex-col overflow-hidden">
-			{@render forestPanel()}
-		</div>
+		{#if !internalCollapsed}
+			<div class="flex h-full flex-col overflow-hidden">
+				{@render forestPanel()}
+			</div>
+		{/if}
 	</Pane>
 	<StyledPaneResizer />
 	<Pane minSize={20}>

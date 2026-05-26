@@ -28,13 +28,23 @@ function createSelectionContext() {
 	const rangeSelectedIds = new SvelteSet<string>();
 	const modifierHeld = new StateRaw(false);
 	const flatVisualOrder = new StateRaw<readonly string[]>([]);
+	const forestHoveredIssueId = new StateRaw<string | null>(null);
+	let forestHoverTimer: ReturnType<typeof setTimeout> | undefined;
 
 	function hoverIssue(issueId: string) {
 		hoveredIssueId.current = issueId;
+		clearTimeout(forestHoverTimer);
+		forestHoverTimer = setTimeout(() => {
+			forestHoveredIssueId.current = issueId;
+		}, 80);
 	}
 
 	function unhover() {
 		hoveredIssueId.current = null;
+		clearTimeout(forestHoverTimer);
+		forestHoverTimer = setTimeout(() => {
+			forestHoveredIssueId.current = null;
+		}, 80);
 	}
 
 	function setModifierHeld(held: boolean) {
@@ -164,6 +174,9 @@ function createSelectionContext() {
 	return {
 		get hoveredIssueId() {
 			return hoveredIssueId.current;
+		},
+		get forestHoveredIssueId() {
+			return forestHoveredIssueId.current;
 		},
 		get activeIssueId() {
 			return activeIssueId.current;
