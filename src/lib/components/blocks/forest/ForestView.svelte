@@ -265,36 +265,6 @@
 		interaction.setPrdIssueId(oakEntry?.issue.id ?? null);
 	});
 
-	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- perf cache: preserve referential equality per tree
-	const overlayConfigCache = new Map<string, OverlayConfig>();
-
-	const overlayConfigById = $derived.by(() => {
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local to derived, not persisted
-		const result = new Map<string, OverlayConfig>();
-		for (const entry of entries) {
-			const resolved = getResolvedOverlayConfig(entry);
-			const cached = overlayConfigCache.get(entry.issue.id);
-			if (
-				cached !== undefined &&
-				cached.glow.enabled === resolved.glow.enabled &&
-				cached.glow.color === resolved.glow.color &&
-				cached.glow.intensity === resolved.glow.intensity &&
-				cached.glow.pulse === resolved.glow.pulse
-			) {
-				result.set(entry.issue.id, cached);
-			} else {
-				overlayConfigCache.set(entry.issue.id, resolved);
-				result.set(entry.issue.id, resolved);
-			}
-		}
-		for (const key of overlayConfigCache.keys()) {
-			if (!result.has(key)) {
-				overlayConfigCache.delete(key);
-			}
-		}
-		return result;
-	});
-
 	const layoutItems = $derived(entries.map((entry) => entry.layoutItem));
 	const layoutResult = $derived(
 		computeForestLayout(layoutItems, {
@@ -368,7 +338,7 @@
 		return resolveGlowOverlay({
 			stateOverlay,
 			issueId: entry.issue.id,
-			hoveredIssueId: interaction.forestHoveredIssueId,
+			hoveredIssueId: interaction.hoveredIssueId,
 			activeIssueId: interaction.activeIssueId,
 			batchSelectedIssueIds: interaction.batchSelectedIssueIds,
 			issueColor: entry.issue.color ?? '#525252',
@@ -506,8 +476,7 @@
 					{@const entry = entryById.get(positioned.id)}
 					{#if entry}
 						{@const size = getNaturalSize(entry)}
-						{@const overlayConfig =
-							overlayConfigById.get(entry.issue.id) ?? OVERLAY_DEFAULTS}
+						{@const overlayConfig = getResolvedOverlayConfig(entry)}
 						{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
 						<ForestTreeTooltip
 							issueTitle={entry.issue.name}
