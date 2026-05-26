@@ -379,5 +379,7 @@
 	"mock_action_spawn_session": "Spuštění relace vyžaduje desktopovou aplikaci",
 	"mock_action_sync_all_github_state": "Synchronizace GitHub vyžaduje desktopovou aplikaci",
 	"mock_action_execute_action": "Spuštění akce vyžaduje desktopovou aplikaci",
-	"mock_action_open_workspace_window": "Otevření okna workspace vyžaduje desktopovou aplikaci"
+	"mock_action_open_workspace_window": "Otevření okna workspace vyžaduje desktopovou aplikaci",
+
+	"nav_open_in_new_window": "Otevřít v novém okně"
 }

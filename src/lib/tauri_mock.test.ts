@@ -144,6 +144,18 @@ describe('mockInvoke', () => {
 		});
 	});
 
+	describe('window commands', () => {
+		it('focus_window returns null for tauri-only command', async () => {
+			const result = await mockInvoke('focus_window', { label: 'workspace-abc' });
+			expect(result).toBeNull();
+		});
+
+		it('list_open_windows returns empty array for tauri-only command', async () => {
+			const result = await mockInvoke<string[]>('list_open_windows');
+			expect(result).toEqual([]);
+		});
+	});
+
 	describe('unknown commands', () => {
 		it('returns undefined for unhandled commands', async () => {
 			const result = await mockInvoke('nonexistent_command', {});

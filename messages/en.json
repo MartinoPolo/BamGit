@@ -427,5 +427,7 @@
 	"ai_config_remove": "Remove",
 	"ai_config_source_user": "User",
 	"ai_config_source_project": "Project",
-	"ai_config_source_custom": "Custom"
+	"ai_config_source_custom": "Custom",
+
+	"nav_open_in_new_window": "Open in new window"
 }

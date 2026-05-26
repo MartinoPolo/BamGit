@@ -77,6 +77,19 @@ pub fn open_or_focus_window_with_position(
     Ok(())
 }
 
+pub fn focus_window_by_label(app: &AppHandle, label: &str) -> Result<(), String> {
+    let window = app
+        .get_webview_window(label)
+        .ok_or_else(|| format!("Window not found: {label}"))?;
+    window
+        .set_focus()
+        .map_err(|error| format!("Failed to focus window: {error}"))
+}
+
+pub fn list_window_labels(app: &AppHandle) -> Vec<String> {
+    app.webview_windows().into_keys().collect()
+}
+
 pub fn close_window(app: &AppHandle, label: &str) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(label) {
         window

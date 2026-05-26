@@ -8,6 +8,10 @@ export type WindowType = (typeof WINDOW_TYPES)[keyof typeof WINDOW_TYPES];
 export const OVERVIEW_LABEL = 'overview';
 const WORKSPACE_LABEL_PREFIX = 'workspace-';
 
+export function workspaceLabel(dashboardId: string): string {
+	return `${WORKSPACE_LABEL_PREFIX}${dashboardId}`;
+}
+
 export function parseWindowLabel(label: string): {
 	windowType: WindowType;
 	dashboardId: string | null;

@@ -263,6 +263,8 @@ pub fn run() {
             window_commands::close_workspace_window,
             window_commands::get_window_bindings,
             window_commands::save_window_geometry,
+            window_commands::focus_window,
+            window_commands::list_open_windows,
             window_commands::get_overview_data,
             dependency_commands::get_issue_dependencies,
             raw_requirements_commands::read_raw_requirements,

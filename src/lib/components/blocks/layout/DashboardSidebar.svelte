@@ -26,6 +26,9 @@
 		onEditWorkspace?: () => void;
 		onOpenSettings?: () => void;
 		onOpenWorkspaceSettings?: () => void;
+		onOpenInNewWindow?: () => void;
+		onFocusWindow?: (label: string) => void;
+		openWindowLabels?: string[];
 	}
 
 	let {
@@ -37,6 +40,9 @@
 		onEditWorkspace,
 		onOpenSettings,
 		onOpenWorkspaceSettings,
+		onOpenInNewWindow,
+		onFocusWindow,
+		openWindowLabels = [],
 	}: Props = $props();
 
 	const NAV_LABELS = {
@@ -144,6 +150,9 @@
 				{collapsed}
 				onEdit={onEditWorkspace}
 				onOpenSettings={onOpenWorkspaceSettings}
+				{onOpenInNewWindow}
+				{onFocusWindow}
+				{openWindowLabels}
 			/>
 		</div>
 

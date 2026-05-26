@@ -11,22 +11,40 @@
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
+	import AppWindowIcon from '@lucide/svelte/icons/app-window';
 	import { useBoard } from '$lib/modules/board/board.context.svelte.js';
 	import { useWindow } from '$lib/modules/window/window.context.svelte.js';
+	import { workspaceLabel } from '$lib/modules/window/types.js';
 
 	interface Props {
 		collapsed?: boolean;
 		onEdit?: () => void;
 		onOpenSettings?: () => void;
+		onOpenInNewWindow?: () => void;
+		onFocusWindow?: (label: string) => void;
+		openWindowLabels?: string[];
 		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof DropdownMenuPortal>>;
 	}
 
-	let { collapsed = false, onEdit, onOpenSettings, portalProps }: Props = $props();
+	let {
+		collapsed = false,
+		onEdit,
+		onOpenSettings,
+		onOpenInNewWindow,
+		onFocusWindow,
+		openWindowLabels = [],
+		portalProps,
+	}: Props = $props();
 
 	const boardCtx = useBoard();
 	const windowCtx = useWindow();
 
 	const activeDashboards = $derived(boardCtx.dashboards.filter((d) => d.status === 'active'));
+
+	function isOpenInOtherWindow(dashboardId: string): boolean {
+		return openWindowLabels.includes(workspaceLabel(dashboardId));
+	}
 
 	const currentDashboardName = $derived(
 		windowCtx.isOverview
@@ -118,18 +136,37 @@
 			{#each activeDashboards as dashboard (dashboard.id)}
 				{@const isCurrent =
 					!windowCtx.isOverview && dashboard.id === windowCtx.boundDashboardId}
+				{@const isInOtherWindow = isOpenInOtherWindow(dashboard.id)}
 				<DropdownMenu.Item
 					class={cn(isCurrent && 'bg-primary-soft')}
-					onSelect={() => windowCtx.navigateToWorkspace(dashboard.id)}
+					onSelect={() => {
+						if (isInOtherWindow && onFocusWindow) {
+							onFocusWindow(workspaceLabel(dashboard.id));
+						} else {
+							windowCtx.navigateToWorkspace(dashboard.id);
+						}
+					}}
 				>
 					<FolderIcon />
 					<span class="flex-1 truncate">{dashboard.name}</span>
+					{#if isInOtherWindow}
+						<AppWindowIcon class="size-3.5 text-muted-foreground" />
+					{/if}
 					{#if isCurrent}
 						<CheckIcon class="size-3.5 text-primary" />
 					{/if}
 				</DropdownMenu.Item>
 			{/each}
 		</DropdownMenu.Group>
+		{#if onOpenInNewWindow}
+			<DropdownMenu.Separator class="-mx-2 my-1.5" />
+			<DropdownMenu.Group>
+				<DropdownMenu.Item onSelect={() => onOpenInNewWindow?.()}>
+					<ExternalLinkIcon />
+					<span class="flex-1">{m.nav_open_in_new_window()}</span>
+				</DropdownMenu.Item>
+			</DropdownMenu.Group>
+		{/if}
 		{#if collapsed && !windowCtx.isOverview}
 			<DropdownMenu.Separator class="-mx-2 my-1.5" />
 			<DropdownMenu.Group>
