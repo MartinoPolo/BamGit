@@ -26,7 +26,12 @@
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
 	import { setProcessesContext } from '$lib/modules/processes';
-	import { setWindowContext } from '$lib/modules/window';
+	import {
+		setWindowContext,
+		openWorkspaceWindow,
+		focusWindow,
+		listOpenWindows,
+	} from '$lib/modules/window';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
@@ -126,6 +131,7 @@
 		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
+		void refreshOpenWindowLabels();
 
 		shortcutsCtx.registerShortcut({
 			id: 'command-palette',
@@ -193,6 +199,28 @@
 
 	const activeSessionCount = $derived(sessionStore.activeSessions.length);
 	const isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
+
+	let sidebarOpenWindowLabels = $state<string[]>([]);
+
+	async function handleSidebarOpenInNewWindow() {
+		const dashboardId = windowCtx.boundDashboardId;
+		if (dashboardId !== null) {
+			await openWorkspaceWindow(dashboardId);
+			void refreshOpenWindowLabels();
+		}
+	}
+
+	function handleSidebarFocusWindow(label: string) {
+		void focusWindow(label);
+	}
+
+	async function refreshOpenWindowLabels() {
+		try {
+			sidebarOpenWindowLabels = await listOpenWindows();
+		} catch {
+			sidebarOpenWindowLabels = [];
+		}
+	}
 </script>
 
 <svelte:window onkeydown={(event) => shortcutsCtx.handleKeydown(event)} />
@@ -234,6 +262,9 @@
 						void goto(`${resolve('/settings/workspace')}?scope=ws&id=${dashboardId}`);
 					}
 				}}
+				onOpenInNewWindow={handleSidebarOpenInNewWindow}
+				onFocusWindow={handleSidebarFocusWindow}
+				openWindowLabels={sidebarOpenWindowLabels}
 			/>
 
 			<main class="flex min-w-0 flex-1 flex-col overflow-auto">

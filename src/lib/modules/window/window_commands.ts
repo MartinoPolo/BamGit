@@ -25,6 +25,18 @@ export function saveWindowGeometry(
 	});
 }
 
+export function openWorkspaceWindow(dashboardId: string): Promise<void> {
+	return invoke('open_workspace_window', { dashboardId });
+}
+
+export function focusWindow(label: string): Promise<void> {
+	return invoke('focus_window', { label });
+}
+
+export function listOpenWindows(): Promise<string[]> {
+	return invoke('list_open_windows');
+}
+
 export function getOverviewData(
 	includeArchived: boolean = false,
 ): Promise<OverviewWorkspaceData[]> {

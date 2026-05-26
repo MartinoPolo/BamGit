@@ -22,6 +22,7 @@
 		onArchive: (workspace: OverviewWorkspaceData) => void;
 		onUnarchive: (workspace: OverviewWorkspaceData) => void;
 		onDelete: (workspace: OverviewWorkspaceData) => void;
+		onOpenInNewWindow?: (workspace: OverviewWorkspaceData) => void;
 	}
 
 	let {
@@ -38,6 +39,7 @@
 		onArchive,
 		onUnarchive,
 		onDelete,
+		onOpenInNewWindow,
 	}: Props = $props();
 </script>
 
@@ -52,6 +54,7 @@
 			{onArchive}
 			{onUnarchive}
 			{onDelete}
+			{onOpenInNewWindow}
 		>
 			<WorkspaceCard
 				{workspace}

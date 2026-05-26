@@ -9,7 +9,7 @@
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
 	import { USAGE_SCOPES } from '$lib/modules/usage/usage_types.js';
 	import { useVersionControl } from '$lib/modules/version-control';
-	import { getOverviewData, useWindow } from '$lib/modules/window';
+	import { getOverviewData, openWorkspaceWindow, useWindow } from '$lib/modules/window';
 	import OverviewHeader from '$lib/components/blocks/overview/OverviewHeader.svelte';
 	import OverviewToolbar from '$lib/components/blocks/overview/OverviewToolbar.svelte';
 	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
@@ -158,6 +158,10 @@
 		windowCtx.navigateToWorkspace(dashboardId);
 	}
 
+	function handleOpenInNewWindow(workspace: OverviewWorkspaceData) {
+		void openWorkspaceWindow(workspace.dashboard_id);
+	}
+
 	function handleGithubClick(workspace: OverviewWorkspaceData) {
 		if (workspace.github_repo == null) {
 			handleGithubRightClick(workspace);
@@ -254,6 +258,7 @@
 				onArchive={handleArchiveWorkspace}
 				onUnarchive={handleUnarchiveWorkspace}
 				onDelete={handleDeleteWorkspace}
+				onOpenInNewWindow={handleOpenInNewWindow}
 			/>
 
 			<WorkspaceDeleteDialog

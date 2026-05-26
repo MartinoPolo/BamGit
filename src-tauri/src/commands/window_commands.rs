@@ -6,6 +6,16 @@ use crate::models::overview::OverviewWorkspaceData;
 use crate::models::window_binding::WindowWorkspaceBinding;
 use crate::window_manager::{self, APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
+#[tauri::command]
+pub async fn focus_window(app: AppHandle, label: String) -> Result<(), String> {
+    window_manager::focus_window_by_label(&app, &label)
+}
+
+#[tauri::command]
+pub async fn list_open_windows(app: AppHandle) -> Result<Vec<String>, String> {
+    Ok(window_manager::list_window_labels(&app))
+}
+
 const BINDING_SELECT_COLUMNS: &str =
     "window_label, dashboard_id, window_x, window_y, window_width, window_height";
 
