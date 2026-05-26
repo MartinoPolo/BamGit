@@ -269,6 +269,7 @@
 	const overlayConfigCache = new Map<string, OverlayConfig>();
 
 	const overlayConfigById = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local to derived, not persisted
 		const result = new Map<string, OverlayConfig>();
 		for (const entry of entries) {
 			const resolved = getResolvedOverlayConfig(entry);
