@@ -554,11 +554,11 @@
 
 @keyframes ic-worktree-shimmer {
 	0% {
-		background-position: 150% 0;
+		background-position: 110% 0;
 	}
 
 	100% {
-		background-position: -50% 0;
+		background-position: -10% 0;
 	}
 }
 
@@ -579,7 +579,7 @@
 	);
 	background-size: 300% 100%;
 	background-repeat: no-repeat;
-	animation: ic-worktree-shimmer 2.5s ease-in-out infinite;
+	animation: ic-worktree-shimmer 1.5s ease-in-out infinite;
 }
 
 @layer base {
