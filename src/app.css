@@ -552,6 +552,36 @@
 	}
 }
 
+@keyframes ic-worktree-shimmer {
+	0% {
+		background-position: 150% 0;
+	}
+
+	100% {
+		background-position: -50% 0;
+	}
+}
+
+[data-card-state='worktreeSetup']::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	z-index: 10;
+	background-image: linear-gradient(
+		105deg,
+		transparent 30%,
+		color-mix(in oklch, var(--ic-color) 8%, transparent) 40%,
+		color-mix(in oklch, var(--ic-color) 15%, transparent) 50%,
+		color-mix(in oklch, var(--ic-color) 8%, transparent) 60%,
+		transparent 70%
+	);
+	background-size: 300% 100%;
+	background-repeat: no-repeat;
+	animation: ic-worktree-shimmer 2.5s ease-in-out infinite;
+}
+
 @layer base {
 	* {
 		@apply border-border;

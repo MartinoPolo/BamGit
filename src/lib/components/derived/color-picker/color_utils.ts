@@ -115,7 +115,7 @@ export function sortColorsByLuminance(colors: readonly string[], darkerFirst: bo
  * Colors with luminance above this get dark text; at or below get light text.
  * Set above pure red (0.2126) so saturated colors like red get white text for visual clarity.
  */
-const CONTRAST_LUMINANCE_THRESHOLD = 0.2126;
+export const CONTRAST_LUMINANCE_THRESHOLD = 0.2126;
 
 /**
  * Returns '#000000' or '#ffffff' for best text readability on the given background color.

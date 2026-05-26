@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worktree Setup Card — Shimmer Variations</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  /* ── Theme tokens ───────────────────────────────────────── */
+
+  body.dark {
+    --bg: #0e0e10;
+    --surface: #1a1a1e;
+    --surface-2: #222226;
+    --border: #2e2e34;
+    --foreground: #e4e4e7;
+    --foreground-muted: #a1a1aa;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    background: var(--bg);
+    color: var(--foreground);
+  }
+
+  body.light {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-2: #f4f4f5;
+    --border: #e4e4e7;
+    --foreground: #18181b;
+    --foreground-muted: #71717a;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    background: var(--bg);
+    color: var(--foreground);
+  }
+
+  /* ── Theme toggle ───────────────────────────────────────── */
+
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .theme-toggle button {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: var(--surface-2);
+    color: var(--foreground-muted);
+    transition: all 0.15s;
+  }
+
+  .theme-toggle button.active {
+    background: var(--foreground);
+    color: var(--bg);
+  }
+
+  /* ── Layout ─────────────────────────────────────────────── */
+
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+
+  p.desc {
+    font-size: 13px;
+    color: var(--foreground-muted);
+    margin-bottom: 28px;
+    line-height: 1.5;
+    max-width: 800px;
+  }
+
+  .section { margin-bottom: 44px; }
+
+  .cards-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .option-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    padding: 4px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  .option-desc {
+    font-size: 12px;
+    color: var(--foreground-muted);
+    margin-bottom: 12px;
+    line-height: 1.4;
+    max-width: 700px;
+  }
+
+  .color-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--foreground-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Base card ──────────────────────────────────────────── */
+
+  .card {
+    width: 420px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: linear-gradient(to bottom,
+      color-mix(in oklch, var(--issue-color) 4%, var(--surface)) 0%,
+      var(--surface) 100%);
+    box-shadow: var(--shadow-sm), 0 0 16px -4px color-mix(in oklch, var(--issue-color) 12%, transparent);
+    --issue-color: #f59e0b;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    min-height: 32px;
+    background: linear-gradient(to right,
+      color-mix(in oklch, var(--issue-color) 65%, var(--surface-2)) 0%,
+      color-mix(in oklch, var(--issue-color) 24%, var(--surface-2)) 100%);
+    border-bottom: 1px solid color-mix(in oklch, var(--issue-color) 22%, var(--border));
+  }
+
+  .card-header .meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    opacity: 0.72;
+  }
+
+  .card-header .title {
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .card-header .chip {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: color-mix(in oklch, var(--issue-color) 25%, transparent);
+    color: var(--issue-color);
+    border: 1px solid color-mix(in oklch, var(--issue-color) 35%, transparent);
+    white-space: nowrap;
+  }
+
+  .card-body {
+    padding: 10px 12px 12px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .tree-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    background: color-mix(in oklch, var(--issue-color) 8%, var(--surface-2));
+    border: 1px solid color-mix(in oklch, var(--issue-color) 20%, var(--border));
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .tree-preview .tree-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.6; }
+
+  .card-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+  .branch-name {
+    font-size: 12px;
+    color: var(--foreground-muted);
+  }
+
+  .setting-up {
+    font-size: 12px;
+    color: var(--foreground-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .setting-up .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid color-mix(in oklch, var(--issue-color) 30%, transparent);
+    border-top-color: var(--issue-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .label-badge {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: color-mix(in oklch, #a855f7 18%, var(--surface-2));
+    color: #c084fc;
+    border: 1px solid color-mix(in oklch, #a855f7 25%, transparent);
+    width: fit-content;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 12px 12px;
+  }
+
+  .btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: color-mix(in oklch, var(--issue-color) 85%, var(--bg));
+    color: #000;
+  }
+
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Shimmer base ───────────────────────────────────────── */
+
+  .shimmer-card {
+    border-color: transparent;
+    position: relative;
+  }
+
+  .shimmer-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 10;
+    background-repeat: no-repeat;
+    background-size: 300% 100%;
+  }
+
+  /* ── Single clean left-to-right sweep ───────────────────── */
+
+  @keyframes shimmer-ltr {
+    0%   { background-position: 150% 0; }
+    100% { background-position: -50% 0; }
+  }
+
+  /* ── V1: Tilted (105deg), 2.5s ──────────────────────────── */
+
+  .v1::after {
+    background-image: linear-gradient(
+      105deg,
+      transparent 30%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 40%,
+      color-mix(in oklch, var(--issue-color) 15%, transparent) 50%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 60%,
+      transparent 70%
+    );
+    animation: shimmer-ltr 2.5s ease-in-out infinite;
+  }
+
+  /* ── V2: Tilted (105deg), 3s — slower ───────────────────── */
+
+  .v2::after {
+    background-image: linear-gradient(
+      105deg,
+      transparent 30%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 40%,
+      color-mix(in oklch, var(--issue-color) 15%, transparent) 50%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 60%,
+      transparent 70%
+    );
+    animation: shimmer-ltr 3s ease-in-out infinite;
+  }
+
+  /* ── V3: Tilted (105deg), 3.5s — slowest ────────────────── */
+
+  .v3::after {
+    background-image: linear-gradient(
+      105deg,
+      transparent 30%,
+      color-mix(in oklch, var(--issue-color) 6%, transparent) 40%,
+      color-mix(in oklch, var(--issue-color) 12%, transparent) 50%,
+      color-mix(in oklch, var(--issue-color) 6%, transparent) 60%,
+      transparent 70%
+    );
+    animation: shimmer-ltr 3.5s ease-in-out infinite;
+  }
+
+  /* ── V4: Vertical (90deg), 2.5s ─────────────────────────── */
+
+  .v4::after {
+    background-image: linear-gradient(
+      90deg,
+      transparent 30%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 40%,
+      color-mix(in oklch, var(--issue-color) 15%, transparent) 50%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 60%,
+      transparent 70%
+    );
+    animation: shimmer-ltr 2.5s ease-in-out infinite;
+  }
+
+  /* ── V5: Vertical (90deg), 3s ───────────────────────────── */
+
+  .v5::after {
+    background-image: linear-gradient(
+      90deg,
+      transparent 30%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 40%,
+      color-mix(in oklch, var(--issue-color) 15%, transparent) 50%,
+      color-mix(in oklch, var(--issue-color) 8%, transparent) 60%,
+      transparent 70%
+    );
+    animation: shimmer-ltr 3s ease-in-out infinite;
+  }
+
+  /* ── V6: Vertical (90deg), 3.5s — slowest ───────────────── */
+
+  .v6::after {
+    background-image: linear-gradient(
+      90deg,
+      transparent 30%,
+      color-mix(in oklch, var(--issue-color) 6%, transparent) 40%,
+      color-mix(in oklch, var(--issue-color) 12%, transparent) 50%,
+      color-mix(in oklch, var(--issue-color) 6%, transparent) 60%,
+      transparent 70%
+    );
+    animation: shimmer-ltr 3.5s ease-in-out infinite;
+  }
+</style>
+</head>
+<body class="light">
+
+<div class="theme-toggle">
+  <button onclick="setTheme('dark')">Dark</button>
+  <button class="active" onclick="setTheme('light')">Light</button>
+</div>
+
+<script>
+function setTheme(theme) {
+  document.body.className = theme;
+  document.querySelectorAll('.theme-toggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === theme);
+  });
+}
+</script>
+
+<h1>Worktree Setup — Shimmer Sweep</h1>
+<p class="desc">
+  Single clean left-to-right sweep per cycle. No repeating bands. Toggle dark/light top-right.
+  <br>Two axes: <b>angle</b> (tilted 105deg vs vertical 90deg) &times; <b>speed</b> (2.5s / 3s / 3.5s).
+</p>
+
+<!-- ── TILTED VARIANTS ────────────────────────────────────── -->
+
+<div class="section">
+  <div style="margin-bottom:12px">
+    <span class="option-label">V1 — Tilted (105deg), 2.5s</span>
+    <span class="option-desc" style="display:inline;margin-left:8px">Your initial favorite. Diagonal band gives a "scanning" feel.</span>
+  </div>
+  <div class="cards-row">
+    <div>
+      <div class="color-label">Amber</div>
+      <div class="card shimmer-card v1" style="--issue-color:#f59e0b">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#102</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Blue</div>
+      <div class="card shimmer-card v1" style="--issue-color:#3b82f6">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#108</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Red</div>
+      <div class="card shimmer-card v1" style="--issue-color:#ef4444">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#103</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div style="margin-bottom:12px">
+    <span class="option-label">V2 — Tilted (105deg), 3s</span>
+    <span class="option-desc" style="display:inline;margin-left:8px">Same angle, slower. More relaxed.</span>
+  </div>
+  <div class="cards-row">
+    <div>
+      <div class="color-label">Amber</div>
+      <div class="card shimmer-card v2" style="--issue-color:#f59e0b">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#102</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Purple</div>
+      <div class="card shimmer-card v2" style="--issue-color:#8b5cf6">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#106</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div style="margin-bottom:12px">
+    <span class="option-label">V3 — Tilted (105deg), 3.5s</span>
+    <span class="option-desc" style="display:inline;margin-left:8px">Slowest tilted. Softer shimmer intensity. Very subtle.</span>
+  </div>
+  <div class="cards-row">
+    <div>
+      <div class="color-label">Amber</div>
+      <div class="card shimmer-card v3" style="--issue-color:#f59e0b">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#102</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Cyan</div>
+      <div class="card shimmer-card v3" style="--issue-color:#06b6d4">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#107</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VERTICAL VARIANTS ──────────────────────────────────── -->
+
+<div class="section">
+  <div style="margin-bottom:12px">
+    <span class="option-label">V4 — Vertical (90deg), 2.5s</span>
+    <span class="option-desc" style="display:inline;margin-left:8px">Perfectly straight vertical band. Same speed as V1.</span>
+  </div>
+  <div class="cards-row">
+    <div>
+      <div class="color-label">Amber</div>
+      <div class="card shimmer-card v4" style="--issue-color:#f59e0b">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#102</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Green</div>
+      <div class="card shimmer-card v4" style="--issue-color:#10b981">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#105</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div style="margin-bottom:12px">
+    <span class="option-label">V5 — Vertical (90deg), 3s</span>
+    <span class="option-desc" style="display:inline;margin-left:8px">Vertical + moderate speed. Middle ground.</span>
+  </div>
+  <div class="cards-row">
+    <div>
+      <div class="color-label">Amber</div>
+      <div class="card shimmer-card v5" style="--issue-color:#f59e0b">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#102</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Rose</div>
+      <div class="card shimmer-card v5" style="--issue-color:#f43f5e">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#109</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div style="margin-bottom:12px">
+    <span class="option-label">V6 — Vertical (90deg), 3.5s</span>
+    <span class="option-desc" style="display:inline;margin-left:8px">Slowest vertical. Softer shimmer. Most subtle of the set.</span>
+  </div>
+  <div class="cards-row">
+    <div>
+      <div class="color-label">Amber</div>
+      <div class="card shimmer-card v6" style="--issue-color:#f59e0b">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#102</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="color-label">Lime</div>
+      <div class="card shimmer-card v6" style="--issue-color:#84cc16">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <span class="meta">100 / <span style="color:var(--issue-color)">#110</span></span>
+            <span class="title">Sprouting: Worktree pending</span>
+          </div>
+          <span class="chip">● WORKTREE SETUP</span>
+        </div>
+        <div class="card-body">
+          <div class="tree-preview"><span class="tree-icon">🌱</span></div>
+          <div class="card-info">
+            <span class="branch-name">🔀 no worktree</span>
+            <span class="setting-up"><span class="spinner"></span> Setting up</span>
+            <span class="label-badge">feature</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary">▶ Run</button>
+          <button class="btn btn-secondary">👁 Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
