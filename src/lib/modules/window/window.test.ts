@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseWindowLabel, isWindowType } from './types.js';
+import { parseWindowLabel, isWindowType, resolvePopstateNavigation } from './types.js';
 
 describe('parseWindowLabel', () => {
 	it('parses overview label', () => {
@@ -49,5 +49,54 @@ describe('isWindowType', () => {
 		expect(isWindowType(42)).toBe(false);
 		expect(isWindowType(null)).toBe(false);
 		expect(isWindowType(undefined)).toBe(false);
+	});
+});
+
+describe('resolvePopstateNavigation', () => {
+	const overviewPath = '/overview';
+
+	it('returns overview when pathname matches overview path', () => {
+		const result = resolvePopstateNavigation('/overview', overviewPath, undefined, 'dash-1');
+		expect(result).toEqual({ windowType: 'overview', dashboardId: null });
+	});
+
+	it('returns overview when pathname is a sub-path of overview', () => {
+		const result = resolvePopstateNavigation(
+			'/overview/details',
+			overviewPath,
+			undefined,
+			null,
+		);
+		expect(result).toEqual({ windowType: 'overview', dashboardId: null });
+	});
+
+	it('returns workspace with page state dashboardId when available', () => {
+		const result = resolvePopstateNavigation('/', overviewPath, 'dash-abc', null);
+		expect(result).toEqual({ windowType: 'workspace', dashboardId: 'dash-abc' });
+	});
+
+	it('falls back to current dashboardId when page state has none', () => {
+		const result = resolvePopstateNavigation('/', overviewPath, undefined, 'dash-current');
+		expect(result).toEqual({ windowType: 'workspace', dashboardId: 'dash-current' });
+	});
+
+	it('prefers page state dashboardId over current dashboardId', () => {
+		const result = resolvePopstateNavigation('/', overviewPath, 'dash-from-state', 'dash-old');
+		expect(result).toEqual({ windowType: 'workspace', dashboardId: 'dash-from-state' });
+	});
+
+	it('falls back to overview when no dashboardId available at workspace path', () => {
+		const result = resolvePopstateNavigation('/', overviewPath, undefined, null);
+		expect(result).toEqual({ windowType: 'overview', dashboardId: null });
+	});
+
+	it('handles base-path-prefixed overview sub-path', () => {
+		const result = resolvePopstateNavigation(
+			'/app/overview/details',
+			'/app/overview',
+			undefined,
+			'dash-1',
+		);
+		expect(result).toEqual({ windowType: 'overview', dashboardId: null });
 	});
 });

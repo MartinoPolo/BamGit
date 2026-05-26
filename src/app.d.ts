@@ -11,6 +11,7 @@ declare global {
 			usageGroupBy?: string | null;
 			usageCustomFrom?: string | null;
 			usageCustomTo?: string | null;
+			dashboardId?: string;
 		}
 		// interface Platform {}
 	}

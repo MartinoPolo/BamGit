@@ -17,8 +17,7 @@ test.describe('Settings entry points', () => {
 		await page.goto('/overview');
 		await page.waitForLoadState('networkidle');
 
-		const content = page.locator('main, [class*="flex-col"][class*="p-8"]').first();
-		const gearButton = content.getByRole('button', { name: 'Settings', exact: true });
+		const gearButton = page.getByRole('button', { name: 'Settings', exact: true });
 		await expect(gearButton).toBeVisible();
 		await gearButton.click();
 
@@ -29,8 +28,7 @@ test.describe('Settings entry points', () => {
 		await page.goto('/overview');
 		await page.waitForLoadState('networkidle');
 
-		const content = page.locator('main, [class*="flex-col"][class*="p-8"]').first();
-		const themeButton = content.getByRole('button', { name: /mode/i });
+		const themeButton = page.getByRole('button', { name: /mode/i });
 		await expect(themeButton).toBeVisible();
 
 		// Verify it cycles on click (compact mode behavior)
