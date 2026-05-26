@@ -439,7 +439,7 @@
 		}
 	}}
 >
-	<ContextMenu.Trigger class="flex flex-1 overflow-hidden rounded-md">
+	<ContextMenu.Trigger class="flex flex-1 overflow-hidden">
 		<div
 			class="relative w-full flex-1 outline-none"
 			bind:clientWidth={rawViewportWidth}

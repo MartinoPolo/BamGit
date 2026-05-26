@@ -35,7 +35,7 @@
 		style="filter: brightness(var(--header-brightness, 1)) saturate(var(--header-saturate, 1)); transition: filter var(--duration-3) ease;"
 	>
 		<span
-			class="inline-flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-semibold opacity-72"
+			class="inline-flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-semibold opacity-85"
 		>
 			{#if hasPrdLabel && ctx.prdParent?.url}
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- external GitHub link -->

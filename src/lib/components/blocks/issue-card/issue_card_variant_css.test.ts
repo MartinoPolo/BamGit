@@ -166,6 +166,27 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card.background).toContain('#00cc88');
 			expect(result.card.background).toContain('radial-gradient');
 		});
+
+		it('darkens light issue color for --ic-number-color', () => {
+			const result = computeForVariant('radiant', {}, { issueColor: '#f59e0b' });
+			expect(result.card['--ic-number-color']).toContain('color-mix');
+			expect(result.card['--ic-number-color']).toContain('#f59e0b');
+			expect(result.card['--ic-number-color']).toContain('black');
+		});
+
+		it('passes dark issue color through for --ic-number-color', () => {
+			const result = computeForVariant('radiant', {}, { issueColor: '#2c5282' });
+			expect(result.card['--ic-number-color']).toBe('#2c5282');
+		});
+	});
+
+	describe('--ic-number-color shared behavior', () => {
+		it('non-radiant variants use inherit for --ic-number-color', () => {
+			const veil = computeForVariant('veil', {}, { issueColor: '#f59e0b' });
+			expect(veil.card['--ic-number-color']).toBe('inherit');
+			const horizon = computeForVariant('refined-horizon', {}, { issueColor: '#f59e0b' });
+			expect(horizon.card['--ic-number-color']).toBe('inherit');
+		});
 	});
 
 	describe('other variants preview backgrounds unchanged', () => {
@@ -248,6 +269,12 @@ describe('computeVariantSlotStyles', () => {
 			expect(result.card['border-color']).toBe('var(--border)');
 			expect(result.card['box-shadow']).toBe('var(--shadow-sm)');
 			expect(result.card.transform).toBe('translateY(-2px)');
+		});
+
+		it('worktreeSetup state removes opacity and sets transparent border', () => {
+			const result = computeForVariant('refined-horizon', {}, { state: 'worktreeSetup' });
+			expect(result.card.opacity).toBeUndefined();
+			expect(result.card['border-color']).toBe('transparent');
 		});
 
 		it('hovered state without isDone uses issue-color glow as before', () => {
