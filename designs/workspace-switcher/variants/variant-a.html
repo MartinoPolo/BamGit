@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workspace Switcher — Variant A</title>
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+    }
+
+    /* ── Layout ── */
+    .variant-label {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+
+    .viewport {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .main-content {
+      flex: 1;
+      background: var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--foreground-subtle);
+      font-size: 13px;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      height: 100%;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-collapsed {
+      width: 56px;
+    }
+
+    .sidebar-collapsed .brand-row { justify-content: center; }
+    .sidebar-collapsed .brand-text { display: none; }
+    .sidebar-collapsed .collapse-btn { display: none; }
+    .sidebar-collapsed .section-label { display: none; }
+    .sidebar-collapsed .nav-items { align-items: center; }
+    .sidebar-collapsed .user-section-inner { flex-direction: column; align-items: center; gap: 4px; }
+    .sidebar-collapsed .user-name { display: none; }
+    .sidebar-collapsed .user-actions { display: none; }
+
+    /* ── Brand Row ── */
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 8px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-icon-wrap {
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--moss-500), var(--moss-700));
+    }
+
+    .brand-text {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .collapse-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .collapse-btn:hover { background: var(--surface-hover); }
+
+    /* ── Section Labels ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--foreground-subtle);
+      padding: 0 6px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Workspace Selector (Trigger) ── */
+    .ws-section {
+      padding: 0 8px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .ws-trigger-row {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+    }
+
+    .ws-trigger {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border: none;
+      color: var(--foreground);
+      cursor: pointer;
+      transition: background 120ms;
+      font-family: inherit;
+      font-size: 12.5px;
+    }
+    .ws-trigger:hover { background: var(--surface-hover); }
+    .ws-trigger.is-open { background: var(--surface-hover); }
+
+    .ws-trigger-icon {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .ws-trigger-name {
+      flex: 1;
+      text-align: left;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ws-trigger-chevron {
+      color: var(--foreground-muted);
+      flex-shrink: 0;
+      transition: transform 120ms;
+    }
+    .ws-trigger.is-open .ws-trigger-chevron {
+      transform: rotate(180deg);
+    }
+
+    .ws-action-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 120ms, color 120ms;
+    }
+    .ws-action-btn:hover {
+      background: var(--surface-hover);
+      color: var(--foreground);
+    }
+
+    /* ── Collapsed Trigger ── */
+    .ws-collapsed-trigger {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 120ms;
+      margin: 0 auto;
+    }
+    .ws-collapsed-trigger:hover { background: var(--surface-hover); }
+
+    /* ── Dropdown ── */
+    .ws-dropdown {
+      position: absolute;
+      min-width: 200px;
+      background: var(--surface-3);
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
+      border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+      z-index: 50;
+    }
+
+    .ws-dropdown-expanded {
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+    }
+
+    .ws-dropdown-collapsed {
+      top: 0;
+      left: calc(100% + 4px);
+      width: 220px;
+    }
+
+    .ws-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--foreground);
+      cursor: pointer;
+      transition: background 90ms;
+      position: relative;
+    }
+    .ws-dropdown-item:hover {
+      background: color-mix(in oklch, var(--primary) 25%, transparent);
+    }
+
+    .ws-dropdown-item.is-current {
+      background: color-mix(in oklch, var(--primary) 15%, transparent);
+    }
+    .ws-dropdown-item.is-current:hover {
+      background: color-mix(in oklch, var(--primary) 25%, transparent);
+    }
+
+    .ws-dropdown-item-icon {
+      flex-shrink: 0;
+      color: var(--foreground-muted);
+    }
+
+    .ws-dropdown-item.is-current .ws-dropdown-item-icon {
+      color: var(--primary);
+    }
+
+    .ws-dropdown-item-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ws-dropdown-item-check {
+      flex-shrink: 0;
+      color: var(--primary);
+      opacity: 0;
+    }
+    .ws-dropdown-item.is-current .ws-dropdown-item-check {
+      opacity: 1;
+    }
+
+    .ws-dropdown-separator {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 8px;
+    }
+
+    /* ── Nav Items ── */
+    .nav-items {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 32px;
+      padding: 7px 10px 7px 13px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: var(--sidebar-fg);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 120ms, color 120ms;
+    }
+    .nav-item:hover { background: var(--surface-hover); }
+    .nav-item.is-active {
+      background: var(--primary-soft);
+      color: var(--foreground);
+      font-weight: 500;
+    }
+    .nav-item-icon { flex-shrink: 0; }
+    .nav-item.is-active .nav-item-icon { color: var(--primary); }
+
+    .nav-collapsed-item {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 120ms;
+      color: var(--sidebar-fg);
+    }
+    .nav-collapsed-item:hover { background: var(--surface-hover); }
+    .nav-collapsed-item.is-active {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    /* ── User Section ── */
+    .user-section {
+      border-top: 1px solid var(--border);
+      padding: 8px;
+    }
+
+    .user-section-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--foreground-muted);
+    }
+
+    .user-name {
+      font-size: 12.5px;
+      color: var(--foreground);
+    }
+
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .theme-toggle, .settings-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--foreground-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle:hover, .settings-btn:hover { background: var(--surface-hover); }
+
+    /* ── SVG Icons ── */
+    .icon { display: inline-flex; }
+
+    /* ── Scene Layout ── */
+    .scenes {
+      display: flex;
+      gap: 48px;
+      padding: 48px;
+      min-height: 100vh;
+      background: var(--background);
+      align-items: flex-start;
+    }
+
+    .scene {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .scene-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--foreground-subtle);
+      text-align: center;
+    }
+
+    .scene-frame {
+      position: relative;
+      height: 640px;
+      display: flex;
+      border-radius: 10px;
+      overflow: visible;
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    .scene-main {
+      flex: 1;
+      min-width: 400px;
+      background: var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--foreground-subtle);
+      font-size: 12px;
+      border-radius: 0 10px 10px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="gk-root theme-dark">
+
+  <div class="gk-eyebrow" style="text-align:center; padding:16px 0 0; color:var(--foreground-subtle);">
+    VARIANT A — CHECK MARK + HIGHLIGHT INDICATOR
+  </div>
+
+  <div class="scenes">
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- Scene 1: Expanded sidebar, dropdown OPEN    -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="scene">
+      <div class="scene-label">Expanded — Dropdown Open</div>
+      <div class="scene-frame">
+        <div class="sidebar">
+
+          <!-- Brand Row -->
+          <div class="brand-row">
+            <div class="brand-left">
+              <div class="brand-icon-wrap"><div class="brand-mark"></div></div>
+              <span class="brand-text">Grovekeeper</span>
+            </div>
+            <button class="collapse-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            </button>
+          </div>
+
+          <!-- Workspace Section -->
+          <div class="ws-section">
+            <div class="section-label">Workspace</div>
+            <div class="ws-trigger-row" style="position:relative;">
+              <button class="ws-trigger is-open">
+                <svg class="ws-trigger-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span class="ws-trigger-name">Grovekeeper</span>
+                <svg class="ws-trigger-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <button class="ws-action-btn" title="Edit workspace">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+              </button>
+              <button class="ws-action-btn" title="Workspace settings">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+
+              <!-- Dropdown (open) -->
+              <div class="ws-dropdown ws-dropdown-expanded">
+                <!-- Overview -->
+                <div class="ws-dropdown-item">
+                  <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                  <span class="ws-dropdown-item-name">Overview</span>
+                  <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+
+                <div class="ws-dropdown-separator"></div>
+
+                <!-- Workspaces -->
+                <div class="ws-dropdown-item is-current">
+                  <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <span class="ws-dropdown-item-name">Grovekeeper</span>
+                  <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="ws-dropdown-item">
+                  <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <span class="ws-dropdown-item-name">low-poly-2d-trees</span>
+                  <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="ws-dropdown-item">
+                  <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <span class="ws-dropdown-item-name">mpx-claude-code</span>
+                  <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="ws-dropdown-item">
+                  <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <span class="ws-dropdown-item-name">peon-ping</span>
+                  <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="ws-dropdown-item">
+                  <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <span class="ws-dropdown-item-name">Personal Website Redesign</span>
+                  <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <nav class="nav-items">
+            <div class="section-label">Navigate</div>
+            <a class="nav-item is-active" href="#">
+              <svg class="nav-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3h-3.9A3 3 0 0 1 14 10.2V10"/><path d="M7 21h10"/><path d="M12 21v-5"/></svg>
+              <span>Dashboard</span>
+            </a>
+            <a class="nav-item" href="#">
+              <svg class="nav-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>Sessions</span>
+            </a>
+            <a class="nav-item" href="#">
+              <svg class="nav-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16h.01"/><path d="M11 12h.01"/><path d="M15 8h.01"/><path d="M7 11h.01"/><path d="M11 7h.01"/></svg>
+              <span>Usage</span>
+            </a>
+          </nav>
+
+          <div style="flex:1"></div>
+
+          <!-- User Section -->
+          <div class="user-section">
+            <div class="user-section-inner">
+              <div class="user-left">
+                <div class="user-avatar">MP</div>
+                <span class="user-name">MartinP</span>
+              </div>
+              <div class="user-actions">
+                <button class="theme-toggle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
+                <button class="settings-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="scene-main">Main content area</div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- Scene 2: Expanded sidebar, dropdown CLOSED  -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="scene">
+      <div class="scene-label">Expanded — Closed</div>
+      <div class="scene-frame">
+        <div class="sidebar">
+          <div class="brand-row">
+            <div class="brand-left">
+              <div class="brand-icon-wrap"><div class="brand-mark"></div></div>
+              <span class="brand-text">Grovekeeper</span>
+            </div>
+            <button class="collapse-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            </button>
+          </div>
+
+          <div class="ws-section">
+            <div class="section-label">Workspace</div>
+            <div class="ws-trigger-row">
+              <button class="ws-trigger">
+                <svg class="ws-trigger-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span class="ws-trigger-name">Grovekeeper</span>
+                <svg class="ws-trigger-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <button class="ws-action-btn" title="Edit workspace">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+              </button>
+              <button class="ws-action-btn" title="Workspace settings">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <nav class="nav-items">
+            <div class="section-label">Navigate</div>
+            <a class="nav-item is-active" href="#">
+              <svg class="nav-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3h-3.9A3 3 0 0 1 14 10.2V10"/><path d="M7 21h10"/><path d="M12 21v-5"/></svg>
+              <span>Dashboard</span>
+            </a>
+            <a class="nav-item" href="#">
+              <svg class="nav-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>Sessions</span>
+            </a>
+            <a class="nav-item" href="#">
+              <svg class="nav-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16h.01"/><path d="M11 12h.01"/><path d="M15 8h.01"/><path d="M7 11h.01"/><path d="M11 7h.01"/></svg>
+              <span>Usage</span>
+            </a>
+          </nav>
+
+          <div style="flex:1"></div>
+
+          <div class="user-section">
+            <div class="user-section-inner">
+              <div class="user-left">
+                <div class="user-avatar">MP</div>
+                <span class="user-name">MartinP</span>
+              </div>
+              <div class="user-actions">
+                <button class="theme-toggle">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
+                <button class="settings-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="scene-main">Main content area</div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- Scene 3: Collapsed sidebar, dropdown OPEN   -->
+    <!-- ════════════════════════════════════════════ -->
+    <div class="scene">
+      <div class="scene-label">Collapsed — Dropdown Open</div>
+      <div class="scene-frame">
+        <div class="sidebar sidebar-collapsed">
+
+          <div class="brand-row">
+            <div class="brand-mark" style="width:22px;height:22px;border-radius:6px;"></div>
+          </div>
+
+          <div class="ws-section" style="display:flex; align-items:center; justify-content:center; position:relative;">
+            <button class="ws-collapsed-trigger">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+            </button>
+
+            <!-- Dropdown (positioned right) -->
+            <div class="ws-dropdown ws-dropdown-collapsed">
+              <div class="ws-dropdown-item">
+                <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span class="ws-dropdown-item-name">Overview</span>
+                <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+
+              <div class="ws-dropdown-separator"></div>
+
+              <div class="ws-dropdown-item is-current">
+                <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span class="ws-dropdown-item-name">Grovekeeper</span>
+                <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="ws-dropdown-item">
+                <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span class="ws-dropdown-item-name">low-poly-2d-trees</span>
+                <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="ws-dropdown-item">
+                <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span class="ws-dropdown-item-name">mpx-claude-code</span>
+                <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="ws-dropdown-item">
+                <svg class="ws-dropdown-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span class="ws-dropdown-item-name">peon-ping</span>
+                <svg class="ws-dropdown-item-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <nav class="nav-items" style="align-items:center;">
+            <div class="nav-collapsed-item is-active">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3h16a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3h-3.9A3 3 0 0 1 14 10.2V10"/><path d="M7 21h10"/><path d="M12 21v-5"/></svg>
+            </div>
+            <div class="nav-collapsed-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div class="nav-collapsed-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 16h.01"/><path d="M11 12h.01"/><path d="M15 8h.01"/></svg>
+            </div>
+          </nav>
+
+          <div style="flex:1"></div>
+
+          <div class="user-section" style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <div class="user-avatar">MP</div>
+            <button class="theme-toggle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+            <div class="nav-collapsed-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+          </div>
+
+        </div>
+        <div class="scene-main">Main content area</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
