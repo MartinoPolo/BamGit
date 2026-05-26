@@ -4,9 +4,11 @@
 	import '../app.css';
 	import { onMount, onDestroy } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
-	import { preloadCode, goto } from '$app/navigation';
+	import { afterNavigate, preloadCode, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
+	import { isTauri } from '$lib/tauri.js';
+	import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 	import DashboardSidebar from '$lib/components/blocks/layout/DashboardSidebar.svelte';
 	import DashboardCreateDialog from '$lib/components/blocks/workspace/DashboardCreateDialog.svelte';
 	import DashboardEditDialog from '$lib/components/blocks/workspace/DashboardEditDialog.svelte';
@@ -24,7 +26,7 @@
 	import { setVersionControlContext } from '$lib/modules/version-control';
 	import { setActionsContext } from '$lib/modules/actions';
 	import { setProcessesContext } from '$lib/modules/processes';
-	import { setWindowContext, openWorkspaceWindow } from '$lib/modules/window';
+	import { setWindowContext } from '$lib/modules/window';
 	import { setKeyboardShortcutsContext } from '$lib/modules/keyboard-shortcuts';
 	import { setCommandPaletteContext } from '$lib/modules/command-palette';
 	import { setRawRequirementsContext } from '$lib/modules/raw-requirements';
@@ -90,9 +92,30 @@
 
 	let editingDashboard = $state<Dashboard | null>(null);
 
+	$effect(() => {
+		const dashboardId = windowCtx.boundDashboardId;
+		void boardStore.loadDashboards(dashboardId);
+		void settingsCtx.loadSettings(dashboardId);
+	});
+
+	$effect(() => {
+		if (!isTauri()) {
+			return;
+		}
+		const title = windowCtx.isOverview
+			? 'Overview — Grovekeeper'
+			: `${boardStore.activeDashboard?.name ?? 'Workspace'} — Grovekeeper`;
+		void getCurrentWebviewWindow().setTitle(title);
+	});
+
+	afterNavigate((navigation) => {
+		if (navigation.to !== null) {
+			windowCtx.syncNavigationState(navigation.to.url.pathname, page.state);
+		}
+	});
+
 	onMount(() => {
 		registerMockToastBridge((title, body) => toastsCtx.show({ tone: 'warning', title, body }));
-		boardStore.loadDashboards(windowCtx.isWorkspace ? windowCtx.boundDashboardId : null);
 		boardStore.loadPalettes();
 		void preloadCode(resolve('/'));
 		void preloadCode(resolve('/overview'));
@@ -100,7 +123,6 @@
 		void preloadCode(resolve('/settings/general'));
 		void preloadCode(resolve('/usage'));
 		void preloadCode(resolve('/quick-ideas'));
-		void settingsCtx.loadSettings();
 		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
@@ -143,7 +165,7 @@
 			const created = await boardStore.createDashboard(request);
 			await boardStore.refreshDashboards();
 			if (windowCtx.isOverview) {
-				await openWorkspaceWindow(created.id);
+				windowCtx.navigateToWorkspace(created.id);
 			} else {
 				boardStore.selectDashboard(created.id);
 			}

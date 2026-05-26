@@ -6,12 +6,12 @@ Settled architectural and design decisions. Each entry records what was chosen, 
 
 ## Platform & Infrastructure
 
-### Single process, multi-window via Tauri single_instance
+### Single process, single-window SPA navigation (multi-window optional)
 
-Decided: 2026-04-28
-What: One Tauri process. Each workspace gets its own WebviewWindow.
-Why: Shared SQLite, IPC between windows, simpler auth flow.
-Rejected: Electron multi-process (too heavy), separate processes per workspace (IPC complexity).
+Decided: 2026-05-26 (revised from 2026-04-28 multi-window default)
+What: One Tauri process, one window. Workspace switching via SvelteKit `goto()` within a single window. Window context is writable — `navigateToWorkspace(id)` / `navigateToOverview()` update reactive state and route. Multi-window remains available via Tauri `single_instance` plugin but is no longer the primary navigation model.
+Why: SPA navigation is simpler, faster, and avoids window management complexity. Users navigate between workspaces like browser tabs, not desktop windows. Theme transitions are smooth within one window.
+Rejected: Multi-window as default (window management overhead, no shared reactive state between windows, theme transitions impossible across windows).
 
 ### SQLite with r2d2 pool in WAL mode (4 readers + 1 writer)
 

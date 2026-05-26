@@ -33,7 +33,6 @@ const COMMAND_BODIES: Record<string, string> = {
 	spawn_session: 'Spawning sessions requires the desktop app',
 	sync_all_github_state: 'GitHub sync requires the desktop app',
 	execute_action: 'Running actions requires the desktop app',
-	open_workspace_window: 'Opening workspace windows requires the desktop app',
 	update_peacock_color: 'Peacock color sync requires the desktop app',
 	pick_folder: 'Folder picker requires the desktop app',
 	open_path: 'Opening local folders requires the desktop app',

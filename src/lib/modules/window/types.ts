@@ -27,3 +27,19 @@ export function parseWindowLabel(label: string): {
 export function isWindowType(value: unknown): value is WindowType {
 	return typeof value === 'string' && value in WINDOW_TYPES;
 }
+
+export function resolvePopstateNavigation(
+	pathname: string,
+	overviewPath: string,
+	pageDashboardId: string | undefined,
+	currentDashboardId: string | null,
+): { windowType: WindowType; dashboardId: string | null } {
+	if (pathname === overviewPath || pathname.startsWith(overviewPath + '/')) {
+		return { windowType: 'overview', dashboardId: null };
+	}
+	const dashboardId = pageDashboardId ?? currentDashboardId;
+	if (dashboardId !== null) {
+		return { windowType: 'workspace', dashboardId };
+	}
+	return { windowType: 'overview', dashboardId: null };
+}
