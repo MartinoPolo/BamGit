@@ -16,6 +16,8 @@ function makeWorkspace(overrides: Partial<OverviewWorkspaceData> = {}): Overview
 		active_session_count: 0,
 		last_activity: new Date().toISOString(),
 		total_cost_usd: 0,
+		cost_today_usd: null,
+		cost_week_usd: null,
 		hitl_count: 0,
 		open_pr_count: 0,
 		prs_needing_attention: 0,
