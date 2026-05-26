@@ -18,7 +18,6 @@
 	import { useKeyboardShortcuts } from '$lib/modules/keyboard-shortcuts';
 
 	interface Props {
-		workspaceName: string;
 		username: string;
 		userInitials: string;
 		activeSessionCount?: number;
@@ -30,7 +29,6 @@
 	}
 
 	let {
-		workspaceName,
 		username,
 		userInitials,
 		activeSessionCount = 0,
@@ -143,7 +141,6 @@
 				</div>
 			{/if}
 			<WorkspaceSelector
-				name={workspaceName}
 				{collapsed}
 				onEdit={onEditWorkspace}
 				onOpenSettings={onOpenWorkspaceSettings}
