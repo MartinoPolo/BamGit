@@ -9,7 +9,6 @@
 		component: DashboardSidebar,
 		tags: ['autodocs'],
 		args: {
-			workspaceName: 'Grovekeeper',
 			username: 'Martin',
 			userInitials: 'MP',
 			activeSessionCount: 0,
@@ -27,7 +26,6 @@
 		<DashboardSidebarStoryWrapper>
 			<div class="flex h-150">
 				<DashboardSidebar
-					workspaceName="Grovekeeper"
 					username="Martin"
 					userInitials="MP"
 					collapsed={false}
@@ -49,7 +47,6 @@
 		<DashboardSidebarStoryWrapper>
 			<div class="flex h-150">
 				<DashboardSidebar
-					workspaceName="Grovekeeper"
 					username="Martin"
 					userInitials="MP"
 					collapsed={true}
@@ -71,7 +68,6 @@
 		<DashboardSidebarStoryWrapper>
 			<div class="flex h-150">
 				<DashboardSidebar
-					workspaceName="Grovekeeper"
 					username="Martin"
 					userInitials="MP"
 					activeSessionCount={3}
@@ -94,7 +90,6 @@
 		<DashboardSidebarStoryWrapper>
 			<div class="flex h-150">
 				<DashboardSidebar
-					workspaceName="My Very Long Workspace Name That Should Be Truncated"
 					username="Martin Pavelka"
 					userInitials="MP"
 					activeSessionCount={1}

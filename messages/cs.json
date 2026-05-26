@@ -8,6 +8,8 @@
 	"nav_settings": "Settings",
 	"nav_workspace": "Workspace",
 	"nav_navigate": "Navigate",
+	"nav_overview": "Overview",
+	"nav_switch_workspace": "Switch workspace",
 
 	"sidebar_expand": "Expand sidebar ({shortcut})",
 	"sidebar_collapse": "Collapse sidebar ({shortcut})",

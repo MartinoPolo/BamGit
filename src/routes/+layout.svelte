@@ -191,7 +191,6 @@
 		}
 	}
 
-	const workspaceName = $derived(boardStore.activeDashboard?.name ?? 'Grovekeeper');
 	const activeSessionCount = $derived(sessionStore.activeSessions.length);
 	const isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 </script>
@@ -215,7 +214,6 @@
 				: 'var(--sidebar-width) 1fr'}
 		>
 			<DashboardSidebar
-				{workspaceName}
 				{username}
 				{userInitials}
 				{activeSessionCount}
