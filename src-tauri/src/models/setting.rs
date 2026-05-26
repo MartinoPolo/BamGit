@@ -19,3 +19,4 @@ pub struct WorkspaceSetting {
 pub const STARTUP_BEHAVIOR_KEY: &str = "startup_behavior";
 pub const STARTUP_BEHAVIOR_OVERVIEW: &str = "overview";
 pub const STARTUP_BEHAVIOR_LAST_WORKSPACE: &str = "last-workspace";
+pub const LAST_WORKSPACE_ID_KEY: &str = "last_workspace_id";

@@ -1786,7 +1786,7 @@ export const MOCK_USER_SETTINGS: Record<string, string> = {
 	accent_color: 'moss',
 	username: 'User',
 	user_initials: 'U',
-	startup_behavior: 'overview',
+	startup_behavior: 'last-workspace',
 	chart_color_theme: 'monochrome',
 	language: 'en',
 	notification_volume: '0.7',

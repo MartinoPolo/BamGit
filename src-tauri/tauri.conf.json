@@ -11,16 +11,7 @@
 	},
 	"app": {
 		"withGlobalTauri": true,
-		"windows": [
-			{
-				"label": "overview",
-				"title": "Grovekeeper",
-				"url": "/overview",
-				"width": 1600,
-				"height": 900,
-				"center": true
-			}
-		],
+		"windows": [],
 		"security": {
 			"csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://avatars.githubusercontent.com; font-src 'self'; connect-src ipc: http://ipc.localhost https://github.com https://api.github.com ws://localhost:9223"
 		}

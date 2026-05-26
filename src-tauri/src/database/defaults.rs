@@ -57,7 +57,7 @@ pub fn seed_defaults(connection: &Connection) -> Result<(), rusqlite::Error> {
         })?;
 
     connection.execute_batch(
-        "INSERT OR IGNORE INTO user_settings (key, value) VALUES ('startup_behavior', 'overview');
+        "INSERT OR IGNORE INTO user_settings (key, value) VALUES ('startup_behavior', 'last-workspace');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('chart_color_theme', 'monochrome');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('theme_mode', 'system');
          INSERT OR IGNORE INTO user_settings (key, value) VALUES ('accent_color', 'moss');
@@ -148,6 +148,7 @@ mod tests {
         "issue_card_header_saturation",
         "issue_card_radial_intensity",
         "editor_command",
+        "overview_footer_content",
     ];
 
     #[test]
@@ -170,6 +171,22 @@ mod tests {
                 "Missing seed default for key: {expected_key}"
             );
         }
+    }
+
+    #[test]
+    fn seed_defaults_startup_behavior_is_last_workspace() {
+        let connection = setup_test_database();
+        seed_defaults(&connection).unwrap();
+
+        let value: String = connection
+            .query_row(
+                "SELECT value FROM user_settings WHERE key = 'startup_behavior'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(value, crate::models::setting::STARTUP_BEHAVIOR_LAST_WORKSPACE);
     }
 
     #[test]

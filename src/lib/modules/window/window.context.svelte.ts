@@ -5,10 +5,11 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { isTauri } from '$lib/tauri.js';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { setUserSetting } from '$lib/modules/settings/settings_commands.js';
+import { LAST_WORKSPACE_ID_KEY } from '$lib/modules/settings/types.js';
 import {
 	type WindowType,
 	OVERVIEW_LABEL,
-	parseWindowLabel,
+	resolveInitialDashboardId,
 	resolvePopstateNavigation,
 } from './types.js';
 
@@ -38,7 +39,7 @@ function resolveWindowLabel(): string {
 
 function createWindowContext() {
 	const label = resolveWindowLabel();
-	const parsed = parseWindowLabel(label);
+	const parsed = resolveInitialDashboardId(label, new URLSearchParams(window.location.search));
 
 	const windowLabel = new StateRaw(label);
 	const windowType = new StateRaw<WindowType>(parsed.windowType);
@@ -65,7 +66,7 @@ function createWindowContext() {
 			boundDashboardId.current = dashboardId;
 			windowType.current = 'workspace';
 			void goto(resolve('/'), { state: { dashboardId } });
-			void setUserSetting('last_workspace_id', dashboardId);
+			void setUserSetting(LAST_WORKSPACE_ID_KEY, dashboardId);
 		},
 
 		navigateToOverview() {
