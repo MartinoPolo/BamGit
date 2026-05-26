@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { parseWindowLabel, isWindowType, resolvePopstateNavigation } from './types.js';
+import {
+	parseWindowLabel,
+	isWindowType,
+	resolvePopstateNavigation,
+	resolveInitialDashboardId,
+} from './types.js';
 
 describe('parseWindowLabel', () => {
 	it('parses overview label', () => {
@@ -98,5 +103,33 @@ describe('resolvePopstateNavigation', () => {
 			'dash-1',
 		);
 		expect(result).toEqual({ windowType: 'overview', dashboardId: null });
+	});
+});
+
+describe('resolveInitialDashboardId', () => {
+	it('returns parsed label result when label already has a dashboardId', () => {
+		const result = resolveInitialDashboardId('workspace-abc', new URLSearchParams());
+		expect(result).toEqual({ windowType: 'workspace', dashboardId: 'abc' });
+	});
+
+	it('returns workspace with dashboardId from searchParams when label has no dashboardId', () => {
+		const result = resolveInitialDashboardId(
+			'overview',
+			new URLSearchParams('dashboardId=xyz'),
+		);
+		expect(result).toEqual({ windowType: 'workspace', dashboardId: 'xyz' });
+	});
+
+	it('returns overview fallback when neither label nor searchParams have dashboardId', () => {
+		const result = resolveInitialDashboardId('overview', new URLSearchParams());
+		expect(result).toEqual({ windowType: 'overview', dashboardId: null });
+	});
+
+	it('prefers label dashboardId over searchParams dashboardId', () => {
+		const result = resolveInitialDashboardId(
+			'workspace-from-label',
+			new URLSearchParams('dashboardId=from-params'),
+		);
+		expect(result).toEqual({ windowType: 'workspace', dashboardId: 'from-label' });
 	});
 });

@@ -21,18 +21,17 @@ use commands::{
 };
 use std::sync::Arc;
 
-use database::connection::DatabaseState;
 use git::fetch_coordinator::FetchCoordinator;
 use git::github_client::GitHubClient;
 use metrics::pricing::PricingEngine;
-use models::setting::{STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
+use models::setting::{LAST_WORKSPACE_ID_KEY, STARTUP_BEHAVIOR_KEY, STARTUP_BEHAVIOR_LAST_WORKSPACE, STARTUP_BEHAVIOR_OVERVIEW};
 use notification::playback_queue;
 use notification::service::NotificationService;
 use process::manager::ProcessManager;
 use session::discovery_polling::DiscoveryPoller;
 use session::manager::SessionManager;
 use tauri::Manager;
-use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
+use window_manager::{APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH, OVERVIEW_URL};
 
 pub type SharedPricingEngine = Arc<tokio::sync::Mutex<PricingEngine>>;
 
@@ -73,7 +72,7 @@ pub fn run() {
                             let _ = window_manager::open_or_focus_window(
                                 app_handle,
                                 window_manager::overview_label(),
-                                "/overview",
+                                OVERVIEW_URL,
                                 APP_NAME,
                                 DEFAULT_WINDOW_WIDTH,
                                 DEFAULT_WINDOW_HEIGHT,
@@ -96,16 +95,36 @@ pub fn run() {
                 .resource_dir()
                 .expect("Failed to resolve resource directory");
 
-            // Determine startup behavior before managing state
-            let startup_behavior = {
+            // Read startup settings before managing state (database_state moves into app)
+            let (startup_behavior, validated_last_workspace_id) = {
                 let connection = database_state.read().unwrap_or_else(|e| panic!("{e}"));
-                connection
+                let behavior = connection
                     .query_row(
                         "SELECT value FROM user_settings WHERE key = ?1",
                         [STARTUP_BEHAVIOR_KEY],
                         |row| row.get::<_, String>(0),
                     )
-                    .unwrap_or_else(|_| STARTUP_BEHAVIOR_OVERVIEW.to_string())
+                    .unwrap_or_else(|_| STARTUP_BEHAVIOR_OVERVIEW.to_string());
+
+                let last_id: Option<String> = connection
+                    .query_row(
+                        "SELECT value FROM user_settings WHERE key = ?1",
+                        [LAST_WORKSPACE_ID_KEY],
+                        |row| row.get(0),
+                    )
+                    .ok();
+
+                let dashboard_exists = last_id.as_ref().is_some_and(|id| {
+                    connection
+                        .query_row(
+                            "SELECT 1 FROM dashboards WHERE id = ?1 AND status = 'active'",
+                            [id.as_str()],
+                            |_| Ok(()),
+                        )
+                        .is_ok()
+                });
+
+                (behavior, if dashboard_exists { last_id } else { None })
             };
 
             let mut pricing_engine = PricingEngine::new(&app_data_directory);
@@ -131,11 +150,23 @@ pub fn run() {
             let poller = app.state::<DiscoveryPoller>();
             poller.start(app.handle().clone(), 3000);
 
-            // Startup behavior: restore last workspace windows or just show overview
-            if startup_behavior == STARTUP_BEHAVIOR_LAST_WORKSPACE {
-                let db = app.state::<DatabaseState>();
-                window_commands::restore_workspace_windows(app.handle(), db.inner());
-            }
+            let initial_url = if startup_behavior == STARTUP_BEHAVIOR_LAST_WORKSPACE {
+                match validated_last_workspace_id {
+                    Some(id) => format!("/?dashboardId={id}"),
+                    None => OVERVIEW_URL.to_string(),
+                }
+            } else {
+                OVERVIEW_URL.to_string()
+            };
+
+            window_manager::open_or_focus_window(
+                app.handle(),
+                window_manager::overview_label(),
+                &initial_url,
+                APP_NAME,
+                DEFAULT_WINDOW_WIDTH,
+                DEFAULT_WINDOW_HEIGHT,
+            )?;
 
             Ok(())
         })

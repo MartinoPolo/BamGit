@@ -28,6 +28,21 @@ export function isWindowType(value: unknown): value is WindowType {
 	return typeof value === 'string' && value in WINDOW_TYPES;
 }
 
+export function resolveInitialDashboardId(
+	label: string,
+	searchParams: URLSearchParams,
+): { windowType: WindowType; dashboardId: string | null } {
+	const parsed = parseWindowLabel(label);
+	if (parsed.dashboardId !== null) {
+		return parsed;
+	}
+	const dashboardId = searchParams.get('dashboardId');
+	if (dashboardId !== null && dashboardId !== '') {
+		return { windowType: 'workspace', dashboardId };
+	}
+	return parsed;
+}
+
 export function resolvePopstateNavigation(
 	pathname: string,
 	overviewPath: string,

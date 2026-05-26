@@ -6,65 +6,6 @@ use crate::models::overview::OverviewWorkspaceData;
 use crate::models::window_binding::WindowWorkspaceBinding;
 use crate::window_manager::{self, APP_NAME, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_WIDTH};
 
-pub fn restore_workspace_windows(app: &AppHandle, state: &DatabaseState) {
-    let connection = match state.read() {
-        Ok(c) => c,
-        Err(error) => {
-            log::warn!("Failed to read DB for window restore: {error}");
-            return;
-        }
-    };
-
-    let query = format!(
-        "SELECT {BINDING_SELECT_COLUMNS}, d.name \
-         FROM window_workspace_bindings wb \
-         JOIN dashboards d ON wb.dashboard_id = d.id"
-    );
-
-    let mut statement = match connection.prepare(&query) {
-        Ok(s) => s,
-        Err(error) => {
-            log::warn!("Failed to prepare window restore query: {error}");
-            return;
-        }
-    };
-
-    let bindings: Vec<(WindowWorkspaceBinding, String)> = statement
-        .query_map([], |row| {
-            let binding = binding_from_row(row)?;
-            let name: String = row.get(6)?;
-            Ok((binding, name))
-        })
-        .ok()
-        .map(|rows| rows.filter_map(|r| r.ok()).collect())
-        .unwrap_or_default();
-
-    drop(statement);
-    drop(connection);
-
-    for (binding, name) in bindings {
-        let title = format!("{name} — {APP_NAME}");
-        let width = binding
-            .window_width
-            .map_or(DEFAULT_WINDOW_WIDTH, |v| v as f64);
-        let height = binding
-            .window_height
-            .map_or(DEFAULT_WINDOW_HEIGHT, |v| v as f64);
-        if let Err(error) = window_manager::open_or_focus_window_with_position(
-            app,
-            &binding.window_label,
-            "index.html",
-            &title,
-            width,
-            height,
-            binding.window_x,
-            binding.window_y,
-        ) {
-            log::warn!("Failed to restore window {}: {error}", binding.window_label);
-        }
-    }
-}
-
 const BINDING_SELECT_COLUMNS: &str =
     "window_label, dashboard_id, window_x, window_y, window_width, window_height";
 

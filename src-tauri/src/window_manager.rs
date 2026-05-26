@@ -6,6 +6,7 @@ const WORKSPACE_PREFIX: &str = "workspace-";
 pub const DEFAULT_WINDOW_WIDTH: f64 = 1600.0;
 pub const DEFAULT_WINDOW_HEIGHT: f64 = 900.0;
 pub const APP_NAME: &str = "Grovekeeper";
+pub const OVERVIEW_URL: &str = "/overview";
 
 pub fn overview_label() -> &'static str {
     OVERVIEW_LABEL
