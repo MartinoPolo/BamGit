@@ -22,6 +22,8 @@ function makeWorkspace(overrides: Partial<OverviewWorkspaceData>): OverviewWorks
 		active_session_count: 0,
 		last_activity: null,
 		total_cost_usd: null,
+		cost_today_usd: null,
+		cost_week_usd: null,
 		hitl_count: 0,
 		open_pr_count: 0,
 		prs_needing_attention: 0,
@@ -90,9 +92,9 @@ describe('sortWorkspaces', () => {
 
 	it('sorts by cost descending (highest first, nulls treated as 0)', () => {
 		const workspaces = [
-			makeWorkspace({ name: 'free', total_cost_usd: null }),
-			makeWorkspace({ name: 'expensive', total_cost_usd: 100 }),
-			makeWorkspace({ name: 'cheap', total_cost_usd: 5 }),
+			makeWorkspace({ name: 'free', cost_today_usd: null }),
+			makeWorkspace({ name: 'expensive', cost_today_usd: 100 }),
+			makeWorkspace({ name: 'cheap', cost_today_usd: 5 }),
 		];
 		const result = sortWorkspaces(workspaces, 'cost', 'descending');
 		expect(result.map((w) => w.name)).toEqual(['expensive', 'cheap', 'free']);

@@ -351,14 +351,14 @@
 				>
 					{#if footerContent === 'cost-today'}
 						today <CostLink
-							costUsd={workspace.total_cost_usd ?? 0}
+							costUsd={workspace.cost_today_usd ?? 0}
 							period="today"
 							scope="workspace"
 							size="sm"
 						/>
 					{:else if footerContent === 'cost-week'}
 						week <CostLink
-							costUsd={workspace.total_cost_usd ?? 0}
+							costUsd={workspace.cost_week_usd ?? 0}
 							period="week"
 							scope="workspace"
 							size="sm"

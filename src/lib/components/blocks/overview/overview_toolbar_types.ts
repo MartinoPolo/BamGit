@@ -112,8 +112,8 @@ export function sortWorkspaces(
 				return directionMultiplier * (a.open_issue_count - b.open_issue_count);
 
 			case 'cost': {
-				const aCost = a.total_cost_usd ?? 0;
-				const bCost = b.total_cost_usd ?? 0;
+				const aCost = a.cost_today_usd ?? 0;
+				const bCost = b.cost_today_usd ?? 0;
 				return directionMultiplier * (aCost - bCost);
 			}
 		}
