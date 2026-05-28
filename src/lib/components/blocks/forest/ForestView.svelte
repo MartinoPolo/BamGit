@@ -21,8 +21,10 @@
 		DEFAULT_TREE_CONFIG,
 		OVERLAY_DEFAULTS,
 		TRUNK_DEAD_SPACE_PERCENT,
+		FirefliesEffect,
 	} from 'low-poly-2d-trees';
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
+	import { useSettings } from '$lib/modules/settings';
 	import * as m from '$lib/paraglide/messages.js';
 	import SproutIcon from '@lucide/svelte/icons/sprout';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
@@ -94,6 +96,8 @@
 	});
 
 	const interaction = useSelection();
+	const settingsCtx = useSettings();
+	const isDark = $derived(settingsCtx.isDark);
 
 	let contextMenuIssueId = $state<string | null>(null);
 
@@ -273,7 +277,7 @@
 		}),
 	);
 
-	const groundStripHeight = $derived(debouncedViewportHeight * (1 - GROUND_Y_FRACTION));
+	const groundStripHeight = $derived(debouncedViewportHeight * 0.45);
 
 	function buildLayoutItem(
 		issue: Issue,
@@ -535,11 +539,53 @@
 					{/if}
 				{/each}
 			{/if}
+			<!-- Mountains background -->
+			<svg
+				class="absolute inset-0 pointer-events-none"
+				viewBox="0 0 1400 600"
+				preserveAspectRatio="none"
+				style:z-index="0"
+			>
+				<!-- Far mountains -->
+				<polygon
+					points="0,600 0,340 80,280 200,320 350,220 500,280 650,200 800,260 950,240 1100,300 1250,260 1400,320 1400,600"
+					style="fill: var(--mountain-far); opacity: 0.5"
+				/>
+				<!-- Mid mountains -->
+				<polygon
+					points="0,600 0,380 120,320 240,360 380,280 500,340 650,300 780,350 920,290 1060,340 1200,310 1400,370 1400,600"
+					style="fill: var(--mountain-mid); opacity: 0.7"
+				/>
+				<!-- Near mountains/hills -->
+				<polygon
+					points="0,600 0,420 100,380 220,410 340,360 480,400 600,370 740,410 860,380 1000,410 1140,370 1280,400 1400,420 1400,600"
+					style="fill: var(--mountain-near); opacity: 0.85"
+				/>
+			</svg>
+			{#if isDark}
+				<!-- Moon -->
+				<div
+					class="pointer-events-none absolute rounded-full"
+					style="
+						top: 8%;
+						right: 12%;
+						width: 40px;
+						height: 40px;
+						z-index: 1;
+						background: radial-gradient(circle, oklch(0.95 0.01 90) 0%, oklch(0.9 0.02 90) 60%, oklch(0.85 0.03 90) 100%);
+						box-shadow: 0 0 40px 15px var(--moon-glow), 0 0 80px 30px color-mix(in oklch, var(--moon-glow) 40%, transparent);
+					"
+				></div>
+				<!-- Fireflies -->
+				<div class="pointer-events-none absolute inset-0" style="z-index: 1;">
+					<FirefliesEffect count={10} color="var(--firefly-color)" />
+				</div>
+			{/if}
 			<button
 				type="button"
 				class="absolute inset-x-0 bottom-0 cursor-default border-0 p-0"
 				style:height="{groundStripHeight}px"
-				style="background: linear-gradient(to top, var(--ground-dark), var(--ground-color))"
+				style="background: linear-gradient(to bottom, transparent 0%, var(--ground-color) 30%, var(--ground-dark) 100%)"
 				style:z-index="1"
 				onclick={handleGroundClick}
 				oncontextmenu={(e) => {

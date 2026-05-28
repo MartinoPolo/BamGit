@@ -67,7 +67,7 @@ export const SPEECH_BUBBLE_COLORS = {
 
 /** Sub-agent category to bird type mapping (REQ-6). Rendering deferred to library enhancement. */
 /** Minimum pixel distance between any two positioned items. */
-export const MIN_SPACING_PX = 60;
+export const MIN_SPACING_PX = 40;
 
 // ─── Row-Based Layout Constants ─────────────────────────────────────────────
 
@@ -78,7 +78,7 @@ export const MAX_DEPTH_ROWS = 10;
 export const TREE_SPACING_FRACTION = 0.08;
 
 /** Y-offset per depth row (moving up toward horizon), as fraction of viewport height. */
-export const ROW_SPACING_Y_FRACTION = 0.08;
+export const ROW_SPACING_Y_FRACTION = 0.04;
 
 /** Scale multiplier applied per depth row (cumulative). Row 0 = 1.0, row 1 = 0.78, etc. */
 export const ROW_SCALE_FACTOR = 0.78;

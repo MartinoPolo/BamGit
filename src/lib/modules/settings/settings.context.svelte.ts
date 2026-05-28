@@ -21,7 +21,12 @@ import {
 	setWorkspaceSetting,
 	deleteWorkspaceSetting,
 } from './settings_commands.js';
-import { isThemeMode, isAccentColor, type ThemeMode } from '$lib/modules/board/types.js';
+import {
+	isThemeMode,
+	isAccentColor,
+	isBackgroundPalette,
+	type ThemeMode,
+} from '$lib/modules/board/types.js';
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -65,6 +70,8 @@ function createSettingsContext() {
 		document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
 		document.documentElement.dataset.accent =
 			values.get('accentColor') ?? SETTING_DEFAULTS.accentColor;
+		document.documentElement.dataset.palette =
+			values.get('backgroundPalette') ?? SETTING_DEFAULTS.backgroundPalette;
 	});
 
 	// ── API ────────────────────────────────────────────────────────────────
@@ -181,6 +188,11 @@ function createSettingsContext() {
 		return isAccentColor(raw) ? raw : SETTING_DEFAULTS.accentColor;
 	}
 
+	function getBackgroundPalette(): string {
+		const raw = values.get('backgroundPalette') ?? SETTING_DEFAULTS.backgroundPalette;
+		return isBackgroundPalette(raw) ? raw : SETTING_DEFAULTS.backgroundPalette;
+	}
+
 	function setReturnUrl(url: string): void {
 		returnUrl.current = url;
 	}
@@ -195,6 +207,7 @@ function createSettingsContext() {
 		setReturnUrl,
 		getThemeMode,
 		getAccentColor,
+		getBackgroundPalette,
 		get isDark() {
 			return isDark;
 		},

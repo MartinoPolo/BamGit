@@ -42,6 +42,8 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 **Deep Module** — Ousterhout pattern: small interface, large implementation. Each module exposes `use{Feature}()` factory.
 **Design Token** — OKLCH CSS custom property in `app.css` under `@theme inline`. Semantic tokens swap via `[data-theme]`.
 **Accent Color** — Theme applied via `data-accent` on `<html>`. 12 presets. Overrides `--primary`, `--accent`, `--ring`.
+**Background Theme** — UI mood/hue setting applied via `data-bg-theme` on `<html>`. 3 built-in presets (Forest, Golden Hour, Twilight). Overrides surface tokens + forest environment tokens. Workspace-overridable. Selectable in Appearance settings and forest view context menu.
+**Issue-Color Palette** — Pool of hex colors (Vivid/Pastel/Muted + custom) for auto-assigning unique colors to issues/trees. Per-dashboard via `color_palette_id` FK. Not a theme/appearance concept.
 **Appearance Settings** — 10 per-card user preferences (variant, badge style, label tint, etc.) stored in `user_settings` with `issue_card_` key prefix; workspace overrides stored in `workspace_settings(dashboard_id, key)` and take priority via the settings engine cascade.
 **State Mapping** — Priority-ordered rule table for tree stage, accessories, overlays, glow, animations. See`.mpx/STATE_MAPPING.md`.
 **State Chip Cascade** — 22-rule priority-ordered derivation in `derive_issue_state_chip.ts` mapping 8 state dimensions to a single {label, color} display chip.

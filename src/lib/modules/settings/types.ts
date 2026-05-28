@@ -2,6 +2,7 @@ export const SETTING_KEYS = {
 	// Appearance
 	themeMode: 'theme_mode',
 	accentColor: 'accent_color',
+	backgroundPalette: 'background_palette',
 
 	// Account
 	username: 'username',
@@ -40,6 +41,7 @@ export type SettingDbKey = (typeof SETTING_KEYS)[SettingKey];
 export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	themeMode: 'system',
 	accentColor: 'moss',
+	backgroundPalette: 'forest',
 	username: 'User',
 	userInitials: 'U',
 	startupBehavior: 'last-workspace',
@@ -64,6 +66,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 export const WORKSPACE_OVERRIDABLE_KEYS: readonly SettingKey[] = [
 	'themeMode',
 	'accentColor',
+	'backgroundPalette',
 	'issueCardVariant',
 	'issueCardButtonColor',
 	'issueCardPriorityPosition',
@@ -78,7 +81,11 @@ export const WORKSPACE_OVERRIDABLE_KEYS: readonly SettingKey[] = [
 ] as const;
 
 // Settings that need localStorage mirror for FOUC prevention
-export const FOUC_MIRROR_KEYS: readonly SettingKey[] = ['themeMode', 'accentColor'] as const;
+export const FOUC_MIRROR_KEYS: readonly SettingKey[] = [
+	'themeMode',
+	'accentColor',
+	'backgroundPalette',
+] as const;
 
 // LocalStorage key prefix for FOUC mirror
 export const FOUC_STORAGE_PREFIX = 'grovekeeper_settings_';

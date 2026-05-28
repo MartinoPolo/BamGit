@@ -1634,9 +1634,14 @@ describe('computeForestLayout — multiple rows', () => {
 		const r1 = findItem(result.items, 'r1');
 		const r2 = findItem(result.items, 'r2');
 
-		expect(r0.y).toBeCloseTo(groundY, 1);
-		expect(r1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
-		expect(r2.y).toBeCloseTo(groundY - 2 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		// Collision avoidance may shift items by a few pixels when oak and r0 overlap
+		expect(Math.abs(r0.y - groundY)).toBeLessThan(MIN_SPACING_PX / 2 + 1);
+		expect(Math.abs(r1.y - (groundY - viewport.height * ROW_SPACING_Y_FRACTION))).toBeLessThan(
+			MIN_SPACING_PX / 2 + 1,
+		);
+		expect(
+			Math.abs(r2.y - (groundY - 2 * viewport.height * ROW_SPACING_Y_FRACTION)),
+		).toBeLessThan(MIN_SPACING_PX / 2 + 1);
 
 		// Each deeper row should be higher (smaller y)
 		expect(r1.y).toBeLessThan(r0.y);

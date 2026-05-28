@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './accent-colors.css';
+@import './palette-colors.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
@@ -432,6 +433,10 @@
 	--chip-success: oklch(0.5 0.2 145);
 	--chip-info: oklch(0.5 0.17 230);
 	--chip-muted: oklch(0.45 0.03 260);
+	--mountain-far: oklch(0.72 0.04 180);
+	--mountain-mid: oklch(0.58 0.05 160);
+	--mountain-near: oklch(0.48 0.06 145);
+	--firefly-color: oklch(0.8 0.2 135);
 }
 
 [data-theme='dark'] {
@@ -472,6 +477,11 @@
 	--chip-success: oklch(0.7 0.2 145);
 	--chip-info: oklch(0.7 0.15 230);
 	--chip-muted: oklch(0.5 0.02 260);
+	--mountain-far: oklch(0.22 0.03 200);
+	--mountain-mid: oklch(0.18 0.04 180);
+	--mountain-near: oklch(0.15 0.05 160);
+	--firefly-color: oklch(0.8 0.2 135);
+	--moon-glow: oklch(0.9 0.03 210);
 }
 
 @keyframes shimmer {
