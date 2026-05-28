@@ -113,8 +113,8 @@
 	const showStars = $derived(settingsCtx.getShowStars());
 	const showMoon = $derived(settingsCtx.getShowMoon());
 
-	const GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX = 8;
-	const MOUNTAINS_GROUND_OVERLAP_PX = 20;
+	const GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX = 40;
+	const MOUNTAINS_GROUND_OVERLAP_PX = 100;
 	const MOUNTAINS_FADE_MIN_PX = 60;
 	const MOUNTAINS_FADE_MAX_PX = 100;
 
@@ -128,14 +128,15 @@
 		return Math.max(0, highestTreeY - GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX);
 	});
 
-	const mountainsHeight = $derived(groundY + MOUNTAINS_GROUND_OVERLAP_PX);
+	const mountainsHeight = $derived(groundTopY + MOUNTAINS_GROUND_OVERLAP_PX);
 	const mountainsOpacity = $derived.by(() => {
-		if (groundY < MOUNTAINS_FADE_MIN_PX) {
+		if (groundTopY < MOUNTAINS_FADE_MIN_PX) {
 			return 0;
 		}
-		if (groundY < MOUNTAINS_FADE_MAX_PX) {
+		if (groundTopY < MOUNTAINS_FADE_MAX_PX) {
 			return (
-				(groundY - MOUNTAINS_FADE_MIN_PX) / (MOUNTAINS_FADE_MAX_PX - MOUNTAINS_FADE_MIN_PX)
+				(groundTopY - MOUNTAINS_FADE_MIN_PX) /
+				(MOUNTAINS_FADE_MAX_PX - MOUNTAINS_FADE_MIN_PX)
 			);
 		}
 		return 1;
@@ -615,11 +616,11 @@
 				{/each}
 			{/if}
 
-			<!-- Ground — extends from highest tree down to bottom, guarantees all trees sit on ground -->
+			<!-- Ground — extends from highest tree down to bottom, layers above mountains -->
 			<div
 				class="pointer-events-none absolute inset-x-0 bottom-0"
 				style:top="{groundTopY}px"
-				style:z-index="1"
+				style:z-index="2"
 				style:background="linear-gradient(to bottom, var(--ground-color),
 				var(--ground-dark))"
 			></div>

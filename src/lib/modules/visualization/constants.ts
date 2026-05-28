@@ -74,11 +74,17 @@ export const MIN_SPACING_PX = 40;
 /** Maximum number of depth rows rendered. Items deeper than this are clamped. */
 export const MAX_DEPTH_ROWS = 10;
 
-/** Horizontal spacing between trees in the same row, as fraction of viewport width. */
+/** Maximum pixel width used for tree placement. Trees center within the viewport when it exceeds this. */
+export const MAX_LAYOUT_WIDTH_PX = 900;
+
+/** Horizontal spacing between trees in the same row, as fraction of effective layout width. */
 export const TREE_SPACING_FRACTION = 0.08;
 
-/** Y-offset per depth row (moving up toward horizon), as fraction of viewport height. */
-export const ROW_SPACING_Y_FRACTION = 0.04;
+/** Base Y-gap between row 0 and row 1, as fraction of viewport height. Successive gaps shrink by ROW_GAP_PERSPECTIVE_FACTOR. */
+export const BASE_ROW_GAP_FRACTION = 0.028;
+
+/** Each successive row gap is this fraction of the previous gap, creating a depth perspective effect. */
+export const ROW_GAP_PERSPECTIVE_FACTOR = 0.82;
 
 /** Scale multiplier applied per depth row (cumulative). Row 0 = 1.0, row 1 = 0.78, etc. */
 export const ROW_SCALE_FACTOR = 0.78;
