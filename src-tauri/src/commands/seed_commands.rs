@@ -75,6 +75,8 @@ const DEMO_ISSUES: &[DemoIssue] = &[
     DemoIssue { index: 24, name: "Session: Metrics dashboard", worktree_state: "active", branch_name: Some("24-session-metrics"), base_branch: Some("main"), parent_index: Some(21), labels: r##"[{"name":"documentation","color":"#06b6d4"}]"##, status: "active", color: Some("#b4d455"), github_issue_number: Some(203), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/203"), priority: Some("low") },
     // === Issue with worktree_state "removing" ===
     DemoIssue { index: 25, name: "Uprooting: Worktree cleanup", worktree_state: "removing", branch_name: Some("25-uprooting-cleanup"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"infrastructure","color":"#64748b"}]"##, status: "active", color: Some("#d4a574"), github_issue_number: Some(121), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/121"), priority: Some("medium") },
+    // === Issue with merge conflict ===
+    DemoIssue { index: 26, name: "Branching: Merge conflict", worktree_state: "active", branch_name: Some("26-branching-conflict"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#c45850"), github_issue_number: Some(122), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/122"), priority: Some("high") },
 ];
 
 const DEMO_DEPENDENCIES: &[DemoDependency] = &[
@@ -118,6 +120,8 @@ const DEMO_GIT_CACHES: &[DemoGitCache] = &[
     DemoGitCache { issue_index: 23, branch_status: "active", pr_state: Some("open"), pr_number: Some(202), behind_base_count: 1, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
     DemoGitCache { issue_index: 24, branch_status: "active", pr_state: Some("draft"), pr_number: Some(203), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
     DemoGitCache { issue_index: 25, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    // Issue 26 (Branching: Merge conflict) — open PR with merge conflict: tests action level #3
+    DemoGitCache { issue_index: 26, branch_status: "active", pr_state: Some("open"), pr_number: Some(122), behind_base_count: 2, merge_conflict: true, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
 ];
 
 const DEMO_SESSIONS: &[DemoSession] = &[
@@ -319,7 +323,7 @@ mod tests {
     }
 
     #[test]
-    fn seed_creates_26_issues() {
+    fn seed_creates_27_issues() {
         let mut connection = setup_test_database();
         seed_demo_data(&mut connection).unwrap();
 
@@ -330,7 +334,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(count, 26);
+        assert_eq!(count, 27);
 
         // Spot-check PRD parent
         let (name, worktree_state): (String, String) = connection
@@ -381,7 +385,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(count, 21);
+        assert_eq!(count, 22);
 
         // Spot-check draft PR
         let pr_state: String = connection
@@ -545,7 +549,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(issue_count, 26);
+        assert_eq!(issue_count, 27);
 
         let session_count: i64 = connection
             .query_row(
@@ -563,7 +567,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(git_cache_count, 21);
+        assert_eq!(git_cache_count, 22);
 
         let dependency_count: i64 = connection
             .query_row(
@@ -654,11 +658,11 @@ mod tests {
             .collect::<Result<Vec<String>, _>>()
             .unwrap();
 
-        assert_eq!(colors.len(), 26, "all 26 issues should have a color");
+        assert_eq!(colors.len(), 27, "all 27 issues should have a color");
 
         let unique: std::collections::HashSet<&str> =
             colors.iter().map(|c| c.as_str()).collect();
-        assert_eq!(unique.len(), 26, "all colors should be distinct");
+        assert_eq!(unique.len(), 27, "all colors should be distinct");
     }
 
     #[test]
@@ -677,10 +681,10 @@ mod tests {
             .collect::<Result<Vec<i32>, _>>()
             .unwrap();
 
-        assert_eq!(numbers.len(), 26, "all 26 issues should have a github_issue_number");
+        assert_eq!(numbers.len(), 27, "all 27 issues should have a github_issue_number");
 
         let unique: std::collections::HashSet<i32> = numbers.iter().copied().collect();
-        assert_eq!(unique.len(), 26, "all github_issue_numbers should be distinct");
+        assert_eq!(unique.len(), 27, "all github_issue_numbers should be distinct");
     }
 
     #[test]
@@ -699,7 +703,7 @@ mod tests {
             .collect::<Result<Vec<(String, i32)>, _>>()
             .unwrap();
 
-        assert_eq!(rows.len(), 26);
+        assert_eq!(rows.len(), 27);
         for (url, number) in &rows {
             assert!(
                 url.contains(&number.to_string()),

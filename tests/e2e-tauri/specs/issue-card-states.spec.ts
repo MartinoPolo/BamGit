@@ -1,4 +1,4 @@
-import { browser, $ } from '@wdio/globals';
+import { browser, $, $$ } from '@wdio/globals';
 import {
 	navigateToWorkspace,
 	findCardByTitle,
@@ -76,28 +76,38 @@ describe('Issue Card — Visual States', () => {
 		await navigateToWorkspace();
 	});
 
-	it('worktreeSetup cards have data-card-state="worktreeSetup" and opacity 0.6', async () => {
+	it('worktreeSetup cards have data-card-state="worktreeSetup" and transparent border', async () => {
 		const card = await findCardByTitle('Worktree pending');
 		expect(await card.getAttribute('data-card-state')).toBe('worktreeSetup');
 
-		const opacity = await browser.execute(
-			(el: HTMLElement) => window.getComputedStyle(el).opacity,
+		const borderColor = await browser.execute(
+			(el: HTMLElement) => window.getComputedStyle(el).borderColor,
 			card as unknown as HTMLElement,
 		);
-		expect(opacity).toBe('0.6');
+		expect(borderColor).toContain('0, 0, 0, 0');
 	});
 
 	it('card grid columns are at least 450px wide', async () => {
 		const firstCard = await $('[data-testid="issue-card"]');
-		const gridParent = await firstCard.parentElement();
-		const columnWidths = await browser.execute(
+		const columnWidths: string = await browser.execute(
 			(el: HTMLElement) => {
-				return window.getComputedStyle(el).gridTemplateColumns;
+				let parent = el.parentElement;
+				while (
+					parent &&
+					!window.getComputedStyle(parent).gridTemplateColumns.includes('px')
+				) {
+					parent = parent.parentElement;
+				}
+				return parent ? window.getComputedStyle(parent).gridTemplateColumns : '';
 			},
-			gridParent as unknown as HTMLElement,
+			firstCard as unknown as HTMLElement,
 		);
 
-		const widths = columnWidths.split(' ').map((w: string) => parseFloat(w));
+		const widths = columnWidths
+			.split(' ')
+			.map((w: string) => parseFloat(w))
+			.filter((w: number) => !isNaN(w));
+		expect(widths.length).toBeGreaterThan(0);
 		for (const width of widths) {
 			expect(width).toBeGreaterThanOrEqual(450);
 		}
@@ -116,5 +126,57 @@ describe('Issue Card — Visual States', () => {
 
 		expect(rect.width).toBe(rect.height);
 		expect(rect.width).toBeGreaterThanOrEqual(100);
+	});
+});
+
+describe('Issue Card — Chip Cascade Priority', () => {
+	before(async () => {
+		await navigateToWorkspace();
+	});
+
+	it('ERROR chip wins over other states (highest session priority)', async () => {
+		const card = await findCardByTitle('Session errored');
+		const label = await getChipLabel(card);
+		expect(label).toBe('ERROR');
+	});
+
+	it('CHANGES REQ chip shows when no higher-priority state is present', async () => {
+		const card = await findCardByTitle('Changes requested');
+		const label = await getChipLabel(card);
+		expect(label).toBe('CHANGES REQ');
+	});
+
+	it('NEEDS INPUT chip shows for needs-input session', async () => {
+		const card = await findCardByTitle('Needs input');
+		const label = await getChipLabel(card);
+		expect(label).toBe('NEEDS INPUT');
+	});
+
+	it('no chip for card with no relevant state condition', async () => {
+		const card = await findCardByTitle('Ready to work');
+		const label = await getChipLabel(card);
+		expect(label).toBeNull();
+	});
+});
+
+describe('Issue Card — Archived State', () => {
+	before(async () => {
+		await navigateToWorkspace();
+	});
+
+	it('archived cards are not shown in the main grid by default', async () => {
+		const allCards = await $$('[data-testid="issue-card"]');
+		const archivedFound: string[] = [];
+		for (const card of allCards) {
+			const text: string = await browser.execute(
+				(el: HTMLElement) =>
+					el.querySelector('[data-testid="issue-card-title"]')?.textContent ?? '',
+				card as unknown as HTMLElement,
+			);
+			if (text.includes('Archived') || text.includes('Stump')) {
+				archivedFound.push(text);
+			}
+		}
+		expect(archivedFound.length).toBe(0);
 	});
 });
