@@ -9,7 +9,7 @@
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
 	import { USAGE_SCOPES } from '$lib/modules/usage/usage_types.js';
 	import { useVersionControl } from '$lib/modules/version-control';
-	import { getOverviewData, openWorkspaceWindow } from '$lib/modules/window';
+	import { getOverviewData, openWorkspaceWindow, useWindow } from '$lib/modules/window';
 	import OverviewHeader from '$lib/components/blocks/overview/OverviewHeader.svelte';
 	import OverviewToolbar from '$lib/components/blocks/overview/OverviewToolbar.svelte';
 	import OverviewSummaryBasin from '$lib/components/blocks/overview/OverviewSummaryBasin.svelte';
@@ -33,6 +33,7 @@
 	import type { Dashboard, OverviewWorkspaceData } from '$lib/types/generated';
 
 	const boardStore = useBoard();
+	const windowCtx = useWindow();
 	const versionControl = useVersionControl();
 	const usageCtx = setUsageContext();
 	const toolbar = setOverviewToolbarContext();
@@ -153,12 +154,12 @@
 		}
 	}
 
-	async function handleOpenWorkspace(dashboardId: string) {
-		try {
-			await openWorkspaceWindow(dashboardId);
-		} catch (err) {
-			console.error('Failed to open workspace window:', err);
-		}
+	function handleOpenWorkspace(dashboardId: string) {
+		windowCtx.navigateToWorkspace(dashboardId);
+	}
+
+	function handleOpenInNewWindow(workspace: OverviewWorkspaceData) {
+		void openWorkspaceWindow(workspace.dashboard_id);
 	}
 
 	function handleGithubClick(workspace: OverviewWorkspaceData) {
@@ -257,6 +258,7 @@
 				onArchive={handleArchiveWorkspace}
 				onUnarchive={handleUnarchiveWorkspace}
 				onDelete={handleDeleteWorkspace}
+				onOpenInNewWindow={handleOpenInNewWindow}
 			/>
 
 			<WorkspaceDeleteDialog

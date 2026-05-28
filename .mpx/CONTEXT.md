@@ -6,7 +6,7 @@ Desktop AI agent orchestration platform for developers running parallel Claude C
 
 ## Domain Language
 
-**Workspace** — Top-level container: one GitHub repo + one project folder + one window.
+**Workspace** — Top-level container: one GitHub repo + one project folder.
 **Overview** — Multi-workspace launcher view showing all workspaces as cards with health indicators.
 **Issue** — Atomic work unit. One GitHub issue, one worktree, one branch, one color. Priority defaults to medium.
 **Session** — One AI agent CLI execution tied to an issue. Has transcript, cost, turns, state. Multiple per issue.
@@ -72,7 +72,7 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 
 ## Relationships
 
-- A **Workspace** has many **Issues** (1:N). One window per workspace.
+- A **Workspace** has many **Issues** (1:N). Navigation between workspaces uses SPA routing within a single window.
 - An **Issue** has many **Sessions** (1:N), one **Worktree** (1:1), one **Character Pack** (1:1).
 - A **Session** runs on one **Provider** (N:1).
 - A **Provider** has many **Discovery Sources** (1:N), each yielding **Skills**, **Rules**, **MCP Servers**.
@@ -109,11 +109,13 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 | PRD Management         | planned                     | #219      | —                                                     |
 | Keyboard Shortcuts     | implemented                 | #87       | —                                                     |
 | Internationalization   | implemented (en + cs)       | #87       | —                                                     |
+| Single-Window Nav      | planned                     | #398      | —                                                     |
 
 ## Key Constraints
 
 - SPA mode (ssr=false, static adapter with fallback). No server-side rendering.
-- Single Tauri process, multiple windows via `single_instance` plugin.
+  <<<<<<< Updated upstream
+- Single Tauri process, single-window SPA navigation. Multi-window optional via `single_instance` plugin.
 - Frontend owns all user-facing text. Rust returns error keys. Paraglide for i18n.
 - No versioned DB migrations (pre-production). `schema::create_tables()` + `seed_defaults()`.
 - GitHub issues are source of truth for work items. No internal task database.

@@ -6,6 +6,11 @@ function trimOrNull(value: string): string | null {
 	return trimmed || null;
 }
 
+export function deriveWorktreeFolder(localFolder: string): string {
+	const trimmed = localFolder.replace(/[\\/]+$/, '');
+	return trimmed ? `${trimmed}-worktrees` : '';
+}
+
 export function extractGitHubIssueNumber(url: string): number | null {
 	const match = url.match(/\/issues\/(\d+)/);
 	return match !== null ? parseInt(match[1], 10) : null;
@@ -67,7 +72,6 @@ export function buildUpdateIssueRequest(
 
 export function buildCreateDashboardRequest(
 	name: string,
-	dashboardType: 'repo' | 'portfolio',
 	accentColor: string,
 	githubRepo: string,
 	localFolder: string,
@@ -79,24 +83,19 @@ export function buildCreateDashboardRequest(
 		return null;
 	}
 
-	const request: CreateDashboardRequest = {
+	return {
 		name: trimmedName,
-		type: dashboardType,
+		type: 'repo',
 		accent_color: accentColor,
+		github_repo: trimOrNull(githubRepo) ?? undefined,
+		local_folder: trimOrNull(localFolder) ?? undefined,
+		default_base_branch: trimOrNull(defaultBaseBranch) ?? undefined,
+		worktree_parent_folder: trimOrNull(worktreeParentFolder) ?? undefined,
 	};
-
-	if (dashboardType === 'repo') {
-		request.github_repo = trimOrNull(githubRepo) ?? undefined;
-		request.local_folder = trimOrNull(localFolder) ?? undefined;
-		request.default_base_branch = trimOrNull(defaultBaseBranch) ?? undefined;
-		request.worktree_parent_folder = trimOrNull(worktreeParentFolder) ?? undefined;
-	}
-
-	return request;
 }
 
 export function buildUpdateDashboardRequest(
-	dashboard: { id: string; type: string } | null,
+	dashboard: { id: string } | null,
 	name: string,
 	accentColor: string | null,
 	githubRepo: string,
@@ -108,18 +107,13 @@ export function buildUpdateDashboardRequest(
 		return null;
 	}
 
-	const request: UpdateDashboardRequest = {
+	return {
 		id: dashboard.id,
 		name: name.trim(),
 		accent_color: accentColor,
+		github_repo: trimOrNull(githubRepo),
+		local_folder: trimOrNull(localFolder),
+		default_base_branch: trimOrNull(defaultBaseBranch),
+		worktree_parent_folder: trimOrNull(worktreeParentFolder),
 	};
-
-	if (dashboard.type === 'repo') {
-		request.github_repo = trimOrNull(githubRepo);
-		request.local_folder = trimOrNull(localFolder);
-		request.default_base_branch = trimOrNull(defaultBaseBranch);
-		request.worktree_parent_folder = trimOrNull(worktreeParentFolder);
-	}
-
-	return request;
 }

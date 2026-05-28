@@ -580,7 +580,6 @@
 						parentIssues={issueStore.parentIssues}
 						archivedIssues={issueStore.archivedIssues}
 						showArchived={issueStore.showArchived}
-						isPortfolio={boardStore.activeDashboard?.type === 'portfolio'}
 						cacheMap={versionControlStore.stateMap}
 						ghAvailable={versionControlStore.isGhAvailable}
 						prioritiesEnabled={boardStore.activeDashboard?.priorities_enabled ?? true}

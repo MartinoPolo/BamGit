@@ -58,7 +58,6 @@ export type { MemoryConfig } from './MemoryConfig';
 export type { NotificationConfig } from './NotificationConfig';
 export type { NotificationEventType } from './NotificationEventType';
 export type { OverviewWorkspaceData } from './OverviewWorkspaceData';
-export type { PortfolioDashboardPointer } from './PortfolioDashboardPointer';
 export type { ProposedMapping } from './ProposedMapping';
 export type { ProcessStatus } from './ProcessStatus';
 export type { ProviderCapabilities } from './ProviderCapabilities';

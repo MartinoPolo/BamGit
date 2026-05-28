@@ -1,4 +1,8 @@
-import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
+import {
+	CONTRAST_LUMINANCE_THRESHOLD,
+	getContrastTextColor,
+	relativeLuminance,
+} from '$lib/components/derived/color-picker/color_utils.js';
 import type { IssueCardAppearanceSettings, IssueCardVariant } from './issue_card_settings.js';
 import type { IssueCardState } from './issue_card_variants.js';
 import type { SessionOverlay } from './types.js';
@@ -200,7 +204,6 @@ function applyStateOverrides(
 
 		case 'worktreeSetup':
 			card['border-color'] = 'transparent';
-			card.opacity = '0.6';
 			break;
 
 		case 'archived':
@@ -333,7 +336,12 @@ export function computeVariantSlotStyles(input: VariantStylesInput): VariantSlot
 		'--ic-color': issueColor,
 		'--ic-header-text':
 			variant === 'veil' ? getContrastTextColor(issueColor) : 'var(--foreground)',
-		'--ic-number-color': variant === 'radiant' ? issueColor : 'inherit',
+		'--ic-number-color':
+			variant === 'radiant'
+				? relativeLuminance(issueColor) > CONTRAST_LUMINANCE_THRESHOLD
+					? `color-mix(in oklch, ${issueColor} 55%, black)`
+					: issueColor
+				: 'inherit',
 		'--ic-overlay-glow': String(settings.overlayGlow / 100),
 	};
 

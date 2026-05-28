@@ -4,7 +4,7 @@ import type { ColorPalette } from '$lib/types/generated';
 
 export interface CreateDashboardRequest {
 	name: string;
-	type: 'repo' | 'portfolio';
+	type: 'repo';
 	github_repo?: string | null;
 	local_folder?: string | null;
 	default_base_branch?: string | null;
@@ -18,7 +18,7 @@ export interface CreateDashboardRequest {
 export interface UpdateDashboardRequest {
 	id: string;
 	name?: string;
-	type?: 'repo' | 'portfolio';
+	type?: 'repo';
 	github_repo?: string | null;
 	local_folder?: string | null;
 	default_base_branch?: string | null;
@@ -38,12 +38,6 @@ export interface UpdateColorPaletteRequest {
 	id: string;
 	name?: string;
 	colors?: string[];
-}
-
-/** @public */
-export interface AddRepoToPortfolioRequest {
-	portfolio_dashboard_id: string;
-	repo_dashboard_id: string;
 }
 
 // ─── Frontend-only value types ────────────────────────────────────────────

@@ -6,12 +6,12 @@ Settled architectural and design decisions. Each entry records what was chosen, 
 
 ## Platform & Infrastructure
 
-### Single process, multi-window via Tauri single_instance
+### Single process, single-window SPA navigation (optional multi-window)
 
-Decided: 2026-04-28
-What: One Tauri process. Each workspace gets its own WebviewWindow.
-Why: Shared SQLite, IPC between windows, simpler auth flow.
-Rejected: Electron multi-process (too heavy), separate processes per workspace (IPC complexity).
+Decided: 2026-04-28. **Updated 2026-05-26: switched from mandatory multi-window to single-window SPA navigation.**
+What: One Tauri process. Single window with SvelteKit `goto()` navigation between Overview and Workspaces. Multi-window kept as optional "Open in new window" escape hatch via `single_instance` plugin.
+Why: Multi-window caused theme desync between windows, cold startup per window, and unnecessary complexity. Single-window with SPA navigation is simpler and more cohesive. Multi-window preserved for side-by-side workspace viewing.
+Rejected: Electron multi-process (too heavy), separate processes per workspace (IPC complexity), removing multi-window entirely (loses side-by-side use case).
 
 ### SQLite with r2d2 pool in WAL mode (4 readers + 1 writer)
 
@@ -570,3 +570,49 @@ Decided: 2026-05-25
 What: RepoCombobox container and item styling aligned to the custom Select component: `bg-surface` container, `p-1.5` padding, `px-2 py-1.5` items, `rounded-sm` items, `data-highlighted:bg-surface-2` highlight. Auto-opens on input click and focus (not just trigger icon).
 Why: RepoCombobox had inconsistencies — `bg-surface-3` container, no container padding, `px-3` items, no rounded corners on items. Select is the closest semantic match (both are combobox-type components).
 Rejected: Align to DropdownMenu pattern (`bg-popover`, `focus:bg-accent/25`) — semantically wrong for a form combobox.
+
+---
+
+## Visual Polish (Dashboard)
+
+### Forest view: no rounded corners
+
+Decided: 2026-05-26
+What: Remove `rounded-md` from ForestView ContextMenu.Trigger. Forest is full-bleed within its pane.
+Why: Rounded corners on a full-bleed panel create an ugly clipped-corner artifact where the rounding meets the pane edge with no gap.
+Rejected: Keep rounding + add padding (wastes space, unnatural gap for a canvas-like viewport).
+
+### Issue-color button text uses getContrastTextColor
+
+Decided: 2026-05-26
+What: `ContextualActionButtons.svelte` uses `getContrastTextColor(issueColor)` for `--issue-btn-text` instead of `var(--background)`. Fixes white-on-yellow and similar poor-contrast combos on light issue colors. Card gradient system itself is kept as-is — only the button text color formula was wrong.
+Why: `var(--background)` is theme-dependent — in light mode it's white, producing white text on light-colored buttons. The raw issue color is close enough to the 85%-mixed button bg for correct contrast decisions.
+Rejected: Full redesign of card color mixing (overkill — the button was the only broken formula), computing exact mixed color in JS (unnecessary precision).
+
+### Issue number opacity raised to 85%
+
+Decided: 2026-05-26
+What: Parent span opacity on issue number in `IssueCardHeader.svelte` changed from `opacity-72` to `opacity-85`. Improves readability on light-background cards.
+Why: 72% opacity on black text over a light Veil gradient was barely legible. 85% preserves the visual hierarchy (number slightly dimmer than title) while remaining readable.
+Rejected: Remove opacity entirely (loses hierarchy), keep at 72% (illegible on light cards).
+
+### Radiant issue number: contrast-safe darkened color
+
+Decided: 2026-05-26
+What: In Radiant variant, `--ic-number-color` uses a contrast-safe version of the issue color instead of the raw color. Light colors (high luminance) are darkened via `color-mix(in oklch, ${issueColor} 55%, black)` to a deep recognizable hue (e.g., yellow → deep amber). Dark colors pass through unchanged.
+Why: Light issue colors like yellow are invisible on light-mode Radiant cards. User wants the number to still "resemble" the issue color, not fall back to generic foreground.
+Rejected: Fall back to `var(--foreground)` (loses color identity), always darken (makes dark colors too dark on dark mode).
+
+### Worktree setup card: shimmer sweep instead of opacity
+
+Decided: 2026-05-26
+What: Replace `opacity: 0.6` on worktreeSetup cards with a tilted (105deg) issue-colored shimmer sweep at 2.5s cycle. Full opacity, transparent border. Implemented via `::after` pseudo-element on `[data-card-state="worktreeSetup"]` with `@keyframes ic-worktree-shimmer` in `app.css`. `background-repeat: no-repeat` to prevent phantom bands.
+Why: 0.6 opacity made content unreadable without clearly signaling loading. Shimmer is a recognized loading pattern, keeps content fully readable, and the issue-colored tint integrates with the card's color identity.
+Rejected: Opacity pulse (still reduces readability), vertical sweep (tilted feels more like a "scan"), desaturation-only (no motion to signal activity).
+
+### Tab component: inner rounding uses rounded-sm
+
+Decided: 2026-05-26
+What: Active tab `rounded-1.5` changed to `rounded-sm` (4px) in `tabs-variants.ts`. Container stays `rounded-md`.
+Why: `rounded-1.5` (6px) inside a `rounded-md` (6px) container with `p-0.75` padding visually reads as sharp corners — the inner element is too close to the container edge for the rounding to register. `rounded-sm` (4px) creates a visible inner radius.
+Rejected: Increase container rounding (would affect overall component shape), remove inner rounding (tabs would have truly sharp corners).

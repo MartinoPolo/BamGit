@@ -16,9 +16,7 @@
 		<div class="text-3xl text-muted-foreground/60">◆</div>
 		<h2 class="text-lg font-semibold">{m.onboarding_title()}</h2>
 		<p class="text-sm text-muted-foreground">
-			A <strong class="text-foreground">repo dashboard</strong> tracks issues for a single
-			repository. A <strong class="text-foreground">portfolio dashboard</strong> groups multiple
-			repos together.
+			A <strong class="text-foreground">repo dashboard</strong> tracks issues for a single repository.
 		</p>
 		<Button intent="primary" onclick={onCreateDashboard}>
 			{m.onboarding_create()}

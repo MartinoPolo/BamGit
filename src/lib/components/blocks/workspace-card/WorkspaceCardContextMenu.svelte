@@ -6,6 +6,7 @@
 	import EditIcon from '@lucide/svelte/icons/pencil';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
+	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import GithubIcon from '$lib/components/derived/icons/GithubIcon.svelte';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import ArchiveRestoreIcon from '@lucide/svelte/icons/archive-restore';
@@ -18,11 +19,20 @@
 		onArchive: (workspace: OverviewWorkspaceData) => void;
 		onUnarchive: (workspace: OverviewWorkspaceData) => void;
 		onDelete: (workspace: OverviewWorkspaceData) => void;
+		onOpenInNewWindow?: (workspace: OverviewWorkspaceData) => void;
 		children: Snippet;
 	}
 
-	let { workspace, onEdit, onSettings, onArchive, onUnarchive, onDelete, children }: Props =
-		$props();
+	let {
+		workspace,
+		onEdit,
+		onSettings,
+		onArchive,
+		onUnarchive,
+		onDelete,
+		onOpenInNewWindow,
+		children,
+	}: Props = $props();
 
 	const isArchived = $derived(workspace.status === 'archived');
 	const hasFolder = $derived(workspace.local_folder != null);
@@ -56,6 +66,12 @@
 				<SettingsIcon />
 				Settings
 			</ContextMenu.Item>
+			{#if onOpenInNewWindow}
+				<ContextMenu.Item onclick={() => onOpenInNewWindow(workspace)}>
+					<ExternalLinkIcon />
+					Open in new window
+				</ContextMenu.Item>
+			{/if}
 		</ContextMenu.Group>
 
 		<ContextMenu.Separator />

@@ -18,6 +18,8 @@ pub struct OverviewWorkspaceData {
     pub active_session_count: i64,
     pub last_activity: Option<String>,
     pub total_cost_usd: Option<f64>,
+    pub cost_today_usd: Option<f64>,
+    pub cost_week_usd: Option<f64>,
     #[ts(type = "number")]
     pub hitl_count: i64,
     #[ts(type = "number")]

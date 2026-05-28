@@ -25,6 +25,7 @@
 	import MonitorIcon from '@lucide/svelte/icons/monitor';
 	import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
 	import { useIssueCard } from './index.js';
+	import { getContrastTextColor } from '$lib/components/derived/color-picker/color_utils.js';
 	import type { Component } from 'svelte';
 
 	type ActionIconComponent = Component<{
@@ -58,7 +59,7 @@
 		}
 		const color = ctx.color;
 		const tonedBg = `color-mix(in oklch, ${color} 85%, var(--background))`;
-		return `--issue-btn-bg: ${tonedBg}; --issue-btn-text: var(--background); --issue-btn-border: color-mix(in oklch, ${color} 60%, transparent);`;
+		return `--issue-btn-bg: ${tonedBg}; --issue-btn-text: ${getContrastTextColor(color)}; --issue-btn-border: color-mix(in oklch, ${color} 60%, transparent);`;
 	});
 
 	const ICON_MAP: Record<string, ActionIconComponent> = {

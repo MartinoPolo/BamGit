@@ -21,7 +21,7 @@ export type IssueCardState = (typeof ISSUE_CARD_STATES)[keyof typeof ISSUE_CARD_
 // fallow-ignore-next-line unused-export
 export const issueCardVariants = tv({
 	slots: {
-		card: 'group relative overflow-hidden rounded-lg border outline-none transition-[box-shadow,transform,opacity,filter,background,border-color] duration-3',
+		card: 'group relative overflow-hidden rounded-lg border outline-none transition-[transform,opacity] duration-3 will-change-[transform,opacity]',
 		header: 'flex min-h-8 items-center justify-between gap-2.5 px-3 py-1.5',
 		preview:
 			'relative flex size-25 shrink-0 items-end justify-center overflow-hidden rounded-lg border border-[color-mix(in_oklch,var(--ic-color)_20%,var(--border))]',

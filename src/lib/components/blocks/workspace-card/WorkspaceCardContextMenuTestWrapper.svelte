@@ -9,6 +9,7 @@
 		onArchive: (workspace: OverviewWorkspaceData) => void;
 		onUnarchive: (workspace: OverviewWorkspaceData) => void;
 		onDelete: (workspace: OverviewWorkspaceData) => void;
+		onOpenInNewWindow?: (workspace: OverviewWorkspaceData) => void;
 		triggerLabel?: string;
 	}
 
@@ -19,10 +20,19 @@
 		onArchive,
 		onUnarchive,
 		onDelete,
+		onOpenInNewWindow,
 		triggerLabel = 'Test Workspace',
 	}: Props = $props();
 </script>
 
-<WorkspaceCardContextMenu {workspace} {onEdit} {onSettings} {onArchive} {onUnarchive} {onDelete}>
+<WorkspaceCardContextMenu
+	{workspace}
+	{onEdit}
+	{onSettings}
+	{onArchive}
+	{onUnarchive}
+	{onDelete}
+	{onOpenInNewWindow}
+>
 	<div data-testid="context-menu-trigger">{triggerLabel}</div>
 </WorkspaceCardContextMenu>

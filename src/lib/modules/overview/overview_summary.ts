@@ -40,7 +40,7 @@ export function calculateOverviewWorkspaceTotals(
 			attentionCount:
 				totals.attentionCount + workspace.prs_needing_attention + workspace.hitl_count,
 			openIssueCount: totals.openIssueCount + workspace.open_issue_count,
-			todayCostUsd: totals.todayCostUsd + (workspace.total_cost_usd ?? 0),
+			todayCostUsd: totals.todayCostUsd + (workspace.cost_today_usd ?? 0),
 		}),
 		{
 			activeSessionCount: 0,

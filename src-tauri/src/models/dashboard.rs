@@ -6,14 +6,12 @@ use ts_rs::TS;
 #[serde(rename_all = "lowercase")]
 pub enum DashboardType {
     Repo,
-    Portfolio,
 }
 
 impl std::fmt::Display for DashboardType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             DashboardType::Repo => write!(f, "repo"),
-            DashboardType::Portfolio => write!(f, "portfolio"),
         }
     }
 }
@@ -22,7 +20,6 @@ impl DashboardType {
     pub fn from_db(value: String) -> Result<Self, String> {
         match value.as_str() {
             "repo" => Ok(DashboardType::Repo),
-            "portfolio" => Ok(DashboardType::Portfolio),
             other => Err(format!("Invalid dashboard type: {other}")),
         }
     }

@@ -487,6 +487,11 @@ pub async fn search_github_issues(
 }
 
 #[derive(serde::Serialize)]
+pub struct RepoBranch {
+    pub name: String,
+}
+
+#[derive(serde::Serialize)]
 pub struct UserRepo {
     pub name: String,
     pub owner: String,
@@ -584,6 +589,49 @@ pub async fn search_github_repos(
         .collect();
 
     Ok(repos)
+}
+
+#[tauri::command]
+pub async fn list_repo_branches(
+    github_client: State<'_, GitHubClient>,
+    owner: String,
+    repo: String,
+) -> Result<Vec<RepoBranch>, String> {
+    if github_client.is_oauth().await {
+        match github_client
+            .api_get(&format!("/repos/{owner}/{repo}/branches?per_page=100"))
+            .await
+        {
+            Ok(response) => {
+                let json_str = serde_json::to_string(&response)
+                    .map_err(|error| format!("Failed to serialize branches response: {error}"))?;
+                return parse_rest_branches(&json_str);
+            }
+            Err(error) => {
+                log::warn!("OAuth branch list failed, falling back to gh CLI: {error}");
+            }
+        }
+    }
+
+    let stdout = run_gh_command(&[
+        "api",
+        &format!("/repos/{owner}/{repo}/branches?per_page=100"),
+    ])
+    .await?;
+
+    parse_rest_branches(&stdout)
+}
+
+fn parse_rest_branches(json: &str) -> Result<Vec<RepoBranch>, String> {
+    let raw: Vec<serde_json::Value> =
+        serde_json::from_str(json).map_err(|error| format!("Failed to parse branches response: {error}"))?;
+    Ok(raw
+        .iter()
+        .filter_map(|branch| {
+            let name = branch.get("name")?.as_str()?.to_string();
+            Some(RepoBranch { name })
+        })
+        .collect())
 }
 
 fn parse_repo_from_json(value: &serde_json::Value, private_key: &str) -> Option<UserRepo> {

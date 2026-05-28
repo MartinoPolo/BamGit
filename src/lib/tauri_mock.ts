@@ -42,6 +42,8 @@ const TAURI_ONLY_COMMANDS = new Set([
 	'sync_all_github_state',
 	'execute_action',
 	'open_workspace_window',
+	'focus_window',
+	'list_open_windows',
 	'update_peacock_color',
 	'pick_folder',
 	'discover_ai_config',
@@ -347,6 +349,12 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 			description: 'API gateway service',
 			is_private: true,
 		},
+	],
+	list_repo_branches: () => [
+		{ name: 'main' },
+		{ name: 'dev' },
+		{ name: 'feature/auth' },
+		{ name: 'fix/login-bug' },
 	],
 	search_github_repos: () => [
 		{
@@ -901,13 +909,6 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	}),
 	update_dashboard: ({ request }) => request,
 	delete_dashboard: () => null,
-	add_repo_to_portfolio: () => ({
-		id: `mock-ptr-${crypto.randomUUID().slice(0, 8)}`,
-		portfolio_dashboard_id: '',
-		repo_dashboard_id: '',
-		sort_order: 0,
-	}),
-	remove_repo_from_portfolio: () => null,
 	create_color_palette: ({ request }) => ({
 		id: `mock-pal-${crypto.randomUUID().slice(0, 8)}`,
 		...(request as object),
@@ -987,6 +988,8 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 	upsert_custom_binding: () => null,
 	delete_custom_binding: () => null,
 	open_workspace_window: () => null,
+	focus_window: () => null,
+	list_open_windows: () => [],
 	close_workspace_window: () => null,
 	save_window_geometry: () => null,
 	open_terminal: () => null,

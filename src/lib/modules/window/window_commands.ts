@@ -1,10 +1,6 @@
 import { invoke } from '$lib/tauri.js';
 import type { OverviewWorkspaceData, WindowWorkspaceBinding } from '$lib/types/generated';
 
-export function openWorkspaceWindow(dashboardId: string): Promise<void> {
-	return invoke('open_workspace_window', { dashboardId });
-}
-
 export function closeWorkspaceWindow(windowLabel: string): Promise<void> {
 	return invoke('close_workspace_window', { windowLabel });
 }
@@ -27,6 +23,18 @@ export function saveWindowGeometry(
 		windowWidth,
 		windowHeight,
 	});
+}
+
+export function openWorkspaceWindow(dashboardId: string): Promise<void> {
+	return invoke('open_workspace_window', { dashboardId });
+}
+
+export function focusWindow(label: string): Promise<void> {
+	return invoke('focus_window', { label });
+}
+
+export function listOpenWindows(): Promise<string[]> {
+	return invoke('list_open_windows');
 }
 
 export function getOverviewData(

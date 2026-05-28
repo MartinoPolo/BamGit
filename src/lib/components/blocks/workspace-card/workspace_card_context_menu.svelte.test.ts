@@ -16,6 +16,8 @@ function makeWorkspace(overrides: Partial<OverviewWorkspaceData> = {}): Overview
 		active_session_count: 0,
 		last_activity: new Date().toISOString(),
 		total_cost_usd: 0,
+		cost_today_usd: null,
+		cost_week_usd: null,
 		hitl_count: 0,
 		open_pr_count: 0,
 		prs_needing_attention: 0,
@@ -38,6 +40,7 @@ function makeCallbacks() {
 		onArchive: vi.fn(),
 		onUnarchive: vi.fn(),
 		onDelete: vi.fn(),
+		onOpenInNewWindow: vi.fn(),
 	};
 }
 
@@ -70,6 +73,7 @@ describe('WorkspaceCardContextMenu', () => {
 		await expect.element(page.getByText('Settings')).toBeVisible();
 		await expect.element(page.getByText('Open Folder')).toBeVisible();
 		await expect.element(page.getByText('Open in GitHub')).toBeVisible();
+		await expect.element(page.getByText('Open in new window')).toBeVisible();
 		await expect.element(page.getByText('Archive')).toBeVisible();
 		await expect.element(page.getByText('Delete...')).toBeVisible();
 	});
@@ -176,5 +180,29 @@ describe('WorkspaceCardContextMenu', () => {
 		await expect.element(githubItem).toBeVisible();
 		const menuItem = githubItem.element().closest('[role="menuitem"]');
 		expect(menuItem).toHaveAttribute('data-disabled');
+	});
+
+	it('shows Open in new window menu item', async () => {
+		const workspace = makeWorkspace();
+		await render(WorkspaceCardContextMenuTestWrapper, {
+			props: { workspace, ...makeCallbacks() },
+		});
+
+		await openContextMenu();
+
+		await expect.element(page.getByText('Open in new window')).toBeVisible();
+	});
+
+	it('calls onOpenInNewWindow when Open in new window is clicked', async () => {
+		const workspace = makeWorkspace();
+		const callbacks = makeCallbacks();
+		await render(WorkspaceCardContextMenuTestWrapper, {
+			props: { workspace, ...callbacks },
+		});
+
+		await openContextMenu();
+		await page.getByText('Open in new window').click();
+
+		expect(callbacks.onOpenInNewWindow).toHaveBeenCalledWith(workspace);
 	});
 });

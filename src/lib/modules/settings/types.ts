@@ -42,7 +42,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	accentColor: 'moss',
 	username: 'User',
 	userInitials: 'U',
-	startupBehavior: 'overview',
+	startupBehavior: 'last-workspace',
 	chartColorTheme: 'monochrome',
 	language: 'en',
 	editorCommand: 'code',
@@ -84,3 +84,5 @@ export const FOUC_MIRROR_KEYS: readonly SettingKey[] = ['themeMode', 'accentColo
 export const FOUC_STORAGE_PREFIX = 'grovekeeper_settings_';
 
 export type SettingScope = 'user' | 'workspace';
+
+export const LAST_WORKSPACE_ID_KEY = 'last_workspace_id';
