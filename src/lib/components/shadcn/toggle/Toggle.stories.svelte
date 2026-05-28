@@ -110,6 +110,52 @@
 	{/snippet}
 </Story>
 
+<Story name="On Backgrounds">
+	{#snippet template(args: ToggleProps)}
+		<div class="flex gap-8">
+			<div class="rounded-lg bg-background p-4">
+				<p class="mb-2 text-xs text-foreground-muted">bg-background</p>
+				<div class="flex items-center gap-3">
+					<Toggle {...args} aria-label="Bold off">
+						<BoldIcon data-icon="inline-start" />
+						Off
+					</Toggle>
+					<Toggle {...args} pressed aria-label="Bold on">
+						<BoldIcon data-icon="inline-start" />
+						On
+					</Toggle>
+				</div>
+			</div>
+			<div class="rounded-lg bg-sidebar p-4">
+				<p class="mb-2 text-xs text-foreground-muted">bg-sidebar</p>
+				<div class="flex items-center gap-3">
+					<Toggle {...args} aria-label="Bold off">
+						<BoldIcon data-icon="inline-start" />
+						Off
+					</Toggle>
+					<Toggle {...args} pressed aria-label="Bold on">
+						<BoldIcon data-icon="inline-start" />
+						On
+					</Toggle>
+				</div>
+			</div>
+			<div class="rounded-lg bg-surface-2 p-4">
+				<p class="mb-2 text-xs text-foreground-muted">bg-surface-2</p>
+				<div class="flex items-center gap-3">
+					<Toggle {...args} aria-label="Bold off">
+						<BoldIcon data-icon="inline-start" />
+						Off
+					</Toggle>
+					<Toggle {...args} pressed aria-label="Bold on">
+						<BoldIcon data-icon="inline-start" />
+						On
+					</Toggle>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Icon Only">
 	{#snippet template(args: ToggleProps)}
 		<Toggle {...args} size="icon" aria-label="Toggle italic">

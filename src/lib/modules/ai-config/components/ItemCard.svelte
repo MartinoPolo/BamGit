@@ -117,7 +117,7 @@
 	tabindex="0"
 	data-deprecated={isDeprecated ? 'true' : undefined}
 	class={cn(
-		'group flex cursor-pointer flex-col gap-2 rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+		'group flex cursor-pointer flex-col gap-2 rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:bg-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
 		isDeprecated && 'opacity-60',
 	)}
 	onclick={onSelect}

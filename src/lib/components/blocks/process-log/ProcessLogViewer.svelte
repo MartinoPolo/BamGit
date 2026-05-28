@@ -264,7 +264,7 @@
 			{#if !isAtTop}
 				<button
 					type="button"
-					class="absolute top-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer rounded-full border border-border bg-surface px-3 py-1 text-xs text-foreground-muted shadow-md transition-opacity duration-3 hover:bg-surface-2 hover:text-foreground"
+					class="absolute top-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer rounded-full border border-border bg-surface px-3 py-1 text-xs text-foreground-muted shadow-md transition-opacity duration-3 hover:bg-surface-hover hover:text-foreground"
 					onclick={scrollToTop}
 				>
 					<ArrowUpIcon class="inline-block size-3" />
@@ -318,7 +318,7 @@
 			{#if !isAtBottom}
 				<button
 					type="button"
-					class="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer rounded-full border border-border bg-surface px-3 py-1 text-xs text-foreground-muted shadow-md transition-opacity duration-3 hover:bg-surface-2 hover:text-foreground"
+					class="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer rounded-full border border-border bg-surface px-3 py-1 text-xs text-foreground-muted shadow-md transition-opacity duration-3 hover:bg-surface-hover hover:text-foreground"
 					onclick={scrollToBottom}
 				>
 					+{linesBelowCount} lines

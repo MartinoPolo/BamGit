@@ -38,7 +38,7 @@
 
 <div
 	class={cn(
-		'group/pool-item flex items-center gap-2 rounded-md border border-transparent px-2 py-1.5 text-sm transition-colors hover:bg-surface-2',
+		'group/pool-item flex items-center gap-2 rounded-md border border-transparent px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover',
 		sound.assignedEventType !== null && 'opacity-50',
 		isPlaying && 'bg-primary/5 border-primary/20',
 		className,
