@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { ACCENT_COLORS } from '$lib/modules/board';
-	import { BACKGROUND_PALETTES } from '$lib/modules/board/types.js';
+	import { BACKGROUND_THEMES } from '$lib/modules/board/types.js';
 	import { useSettings } from '$lib/modules/settings';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
@@ -15,8 +15,8 @@
 	const accentColor = $derived(settingsCtx.getAccentColor());
 	const themeOverridden = $derived(settingsCtx.isOverridden('themeMode'));
 	const accentOverridden = $derived(settingsCtx.isOverridden('accentColor'));
-	const backgroundPalette = $derived(settingsCtx.getBackgroundPalette());
-	const paletteOverridden = $derived(settingsCtx.isOverridden('backgroundPalette'));
+	const backgroundTheme = $derived(settingsCtx.getBackgroundTheme());
+	const themeOverriddenBg = $derived(settingsCtx.isOverridden('backgroundTheme'));
 
 	const themeModes = [
 		{ value: 'light' as const, Icon: Sun, label: () => m.theme_light() },
@@ -24,18 +24,18 @@
 		{ value: 'system' as const, Icon: Monitor, label: () => m.theme_system() },
 	];
 
-	const PALETTE_PREVIEW_COLORS: Record<string, string> = {
+	const THEME_PREVIEW_COLORS: Record<string, string> = {
 		forest: 'oklch(0.58 0.096 134)',
 		'golden-hour': 'oklch(0.7 0.12 75)',
 		twilight: 'oklch(0.6 0.1 220)',
 	};
 
-	function palettePreviewColor(palette: string): string {
-		return PALETTE_PREVIEW_COLORS[palette] ?? 'oklch(0.5 0.05 150)';
+	function themePreviewColor(theme: string): string {
+		return THEME_PREVIEW_COLORS[theme] ?? 'oklch(0.5 0.05 150)';
 	}
 
-	function formatPaletteName(palette: string): string {
-		return palette.replace(/-/g, ' ');
+	function formatThemeName(theme: string): string {
+		return theme.replace(/-/g, ' ');
 	}
 </script>
 
@@ -99,35 +99,35 @@
 		</div>
 	</section>
 
-	<!-- Background Palette -->
+	<!-- Background Theme -->
 	<section class="flex flex-col gap-4">
 		<div class="flex items-center gap-2">
 			<div>
-				<h2 class="text-lg font-medium">Background Palette</h2>
+				<h2 class="text-lg font-medium">Background Theme</h2>
 				<p class="mt-1 text-sm text-muted-foreground">
 					Set the color mood for the app background and forest view.
 				</p>
 			</div>
 			<SettingOverrideIndicator
-				overridden={paletteOverridden}
-				onreset={() => void settingsCtx.resetOverride('backgroundPalette')}
+				overridden={themeOverriddenBg}
+				onreset={() => void settingsCtx.resetOverride('backgroundTheme')}
 			/>
 		</div>
 		<div class="flex flex-wrap gap-3">
-			{#each BACKGROUND_PALETTES as palette (palette)}
+			{#each BACKGROUND_THEMES as bgTheme (bgTheme)}
 				<Button
 					intent="secondary"
 					size="sm"
-					onclick={() => void settingsCtx.set('backgroundPalette', palette)}
-					class="capitalize {backgroundPalette === palette
+					onclick={() => void settingsCtx.set('backgroundTheme', bgTheme)}
+					class="capitalize {backgroundTheme === bgTheme
 						? 'border-primary bg-surface-2 font-medium'
 						: ''}"
 				>
 					<div
 						class="size-4 rounded-full"
-						style:background-color={palettePreviewColor(palette)}
+						style:background-color={themePreviewColor(bgTheme)}
 					></div>
-					{formatPaletteName(palette)}
+					{formatThemeName(bgTheme)}
 				</Button>
 			{/each}
 		</div>

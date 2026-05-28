@@ -216,6 +216,10 @@
 	"forest_menu_archive": "Archivovat",
 	"forest_menu_change_color": "Zmenit barvu",
 	"forest_menu_prune_worktree": "Orezat worktree",
+	"forest_menu_background_theme": "Pozadí",
+	"forest_menu_show_mountains": "Zobrazit hory",
+	"forest_menu_show_stars": "Zobrazit hvězdy",
+	"forest_menu_show_moon": "Zobrazit měsíc",
 
 	"prune_title": "Prune Worktrees",
 	"prune_description": "These issues have merged PRs and closed GitHub issues. Select which worktrees to remove.",

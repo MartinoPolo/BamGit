@@ -220,6 +220,10 @@
 	"forest_menu_archive": "Archive",
 	"forest_menu_change_color": "Change Color",
 	"forest_menu_prune_worktree": "Prune Worktree",
+	"forest_menu_background_theme": "Background Theme",
+	"forest_menu_show_mountains": "Show Mountains",
+	"forest_menu_show_stars": "Show Stars",
+	"forest_menu_show_moon": "Show Moon",
 
 	"archive_confirm_title": "Archive Issue",
 	"archive_confirm_body": "Are you sure you want to archive \"{name}\"?",

@@ -5,8 +5,8 @@
 		computeVisualization,
 		computeForestLayout,
 		computeDepthRows,
-		GROUND_Y_FRACTION,
 		resolveGlowOverlay,
+		GROUND_Y_FRACTION,
 	} from '$lib/modules/visualization';
 	import type {
 		TreeVisualization,
@@ -21,10 +21,10 @@
 		DEFAULT_TREE_CONFIG,
 		OVERLAY_DEFAULTS,
 		TRUNK_DEAD_SPACE_PERCENT,
-		FirefliesEffect,
 	} from 'low-poly-2d-trees';
 	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
 	import { useSettings } from '$lib/modules/settings';
+	import { BACKGROUND_THEMES } from '$lib/modules/board/types.js';
 	import * as m from '$lib/paraglide/messages.js';
 	import SproutIcon from '@lucide/svelte/icons/sprout';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
@@ -33,6 +33,7 @@
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
+	import MountainIcon from '@lucide/svelte/icons/mountain';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as ContextMenu from '$lib/components/shadcn/context-menu/index.js';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
@@ -72,6 +73,15 @@
 	const POTTED_NATURAL_WIDTH = 192;
 	const POTTED_NATURAL_HEIGHT = 288;
 
+	const STAR_COUNT = 25;
+	const STARS = Array.from({ length: STAR_COUNT }, (_, i) => ({
+		x: ((i * 53 + 13) % 96) + 2,
+		y: ((i * 71 + 7) % 55) + 3,
+		size: 1 + (i % 3),
+		delay: (i * 1.3) % 4,
+		opacity: 0.3 + (i % 5) * 0.1,
+	}));
+
 	let rawViewportWidth = $state(0);
 	let rawViewportHeight = $state(0);
 
@@ -98,6 +108,38 @@
 	const interaction = useSelection();
 	const settingsCtx = useSettings();
 	const isDark = $derived(settingsCtx.isDark);
+	const backgroundTheme = $derived(settingsCtx.getBackgroundTheme());
+	const showMountains = $derived(settingsCtx.getShowMountains());
+	const showStars = $derived(settingsCtx.getShowStars());
+	const showMoon = $derived(settingsCtx.getShowMoon());
+
+	const GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX = 8;
+	const MOUNTAINS_GROUND_OVERLAP_PX = 20;
+	const MOUNTAINS_FADE_MIN_PX = 60;
+	const MOUNTAINS_FADE_MAX_PX = 100;
+
+	const groundY = $derived(debouncedViewportHeight * GROUND_Y_FRACTION);
+
+	const groundTopY = $derived.by(() => {
+		if (layoutResult.items.length === 0) {
+			return groundY;
+		}
+		const highestTreeY = Math.min(...layoutResult.items.map((item) => item.y));
+		return Math.max(0, highestTreeY - GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX);
+	});
+
+	const mountainsHeight = $derived(groundY + MOUNTAINS_GROUND_OVERLAP_PX);
+	const mountainsOpacity = $derived.by(() => {
+		if (groundY < MOUNTAINS_FADE_MIN_PX) {
+			return 0;
+		}
+		if (groundY < MOUNTAINS_FADE_MAX_PX) {
+			return (
+				(groundY - MOUNTAINS_FADE_MIN_PX) / (MOUNTAINS_FADE_MAX_PX - MOUNTAINS_FADE_MIN_PX)
+			);
+		}
+		return 1;
+	});
 
 	let contextMenuIssueId = $state<string | null>(null);
 
@@ -277,8 +319,6 @@
 		}),
 	);
 
-	const groundStripHeight = $derived(debouncedViewportHeight * 0.45);
-
 	function buildLayoutItem(
 		issue: Issue,
 		visualization: TreeVisualization,
@@ -359,11 +399,6 @@
 		interaction.activateIssue(entry.issue.id);
 	}
 
-	function handleContextMenu(event: MouseEvent, entry: IssueEntry) {
-		event.preventDefault();
-		contextMenuIssueId = entry.issue.id;
-	}
-
 	// fallow-ignore-next-line complexity
 	function getGroundElementProps(
 		entry: IssueEntry,
@@ -388,7 +423,7 @@
 		return { groundElements: true };
 	}
 
-	function handleGroundClick() {
+	function handleBackgroundClick() {
 		interaction.deactivate();
 	}
 
@@ -426,6 +461,14 @@
 		}
 	}
 
+	function handleBackgroundThemeChange(value: string) {
+		void settingsCtx.set('backgroundTheme', value);
+	}
+
+	function formatThemeName(theme: string): string {
+		return theme.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+	}
+
 	const emptyStateTreeConfig: TreeConfig = {
 		...DEFAULT_TREE_CONFIG,
 		stage: 'seed',
@@ -436,13 +479,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<ContextMenu.Root
-	onOpenChange={(isOpen) => {
-		if (isOpen === false) {
-			contextMenuIssueId = null;
-		}
-	}}
->
+<ContextMenu.Root>
 	<ContextMenu.Trigger class="flex flex-1 overflow-hidden">
 		<div
 			class="relative w-full flex-1 outline-none"
@@ -455,10 +492,21 @@
 			onkeydown={handleKeydown}
 			tabindex="0"
 		>
+			<!-- Full-bleed clickable background for deselect + forest context menu -->
+			<button
+				type="button"
+				class="absolute inset-0 cursor-default border-0 bg-transparent p-0"
+				style:z-index="0"
+				onclick={handleBackgroundClick}
+				tabindex="-1"
+				aria-label="Forest background — click to deselect"
+			></button>
+
 			{#if issues.length === 0}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					class="absolute inset-0 flex flex-col items-center justify-center gap-4"
+					style:z-index="5"
 					oncontextmenu={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -482,130 +530,242 @@
 						{@const size = getNaturalSize(entry)}
 						{@const overlayConfig = getResolvedOverlayConfig(entry)}
 						{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
-						<ForestTreeTooltip
-							issueTitle={entry.issue.name}
-							issueStatus={entry.issue.status}
-						>
-							{#snippet children(triggerProps)}
-								<button
-									{...triggerProps}
-									type="button"
-									class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
-									style:left="{positioned.x}px"
-									style:top="{positioned.y}px"
-									style:width="{size.width}px"
-									style:height="{size.height}px"
-									style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
-										100}%)) scale({positioned.scale})"
-									style:opacity={positioned.opacity}
-									style:z-index={positioned.zIndex}
-									style:pointer-events="none"
-									style:will-change="transform"
-									onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
-									onmouseleave={() => interaction.unhover()}
-									onclick={(event) => handleTreeClick(entry, event)}
-									oncontextmenu={(e) => handleContextMenu(e, entry)}
-									aria-label="Tree for issue {entry.issue.name}"
-								>
-									{#if entry.visualization.kind === 'oak'}
-										<LowPolyTree
-											config={getOakConfig(entry)}
-											{overlayConfig}
-											groundElements={groundProps.groundElements}
-											groundElementCount={groundProps.groundElementCount}
-										/>
-									{:else if entry.visualization.kind === 'tree'}
-										<LowPolyTree
-											config={entry.visualization.config}
-											toolVisibility={entry.visualization.toolVisibility}
-											{overlayConfig}
-											animateCanopySway={entry.visualization
-												.animateCanopySway}
-											animateGrowth={entry.visualization.animateGrowth}
-											animateTools={entry.visualization.animateTools}
-											groundElements={groundProps.groundElements}
-											groundElementCount={groundProps.groundElementCount}
-										/>
-									{:else if entry.visualization.kind === 'potted-plant'}
-										<PottedPlant
-											stage={entry.visualization.stage}
-											seed={entry.visualization.seed}
-											{overlayConfig}
-										/>
-									{/if}
-								</button>
-							{/snippet}
-						</ForestTreeTooltip>
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div style="display: contents" oncontextmenu={(e) => e.stopPropagation()}>
+							<ContextMenu.Root
+								onOpenChange={(open) => {
+									if (open) {
+										contextMenuIssueId = entry.issue.id;
+									}
+								}}
+							>
+								<ContextMenu.Trigger class="contents">
+									<ForestTreeTooltip
+										issueTitle={entry.issue.name}
+										issueStatus={entry.issue.status}
+									>
+										{#snippet children(triggerProps)}
+											<button
+												{...triggerProps}
+												type="button"
+												class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
+												style:left="{positioned.x}px"
+												style:top="{positioned.y}px"
+												style:width="{size.width}px"
+												style:height="{size.height}px"
+												style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
+													100}%)) scale({positioned.scale})"
+												style:opacity={positioned.opacity}
+												style:z-index={positioned.zIndex}
+												style:pointer-events="none"
+												style:will-change="transform"
+												onmouseenter={() =>
+													interaction.hoverIssue(entry.issue.id)}
+												onmouseleave={() => interaction.unhover()}
+												onclick={(event) => handleTreeClick(entry, event)}
+												aria-label="Tree for issue {entry.issue.name}"
+											>
+												{#if entry.visualization.kind === 'oak'}
+													<LowPolyTree
+														config={getOakConfig(entry)}
+														{overlayConfig}
+														groundElements={groundProps.groundElements}
+														groundElementCount={groundProps.groundElementCount}
+													/>
+												{:else if entry.visualization.kind === 'tree'}
+													<LowPolyTree
+														config={entry.visualization.config}
+														toolVisibility={entry.visualization
+															.toolVisibility}
+														{overlayConfig}
+														animateCanopySway={entry.visualization
+															.animateCanopySway}
+														animateGrowth={entry.visualization
+															.animateGrowth}
+														animateTools={entry.visualization
+															.animateTools}
+														groundElements={groundProps.groundElements}
+														groundElementCount={groundProps.groundElementCount}
+													/>
+												{:else if entry.visualization.kind === 'potted-plant'}
+													<PottedPlant
+														stage={entry.visualization.stage}
+														seed={entry.visualization.seed}
+														{overlayConfig}
+													/>
+												{/if}
+											</button>
+										{/snippet}
+									</ForestTreeTooltip>
+								</ContextMenu.Trigger>
+								<ContextMenu.Content>
+									{#each contextMenuItems as item (item.action)}
+										<ContextMenu.Item
+											disabled={!isContextMenuActionEnabled(item.action)}
+											onclick={() => handleContextMenuAction(item.action)}
+										>
+											<item.icon class="size-4" />
+											{item.label()}
+										</ContextMenu.Item>
+									{/each}
+								</ContextMenu.Content>
+							</ContextMenu.Root>
+						</div>
 					{/if}
 				{/each}
 			{/if}
-			<!-- Mountains background -->
-			<svg
-				class="absolute inset-0 pointer-events-none"
-				viewBox="0 0 1400 600"
-				preserveAspectRatio="none"
-				style:z-index="0"
-			>
-				<!-- Far mountains -->
-				<polygon
-					points="0,600 0,340 80,280 200,320 350,220 500,280 650,200 800,260 950,240 1100,300 1250,260 1400,320 1400,600"
-					style="fill: var(--mountain-far); opacity: 0.5"
-				/>
-				<!-- Mid mountains -->
-				<polygon
-					points="0,600 0,380 120,320 240,360 380,280 500,340 650,300 780,350 920,290 1060,340 1200,310 1400,370 1400,600"
-					style="fill: var(--mountain-mid); opacity: 0.7"
-				/>
-				<!-- Near mountains/hills -->
-				<polygon
-					points="0,600 0,420 100,380 220,410 340,360 480,400 600,370 740,410 860,380 1000,410 1140,370 1280,400 1400,420 1400,600"
-					style="fill: var(--mountain-near); opacity: 0.85"
-				/>
-			</svg>
-			{#if isDark}
-				<!-- Moon -->
-				<div
-					class="pointer-events-none absolute rounded-full"
-					style="
-						top: 8%;
-						right: 12%;
-						width: 40px;
-						height: 40px;
-						z-index: 1;
-						background: radial-gradient(circle, oklch(0.95 0.01 90) 0%, oklch(0.9 0.02 90) 60%, oklch(0.85 0.03 90) 100%);
-						box-shadow: 0 0 40px 15px var(--moon-glow), 0 0 80px 30px color-mix(in oklch, var(--moon-glow) 40%, transparent);
-					"
-				></div>
-				<!-- Fireflies -->
-				<div class="pointer-events-none absolute inset-0" style="z-index: 1;">
-					<FirefliesEffect count={10} color="var(--firefly-color)" />
-				</div>
-			{/if}
-			<button
-				type="button"
-				class="absolute inset-x-0 bottom-0 cursor-default border-0 p-0"
-				style:height="{groundStripHeight}px"
-				style="background: linear-gradient(to bottom, transparent 0%, var(--ground-color) 30%, var(--ground-dark) 100%)"
+
+			<!-- Ground — extends from highest tree down to bottom, guarantees all trees sit on ground -->
+			<div
+				class="pointer-events-none absolute inset-x-0 bottom-0"
+				style:top="{groundTopY}px"
 				style:z-index="1"
-				onclick={handleGroundClick}
-				oncontextmenu={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-				}}
-				tabindex="-1"
-				aria-label="Forest ground — click to deselect"
-			></button>
+				style:background="linear-gradient(to bottom, var(--ground-color),
+				var(--ground-dark))"
+			></div>
+
+			<!-- Mountains — proportionally scaled, cropped from top as container shrinks -->
+			{#if showMountains}
+				<svg
+					class="pointer-events-none absolute inset-x-0 top-0 w-full"
+					style:height="{mountainsHeight}px"
+					style:z-index="1"
+					style:opacity={mountainsOpacity}
+					style:transition="opacity var(--duration-4) ease"
+					viewBox="0 0 1400 600"
+					preserveAspectRatio="xMidYMax slice"
+					overflow="hidden"
+				>
+					<defs>
+						<linearGradient id="near-mountain-fill" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0%" stop-color="var(--mountain-near)" />
+							<stop offset="100%" stop-color="var(--ground-dark)" />
+						</linearGradient>
+					</defs>
+					<!-- Far mountains -->
+					<polygon
+						points="0,600 0,340 80,280 200,320 350,220 500,280 650,200 800,260 950,240 1100,300 1250,260 1400,320 1400,600"
+						style="fill: var(--mountain-far); opacity: 0.7"
+					/>
+					<!-- Mid mountains -->
+					<polygon
+						points="0,600 0,380 120,320 240,360 380,280 500,340 650,300 780,350 920,290 1060,340 1200,310 1400,370 1400,600"
+						style="fill: var(--mountain-mid); opacity: 0.85"
+					/>
+					<!-- Near mountains — blends into the ground div below -->
+					<polygon
+						points="0,600 0,420 100,380 220,410 340,360 480,400 600,370 740,410 860,380 1000,410 1140,370 1280,400 1400,420 1400,600"
+						fill="url(#near-mountain-fill)"
+					/>
+				</svg>
+			{/if}
+
+			{#if isDark}
+				<!-- Moon (dark mode only) -->
+				{#if showMoon}
+					<div
+						class="pointer-events-none absolute rounded-full"
+						style="
+							top: 8%;
+							right: 12%;
+							width: 40px;
+							height: 40px;
+							z-index: 1;
+							background: radial-gradient(circle, oklch(0.82 0.02 90) 0%, oklch(0.78 0.025 90) 60%, oklch(0.75 0.03 90) 100%);
+							box-shadow: 0 0 25px 10px var(--moon-glow), 0 0 50px 20px color-mix(in oklch, var(--moon-glow) 25%, transparent);
+						"
+					></div>
+				{/if}
+
+				<!-- Stars (dark mode only) -->
+				{#if showStars}
+					<div
+						class="pointer-events-none absolute inset-0 forest-stars"
+						style:z-index="1"
+					>
+						{#each STARS as star (star.x * 1000 + star.y)}
+							<div
+								class="absolute rounded-full forest-star"
+								style:left="{star.x}%"
+								style:top="{star.y}%"
+								style:width="{star.size}px"
+								style:height="{star.size}px"
+								style:opacity={star.opacity}
+								style:background="var(--star-color, oklch(0.75 0.02 90))"
+								style:animation-delay="{star.delay}s"
+							></div>
+						{/each}
+					</div>
+				{/if}
+			{/if}
 		</div>
 	</ContextMenu.Trigger>
+
+	<!-- Forest-level context menu -->
 	<ContextMenu.Content>
-		{#each contextMenuItems as item (item.action)}
-			<ContextMenu.Item
-				disabled={!isContextMenuActionEnabled(item.action)}
-				onclick={() => handleContextMenuAction(item.action)}
+		<ContextMenu.Sub>
+			<ContextMenu.SubTrigger>
+				<MountainIcon class="size-4" />
+				{m.forest_menu_background_theme()}
+			</ContextMenu.SubTrigger>
+			<ContextMenu.Portal>
+				<ContextMenu.SubContent>
+					<ContextMenu.RadioGroup
+						value={backgroundTheme}
+						onValueChange={handleBackgroundThemeChange}
+					>
+						{#each BACKGROUND_THEMES as theme (theme)}
+							<ContextMenu.RadioItem value={theme}>
+								{formatThemeName(theme)}
+							</ContextMenu.RadioItem>
+						{/each}
+					</ContextMenu.RadioGroup>
+				</ContextMenu.SubContent>
+			</ContextMenu.Portal>
+		</ContextMenu.Sub>
+		{#if isDark}
+			<ContextMenu.Separator />
+			<ContextMenu.CheckboxItem
+				checked={showMountains}
+				onCheckedChange={(checked) =>
+					void settingsCtx.set('showMountains', String(checked))}
 			>
-				<item.icon class="size-4" />
-				{item.label()}
-			</ContextMenu.Item>
-		{/each}
+				{m.forest_menu_show_mountains()}
+			</ContextMenu.CheckboxItem>
+			<ContextMenu.CheckboxItem
+				checked={showStars}
+				onCheckedChange={(checked) => void settingsCtx.set('showStars', String(checked))}
+			>
+				{m.forest_menu_show_stars()}
+			</ContextMenu.CheckboxItem>
+			<ContextMenu.CheckboxItem
+				checked={showMoon}
+				onCheckedChange={(checked) => void settingsCtx.set('showMoon', String(checked))}
+			>
+				{m.forest_menu_show_moon()}
+			</ContextMenu.CheckboxItem>
+		{/if}
 	</ContextMenu.Content>
 </ContextMenu.Root>
+
+<style>
+	.forest-star {
+		animation: -global-star-twinkle 3.5s ease-in-out infinite;
+	}
+
+	@keyframes -global-star-twinkle {
+		0%,
+		100% {
+			opacity: var(--tw-opacity, 0.5);
+		}
+		50% {
+			opacity: calc(var(--tw-opacity, 0.5) * 0.7);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.forest-star {
+			animation: none;
+		}
+	}
+</style>

@@ -1796,12 +1796,14 @@ export const MOCK_IMPORT_SUMMARY = {
 export const MOCK_USER_SETTINGS: Record<string, string> = {
 	theme_mode: 'system',
 	accent_color: 'moss',
+	background_theme: 'forest',
 	username: 'User',
 	user_initials: 'U',
 	startup_behavior: 'last-workspace',
 	chart_color_theme: 'monochrome',
 	language: 'en',
 	notification_volume: '0.7',
+	editor_command: 'code',
 	issue_card_variant: 'refined-horizon',
 	issue_card_button_color: 'issue-color',
 	issue_card_priority_position: 'header-right',
@@ -1812,5 +1814,8 @@ export const MOCK_USER_SETTINGS: Record<string, string> = {
 	issue_card_color_saturation: '150',
 	issue_card_header_saturation: '85',
 	issue_card_radial_intensity: '75',
+	show_mountains: 'true',
+	show_stars: 'true',
+	show_moon: 'true',
 	overview_footer_content: 'cost-today',
 };

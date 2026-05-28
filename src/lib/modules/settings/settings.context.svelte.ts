@@ -24,7 +24,7 @@ import {
 import {
 	isThemeMode,
 	isAccentColor,
-	isBackgroundPalette,
+	isBackgroundTheme,
 	type ThemeMode,
 } from '$lib/modules/board/types.js';
 
@@ -70,8 +70,8 @@ function createSettingsContext() {
 		document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
 		document.documentElement.dataset.accent =
 			values.get('accentColor') ?? SETTING_DEFAULTS.accentColor;
-		document.documentElement.dataset.palette =
-			values.get('backgroundPalette') ?? SETTING_DEFAULTS.backgroundPalette;
+		document.documentElement.dataset.bgTheme =
+			values.get('backgroundTheme') ?? SETTING_DEFAULTS.backgroundTheme;
 	});
 
 	// ── API ────────────────────────────────────────────────────────────────
@@ -188,9 +188,21 @@ function createSettingsContext() {
 		return isAccentColor(raw) ? raw : SETTING_DEFAULTS.accentColor;
 	}
 
-	function getBackgroundPalette(): string {
-		const raw = values.get('backgroundPalette') ?? SETTING_DEFAULTS.backgroundPalette;
-		return isBackgroundPalette(raw) ? raw : SETTING_DEFAULTS.backgroundPalette;
+	function getBackgroundTheme(): string {
+		const raw = values.get('backgroundTheme') ?? SETTING_DEFAULTS.backgroundTheme;
+		return isBackgroundTheme(raw) ? raw : SETTING_DEFAULTS.backgroundTheme;
+	}
+
+	function getShowMountains(): boolean {
+		return (values.get('showMountains') ?? SETTING_DEFAULTS.showMountains) === 'true';
+	}
+
+	function getShowStars(): boolean {
+		return (values.get('showStars') ?? SETTING_DEFAULTS.showStars) === 'true';
+	}
+
+	function getShowMoon(): boolean {
+		return (values.get('showMoon') ?? SETTING_DEFAULTS.showMoon) === 'true';
 	}
 
 	function setReturnUrl(url: string): void {
@@ -207,7 +219,10 @@ function createSettingsContext() {
 		setReturnUrl,
 		getThemeMode,
 		getAccentColor,
-		getBackgroundPalette,
+		getBackgroundTheme,
+		getShowMountains,
+		getShowStars,
+		getShowMoon,
 		get isDark() {
 			return isDark;
 		},
