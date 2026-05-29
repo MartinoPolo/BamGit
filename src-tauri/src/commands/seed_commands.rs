@@ -28,6 +28,9 @@ struct DemoGitCache {
     pr_number: Option<i32>,
     behind_base_count: i32,
     merge_conflict: bool,
+    github_issue_state: Option<&'static str>,
+    has_local_changes: bool,
+    ahead_remote_count: i32,
 }
 
 struct DemoDependency {
@@ -51,13 +54,13 @@ const DEMO_ISSUES: &[DemoIssue] = &[
     DemoIssue { index: 4, name: "Sapling: Ready to work", worktree_state: "active", branch_name: Some("4-sapling-ready"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"feature","color":"#3b82f6"}]"##, status: "active", color: Some("#f58231"), github_issue_number: Some(104), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/104"), priority: Some("medium") },
     DemoIssue { index: 5, name: "Growing: Session running", worktree_state: "active", branch_name: Some("5-growing-running"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"task","color":"#22c55e"}]"##, status: "active", color: Some("#911eb4"), github_issue_number: Some(105), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/105"), priority: Some("high") },
     DemoIssue { index: 6, name: "Growing: Needs input", worktree_state: "active", branch_name: Some("6-growing-input"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"task","color":"#22c55e"},{"name":"HITL","color":"#f59e0b"}]"##, status: "active", color: Some("#42d4f4"), github_issue_number: Some(106), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/106"), priority: Some("medium") },
-    DemoIssue { index: 7, name: "Growing: Session errored", worktree_state: "active", branch_name: Some("7-growing-errored"), base_branch: Some("main"), parent_index: Some(5), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#f032e6"), github_issue_number: Some(107), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/107"), priority: Some("high") },
-    DemoIssue { index: 8, name: "Growing: Session paused", worktree_state: "active", branch_name: Some("8-growing-paused"), base_branch: Some("main"), parent_index: Some(5), labels: r##"[{"name":"refactor","color":"#8b5cf6"}]"##, status: "active", color: Some("#bfef45"), github_issue_number: Some(108), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/108"), priority: Some("low") },
-    DemoIssue { index: 9, name: "Leafy: Commits no PR", worktree_state: "active", branch_name: Some("9-leafy-commits"), base_branch: Some("main"), parent_index: Some(5), labels: r##"[{"name":"feature","color":"#3b82f6"}]"##, status: "active", color: Some("#fabed4"), github_issue_number: Some(109), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/109"), priority: Some("medium") },
+    DemoIssue { index: 7, name: "Growing: Session errored", worktree_state: "active", branch_name: Some("7-growing-errored"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#f032e6"), github_issue_number: Some(107), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/107"), priority: Some("high") },
+    DemoIssue { index: 8, name: "Growing: Session paused", worktree_state: "active", branch_name: Some("8-growing-paused"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"refactor","color":"#8b5cf6"}]"##, status: "active", color: Some("#bfef45"), github_issue_number: Some(108), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/108"), priority: Some("low") },
+    DemoIssue { index: 9, name: "Leafy: Commits no PR", worktree_state: "active", branch_name: Some("9-leafy-commits"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"feature","color":"#3b82f6"}]"##, status: "active", color: Some("#fabed4"), github_issue_number: Some(109), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/109"), priority: Some("medium") },
     DemoIssue { index: 10, name: "Leafy: Draft PR", worktree_state: "active", branch_name: Some("10-leafy-draft"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"documentation","color":"#06b6d4"}]"##, status: "active", color: Some("#469990"), github_issue_number: Some(110), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/110"), priority: Some("lowest") },
     DemoIssue { index: 11, name: "Flowering: PR open", worktree_state: "active", branch_name: Some("11-flowering-open"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"feature","color":"#3b82f6"}]"##, status: "active", color: Some("#dcbeff"), github_issue_number: Some(111), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/111"), priority: Some("high") },
-    DemoIssue { index: 12, name: "Flowering: Review requested", worktree_state: "active", branch_name: Some("12-flowering-review"), base_branch: Some("main"), parent_index: Some(7), labels: r##"[{"name":"infrastructure","color":"#64748b"}]"##, status: "active", color: Some("#9a6324"), github_issue_number: Some(112), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/112"), priority: Some("medium") },
-    DemoIssue { index: 13, name: "Seasonal: Changes requested", worktree_state: "active", branch_name: Some("13-seasonal-changes"), base_branch: Some("main"), parent_index: Some(7), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#fffac8"), github_issue_number: Some(113), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/113"), priority: Some("top") },
+    DemoIssue { index: 12, name: "Flowering: Review requested", worktree_state: "active", branch_name: Some("12-flowering-review"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"infrastructure","color":"#64748b"}]"##, status: "active", color: Some("#9a6324"), github_issue_number: Some(112), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/112"), priority: Some("medium") },
+    DemoIssue { index: 13, name: "Seasonal: Changes requested", worktree_state: "active", branch_name: Some("13-seasonal-changes"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#fffac8"), github_issue_number: Some(113), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/113"), priority: Some("top") },
     DemoIssue { index: 14, name: "Fruiting: Approved", worktree_state: "active", branch_name: Some("14-fruiting-approved"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"feature","color":"#3b82f6"}]"##, status: "active", color: Some("#800000"), github_issue_number: Some(114), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/114"), priority: Some("medium") },
     DemoIssue { index: 15, name: "Fruiting: Ready to merge", worktree_state: "active", branch_name: Some("15-fruiting-ready"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"task","color":"#22c55e"}]"##, status: "active", color: Some("#aaffc3"), github_issue_number: Some(115), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/115"), priority: Some("low") },
     DemoIssue { index: 16, name: "Wilting: PR closed", worktree_state: "active", branch_name: Some("16-wilting-closed"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#808000"), github_issue_number: Some(116), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/116"), priority: None },
@@ -72,6 +75,8 @@ const DEMO_ISSUES: &[DemoIssue] = &[
     DemoIssue { index: 24, name: "Session: Metrics dashboard", worktree_state: "active", branch_name: Some("24-session-metrics"), base_branch: Some("main"), parent_index: Some(21), labels: r##"[{"name":"documentation","color":"#06b6d4"}]"##, status: "active", color: Some("#b4d455"), github_issue_number: Some(203), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/203"), priority: Some("low") },
     // === Issue with worktree_state "removing" ===
     DemoIssue { index: 25, name: "Uprooting: Worktree cleanup", worktree_state: "removing", branch_name: Some("25-uprooting-cleanup"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"infrastructure","color":"#64748b"}]"##, status: "active", color: Some("#d4a574"), github_issue_number: Some(121), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/121"), priority: Some("medium") },
+    // === Issue with merge conflict ===
+    DemoIssue { index: 26, name: "Branching: Merge conflict", worktree_state: "active", branch_name: Some("26-branching-conflict"), base_branch: Some("main"), parent_index: Some(0), labels: r##"[{"name":"bug","color":"#ef4444"}]"##, status: "active", color: Some("#c45850"), github_issue_number: Some(122), github_issue_url: Some("https://github.com/demo/grovekeeper-forest/issues/122"), priority: Some("high") },
 ];
 
 const DEMO_DEPENDENCIES: &[DemoDependency] = &[
@@ -90,27 +95,33 @@ const DEMO_DEPENDENCIES: &[DemoDependency] = &[
 ];
 
 const DEMO_GIT_CACHES: &[DemoGitCache] = &[
-    DemoGitCache { issue_index: 4, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 5, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 6, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 7, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 8, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 9, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 10, branch_status: "active", pr_state: Some("draft"), pr_number: Some(110), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 11, branch_status: "active", pr_state: Some("open"), pr_number: Some(111), behind_base_count: 3, merge_conflict: false },
-    DemoGitCache { issue_index: 12, branch_status: "active", pr_state: Some("review-requested"), pr_number: Some(112), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 13, branch_status: "active", pr_state: Some("changes-requested"), pr_number: Some(113), behind_base_count: 0, merge_conflict: true },
-    DemoGitCache { issue_index: 14, branch_status: "active", pr_state: Some("approved"), pr_number: Some(114), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 15, branch_status: "active", pr_state: Some("ready-to-merge"), pr_number: Some(115), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 16, branch_status: "active", pr_state: Some("closed"), pr_number: Some(116), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 17, branch_status: "active", pr_state: Some("merged"), pr_number: Some(117), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 18, branch_status: "deleted", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 19, branch_status: "remote-gone", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 20, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 22, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 23, branch_status: "active", pr_state: Some("open"), pr_number: Some(202), behind_base_count: 1, merge_conflict: false },
-    DemoGitCache { issue_index: 24, branch_status: "active", pr_state: Some("draft"), pr_number: Some(203), behind_base_count: 0, merge_conflict: false },
-    DemoGitCache { issue_index: 25, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false },
+    // Issue 4 (Sapling: Ready to work) — local changes, no PR: tests action level #4
+    DemoGitCache { issue_index: 4, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: true, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 5, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 6, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 7, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 8, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    // Issue 9 (Leafy: Commits no PR) — ahead of remote, no PR: tests action level #6
+    DemoGitCache { issue_index: 9, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 2 },
+    DemoGitCache { issue_index: 10, branch_status: "active", pr_state: Some("draft"), pr_number: Some(110), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 11, branch_status: "active", pr_state: Some("open"), pr_number: Some(111), behind_base_count: 3, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 12, branch_status: "active", pr_state: Some("review-requested"), pr_number: Some(112), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 13, branch_status: "active", pr_state: Some("changes-requested"), pr_number: Some(113), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 14, branch_status: "active", pr_state: Some("approved"), pr_number: Some(114), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 15, branch_status: "active", pr_state: Some("ready-to-merge"), pr_number: Some(115), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    // Issue 16 (Wilting: PR closed) — github issue still open, PR closed
+    DemoGitCache { issue_index: 16, branch_status: "active", pr_state: Some("closed"), pr_number: Some(116), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("closed"), has_local_changes: false, ahead_remote_count: 0 },
+    // Issue 17 (Bare: PR merged) — github issue closed + PR merged = "Done" state
+    DemoGitCache { issue_index: 17, branch_status: "active", pr_state: Some("merged"), pr_number: Some(117), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("closed"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 18, branch_status: "deleted", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 19, branch_status: "remote-gone", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 20, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 22, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 23, branch_status: "active", pr_state: Some("open"), pr_number: Some(202), behind_base_count: 1, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 24, branch_status: "active", pr_state: Some("draft"), pr_number: Some(203), behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    DemoGitCache { issue_index: 25, branch_status: "active", pr_state: None, pr_number: None, behind_base_count: 0, merge_conflict: false, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
+    // Issue 26 (Branching: Merge conflict) — open PR with merge conflict: tests action level #3
+    DemoGitCache { issue_index: 26, branch_status: "active", pr_state: Some("open"), pr_number: Some(122), behind_base_count: 2, merge_conflict: true, github_issue_state: Some("open"), has_local_changes: false, ahead_remote_count: 0 },
 ];
 
 const DEMO_SESSIONS: &[DemoSession] = &[
@@ -206,8 +217,8 @@ fn seed_demo_data(connection: &mut Connection) -> Result<String, String> {
 
         transaction
             .execute(
-                "INSERT INTO git_status_cache (issue_id, branch_status, pr_state, pr_number, behind_base_count, merge_conflict) \
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                "INSERT INTO git_status_cache (issue_id, branch_status, pr_state, pr_number, behind_base_count, merge_conflict, github_issue_state, has_local_changes, ahead_remote_count) \
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                 params![
                     issue_id,
                     cache.branch_status,
@@ -215,6 +226,9 @@ fn seed_demo_data(connection: &mut Connection) -> Result<String, String> {
                     cache.pr_number,
                     cache.behind_base_count,
                     cache.merge_conflict,
+                    cache.github_issue_state,
+                    cache.has_local_changes,
+                    cache.ahead_remote_count,
                 ],
             )
             .map_err(|error| format!("Failed to insert git_status_cache for issue {}: {error}", cache.issue_index))?;
@@ -309,7 +323,7 @@ mod tests {
     }
 
     #[test]
-    fn seed_creates_26_issues() {
+    fn seed_creates_27_issues() {
         let mut connection = setup_test_database();
         seed_demo_data(&mut connection).unwrap();
 
@@ -320,7 +334,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(count, 26);
+        assert_eq!(count, 27);
 
         // Spot-check PRD parent
         let (name, worktree_state): (String, String) = connection
@@ -371,7 +385,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(count, 21);
+        assert_eq!(count, 22);
 
         // Spot-check draft PR
         let pr_state: String = connection
@@ -458,21 +472,28 @@ mod tests {
     }
 
     #[test]
-    fn seed_creates_three_depth_levels() {
+    fn seed_all_session_state_cards_are_direct_prd_children() {
         let mut connection = setup_test_database();
         seed_demo_data(&mut connection).unwrap();
 
-        // issue-7's parent is issue-5
-        let parent: String = connection
-            .query_row(
-                "SELECT parent_issue_id FROM issues WHERE id = 'demo-issue-7'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert_eq!(parent, "demo-issue-5");
+        // IssueCardGrid only renders 2 levels (PRD + direct children).
+        // Issues 7, 8, 9 were previously grandchildren of issue-0 via issue-5;
+        // they are now direct children of issue-0 so they render in the grid.
+        for index in [7, 8, 9, 12, 13] {
+            let parent: String = connection
+                .query_row(
+                    &format!("SELECT parent_issue_id FROM issues WHERE id = 'demo-issue-{index}'"),
+                    [],
+                    |row| row.get(0),
+                )
+                .unwrap();
+            assert_eq!(
+                parent, "demo-issue-0",
+                "demo-issue-{index} should be a direct child of demo-issue-0"
+            );
+        }
 
-        // issue-5's parent is issue-0
+        // issue-5 (Growing: Session running) remains a direct child of issue-0
         let parent: String = connection
             .query_row(
                 "SELECT parent_issue_id FROM issues WHERE id = 'demo-issue-5'",
@@ -481,16 +502,6 @@ mod tests {
             )
             .unwrap();
         assert_eq!(parent, "demo-issue-0");
-
-        // issue-12's parent is issue-7
-        let parent: String = connection
-            .query_row(
-                "SELECT parent_issue_id FROM issues WHERE id = 'demo-issue-12'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap();
-        assert_eq!(parent, "demo-issue-7");
     }
 
     #[test]
@@ -538,7 +549,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(issue_count, 26);
+        assert_eq!(issue_count, 27);
 
         let session_count: i64 = connection
             .query_row(
@@ -556,7 +567,7 @@ mod tests {
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(git_cache_count, 21);
+        assert_eq!(git_cache_count, 22);
 
         let dependency_count: i64 = connection
             .query_row(
@@ -647,11 +658,11 @@ mod tests {
             .collect::<Result<Vec<String>, _>>()
             .unwrap();
 
-        assert_eq!(colors.len(), 26, "all 26 issues should have a color");
+        assert_eq!(colors.len(), 27, "all 27 issues should have a color");
 
         let unique: std::collections::HashSet<&str> =
             colors.iter().map(|c| c.as_str()).collect();
-        assert_eq!(unique.len(), 26, "all colors should be distinct");
+        assert_eq!(unique.len(), 27, "all colors should be distinct");
     }
 
     #[test]
@@ -670,10 +681,10 @@ mod tests {
             .collect::<Result<Vec<i32>, _>>()
             .unwrap();
 
-        assert_eq!(numbers.len(), 26, "all 26 issues should have a github_issue_number");
+        assert_eq!(numbers.len(), 27, "all 27 issues should have a github_issue_number");
 
         let unique: std::collections::HashSet<i32> = numbers.iter().copied().collect();
-        assert_eq!(unique.len(), 26, "all github_issue_numbers should be distinct");
+        assert_eq!(unique.len(), 27, "all github_issue_numbers should be distinct");
     }
 
     #[test]
@@ -692,7 +703,7 @@ mod tests {
             .collect::<Result<Vec<(String, i32)>, _>>()
             .unwrap();
 
-        assert_eq!(rows.len(), 26);
+        assert_eq!(rows.len(), 27);
         for (url, number) in &rows {
             assert!(
                 url.contains(&number.to_string()),

@@ -24,7 +24,11 @@
 	);
 </script>
 
-<div class={ctx.slotClasses.preview} style={ctx.previewStyleString}>
+<div
+	data-testid="issue-card-preview"
+	class={ctx.slotClasses.preview}
+	style={ctx.previewStyleString}
+>
 	{#if ctx.notificationDotColor !== null && ctx.sessionState === null}
 		<SimpleTooltip text={m.issue_card_session_needs_attention()}>
 			<span

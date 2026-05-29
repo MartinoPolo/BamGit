@@ -84,9 +84,9 @@
 		outline: none;
 		position: relative;
 		transition:
-			color var(--duration-3) ease-out,
-			text-shadow var(--duration-4) ease-out,
-			filter var(--duration-3) ease-out;
+			color var(--transition-duration-3) ease-out,
+			text-shadow var(--transition-duration-4) ease-out,
+			filter var(--transition-duration-3) ease-out;
 		user-select: none;
 		border-bottom: 1px solid transparent;
 	}

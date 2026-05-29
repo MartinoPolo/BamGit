@@ -59,6 +59,15 @@ export const config: WebdriverIO.Config = {
 	async before() {
 		const { browser } = await import('@wdio/globals');
 
+		// Wait for Tauri APIs to be injected into the webview
+		await browser.waitUntil(
+			async () =>
+				browser.execute(
+					'return !!(window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke)',
+				),
+			{ timeout: 15_000, timeoutMsg: 'Tauri API not available after 15s' },
+		);
+
 		// String scripts bypass esbuild's __name transform that breaks in the browser.
 
 		// Bridge window.wdioTauri → Rust tauri-plugin-wdio via Tauri invoke.
@@ -71,12 +80,12 @@ export const config: WebdriverIO.Config = {
 				'};',
 		);
 
-		// Minimize window so E2E tests don't steal focus
+		// Seed demo workspace so issue cards are available
 		await browser.execute(
-			'var t = window.__TAURI__;' +
-				'if(t && t.window && t.window.getCurrentWindow){' +
-				't.window.getCurrentWindow().minimize()' +
-				'}',
+			'return (async function(){' +
+				'var t = window.__TAURI__;' +
+				'await t.core.invoke("seed_demo_workspace");' +
+				'})()',
 		);
 	},
 

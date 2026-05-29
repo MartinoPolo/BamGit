@@ -140,9 +140,9 @@
 		background: var(--card);
 		cursor: pointer;
 		transition:
-			border-color var(--duration-3) ease,
-			box-shadow var(--duration-3) ease,
-			transform var(--duration-3) ease;
+			border-color var(--transition-duration-3) ease,
+			box-shadow var(--transition-duration-3) ease,
+			transform var(--transition-duration-3) ease;
 		text-align: left;
 		box-sizing: border-box;
 	}
@@ -288,7 +288,7 @@
 		background: var(--primary);
 		color: var(--primary-foreground);
 		cursor: pointer;
-		transition: opacity var(--duration-3) ease;
+		transition: opacity var(--transition-duration-3) ease;
 	}
 
 	.hitl-quick-start:hover {
