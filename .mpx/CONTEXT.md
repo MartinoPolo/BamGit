@@ -91,32 +91,31 @@ _Avoid_: "selected" for single-click inspect, "active" for batch selection.
 
 ## Core Features
 
-| Feature                | Status                      | PRD       | Design                                                |
-| ---------------------- | --------------------------- | --------- | ----------------------------------------------------- |
-| Workspace Dashboard    | implemented                 | #87, #89  | `designs/issue-card-v2/`                              |
-| Issue Card v2 Redesign | implemented                 | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
-| Overview Dashboard     | implemented                 | #96       | `claude_design/Workspace Card.html`                   |
-| Issue Creation         | implemented                 | #89       | `claude_design/Creation Wizard.html`                  |
-| Session Management     | partial (UI done)           | #90       | `claude_design/Session Chat View.html`                |
-| Session Chat UI        | partial (components built)  | #90       | `claude_design/Session Chat View.html`                |
-| Forest Visualization   | partial (rendering done)    | #88       | `.mpx/STATE_MAPPING.md`                               |
-| Git/GitHub Integration | implemented                 | #91       | —                                                     |
-| Notification System    | implemented                 | #95       | —                                                     |
-| Character Pack System  | implemented                 | #95       | —                                                     |
-| Metrics & Statistics   | implemented                 | #93       | —                                                     |
-| AI Configuration       | implemented (in Settings)   | #94, #320 | —                                                     |
-| AFK/HITL Workflow      | not started                 | #92       | —                                                     |
-| Settings (Two-Layer)   | implemented                 | #320      | —                                                     |
-| Process Management     | partial (commands + badges) | #339      | —                                                     |
-| PRD Management         | planned                     | #219      | —                                                     |
-| Keyboard Shortcuts     | implemented                 | #87       | —                                                     |
-| Internationalization   | implemented (en + cs)       | #87       | —                                                     |
-| Single-Window Nav      | planned                     | #398      | —                                                     |
+| Feature                | Status                             | PRD       | Design                                                |
+| ---------------------- | ---------------------------------- | --------- | ----------------------------------------------------- |
+| Workspace Dashboard    | implemented                        | #87, #89  | `designs/issue-card-v2/`                              |
+| Issue Card v2 Redesign | implemented                        | #296      | `designs/issue-card-v2/ISSUE_CARD_FINAL_DECISIONS.md` |
+| Overview Dashboard     | implemented                        | #96       | `claude_design/Workspace Card.html`                   |
+| Issue Creation         | implemented                        | #89       | `claude_design/Creation Wizard.html`                  |
+| Session Management     | partial (UI done)                  | #90       | `claude_design/Session Chat View.html`                |
+| Session Chat UI        | partial (components built)         | #90       | `claude_design/Session Chat View.html`                |
+| Forest Visualization   | partial (rendering done)           | #88       | `.mpx/STATE_MAPPING.md`                               |
+| Git/GitHub Integration | implemented                        | #91       | —                                                     |
+| Notification System    | implemented                        | #95       | —                                                     |
+| Character Pack System  | implemented                        | #95       | —                                                     |
+| Metrics & Statistics   | partial (dashboard + backend done) | #93       | Optimize/Compare/Currency deferred                    |
+| AI Configuration       | implemented (in Settings)          | #94, #320 | —                                                     |
+| AFK/HITL Workflow      | not started                        | #92       | —                                                     |
+| Settings (Two-Layer)   | implemented                        | #320      | —                                                     |
+| Process Management     | partial (commands + badges)        | #339      | —                                                     |
+| PRD Management         | planned                            | #219      | —                                                     |
+| Keyboard Shortcuts     | implemented                        | #87       | —                                                     |
+| Internationalization   | implemented (en + cs)              | #87       | —                                                     |
+| Single-Window Nav      | planned                            | #398      | —                                                     |
 
 ## Key Constraints
 
 - SPA mode (ssr=false, static adapter with fallback). No server-side rendering.
-  <<<<<<< Updated upstream
 - Single Tauri process, single-window SPA navigation. Multi-window optional via `single_instance` plugin.
 - Frontend owns all user-facing text. Rust returns error keys. Paraglide for i18n.
 - No versioned DB migrations (pre-production). `schema::create_tables()` + `seed_defaults()`.

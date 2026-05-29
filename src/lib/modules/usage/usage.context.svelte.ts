@@ -4,7 +4,10 @@ import { invoke } from '$lib/tauri.js';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
 import { useSettings } from '$lib/modules/settings/settings.context.svelte.js';
-import type { UsageDashboardData, Achievement } from '$lib/types/generated/index.js';
+import type { UsageDashboardData, Achievement, ImportSummary } from '$lib/types/generated/index.js';
+import { useToasts } from '$lib/modules/toasts/index.js';
+import { getUserSetting, setUserSetting } from '$lib/modules/settings/settings_commands.js';
+import { formatImportToastMessage, isImportPrompted } from './import_helpers.js';
 import {
 	CHART_COLOR_THEMES,
 	FRESH_THRESHOLD_MS,
@@ -35,8 +38,8 @@ export function setUsageContext() {
 
 function createUsageContext() {
 	const settings = useSettings();
+	const toasts = useToasts();
 
-	// Clean up old localStorage key (migrated to settings engine)
 	if (browser) {
 		localStorage.removeItem('gk-usage-color-theme');
 	}
@@ -66,6 +69,16 @@ function createUsageContext() {
 	const refreshState = new StateRaw<RefreshState>(REFRESH_STATES.idle);
 	const lastUpdatedAt = new StateRaw<number | null>(null);
 	const showAchievements = new StateRaw(false);
+	const importState = new StateRaw<'idle' | 'loading' | 'done'>('idle');
+	const importPrompted = new StateRaw(false);
+	const importPromptedLoaded = new StateRaw(false);
+
+	void getUserSetting('usage_import_prompted').then((setting) => {
+		if (isImportPrompted(setting)) {
+			importPrompted.current = true;
+		}
+		importPromptedLoaded.current = true;
+	});
 
 	const unlockedCount = $derived.by(
 		() => achievements.current.filter((a) => a.unlocked_at !== null).length,
@@ -145,6 +158,35 @@ function createUsageContext() {
 		}
 	}
 
+	async function handleImport(dashboardId?: string) {
+		importState.current = 'loading';
+		try {
+			const summary = await invoke<ImportSummary>('import_historical_sessions');
+			toasts.show({
+				tone: 'success',
+				title: 'Import complete',
+				body: formatImportToastMessage(summary),
+			});
+			importState.current = 'done';
+			await setUserSetting('usage_import_prompted', 'true');
+			importPrompted.current = true;
+			await loadData(dashboardId);
+		} catch (error) {
+			console.error('Failed to import historical sessions:', error);
+			toasts.show({
+				tone: 'danger',
+				title: 'Import failed',
+				body: String(error),
+			});
+			importState.current = 'idle';
+		}
+	}
+
+	async function handleSkipImport() {
+		await setUserSetting('usage_import_prompted', 'true');
+		importPrompted.current = true;
+	}
+
 	return {
 		activePeriod,
 		scope,
@@ -156,6 +198,9 @@ function createUsageContext() {
 		refreshState,
 		lastUpdatedAt,
 		showAchievements,
+		importState,
+		importPrompted,
+		importPromptedLoaded,
 		get unlockedCount() {
 			return unlockedCount;
 		},
@@ -163,5 +208,7 @@ function createUsageContext() {
 		loadAchievements,
 		notifyNewData,
 		clearTimers,
+		handleImport,
+		handleSkipImport,
 	};
 }

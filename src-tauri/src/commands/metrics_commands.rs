@@ -5,9 +5,10 @@ use tauri::{Manager, State};
 use ts_rs::TS;
 
 use crate::database::connection::DatabaseState;
-use crate::metrics::{achievement_tracker, currency, historical_import, queries};
+use crate::metrics::{achievement_tracker, currency, historical_import, pricing, queries};
 use crate::models::achievement::Achievement;
 use crate::models::metrics::{GroupBy, MetricsPeriod, UsageDashboardData};
+use crate::SharedPricingEngine;
 
 #[derive(Debug, Clone, Serialize, TS)]
 #[ts(export)]
@@ -54,29 +55,46 @@ pub fn get_achievements(state: State<DatabaseState>) -> Result<Vec<Achievement>,
 }
 
 #[tauri::command]
-pub fn import_historical_sessions(state: State<DatabaseState>) -> Result<ImportSummary, String> {
+pub async fn import_historical_sessions(
+    state: State<'_, DatabaseState>,
+    pricing_state: State<'_, SharedPricingEngine>,
+) -> Result<ImportSummary, String> {
+    let summary = {
+        let connection = state.write()?;
+        let results = historical_import::import_all_providers(&connection);
+
+        let mut total_sessions = 0u64;
+        let mut total_skipped = 0u64;
+        let mut providers = Vec::new();
+
+        for r in results {
+            total_sessions += r.result.sessions_imported;
+            total_skipped += r.result.sessions_skipped;
+            providers.push(ProviderImportSummary {
+                provider: r.provider,
+                sessions_imported: r.result.sessions_imported,
+                sessions_skipped: r.result.sessions_skipped,
+            });
+        }
+
+        ImportSummary {
+            providers,
+            total_sessions,
+            total_skipped,
+        }
+    };
+
+    let engine = pricing_state.lock().await;
     let connection = state.write()?;
-    let results = historical_import::import_all_providers(&connection);
+    let recomputed = pricing::recompute_missing_costs(&connection, &engine);
+    drop(engine);
+    drop(connection);
 
-    let mut total_sessions = 0u64;
-    let mut total_skipped = 0u64;
-    let mut providers = Vec::new();
-
-    for r in results {
-        total_sessions += r.result.sessions_imported;
-        total_skipped += r.result.sessions_skipped;
-        providers.push(ProviderImportSummary {
-            provider: r.provider,
-            sessions_imported: r.result.sessions_imported,
-            sessions_skipped: r.result.sessions_skipped,
-        });
+    if recomputed > 0 {
+        log::info!("Recomputed costs for {recomputed} imported sessions");
     }
 
-    Ok(ImportSummary {
-        providers,
-        total_sessions,
-        total_skipped,
-    })
+    Ok(summary)
 }
 
 #[tauri::command]
