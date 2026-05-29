@@ -645,12 +645,12 @@
 				onChangeIssueColor?.(issue.id);
 				break;
 			case TREE_CONTEXT_MENU_ACTIONS.openGithub:
-				if (issue.github_issue_url) {
+				if (issue.github_issue_url !== null && issue.github_issue_url !== undefined) {
 					void openUrl(issue.github_issue_url);
 				}
 				break;
 			case TREE_CONTEXT_MENU_ACTIONS.openWorktree:
-				if (issue.worktree_folder) {
+				if (issue.worktree_folder !== null && issue.worktree_folder !== undefined) {
 					void invoke('open_folder_in_explorer', { folderPath: issue.worktree_folder });
 				}
 				break;
