@@ -854,7 +854,7 @@
 				class="pointer-events-none absolute inset-x-0 bottom-0"
 				style:top="{groundTopY}px"
 				style:z-index="2"
-				style:background="linear-gradient(to bottom, var(--ground-color), var(--ground-dark))"
+				class:ground-gradient={true}
 			></div>
 
 			<!-- Mountains — proportionally scaled, cropped from top as container shrinks -->
@@ -991,9 +991,14 @@
 		100% {
 			opacity: var(--tw-opacity, 0.5);
 		}
+
 		50% {
 			opacity: calc(var(--tw-opacity, 0.5) * 0.7);
 		}
+	}
+
+	.ground-gradient {
+		background: linear-gradient(to bottom, var(--ground-color), var(--ground-dark));
 	}
 
 	@media (prefers-reduced-motion: reduce) {
