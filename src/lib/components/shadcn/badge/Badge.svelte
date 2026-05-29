@@ -17,16 +17,16 @@
 	}: BadgeProps = $props();
 
 	const BADGE_TRANSITION = [
-		'padding var(--duration-5) linear',
-		'gap var(--duration-5) linear',
-		'background-color var(--duration-4) ease-in-out',
-		'color var(--duration-4) ease-in-out',
-		'border-color var(--duration-4) ease-in-out',
+		'padding var(--transition-duration-5) linear',
+		'gap var(--transition-duration-5) linear',
+		'background-color var(--transition-duration-4) ease-in-out',
+		'color var(--transition-duration-4) ease-in-out',
+		'border-color var(--transition-duration-4) ease-in-out',
 	].join(', ');
 
 	const TEXT_TRANSITION = [
-		'opacity var(--duration-4) ease-in-out',
-		'max-width var(--duration-5) ease-in-out',
+		'opacity var(--transition-duration-4) ease-in-out',
+		'max-width var(--transition-duration-5) ease-in-out',
 	].join(', ');
 </script>
 

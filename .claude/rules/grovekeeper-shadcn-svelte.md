@@ -79,16 +79,16 @@ Use Button as the template for variant-bearing components.
 
 Use these instead of hardcoded millisecond values:
 
-| Token          | Value | Tailwind class | Use for                            |
-| -------------- | ----- | -------------- | ---------------------------------- |
-| `--duration-1` | 90ms  | `duration-1`   | Micro-interactions (menu appear)   |
-| `--duration-2` | 120ms | `duration-2`   | Fast feedback (button press)       |
-| `--duration-3` | 160ms | `duration-3`   | Hover states, card transitions     |
-| `--duration-4` | 220ms | `duration-4`   | General UI transitions             |
-| `--duration-5` | 320ms | `duration-5`   | Expansion, progress, layout shifts |
+| Token                     | Value | Tailwind class | Use for                            |
+| ------------------------- | ----- | -------------- | ---------------------------------- |
+| `--transition-duration-1` | 90ms  | `duration-1`   | Micro-interactions (menu appear)   |
+| `--transition-duration-2` | 120ms | `duration-2`   | Fast feedback (button press)       |
+| `--transition-duration-3` | 160ms | `duration-3`   | Hover states, card transitions     |
+| `--transition-duration-4` | 220ms | `duration-4`   | General UI transitions             |
+| `--transition-duration-5` | 320ms | `duration-5`   | Expansion, progress, layout shifts |
 
 In Tailwind classes: `duration-3`, `duration-4`, `duration-5`.
-In inline/CSS transitions: `var(--duration-3)`, `var(--duration-4)`, `var(--duration-5)`.
+In inline/CSS transitions: `var(--transition-duration-3)`, `var(--transition-duration-4)`, `var(--transition-duration-5)`.
 
 ## Animation Patterns
 

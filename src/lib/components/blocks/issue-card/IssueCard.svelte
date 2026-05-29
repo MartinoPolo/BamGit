@@ -172,7 +172,10 @@
 
 	<!-- Contextual action buttons -->
 	{#if !ctx.isArchived && !ctx.isGhost && onExecuteAction}
-		<div class="absolute bottom-2 right-2.5 flex items-center gap-1">
+		<div
+			data-testid="issue-card-actions"
+			class="absolute bottom-2 right-2.5 flex items-center gap-1"
+		>
 			<ContextualActionButtons
 				derivedActions={contextualActions}
 				onExecute={handleContextualAction}

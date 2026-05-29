@@ -117,6 +117,17 @@
 	onMount(() => {
 		registerMockToastBridge((title, body) => toastsCtx.show({ tone: 'warning', title, body }));
 		boardStore.loadPalettes();
+
+		// Expose reload function for E2E tests
+		(window as unknown as Record<string, unknown>).__E2E_RELOAD_STORES__ = async (
+			dashboardId?: string,
+		) => {
+			await boardStore.loadDashboards(dashboardId ?? null);
+			if (dashboardId !== undefined && dashboardId !== null) {
+				boardStore.selectDashboard(dashboardId);
+			}
+			await sessionStore.loadSessions();
+		};
 		void preloadCode(resolve('/'));
 		void preloadCode(resolve('/overview'));
 		void preloadCode(resolve('/sessions'));
@@ -126,6 +137,7 @@
 		void characterPacksCtx.loadPacks();
 		void shortcutsCtx.loadCustomBindings();
 		void versionControlCtx.checkAvailability();
+		void sessionStore.loadSessions();
 
 		shortcutsCtx.registerShortcut({
 			id: 'command-palette',
