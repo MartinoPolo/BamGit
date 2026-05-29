@@ -60,6 +60,8 @@ pub fn check_session_achievements(
     _cost_usd: f64,
     duration_seconds: Option<f64>,
     cache_hit_ratio: f64,
+    one_shot_turns: i64,
+    edit_turns: i64,
 ) -> Vec<AchievementKind> {
     let mut newly_unlocked = Vec::new();
 
@@ -76,6 +78,12 @@ pub fn check_session_achievements(
     if cache_hit_ratio >= 90.0 {
         if let Ok(true) = increment_achievement(conn, AchievementKind::CacheMaster, 1) {
             newly_unlocked.push(AchievementKind::CacheMaster);
+        }
+    }
+
+    if edit_turns > 0 && one_shot_turns == edit_turns {
+        if let Ok(true) = increment_achievement(conn, AchievementKind::OneShotWonder, 1) {
+            newly_unlocked.push(AchievementKind::OneShotWonder);
         }
     }
 
@@ -167,5 +175,49 @@ mod tests {
         increment_achievement(&conn, AchievementKind::FirstSeed, 1).unwrap();
         let again = increment_achievement(&conn, AchievementKind::FirstSeed, 1).unwrap();
         assert!(!again);
+    }
+
+    #[test]
+    fn one_shot_wonder_increments_on_perfect_rate() {
+        let conn = setup_db();
+        let unlocked = check_session_achievements(&conn, 0.0, None, 0.0, 3, 3);
+        let progress: i64 = conn
+            .query_row(
+                "SELECT progress FROM achievements WHERE kind = 'one-shot-wonder'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(0);
+        assert_eq!(progress, 1, "OneShotWonder should be incremented when one_shot_turns == edit_turns");
+        // Should not be in unlocked list yet (threshold is 5)
+        assert!(!unlocked.contains(&AchievementKind::OneShotWonder));
+    }
+
+    #[test]
+    fn one_shot_wonder_does_not_increment_on_imperfect_rate() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, None, 0.0, 2, 5);
+        let progress: i64 = conn
+            .query_row(
+                "SELECT progress FROM achievements WHERE kind = 'one-shot-wonder'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(0);
+        assert_eq!(progress, 0, "OneShotWonder should not increment when one_shot_turns != edit_turns");
+    }
+
+    #[test]
+    fn one_shot_wonder_does_not_increment_on_zero_turns() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, None, 0.0, 0, 0);
+        let progress: i64 = conn
+            .query_row(
+                "SELECT progress FROM achievements WHERE kind = 'one-shot-wonder'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(0);
+        assert_eq!(progress, 0, "OneShotWonder should not increment when edit_turns == 0");
     }
 }

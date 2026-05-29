@@ -1,6 +1,7 @@
 ﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import DownloadIcon from '@lucide/svelte/icons/download';
+	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import * as Card from '$lib/components/shadcn/card/index.js';
@@ -176,6 +177,20 @@
 				lastUpdatedAt={ctx.lastUpdatedAt.current}
 				onrefresh={() => ctx.loadData(windowCtx.boundDashboardId ?? undefined)}
 			/>
+			<Button
+				intent="secondary"
+				size="sm"
+				disabled={ctx.importState.current === 'loading'}
+				onclick={() => ctx.handleImport(windowCtx.boundDashboardId ?? undefined)}
+			>
+				{#if ctx.importState.current === 'loading'}
+					<LoaderCircleIcon class="animate-spin" data-icon="inline-start" />
+					Importing…
+				{:else}
+					<DownloadIcon data-icon="inline-start" />
+					Import
+				{/if}
+			</Button>
 			<Button intent="secondary" size="sm" onclick={handleExportCsv}>
 				<DownloadIcon data-icon="inline-start" />
 				Export CSV
@@ -205,6 +220,38 @@
 
 	{#if ctx.refreshState.current === 'loading' && !ctx.dashboardData.current}
 		<div class="flex h-64 items-center justify-center text-muted-foreground">Loading...</div>
+	{:else if ctx.dashboardData.current && ctx.dashboardData.current.stats.session_count === 0 && ctx.importPromptedLoaded.current && !ctx.importPrompted.current}
+		<!-- Empty state: no data yet, offer import -->
+		<div class="flex h-64 items-center justify-center">
+			<Card.Card class="max-w-md text-center">
+				<div class="flex flex-col items-center gap-4 p-8">
+					<h2 class="text-lg font-semibold text-foreground">No usage data yet</h2>
+					<p class="text-sm text-muted-foreground">
+						Import session history from Claude Code, Cursor, and Codex?
+					</p>
+					<div class="flex items-center gap-2">
+						<Button
+							intent="primary"
+							size="sm"
+							disabled={ctx.importState.current === 'loading'}
+							onclick={() =>
+								ctx.handleImport(windowCtx.boundDashboardId ?? undefined)}
+						>
+							{#if ctx.importState.current === 'loading'}
+								<LoaderCircleIcon class="animate-spin" data-icon="inline-start" />
+								Importing…
+							{:else}
+								<DownloadIcon data-icon="inline-start" />
+								Import History
+							{/if}
+						</Button>
+						<Button intent="secondary" size="sm" onclick={() => ctx.handleSkipImport()}>
+							Skip
+						</Button>
+					</div>
+				</div>
+			</Card.Card>
+		</div>
 	{:else if ctx.dashboardData.current}
 		{@const data = ctx.dashboardData.current}
 

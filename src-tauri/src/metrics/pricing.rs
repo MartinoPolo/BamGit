@@ -426,6 +426,54 @@ fn strip_provider_prefix(model: &str) -> &str {
     }
 }
 
+pub fn recompute_missing_costs(conn: &Connection, engine: &PricingEngine) -> usize {
+    let mut statement = match conn.prepare(
+        "SELECT session_id, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens \
+         FROM session_metrics WHERE cost_usd = 0.0 AND (input_tokens > 0 OR output_tokens > 0)",
+    ) {
+        Ok(s) => s,
+        Err(e) => {
+            log::warn!("Failed to prepare recompute query: {e}");
+            return 0;
+        }
+    };
+
+    let rows: Vec<(String, String, u64, u64, u64, u64)> = match statement.query_map([], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, u64>(2)?,
+            row.get::<_, u64>(3)?,
+            row.get::<_, u64>(4)?,
+            row.get::<_, u64>(5)?,
+        ))
+    }) {
+        Ok(mapped) => mapped.flatten().collect(),
+        Err(e) => {
+            log::warn!("Failed to execute recompute query: {e}");
+            return 0;
+        }
+    };
+
+    let mut updated_count = 0usize;
+    for (session_id, model, input_tokens, output_tokens, cache_read, cache_write) in &rows {
+        let result = engine.calculate_cost(model, *input_tokens, *output_tokens, *cache_read, *cache_write, false);
+        if result.pricing_available {
+            let _ = conn.execute(
+                "UPDATE session_metrics SET cost_usd = ?1 WHERE session_id = ?2",
+                rusqlite::params![result.cost_usd, session_id],
+            );
+            let _ = conn.execute(
+                "UPDATE sessions SET cost_usd = ?1 WHERE id = ?2",
+                rusqlite::params![result.cost_usd, session_id],
+            );
+            updated_count += 1;
+        }
+    }
+
+    updated_count
+}
+
 fn resolve_alias(model: &str) -> Option<&'static str> {
     let aliases: &[(&str, &str)] = &[("cursor-auto", "claude-sonnet-4-5")];
     aliases
@@ -505,6 +553,137 @@ mod tests {
         let expected = 1000.0 * 0.001 + 500.0 * 0.002;
         assert!(result.pricing_available);
         assert!((result.cost_usd - expected).abs() < 1e-12);
+    }
+
+    #[test]
+    fn recompute_missing_costs_updates_zero_cost_sessions() {
+        let conn = Connection::open_in_memory().unwrap();
+        crate::database::schema::create_tables(&conn).unwrap();
+
+        conn.execute(
+            "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO sessions (id, state, started_at) VALUES ('s1', 'finished', '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO session_metrics (session_id, provider, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, started_at) \
+             VALUES ('s1', 'claude-code', 'claude-sonnet-4-5', 1000, 500, 0, 0, 0.0, '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+
+        let engine = engine_with_defaults();
+        let updated = recompute_missing_costs(&conn, &engine);
+        assert_eq!(updated, 1);
+
+        let metrics_cost: f64 = conn.query_row(
+            "SELECT cost_usd FROM session_metrics WHERE session_id = 's1'",
+            [],
+            |row| row.get(0),
+        ).unwrap();
+        assert!(metrics_cost > 0.0, "session_metrics.cost_usd should be updated");
+
+        let session_cost: f64 = conn.query_row(
+            "SELECT cost_usd FROM sessions WHERE id = 's1'",
+            [],
+            |row| row.get(0),
+        ).unwrap();
+        assert!((metrics_cost - session_cost).abs() < 1e-12, "sessions.cost_usd should match session_metrics.cost_usd");
+    }
+
+    #[test]
+    fn recompute_missing_costs_skips_sessions_with_no_tokens() {
+        let conn = Connection::open_in_memory().unwrap();
+        crate::database::schema::create_tables(&conn).unwrap();
+
+        conn.execute(
+            "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO sessions (id, state, started_at) VALUES ('s1', 'finished', '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO session_metrics (session_id, provider, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, started_at) \
+             VALUES ('s1', 'claude-code', 'claude-sonnet-4-5', 0, 0, 0, 0, 0.0, '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+
+        let engine = engine_with_defaults();
+        let updated = recompute_missing_costs(&conn, &engine);
+        assert_eq!(updated, 0);
+
+        let cost: f64 = conn.query_row(
+            "SELECT cost_usd FROM session_metrics WHERE session_id = 's1'",
+            [],
+            |row| row.get(0),
+        ).unwrap();
+        assert_eq!(cost, 0.0);
+    }
+
+    #[test]
+    fn recompute_missing_costs_skips_already_priced_sessions() {
+        let conn = Connection::open_in_memory().unwrap();
+        crate::database::schema::create_tables(&conn).unwrap();
+
+        conn.execute(
+            "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO sessions (id, state, started_at, cost_usd) VALUES ('s1', 'finished', '2026-01-01T00:00:00', 5.0)",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO session_metrics (session_id, provider, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, started_at) \
+             VALUES ('s1', 'claude-code', 'claude-sonnet-4-5', 1000, 500, 0, 0, 5.0, '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+
+        let engine = engine_with_defaults();
+        let updated = recompute_missing_costs(&conn, &engine);
+        assert_eq!(updated, 0);
+
+        let cost: f64 = conn.query_row(
+            "SELECT cost_usd FROM session_metrics WHERE session_id = 's1'",
+            [],
+            |row| row.get(0),
+        ).unwrap();
+        assert_eq!(cost, 5.0, "Already-priced session should not be modified");
+    }
+
+    #[test]
+    fn recompute_missing_costs_handles_unknown_model() {
+        let conn = Connection::open_in_memory().unwrap();
+        crate::database::schema::create_tables(&conn).unwrap();
+
+        conn.execute(
+            "INSERT INTO dashboards (id, name, type) VALUES ('d1', 'Test', 'repo')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO sessions (id, state, started_at) VALUES ('s1', 'finished', '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO session_metrics (session_id, provider, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, started_at) \
+             VALUES ('s1', 'claude-code', 'unknown-xyz', 1000, 500, 0, 0, 0.0, '2026-01-01T00:00:00')",
+            [],
+        ).unwrap();
+
+        let engine = engine_with_defaults();
+        let updated = recompute_missing_costs(&conn, &engine);
+        assert_eq!(updated, 0);
+
+        let cost: f64 = conn.query_row(
+            "SELECT cost_usd FROM session_metrics WHERE session_id = 's1'",
+            [],
+            |row| row.get(0),
+        ).unwrap();
+        assert_eq!(cost, 0.0, "Unknown model should not produce a cost");
     }
 
     #[test]

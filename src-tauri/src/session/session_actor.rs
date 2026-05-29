@@ -415,6 +415,8 @@ struct SessionMetricsSnapshot {
     cache_read_tokens: i64,
     cache_write_tokens: i64,
     duration_seconds: Option<f64>,
+    one_shot_turns: i64,
+    edit_turns: i64,
 }
 
 fn read_session_metrics_snapshot(
@@ -422,7 +424,8 @@ fn read_session_metrics_snapshot(
     conn: &Connection,
 ) -> Option<SessionMetricsSnapshot> {
     conn.query_row(
-        "SELECT model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, duration_seconds \
+        "SELECT model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
+         duration_seconds, one_shot_turns, edit_turns \
          FROM session_metrics WHERE session_id = ?1",
         [session_id],
         |row| {
@@ -433,6 +436,8 @@ fn read_session_metrics_snapshot(
                 cache_read_tokens: row.get(3)?,
                 cache_write_tokens: row.get(4)?,
                 duration_seconds: row.get(5)?,
+                one_shot_turns: row.get(6)?,
+                edit_turns: row.get(7)?,
             })
         },
     )
@@ -511,6 +516,8 @@ async fn handle_session_completion(
             cost,
             snapshot.duration_seconds,
             cache_hit_ratio,
+            snapshot.one_shot_turns,
+            snapshot.edit_turns,
         )
     };
 
