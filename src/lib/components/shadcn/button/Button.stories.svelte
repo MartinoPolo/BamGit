@@ -50,6 +50,9 @@
 		for (const button of buttons) {
 			await expect(button).toBeDisabled();
 		}
+		for (const button of buttons) {
+			button.click();
+		}
 		await expect(args.onclick).not.toHaveBeenCalled();
 	};
 </script>

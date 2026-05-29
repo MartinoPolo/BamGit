@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { expect, userEvent } from 'storybook/test';
+	import { expect, userEvent, waitFor } from 'storybook/test';
 	import * as Accordion from './index.js';
 	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
 	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
@@ -58,11 +58,14 @@
 		await expect(triggers[1]).toBeDisabled();
 		await expect(triggers[2]).toHaveAttribute('data-state', 'closed');
 
-		// Disabled trigger should not be clickable (pointer-events: none)
-		await expect(triggers[1]).toHaveAttribute('data-state', 'closed');
+		// Attempt to click the disabled trigger
+		triggers[1].click();
 
-		// First item should still be expanded
-		await expect(triggers[0]).toHaveAttribute('data-state', 'open');
+		// Disabled trigger must not change state — first item stays expanded
+		await waitFor(() => {
+			expect(triggers[1]).toHaveAttribute('data-state', 'closed');
+			expect(triggers[0]).toHaveAttribute('data-state', 'open');
+		});
 	};
 
 	const playKeyboardToggle = async ({ canvasElement }: { canvasElement: HTMLElement }) => {

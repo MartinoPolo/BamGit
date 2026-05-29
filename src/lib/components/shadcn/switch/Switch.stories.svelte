@@ -56,6 +56,38 @@
 	import type { SwitchProps } from './switch-variants.js';
 </script>
 
+<Story name="All States">
+	{#snippet template(args: SwitchProps)}
+		<div class="grid grid-cols-4 gap-6">
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Off</span>
+				<Switch {...args} />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">On</span>
+				<Switch checked />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Disabled Off</span>
+				<Switch disabled />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Disabled On</span>
+				<Switch disabled checked />
+			</div>
+			<div class="col-span-4 flex flex-col gap-2">
+				<span class="text-xs text-foreground-subtle">With label</span>
+				<div class="flex items-center gap-2.5">
+					<Switch id="sw-label-demo" checked />
+					<Label for="sw-label-demo" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Auto-fetch every 5 min</Label
+					>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Off [play: click toggles on]" play={playClickTogglesOn}>
 	{#snippet template(args: SwitchProps)}
 		<Switch {...args} />
@@ -98,38 +130,6 @@
 			<Label for="auto-fetch" class="mb-0 cursor-pointer text-(length:--text-md)"
 				>Auto-fetch</Label
 			>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All States">
-	{#snippet template(args: SwitchProps)}
-		<div class="grid grid-cols-4 gap-6">
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Off</span>
-				<Switch {...args} />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">On</span>
-				<Switch checked />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Disabled Off</span>
-				<Switch disabled />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Disabled On</span>
-				<Switch disabled checked />
-			</div>
-			<div class="col-span-4 flex flex-col gap-2">
-				<span class="text-xs text-foreground-subtle">With label</span>
-				<div class="flex items-center gap-2.5">
-					<Switch id="sw-label-demo" checked />
-					<Label for="sw-label-demo" class="mb-0 cursor-pointer text-(length:--text-md)"
-						>Auto-fetch every 5 min</Label
-					>
-				</div>
-			</div>
 		</div>
 	{/snippet}
 </Story>

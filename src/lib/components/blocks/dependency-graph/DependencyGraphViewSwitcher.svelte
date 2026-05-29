@@ -29,29 +29,25 @@
 </script>
 
 <div class="view-switcher">
-	<Tabs.Root aria-label="Dependency graph view">
-		<Tabs.Tab
-			active={viewMode === VIEW_MODE.global}
-			onclick={() => onViewModeChange(VIEW_MODE.global)}
-		>
-			<GlobeIcon data-icon="inline-start" />
-			Global
-		</Tabs.Tab>
-		<Tabs.Tab
-			active={viewMode === VIEW_MODE.prds}
-			onclick={() => onViewModeChange(VIEW_MODE.prds)}
-		>
-			<LayersIcon data-icon="inline-start" />
-			PRDs
-		</Tabs.Tab>
-		<Tabs.Tab
-			active={viewMode === VIEW_MODE.singlePrd}
-			onclick={() => onViewModeChange(VIEW_MODE.singlePrd)}
-			disabled={prdOptions.length === 0}
-		>
-			<FocusIcon data-icon="inline-start" />
-			Single PRD
-		</Tabs.Tab>
+	<Tabs.Root
+		aria-label="Dependency graph view"
+		value={viewMode}
+		onValueChange={(v) => onViewModeChange(v as ViewMode)}
+	>
+		<Tabs.List>
+			<Tabs.Trigger value={VIEW_MODE.global}>
+				<GlobeIcon data-icon="inline-start" />
+				Global
+			</Tabs.Trigger>
+			<Tabs.Trigger value={VIEW_MODE.prds}>
+				<LayersIcon data-icon="inline-start" />
+				PRDs
+			</Tabs.Trigger>
+			<Tabs.Trigger value={VIEW_MODE.singlePrd} disabled={prdOptions.length === 0}>
+				<FocusIcon data-icon="inline-start" />
+				Single PRD
+			</Tabs.Trigger>
+		</Tabs.List>
 	</Tabs.Root>
 
 	{#if viewMode === VIEW_MODE.singlePrd}

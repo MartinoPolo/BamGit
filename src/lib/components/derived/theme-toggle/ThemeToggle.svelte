@@ -7,7 +7,7 @@
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import SidebarCollapsedItem from '$lib/components/derived/sidebar-collapsed-item/SidebarCollapsedItem.svelte';
-	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import type { ButtonSize } from '$lib/components/shadcn/button/button-variants.js';
 
@@ -70,17 +70,16 @@
 		onclick={cycleMode}
 	/>
 {:else}
-	<Tabs class="w-full *:flex-1 *:justify-center">
-		{#each modes as { value, Icon, labelKey } (value)}
-			<SimpleTooltip text="{MODE_LABELS[labelKey]()} mode">
-				<Tab
-					active={themeMode === value}
-					onclick={() => void settingsCtx.set('themeMode', value)}
-				>
-					<Icon class="size-3.5" />
-					<span>{MODE_LABELS[labelKey]()}</span>
-				</Tab>
-			</SimpleTooltip>
-		{/each}
-	</Tabs>
+	<Tabs.Root value={themeMode} onValueChange={(v) => void settingsCtx.set('themeMode', v)}>
+		<Tabs.List class="w-full *:flex-1 *:justify-center">
+			{#each modes as { value, Icon, labelKey } (value)}
+				<SimpleTooltip text="{MODE_LABELS[labelKey]()} mode">
+					<Tabs.Trigger {value}>
+						<Icon class="size-3.5" />
+						<span>{MODE_LABELS[labelKey]()}</span>
+					</Tabs.Trigger>
+				</SimpleTooltip>
+			{/each}
+		</Tabs.List>
+	</Tabs.Root>
 {/if}

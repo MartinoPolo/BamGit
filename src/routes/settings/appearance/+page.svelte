@@ -4,7 +4,7 @@
 	import { BACKGROUND_THEMES } from '$lib/modules/board/types.js';
 	import { useSettings } from '$lib/modules/settings';
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import SettingOverrideIndicator from '$lib/components/derived/setting-override-indicator/SettingOverrideIndicator.svelte';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
@@ -52,17 +52,16 @@
 				onreset={() => void settingsCtx.resetOverride('themeMode')}
 			/>
 		</div>
-		<Tabs class="w-fit *:justify-center">
-			{#each themeModes as { value, Icon, label } (value)}
-				<Tab
-					active={themeMode === value}
-					onclick={() => void settingsCtx.set('themeMode', value)}
-				>
-					<Icon class="size-4" />
-					<span>{label()}</span>
-				</Tab>
-			{/each}
-		</Tabs>
+		<Tabs.Root value={themeMode} onValueChange={(v) => void settingsCtx.set('themeMode', v)}>
+			<Tabs.List class="w-fit *:justify-center">
+				{#each themeModes as { value, Icon, label } (value)}
+					<Tabs.Trigger {value}>
+						<Icon class="size-4" />
+						<span>{label()}</span>
+					</Tabs.Trigger>
+				{/each}
+			</Tabs.List>
+		</Tabs.Root>
 	</section>
 
 	<!-- Accent Color -->

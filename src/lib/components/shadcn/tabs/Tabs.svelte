@@ -1,21 +1,13 @@
 <script lang="ts">
+	import { Tabs as TabsPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
-	import { tabsContainerVariants, type TabsContainerProps } from './tabs-variants.js';
 
 	let {
-		class: className,
 		ref = $bindable(null),
-		children,
+		value = $bindable(''),
+		class: className,
 		...restProps
-	}: TabsContainerProps = $props();
+	}: TabsPrimitive.RootProps = $props();
 </script>
 
-<div
-	bind:this={ref}
-	data-slot="tabs"
-	role="tablist"
-	class={cn(tabsContainerVariants(), className)}
-	{...restProps}
->
-	{@render children?.()}
-</div>
+<TabsPrimitive.Root bind:ref bind:value data-slot="tabs" class={cn(className)} {...restProps} />

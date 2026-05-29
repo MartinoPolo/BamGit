@@ -52,7 +52,7 @@
 				<ChevronRightIcon
 					size={10}
 					strokeWidth={2}
-					class="text-foreground-subtle transition-transform duration-120"
+					class="text-foreground-subtle transition-transform duration-2"
 					style="transform: {expanded ? 'rotate(90deg)' : 'none'}"
 				/>
 			</span>

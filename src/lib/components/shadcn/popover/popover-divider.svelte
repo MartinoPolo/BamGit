@@ -1,17 +1,13 @@
 <script lang="ts">
+	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import { cn } from '$lib/utils.js';
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { Separator as SeparatorPrimitive } from 'bits-ui';
 
 	let {
-		ref = $bindable<HTMLHRElement | null>(null),
+		ref = $bindable(null),
 		class: className,
 		...restProps
-	}: { ref?: HTMLHRElement | null; class?: string } & HTMLAttributes<HTMLHRElement> = $props();
+	}: SeparatorPrimitive.RootProps = $props();
 </script>
 
-<hr
-	bind:this={ref}
-	data-slot="popover-divider"
-	class={cn('my-1 border-t border-border', className)}
-	{...restProps}
-/>
+<Separator bind:ref data-slot="popover-divider" class={cn('my-1', className)} {...restProps} />

@@ -7,4 +7,3 @@ export {
 	type HelpTextProps,
 	type HelpTextState,
 } from './help-text-variants.js';
-export type { HelpTextProps as Props } from './help-text-variants.js';

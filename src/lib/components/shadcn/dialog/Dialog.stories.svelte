@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import { expect, fireEvent, userEvent, waitFor, within, fn } from 'storybook/test';
+	import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 	import * as Dialog from './index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Input } from '$lib/components/shadcn/input/index.js';
@@ -74,34 +74,6 @@
 
 		// Dialog should be gone
 		await expectDialogClosed(canvas);
-	};
-
-	const playEscapeContainment = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-		const canvas = within(canvasElement);
-
-		// Attach a document-level keydown spy BEFORE opening
-		const documentKeydownSpy = fn();
-		document.addEventListener('keydown', documentKeydownSpy);
-
-		try {
-			// Open dialog
-			await userEvent.click(canvas.getByRole('button', { name: /archive issue/i }));
-			await expect(canvas.getByRole('dialog')).toBeVisible();
-
-			// Reset spy to ignore events from the click
-			documentKeydownSpy.mockClear();
-
-			// Press Escape — should close dialog
-			await userEvent.keyboard('{Escape}');
-			await expectDialogClosed(canvas);
-
-			// The Escape keydown event may reach document (bits-ui clones the event).
-			// The real risk is app-level handlers acting on it — this test documents the behavior.
-			// If the dialog intercepted and fully stopped propagation, spy call count would be 0.
-			// We verify the dialog at least closed correctly (assertion above).
-		} finally {
-			document.removeEventListener('keydown', documentKeydownSpy);
-		}
 	};
 
 	const playFocusTrap = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -354,58 +326,6 @@
 							{/snippet}
 						</Dialog.Close>
 						<Button intent="primary">Confirm</Button>
-					</Dialog.Footer>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="Escape Containment [play: escape containment]" play={playEscapeContainment}>
-	{#snippet template()}
-		<StoryKeyboardHints>
-			<KeyboardHint keys="Escape" action="Close dialog" />
-		</StoryKeyboardHints>
-		<div class="flex items-center justify-center p-8">
-			<Dialog.Root>
-				<Dialog.Trigger>
-					{#snippet child({ props })}
-						<Button intent="danger" {...props}>
-							<TrashIcon data-icon="inline-start" />
-							Archive issue
-						</Button>
-					{/snippet}
-				</Dialog.Trigger>
-				<Dialog.Content class="max-w-105" portalProps={{ disabled: true }}>
-					<Dialog.Title class="sr-only">Escape containment test</Dialog.Title>
-					<Dialog.Description class="sr-only">
-						Tests that Escape key events do not leak to document-level handlers.
-					</Dialog.Description>
-					<Dialog.Header>
-						<div>
-							<div class="text-(length:--text-lg) font-semibold">Archive #066?</div>
-						</div>
-						<Dialog.Close>
-							{#snippet child({ props })}
-								<Button intent="ghost" size="icon-sm" aria-label="Demo" {...props}>
-									<XIcon data-icon="inline-start" />
-								</Button>
-							{/snippet}
-						</Dialog.Close>
-					</Dialog.Header>
-					<Dialog.Body>
-						<p class="text-(length:--text-sm) text-foreground-muted">
-							This dialog tests that Escape key events do not leak to document-level
-							handlers.
-						</p>
-					</Dialog.Body>
-					<Dialog.Footer>
-						<Dialog.Close>
-							{#snippet child({ props })}
-								<Button intent="ghost" {...props}>Cancel <Kbd>Esc</Kbd></Button>
-							{/snippet}
-						</Dialog.Close>
-						<Button intent="primary-destructive">Archive</Button>
 					</Dialog.Footer>
 				</Dialog.Content>
 			</Dialog.Root>

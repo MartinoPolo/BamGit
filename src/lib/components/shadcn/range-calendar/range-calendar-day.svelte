@@ -24,8 +24,8 @@
 		'data-[range-end]:bg-primary data-[range-end]:text-primary-foreground data-[range-end]:hover:bg-primary/80',
 		// Range middle — hover adds subtle accent overlay
 		'data-[range-middle]:hover:bg-accent/15',
-		// Outside months — hidden so they don't duplicate across adjacent month grids
-		'data-[outside-month]:invisible data-[outside-month]:pointer-events-none',
+		// Outside months — dimmed but interactive
+		'[&[data-outside-month]:not([data-selected])]:text-muted-foreground',
 		// Disabled
 		'data-[disabled]:text-muted-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 		// Unavailable

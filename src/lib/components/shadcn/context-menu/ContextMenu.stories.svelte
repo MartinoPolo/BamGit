@@ -115,13 +115,12 @@
 		const disabledItems = canvasElement.querySelectorAll('[role="menuitem"][data-disabled]');
 		await expect(disabledItems.length).toBeGreaterThanOrEqual(1);
 
-		// Verify each disabled item has data-disabled (pointer-events:none prevents click)
-		for (const item of disabledItems) {
-			await expect(item).toHaveAttribute('data-disabled');
-		}
-
-		// Menu should still be open after checking disabled items
-		await expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy();
+		// Click a disabled item — menu must stay open because disabled items reject interactions
+		const disabledItem = disabledItems[0] as HTMLElement;
+		disabledItem.click();
+		await waitFor(() => {
+			expect(canvasElement.querySelector('[role="menu"]')).toBeTruthy();
+		});
 	};
 
 	const playEscapeContainment = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -160,6 +159,78 @@
 	let checkboxChecked = $state(false);
 	let radioValue = $state('middle');
 </script>
+
+<Story name="All Variants">
+	{#snippet template()}
+		<div class="flex gap-8">
+			<div class="flex flex-col gap-2">
+				<span class="text-xs text-muted-foreground">Right-click each target</span>
+				<ContextMenu.Root>
+					<ContextMenu.Trigger>
+						<div
+							class="flex h-24 w-60 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
+						>
+							With Icons + Destructive
+						</div>
+					</ContextMenu.Trigger>
+					<ContextMenu.Content portalProps={{ disabled: true }}>
+						<ContextMenu.Item>
+							<ScissorsIcon class="size-4" />
+							Cut
+							<ContextMenu.Shortcut>Ctrl+X</ContextMenu.Shortcut>
+						</ContextMenu.Item>
+						<ContextMenu.Item>
+							<CopyIcon class="size-4" />
+							Copy
+							<ContextMenu.Shortcut>Ctrl+C</ContextMenu.Shortcut>
+						</ContextMenu.Item>
+						<ContextMenu.Item>
+							<ClipboardIcon class="size-4" />
+							Paste
+							<ContextMenu.Shortcut>Ctrl+V</ContextMenu.Shortcut>
+						</ContextMenu.Item>
+						<ContextMenu.Separator />
+						<ContextMenu.Item variant="destructive">
+							<TrashIcon class="size-4" />
+							Delete
+							<ContextMenu.Shortcut
+								><DeleteIcon class="size-3.5" /></ContextMenu.Shortcut
+							>
+						</ContextMenu.Item>
+					</ContextMenu.Content>
+				</ContextMenu.Root>
+				<ContextMenu.Root>
+					<ContextMenu.Trigger>
+						<div
+							class="flex h-24 w-60 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
+						>
+							With Submenus + Icons
+						</div>
+					</ContextMenu.Trigger>
+					<ContextMenu.Content portalProps={{ disabled: true }}>
+						<ContextMenu.Item>New File</ContextMenu.Item>
+						<ContextMenu.Sub>
+							<ContextMenu.SubTrigger>
+								<FolderIcon class="size-4" />
+								Move to
+							</ContextMenu.SubTrigger>
+							<ContextMenu.Portal>
+								<ContextMenu.SubContent>
+									<ContextMenu.Item>Archive</ContextMenu.Item>
+									<ContextMenu.Item>Trash</ContextMenu.Item>
+								</ContextMenu.SubContent>
+							</ContextMenu.Portal>
+						</ContextMenu.Sub>
+						<ContextMenu.Separator />
+						<ContextMenu.CheckboxItem bind:checked={checkboxChecked}>
+							Show Preview
+						</ContextMenu.CheckboxItem>
+					</ContextMenu.Content>
+				</ContextMenu.Root>
+			</div>
+		</div>
+	{/snippet}
+</Story>
 
 <Story name="Basic Menu [play: opens on right click]" play={playOpensOnRightClick}>
 	{#snippet template()}
@@ -360,78 +431,6 @@
 				</ContextMenu.Item>
 			</ContextMenu.Content>
 		</ContextMenu.Root>
-	{/snippet}
-</Story>
-
-<Story name="All Variants">
-	{#snippet template()}
-		<div class="flex gap-8">
-			<div class="flex flex-col gap-2">
-				<span class="text-xs text-muted-foreground">Right-click each target</span>
-				<ContextMenu.Root>
-					<ContextMenu.Trigger>
-						<div
-							class="flex h-24 w-60 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
-						>
-							With Icons + Destructive
-						</div>
-					</ContextMenu.Trigger>
-					<ContextMenu.Content portalProps={{ disabled: true }}>
-						<ContextMenu.Item>
-							<ScissorsIcon class="size-4" />
-							Cut
-							<ContextMenu.Shortcut>Ctrl+X</ContextMenu.Shortcut>
-						</ContextMenu.Item>
-						<ContextMenu.Item>
-							<CopyIcon class="size-4" />
-							Copy
-							<ContextMenu.Shortcut>Ctrl+C</ContextMenu.Shortcut>
-						</ContextMenu.Item>
-						<ContextMenu.Item>
-							<ClipboardIcon class="size-4" />
-							Paste
-							<ContextMenu.Shortcut>Ctrl+V</ContextMenu.Shortcut>
-						</ContextMenu.Item>
-						<ContextMenu.Separator />
-						<ContextMenu.Item variant="destructive">
-							<TrashIcon class="size-4" />
-							Delete
-							<ContextMenu.Shortcut
-								><DeleteIcon class="size-3.5" /></ContextMenu.Shortcut
-							>
-						</ContextMenu.Item>
-					</ContextMenu.Content>
-				</ContextMenu.Root>
-				<ContextMenu.Root>
-					<ContextMenu.Trigger>
-						<div
-							class="flex h-24 w-60 items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground"
-						>
-							With Submenus + Icons
-						</div>
-					</ContextMenu.Trigger>
-					<ContextMenu.Content portalProps={{ disabled: true }}>
-						<ContextMenu.Item>New File</ContextMenu.Item>
-						<ContextMenu.Sub>
-							<ContextMenu.SubTrigger>
-								<FolderIcon class="size-4" />
-								Move to
-							</ContextMenu.SubTrigger>
-							<ContextMenu.Portal>
-								<ContextMenu.SubContent>
-									<ContextMenu.Item>Archive</ContextMenu.Item>
-									<ContextMenu.Item>Trash</ContextMenu.Item>
-								</ContextMenu.SubContent>
-							</ContextMenu.Portal>
-						</ContextMenu.Sub>
-						<ContextMenu.Separator />
-						<ContextMenu.CheckboxItem bind:checked={checkboxChecked}>
-							Show Preview
-						</ContextMenu.CheckboxItem>
-					</ContextMenu.Content>
-				</ContextMenu.Root>
-			</div>
-		</div>
 	{/snippet}
 </Story>
 

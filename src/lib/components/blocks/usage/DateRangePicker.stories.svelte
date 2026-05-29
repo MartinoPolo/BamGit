@@ -136,6 +136,7 @@
 </script>
 
 <script lang="ts">
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import StoryKeyboardHints from '$lib/storybook/StoryKeyboardHints.svelte';
 	import KeyboardHint from '$lib/storybook/KeyboardHint.svelte';
 
@@ -145,11 +146,15 @@
 <Story name="Default">
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
-			<DateRangePicker
-				onselect={(range) => {
-					selectedRange = range;
-				}}
-			/>
+			<Tabs.Root value="custom">
+				<Tabs.List>
+					<DateRangePicker
+						onselect={(range) => {
+							selectedRange = range;
+						}}
+					/>
+				</Tabs.List>
+			</Tabs.Root>
 			{#if selectedRange !== null}
 				<p class="text-sm text-muted-foreground">
 					Selected: {selectedRange.start} → {selectedRange.end}
@@ -162,7 +167,11 @@
 <Story name="Open Popover [play: popover opens]" play={playOpenPopover}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
-			<DateRangePicker onselect={() => {}} />
+			<Tabs.Root value="custom">
+				<Tabs.List>
+					<DateRangePicker onselect={() => {}} />
+				</Tabs.List>
+			</Tabs.Root>
 		</div>
 	{/snippet}
 </Story>
@@ -174,7 +183,11 @@
 >
 	{#snippet template(args)}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
-			<DateRangePicker onselect={args.onselect} />
+			<Tabs.Root value="custom">
+				<Tabs.List>
+					<DateRangePicker onselect={args.onselect} />
+				</Tabs.List>
+			</Tabs.Root>
 		</div>
 	{/snippet}
 </Story>
@@ -185,7 +198,11 @@
 			<StoryKeyboardHints>
 				<KeyboardHint keys="Escape" action="Close popover" />
 			</StoryKeyboardHints>
-			<DateRangePicker onselect={() => {}} />
+			<Tabs.Root value="custom">
+				<Tabs.List>
+					<DateRangePicker onselect={() => {}} />
+				</Tabs.List>
+			</Tabs.Root>
 		</div>
 	{/snippet}
 </Story>
@@ -193,7 +210,11 @@
 <Story name="Click Outside Closes [play: click outside closes]" play={playClickOutsideCloses}>
 	{#snippet template()}
 		<div class="flex flex-col items-start gap-4 p-8 pb-96">
-			<DateRangePicker onselect={() => {}} />
+			<Tabs.Root value="custom">
+				<Tabs.List>
+					<DateRangePicker onselect={() => {}} />
+				</Tabs.List>
+			</Tabs.Root>
 		</div>
 	{/snippet}
 </Story>
@@ -204,7 +225,11 @@
 			<StoryKeyboardHints>
 				<KeyboardHint keys="Escape" action="Close popover" />
 			</StoryKeyboardHints>
-			<DateRangePicker onselect={() => {}} />
+			<Tabs.Root value="custom">
+				<Tabs.List>
+					<DateRangePicker onselect={() => {}} />
+				</Tabs.List>
+			</Tabs.Root>
 		</div>
 	{/snippet}
 </Story>
