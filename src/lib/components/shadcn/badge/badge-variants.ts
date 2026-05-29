@@ -9,15 +9,15 @@ export const badgeVariants = tv({
 		tone: {
 			neutral: 'bg-surface-2 text-foreground-muted border-border',
 			success:
-				'bg-[color-mix(in_oklch,var(--status-success)_14%,transparent)] text-status-success border-[color-mix(in_oklch,var(--status-success)_30%,transparent)]',
+				'bg-[color-mix(in_srgb,var(--status-success)_14%,transparent)] text-status-success border-[color-mix(in_srgb,var(--status-success)_30%,transparent)]',
 			warning:
-				'bg-[color-mix(in_oklch,var(--status-warning)_14%,transparent)] text-[color-mix(in_oklch,var(--status-warning)_70%,var(--foreground))] border-[color-mix(in_oklch,var(--status-warning)_30%,transparent)]',
-			danger: 'bg-[color-mix(in_oklch,var(--status-danger)_14%,transparent)] text-status-danger border-[color-mix(in_oklch,var(--status-danger)_30%,transparent)]',
-			info: 'bg-[color-mix(in_oklch,var(--status-info)_14%,transparent)] text-status-info border-[color-mix(in_oklch,var(--status-info)_30%,transparent)]',
+				'bg-[color-mix(in_srgb,var(--status-warning)_14%,transparent)] text-[color-mix(in_srgb,var(--status-warning)_70%,var(--foreground))] border-[color-mix(in_srgb,var(--status-warning)_30%,transparent)]',
+			danger: 'bg-[color-mix(in_srgb,var(--status-danger)_14%,transparent)] text-status-danger border-[color-mix(in_srgb,var(--status-danger)_30%,transparent)]',
+			info: 'bg-[color-mix(in_srgb,var(--status-info)_14%,transparent)] text-status-info border-[color-mix(in_srgb,var(--status-info)_30%,transparent)]',
 			primary:
-				'bg-[color-mix(in_oklch,var(--primary)_14%,transparent)] text-primary border-[color-mix(in_oklch,var(--primary)_30%,transparent)]',
-			accent: 'bg-[color-mix(in_oklch,var(--accent)_16%,transparent)] text-[color-mix(in_oklch,var(--accent)_70%,var(--foreground))] border-[color-mix(in_oklch,var(--accent)_32%,transparent)]',
-			merged: 'bg-[color-mix(in_oklch,var(--status-merged)_14%,transparent)] text-status-merged border-[color-mix(in_oklch,var(--status-merged)_30%,transparent)]',
+				'bg-[color-mix(in_srgb,var(--primary)_14%,transparent)] text-primary border-[color-mix(in_srgb,var(--primary)_30%,transparent)]',
+			accent: 'bg-[color-mix(in_srgb,var(--accent)_16%,transparent)] text-[color-mix(in_srgb,var(--accent)_70%,var(--foreground))] border-[color-mix(in_srgb,var(--accent)_32%,transparent)]',
+			merged: 'bg-[color-mix(in_srgb,var(--status-merged)_14%,transparent)] text-status-merged border-[color-mix(in_srgb,var(--status-merged)_30%,transparent)]',
 		},
 		badgeStyle: {
 			outlined: '',

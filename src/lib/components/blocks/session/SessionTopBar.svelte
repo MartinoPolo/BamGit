@@ -87,16 +87,15 @@
 
 		<Separator orientation="vertical" class="mx-1 h-4.5" />
 
-		<Tabs.Root>
-			<Tabs.Tab active={activeTab === 'chat'} onclick={() => onTabChange?.('chat')}>
-				Chat
-			</Tabs.Tab>
-			<Tabs.Tab active={activeTab === 'files'} onclick={() => onTabChange?.('files')}>
-				Files
-			</Tabs.Tab>
-			<Tabs.Tab active={activeTab === 'stats'} onclick={() => onTabChange?.('stats')}>
-				Stats
-			</Tabs.Tab>
+		<Tabs.Root
+			value={activeTab}
+			onValueChange={(v) => onTabChange?.(v as 'chat' | 'files' | 'stats')}
+		>
+			<Tabs.List>
+				<Tabs.Trigger value="chat">Chat</Tabs.Trigger>
+				<Tabs.Trigger value="files">Files</Tabs.Trigger>
+				<Tabs.Trigger value="stats">Stats</Tabs.Trigger>
+			</Tabs.List>
 		</Tabs.Root>
 	</div>
 </div>

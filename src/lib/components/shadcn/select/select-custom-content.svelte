@@ -23,7 +23,7 @@
 		data-slot="select-content"
 		class={cn(
 			'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-			'z-50 min-w-(--bits-select-anchor-width) overflow-hidden rounded-lg border border-border bg-surface p-1.5 shadow-lg outline-none duration-100 data-closed:overflow-hidden',
+			'z-(--z-dropdown) min-w-(--bits-select-anchor-width) overflow-hidden rounded-lg border border-border bg-surface p-1.5 shadow-lg outline-none duration-1 data-closed:overflow-hidden',
 			className,
 		)}
 		{...restProps}

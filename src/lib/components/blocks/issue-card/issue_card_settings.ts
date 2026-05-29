@@ -43,8 +43,11 @@ export const PRIORITY_POSITION_OPTIONS = [
 ] as const;
 export type PriorityPositionOption = (typeof PRIORITY_POSITION_OPTIONS)[number];
 
-export const BADGE_STYLE_OPTIONS = ['solid', 'subtle', 'outlined'] as const;
-export type BadgeStyleOption = (typeof BADGE_STYLE_OPTIONS)[number];
+import {
+	BADGE_STYLE_OPTIONS,
+	type BadgeStyleOption,
+} from '$lib/components/shadcn/badge/badge_types.js';
+export { BADGE_STYLE_OPTIONS, type BadgeStyleOption };
 
 // ── Preview position helpers ─────────────────────────────────────────
 

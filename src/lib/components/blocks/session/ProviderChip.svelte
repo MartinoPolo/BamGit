@@ -12,7 +12,7 @@
 </script>
 
 <div
-	class="inline-flex cursor-pointer items-center gap-1.25 rounded-1.5 border border-border bg-surface-2 px-2 py-0.75 pl-1.25 transition-[border-color] duration-120 hover:border-border-strong"
+	class="inline-flex cursor-pointer items-center gap-1.25 rounded-1.5 border border-border bg-surface-2 px-2 py-0.75 pl-1.25 transition-[border-color] duration-2 hover:border-border-strong"
 >
 	<div
 		class="flex size-3.5 items-center justify-center rounded-0.75"

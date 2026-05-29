@@ -2,7 +2,7 @@ import { createContext } from 'svelte';
 import type { Tooltip } from 'layerchart';
 import type { Component, Snippet } from 'svelte';
 
-export const THEMES = { light: '', dark: '.dark' } as const;
+export const THEMES = { light: '', dark: "[data-theme='dark']" } as const;
 
 export type ChartConfig = {
 	[k in string]: {

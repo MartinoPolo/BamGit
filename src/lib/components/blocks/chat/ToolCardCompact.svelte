@@ -17,7 +17,7 @@
 </script>
 
 <div
-	class="flex h-9 cursor-pointer items-center gap-2 rounded-md border border-border bg-surface-2 px-2.5 opacity-80 transition-opacity duration-120 hover:opacity-100"
+	class="flex h-9 cursor-pointer items-center gap-2 rounded-md border border-border bg-surface-2 px-2.5 opacity-80 transition-opacity duration-2 hover:opacity-100"
 	class:border-l-2={message.isError === true}
 	class:border-l-status-danger={message.isError === true}
 	onclick={onExpand}

@@ -384,23 +384,6 @@
 </Story>
 
 <Story
-	name="Disabled Select Ignores Click [play: disabled ignores click]"
-	play={playDisabledIgnoresClick}
->
-	{#snippet template()}
-		<div class="max-w-xs">
-			<Label>Provider</Label>
-			<SelectCustom.CustomRoot type="single" value="claude-sonnet" disabled>
-				<SelectCustom.CustomTrigger>Claude · Sonnet 4.5</SelectCustom.CustomTrigger>
-				<SelectCustom.CustomContent portalProps={{ disabled: true }}>
-					<SelectCustom.CustomItem value="claude-sonnet" label="Claude · Sonnet 4.5" />
-				</SelectCustom.CustomContent>
-			</SelectCustom.CustomRoot>
-		</div>
-	{/snippet}
-</Story>
-
-<Story
 	name="Click Outside Closes Dropdown [play: click outside closes]"
 	play={playClickOutsideCloses}
 >

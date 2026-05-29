@@ -7,7 +7,7 @@
 	} from '$lib/modules/settings/settings_commands.js';
 	import { invoke } from '$lib/tauri.js';
 	import { useToasts } from '$lib/modules/toasts/index.js';
-	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
 	import ColorThemePicker from '$lib/components/derived/color-theme-picker/ColorThemePicker.svelte';
@@ -125,16 +125,18 @@
 				Choose what to show when the app launches.
 			</p>
 		</div>
-		<Tabs class="w-fit *:justify-center">
-			{#each startupOptions as option (option.value)}
-				<Tab
-					active={currentStartup === option.value}
-					onclick={() => void settings.set('startupBehavior', option.value)}
-				>
-					{option.label}
-				</Tab>
-			{/each}
-		</Tabs>
+		<Tabs.Root
+			value={currentStartup}
+			onValueChange={(v) => void settings.set('startupBehavior', v)}
+		>
+			<Tabs.List class="w-fit *:justify-center">
+				{#each startupOptions as option (option.value)}
+					<Tabs.Trigger value={option.value}>
+						{option.label}
+					</Tabs.Trigger>
+				{/each}
+			</Tabs.List>
+		</Tabs.Root>
 	</section>
 
 	<section class="flex flex-col gap-4">

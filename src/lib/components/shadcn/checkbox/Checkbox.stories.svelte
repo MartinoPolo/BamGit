@@ -66,6 +66,42 @@
 	import type { CheckboxProps } from './checkbox-variants.js';
 </script>
 
+<Story name="All States">
+	{#snippet template(args: CheckboxProps)}
+		<div class="grid grid-cols-4 gap-6">
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Unchecked</span>
+				<Checkbox {...args} />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Checked</span>
+				<Checkbox checked />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Indeterminate</span>
+				<Checkbox indeterminate />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Disabled</span>
+				<Checkbox disabled />
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<span class="text-xs text-foreground-subtle">Disabled + Checked</span>
+				<Checkbox disabled checked />
+			</div>
+			<div class="col-span-3 flex flex-col gap-2">
+				<span class="text-xs text-foreground-subtle">With label</span>
+				<div class="flex items-center gap-2">
+					<Checkbox id="cb-label-demo" checked />
+					<Label for="cb-label-demo" class="mb-0 cursor-pointer text-(length:--text-md)"
+						>Auto-create worktree</Label
+					>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Unchecked [play: click to check]" play={playClickToCheck}>
 	{#snippet template(args: CheckboxProps)}
 		<Checkbox {...args} />
@@ -111,42 +147,6 @@
 			<Label for="worktree" class="mb-0 cursor-pointer text-(length:--text-md)"
 				>Auto-create worktree</Label
 			>
-		</div>
-	{/snippet}
-</Story>
-
-<Story name="All States">
-	{#snippet template(args: CheckboxProps)}
-		<div class="grid grid-cols-4 gap-6">
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Unchecked</span>
-				<Checkbox {...args} />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Checked</span>
-				<Checkbox checked />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Indeterminate</span>
-				<Checkbox indeterminate />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Disabled</span>
-				<Checkbox disabled />
-			</div>
-			<div class="flex flex-col items-center gap-2">
-				<span class="text-xs text-foreground-subtle">Disabled + Checked</span>
-				<Checkbox disabled checked />
-			</div>
-			<div class="col-span-3 flex flex-col gap-2">
-				<span class="text-xs text-foreground-subtle">With label</span>
-				<div class="flex items-center gap-2">
-					<Checkbox id="cb-label-demo" checked />
-					<Label for="cb-label-demo" class="mb-0 cursor-pointer text-(length:--text-md)"
-						>Auto-create worktree</Label
-					>
-				</div>
-			</div>
 		</div>
 	{/snippet}
 </Story>

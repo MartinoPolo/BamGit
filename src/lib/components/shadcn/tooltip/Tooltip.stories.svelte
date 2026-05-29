@@ -157,7 +157,7 @@
 						portalProps={{ disabled: true }}
 					>
 						<div class="font-semibold">#128 · Build kanban DnD</div>
-						<div class="mt-0.5 text-[10.5px] leading-undefined opacity-80">
+						<div class="mt-0.5 text-[10.5px] leading-tight opacity-80">
 							Claude · 2m 14s · 3 commits ahead
 						</div>
 					</Tooltip.Content>

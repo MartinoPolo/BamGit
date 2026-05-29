@@ -14,3 +14,4 @@ export {
 	type BadgeSize,
 	type BadgeDot,
 } from './badge-variants.js';
+export { BADGE_STYLE_OPTIONS, type BadgeStyleOption } from './badge_types.js';

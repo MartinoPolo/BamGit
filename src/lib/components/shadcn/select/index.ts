@@ -15,7 +15,6 @@ export {
 	type SelectState,
 	selectVariants,
 } from './select-variants.js';
-export type { SelectProps as Props } from './select-variants.js';
 
 // bits-ui based custom select components
 export {

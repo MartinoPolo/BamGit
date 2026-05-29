@@ -1,4 +1,4 @@
-import type { BadgeStyleOption } from '$lib/components/blocks/issue-card/index.js';
+import type { BadgeStyleOption } from './badge_types.js';
 
 const BADGE_STYLE_CLASSES: Record<BadgeStyleOption, string> = {
 	solid: 'bg-[var(--badge-color)] text-[var(--badge-contrast-text,#fff)] border-transparent',

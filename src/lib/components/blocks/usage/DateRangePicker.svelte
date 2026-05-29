@@ -7,10 +7,9 @@
 
 	interface Props {
 		onselect: (range: { start: string; end: string }) => void;
-		active?: boolean;
 	}
 
-	let { onselect, active = false }: Props = $props();
+	let { onselect }: Props = $props();
 
 	let open = $state(false);
 	let selectedRange = $state<DateRange | undefined>(undefined);
@@ -41,7 +40,7 @@
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
-			<Tabs.Tab {active} {...props}>Custom</Tabs.Tab>
+			<Tabs.Trigger value="custom" {...props}>Custom</Tabs.Trigger>
 		{/snippet}
 	</Popover.Trigger>
 	<Popover.Content class="w-auto p-0" portalProps={{ disabled: true }}>

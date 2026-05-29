@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
-	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
+	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 
 	const LOCALE_LABELS: Record<string, string> = {
 		en: 'English',
@@ -16,12 +16,17 @@
 				Choose the display language for the app interface.
 			</p>
 		</div>
-		<Tabs class="w-fit *:justify-center">
-			{#each locales as locale (locale)}
-				<Tab active={getLocale() === locale} onclick={() => setLocale(locale)}>
-					{LOCALE_LABELS[locale] ?? locale}
-				</Tab>
-			{/each}
-		</Tabs>
+		<Tabs.Root
+			value={getLocale()}
+			onValueChange={(v) => setLocale(v as (typeof locales)[number])}
+		>
+			<Tabs.List class="w-fit *:justify-center">
+				{#each locales as locale (locale)}
+					<Tabs.Trigger value={locale}>
+						{LOCALE_LABELS[locale] ?? locale}
+					</Tabs.Trigger>
+				{/each}
+			</Tabs.List>
+		</Tabs.Root>
 	</section>
 </div>

@@ -4,7 +4,6 @@ export { Root, Root as Button };
 export {
 	buttonVariants,
 	type ButtonProps,
-	type ButtonProps as Props,
 	type ButtonIntent,
 	type ButtonSize,
 	BUTTON_INTENTS,

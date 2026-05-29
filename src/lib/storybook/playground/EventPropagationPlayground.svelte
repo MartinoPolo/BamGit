@@ -78,7 +78,7 @@
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 	<div
-		class="relative flex w-[70%] flex-col gap-4 p-6 transition-colors duration-300"
+		class="relative flex w-[70%] flex-col gap-4 p-6 transition-colors duration-5"
 		class:bg-status-danger={isFlashing}
 		class:bg-surface-2={!isFlashing}
 		onkeydown={handleLeakedEvent}

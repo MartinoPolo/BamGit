@@ -161,21 +161,21 @@
 	</div>
 
 	<!-- Tabs row -->
-	<Tabs.Root
-		class="flex w-full gap-1 overflow-x-auto border-b border-border bg-transparent px-6 py-2"
-	>
-		{#each aiConfig.visibleTabs as tab (tab)}
-			{@const count = aiConfig.tabCounts[tab]}
-			{@const isActive = activeTab === tab}
-			{@const isDimmed = tab !== 'settings' && count === 0 && aiConfig.searchQuery !== ''}
-			<Tabs.Tab
-				active={isActive}
-				onclick={() => (aiConfig.activeTab = tab)}
-				class={cn(isDimmed && 'text-foreground-subtle opacity-60')}
-			>
-				{TAB_LABELS[tab]}{tab !== 'settings' ? ` (${count})` : ''}
-			</Tabs.Tab>
-		{/each}
+	<Tabs.Root value={activeTab} onValueChange={(v) => (aiConfig.activeTab = v as AiConfigTab)}>
+		<Tabs.List
+			class="flex w-full gap-1 overflow-x-auto border-b border-border bg-transparent px-6 py-2"
+		>
+			{#each aiConfig.visibleTabs as tab (tab)}
+				{@const count = aiConfig.tabCounts[tab]}
+				{@const isDimmed = tab !== 'settings' && count === 0 && aiConfig.searchQuery !== ''}
+				<Tabs.Trigger
+					value={tab}
+					class={cn(isDimmed && 'text-foreground-subtle opacity-60')}
+				>
+					{TAB_LABELS[tab]}{tab !== 'settings' ? ` (${count})` : ''}
+				</Tabs.Trigger>
+			{/each}
+		</Tabs.List>
 	</Tabs.Root>
 
 	<!-- Body: sources + toolbar + content -->

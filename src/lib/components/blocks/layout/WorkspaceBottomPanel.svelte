@@ -155,19 +155,21 @@
 
 <div class="flex h-full flex-col">
 	<div class="flex shrink-0 justify-center px-2 pt-1">
-		<Tabs.Root>
-			{#each tabValues as tab (tab)}
-				<Tabs.Tab active={defaultTab === tab} onclick={() => handleTabClick(tab)}>
-					{BOTTOM_PANEL_TAB_LABELS[tab]}
-					{#if tab === BOTTOM_PANEL_TABS.assignedIssues && unlinkedCount > 0}
-						<span
-							class="ml-0.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-primary px-1.5 py-0 font-mono text-[10px] leading-4 text-primary-foreground"
-						>
-							{unlinkedCount}
-						</span>
-					{/if}
-				</Tabs.Tab>
-			{/each}
+		<Tabs.Root value={defaultTab}>
+			<Tabs.List>
+				{#each tabValues as tab (tab)}
+					<Tabs.Trigger value={tab} onclick={() => handleTabClick(tab)}>
+						{BOTTOM_PANEL_TAB_LABELS[tab]}
+						{#if tab === BOTTOM_PANEL_TABS.assignedIssues && unlinkedCount > 0}
+							<span
+								class="ml-0.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-primary px-1.5 py-0 font-mono text-[10px] leading-4 text-primary-foreground"
+							>
+								{unlinkedCount}
+							</span>
+						{/if}
+					</Tabs.Trigger>
+				{/each}
+			</Tabs.List>
 		</Tabs.Root>
 	</div>
 

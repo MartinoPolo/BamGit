@@ -185,19 +185,18 @@
 
 	<!-- Filter bar: period tabs + group-by -->
 	<div class="flex items-center gap-3">
-		<Tabs.Root class="gap-1 rounded-lg bg-muted p-1">
-			{#each PERIODS as period (period.value)}
-				<Tabs.Tab
-					active={ctx.activePeriod.current === period.value}
-					onclick={() => handlePeriodChange(period.value)}
-				>
-					{period.label}
-				</Tabs.Tab>
-			{/each}
-			<DateRangePicker
-				onselect={handleCustomRange}
-				active={ctx.activePeriod.current === 'custom'}
-			/>
+		<Tabs.Root
+			value={ctx.activePeriod.current}
+			onValueChange={(v) => handlePeriodChange(v as MetricsPeriod)}
+		>
+			<Tabs.List class="gap-1 rounded-lg bg-muted p-1">
+				{#each PERIODS as period (period.value)}
+					<Tabs.Trigger value={period.value}>
+						{period.label}
+					</Tabs.Trigger>
+				{/each}
+				<DateRangePicker onselect={handleCustomRange} />
+			</Tabs.List>
 		</Tabs.Root>
 		<ScopeToggle value={ctx.scope.current} onchange={handleScopeChange} />
 		<GroupByDropdown value={ctx.groupBy.current} onchange={handleGroupByChange} />
