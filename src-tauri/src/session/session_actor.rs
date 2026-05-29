@@ -10,6 +10,7 @@ use super::provider::{ActorCommand, ProviderAdapter, SessionEvent, SessionHandle
 use crate::metrics::achievement_tracker;
 use crate::models::achievement::AchievementKind;
 use crate::models::session::SessionState;
+use crate::models::notification::NotificationEventType;
 use crate::notification::service::{session_state_to_event_type, NotificationService};
 use crate::SharedPricingEngine;
 
@@ -190,6 +191,13 @@ fn handle_event(
             ..
         } => {
             update_cli_session_id(session_id, cli_session_id, database_connection);
+            fire_notification_direct(
+                session_id,
+                NotificationEventType::SessionStart,
+                "NOTIFICATION_SESSION_STARTED",
+                app_handle,
+                database_connection,
+            );
         }
         SessionEvent::PermissionPrompt { .. } | SessionEvent::ElicitationPrompt { .. } => {
             if let Some(ref db_state) = resolved_state {
@@ -203,6 +211,15 @@ fn handle_event(
                 );
             }
         }
+        SessionEvent::CompactBoundary { .. } => {
+            fire_notification_direct(
+                session_id,
+                NotificationEventType::ResourceLimit,
+                "NOTIFICATION_CONTEXT_LIMIT_APPROACHING",
+                app_handle,
+                database_connection,
+            );
+        }
         _ => {}
     }
 }
@@ -215,17 +232,27 @@ fn fire_notification(
     database_connection: &std::sync::Arc<StdMutex<Connection>>,
 ) {
     if let Some(event_type) = session_state_to_event_type(state) {
-        if let Some(service) = app_handle.try_state::<NotificationService>() {
-            let issue_id = resolve_session_issue_id(session_id, database_connection);
-            service.notify(
-                event_type,
-                session_id,
-                issue_id.as_deref(),
-                message,
-                app_handle,
-                database_connection,
-            );
-        }
+        fire_notification_direct(session_id, event_type, message, app_handle, database_connection);
+    }
+}
+
+fn fire_notification_direct(
+    session_id: &str,
+    event_type: NotificationEventType,
+    message: &str,
+    app_handle: &AppHandle,
+    database_connection: &std::sync::Arc<StdMutex<Connection>>,
+) {
+    if let Some(service) = app_handle.try_state::<NotificationService>() {
+        let issue_id = resolve_session_issue_id(session_id, database_connection);
+        service.notify(
+            event_type,
+            session_id,
+            issue_id.as_deref(),
+            message,
+            app_handle,
+            database_connection,
+        );
     }
 }
 
@@ -494,6 +521,7 @@ async fn handle_session_completion(
     }
 }
 
+// TODO(PRD #93): Fire NotificationEventType::AchievementUnlocked notification here
 fn emit_achievement_unlocked(kind: &AchievementKind, app_handle: &AppHandle) {
     let _ = app_handle.emit("achievement-unlocked", kind.as_str());
 }

@@ -260,7 +260,8 @@ fn debounce_window_for(event_type: NotificationEventType) -> u64 {
         NotificationEventType::BranchBehindBase
         | NotificationEventType::MergeConflict
         | NotificationEventType::GithubIssueAssigned
-        | NotificationEventType::GithubTriggerReceived => POLLING_DEBOUNCE_WINDOW_MS,
+        | NotificationEventType::GithubTriggerReceived
+        | NotificationEventType::ResourceLimit => POLLING_DEBOUNCE_WINDOW_MS,
         _ => DEFAULT_DEBOUNCE_WINDOW_MS,
     }
 }
@@ -309,6 +310,10 @@ mod tests {
         );
         assert_eq!(
             debounce_window_for(NotificationEventType::MergeConflict),
+            POLLING_DEBOUNCE_WINDOW_MS
+        );
+        assert_eq!(
+            debounce_window_for(NotificationEventType::ResourceLimit),
             POLLING_DEBOUNCE_WINDOW_MS
         );
     }

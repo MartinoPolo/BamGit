@@ -9,6 +9,7 @@ import type {
 const NOTIFICATION_STATES: Record<string, NotificationEventType> = {
 	'needs-input': 'session.needs-input',
 	'needs-review': 'session.needs-input',
+	finished: 'task.complete',
 	errored: 'session.error',
 };
 
