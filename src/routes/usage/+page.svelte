@@ -1,11 +1,17 @@
 ﻿<script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
+	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as Tabs from '$lib/components/shadcn/tabs/index.js';
 	import * as Card from '$lib/components/shadcn/card/index.js';
+	import * as Alert from '$lib/components/shadcn/alert/index.js';
+	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
+	import { listen } from '$lib/tauri.js';
 	import { setUsageContext } from '$lib/modules/usage/usage.context.svelte.js';
 	import { initUsageUrlStateSync } from '$lib/modules/usage/url_state_sync.svelte.js';
 	import { useWindow } from '$lib/modules/window/window.context.svelte.js';
@@ -146,8 +152,32 @@
 	}
 
 	onMount(() => {
+		let cancelled = false;
+		let teardown: (() => void) | undefined;
+
+		void Promise.all([
+			listen('metrics-updated', () => {
+				ctx.notifyNewData();
+			}),
+			listen('achievement-unlocked', () => {
+				void ctx.loadAchievements();
+			}),
+		]).then(([unMetrics, unAchievement]) => {
+			if (cancelled) {
+				unMetrics();
+				unAchievement();
+				return;
+			}
+			teardown = () => {
+				unMetrics();
+				unAchievement();
+			};
+		});
+
 		return () => {
+			cancelled = true;
 			ctx.clearTimers();
+			teardown?.();
 		};
 	});
 </script>
@@ -255,11 +285,28 @@
 	{:else if ctx.dashboardData.current}
 		{@const data = ctx.dashboardData.current}
 
+		{#if !data.pricing_available}
+			<Alert.Root tone="warning">
+				<TriangleAlertIcon />
+				<Alert.Title>Pricing data incomplete</Alert.Title>
+				<Alert.Description
+					>Some sessions have no pricing data — costs may be underreported.</Alert.Description
+				>
+			</Alert.Root>
+		{/if}
+
 		<!-- KPI Cards -->
 		<div class="grid grid-cols-4 gap-4">
 			<Card.Card>
 				<div class="p-4">
-					<div class="text-sm text-muted-foreground">Total cost</div>
+					<div class="flex items-center gap-1 text-sm text-muted-foreground">
+						Total cost
+						{#if !data.pricing_available}
+							<SimpleTooltip text="Some sessions have no pricing data">
+								<TriangleAlertIcon class="size-3.5 text-status-warning" />
+							</SimpleTooltip>
+						{/if}
+					</div>
 					<div class="text-2xl font-bold">
 						{formatCostDisplay(data.stats.total_cost_usd)}
 					</div>
@@ -384,7 +431,10 @@
 					<div class="px-4 pb-4">
 						<div class="flex flex-col gap-2">
 							{#each data.top_sessions as session (session.session_id)}
-								<div class="flex items-center justify-between text-sm">
+								<button
+									class="flex w-full items-center justify-between rounded-md px-1 -mx-1 text-sm cursor-pointer transition-colors duration-3 hover:bg-accent/15"
+									onclick={() => goto(resolve('/sessions'))}
+								>
 									<div class="flex items-center gap-2 truncate">
 										{#if session.issue_number}
 											<span class="text-muted-foreground"
@@ -395,10 +445,17 @@
 											>{session.issue_name ?? 'Ad-hoc session'}</span
 										>
 									</div>
-									<span class="shrink-0 tabular-nums font-medium"
-										>{formatCostDisplay(session.cost_usd)}</span
-									>
-								</div>
+									<div class="flex items-center gap-1.5">
+										{#if session.cost_usd === 0 && !session.pricing_available}
+											<TriangleAlertIcon
+												class="size-3.5 text-muted-foreground/50"
+											/>
+										{/if}
+										<span class="shrink-0 tabular-nums font-medium"
+											>{formatCostDisplay(session.cost_usd)}</span
+										>
+									</div>
+								</button>
 							{/each}
 						</div>
 					</div>

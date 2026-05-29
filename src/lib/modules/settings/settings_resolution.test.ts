@@ -50,6 +50,10 @@ describe('WORKSPACE_OVERRIDABLE_KEYS', () => {
 			expect(key in SETTING_KEYS).toBe(true);
 		}
 	});
+
+	it('includes chartColorTheme for per-workspace color theme override', () => {
+		expect(WORKSPACE_OVERRIDABLE_KEYS).toContain('chartColorTheme');
+	});
 });
 
 describe('SETTING_KEYS', () => {

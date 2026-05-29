@@ -3,4 +3,4 @@
 /**
  * A top session entry.
  */
-export type TopSession = { session_id: string, issue_name: string | null, issue_number: number | null, cost_usd: number, turn_count: number, tool_call_count: number, started_at: string, };
+export type TopSession = { session_id: string, issue_name: string | null, issue_number: number | null, cost_usd: number, turn_count: number, tool_call_count: number, started_at: string, pricing_available: boolean, };

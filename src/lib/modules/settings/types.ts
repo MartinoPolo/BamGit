@@ -85,6 +85,7 @@ export const WORKSPACE_OVERRIDABLE_KEYS: readonly SettingKey[] = [
 	'issueCardColorSaturation',
 	'issueCardHeaderSaturation',
 	'issueCardRadialIntensity',
+	'chartColorTheme',
 	'notificationVolume',
 	'showMountains',
 	'showStars',
