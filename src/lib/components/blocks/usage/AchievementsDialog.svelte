@@ -1,10 +1,12 @@
 <script lang="ts">
 	import TrophyIcon from '@lucide/svelte/icons/trophy';
+	import LockIcon from '@lucide/svelte/icons/lock';
 	import XIcon from '@lucide/svelte/icons/x';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as Dialog from '$lib/components/shadcn/dialog/index.js';
 	import { cn } from '$lib/utils.js';
 	import type { Achievement } from '$lib/types/generated/index.js';
+	import { isLockedAchievement, getLockedAchievementTooltip } from './locked_achievements.js';
 
 	interface Props {
 		achievements: Achievement[];
@@ -51,28 +53,35 @@
 		<Dialog.Body>
 			<div class="grid grid-cols-2 gap-3">
 				{#each achievements as achievement (achievement.kind)}
+					{@const locked = isLockedAchievement(achievement.kind)}
+					{@const unlocked = achievement.unlocked_at !== null}
 					<div
 						class={cn(
 							'flex items-center gap-3 rounded-lg border p-3 transition-colors',
-							achievement.unlocked_at !== null
+							unlocked
 								? 'border-primary/30 bg-primary/5'
-								: 'opacity-50',
+								: locked
+									? 'opacity-30'
+									: 'opacity-50',
 						)}
+						title={locked ? getLockedAchievementTooltip(achievement.kind) : undefined}
 					>
 						<div
 							class={cn(
 								'flex size-10 shrink-0 items-center justify-center rounded-lg text-lg',
-								achievement.unlocked_at !== null ? 'bg-primary/10' : 'bg-muted',
+								unlocked ? 'bg-primary/10' : 'bg-muted',
 							)}
 						>
-							<TrophyIcon
-								class={cn(
-									'size-5',
-									achievement.unlocked_at !== null
-										? 'text-primary'
-										: 'text-muted-foreground',
-								)}
-							/>
+							{#if locked}
+								<LockIcon class="size-5 text-muted-foreground" />
+							{:else}
+								<TrophyIcon
+									class={cn(
+										'size-5',
+										unlocked ? 'text-primary' : 'text-muted-foreground',
+									)}
+								/>
+							{/if}
 						</div>
 						<div class="min-w-0">
 							<div class="truncate text-sm font-medium">
@@ -81,15 +90,19 @@
 							<div class="text-xs text-muted-foreground">
 								{achievement.description}
 							</div>
-							<div class="mt-1 h-1 overflow-hidden rounded-full bg-muted">
-								<div
-									class="h-full rounded-full bg-primary"
-									style:width="{Math.min(
-										(achievement.progress / achievement.threshold) * 100,
-										100,
-									)}%"
-								></div>
-							</div>
+							{#if locked}
+								<div class="mt-1 text-xs text-muted-foreground">Locked</div>
+							{:else}
+								<div class="mt-1 h-1 overflow-hidden rounded-full bg-muted">
+									<div
+										class="h-full rounded-full bg-primary"
+										style:width="{Math.min(
+											(achievement.progress / achievement.threshold) * 100,
+											100,
+										)}%"
+									></div>
+								</div>
+							{/if}
 						</div>
 					</div>
 				{/each}
