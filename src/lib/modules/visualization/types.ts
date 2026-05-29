@@ -168,10 +168,8 @@ export interface ForestLayoutResult {
 export const TREE_CONTEXT_MENU_ACTIONS = {
 	openGithub: 'open-github',
 	openWorktree: 'open-worktree',
-	startSession: 'start-session',
 	archive: 'archive',
 	changeColor: 'change-color',
-	pruneWorktree: 'prune-worktree',
 } as const;
 
 export type TreeContextMenuAction =

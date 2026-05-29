@@ -35,10 +35,8 @@
 	import SproutIcon from '@lucide/svelte/icons/sprout';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
 	import GitBranchIcon from '@lucide/svelte/icons/git-branch';
-	import PlayIcon from '@lucide/svelte/icons/play';
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
-	import ScissorsIcon from '@lucide/svelte/icons/scissors';
 	import MountainIcon from '@lucide/svelte/icons/mountain';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as ContextMenu from '$lib/components/shadcn/context-menu/index.js';
@@ -49,6 +47,8 @@
 	import { useSelection } from '$lib/modules/board';
 	import { BATCH_SELECTED_GLOW_COLOR } from '$lib/components/blocks/issue-card/batch_selection_utils.js';
 	import { SPECIAL_LABELS } from '$lib/modules/visualization';
+	import { openUrl } from '$lib/opener.js';
+	import { invoke } from '$lib/tauri.js';
 
 	interface Props {
 		issues: readonly Issue[];
@@ -170,11 +170,6 @@
 			icon: GitBranchIcon,
 		},
 		{
-			action: TREE_CONTEXT_MENU_ACTIONS.startSession,
-			label: () => m.forest_menu_start_session(),
-			icon: PlayIcon,
-		},
-		{
 			action: TREE_CONTEXT_MENU_ACTIONS.archive,
 			label: () => m.forest_menu_archive(),
 			icon: ArchiveIcon,
@@ -183,11 +178,6 @@
 			action: TREE_CONTEXT_MENU_ACTIONS.changeColor,
 			label: () => m.forest_menu_change_color(),
 			icon: PaletteIcon,
-		},
-		{
-			action: TREE_CONTEXT_MENU_ACTIONS.pruneWorktree,
-			label: () => m.forest_menu_prune_worktree(),
-			icon: ScissorsIcon,
 		},
 	];
 
@@ -655,9 +645,14 @@
 				onChangeIssueColor?.(issue.id);
 				break;
 			case TREE_CONTEXT_MENU_ACTIONS.openGithub:
+				if (issue.github_issue_url) {
+					void openUrl(issue.github_issue_url);
+				}
+				break;
 			case TREE_CONTEXT_MENU_ACTIONS.openWorktree:
-			case TREE_CONTEXT_MENU_ACTIONS.startSession:
-			case TREE_CONTEXT_MENU_ACTIONS.pruneWorktree:
+				if (issue.worktree_folder) {
+					void invoke('open_folder_in_explorer', { folderPath: issue.worktree_folder });
+				}
 				break;
 		}
 	}
@@ -836,7 +831,10 @@
 								<ContextMenu.Content>
 									{#each contextMenuItems as item (item.action)}
 										<ContextMenu.Item
-											disabled={!isContextMenuActionEnabled(item.action)}
+											disabled={!isContextMenuActionEnabled(
+												item.action,
+												entry.issue,
+											)}
 											onclick={() => handleContextMenuAction(item.action)}
 										>
 											<item.icon class="size-4" />
