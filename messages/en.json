@@ -216,10 +216,8 @@
 
 	"forest_menu_open_github": "Open GitHub",
 	"forest_menu_open_worktree": "Open Worktree",
-	"forest_menu_start_session": "Start Session",
 	"forest_menu_archive": "Archive",
 	"forest_menu_change_color": "Change Color",
-	"forest_menu_prune_worktree": "Prune Worktree",
 	"forest_menu_background_theme": "Background Theme",
 	"forest_menu_show_mountains": "Show Mountains",
 	"forest_menu_show_stars": "Show Stars",
