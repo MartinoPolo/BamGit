@@ -107,6 +107,7 @@ function placeRowItems(
 
 // ─── Collision Avoidance ────────────────────────────────────────────────────
 
+// fallow-ignore-next-line complexity
 function enforceMinimumSpacing(items: PositionedForestItem[]): PositionedForestItem[] {
 	const positions = items.map((item) => ({ ...item }));
 

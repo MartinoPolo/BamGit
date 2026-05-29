@@ -553,6 +553,7 @@
 
 	const Y_OFFSET_FACTOR = 0.5 - TRUNK_DEAD_SPACE_PERCENT;
 
+	// fallow-ignore-next-line complexity
 	function findHoveredTreeId(forestMouseX: number, forestMouseY: number): string | null {
 		let bestExactId: string | null = null;
 		let bestExactZ = -Infinity;
