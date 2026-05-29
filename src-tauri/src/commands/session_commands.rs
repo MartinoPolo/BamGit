@@ -14,6 +14,8 @@ use crate::session::discovery_polling::DiscoveryPoller;
 use crate::session::manager::SessionManager;
 use serde_json::Value;
 
+use crate::models::notification::NotificationEventType;
+use crate::notification::service::NotificationService;
 use crate::session::provider::{ActorCommand, ApprovalDecision, ProviderKind, SpawnConfig};
 
 const SESSION_SELECT_COLUMNS: &str =
@@ -270,6 +272,17 @@ pub async fn adopt_session(
             ],
         )
         .map_err(|e| format!("Failed to create adopted session row: {e}"))?;
+    }
+
+    if let Some(service) = app_handle.try_state::<NotificationService>() {
+        service.notify(
+            NotificationEventType::TaskAcknowledge,
+            &session_id,
+            request.issue_id.as_deref(),
+            "NOTIFICATION_SESSION_ADOPTED",
+            &app_handle,
+            &database_connection,
+        );
     }
 
     manager

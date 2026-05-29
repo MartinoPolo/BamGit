@@ -84,7 +84,7 @@ describe('computeSessionEventEffects — resolvedState', () => {
 		expect(notificationAction).toEqual({ type: 'add', notificationType: 'session.error' });
 	});
 
-	it('returns clear notification action for running state (not in notification map)', () => {
+	it('returns clear notification action for running state (backend fires session.start directly)', () => {
 		const { notificationAction } = computeEffects(
 			makeEvent({ type: 'run_state', state: 'running', error: null }),
 			'running',
@@ -93,13 +93,13 @@ describe('computeSessionEventEffects — resolvedState', () => {
 		expect(notificationAction).toEqual({ type: 'clear' });
 	});
 
-	it('returns clear notification action for finished state (not in notification map)', () => {
+	it('returns task.complete notification action for finished state', () => {
 		const { notificationAction } = computeEffects(
 			makeEvent({ type: 'run_state', state: 'finished', error: null }),
 			'finished',
 			null,
 		);
-		expect(notificationAction).toEqual({ type: 'clear' });
+		expect(notificationAction).toEqual({ type: 'add', notificationType: 'task.complete' });
 	});
 
 	it('returns null notification action when resolvedState is null', () => {

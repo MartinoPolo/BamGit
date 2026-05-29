@@ -268,11 +268,12 @@ fn notification_toast_title(event_type: NotificationEventType) -> &'static str {
 
 /// Map a SessionState to a notification event type.
 /// Returns None for states that should not trigger notifications (e.g. Running, Paused).
+/// Note: session.start is fired directly from SessionInit, not via this mapping.
 pub fn session_state_to_event_type(state: &SessionState) -> Option<NotificationEventType> {
     match state {
         SessionState::NeedsInput => Some(NotificationEventType::SessionNeedsInput),
         SessionState::NeedsReview => Some(NotificationEventType::SessionNeedsInput),
-        SessionState::Finished => Some(NotificationEventType::SessionEnd),
+        SessionState::Finished => Some(NotificationEventType::TaskComplete),
         SessionState::Errored => Some(NotificationEventType::SessionError),
         SessionState::Running | SessionState::Paused => None,
     }
@@ -294,7 +295,7 @@ mod tests {
         );
         assert_eq!(
             session_state_to_event_type(&SessionState::Finished),
-            Some(NotificationEventType::SessionEnd)
+            Some(NotificationEventType::TaskComplete)
         );
         assert_eq!(
             session_state_to_event_type(&SessionState::Errored),
