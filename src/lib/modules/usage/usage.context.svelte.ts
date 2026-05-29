@@ -1,7 +1,9 @@
 import { createContext } from 'svelte';
+import { browser } from '$app/environment';
 import { invoke } from '$lib/tauri.js';
 import { StateRaw } from '$lib/reactivity/state.svelte.js';
 import { Persisted, stringSerde } from '$lib/reactivity/persisted.svelte.js';
+import { useSettings } from '$lib/modules/settings/settings.context.svelte.js';
 import type { UsageDashboardData, Achievement } from '$lib/types/generated/index.js';
 import {
 	CHART_COLOR_THEMES,
@@ -32,6 +34,13 @@ export function setUsageContext() {
 }
 
 function createUsageContext() {
+	const settings = useSettings();
+
+	// Clean up old localStorage key (migrated to settings engine)
+	if (browser) {
+		localStorage.removeItem('gk-usage-color-theme');
+	}
+
 	const activePeriod = new StateRaw<MetricsPeriod>('thirty-days');
 	const scope = new StateRaw<UsageScope>(USAGE_SCOPES.workspace);
 	const customDateRange = new StateRaw<{ start: string; end: string } | null>(null);
@@ -40,11 +49,17 @@ function createUsageContext() {
 		serde: stringSerde(isGroupByOption),
 		defaultValue: GROUP_BY_OPTIONS.none as GroupByOption,
 	});
-	const colorTheme = new Persisted({
-		key: 'gk-usage-color-theme',
-		serde: stringSerde(isChartColorTheme),
-		defaultValue: CHART_COLOR_THEMES.monochrome as ChartColorTheme,
-	});
+	const colorTheme = {
+		get current(): ChartColorTheme {
+			const value = settings.get('chartColorTheme');
+			return isChartColorTheme(value)
+				? value
+				: (CHART_COLOR_THEMES.monochrome as ChartColorTheme);
+		},
+		set current(value: ChartColorTheme) {
+			void settings.set('chartColorTheme', value);
+		},
+	};
 
 	const dashboardData = new StateRaw<UsageDashboardData | null>(null);
 	const achievements = new StateRaw<Achievement[]>([]);
@@ -85,6 +100,15 @@ function createUsageContext() {
 		}, STALE_THRESHOLD_MS);
 	}
 
+	async function loadAchievements() {
+		try {
+			const achievementList = await invoke<Achievement[]>('get_achievements');
+			achievements.current = achievementList;
+		} catch (error) {
+			console.error('Failed to load achievements:', error);
+		}
+	}
+
 	async function loadData(dashboardId?: string) {
 		if (activePeriod.current === 'custom' && customDateRange.current == null) {
 			return;
@@ -99,16 +123,13 @@ function createUsageContext() {
 			const groupByArg =
 				groupBy.current === GROUP_BY_OPTIONS.none ? undefined : groupBy.current;
 
-			const [dashboard, achievementList] = await Promise.all([
-				invoke<UsageDashboardData>('get_usage_dashboard', {
-					period: periodArg,
-					dashboardId,
-					groupBy: groupByArg,
-				}),
-				invoke<Achievement[]>('get_achievements'),
-			]);
+			void loadAchievements();
+			const dashboard = await invoke<UsageDashboardData>('get_usage_dashboard', {
+				period: periodArg,
+				dashboardId,
+				groupBy: groupByArg,
+			});
 			dashboardData.current = dashboard;
-			achievements.current = achievementList;
 			lastUpdatedAt.current = Date.now();
 			refreshState.current = REFRESH_STATES.fresh;
 			startFreshnessTimers();
@@ -139,6 +160,7 @@ function createUsageContext() {
 			return unlockedCount;
 		},
 		loadData,
+		loadAchievements,
 		notifyNewData,
 		clearTimers,
 	};

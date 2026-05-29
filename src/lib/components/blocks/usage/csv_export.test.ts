@@ -30,6 +30,7 @@ function createTestData(overrides: Partial<UsageDashboardData> = {}): UsageDashb
 				turn_count: 25,
 				tool_call_count: 40,
 				started_at: '2026-05-01T10:00:00Z',
+				pricing_available: true,
 			},
 		],
 		tool_usage: [
@@ -140,6 +141,7 @@ describe('generateUsageCsv — Top Sessions section', () => {
 					turn_count: 10,
 					tool_call_count: 20,
 					started_at: '2026-05-02T14:00:00Z',
+					pricing_available: true,
 				},
 			],
 		});

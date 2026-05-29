@@ -473,7 +473,7 @@ async fn handle_session_completion(
             if result.pricing_available {
                 if let Ok(conn) = database_connection.lock() {
                     let _ = conn.execute(
-                        "UPDATE session_metrics SET cost_usd = ?1 WHERE session_id = ?2",
+                        "UPDATE session_metrics SET cost_usd = ?1, pricing_available = 1 WHERE session_id = ?2",
                         rusqlite::params![result.cost_usd, session_id],
                     );
                     let _ = conn.execute(

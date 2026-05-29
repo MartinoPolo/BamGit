@@ -171,6 +171,7 @@ pub struct TopSession {
     #[ts(type = "number")]
     pub tool_call_count: i64,
     pub started_at: String,
+    pub pricing_available: bool,
 }
 
 /// Tool usage breakdown row.

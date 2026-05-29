@@ -312,7 +312,7 @@ pub fn query_top_sessions(
     };
 
     let sql = format!(
-        "SELECT sm.session_id, i.name, i.github_issue_number, sm.cost_usd, sm.turn_count, sm.tool_call_count, sm.started_at
+        "SELECT sm.session_id, i.name, i.github_issue_number, sm.cost_usd, sm.turn_count, sm.tool_call_count, sm.started_at, sm.pricing_available
          FROM session_metrics sm
          LEFT JOIN sessions s ON sm.session_id = s.id
          LEFT JOIN issues i ON s.issue_id = i.id
@@ -331,6 +331,7 @@ pub fn query_top_sessions(
             turn_count: row.get::<_, i64>(4)?,
             tool_call_count: row.get::<_, i64>(5)?,
             started_at: row.get::<_, String>(6)?,
+            pricing_available: row.get::<_, bool>(7)?,
         })
     };
 
@@ -375,6 +376,39 @@ pub fn query_tool_usage(
     }
 }
 
+fn query_all_pricing_available(
+    conn: &Connection,
+    period: &MetricsPeriod,
+    dashboard_id: Option<&str>,
+) -> Result<bool, rusqlite::Error> {
+    let date_filter = period.to_sql_date_filter();
+    let date_and = match date_filter.as_deref() {
+        Some(raw) => format!(" AND {}", raw.replace("started_at", "sm.started_at")),
+        None => String::new(),
+    };
+
+    let ws_filter = match dashboard_id {
+        Some(_) => " AND i.dashboard_id = :dashboard_id",
+        None => "",
+    };
+
+    let sql = format!(
+        "SELECT COUNT(*) FROM session_metrics sm
+         LEFT JOIN sessions s ON sm.session_id = s.id
+         LEFT JOIN issues i ON s.issue_id = i.id
+         WHERE sm.pricing_available = 0{date_and}{ws_filter}"
+    );
+
+    let mut stmt = conn.prepare(&sql)?;
+    let count: i64 = if let Some(did) = dashboard_id {
+        stmt.query_row(&[(":dashboard_id", did)], |row| row.get(0))?
+    } else {
+        stmt.query_row([], |row| row.get(0))?
+    };
+
+    Ok(count == 0)
+}
+
 pub fn query_usage_dashboard(
     conn: &Connection,
     period: &MetricsPeriod,
@@ -391,6 +425,8 @@ pub fn query_usage_dashboard(
     let top_sessions = query_top_sessions(conn, period, dashboard_id, 5)?;
     let tool_usage = query_tool_usage(conn, period, dashboard_id, 10)?;
 
+    let pricing_available = query_all_pricing_available(conn, period, dashboard_id)?;
+
     Ok(UsageDashboardData {
         stats,
         time_bucket_costs,
@@ -398,7 +434,7 @@ pub fn query_usage_dashboard(
         activity_breakdown,
         top_sessions,
         tool_usage,
-        pricing_available: true,
+        pricing_available,
     })
 }
 

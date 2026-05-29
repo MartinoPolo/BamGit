@@ -179,7 +179,8 @@ pub fn create_tables(connection: &Connection) -> Result<(), rusqlite::Error> {
             retry_count INTEGER NOT NULL DEFAULT 0,
             started_at TEXT NOT NULL,
             ended_at TEXT,
-            imported INTEGER NOT NULL DEFAULT 0
+            imported INTEGER NOT NULL DEFAULT 0,
+            pricing_available INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS turn_metrics (

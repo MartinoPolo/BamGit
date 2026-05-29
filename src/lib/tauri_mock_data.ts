@@ -1645,6 +1645,7 @@ export const MOCK_USAGE_DASHBOARD = {
 			turn_count: 28,
 			tool_call_count: 67,
 			started_at: '2026-04-24T14:30:00Z',
+			pricing_available: true,
 		},
 		{
 			session_id: 's2',
@@ -1654,6 +1655,7 @@ export const MOCK_USAGE_DASHBOARD = {
 			turn_count: 15,
 			tool_call_count: 34,
 			started_at: '2026-04-22T10:00:00Z',
+			pricing_available: true,
 		},
 		{
 			session_id: 's3',
@@ -1663,6 +1665,7 @@ export const MOCK_USAGE_DASHBOARD = {
 			turn_count: 12,
 			tool_call_count: 29,
 			started_at: '2026-04-20T09:00:00Z',
+			pricing_available: true,
 		},
 		{
 			session_id: 's4',
@@ -1672,6 +1675,7 @@ export const MOCK_USAGE_DASHBOARD = {
 			turn_count: 9,
 			tool_call_count: 22,
 			started_at: '2026-04-18T16:00:00Z',
+			pricing_available: true,
 		},
 		{
 			session_id: 's5',
@@ -1681,6 +1685,7 @@ export const MOCK_USAGE_DASHBOARD = {
 			turn_count: 7,
 			tool_call_count: 15,
 			started_at: '2026-04-15T11:00:00Z',
+			pricing_available: true,
 		},
 	],
 	tool_usage: [
