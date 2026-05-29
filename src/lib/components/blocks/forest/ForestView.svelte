@@ -854,8 +854,7 @@
 				class="pointer-events-none absolute inset-x-0 bottom-0"
 				style:top="{groundTopY}px"
 				style:z-index="2"
-				style:background="linear-gradient(to bottom, var(--ground-color),
-				var(--ground-dark))"
+				style:background="linear-gradient(to bottom, var(--ground-color), var(--ground-dark))"
 			></div>
 
 			<!-- Mountains — proportionally scaled, cropped from top as container shrinks -->
