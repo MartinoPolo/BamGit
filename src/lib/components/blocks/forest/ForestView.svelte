@@ -21,8 +21,14 @@
 		DEFAULT_TREE_CONFIG,
 		OVERLAY_DEFAULTS,
 		TRUNK_DEAD_SPACE_PERCENT,
+		generateTree,
+		generatePottedPlant,
+		computeTreeHull,
+		padConvexHull,
+		VIEWBOX_WIDTH,
+		VIEWBOX_HEIGHT,
 	} from 'low-poly-2d-trees';
-	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
+	import type { TreeConfig, OverlayConfig, Point2D } from 'low-poly-2d-trees';
 	import { useSettings } from '$lib/modules/settings';
 	import { BACKGROUND_THEMES } from '$lib/modules/board/types.js';
 	import * as m from '$lib/paraglide/messages.js';
@@ -72,6 +78,8 @@
 	const OAK_NATURAL_HEIGHT = 448;
 	const POTTED_NATURAL_WIDTH = 192;
 	const POTTED_NATURAL_HEIGHT = 288;
+
+	const HIT_AREA_HULL_PADDING = 20;
 
 	const STAR_COUNT = 25;
 	const STARS = Array.from({ length: STAR_COUNT }, (_, i) => ({
@@ -187,6 +195,9 @@
 		readonly issue: Issue;
 		readonly visualization: TreeVisualization;
 		readonly layoutItem: ForestLayoutItem;
+		readonly exactHull: readonly Point2D[];
+		readonly paddedHull: readonly Point2D[];
+		readonly crownTopFraction: number;
 	}
 
 	interface VisualizationCacheEntry {
@@ -250,6 +261,85 @@
 		};
 	}
 
+	function createFallbackHull(crownTop: Point2D, trunkBase: Point2D): Point2D[] {
+		const cx = (crownTop.x + trunkBase.x) / 2;
+		const top = crownTop.y - 20;
+		const bottom = trunkBase.y + 10;
+		const halfWidth = Math.max(30, Math.abs(crownTop.x - trunkBase.x) + 20);
+		return [
+			{ x: cx - halfWidth, y: top },
+			{ x: cx + halfWidth, y: top },
+			{ x: cx + halfWidth, y: bottom },
+			{ x: cx - halfWidth, y: bottom },
+		];
+	}
+
+	function buildHulls(
+		geometry: {
+			anchors: { crownTop: Point2D; trunkBase: Point2D };
+		} & Parameters<typeof computeTreeHull>[0],
+	): {
+		exactHull: readonly Point2D[];
+		paddedHull: readonly Point2D[];
+	} {
+		const exact = computeTreeHull(geometry, 0);
+		const hullTooSmall =
+			exact.length < 3 ||
+			Math.max(
+				Math.max(...exact.map((p) => p.x)) - Math.min(...exact.map((p) => p.x)),
+				Math.max(...exact.map((p) => p.y)) - Math.min(...exact.map((p) => p.y)),
+			) < 30;
+		if (hullTooSmall) {
+			const fallback = createFallbackHull(
+				geometry.anchors.crownTop,
+				geometry.anchors.trunkBase,
+			);
+			return {
+				exactHull: fallback,
+				paddedHull: padConvexHull(fallback, HIT_AREA_HULL_PADDING),
+			};
+		}
+		return {
+			exactHull: exact,
+			paddedHull: computeTreeHull(geometry, HIT_AREA_HULL_PADDING),
+		};
+	}
+
+	function computeHitAreaData(visualization: TreeVisualization): {
+		exactHull: readonly Point2D[];
+		paddedHull: readonly Point2D[];
+		crownTopFraction: number;
+	} {
+		if (visualization.kind === 'tree') {
+			const geometry = generateTree(visualization.config);
+			return {
+				...buildHulls(geometry),
+				crownTopFraction: geometry.anchors.crownTop.y / VIEWBOX_HEIGHT,
+			};
+		}
+		if (visualization.kind === 'oak') {
+			const oakConfig: TreeConfig = {
+				...DEFAULT_TREE_CONFIG,
+				shape: 'oak',
+				stage: 'leafy',
+				seed: visualization.seed,
+			};
+			const geometry = generateTree(oakConfig);
+			return {
+				...buildHulls(geometry),
+				crownTopFraction: geometry.anchors.crownTop.y / VIEWBOX_HEIGHT,
+			};
+		}
+		const geometry = generatePottedPlant({
+			stage: visualization.stage,
+			seed: visualization.seed,
+		});
+		return {
+			...buildHulls(geometry),
+			crownTopFraction: geometry.anchors.crownTop.y / VIEWBOX_HEIGHT,
+		};
+	}
+
 	// fallow-ignore-next-line complexity
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const visualizations = new SvelteMap<string, TreeVisualization>();
@@ -290,10 +380,14 @@
 		const results: IssueEntry[] = [];
 		for (const issue of issues) {
 			const visualization = visualizations.get(issue.id)!;
+			const hitAreaData = computeHitAreaData(visualization);
 			results.push({
 				issue,
 				visualization,
 				layoutItem: buildLayoutItem(issue, visualization, depthRows.get(issue.id) ?? 0),
+				exactHull: hitAreaData.exactHull,
+				paddedHull: hitAreaData.paddedHull,
+				crownTopFraction: hitAreaData.crownTopFraction,
 			});
 		}
 		return results;
@@ -424,6 +518,111 @@
 		return { groundElements: true };
 	}
 
+	function hullToSvgPoints(hull: readonly Point2D[]): string {
+		return hull.map((point) => `${point.x},${point.y}`).join(' ');
+	}
+
+	const tooltipAnchors = new SvelteMap<string, HTMLElement>();
+
+	function registerTooltipAnchor(element: HTMLElement, issueId: string) {
+		tooltipAnchors.set(issueId, element);
+		return {
+			destroy() {
+				tooltipAnchors.delete(issueId);
+			},
+		};
+	}
+
+	function isPointInHull(px: number, py: number, hull: readonly Point2D[]): boolean {
+		let inside = false;
+		for (let i = 0, j = hull.length - 1; i < hull.length; j = i++) {
+			const yi = hull[i].y;
+			const yj = hull[j].y;
+			const aboveI = yi > py;
+			const aboveJ = yj > py;
+			if (aboveI !== aboveJ) {
+				const xi = hull[i].x;
+				const xj = hull[j].x;
+				if (px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) {
+					inside = !inside;
+				}
+			}
+		}
+		return inside;
+	}
+
+	const Y_OFFSET_FACTOR = 0.5 - TRUNK_DEAD_SPACE_PERCENT;
+
+	function findHoveredTreeId(forestMouseX: number, forestMouseY: number): string | null {
+		let bestExactId: string | null = null;
+		let bestExactZ = -Infinity;
+		let bestPaddedId: string | null = null;
+		let bestPaddedZ = -Infinity;
+
+		for (const positioned of layoutResult.items) {
+			const entry = entryById.get(positioned.id);
+			if (!entry) {
+				continue;
+			}
+
+			const size = getNaturalSize(entry);
+			const s = positioned.scale;
+			const w = size.width;
+			const h = size.height;
+
+			const lx = (forestMouseX - positioned.x) / s + w / 2;
+			const ly = (forestMouseY - positioned.y + Y_OFFSET_FACTOR * h) / s + h / 2;
+
+			const svgScale = Math.min(w / VIEWBOX_WIDTH, h / VIEWBOX_HEIGHT);
+			const xOff = (w - VIEWBOX_WIDTH * svgScale) / 2;
+			const yOff = (h - VIEWBOX_HEIGHT * svgScale) / 2;
+			const vx = (lx - xOff) / svgScale;
+			const vy = (ly - yOff) / svgScale;
+
+			if (
+				vx < -HIT_AREA_HULL_PADDING ||
+				vx > VIEWBOX_WIDTH + HIT_AREA_HULL_PADDING ||
+				vy < -HIT_AREA_HULL_PADDING ||
+				vy > VIEWBOX_HEIGHT + HIT_AREA_HULL_PADDING
+			) {
+				continue;
+			}
+
+			if (entry.exactHull.length >= 3 && isPointInHull(vx, vy, entry.exactHull)) {
+				if (positioned.zIndex > bestExactZ) {
+					bestExactId = positioned.id;
+					bestExactZ = positioned.zIndex;
+				}
+			} else if (entry.paddedHull.length >= 3 && isPointInHull(vx, vy, entry.paddedHull)) {
+				if (positioned.zIndex > bestPaddedZ) {
+					bestPaddedId = positioned.id;
+					bestPaddedZ = positioned.zIndex;
+				}
+			}
+		}
+
+		return bestExactId ?? bestPaddedId;
+	}
+
+	function handleForestPointerMove(event: PointerEvent) {
+		const target = event.currentTarget as HTMLElement;
+		const rect = target.getBoundingClientRect();
+		const mx = event.clientX - rect.left;
+		const my = event.clientY - rect.top;
+		const targetId = findHoveredTreeId(mx, my);
+		if (targetId !== interaction.hoveredIssueId) {
+			if (targetId) {
+				interaction.hoverIssue(targetId);
+			} else {
+				interaction.unhover();
+			}
+		}
+	}
+
+	function handleForestPointerLeave() {
+		interaction.unhover();
+	}
+
 	function handleBackgroundClick() {
 		interaction.deactivate();
 	}
@@ -490,7 +689,10 @@
 			style:min-height="0"
 			style:isolation="isolate"
 			style:contain="content"
+			style:cursor={interaction.hoveredIssueId ? 'pointer' : 'default'}
 			onkeydown={handleKeydown}
+			onpointermove={handleForestPointerMove}
+			onpointerleave={handleForestPointerLeave}
 			tabindex="0"
 		>
 			<!-- Full-bleed clickable background for deselect + forest context menu -->
@@ -536,7 +738,8 @@
 							<ContextMenu.Root
 								onOpenChange={(open) => {
 									if (open) {
-										contextMenuIssueId = entry.issue.id;
+										contextMenuIssueId =
+											interaction.hoveredIssueId ?? entry.issue.id;
 									}
 								}}
 							>
@@ -544,12 +747,13 @@
 									<ForestTreeTooltip
 										issueTitle={entry.issue.name}
 										issueStatus={entry.issue.status}
+										customAnchor={tooltipAnchors.get(entry.issue.id) ?? null}
 									>
 										{#snippet children(triggerProps)}
 											<button
 												{...triggerProps}
 												type="button"
-												class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
+												class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto"
 												style:left="{positioned.x}px"
 												style:top="{positioned.y}px"
 												style:width="{size.width}px"
@@ -560,10 +764,14 @@
 												style:z-index={positioned.zIndex}
 												style:pointer-events="none"
 												style:will-change="transform"
-												onmouseenter={() =>
-													interaction.hoverIssue(entry.issue.id)}
-												onmouseleave={() => interaction.unhover()}
-												onclick={(event) => handleTreeClick(entry, event)}
+												onclick={(event) => {
+													const targetId =
+														interaction.hoveredIssueId ??
+														entry.issue.id;
+													const targetEntry =
+														entryById.get(targetId) ?? entry;
+													handleTreeClick(targetEntry, event);
+												}}
 												aria-label="Tree for issue {entry.issue.name}"
 											>
 												{#if entry.visualization.kind === 'oak'}
@@ -595,6 +803,31 @@
 														{overlayConfig}
 													/>
 												{/if}
+
+												<!-- Hit-area polygon: expands clickable area for context menu -->
+												{#if entry.paddedHull.length >= 3}
+													<svg
+														class="absolute inset-0 size-full"
+														viewBox="0 0 {VIEWBOX_WIDTH} {VIEWBOX_HEIGHT}"
+														style:pointer-events="none"
+													>
+														<polygon
+															points={hullToSvgPoints(
+																entry.paddedHull,
+															)}
+															fill="transparent"
+															style:pointer-events="fill"
+														/>
+													</svg>
+												{/if}
+
+												<!-- Tooltip anchor: positioned at the crown top of the tree -->
+												<div
+													use:registerTooltipAnchor={entry.issue.id}
+													class="pointer-events-none absolute left-1/2 h-px w-px"
+													style:top="{entry.crownTopFraction * 100}%"
+													aria-hidden="true"
+												></div>
 											</button>
 										{/snippet}
 									</ForestTreeTooltip>

@@ -107,12 +107,7 @@ function placeRowItems(
 
 // ─── Collision Avoidance ────────────────────────────────────────────────────
 
-// fallow-ignore-next-line complexity
-function enforceMinimumSpacing(
-	items: PositionedForestItem[],
-	centerX: number,
-	centerY: number,
-): PositionedForestItem[] {
+function enforceMinimumSpacing(items: PositionedForestItem[]): PositionedForestItem[] {
 	const positions = items.map((item) => ({ ...item }));
 
 	for (let pass = 0; pass < MAX_RELAXATION_PASSES; pass++) {
@@ -120,41 +115,13 @@ function enforceMinimumSpacing(
 		for (let i = 0; i < positions.length; i++) {
 			for (let j = i + 1; j < positions.length; j++) {
 				const dx = positions[j].x - positions[i].x;
-				const dy = positions[j].y - positions[i].y;
-				const dist = Math.sqrt(dx * dx + dy * dy);
+				const absDx = Math.abs(dx);
 
-				if (dist < MIN_SPACING_PX && dist > 0) {
-					const overlap = (MIN_SPACING_PX - dist) / 2;
-					const nx = dx / dist;
-					const ny = dy / dist;
-
-					positions[i] = {
-						...positions[i],
-						x: positions[i].x - nx * overlap,
-						y: positions[i].y - ny * overlap,
-					};
-					positions[j] = {
-						...positions[j],
-						x: positions[j].x + nx * overlap,
-						y: positions[j].y + ny * overlap,
-					};
-					adjusted = true;
-				} else if (dist === 0) {
-					const angleFromCenter = Math.atan2(
-						positions[i].y - centerY,
-						positions[i].x - centerX,
-					);
-					const nudge = MIN_SPACING_PX / 2;
-					positions[i] = {
-						...positions[i],
-						x: positions[i].x - Math.cos(angleFromCenter) * nudge,
-						y: positions[i].y - Math.sin(angleFromCenter) * nudge,
-					};
-					positions[j] = {
-						...positions[j],
-						x: positions[j].x + Math.cos(angleFromCenter) * nudge,
-						y: positions[j].y + Math.sin(angleFromCenter) * nudge,
-					};
+				if (absDx < MIN_SPACING_PX) {
+					const xOverlap = absDx > 0 ? (MIN_SPACING_PX - absDx) / 2 : MIN_SPACING_PX / 2;
+					const direction = dx >= 0 ? 1 : -1;
+					positions[i] = { ...positions[i], x: positions[i].x - direction * xOverlap };
+					positions[j] = { ...positions[j], x: positions[j].x + direction * xOverlap };
 					adjusted = true;
 				}
 			}
@@ -248,7 +215,7 @@ export function computeForestLayout(
 	}
 
 	// Apply collision avoidance
-	const resolved = enforceMinimumSpacing(allPositioned, centerX, groundY);
+	const resolved = enforceMinimumSpacing(allPositioned);
 
 	// Find oak in resolved results
 	const resolvedOak = oak ? (resolved.find((item) => item.id === oak!.id) ?? null) : null;
