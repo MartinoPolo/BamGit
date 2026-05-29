@@ -63,6 +63,38 @@
 	{/snippet}
 </Story>
 
+<Story name="On Backgrounds">
+	<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -- Storybook requires template arg -->
+	{#snippet template(_args: NavItemProps)}
+		<div class="flex gap-8">
+			<div class="w-56 rounded-lg bg-sidebar p-2">
+				<p class="mb-2 px-2 text-xs font-medium text-muted-foreground">bg-sidebar</p>
+				<nav class="flex flex-col gap-0.5">
+					<SidebarNavItem icon={HomeIcon} label="Dashboard" href="#" active />
+					<SidebarNavItem icon={InboxIcon} label="Inbox" href="#" badge={3} />
+					<SidebarNavItem icon={TreesIcon} label="Forest" href="#" />
+				</nav>
+			</div>
+			<div class="w-56 rounded-lg bg-background p-2">
+				<p class="mb-2 px-2 text-xs font-medium text-muted-foreground">bg-background</p>
+				<nav class="flex flex-col gap-0.5">
+					<SidebarNavItem icon={HomeIcon} label="Dashboard" href="#" active />
+					<SidebarNavItem icon={InboxIcon} label="Inbox" href="#" badge={3} />
+					<SidebarNavItem icon={TreesIcon} label="Forest" href="#" />
+				</nav>
+			</div>
+			<div class="w-56 rounded-lg bg-surface-2 p-2">
+				<p class="mb-2 px-2 text-xs font-medium text-muted-foreground">bg-surface-2</p>
+				<nav class="flex flex-col gap-0.5">
+					<SidebarNavItem icon={HomeIcon} label="Dashboard" href="#" active />
+					<SidebarNavItem icon={InboxIcon} label="Inbox" href="#" badge={3} />
+					<SidebarNavItem icon={TreesIcon} label="Forest" href="#" />
+				</nav>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Default" args={{ icon: HomeIcon, label: 'Dashboard', href: '#' }}>
 	{#snippet template(args: NavItemProps)}
 		<div class="w-56 rounded-lg bg-sidebar p-2">

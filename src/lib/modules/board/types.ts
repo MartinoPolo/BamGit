@@ -62,6 +62,14 @@ export const ACCENT_COLORS = [
 /** @public */
 export type AccentColor = (typeof ACCENT_COLORS)[number];
 
+export const BACKGROUND_THEMES = ['forest', 'golden-hour', 'twilight'] as const;
+/** @public */
+export type BackgroundTheme = (typeof BACKGROUND_THEMES)[number];
+
+export function isBackgroundTheme(value: unknown): value is BackgroundTheme {
+	return typeof value === 'string' && BACKGROUND_THEMES.includes(value as BackgroundTheme);
+}
+
 // ─── Type guards ──────────────────────────────────────────────────────────
 
 export function isThemeMode(value: unknown): value is ThemeMode {

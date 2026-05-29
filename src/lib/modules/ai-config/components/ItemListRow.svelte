@@ -98,7 +98,7 @@
 <button
 	type="button"
 	class={cn(
-		'group flex w-full items-center gap-2 rounded-md px-3 py-2 text-left hover:bg-surface-2',
+		'group flex w-full items-center gap-2 rounded-md px-3 py-2 text-left hover:bg-surface-hover',
 		item.deprecated && 'opacity-60',
 	)}
 	onclick={onSelect}

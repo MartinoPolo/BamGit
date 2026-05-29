@@ -174,6 +174,85 @@
 	{/snippet}
 </Story>
 
+<Story name="Ghost on Backgrounds">
+	{#snippet template(args: ButtonProps)}
+		<div class="flex flex-wrap gap-4">
+			<div class="rounded-lg bg-background p-4">
+				<p class="mb-2 text-xs opacity-70">bg-background</p>
+				<div class="flex items-center gap-2">
+					<Button intent="ghost" size="icon-sm" aria-label="Mail" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" size="icon-sm" aria-label="Settings" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" {...args}>Action</Button>
+				</div>
+			</div>
+			<div class="rounded-lg bg-sidebar p-4">
+				<p class="mb-2 text-xs opacity-70">bg-sidebar</p>
+				<div class="flex items-center gap-2">
+					<Button intent="ghost" size="icon-sm" aria-label="Mail" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" size="icon-sm" aria-label="Settings" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" {...args}>Action</Button>
+				</div>
+			</div>
+			<div class="rounded-lg bg-surface p-4">
+				<p class="mb-2 text-xs opacity-70">bg-surface</p>
+				<div class="flex items-center gap-2">
+					<Button intent="ghost" size="icon-sm" aria-label="Mail" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" size="icon-sm" aria-label="Settings" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" {...args}>Action</Button>
+				</div>
+			</div>
+			<div class="rounded-lg bg-surface-2 p-4">
+				<p class="mb-2 text-xs opacity-70">bg-surface-2</p>
+				<div class="flex items-center gap-2">
+					<Button intent="ghost" size="icon-sm" aria-label="Mail" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" size="icon-sm" aria-label="Settings" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" {...args}>Action</Button>
+				</div>
+			</div>
+			<div class="rounded-lg p-4" style="background: oklch(0.75 0.12 300)">
+				<p class="mb-2 text-xs opacity-70">oklch(0.75 0.12 300) — vivid lavender</p>
+				<div class="flex items-center gap-2">
+					<Button intent="ghost" size="icon-sm" aria-label="Mail" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" size="icon-sm" aria-label="Settings" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" {...args}>Action</Button>
+				</div>
+			</div>
+			<div class="rounded-lg p-4 text-white" style="background: oklch(0.5 0.05 200)">
+				<p class="mb-2 text-xs opacity-70">oklch(0.5 0.05 200) — mid-tone gray-blue</p>
+				<div class="flex items-center gap-2">
+					<Button intent="ghost" size="icon-sm" aria-label="Mail" {...args}
+						><MailIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" size="icon-sm" aria-label="Settings" {...args}
+						><SettingsIcon data-icon="inline-start" /></Button
+					>
+					<Button intent="ghost" {...args}>Action</Button>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+</Story>
+
 <Story name="Ghost Overlay">
 	{#snippet template(args: ButtonProps)}
 		<div class="flex flex-wrap gap-4">

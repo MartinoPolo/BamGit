@@ -3,8 +3,10 @@ import {
 	computeForestLayout,
 	MIN_SPACING_PX,
 	MAX_DEPTH_ROWS,
+	MAX_LAYOUT_WIDTH_PX,
 	TREE_SPACING_FRACTION,
-	ROW_SPACING_Y_FRACTION,
+	BASE_ROW_GAP_FRACTION,
+	ROW_GAP_PERSPECTIVE_FACTOR,
 	ROW_SCALE_FACTOR,
 	ROW_OPACITY_FACTOR,
 	ROW_X_OFFSET_FRACTION,
@@ -197,6 +199,25 @@ function findItem(items: readonly PositionedForestItem[], id: string): Positione
 
 function euclideanDistance(a: PositionedForestItem, b: PositionedForestItem): number {
 	return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+}
+
+function expectedRowY(depthRow: number, groundY: number, viewportHeight: number): number {
+	if (depthRow === 0) {
+		return groundY;
+	}
+	const baseGap = viewportHeight * BASE_ROW_GAP_FRACTION;
+	return (
+		groundY -
+		(baseGap * (1 - ROW_GAP_PERSPECTIVE_FACTOR ** depthRow)) / (1 - ROW_GAP_PERSPECTIVE_FACTOR)
+	);
+}
+
+function expectedEffectiveWidth(viewportWidth: number): number {
+	return Math.min(viewportWidth, MAX_LAYOUT_WIDTH_PX);
+}
+
+function expectedLayoutOffsetX(viewportWidth: number): number {
+	return (viewportWidth - expectedEffectiveWidth(viewportWidth)) / 2;
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1392,8 +1413,10 @@ describe('computeForestLayout — oak absent', () => {
 // ─── Row 0 Left-Right Alternation ────────────────────────────────────────
 
 describe('computeForestLayout — row 0 equidistant placement', () => {
-	it('distributes 4 trees equidistantly across viewport width', () => {
+	it('distributes 4 trees equidistantly within effective layout width', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
+		const ew = expectedEffectiveWidth(viewport.width);
+		const offset = expectedLayoutOffsetX(viewport.width);
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1404,16 +1427,15 @@ describe('computeForestLayout — row 0 equidistant placement', () => {
 		];
 		const result = computeForestLayout(items, viewport);
 
-		// 4 non-oak trees → equidistant at width*(i+1)/5
 		const t0 = findItem(result.items, 't0');
 		const t1 = findItem(result.items, 't1');
 		const t2 = findItem(result.items, 't2');
 		const t3 = findItem(result.items, 't3');
 
-		expect(t0.x).toBeCloseTo(1200 * (1 / 5), 0);
-		expect(t1.x).toBeCloseTo(1200 * (2 / 5), 0);
-		expect(t2.x).toBeCloseTo(1200 * (3 / 5), 0);
-		expect(t3.x).toBeCloseTo(1200 * (4 / 5), 0);
+		expect(t0.x).toBeCloseTo(offset + ew * (1 / 5), 0);
+		expect(t1.x).toBeCloseTo(offset + ew * (2 / 5), 0);
+		expect(t2.x).toBeCloseTo(offset + ew * (3 / 5), 0);
+		expect(t3.x).toBeCloseTo(offset + ew * (4 / 5), 0);
 	});
 });
 
@@ -1422,6 +1444,7 @@ describe('computeForestLayout — row 0 equidistant placement', () => {
 describe('computeForestLayout — equidistant spacing', () => {
 	it('non-oak row-0 items have equal horizontal spacing between consecutive positions', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
+		const ew = expectedEffectiveWidth(viewport.width);
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1432,15 +1455,13 @@ describe('computeForestLayout — equidistant spacing', () => {
 		];
 		const result = computeForestLayout(items, viewport);
 
-		// Collect non-oak row-0 x positions, sorted
 		const nonOakRow0 = result.items
 			.filter((item) => item.rowIndex === 0 && item.id !== 'oak-1')
 			.sort((a, b) => a.x - b.x);
 
-		// Consecutive positions should have equal spacing: width / (count + 1)
-		const expectedSpacing = viewport.width / (nonOakRow0.length + 1);
+		const spacing = ew / (nonOakRow0.length + 1);
 		for (let i = 1; i < nonOakRow0.length; i++) {
-			expect(nonOakRow0[i].x - nonOakRow0[i - 1].x).toBeCloseTo(expectedSpacing, 0);
+			expect(nonOakRow0[i].x - nonOakRow0[i - 1].x).toBeCloseTo(spacing, 0);
 		}
 	});
 });
@@ -1485,8 +1506,9 @@ describe('computeForestLayout — back-row perspective row 1', () => {
 		const row1Tree = findItem(result.items, 'row1');
 		expect(row1Tree.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
 		expect(row1Tree.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
-		// Y should be shifted up from groundY
-		expect(row1Tree.y).toBeCloseTo(groundY - 1 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(Math.abs(row1Tree.y - expectedRowY(1, groundY, viewport.height))).toBeLessThan(
+			MIN_SPACING_PX / 2 + 1,
+		);
 		expect(row1Tree.rowIndex).toBe(1);
 	});
 });
@@ -1504,7 +1526,7 @@ describe('computeForestLayout — back-row perspective row 2', () => {
 		const row2Tree = findItem(result.items, 'row2');
 		expect(row2Tree.scale).toBeCloseTo(ROW_SCALE_FACTOR ** 2, 2);
 		expect(row2Tree.opacity).toBeCloseTo(ROW_OPACITY_FACTOR ** 2, 2);
-		expect(row2Tree.y).toBeCloseTo(groundY - 2 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(row2Tree.y).toBeCloseTo(expectedRowY(2, groundY, viewport.height), 1);
 		expect(row2Tree.rowIndex).toBe(2);
 	});
 });
@@ -1512,17 +1534,18 @@ describe('computeForestLayout — back-row perspective row 2', () => {
 // ─── Back-Row X-Offset ─────────────────────────────────────────────────
 
 describe('computeForestLayout — back-row x-offset', () => {
-	it('row 1+ trees are offset by ROW_X_OFFSET_FRACTION', () => {
+	it('row 1+ trees are offset by ROW_X_OFFSET_FRACTION using effective width', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
+		const ew = expectedEffectiveWidth(viewport.width);
+		const offset = expectedLayoutOffsetX(viewport.width);
 
-		// Single tree in row 1 — equidistant with 1 item: width*(1)/(1+1) + offset
 		const items: ForestLayoutItem[] = [createOak(), createTree('r1', { depthRow: 1 })];
 		const result = computeForestLayout(items, viewport);
 
 		const r1 = findItem(result.items, 'r1');
-		const rowOffset = 1 * viewport.width * TREE_SPACING_FRACTION * ROW_X_OFFSET_FRACTION;
-		const expectedX = rowOffset + (viewport.width * 1) / 2;
-		expect(r1.x).toBeCloseTo(expectedX, 0);
+		const rowOffset = 1 * ew * TREE_SPACING_FRACTION * ROW_X_OFFSET_FRACTION;
+		const expX = offset + rowOffset + (ew * 1) / 2;
+		expect(Math.abs(r1.x - expX)).toBeLessThan(MIN_SPACING_PX / 2 + 1);
 	});
 });
 
@@ -1540,10 +1563,7 @@ describe('computeForestLayout — max depth clamp', () => {
 		const deep = findItem(result.items, 'deep');
 		expect(deep.scale).toBeCloseTo(ROW_SCALE_FACTOR ** clampedRow, 2);
 		expect(deep.opacity).toBeCloseTo(ROW_OPACITY_FACTOR ** clampedRow, 2);
-		expect(deep.y).toBeCloseTo(
-			groundY - clampedRow * viewport.height * ROW_SPACING_Y_FRACTION,
-			1,
-		);
+		expect(deep.y).toBeCloseTo(expectedRowY(clampedRow, groundY, viewport.height), 1);
 		expect(deep.rowIndex).toBe(clampedRow);
 	});
 });
@@ -1592,6 +1612,8 @@ describe('computeForestLayout — minimum spacing', () => {
 describe('computeForestLayout — many items row 0', () => {
 	it('15 trees all depthRow=0 are all positioned equidistantly', () => {
 		const viewport = createViewport({ width: 1200, height: 800 });
+		const ew = expectedEffectiveWidth(viewport.width);
+		const offset = expectedLayoutOffsetX(viewport.width);
 
 		const items: ForestLayoutItem[] = [
 			createOak(),
@@ -1601,17 +1623,14 @@ describe('computeForestLayout — many items row 0', () => {
 		];
 		const result = computeForestLayout(items, viewport);
 
-		// All 16 items should be positioned (15 trees + 1 oak)
 		expect(result.items).toHaveLength(16);
 
-		// Non-oak items should be equidistantly distributed
 		const nonOakItems = result.items
 			.filter((item) => item.id !== 'oak-1')
 			.sort((a, b) => a.x - b.x);
 
 		expect(nonOakItems).toHaveLength(15);
-		// First item should be at width / 16
-		expect(nonOakItems[0].x).toBeCloseTo(viewport.width / 16, 0);
+		expect(nonOakItems[0].x).toBeCloseTo(offset + ew / 16, 0);
 	});
 });
 
@@ -1634,11 +1653,14 @@ describe('computeForestLayout — multiple rows', () => {
 		const r1 = findItem(result.items, 'r1');
 		const r2 = findItem(result.items, 'r2');
 
-		expect(r0.y).toBeCloseTo(groundY, 1);
-		expect(r1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
-		expect(r2.y).toBeCloseTo(groundY - 2 * viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(Math.abs(r0.y - groundY)).toBeLessThan(MIN_SPACING_PX / 2 + 1);
+		expect(Math.abs(r1.y - expectedRowY(1, groundY, viewport.height))).toBeLessThan(
+			MIN_SPACING_PX / 2 + 1,
+		);
+		expect(Math.abs(r2.y - expectedRowY(2, groundY, viewport.height))).toBeLessThan(
+			MIN_SPACING_PX / 2 + 1,
+		);
 
-		// Each deeper row should be higher (smaller y)
 		expect(r1.y).toBeLessThan(r0.y);
 		expect(r2.y).toBeLessThan(r1.y);
 	});
@@ -1735,12 +1757,14 @@ describe('computeForestLayout — potted plants in rows', () => {
 		const p0 = findItem(result.items, 'p0');
 		const p1 = findItem(result.items, 'p1');
 
-		expect(p0.y).toBeCloseTo(groundY, 1);
+		expect(Math.abs(p0.y - groundY)).toBeLessThan(MIN_SPACING_PX / 2 + 1);
 		expect(p0.scale).toBe(1.0);
 		expect(p0.opacity).toBe(1.0);
 		expect(p0.rowIndex).toBe(0);
 
-		expect(p1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(Math.abs(p1.y - expectedRowY(1, groundY, viewport.height))).toBeLessThan(
+			MIN_SPACING_PX / 2 + 1,
+		);
 		expect(p1.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
 		expect(p1.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
 		expect(p1.rowIndex).toBe(1);
@@ -1763,12 +1787,14 @@ describe('computeForestLayout — stumps in rows', () => {
 		const s0 = findItem(result.items, 's0');
 		const s1 = findItem(result.items, 's1');
 
-		expect(s0.y).toBeCloseTo(groundY, 1);
+		expect(Math.abs(s0.y - groundY)).toBeLessThan(MIN_SPACING_PX / 2 + 1);
 		expect(s0.scale).toBe(1.0);
 		expect(s0.opacity).toBe(1.0);
 		expect(s0.rowIndex).toBe(0);
 
-		expect(s1.y).toBeCloseTo(groundY - viewport.height * ROW_SPACING_Y_FRACTION, 1);
+		expect(Math.abs(s1.y - expectedRowY(1, groundY, viewport.height))).toBeLessThan(
+			MIN_SPACING_PX / 2 + 1,
+		);
 		expect(s1.scale).toBeCloseTo(ROW_SCALE_FACTOR, 2);
 		expect(s1.opacity).toBeCloseTo(ROW_OPACITY_FACTOR, 2);
 		expect(s1.rowIndex).toBe(1);

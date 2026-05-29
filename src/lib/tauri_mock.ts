@@ -26,6 +26,10 @@ import {
 
 type MockHandler = (args: Record<string, unknown>) => unknown;
 
+/** Mutable workspace-level settings store, keyed by `${dashboardId}::${key}` */
+const mockWorkspaceSettings: Map<string, { dashboardId: string; key: string; value: string }> =
+	new Map();
+
 const TAURI_ONLY_COMMANDS = new Set([
 	'setup_worktree',
 	'remove_worktree',
@@ -287,16 +291,44 @@ const MOCK_COMMAND_HANDLERS: Record<string, MockHandler> = {
 		}
 		return null;
 	},
-	set_user_setting: () => null,
-	bulk_set_user_settings: () => null,
-	delete_user_setting: () => null,
+	set_user_setting: ({ key, value }) => {
+		MOCK_USER_SETTINGS[key as string] = value as string;
+		return null;
+	},
+	bulk_set_user_settings: ({ entries }) => {
+		for (const [key, value] of Object.entries(entries as Record<string, string>)) {
+			MOCK_USER_SETTINGS[key] = value;
+		}
+		return null;
+	},
+	delete_user_setting: ({ key }) => {
+		delete MOCK_USER_SETTINGS[key as string];
+		return null;
+	},
 	get_all_user_settings: () =>
 		Object.entries(MOCK_USER_SETTINGS).map(([key, value]) => ({ key, value })),
-	get_workspace_setting: () => null,
-	set_workspace_setting: () => null,
-	delete_workspace_setting: () => null,
-	get_all_workspace_settings: () => [],
-	get_workspace_overridden_keys: () => [],
+	get_workspace_setting: ({ dashboardId, key }) => {
+		const entry = mockWorkspaceSettings.get(`${dashboardId}::${key}`);
+		return entry ? { key: entry.key, value: entry.value } : null;
+	},
+	set_workspace_setting: ({ dashboardId, key, value }) => {
+		mockWorkspaceSettings.set(`${dashboardId}::${key}`, {
+			dashboardId: dashboardId as string,
+			key: key as string,
+			value: value as string,
+		});
+		return null;
+	},
+	delete_workspace_setting: ({ dashboardId, key }) => {
+		mockWorkspaceSettings.delete(`${dashboardId}::${key}`);
+		return null;
+	},
+	get_all_workspace_settings: ({ dashboardId }) =>
+		[...mockWorkspaceSettings.values()].filter((s) => s.dashboardId === dashboardId),
+	get_workspace_overridden_keys: ({ dashboardId }) =>
+		[...mockWorkspaceSettings.values()]
+			.filter((s) => s.dashboardId === dashboardId)
+			.map((s) => s.key),
 	get_resolved_setting: (args: Record<string, unknown>) => {
 		const key = args.key as string;
 		return MOCK_USER_SETTINGS[key] ?? null;

@@ -2,6 +2,7 @@ export const SETTING_KEYS = {
 	// Appearance
 	themeMode: 'theme_mode',
 	accentColor: 'accent_color',
+	backgroundTheme: 'background_theme',
 
 	// Account
 	username: 'username',
@@ -30,6 +31,11 @@ export const SETTING_KEYS = {
 	issueCardHeaderSaturation: 'issue_card_header_saturation',
 	issueCardRadialIntensity: 'issue_card_radial_intensity',
 
+	// Forest View
+	showMountains: 'show_mountains',
+	showStars: 'show_stars',
+	showMoon: 'show_moon',
+
 	// Overview
 	overviewFooterContent: 'overview_footer_content',
 } as const;
@@ -40,6 +46,7 @@ export type SettingDbKey = (typeof SETTING_KEYS)[SettingKey];
 export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	themeMode: 'system',
 	accentColor: 'moss',
+	backgroundTheme: 'forest',
 	username: 'User',
 	userInitials: 'U',
 	startupBehavior: 'last-workspace',
@@ -57,6 +64,9 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	issueCardColorSaturation: '150',
 	issueCardHeaderSaturation: '85',
 	issueCardRadialIntensity: '75',
+	showMountains: 'true',
+	showStars: 'true',
+	showMoon: 'true',
 	overviewFooterContent: 'cost-today',
 };
 
@@ -64,6 +74,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 export const WORKSPACE_OVERRIDABLE_KEYS: readonly SettingKey[] = [
 	'themeMode',
 	'accentColor',
+	'backgroundTheme',
 	'issueCardVariant',
 	'issueCardButtonColor',
 	'issueCardPriorityPosition',
@@ -75,10 +86,17 @@ export const WORKSPACE_OVERRIDABLE_KEYS: readonly SettingKey[] = [
 	'issueCardHeaderSaturation',
 	'issueCardRadialIntensity',
 	'notificationVolume',
+	'showMountains',
+	'showStars',
+	'showMoon',
 ] as const;
 
 // Settings that need localStorage mirror for FOUC prevention
-export const FOUC_MIRROR_KEYS: readonly SettingKey[] = ['themeMode', 'accentColor'] as const;
+export const FOUC_MIRROR_KEYS: readonly SettingKey[] = [
+	'themeMode',
+	'accentColor',
+	'backgroundTheme',
+] as const;
 
 // LocalStorage key prefix for FOUC mirror
 export const FOUC_STORAGE_PREFIX = 'grovekeeper_settings_';

@@ -47,7 +47,7 @@
 					value={option.value}
 					onclick={handleItemClick}
 					class={cn(
-						'flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-(length:--text-sm) outline-none transition-colors hover:bg-surface-2 focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:bg-surface-2',
+						'flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-(length:--text-sm) outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:bg-surface-hover',
 					)}
 				>
 					{#snippet children({ checked })}

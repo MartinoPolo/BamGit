@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './accent-colors.css';
+@import './palette-colors.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
@@ -392,6 +393,7 @@
 	--focus-ring-offset: 2px;
 	--sidebar-width: 240px;
 	--sidebar-width-collapsed: 56px;
+	--surface-hover: color-mix(in oklch, var(--foreground) 6%, transparent);
 	--tree-bg-mix: 22%;
 	--header-saturate: 1;
 	--chart-1: oklch(0.58 0.096 134);
@@ -407,7 +409,6 @@
 	--background: oklch(0.985 0.005 130);
 	--surface: oklch(1 0 0);
 	--surface-2: oklch(0.965 0.008 130);
-	--surface-hover: oklch(0.94 0.012 130);
 	--surface-3: oklch(0.94 0.012 130);
 	--foreground: oklch(0.205 0.015 145);
 	--foreground-muted: oklch(0.46 0.015 145);
@@ -432,6 +433,10 @@
 	--chip-success: oklch(0.5 0.2 145);
 	--chip-info: oklch(0.5 0.17 230);
 	--chip-muted: oklch(0.45 0.03 260);
+	--mountain-far: oklch(0.72 0.04 180);
+	--mountain-mid: oklch(0.58 0.05 160);
+	--mountain-near: oklch(0.48 0.06 145);
+	--star-color: oklch(0.8 0.2 135);
 }
 
 [data-theme='dark'] {
@@ -440,7 +445,6 @@
 	--background: oklch(0.155 0.018 150);
 	--surface: oklch(0.19 0.02 150);
 	--surface-2: oklch(0.225 0.022 150);
-	--surface-hover: oklch(0.265 0.024 150);
 	--surface-3: oklch(0.265 0.024 150);
 	--foreground: oklch(0.965 0.01 130);
 	--foreground-muted: oklch(0.73 0.018 135);
@@ -472,6 +476,11 @@
 	--chip-success: oklch(0.7 0.2 145);
 	--chip-info: oklch(0.7 0.15 230);
 	--chip-muted: oklch(0.5 0.02 260);
+	--mountain-far: oklch(0.22 0.03 200);
+	--mountain-mid: oklch(0.18 0.04 180);
+	--mountain-near: oklch(0.15 0.05 160);
+	--star-color: oklch(0.8 0.2 135);
+	--moon-glow: oklch(0.9 0.03 210);
 }
 
 @keyframes shimmer {

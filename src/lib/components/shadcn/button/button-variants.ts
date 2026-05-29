@@ -13,7 +13,7 @@ export const buttonVariants = tv({
 			primary: `bg-primary text-primary-foreground shadow-sm hover:bg-[color-mix(in_oklch,var(--primary)_88%,white_12%)] dark:hover:bg-[color-mix(in_oklch,var(--primary)_88%,black_12%)] ${FILLED_BUTTON_KBD_CLASSES}`,
 			secondary:
 				'border-border bg-surface-2 text-foreground hover:bg-surface-3 hover:border-border-strong',
-			ghost: 'bg-transparent text-foreground-muted hover:bg-surface-2 hover:text-foreground',
+			ghost: 'bg-transparent text-foreground-muted hover:bg-surface-hover hover:text-foreground',
 			'ghost-overlay':
 				'bg-transparent border-transparent text-current opacity-60 hover:opacity-90 hover:bg-[color-mix(in_oklch,currentColor_10%,transparent)]',
 			danger: 'bg-transparent text-status-danger border-[color-mix(in_oklch,var(--status-danger)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--status-danger)_12%,transparent)]',

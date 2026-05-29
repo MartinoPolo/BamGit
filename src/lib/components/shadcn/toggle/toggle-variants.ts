@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
 export const togglePressedVariants = tv({
 	variants: {
 		intent: {
-			default: 'data-[state=on]:bg-surface-2 data-[state=on]:text-foreground',
+			default: 'data-[state=on]:bg-surface-hover data-[state=on]:text-foreground',
 			outline:
 				'data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-transparent',
 		},

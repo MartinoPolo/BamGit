@@ -19,7 +19,7 @@
 	tabindex={0}
 	class={cn(
 		'flex min-h-7 w-full cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 text-(length:--text-sm) text-foreground outline-none',
-		'hover:bg-surface-2 focus-visible:bg-surface-2',
+		'hover:bg-surface-hover focus-visible:bg-surface-hover',
 		'data-[state=active]:text-primary',
 		className,
 	)}

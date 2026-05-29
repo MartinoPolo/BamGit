@@ -5,10 +5,11 @@
 	interface Props {
 		issueTitle: string;
 		issueStatus: string;
+		customAnchor?: HTMLElement | null;
 		children: Snippet<[Record<string, unknown>]>;
 	}
 
-	let { issueTitle, issueStatus, children }: Props = $props();
+	let { issueTitle, issueStatus, customAnchor = null, children }: Props = $props();
 </script>
 
 <Tooltip.Root>
@@ -17,7 +18,7 @@
 			{@render children(props)}
 		{/snippet}
 	</Tooltip.Trigger>
-	<Tooltip.Content side="top" sideOffset={8}>
+	<Tooltip.Content side="top" sideOffset={8} {customAnchor}>
 		<span class="font-medium">{issueTitle}</span>
 		<span class="text-muted-foreground/70"> · {issueStatus}</span>
 	</Tooltip.Content>

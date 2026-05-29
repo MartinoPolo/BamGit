@@ -59,7 +59,7 @@
 
 <div
 	class={cn(
-		'flex items-center gap-3 rounded-lg border border-border bg-surface p-3 transition-colors hover:bg-surface-2/50',
+		'flex items-center gap-3 rounded-lg border border-border bg-surface p-3 transition-colors hover:bg-surface-hover/50',
 		className,
 	)}
 >

@@ -5,8 +5,8 @@
 		computeVisualization,
 		computeForestLayout,
 		computeDepthRows,
-		GROUND_Y_FRACTION,
 		resolveGlowOverlay,
+		GROUND_Y_FRACTION,
 	} from '$lib/modules/visualization';
 	import type {
 		TreeVisualization,
@@ -21,8 +21,16 @@
 		DEFAULT_TREE_CONFIG,
 		OVERLAY_DEFAULTS,
 		TRUNK_DEAD_SPACE_PERCENT,
+		generateTree,
+		generatePottedPlant,
+		computeTreeHull,
+		padConvexHull,
+		VIEWBOX_WIDTH,
+		VIEWBOX_HEIGHT,
 	} from 'low-poly-2d-trees';
-	import type { TreeConfig, OverlayConfig } from 'low-poly-2d-trees';
+	import type { TreeConfig, OverlayConfig, Point2D } from 'low-poly-2d-trees';
+	import { useSettings } from '$lib/modules/settings';
+	import { BACKGROUND_THEMES } from '$lib/modules/board/types.js';
 	import * as m from '$lib/paraglide/messages.js';
 	import SproutIcon from '@lucide/svelte/icons/sprout';
 	import GlobeIcon from '@lucide/svelte/icons/globe';
@@ -31,6 +39,7 @@
 	import ArchiveIcon from '@lucide/svelte/icons/archive';
 	import PaletteIcon from '@lucide/svelte/icons/palette';
 	import ScissorsIcon from '@lucide/svelte/icons/scissors';
+	import MountainIcon from '@lucide/svelte/icons/mountain';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import * as ContextMenu from '$lib/components/shadcn/context-menu/index.js';
 	import ForestTreeTooltip from './ForestTreeTooltip.svelte';
@@ -70,6 +79,17 @@
 	const POTTED_NATURAL_WIDTH = 192;
 	const POTTED_NATURAL_HEIGHT = 288;
 
+	const HIT_AREA_HULL_PADDING = 20;
+
+	const STAR_COUNT = 25;
+	const STARS = Array.from({ length: STAR_COUNT }, (_, i) => ({
+		x: ((i * 53 + 13) % 96) + 2,
+		y: ((i * 71 + 7) % 55) + 3,
+		size: 1 + (i % 3),
+		delay: (i * 1.3) % 4,
+		opacity: 0.3 + (i % 5) * 0.1,
+	}));
+
 	let rawViewportWidth = $state(0);
 	let rawViewportHeight = $state(0);
 
@@ -94,6 +114,41 @@
 	});
 
 	const interaction = useSelection();
+	const settingsCtx = useSettings();
+	const isDark = $derived(settingsCtx.isDark);
+	const backgroundTheme = $derived(settingsCtx.getBackgroundTheme());
+	const showMountains = $derived(settingsCtx.getShowMountains());
+	const showStars = $derived(settingsCtx.getShowStars());
+	const showMoon = $derived(settingsCtx.getShowMoon());
+
+	const GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX = 40;
+	const MOUNTAINS_GROUND_OVERLAP_PX = 100;
+	const MOUNTAINS_FADE_MIN_PX = 60;
+	const MOUNTAINS_FADE_MAX_PX = 100;
+
+	const groundY = $derived(debouncedViewportHeight * GROUND_Y_FRACTION);
+
+	const groundTopY = $derived.by(() => {
+		if (layoutResult.items.length === 0) {
+			return groundY;
+		}
+		const highestTreeY = Math.min(...layoutResult.items.map((item) => item.y));
+		return Math.max(0, highestTreeY - GROUND_MARGIN_ABOVE_HIGHEST_TREE_PX);
+	});
+
+	const mountainsHeight = $derived(groundTopY + MOUNTAINS_GROUND_OVERLAP_PX);
+	const mountainsOpacity = $derived.by(() => {
+		if (groundTopY < MOUNTAINS_FADE_MIN_PX) {
+			return 0;
+		}
+		if (groundTopY < MOUNTAINS_FADE_MAX_PX) {
+			return (
+				(groundTopY - MOUNTAINS_FADE_MIN_PX) /
+				(MOUNTAINS_FADE_MAX_PX - MOUNTAINS_FADE_MIN_PX)
+			);
+		}
+		return 1;
+	});
 
 	let contextMenuIssueId = $state<string | null>(null);
 
@@ -140,6 +195,9 @@
 		readonly issue: Issue;
 		readonly visualization: TreeVisualization;
 		readonly layoutItem: ForestLayoutItem;
+		readonly exactHull: readonly Point2D[];
+		readonly paddedHull: readonly Point2D[];
+		readonly crownTopFraction: number;
 	}
 
 	interface VisualizationCacheEntry {
@@ -203,6 +261,85 @@
 		};
 	}
 
+	function createFallbackHull(crownTop: Point2D, trunkBase: Point2D): Point2D[] {
+		const cx = (crownTop.x + trunkBase.x) / 2;
+		const top = crownTop.y - 20;
+		const bottom = trunkBase.y + 10;
+		const halfWidth = Math.max(30, Math.abs(crownTop.x - trunkBase.x) + 20);
+		return [
+			{ x: cx - halfWidth, y: top },
+			{ x: cx + halfWidth, y: top },
+			{ x: cx + halfWidth, y: bottom },
+			{ x: cx - halfWidth, y: bottom },
+		];
+	}
+
+	function buildHulls(
+		geometry: {
+			anchors: { crownTop: Point2D; trunkBase: Point2D };
+		} & Parameters<typeof computeTreeHull>[0],
+	): {
+		exactHull: readonly Point2D[];
+		paddedHull: readonly Point2D[];
+	} {
+		const exact = computeTreeHull(geometry, 0);
+		const hullTooSmall =
+			exact.length < 3 ||
+			Math.max(
+				Math.max(...exact.map((p) => p.x)) - Math.min(...exact.map((p) => p.x)),
+				Math.max(...exact.map((p) => p.y)) - Math.min(...exact.map((p) => p.y)),
+			) < 30;
+		if (hullTooSmall) {
+			const fallback = createFallbackHull(
+				geometry.anchors.crownTop,
+				geometry.anchors.trunkBase,
+			);
+			return {
+				exactHull: fallback,
+				paddedHull: padConvexHull(fallback, HIT_AREA_HULL_PADDING),
+			};
+		}
+		return {
+			exactHull: exact,
+			paddedHull: computeTreeHull(geometry, HIT_AREA_HULL_PADDING),
+		};
+	}
+
+	function computeHitAreaData(visualization: TreeVisualization): {
+		exactHull: readonly Point2D[];
+		paddedHull: readonly Point2D[];
+		crownTopFraction: number;
+	} {
+		if (visualization.kind === 'tree') {
+			const geometry = generateTree(visualization.config);
+			return {
+				...buildHulls(geometry),
+				crownTopFraction: geometry.anchors.crownTop.y / VIEWBOX_HEIGHT,
+			};
+		}
+		if (visualization.kind === 'oak') {
+			const oakConfig: TreeConfig = {
+				...DEFAULT_TREE_CONFIG,
+				shape: 'oak',
+				stage: 'leafy',
+				seed: visualization.seed,
+			};
+			const geometry = generateTree(oakConfig);
+			return {
+				...buildHulls(geometry),
+				crownTopFraction: geometry.anchors.crownTop.y / VIEWBOX_HEIGHT,
+			};
+		}
+		const geometry = generatePottedPlant({
+			stage: visualization.stage,
+			seed: visualization.seed,
+		});
+		return {
+			...buildHulls(geometry),
+			crownTopFraction: geometry.anchors.crownTop.y / VIEWBOX_HEIGHT,
+		};
+	}
+
 	// fallow-ignore-next-line complexity
 	const entries = $derived.by<readonly IssueEntry[]>(() => {
 		const visualizations = new SvelteMap<string, TreeVisualization>();
@@ -243,10 +380,14 @@
 		const results: IssueEntry[] = [];
 		for (const issue of issues) {
 			const visualization = visualizations.get(issue.id)!;
+			const hitAreaData = computeHitAreaData(visualization);
 			results.push({
 				issue,
 				visualization,
 				layoutItem: buildLayoutItem(issue, visualization, depthRows.get(issue.id) ?? 0),
+				exactHull: hitAreaData.exactHull,
+				paddedHull: hitAreaData.paddedHull,
+				crownTopFraction: hitAreaData.crownTopFraction,
 			});
 		}
 		return results;
@@ -272,8 +413,6 @@
 			height: debouncedViewportHeight,
 		}),
 	);
-
-	const groundStripHeight = $derived(debouncedViewportHeight * (1 - GROUND_Y_FRACTION));
 
 	function buildLayoutItem(
 		issue: Issue,
@@ -355,11 +494,6 @@
 		interaction.activateIssue(entry.issue.id);
 	}
 
-	function handleContextMenu(event: MouseEvent, entry: IssueEntry) {
-		event.preventDefault();
-		contextMenuIssueId = entry.issue.id;
-	}
-
 	// fallow-ignore-next-line complexity
 	function getGroundElementProps(
 		entry: IssueEntry,
@@ -384,7 +518,113 @@
 		return { groundElements: true };
 	}
 
-	function handleGroundClick() {
+	function hullToSvgPoints(hull: readonly Point2D[]): string {
+		return hull.map((point) => `${point.x},${point.y}`).join(' ');
+	}
+
+	const tooltipAnchors = new SvelteMap<string, HTMLElement>();
+
+	function registerTooltipAnchor(element: HTMLElement, issueId: string) {
+		tooltipAnchors.set(issueId, element);
+		return {
+			destroy() {
+				tooltipAnchors.delete(issueId);
+			},
+		};
+	}
+
+	function isPointInHull(px: number, py: number, hull: readonly Point2D[]): boolean {
+		let inside = false;
+		for (let i = 0, j = hull.length - 1; i < hull.length; j = i++) {
+			const yi = hull[i].y;
+			const yj = hull[j].y;
+			const aboveI = yi > py;
+			const aboveJ = yj > py;
+			if (aboveI !== aboveJ) {
+				const xi = hull[i].x;
+				const xj = hull[j].x;
+				if (px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) {
+					inside = !inside;
+				}
+			}
+		}
+		return inside;
+	}
+
+	const Y_OFFSET_FACTOR = 0.5 - TRUNK_DEAD_SPACE_PERCENT;
+
+	// fallow-ignore-next-line complexity
+	function findHoveredTreeId(forestMouseX: number, forestMouseY: number): string | null {
+		let bestExactId: string | null = null;
+		let bestExactZ = -Infinity;
+		let bestPaddedId: string | null = null;
+		let bestPaddedZ = -Infinity;
+
+		for (const positioned of layoutResult.items) {
+			const entry = entryById.get(positioned.id);
+			if (!entry) {
+				continue;
+			}
+
+			const size = getNaturalSize(entry);
+			const s = positioned.scale;
+			const w = size.width;
+			const h = size.height;
+
+			const lx = (forestMouseX - positioned.x) / s + w / 2;
+			const ly = (forestMouseY - positioned.y + Y_OFFSET_FACTOR * h) / s + h / 2;
+
+			const svgScale = Math.min(w / VIEWBOX_WIDTH, h / VIEWBOX_HEIGHT);
+			const xOff = (w - VIEWBOX_WIDTH * svgScale) / 2;
+			const yOff = (h - VIEWBOX_HEIGHT * svgScale) / 2;
+			const vx = (lx - xOff) / svgScale;
+			const vy = (ly - yOff) / svgScale;
+
+			if (
+				vx < -HIT_AREA_HULL_PADDING ||
+				vx > VIEWBOX_WIDTH + HIT_AREA_HULL_PADDING ||
+				vy < -HIT_AREA_HULL_PADDING ||
+				vy > VIEWBOX_HEIGHT + HIT_AREA_HULL_PADDING
+			) {
+				continue;
+			}
+
+			if (entry.exactHull.length >= 3 && isPointInHull(vx, vy, entry.exactHull)) {
+				if (positioned.zIndex > bestExactZ) {
+					bestExactId = positioned.id;
+					bestExactZ = positioned.zIndex;
+				}
+			} else if (entry.paddedHull.length >= 3 && isPointInHull(vx, vy, entry.paddedHull)) {
+				if (positioned.zIndex > bestPaddedZ) {
+					bestPaddedId = positioned.id;
+					bestPaddedZ = positioned.zIndex;
+				}
+			}
+		}
+
+		return bestExactId ?? bestPaddedId;
+	}
+
+	function handleForestPointerMove(event: PointerEvent) {
+		const target = event.currentTarget as HTMLElement;
+		const rect = target.getBoundingClientRect();
+		const mx = event.clientX - rect.left;
+		const my = event.clientY - rect.top;
+		const targetId = findHoveredTreeId(mx, my);
+		if (targetId !== interaction.hoveredIssueId) {
+			if (targetId !== null) {
+				interaction.hoverIssue(targetId);
+			} else {
+				interaction.unhover();
+			}
+		}
+	}
+
+	function handleForestPointerLeave() {
+		interaction.unhover();
+	}
+
+	function handleBackgroundClick() {
 		interaction.deactivate();
 	}
 
@@ -422,6 +662,14 @@
 		}
 	}
 
+	function handleBackgroundThemeChange(value: string) {
+		void settingsCtx.set('backgroundTheme', value);
+	}
+
+	function formatThemeName(theme: string): string {
+		return theme.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+	}
+
 	const emptyStateTreeConfig: TreeConfig = {
 		...DEFAULT_TREE_CONFIG,
 		stage: 'seed',
@@ -432,13 +680,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<ContextMenu.Root
-	onOpenChange={(isOpen) => {
-		if (isOpen === false) {
-			contextMenuIssueId = null;
-		}
-	}}
->
+<ContextMenu.Root>
 	<ContextMenu.Trigger class="flex flex-1 overflow-hidden">
 		<div
 			class="relative w-full flex-1 outline-none"
@@ -448,13 +690,27 @@
 			style:min-height="0"
 			style:isolation="isolate"
 			style:contain="content"
+			style:cursor={interaction.hoveredIssueId !== null ? 'pointer' : 'default'}
 			onkeydown={handleKeydown}
+			onpointermove={handleForestPointerMove}
+			onpointerleave={handleForestPointerLeave}
 			tabindex="0"
 		>
+			<!-- Full-bleed clickable background for deselect + forest context menu -->
+			<button
+				type="button"
+				class="absolute inset-0 cursor-default border-0 bg-transparent p-0"
+				style:z-index="0"
+				onclick={handleBackgroundClick}
+				tabindex="-1"
+				aria-label="Forest background — click to deselect"
+			></button>
+
 			{#if issues.length === 0}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					class="absolute inset-0 flex flex-col items-center justify-center gap-4"
+					style:z-index="5"
 					oncontextmenu={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -478,88 +734,277 @@
 						{@const size = getNaturalSize(entry)}
 						{@const overlayConfig = getResolvedOverlayConfig(entry)}
 						{@const groundProps = getGroundElementProps(entry, positioned.rowIndex)}
-						<ForestTreeTooltip
-							issueTitle={entry.issue.name}
-							issueStatus={entry.issue.status}
-						>
-							{#snippet children(triggerProps)}
-								<button
-									{...triggerProps}
-									type="button"
-									class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto [&_.tree-root]:cursor-pointer"
-									style:left="{positioned.x}px"
-									style:top="{positioned.y}px"
-									style:width="{size.width}px"
-									style:height="{size.height}px"
-									style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
-										100}%)) scale({positioned.scale})"
-									style:opacity={positioned.opacity}
-									style:z-index={positioned.zIndex}
-									style:pointer-events="none"
-									style:will-change="transform"
-									onmouseenter={() => interaction.hoverIssue(entry.issue.id)}
-									onmouseleave={() => interaction.unhover()}
-									onclick={(event) => handleTreeClick(entry, event)}
-									oncontextmenu={(e) => handleContextMenu(e, entry)}
-									aria-label="Tree for issue {entry.issue.name}"
-								>
-									{#if entry.visualization.kind === 'oak'}
-										<LowPolyTree
-											config={getOakConfig(entry)}
-											{overlayConfig}
-											groundElements={groundProps.groundElements}
-											groundElementCount={groundProps.groundElementCount}
-										/>
-									{:else if entry.visualization.kind === 'tree'}
-										<LowPolyTree
-											config={entry.visualization.config}
-											toolVisibility={entry.visualization.toolVisibility}
-											{overlayConfig}
-											animateCanopySway={entry.visualization
-												.animateCanopySway}
-											animateGrowth={entry.visualization.animateGrowth}
-											animateTools={entry.visualization.animateTools}
-											groundElements={groundProps.groundElements}
-											groundElementCount={groundProps.groundElementCount}
-										/>
-									{:else if entry.visualization.kind === 'potted-plant'}
-										<PottedPlant
-											stage={entry.visualization.stage}
-											seed={entry.visualization.seed}
-											{overlayConfig}
-										/>
-									{/if}
-								</button>
-							{/snippet}
-						</ForestTreeTooltip>
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
+						<div style="display: contents" oncontextmenu={(e) => e.stopPropagation()}>
+							<ContextMenu.Root
+								onOpenChange={(open: boolean) => {
+									if (open) {
+										contextMenuIssueId =
+											interaction.hoveredIssueId ?? entry.issue.id;
+									}
+								}}
+							>
+								<ContextMenu.Trigger class="contents">
+									<ForestTreeTooltip
+										issueTitle={entry.issue.name}
+										issueStatus={entry.issue.status}
+										customAnchor={tooltipAnchors.get(entry.issue.id) ?? null}
+									>
+										{#snippet children(triggerProps)}
+											<button
+												{...triggerProps}
+												type="button"
+												class="absolute border-0 bg-transparent p-0 transition-transform duration-4 focus-visible:outline-2 focus-visible:outline-ring [&>svg]:pointer-events-none [&_.tree-root]:pointer-events-auto"
+												style:left="{positioned.x}px"
+												style:top="{positioned.y}px"
+												style:width="{size.width}px"
+												style:height="{size.height}px"
+												style:transform="translate(-50%, calc(-100% + {TRUNK_DEAD_SPACE_PERCENT *
+													100}%)) scale({positioned.scale})"
+												style:opacity={positioned.opacity}
+												style:z-index={positioned.zIndex}
+												style:pointer-events="none"
+												style:will-change="transform"
+												onclick={(event) => {
+													const targetId =
+														interaction.hoveredIssueId ??
+														entry.issue.id;
+													const targetEntry =
+														entryById.get(targetId) ?? entry;
+													handleTreeClick(targetEntry, event);
+												}}
+												aria-label="Tree for issue {entry.issue.name}"
+											>
+												{#if entry.visualization.kind === 'oak'}
+													<LowPolyTree
+														config={getOakConfig(entry)}
+														{overlayConfig}
+														groundElements={groundProps.groundElements}
+														groundElementCount={groundProps.groundElementCount}
+													/>
+												{:else if entry.visualization.kind === 'tree'}
+													<LowPolyTree
+														config={entry.visualization.config}
+														toolVisibility={entry.visualization
+															.toolVisibility}
+														{overlayConfig}
+														animateCanopySway={entry.visualization
+															.animateCanopySway}
+														animateGrowth={entry.visualization
+															.animateGrowth}
+														animateTools={entry.visualization
+															.animateTools}
+														groundElements={groundProps.groundElements}
+														groundElementCount={groundProps.groundElementCount}
+													/>
+												{:else if entry.visualization.kind === 'potted-plant'}
+													<PottedPlant
+														stage={entry.visualization.stage}
+														seed={entry.visualization.seed}
+														{overlayConfig}
+													/>
+												{/if}
+
+												<!-- Hit-area polygon: expands clickable area for context menu -->
+												{#if entry.paddedHull.length >= 3}
+													<svg
+														class="absolute inset-0 size-full"
+														viewBox="0 0 {VIEWBOX_WIDTH} {VIEWBOX_HEIGHT}"
+														style:pointer-events="none"
+													>
+														<polygon
+															points={hullToSvgPoints(
+																entry.paddedHull,
+															)}
+															fill="transparent"
+															style:pointer-events="fill"
+														/>
+													</svg>
+												{/if}
+
+												<!-- Tooltip anchor: positioned at the crown top of the tree -->
+												<div
+													use:registerTooltipAnchor={entry.issue.id}
+													class="pointer-events-none absolute left-1/2 h-px w-px"
+													style:top="{entry.crownTopFraction * 100}%"
+													aria-hidden="true"
+												></div>
+											</button>
+										{/snippet}
+									</ForestTreeTooltip>
+								</ContextMenu.Trigger>
+								<ContextMenu.Content>
+									{#each contextMenuItems as item (item.action)}
+										<ContextMenu.Item
+											disabled={!isContextMenuActionEnabled(item.action)}
+											onclick={() => handleContextMenuAction(item.action)}
+										>
+											<item.icon class="size-4" />
+											{item.label()}
+										</ContextMenu.Item>
+									{/each}
+								</ContextMenu.Content>
+							</ContextMenu.Root>
+						</div>
 					{/if}
 				{/each}
 			{/if}
-			<button
-				type="button"
-				class="absolute inset-x-0 bottom-0 cursor-default border-0 p-0"
-				style:height="{groundStripHeight}px"
-				style="background: linear-gradient(to top, var(--ground-dark), var(--ground-color))"
-				style:z-index="1"
-				onclick={handleGroundClick}
-				oncontextmenu={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-				}}
-				tabindex="-1"
-				aria-label="Forest ground — click to deselect"
-			></button>
+
+			<!-- Ground — extends from highest tree down to bottom, layers above mountains -->
+			<div
+				class="pointer-events-none absolute inset-x-0 bottom-0"
+				style:top="{groundTopY}px"
+				style:z-index="2"
+				class:ground-gradient={true}
+			></div>
+
+			<!-- Mountains — proportionally scaled, cropped from top as container shrinks -->
+			{#if showMountains}
+				<svg
+					class="pointer-events-none absolute inset-x-0 top-0 w-full"
+					style:height="{mountainsHeight}px"
+					style:z-index="1"
+					style:opacity={mountainsOpacity}
+					style:transition="opacity var(--duration-4) ease"
+					viewBox="0 0 1400 600"
+					preserveAspectRatio="xMidYMax slice"
+					overflow="hidden"
+				>
+					<defs>
+						<linearGradient id="near-mountain-fill" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0%" stop-color="var(--mountain-near)" />
+							<stop offset="100%" stop-color="var(--ground-dark)" />
+						</linearGradient>
+					</defs>
+					<!-- Far mountains -->
+					<polygon
+						points="0,600 0,340 80,280 200,320 350,220 500,280 650,200 800,260 950,240 1100,300 1250,260 1400,320 1400,600"
+						style="fill: var(--mountain-far); opacity: 0.7"
+					/>
+					<!-- Mid mountains -->
+					<polygon
+						points="0,600 0,380 120,320 240,360 380,280 500,340 650,300 780,350 920,290 1060,340 1200,310 1400,370 1400,600"
+						style="fill: var(--mountain-mid); opacity: 0.85"
+					/>
+					<!-- Near mountains — blends into the ground div below -->
+					<polygon
+						points="0,600 0,420 100,380 220,410 340,360 480,400 600,370 740,410 860,380 1000,410 1140,370 1280,400 1400,420 1400,600"
+						fill="url(#near-mountain-fill)"
+					/>
+				</svg>
+			{/if}
+
+			{#if isDark}
+				<!-- Moon (dark mode only) -->
+				{#if showMoon}
+					<div
+						class="pointer-events-none absolute rounded-full"
+						style="
+							top: 8%;
+							right: 12%;
+							width: 40px;
+							height: 40px;
+							z-index: 1;
+							background: radial-gradient(circle, oklch(0.82 0.02 90) 0%, oklch(0.78 0.025 90) 60%, oklch(0.75 0.03 90) 100%);
+							box-shadow: 0 0 25px 10px var(--moon-glow), 0 0 50px 20px color-mix(in oklch, var(--moon-glow) 25%, transparent);
+						"
+					></div>
+				{/if}
+
+				<!-- Stars (dark mode only) -->
+				{#if showStars}
+					<div
+						class="pointer-events-none absolute inset-0 forest-stars"
+						style:z-index="1"
+					>
+						{#each STARS as star (star.x * 1000 + star.y)}
+							<div
+								class="absolute rounded-full forest-star"
+								style:left="{star.x}%"
+								style:top="{star.y}%"
+								style:width="{star.size}px"
+								style:height="{star.size}px"
+								style:opacity={star.opacity}
+								style:background="var(--star-color, oklch(0.75 0.02 90))"
+								style:animation-delay="{star.delay}s"
+							></div>
+						{/each}
+					</div>
+				{/if}
+			{/if}
 		</div>
 	</ContextMenu.Trigger>
+
+	<!-- Forest-level context menu -->
 	<ContextMenu.Content>
-		{#each contextMenuItems as item (item.action)}
-			<ContextMenu.Item
-				disabled={!isContextMenuActionEnabled(item.action)}
-				onclick={() => handleContextMenuAction(item.action)}
+		<ContextMenu.Sub>
+			<ContextMenu.SubTrigger>
+				<MountainIcon class="size-4" />
+				{m.forest_menu_background_theme()}
+			</ContextMenu.SubTrigger>
+			<ContextMenu.Portal>
+				<ContextMenu.SubContent>
+					<ContextMenu.RadioGroup
+						value={backgroundTheme}
+						onValueChange={handleBackgroundThemeChange}
+					>
+						{#each BACKGROUND_THEMES as theme (theme)}
+							<ContextMenu.RadioItem value={theme}>
+								{formatThemeName(theme)}
+							</ContextMenu.RadioItem>
+						{/each}
+					</ContextMenu.RadioGroup>
+				</ContextMenu.SubContent>
+			</ContextMenu.Portal>
+		</ContextMenu.Sub>
+		{#if isDark}
+			<ContextMenu.Separator />
+			<ContextMenu.CheckboxItem
+				checked={showMountains}
+				onCheckedChange={(checked) =>
+					void settingsCtx.set('showMountains', String(checked))}
 			>
-				<item.icon class="size-4" />
-				{item.label()}
-			</ContextMenu.Item>
-		{/each}
+				{m.forest_menu_show_mountains()}
+			</ContextMenu.CheckboxItem>
+			<ContextMenu.CheckboxItem
+				checked={showStars}
+				onCheckedChange={(checked) => void settingsCtx.set('showStars', String(checked))}
+			>
+				{m.forest_menu_show_stars()}
+			</ContextMenu.CheckboxItem>
+			<ContextMenu.CheckboxItem
+				checked={showMoon}
+				onCheckedChange={(checked) => void settingsCtx.set('showMoon', String(checked))}
+			>
+				{m.forest_menu_show_moon()}
+			</ContextMenu.CheckboxItem>
+		{/if}
 	</ContextMenu.Content>
 </ContextMenu.Root>
+
+<style>
+	.forest-star {
+		animation: -global-star-twinkle 3.5s ease-in-out infinite;
+	}
+
+	@keyframes -global-star-twinkle {
+		0%,
+		100% {
+			opacity: var(--tw-opacity, 0.5);
+		}
+
+		50% {
+			opacity: calc(var(--tw-opacity, 0.5) * 0.7);
+		}
+	}
+
+	.ground-gradient {
+		background: linear-gradient(to bottom, var(--ground-color), var(--ground-dark));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.forest-star {
+			animation: none;
+		}
+	}
+</style>

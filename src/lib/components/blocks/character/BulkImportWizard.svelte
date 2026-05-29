@@ -374,7 +374,7 @@
 													'flex w-full items-center gap-2 rounded px-2 py-1 text-xs transition-colors',
 													isActive
 														? 'bg-primary/10 text-primary'
-														: 'hover:bg-surface-2',
+														: 'hover:bg-surface-hover',
 													!isSelected && 'opacity-40',
 												)}
 												onclick={() => {

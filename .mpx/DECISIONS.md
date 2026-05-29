@@ -616,3 +616,49 @@ Decided: 2026-05-26
 What: Active tab `rounded-1.5` changed to `rounded-sm` (4px) in `tabs-variants.ts`. Container stays `rounded-md`.
 Why: `rounded-1.5` (6px) inside a `rounded-md` (6px) container with `p-0.75` padding visually reads as sharp corners — the inner element is too close to the container edge for the rounding to register. `rounded-sm` (4px) creates a visible inner radius.
 Rejected: Increase container rounding (would affect overall component shape), remove inner rounding (tabs would have truly sharp corners).
+
+---
+
+## Forest View & Environment
+
+### Background themes: renamed from palettes, data-bg-theme attribute
+
+Decided: 2026-05-28
+What: Rename "background palette" → "background theme" everywhere. HTML attribute `data-palette` → `data-bg-theme`. Setting key `backgroundPalette` → `backgroundTheme`. Type `BackgroundPalette` → `BackgroundTheme`. Constant `BACKGROUND_PALETTES` → `BACKGROUND_THEMES`. Avoids confusion with issue-color palettes and semantic conflict with `data-theme` (light/dark).
+Why: "Theme" better describes a mood/hue preset. `data-bg-theme` is unambiguous alongside `data-theme`.
+Rejected: `data-environment` (too long), `data-palette` (confusing with issue-color palettes), `data-theme` reuse (conflicts with light/dark).
+
+### Sharp ground edge via merged near-mountain SVG
+
+Decided: 2026-05-28
+What: Remove the separate ground gradient `<button>` as a visual element. The near-mountain SVG polygon's bottom fills to viewport bottom, acting as the visible ground. Its top edge creates a gently undulating terrain horizon — sharp, not foggy. Full-bleed clickable background div covers entire forest viewport for click-to-deselect and context menu. Trees in row 0 positioned at `GROUND_Y_FRACTION = 0.82`; mountain curve's lowest valley sits at or above that line.
+Why: The transparent→ground gradient created a fog/mist zone between sky and ground. Merging near mountains with ground creates a unified landscape. Flat tree Y positioning (82%) is simpler than matching each tree to the curve.
+Rejected: CSS clip-path (doesn't scale with viewport), hard gradient stop (too flat), per-tree Y matching to curve (complex for negligible benefit).
+
+### Mountain opacity increased for visibility
+
+Decided: 2026-05-28
+What: Bump mountain opacity: far 0.5→0.7, mid 0.7→0.85, near 0.85→1.0. Mountains always visible in all palettes, no toggle.
+Why: Mountains were nearly invisible in light mode due to sky/mountain color proximity combined with low opacity.
+Rejected: Toggle setting (unnecessary complexity — mountains are 3 polygons, essentially free).
+
+### Dark mode: stars + moon replace fireflies, all toggleable
+
+Decided: 2026-05-28
+What: Replace `FirefliesEffect` (library import) with local CSS stars — ~20-30 small circles (1-3px) in upper 60% of viewport, static positions, subtle twinkling animation (opacity ±10-20% from base, ~3-4s cycle, staggered). Moon dimmed: body `oklch(0.82→0.75)`, glow spread reduced (`25px 10px` / `50px 20px`), glow opacity 25%. Star brightness similar to moon. Three persisted settings: `showMountains`, `showStars`, `showMoon` — all dark-mode-only toggles in forest context menu. `prefers-reduced-motion` disables twinkling.
+Why: Firefly shapes looked weird. Stars (circles) fit the night sky better. Moon was too bright (pure white spotlight). All three effects are personal preference → persisted toggles.
+Rejected: Animated drifting stars (perf cost for no benefit), fireflies with different shapes (still looked odd), session-only toggles (inconsistent with other settings).
+
+### Forest view context menus: two-level separation
+
+Decided: 2026-05-28
+What: Two distinct context menus. (1) Forest-level: right-click on sky/ground/mountains → "Background Theme" radio submenu (Forest/Golden Hour/Twilight) + dark-mode toggles (Mountains/Stars/Moon). (2) Tree-level: right-click on a tree → issue-specific actions (Open GitHub, Start Session, Archive, etc.). Fix existing bug where tree context menu doesn't appear and forest-level menu incorrectly shows issue actions.
+Why: Previous single ContextMenu.Root couldn't distinguish between tree clicks and background clicks. Issue actions on sky/ground make no sense.
+Rejected: Single merged menu (confusing UX), forest settings only in Appearance page (less discoverable).
+
+### Issue-color palettes moved out of Appearance settings
+
+Decided: 2026-05-25
+What: Issue-color palette management (Vivid/Pastel/Muted + custom) removed from Appearance settings page. To be relocated to workspace/dashboard settings where palettes are actually assigned. Renamed to "Issue Color Palettes" to distinguish from background themes. Dashboard palette picker wiring tracked in #395.
+Why: Appearance page should be about look & feel (theme, accent, background theme). Issue-color pools are a per-dashboard data concern, not a global appearance setting.
+Rejected: Remove palette feature entirely (backend is fully wired, just needs UI), keep in Appearance (confusing alongside background themes), replace with background themes (different purpose).
