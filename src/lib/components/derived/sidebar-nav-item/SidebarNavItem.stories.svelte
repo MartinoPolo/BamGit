@@ -64,6 +64,7 @@
 </Story>
 
 <Story name="On Backgrounds">
+	<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -- Storybook requires template arg -->
 	{#snippet template(_args: NavItemProps)}
 		<div class="flex gap-8">
 			<div class="w-56 rounded-lg bg-sidebar p-2">

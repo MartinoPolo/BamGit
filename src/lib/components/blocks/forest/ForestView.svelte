@@ -611,7 +611,7 @@
 		const my = event.clientY - rect.top;
 		const targetId = findHoveredTreeId(mx, my);
 		if (targetId !== interaction.hoveredIssueId) {
-			if (targetId) {
+			if (targetId !== null) {
 				interaction.hoverIssue(targetId);
 			} else {
 				interaction.unhover();
@@ -689,7 +689,7 @@
 			style:min-height="0"
 			style:isolation="isolate"
 			style:contain="content"
-			style:cursor={interaction.hoveredIssueId ? 'pointer' : 'default'}
+			style:cursor={interaction.hoveredIssueId !== null ? 'pointer' : 'default'}
 			onkeydown={handleKeydown}
 			onpointermove={handleForestPointerMove}
 			onpointerleave={handleForestPointerLeave}
@@ -736,7 +736,7 @@
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div style="display: contents" oncontextmenu={(e) => e.stopPropagation()}>
 							<ContextMenu.Root
-								onOpenChange={(open) => {
+								onOpenChange={(open: boolean) => {
 									if (open) {
 										contextMenuIssueId =
 											interaction.hoveredIssueId ?? entry.issue.id;
