@@ -12,6 +12,7 @@
 		cacheSavingsEstimate: number;
 		maxToolCallCount: number;
 		maxTrendCost: number;
+		formatCost?: (amountUsd: number) => string;
 		activities: OverviewWorkspaceActivity[];
 		totals: OverviewWorkspaceTotals;
 		formatRelativeTime: (isoString: string | null) => string;
@@ -24,6 +25,7 @@
 		cacheSavingsEstimate,
 		maxToolCallCount,
 		maxTrendCost,
+		formatCost,
 		activities,
 		totals,
 		formatRelativeTime,
@@ -40,6 +42,7 @@
 		{cacheSavingsEstimate}
 		{maxToolCallCount}
 		{maxTrendCost}
+		{formatCost}
 		{onOpenUsage}
 	/>
 	<OverviewRecentActivityPanel {activities} {totals} {formatRelativeTime} {onOpenWorkspace} />

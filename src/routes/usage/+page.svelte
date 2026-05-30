@@ -27,8 +27,10 @@
 		type GroupByOption,
 		type UsageScope,
 	} from '$lib/modules/usage/usage_types.js';
-	import { exportUsageCsv } from '$lib/components/blocks/usage/csv_export.js';
-	import { formatCostDisplay } from '$lib/components/blocks/usage/cost_link_utils.js';
+	import {
+		exportUsageCsv,
+		type CsvCurrencyOptions,
+	} from '$lib/components/blocks/usage/csv_export.js';
 
 	import CostChart from '$lib/components/blocks/usage/CostChart.svelte';
 	import RefreshIndicator from '$lib/components/blocks/usage/RefreshIndicator.svelte';
@@ -147,7 +149,18 @@
 
 	function handleExportCsv() {
 		if (ctx.dashboardData.current) {
-			void exportUsageCsv(ctx.dashboardData.current, ctx.activePeriod.current);
+			let currencyOptions: CsvCurrencyOptions | undefined;
+			if (ctx.displayCurrency !== 'USD' && ctx.currentExchangeRate !== null) {
+				currencyOptions = {
+					currency: ctx.displayCurrency,
+					exchangeRate: ctx.currentExchangeRate,
+				};
+			}
+			void exportUsageCsv(
+				ctx.dashboardData.current,
+				ctx.activePeriod.current,
+				currencyOptions,
+			);
 		}
 	}
 
@@ -308,7 +321,7 @@
 						{/if}
 					</div>
 					<div class="text-2xl font-bold">
-						{formatCostDisplay(data.stats.total_cost_usd)}
+						{ctx.formatCost(data.stats.total_cost_usd)}
 					</div>
 					<div class={cn('text-xs', deltaTone(data.stats.cost_delta_percent))}>
 						{formatDelta(data.stats.cost_delta_percent)} vs prev period
@@ -339,7 +352,7 @@
 					<div class="text-sm text-muted-foreground">Cache hit</div>
 					<div class="text-2xl font-bold">{data.stats.cache_hit_ratio.toFixed(0)}%</div>
 					<div class="text-xs text-muted-foreground">
-						saving ≈ {formatCostDisplay(
+						saving ≈ {ctx.formatCost(
 							data.stats.total_cost_usd * (data.stats.cache_hit_ratio / 100) * 0.9,
 						)}/mo
 					</div>
@@ -359,6 +372,8 @@
 					colorTheme={ctx.colorTheme.current}
 					groupBy={ctx.groupBy.current}
 					period={ctx.activePeriod.current}
+					formatCostValue={ctx.formatCost}
+					currencyCode={ctx.displayCurrency}
 				/>
 			</div>
 		</Card.Card>
@@ -395,7 +410,7 @@
 									></div>
 								</div>
 								<span class="text-right text-sm tabular-nums"
-									>{formatCostDisplay(activity.cost_usd)}</span
+									>{ctx.formatCost(activity.cost_usd)}</span
 								>
 								<span class="text-right text-sm tabular-nums text-muted-foreground"
 									>{activity.turn_count}</span
@@ -452,7 +467,7 @@
 											/>
 										{/if}
 										<span class="shrink-0 tabular-nums font-medium"
-											>{formatCostDisplay(session.cost_usd)}</span
+											>{ctx.formatCost(session.cost_usd)}</span
 										>
 									</div>
 								</button>

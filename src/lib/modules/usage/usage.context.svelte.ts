@@ -23,6 +23,7 @@ import {
 	type RefreshState,
 	type UsageScope,
 } from './usage_types.js';
+import { formatCostWithFallback, type SupportedCurrency } from './currency.js';
 
 type UsageContext = ReturnType<typeof createUsageContext>;
 
@@ -64,6 +65,17 @@ function createUsageContext() {
 		},
 	};
 
+	const exchangeRates = new StateRaw<Record<string, number> | null>(null);
+	const exchangeRatesError = new StateRaw(false);
+
+	void invoke<Record<string, number>>('get_exchange_rates')
+		.then((rates) => {
+			exchangeRates.current = rates;
+		})
+		.catch(() => {
+			exchangeRatesError.current = true;
+		});
+
 	const dashboardData = new StateRaw<UsageDashboardData | null>(null);
 	const achievements = new StateRaw<Achievement[]>([]);
 	const refreshState = new StateRaw<RefreshState>(REFRESH_STATES.idle);
@@ -83,6 +95,24 @@ function createUsageContext() {
 	const unlockedCount = $derived.by(
 		() => achievements.current.filter((a) => a.unlocked_at !== null).length,
 	);
+
+	const displayCurrency: SupportedCurrency = $derived(settings.getDisplayCurrency());
+
+	const currentExchangeRate = $derived.by((): number | null => {
+		if (displayCurrency === 'USD') {
+			return 1;
+		}
+		return exchangeRates.current?.[displayCurrency] ?? null;
+	});
+
+	function formatCost(amountUsd: number): string {
+		return formatCostWithFallback(
+			amountUsd,
+			displayCurrency,
+			currentExchangeRate,
+			exchangeRatesError.current,
+		);
+	}
 
 	let staleTimer: ReturnType<typeof setTimeout> | undefined;
 	let freshTimer: ReturnType<typeof setTimeout> | undefined;
@@ -204,6 +234,15 @@ function createUsageContext() {
 		get unlockedCount() {
 			return unlockedCount;
 		},
+		get displayCurrency() {
+			return displayCurrency;
+		},
+		get currentExchangeRate() {
+			return currentExchangeRate;
+		},
+		exchangeRates,
+		exchangeRatesError,
+		formatCost,
 		loadData,
 		loadAchievements,
 		notifyNewData,

@@ -11,6 +11,8 @@
 	interface Props {
 		workspaces: OverviewWorkspaceData[];
 		footerContent?: OverviewFooterContent;
+		currency?: string;
+		exchangeRate?: number | null;
 		onAddWorkspace: () => void;
 		onOpenWorkspace: (dashboardId: string) => void;
 		onGithubClick: (workspace: OverviewWorkspaceData) => void;
@@ -28,6 +30,8 @@
 	let {
 		workspaces,
 		footerContent = OVERVIEW_FOOTER_CONTENT_DEFAULT,
+		currency,
+		exchangeRate,
 		onAddWorkspace,
 		onOpenWorkspace,
 		onGithubClick,
@@ -59,6 +63,8 @@
 			<WorkspaceCard
 				{workspace}
 				{footerContent}
+				{currency}
+				{exchangeRate}
 				onclick={() => onOpenWorkspace(workspace.dashboard_id)}
 				onGithubClick={() => onGithubClick(workspace)}
 				onFolderClick={() => onFolderClick(workspace)}

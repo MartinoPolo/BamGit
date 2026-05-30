@@ -11,6 +11,7 @@ export const SETTING_KEYS = {
 	// General
 	startupBehavior: 'startup_behavior',
 	chartColorTheme: 'chart_color_theme',
+	displayCurrency: 'display_currency',
 	language: 'language',
 
 	// Notifications
@@ -51,6 +52,7 @@ export const SETTING_DEFAULTS: Record<SettingKey, string> = {
 	userInitials: 'U',
 	startupBehavior: 'last-workspace',
 	chartColorTheme: 'monochrome',
+	displayCurrency: 'USD',
 	language: 'en',
 	editorCommand: 'code',
 	notificationVolume: '0.7',
@@ -86,6 +88,7 @@ export const WORKSPACE_OVERRIDABLE_KEYS: readonly SettingKey[] = [
 	'issueCardHeaderSaturation',
 	'issueCardRadialIntensity',
 	'chartColorTheme',
+	'displayCurrency',
 	'notificationVolume',
 	'showMountains',
 	'showStars',

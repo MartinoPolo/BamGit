@@ -23,9 +23,19 @@
 		colorTheme: ChartColorTheme;
 		groupBy: GroupByOption;
 		period: MetricsPeriod;
+		formatCostValue?: (amountUsd: number) => string;
+		currencyCode?: string;
 	}
 
-	let { data, groupedData = [], colorTheme, groupBy, period }: Props = $props();
+	let {
+		data,
+		groupedData = [],
+		colorTheme,
+		groupBy,
+		period,
+		formatCostValue,
+		currencyCode = 'USD',
+	}: Props = $props();
 
 	const chartColors = [
 		'var(--chart-1)',
@@ -128,6 +138,9 @@
 		if (typeof value !== 'number') {
 			return String(value);
 		}
+		if (formatCostValue !== undefined) {
+			return formatCostValue(value);
+		}
 		if (value === 0) {
 			return '$0';
 		}
@@ -150,7 +163,7 @@
 		}
 		return {
 			cost_usd: {
-				label: 'Cost (USD)',
+				label: `Cost (${currencyCode})`,
 				color: 'var(--chart-1)',
 			},
 		} satisfies Chart.ChartConfig;
@@ -174,7 +187,10 @@
 				}}
 			>
 				{#snippet tooltip()}
-					<Chart.Tooltip labelFormatter={(value) => formatXLabel(value)} />
+					<Chart.Tooltip
+						labelFormatter={(value) => formatXLabel(value)}
+						valueFormatter={formatCostValue}
+					/>
 				{/snippet}
 			</BarChart>
 		{:else}
@@ -204,6 +220,7 @@
 							}
 							return label;
 						}}
+						valueFormatter={formatCostValue}
 					/>
 				{/snippet}
 			</BarChart>

@@ -27,6 +27,7 @@ import {
 	isBackgroundTheme,
 	type ThemeMode,
 } from '$lib/modules/board/types.js';
+import { isSupportedCurrency, type SupportedCurrency } from '$lib/modules/usage/currency.js';
 
 // ─── Context ──────────────────────────────────────────────────────────────
 
@@ -205,6 +206,13 @@ function createSettingsContext() {
 		return (values.get('showMoon') ?? SETTING_DEFAULTS.showMoon) === 'true';
 	}
 
+	function getDisplayCurrency(): SupportedCurrency {
+		const raw = values.get('displayCurrency') ?? SETTING_DEFAULTS.displayCurrency;
+		return isSupportedCurrency(raw)
+			? raw
+			: (SETTING_DEFAULTS.displayCurrency as SupportedCurrency);
+	}
+
 	function setReturnUrl(url: string): void {
 		returnUrl.current = url;
 	}
@@ -223,6 +231,7 @@ function createSettingsContext() {
 		getShowMountains,
 		getShowStars,
 		getShowMoon,
+		getDisplayCurrency,
 		get isDark() {
 			return isDark;
 		},
