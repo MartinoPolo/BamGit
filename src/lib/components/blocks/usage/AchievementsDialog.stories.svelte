@@ -1,5 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import { expect, waitFor, within } from 'storybook/test';
 	import AchievementsDialog from './AchievementsDialog.svelte';
 	import type { Achievement } from '$lib/types/generated/index.js';
 
@@ -59,9 +60,43 @@
 		component: AchievementsDialog,
 		tags: ['autodocs'],
 	});
+
+	const playDefaultDialog = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+		const canvas = within(canvasElement);
+
+		// Find the trigger button — shows "2/6" text
+		const triggerButton = canvas.getByRole('button', { name: /2\/6/ });
+		await expect(triggerButton).toBeInTheDocument();
+
+		// Open dialog — use native click for bits-ui child-snippet trigger
+		triggerButton.click();
+
+		// Both Dialog.Description (sr-only) and visible div contain "2 of 6 unlocked"
+		await waitFor(() => {
+			const matches = canvas.getAllByText('2 of 6 unlocked');
+			expect(matches.length).toBeGreaterThanOrEqual(1);
+		});
+
+		// Verify unlocked achievements have primary styling
+		const firstSeed = canvas.getByText('First Seed').closest('div[class*="rounded-lg"]');
+		await expect(firstSeed).toHaveClass(/bg-primary/);
+
+		// Verify not-yet-unlocked have opacity
+		const greenThumb = canvas.getByText('Green Thumb').closest('div[class*="rounded-lg"]');
+		await expect(greenThumb).toHaveClass(/opacity-50/);
+
+		// Close dialog — find close button (aria-label="Close")
+		const closeButton = canvas.getByRole('button', { name: 'Close' });
+		closeButton.click();
+
+		// Verify dialog is closed
+		await waitFor(() => {
+			expect(canvas.queryByText('2 of 6 unlocked')).not.toBeInTheDocument();
+		});
+	};
 </script>
 
-<Story name="Default">
+<Story name="Default [play: open/close and states]" play={playDefaultDialog}>
 	{#snippet template()}
 		<div class="flex items-center justify-center p-8">
 			<AchievementsDialog

@@ -22,7 +22,12 @@
 	}
 </script>
 
-<Select {value} onchange={handleChange} class="h-8 w-auto min-w-35 text-sm">
+<Select
+	{value}
+	onchange={handleChange}
+	class="h-8 w-auto min-w-35 text-sm"
+	aria-label="Usage scope"
+>
 	{#each scopeOptions as option (option.value)}
 		<option value={option.value}>{option.label}</option>
 	{/each}
