@@ -317,12 +317,10 @@ fn import_single_claude_session(conn: &Connection, path: &Path) -> Result<Import
 }
 
 fn import_cursor_sessions(conn: &Connection) -> ImportResult {
-    let mut result = ImportResult::empty();
-
     let cursor_db_path = get_cursor_db_path();
     let cursor_db_path = match cursor_db_path {
         Some(p) if p.exists() => p,
-        _ => return result,
+        _ => return ImportResult::empty(),
     };
 
     let cursor_conn = match rusqlite::Connection::open_with_flags(
@@ -332,9 +330,15 @@ fn import_cursor_sessions(conn: &Connection) -> ImportResult {
         Ok(c) => c,
         Err(e) => {
             log::warn!("Failed to open Cursor DB: {e}");
-            return result;
+            return ImportResult::empty();
         }
     };
+
+    import_cursor_sessions_from(conn, &cursor_conn)
+}
+
+fn import_cursor_sessions_from(conn: &Connection, cursor_conn: &Connection) -> ImportResult {
+    let mut result = ImportResult::empty();
 
     let mut stmt = match cursor_conn.prepare(
         "SELECT key, value FROM cursorDiskKV WHERE key LIKE 'bubbleId:%'"
@@ -665,4 +669,317 @@ fn compute_duration_seconds(start: &str, end: Option<&str>) -> Option<f64> {
         .or_else(|_| chrono::NaiveDateTime::parse_from_str(end, "%Y-%m-%d %H:%M:%S"))
         .ok()?;
     Some((end_dt - start_dt).num_seconds() as f64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use tempfile::TempDir;
+
+    fn setup_db() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        crate::database::schema::create_tables(&conn).unwrap();
+        conn
+    }
+
+    fn query_tool_names(conn: &Connection, session_id: &str) -> Vec<String> {
+        let mut stmt = conn
+            .prepare("SELECT tool_name FROM tool_usage WHERE session_id = ?1 ORDER BY tool_name")
+            .unwrap();
+        stmt.query_map([session_id], |row| row.get(0))
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect()
+    }
+
+    fn write_jsonl(dir: &TempDir, filename: &str, lines: &[&str]) -> PathBuf {
+        let path = dir.path().join(filename);
+        let mut file = std::fs::File::create(&path).unwrap();
+        for line in lines {
+            writeln!(file, "{}", line).unwrap();
+        }
+        path
+    }
+
+    // ── Group 1: Claude Code JSONL Parser ──
+
+    #[test]
+    fn test_claude_valid_session_import() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "test-session.jsonl", &[
+            r#"{"type":"system","model":"claude-sonnet-4-20250514","timestamp":"2025-01-01T10:00:00Z"}"#,
+            r#"{"type":"user","message":{"content":"fix the bug"},"timestamp":"2025-01-01T10:00:01Z"}"#,
+            r#"{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read","id":"1"}]},"timestamp":"2025-01-01T10:00:02Z"}"#,
+            r#"{"type":"result","usage":{"input_tokens":100,"output_tokens":50,"cache_read_input_tokens":30,"cache_creation_input_tokens":10},"total_cost_usd":0.05,"timestamp":"2025-01-01T10:00:03Z"}"#,
+            r#"{"type":"user","message":{"content":"now edit it"},"timestamp":"2025-01-01T10:01:00Z"}"#,
+            r#"{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Edit","id":"2"}]},"timestamp":"2025-01-01T10:01:01Z"}"#,
+            r#"{"type":"result","usage":{"input_tokens":200,"output_tokens":100,"cache_read_input_tokens":50,"cache_creation_input_tokens":20},"total_cost_usd":0.10,"timestamp":"2025-01-01T10:01:02Z"}"#,
+        ]);
+
+        let result = import_single_claude_session(&conn, &path).unwrap();
+
+        assert_eq!(result.sessions_imported, 1);
+        assert_eq!(result.turns_imported, 2);
+        assert_eq!(result.tool_calls_imported, 2);
+
+        let (input_tokens, output_tokens, cost_usd, model): (i64, i64, f64, String) = conn
+            .query_row(
+                "SELECT input_tokens, output_tokens, cost_usd, model FROM session_metrics WHERE session_id = ?1",
+                ["imported-test-session"],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            )
+            .unwrap();
+
+        assert_eq!(input_tokens, 300);
+        assert_eq!(output_tokens, 150);
+        assert!((cost_usd - 0.15).abs() < 1e-10);
+        assert_eq!(model, "claude-sonnet-4-20250514");
+
+        let dedup_key: String = conn
+            .query_row(
+                "SELECT dedup_key FROM import_history WHERE dedup_key = ?1",
+                ["claude:test-session"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(dedup_key, "claude:test-session");
+    }
+
+    #[test]
+    fn test_claude_malformed_json_lines_skipped() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "malformed.jsonl", &[
+            r#"{"type":"system","model":"claude-sonnet-4-20250514","timestamp":"2025-01-01T10:00:00Z"}"#,
+            "not valid json",
+            r#"{"type":"user","message":{"content":"hello"},"timestamp":"2025-01-01T10:00:01Z"}"#,
+            r#"{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read","id":"1"}]},"timestamp":"2025-01-01T10:00:02Z"}"#,
+            r#"{"type":"result","usage":{"input_tokens":100,"output_tokens":50},"total_cost_usd":0.05,"timestamp":"2025-01-01T10:00:03Z"}"#,
+        ]);
+
+        let result = import_single_claude_session(&conn, &path).unwrap();
+        assert_eq!(result.sessions_imported, 1, "Should parse successfully despite malformed line");
+    }
+
+    #[test]
+    fn test_claude_dedup_skips_second_import() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "dedup-test.jsonl", &[
+            r#"{"type":"system","model":"claude-sonnet-4-20250514","timestamp":"2025-01-01T10:00:00Z"}"#,
+            r#"{"type":"user","message":{"content":"hello"},"timestamp":"2025-01-01T10:00:01Z"}"#,
+            r#"{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read","id":"1"}]},"timestamp":"2025-01-01T10:00:02Z"}"#,
+            r#"{"type":"result","usage":{"input_tokens":100,"output_tokens":50},"total_cost_usd":0.05,"timestamp":"2025-01-01T10:00:03Z"}"#,
+        ]);
+
+        let first = import_single_claude_session(&conn, &path).unwrap();
+        assert_eq!(first.sessions_imported, 1);
+
+        let second = import_single_claude_session(&conn, &path).unwrap();
+        assert_eq!(second.sessions_skipped, 1);
+        assert_eq!(second.sessions_imported, 0);
+    }
+
+    #[test]
+    fn test_claude_empty_file_returns_empty() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "empty.jsonl", &[]);
+
+        let result = import_single_claude_session(&conn, &path).unwrap();
+        assert_eq!(result.sessions_imported, 0);
+    }
+
+    #[test]
+    fn test_claude_category_classification() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "edit-session.jsonl", &[
+            r#"{"type":"system","model":"claude-sonnet-4-20250514","timestamp":"2025-01-01T10:00:00Z"}"#,
+            r#"{"type":"user","message":{"content":"update the file"},"timestamp":"2025-01-01T10:00:01Z"}"#,
+            r#"{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Edit","id":"1"}]},"timestamp":"2025-01-01T10:00:02Z"}"#,
+            r#"{"type":"result","usage":{"input_tokens":100,"output_tokens":50},"total_cost_usd":0.05,"timestamp":"2025-01-01T10:00:03Z"}"#,
+        ]);
+
+        import_single_claude_session(&conn, &path).unwrap();
+
+        let has_edits: i64 = conn
+            .query_row(
+                "SELECT has_edits FROM turn_metrics WHERE session_id = ?1",
+                ["imported-edit-session"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(has_edits, 1, "Turn with Edit tool should have has_edits = 1");
+    }
+
+    // ── Group 2: Cursor SQLite Parser ──
+
+    fn setup_cursor_db(cursor_conn: &Connection, entries: &[(&str, &str)]) {
+        cursor_conn
+            .execute(
+                "CREATE TABLE cursorDiskKV (key TEXT PRIMARY KEY, value TEXT)",
+                [],
+            )
+            .unwrap();
+        for (key, value) in entries {
+            cursor_conn
+                .execute(
+                    "INSERT INTO cursorDiskKV (key, value) VALUES (?1, ?2)",
+                    rusqlite::params![key, value],
+                )
+                .unwrap();
+        }
+    }
+
+    #[test]
+    fn test_cursor_valid_conversation_import() {
+        let conn = setup_db();
+        let cursor_conn = Connection::open_in_memory().unwrap();
+        let bubble_json = r#"{"conversationId":"conv-123","createdAt":"2025-01-01T10:00:00Z","tokenCount":{"inputTokens":100,"outputTokens":50},"modelInfo":{"modelName":"gpt-4"}}"#;
+        setup_cursor_db(&cursor_conn, &[("bubbleId:1", bubble_json)]);
+
+        let result = import_cursor_sessions_from(&conn, &cursor_conn);
+
+        assert_eq!(result.sessions_imported, 1);
+
+        let provider: String = conn
+            .query_row(
+                "SELECT provider FROM sessions WHERE id = ?1",
+                ["imported-cursor-conv-123"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(provider, "cursor");
+
+        let dedup_exists: bool = conn
+            .query_row(
+                "SELECT COUNT(*) > 0 FROM import_history WHERE dedup_key = ?1",
+                ["cursor:conv-123"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert!(dedup_exists);
+    }
+
+    #[test]
+    fn test_cursor_empty_db_returns_empty() {
+        let conn = setup_db();
+        let cursor_conn = Connection::open_in_memory().unwrap();
+        setup_cursor_db(&cursor_conn, &[]);
+
+        let result = import_cursor_sessions_from(&conn, &cursor_conn);
+        assert_eq!(result.sessions_imported, 0);
+    }
+
+    #[test]
+    fn test_cursor_dedup_skips_second_import() {
+        let conn = setup_db();
+        let cursor_conn = Connection::open_in_memory().unwrap();
+        let bubble_json = r#"{"conversationId":"conv-456","createdAt":"2025-01-01T10:00:00Z","tokenCount":{"inputTokens":100,"outputTokens":50},"modelInfo":{"modelName":"gpt-4"}}"#;
+        setup_cursor_db(&cursor_conn, &[("bubbleId:1", bubble_json)]);
+
+        let first = import_cursor_sessions_from(&conn, &cursor_conn);
+        assert_eq!(first.sessions_imported, 1);
+
+        let second = import_cursor_sessions_from(&conn, &cursor_conn);
+        assert_eq!(second.sessions_skipped, 1);
+        assert_eq!(second.sessions_imported, 0);
+    }
+
+    // ── Group 3: Codex JSONL Parser ──
+
+    #[test]
+    fn test_codex_valid_session_import() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "codex-session.jsonl", &[
+            r#"{"type":"session_meta","payload":{"originator":"codex-cli","session_id":"sess-abc"}}"#,
+            r#"{"type":"event_msg","event_type":"token_count","info":{"last_token_usage":{"input_tokens":200,"output_tokens":80}},"timestamp":"2025-01-01T10:00:00Z"}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"exec_command"}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"read_file"}"#,
+        ]);
+
+        let result = import_single_codex_session(&conn, &path).unwrap();
+
+        assert_eq!(result.sessions_imported, 1);
+        assert_eq!(result.tool_calls_imported, 2);
+
+        let session_exists: bool = conn
+            .query_row(
+                "SELECT COUNT(*) > 0 FROM sessions WHERE id = ?1",
+                ["imported-codex-sess-abc"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert!(session_exists);
+
+        let dedup_exists: bool = conn
+            .query_row(
+                "SELECT COUNT(*) > 0 FROM import_history WHERE dedup_key = ?1",
+                ["codex:sess-abc"],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert!(dedup_exists);
+
+        let tool_names = query_tool_names(&conn, "imported-codex-sess-abc");
+        assert!(tool_names.contains(&"Bash".to_string()));
+        assert!(tool_names.contains(&"Read".to_string()));
+    }
+
+    #[test]
+    fn test_codex_non_codex_originator_skipped() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "not-codex.jsonl", &[
+            r#"{"type":"session_meta","payload":{"originator":"not-codex","session_id":"sess-xyz"}}"#,
+            r#"{"type":"event_msg","event_type":"token_count","info":{"last_token_usage":{"input_tokens":100,"output_tokens":50}},"timestamp":"2025-01-01T10:00:00Z"}"#,
+        ]);
+
+        let result = import_single_codex_session(&conn, &path).unwrap();
+        assert_eq!(result.sessions_imported, 0);
+    }
+
+    #[test]
+    fn test_codex_dedup_skips_second_import() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "codex-dedup.jsonl", &[
+            r#"{"type":"session_meta","payload":{"originator":"codex-cli","session_id":"sess-dedup"}}"#,
+            r#"{"type":"event_msg","event_type":"token_count","info":{"last_token_usage":{"input_tokens":100,"output_tokens":50}},"timestamp":"2025-01-01T10:00:00Z"}"#,
+        ]);
+
+        let first = import_single_codex_session(&conn, &path).unwrap();
+        assert_eq!(first.sessions_imported, 1);
+
+        let second = import_single_codex_session(&conn, &path).unwrap();
+        assert_eq!(second.sessions_skipped, 1);
+        assert_eq!(second.sessions_imported, 0);
+    }
+
+    #[test]
+    fn test_codex_tool_name_mapping() {
+        let conn = setup_db();
+        let dir = TempDir::new().unwrap();
+        let path = write_jsonl(&dir, "codex-tools.jsonl", &[
+            r#"{"type":"session_meta","payload":{"originator":"codex-cli","session_id":"sess-tools"}}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"exec_command"}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"read_file"}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"write_file"}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"spawn_agent"}"#,
+            r#"{"type":"response_item","item_type":"function_call","name":"read_dir"}"#,
+        ]);
+
+        import_single_codex_session(&conn, &path).unwrap();
+
+        let tool_names = query_tool_names(&conn, "imported-codex-sess-tools");
+        assert!(tool_names.contains(&"Bash".to_string()), "exec_command should map to Bash");
+        assert!(tool_names.contains(&"Read".to_string()), "read_file should map to Read");
+        assert!(tool_names.contains(&"Edit".to_string()), "write_file should map to Edit");
+        assert!(tool_names.contains(&"Agent".to_string()), "spawn_agent should map to Agent");
+        assert!(tool_names.contains(&"Glob".to_string()), "read_dir should map to Glob");
+    }
 }

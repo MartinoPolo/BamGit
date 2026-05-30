@@ -144,6 +144,15 @@ mod tests {
         conn
     }
 
+    fn get_progress(conn: &Connection, kind: &str) -> i64 {
+        conn.query_row(
+            "SELECT progress FROM achievements WHERE kind = ?1",
+            [kind],
+            |row| row.get(0),
+        )
+        .unwrap_or(0)
+    }
+
     #[test]
     fn increment_below_threshold_does_not_unlock() {
         let conn = setup_db();
@@ -181,15 +190,7 @@ mod tests {
     fn one_shot_wonder_increments_on_perfect_rate() {
         let conn = setup_db();
         let unlocked = check_session_achievements(&conn, 0.0, None, 0.0, 3, 3);
-        let progress: i64 = conn
-            .query_row(
-                "SELECT progress FROM achievements WHERE kind = 'one-shot-wonder'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap_or(0);
-        assert_eq!(progress, 1, "OneShotWonder should be incremented when one_shot_turns == edit_turns");
-        // Should not be in unlocked list yet (threshold is 5)
+        assert_eq!(get_progress(&conn, "one-shot-wonder"), 1, "OneShotWonder should be incremented when one_shot_turns == edit_turns");
         assert!(!unlocked.contains(&AchievementKind::OneShotWonder));
     }
 
@@ -197,27 +198,123 @@ mod tests {
     fn one_shot_wonder_does_not_increment_on_imperfect_rate() {
         let conn = setup_db();
         check_session_achievements(&conn, 0.0, None, 0.0, 2, 5);
-        let progress: i64 = conn
-            .query_row(
-                "SELECT progress FROM achievements WHERE kind = 'one-shot-wonder'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap_or(0);
-        assert_eq!(progress, 0, "OneShotWonder should not increment when one_shot_turns != edit_turns");
+        assert_eq!(get_progress(&conn, "one-shot-wonder"), 0, "OneShotWonder should not increment when one_shot_turns != edit_turns");
     }
 
     #[test]
     fn one_shot_wonder_does_not_increment_on_zero_turns() {
         let conn = setup_db();
         check_session_achievements(&conn, 0.0, None, 0.0, 0, 0);
-        let progress: i64 = conn
-            .query_row(
-                "SELECT progress FROM achievements WHERE kind = 'one-shot-wonder'",
-                [],
-                |row| row.get(0),
-            )
-            .unwrap_or(0);
-        assert_eq!(progress, 0, "OneShotWonder should not increment when edit_turns == 0");
+        assert_eq!(get_progress(&conn, "one-shot-wonder"), 0, "OneShotWonder should not increment when edit_turns == 0");
+    }
+
+    // ── Group 4: Achievement Triggers ──
+
+    #[test]
+    fn test_speed_runner_triggers_under_60_seconds() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, Some(30.0), 0.0, 0, 0);
+        assert_eq!(get_progress(&conn, "speed-runner"), 1, "SpeedRunner should trigger for duration < 60s");
+    }
+
+    #[test]
+    fn test_speed_runner_does_not_trigger_at_60() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, Some(60.0), 0.0, 0, 0);
+        assert_eq!(get_progress(&conn, "speed-runner"), 0, "SpeedRunner should NOT trigger at exactly 60s (condition is < 60.0)");
+    }
+
+    #[test]
+    fn test_speed_runner_does_not_trigger_on_none() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, None, 0.0, 0, 0);
+        assert_eq!(get_progress(&conn, "speed-runner"), 0, "SpeedRunner should NOT trigger when duration is None");
+    }
+
+    #[test]
+    fn test_cache_master_triggers_at_90_percent() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, None, 90.0, 0, 0);
+        assert_eq!(get_progress(&conn, "cache-master"), 1, "CacheMaster should trigger at 90.0% cache hit ratio");
+    }
+
+    #[test]
+    fn test_cache_master_does_not_trigger_at_89_9() {
+        let conn = setup_db();
+        check_session_achievements(&conn, 0.0, None, 89.9, 0, 0);
+        assert_eq!(get_progress(&conn, "cache-master"), 0, "CacheMaster should NOT trigger at 89.9%");
+    }
+
+    #[test]
+    fn test_big_spender_increments_at_100_dollars() {
+        let conn = setup_db();
+        conn.execute(
+            "INSERT INTO sessions (id, provider, state, started_at) VALUES ('s1', 'claude-code', 'finished', '2025-01-01T00:00:00Z')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO session_metrics (session_id, provider, cost_usd, started_at) VALUES ('s1', 'claude-code', 100.0, '2025-01-01T00:00:00Z')",
+            [],
+        ).unwrap();
+
+        // _cost_usd param is unused — BigSpender queries SUM(cost_usd) from session_metrics directly
+        check_session_achievements(&conn, 0.0, None, 0.0, 0, 0);
+
+        assert_eq!(get_progress(&conn, "big-spender"), 1, "BigSpender progress should be 1 when SUM(cost_usd) >= 100");
+    }
+
+    #[test]
+    fn test_big_spender_does_not_increment_at_99() {
+        let conn = setup_db();
+        conn.execute(
+            "INSERT INTO sessions (id, provider, state, started_at) VALUES ('s1', 'claude-code', 'finished', '2025-01-01T00:00:00Z')",
+            [],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO session_metrics (session_id, provider, cost_usd, started_at) VALUES ('s1', 'claude-code', 99.0, '2025-01-01T00:00:00Z')",
+            [],
+        ).unwrap();
+
+        check_session_achievements(&conn, 0.0, None, 0.0, 0, 0);
+
+        assert_eq!(get_progress(&conn, "big-spender"), 0, "BigSpender should NOT increment when SUM(cost_usd) < 100");
+    }
+
+    // ── Group 5: Integration Test ──
+
+    #[test]
+    fn test_session_completion_integration() {
+        let conn = setup_db();
+
+        conn.execute(
+            "INSERT INTO sessions (id, provider, state, started_at, ended_at, cost_usd, token_count) \
+             VALUES ('int-test-1', 'claude-code', 'finished', '2025-01-01T10:00:00Z', '2025-01-01T10:00:30Z', 0.50, 500)",
+            [],
+        ).unwrap();
+
+        conn.execute(
+            "INSERT INTO session_metrics \
+             (session_id, provider, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
+              cost_usd, duration_seconds, turn_count, tool_call_count, one_shot_turns, edit_turns, started_at, ended_at) \
+             VALUES ('int-test-1', 'claude-code', 'claude-sonnet-4-20250514', 300, 200, 270, 10, 0.50, 25.0, 3, 5, 2, 2, \
+                     '2025-01-01T10:00:00Z', '2025-01-01T10:00:30Z')",
+            [],
+        ).unwrap();
+
+        // cache_hit_ratio = 270 / (270 + 300) * 100 = 47.4%
+        let cache_hit_ratio = 270.0 / (270.0 + 300.0) * 100.0;
+        let unlocked = check_session_achievements(&conn, 0.50, Some(25.0), cache_hit_ratio, 2, 2);
+
+        assert_eq!(get_progress(&conn, "green-thumb"), 1, "GreenThumb should be incremented");
+        assert!(!unlocked.contains(&AchievementKind::GreenThumb), "GreenThumb should not be unlocked yet (threshold 10)");
+
+        assert_eq!(get_progress(&conn, "speed-runner"), 1, "SpeedRunner should be incremented (25s < 60s)");
+        assert!(unlocked.contains(&AchievementKind::SpeedRunner), "SpeedRunner should be unlocked (threshold 1)");
+
+        assert_eq!(get_progress(&conn, "cache-master"), 0, "CacheMaster should NOT be incremented (47.4% < 90%)");
+
+        assert_eq!(get_progress(&conn, "one-shot-wonder"), 1, "OneShotWonder should be incremented (2 == 2, both > 0)");
+
+        assert_eq!(get_progress(&conn, "big-spender"), 0, "BigSpender should NOT be incremented (total cost $0.50)");
     }
 }
