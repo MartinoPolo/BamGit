@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/shadcn/button/index.js';
-	import { formatCostDisplay } from '$lib/components/blocks/usage/cost_link_utils.js';
+	import { formatCostWithFallback } from '$lib/modules/usage/currency.js';
 	import type { UsageDashboardData } from '$lib/types/generated';
 	import {
 		overviewMetricCardClass,
@@ -13,11 +13,18 @@
 		cacheSavingsEstimate: number;
 		maxToolCallCount: number;
 		maxTrendCost: number;
+		formatCost?: (amountUsd: number) => string;
 		onOpenUsage: () => void;
 	}
 
-	let { usageData, cacheSavingsEstimate, maxToolCallCount, maxTrendCost, onOpenUsage }: Props =
-		$props();
+	let {
+		usageData,
+		cacheSavingsEstimate,
+		maxToolCallCount,
+		maxTrendCost,
+		formatCost = (amountUsd: number) => formatCostWithFallback(amountUsd, 'USD', 1),
+		onOpenUsage,
+	}: Props = $props();
 
 	function formatDelta(value: number | null | undefined): string {
 		if (value == null) {
@@ -54,7 +61,7 @@
 					>30d cost</span
 				>
 				<strong class="mt-1 block font-mono text-xl leading-none font-semibold">
-					{formatCostDisplay(usageData.stats.total_cost_usd)}
+					{formatCost(usageData.stats.total_cost_usd)}
 				</strong>
 				<small class="mt-1 block text-[11px] text-foreground-muted">
 					{formatDelta(usageData.stats.cost_delta_percent)}
@@ -90,7 +97,7 @@
 					{usageData.stats.cache_hit_ratio.toFixed(0)}%
 				</strong>
 				<small class="mt-1 block text-[11px] text-foreground-muted">
-					saving ~{formatCostDisplay(cacheSavingsEstimate)}/mo
+					saving ~{formatCost(cacheSavingsEstimate)}/mo
 				</small>
 			</div>
 		</div>
@@ -106,7 +113,7 @@
 					{#each usageData.time_bucket_costs.slice(-14) as bucket (bucket.date)}
 						<span
 							class="w-full min-w-1.5 rounded-t-xs bg-linear-to-b from-moss-300 to-[color-mix(in_oklch,var(--moss-500)_65%,var(--surface))]"
-							title={`${bucket.date}: ${formatCostDisplay(bucket.cost_usd)}`}
+							title={`${bucket.date}: ${formatCost(bucket.cost_usd)}`}
 							style:height={`${Math.max(10, (bucket.cost_usd / maxTrendCost) * 44)}px`}
 						></span>
 					{/each}

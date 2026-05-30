@@ -247,6 +247,8 @@
 			<OverviewWorkspaceGrid
 				workspaces={displayedWorkspaces}
 				footerContent={toolbar.footerContent.current}
+				currency={usageCtx.displayCurrency}
+				exchangeRate={usageCtx.currentExchangeRate}
 				onAddWorkspace={() => (boardStore.showCreateDialog = true)}
 				onOpenWorkspace={handleOpenWorkspace}
 				onGithubClick={handleGithubClick}
@@ -287,6 +289,7 @@
 				{cacheSavingsEstimate}
 				{maxToolCallCount}
 				{maxTrendCost}
+				formatCost={usageCtx.formatCost}
 				activities={recentWorkspaceActivities}
 				totals={workspaceTotals}
 				formatRelativeTime={formatWorkspaceActivityRelativeTime}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateUsageCsv } from './csv_export.js';
+import { generateUsageCsv, type CsvCurrencyOptions } from './csv_export.js';
 import type { UsageDashboardData } from '$lib/types/generated/index.js';
 
 function createTestData(overrides: Partial<UsageDashboardData> = {}): UsageDashboardData {
@@ -160,5 +160,41 @@ describe('generateUsageCsv — Tool Usage section', () => {
 		const csv = generateUsageCsv(createTestData());
 		expect(csv).toContain('Read,150');
 		expect(csv).toContain('Edit,75');
+	});
+});
+
+describe('generateUsageCsv — currency conversion', () => {
+	const eurOptions: CsvCurrencyOptions = { currency: 'EUR', exchangeRate: 0.92 };
+
+	it('uses currency code in cost headers when options provided', () => {
+		const csv = generateUsageCsv(createTestData(), eurOptions);
+		expect(csv).toContain('Cost (EUR)');
+		expect(csv).not.toContain('Cost (USD)');
+	});
+
+	it('converts summary total cost', () => {
+		const csv = generateUsageCsv(createTestData(), eurOptions);
+		expect(csv).toContain('Total Cost,39.10');
+	});
+
+	it('converts daily cost values', () => {
+		const csv = generateUsageCsv(createTestData(), eurOptions);
+		expect(csv).toContain('2026-05-01,9.31,5');
+	});
+
+	it('converts activity breakdown cost values', () => {
+		const csv = generateUsageCsv(createTestData(), eurOptions);
+		expect(csv).toContain('coding,23.00,100,80.50');
+	});
+
+	it('converts top session cost values', () => {
+		const csv = generateUsageCsv(createTestData(), eurOptions);
+		expect(csv).toContain('11.35');
+	});
+
+	it('produces original USD output without currency options', () => {
+		const csv = generateUsageCsv(createTestData());
+		expect(csv).toContain('Cost (USD)');
+		expect(csv).toContain('42.50');
 	});
 });

@@ -25,6 +25,7 @@
 		labelFormatter = defaultFormatter,
 		labelClassName,
 		formatter,
+		valueFormatter,
 		nameKey,
 		color,
 		...restProps
@@ -49,6 +50,7 @@
 				},
 			]
 		>;
+		valueFormatter?: (value: number) => string;
 	} = $props();
 
 	const chart = useChart();
@@ -185,7 +187,9 @@
 							</div>
 							{#if item.value !== undefined}
 								<span class="text-foreground font-mono font-medium tabular-nums">
-									{item.value.toLocaleString()}
+									{valueFormatter !== undefined
+										? valueFormatter(Number(item.value))
+										: item.value.toLocaleString()}
 								</span>
 							{/if}
 						</div>

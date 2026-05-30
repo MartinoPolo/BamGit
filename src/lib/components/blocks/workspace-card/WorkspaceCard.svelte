@@ -33,6 +33,8 @@
 	interface Props {
 		workspace: OverviewWorkspaceData;
 		footerContent?: OverviewFooterContent;
+		currency?: string;
+		exchangeRate?: number | null;
 		onclick: () => void;
 		onGithubClick?: () => void;
 		onFolderClick?: () => void;
@@ -49,6 +51,8 @@
 	let {
 		workspace,
 		footerContent = OVERVIEW_FOOTER_CONTENT_DEFAULT,
+		currency,
+		exchangeRate,
 		onclick,
 		onGithubClick,
 		onFolderClick,
@@ -355,6 +359,8 @@
 							period="today"
 							scope="workspace"
 							size="sm"
+							{currency}
+							{exchangeRate}
 						/>
 					{:else if footerContent === 'cost-week'}
 						week <CostLink
@@ -362,6 +368,8 @@
 							period="week"
 							scope="workspace"
 							size="sm"
+							{currency}
+							{exchangeRate}
 						/>
 					{:else if footerContent === 'cost-total'}
 						total <CostLink
@@ -369,6 +377,8 @@
 							period="all"
 							scope="workspace"
 							size="sm"
+							{currency}
+							{exchangeRate}
 						/>
 					{:else if footerContent === 'sessions'}
 						<UserIcon class="size-3" />

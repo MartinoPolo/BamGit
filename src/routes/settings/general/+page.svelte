@@ -10,8 +10,10 @@
 	import { Tabs, Tab } from '$lib/components/shadcn/tabs/index.js';
 	import { Button } from '$lib/components/shadcn/button/index.js';
 	import { Separator } from '$lib/components/shadcn/separator/index.js';
+	import { Root as Select } from '$lib/components/shadcn/select/index.js';
 	import ColorThemePicker from '$lib/components/derived/color-theme-picker/ColorThemePicker.svelte';
 	import { CHART_COLOR_THEME_OPTIONS } from '$lib/modules/usage/usage_types.js';
+	import { CURRENCY_SELECT_OPTIONS } from '$lib/modules/usage/currency.js';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import UploadIcon from '@lucide/svelte/icons/upload';
 
@@ -25,6 +27,7 @@
 
 	const currentStartup = $derived(settings.get('startupBehavior'));
 	const currentChartTheme = $derived(settings.get('chartColorTheme'));
+	const currentCurrency = $derived(settings.get('displayCurrency'));
 
 	async function handleExport() {
 		try {
@@ -150,6 +153,27 @@
 			onchange={(value) => void settings.set('chartColorTheme', value)}
 			triggerLabel="Chart theme"
 		/>
+	</section>
+
+	<section class="flex flex-col gap-4">
+		<div>
+			<h2 class="text-lg font-medium">Display Currency</h2>
+			<p class="mt-1 text-sm text-muted-foreground">
+				Currency used to display costs across the app.
+			</p>
+		</div>
+		<Select
+			value={currentCurrency}
+			onchange={(event) => {
+				const target = event.currentTarget as HTMLSelectElement;
+				void settings.set('displayCurrency', target.value);
+			}}
+			class="w-64"
+		>
+			{#each CURRENCY_SELECT_OPTIONS as option (option.value)}
+				<option value={option.value}>{option.label}</option>
+			{/each}
+		</Select>
 	</section>
 
 	<Separator />

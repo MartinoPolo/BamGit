@@ -3,7 +3,8 @@
 	import { resolve } from '$app/paths';
 	import { SimpleTooltip } from '$lib/components/shadcn/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
-	import { getCostMagnitude, formatCostDisplay, type CostMagnitude } from './cost_link_utils.js';
+	import { getCostMagnitude, type CostMagnitude } from './cost_link_utils.js';
+	import { formatCostWithFallback } from '$lib/modules/usage/currency.js';
 	import type { MetricsPeriod, UsageScope } from '$lib/modules/usage/usage_types.js';
 	import { serializeUsageToParams } from '$lib/modules/usage/url_state.js';
 
@@ -13,6 +14,8 @@
 		scope?: UsageScope;
 		size?: 'sm' | 'md';
 		disabled?: boolean;
+		currency?: string;
+		exchangeRate?: number | null;
 		class?: string;
 	}
 
@@ -22,11 +25,15 @@
 		scope = 'workspace',
 		size = 'md',
 		disabled = false,
+		currency,
+		exchangeRate,
 		class: className,
 	}: Props = $props();
 
 	const magnitude: CostMagnitude = $derived(getCostMagnitude(costUsd));
-	const displayValue: string = $derived(formatCostDisplay(costUsd));
+	const displayValue: string = $derived(
+		formatCostWithFallback(costUsd, currency ?? 'USD', exchangeRate ?? null),
+	);
 
 	const usageHref: string = $derived.by(() => {
 		const params = serializeUsageToParams({
